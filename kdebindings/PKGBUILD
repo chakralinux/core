@@ -1,0 +1,179 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+
+
+# original name (used for the source and pkgnames)
+_origname=kdebindings
+_ARCHITECTURE="$_arch"
+
+
+#
+# package info
+#
+pkgbase=('kdebindings')
+pkgname=('kdebindings-common'
+	 'kdebindings-csharp'
+         'kdebindings-python'
+	 'kdebindings-ruby')
+
+          # disabled:
+          # kdebindings-java
+          # kdebindings-php
+
+
+arch=('i686' 'x86_64')
+pkgver=${_kdever}
+pkgrel=1
+
+pkgdesc="split package"
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+
+install=${_origname}.install
+options=('docs' '!splithdr')
+
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt' "kdepim-runtime>=${_kdever}"
+             'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}")
+
+source=($_mirror/${_origname}-$_kdever.tar.bz2)
+md5sums=('e6cce39fb0f78b589914678588ce5063') # kdebindings-4.4.3.tar.bz2
+
+
+#
+# build function
+#
+build()
+{
+	cd ${srcdir}/${_origname}-${pkgver}
+	#fix ruby
+	for f in `find ruby -name CMakeLists.txt`; do
+		sed -i "s|\${RUBY_INCLUDE_PATH}|\${RUBY_INCLUDE_PATH} /usr/include/ruby-1.9.1/${_ARCHITECTURE}-linux|" "${f}"
+	done
+
+	msg "starting build ..."
+	export JAVA_HOME=/opt/java
+  	export MAKEFLAGS="-j1"
+	export MONO_SHARED_DIR=${srcdir}/.wabi
+	mkdir -p "${MONO_SHARED_DIR}"
+
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+                -DBUILD_java=OFF \
+                -DBUILD_php=OFF \
+                -DBUILD_falcon=OFF \
+                -DENABLE_KROSSRUBY=OFF \
+                -DWITH_PolkitQt=OFF
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+
+	make || return 1
+}
+
+
+
+#
+# split-install functions
+#
+package_kdebindings-common()
+{
+	pkgdesc="KDE Bindings - Common files and libraries"
+	depends=("kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}" 'qscintilla' 'qimageblitz')
+	replaces=('kdebindings-common-devel')
+	conflicts=("kdemod-${_origname}")
+	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
+
+	splitdirs="smoke"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+
+	# include our patches into the package
+	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+	if [ "$?" = "0" ]; then
+		warning "incuding patches into package"
+		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+		for i in ${startdir}/*.patch; do
+			msg "$i"
+			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+		done
+	else
+		warning "no patches found, skipping to include them into the package..."
+	fi
+}
+
+package_kdebindings-csharp()
+{
+	pkgdesc="KDE Bindings - C#"
+	depends=("${_origname}-common>=${_kdever}" 'mono')
+	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
+	conflicts=("kdemod-${_origname}-chsharp=${_kdever}")
+
+	splitdirs="csharp"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdebindings-java()
+{
+	pkgdesc="KDE Bindings - Java"
+	depends=("${_origname}-common>=${_kdever}")
+	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
+	conflicts=("kdemod-${_origname}-java=${_kdever}")
+
+	splitdirs="java"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdebindings-php()
+{
+	pkgdesc="KDE Bindings - PHP"
+	depends=("${_origname}-common>=${_kdever}")
+	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
+	conflicts=("kdemod-${_origname}-php=${_kdever}")
+
+	splitdirs="php"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdebindings-python()
+{
+	pkgdesc="KDE Bindings - Python"
+	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}" 'pyqt' "kdepim-runtime>=${_kdever}")
+	conflicts=("kdemod-${_origname}-python=${_kdever}")
+	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
+
+	splitdirs="python"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdebindings-ruby()
+{
+	pkgdesc="KDE Bindings - Ruby"
+	depends=("${_origname}-common>=${_kdever}" 'ruby')
+	conflicts=("kdemod-${_origname}-ruby=${_kdever}")
+	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
+
+	splitdirs="ruby"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}

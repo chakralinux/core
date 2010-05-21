@@ -1,0 +1,237 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+
+
+# original name (used for the source and pkgnames)
+_origname=kdegraphics
+
+
+
+#
+# package info
+#
+pkgbase=('kdegraphics')
+pkgname=('kdegraphics-common'
+         'kdegraphics-doc'
+         'kdegraphics-gwenview'
+         'kdegraphics-kamera'
+         'kdegraphics-kcolorchooser'
+         'kdegraphics-kolourpaint'
+         'kdegraphics-kruler'
+         'kdegraphics-ksnapshot'
+         'kdegraphics-okular')
+
+arch=('i686' 'x86_64')
+pkgver=${_kdever}
+pkgrel=1
+
+pkgdesc="split package"
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+
+options=('docs' '!splithdr')
+
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}"
+             'poppler-qt' 'libspectre' 'sane' 'chmlib' 'libdjvu' 'lcms' 'qca'
+             'qimageblitz' 'ebook-tools' 'libxxf86vm')
+
+source=("$_mirror/${_origname}-$_kdever.tar.bz2"
+        "fix-libjpeg8-compatibility.patch")
+
+md5sums=('bd95684c27a74fd7ca759896281916a9'  #  kdegraphics-4.4.3.tar.bz2
+         '492dc2dfe799ff81d55fcb488faf2860') #  fix-libjpeg8-compatibility.patch
+
+
+
+#
+# build function
+#
+build()
+{
+	cd ${srcdir}/${_origname}-${pkgver}
+	msg "apply patches ..."
+        # Fixed in 4.5, check before build 4.4.4
+        cd ${srcdir}/${pkgbase}-${pkgver}
+        patch -Np1 -i ${srcdir}/fix-libjpeg8-compatibility.patch || return 1
+
+	msg "starting build ..."
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+
+	make || return 1
+}
+
+
+
+#
+# split-install functions
+#
+package_kdegraphics-common()
+{
+	pkgdesc="KDE Graphics - Common files and libraries"
+	# note on libxxf86vm:
+	#       not detected by namcap because libgl depends on it
+	#       but nvidia providing libgl does not depend on libxxf86vm
+	depends=("kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'libxxf86vm' 'sane' 'lcms')
+	replaces=('kdegraphics-common-devel' 'libkexiv2' 'libkdcraw')
+	conflicts=("kdemod-${_origname}-common")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kgamma ksaneplugin libs strigi-analyzer svgpart thumbnailers"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+
+	# WORKAROUND -> install cmake modules
+	install -D -m644 $srcdir/${_origname}-${pkgver}/cmake/modules/FindKSane.cmake \
+		$pkgdir/usr/share/apps/cmake/modules/FindKSane.cmake
+
+	# include our patches into the package
+	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+	if [ "$?" = "0" ]; then
+		warning "incuding patches into package"
+		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+		for i in ${startdir}/*.patch; do
+			msg "$i"
+			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+		done
+	else
+		warning "no patches found, skipping to include them into the package..."
+	fi
+}
+
+package_kdegraphics-doc()
+{
+	pkgdesc="KDE Graphics - Documentation"
+	depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdemod-${_origname}-doc")
+	groups=("kde-complete" "${_origname}" "kde-doc" "kde-uninstall")
+
+	splitdirs="doc"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegraphics-gwenview()
+{
+	pkgdesc="A full-featured picture viewer and maniplator"
+	depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdemod-${_origname}-gwenview")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="gwenview"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegraphics-kamera()
+{
+	pkgdesc="Digital camera io_slave for Konqueror"
+	depends=("${_origname}-common>=${_kdever}" 'libgphoto2')
+	conflicts=("kdemod-${_origname}-kamera")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kamera"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegraphics-kcolorchooser()
+{
+	pkgdesc="A color value editor and a color picker"
+	depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdemod-${_origname}-kcolorchooser")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kcolorchooser"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegraphics-kolourpaint()
+{
+	pkgdesc="An easy-to-use paint program designed for everyday tasks like drawing simple diagrams,logos,icons and editing screenshots"
+	depends=("${_origname}-common>=${_kdever}" 'qimageblitz')
+	conflicts=("kdemod-${_origname}-kolourpaint")
+	groups=("kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kolourpaint"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegraphics-kruler()
+{
+	pkgdesc="A ruler in inch, centimeter and pixel to check distances on the screen"
+	depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdemod-${_origname}-kruler")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kruler"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegraphics-ksnapshot()
+{
+	pkgdesc="Make snapshots of the screen contents"
+	depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdemod-${_origname}-ksnapshot")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="ksnapshot"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegraphics-okular()
+{
+	pkgdesc="An all-purpose document viewer"
+	depends=("${_origname}-common>=${_kdever}" 'qimageblitz' 'poppler-qt'
+                 'chmlib' 'libdjvu' 'libspectre' 'ebook-tools')
+	conflicts=("kdemod-${_origname}-okular")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	replaces=('kdegraphics-okular-devel')
+	install=${_origname}.install
+
+	splitdirs="okular"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+
+	# WORKAROUND -> install cmake modules
+	install -D -m644 $srcdir/${_origname}-${pkgver}/cmake/modules/FindOkular.cmake \
+		$pkgdir/usr/share/apps/cmake/modules/FindOkular.cmake
+}

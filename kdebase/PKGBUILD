@@ -1,0 +1,212 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+
+
+# original name (used for the source and pkgnames)
+_origname=kdebase
+
+
+
+#
+# package info
+#
+pkgbase=('kdebase')
+pkgname=('kdebase'
+         'kdebase-doc'
+	 'kdebase-dolphin'
+	 'kdebase-konqueror'
+         'kdebase-konsole'
+         'kdebase-kwrite')
+
+arch=('i686' 'x86_64')
+pkgver=${_kdever}
+pkgrel=1
+
+pkgdesc="split package"
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+
+options=('docs' '!splithdr')
+
+makedepends=("kdebase-workspace>=${_kdever}" 'pkgconfig' 'cmake' 'automoc4' 'libraw1394' 'ruby' 'opencv')
+
+source=($_mirror/${_origname}-$_kdever.tar.bz2
+	http://kde-apps.org/CONTENT/content-files/99752-kde_cdemu-0.3.tar.gz
+	01_dolphin_add_toolbar_buttons.patch
+	02_dolphin_properties.patch
+	03_konsole_defaults.patch
+	04_konq_scan_nsplugins_at_startup.patch
+	feature_user-image-from-webcam.patch)
+
+md5sums=('034eaeaafc1fb0c48fc54336283891ce'
+         'f98c26deff86b32a26e0238896d49382' # 99752-kde_cdemu-0.3.tar.gz
+         '12d902dd5d090b146676231c5163bc4f' # 01_dolphin_add_toolbar_buttons.patch
+         '92a47ed820a541b34dd220e1da5649b7' # 02_dolphin_properties.patch
+         '8ab6f508a4e04517dd51ac3ab2eb01ef' # 03_konsole_defaults.patch
+         'a8dc0bddce464af5846ac722007e0b59' # 04_konq_scan_nsplugins_at_startup.patch
+         '52cfd4456f8ec830b8d49c8aaa40b539') # feature_user-image-from-webcam.patch
+
+
+
+#
+# build function
+#
+build()
+{
+	cd ${_origname}-${pkgver}
+
+	# branch update
+	if [ "$_branchupdate" = "yes" ] ; then
+		msg "applying branch update ..."
+		pushd apps &>/dev/null
+		patch -p0 -i $startdir/branch-update-r*.patch || return 1
+		popd &>/dev/null
+	else
+		warning "branch updates disabled ..."
+		warning "if you want to make use of it, run branch_updater.sh"
+		warning "and enable branch updates in _/buildsystem/kdemod.conf"
+	fi
+
+	msg "applying main patchset ..."
+	patch -Np1 -i ${startdir}/01_dolphin_add_toolbar_buttons.patch || return 1
+	patch -Np1 -i ${startdir}/02_dolphin_properties.patch || return 1
+	patch -Np1 -i ${startdir}/03_konsole_defaults.patch || return 1
+	patch -Np1 -i ${startdir}/04_konq_scan_nsplugins_at_startup.patch || return 1
+	patch -Np1 -i ${startdir}/feature_user-image-from-webcam.patch || return 1
+
+	msg "starting build ..."
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+
+	make || return 1
+}
+
+
+
+#
+# split-install functions
+#
+package_kdebase()
+{
+	pkgdesc="KDE Base Applications"
+	depends=("kdebase-runtime>=${_kdever}" 'libraw1394' 'opencv')
+	optdepends=("cdemu-client: Support transparent CD/DVD image mounting in KDE")
+	replaces=('kdebase-devel')
+	conflicts=("kdemod-${_origname}")
+	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kappfinder kdepasswd kdialog keditbookmarks kfind kinfocenter lib nsplugins plasma"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+		
+	# install cdemu frontend
+	cd ${srcdir}/kde_cdemu-0.3
+	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+	make
+	make DESTDIR=${pkgdir} install || return 1
+	
+	# we dont want the cdemu manager app. the service menu + devicenotifier is perfect already
+	rm -rf ${pkgdir}/usr/share/applications/kde4/kde_cdemu.desktop
+
+	# include our patches into the package
+	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+	if [ "$?" = "0" ]; then
+		warning "incuding patches into package"
+		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+		for i in ${startdir}/*.patch; do
+			msg "$i"
+			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+		done
+	else
+		warning "no patches found, skipping to include them into the package..."
+	fi
+}
+
+package_kdebase-doc()
+{
+	pkgdesc="KDE Base Applications - Documentation"
+	depends=("${_origname}>=${_kdever}")
+        groups=("kde-complete" "kde-uninstall" "kde-doc")
+
+	splitdirs="doc"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdebase-dolphin()
+{
+	pkgdesc="KDE Base Applications - Dolphin, the default KDE file manager"
+	depends=("${_origname}>=${_kdever}")
+	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
+	conflicts=("kdemod-${_origname}-dolphin")
+	install=${_origname}-dolphin.install
+
+	splitdirs="dolphin"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdebase-konqueror()
+{
+	pkgdesc="KDE Base Applications - Konqueror, the default KDE web browser"
+	depends=("${_origname}>=${_kdever}" "${_origname}-dolphin>=${_kdever}")
+	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
+	replaces=('kdebase-konqueror-devel')
+	conflicts=("kdemod-${_origname}-konqueror")
+	install=${_origname}-konqueror.install
+
+	splitdirs="konqueror"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdebase-konsole()
+{
+	pkgdesc="KDE Base Applications - Konsole, the default KDE terminal program"
+	depends=("${_origname}>=${_kdever}")
+	groups=("${_pkgprefix}" "complete" "minimal" "uninstall")
+	conflicts=("kdemod-${_origname}-konsole")
+	install=${_origname}-konsole.install
+
+	splitdirs="konsole"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdebase-kwrite()
+{
+	pkgdesc="KDE Base Applications - KWrite, a simple text editor"
+	depends=("${_origname}>=${_kdever}")
+	groups=("complete" "uninstall")
+	conflicts=("kdemod-${_origname}-kwrite")
+	install=${_origname}-kwrite.install
+
+	splitdirs="kwrite"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}

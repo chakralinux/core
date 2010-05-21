@@ -1,0 +1,40 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+
+
+#
+# package info
+#
+pkgname=arxin
+pkgver=20100210
+pkgrel=1
+pkgdesc="A graphical configurator for Arch Linux system settings."
+arch=('i686' 'x86_64')
+url="http://chakra-project.org/tools-arxin.html"
+license=('GPL')
+depends=('kdelibs' 'kdebindings-common' 'kdebindings-python')
+makedepends=('cmake')
+replaces=('arxin-svn')
+conflicts=('arxin-svn')
+groups=()
+source=()
+options=('!splithdr')
+
+groups=('kdemod' 'complete' 'uninstall' 'tools')
+
+install=tools-arxin.install
+
+#
+# build function
+#
+build()
+{
+        cp -rf ${startdir}/usr ${startdir}/pkg
+} 

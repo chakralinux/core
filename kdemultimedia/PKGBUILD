@@ -1,0 +1,236 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+
+
+# original name (used for the source and pkgnames)
+_origname=kdemultimedia
+
+
+
+#
+# package info
+#
+pkgbase=('kdemultimedia')
+pkgname=('kdemultimedia-common'
+         'kdemultimedia-doc'
+         'kdemultimedia-dragonplayer'
+         'kdemultimedia-juk'
+         'kdemultimedia-kmix'
+         'kdemultimedia-kscd'
+         'kdemultimedia-thumbnailers')
+
+arch=('i686' 'x86_64')
+pkgver=${_kdever}
+pkgrel=1
+
+pkgdesc="split package"
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+
+options=('docs' '!splithdr')
+
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}"
+             'tunepimp' 'cdparanoia' 'mplayer')
+
+source=($_mirror/${_origname}-$_kdever.tar.bz2
+	http://kenai.com/projects/kde-odf-thumbnail/downloads/download/1.0.0/kde-odf-thumbnail-1.0.0.tar.gz
+	http://kde-apps.org/CONTENT/content-files/107128-GimpResourcesThumbnailer-2.1.0.tar.gz
+	http://kde-apps.org/CONTENT/content-files/114885-AudioThumbs-0.1.tar.gz
+	mplayerthumbs-horizontal.patch
+	sprocket-large.png
+	sprocket-medium.png
+	sprocket-small.png)
+
+md5sums=('cb1648e560f523a1bac6caf5574854be' # kdemultimedia-4.4.3.tar.bz2
+         'edf694939f4b5d5e97c3fe2f91e7cec3' # kde-odf-thumbnail-1.0.0.tar.gz
+         '5e3022ddcf3876e07d4b9870e1806b48' # 107128-GimpResourcesThumbnailer-2.1.0.tar.gz
+         '07c3039ddf5e88ba0ab290570f43749d' # 114885-AudioThumbs-0.1.tar.gz
+         '00ff1e8a1e4c1e39e3d1146f1d08036c' # mplayerthumbs-horizontal.patch
+         '6eeba61989d0e6904fe2c18bb01a3775' # sprocket-large.png
+         'ebb3b4c68ee69e128faf5ef0b37aaeae' # sprocket-medium.png
+         '450cf7bf2ac02b1efe75156d9bb887f6') # sprocket-small.png
+
+
+#
+# build function
+#
+build()
+{
+	cd ${srcdir}/${_origname}-${pkgver}
+
+	msg "applying patches ..."
+	patch -Np1 -i ${srcdir}/mplayerthumbs-horizontal.patch || return 1
+
+	msg "starting build ..."
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+
+	make VERBOSE=1 || return 1
+
+	pushd $srcdir/OpenOfficeorgThumbnail-1.0.0
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+	popd
+
+	pushd $srcdir/GimpResourcesThumbnailer-2.1.0
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+	popd
+
+	pushd $srcdir/AudioThumbs-0.1
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+	popd
+}
+
+
+
+#
+# split-install functions
+#
+package_kdemultimedia-common()
+{
+	pkgdesc="KDE multimedia - Common files and libraries"
+	depends=("kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'flac' 'musicbrainz' 'cdparanoia')
+	replaces=('kdemultimedia-common-devel')
+	conflicts=("kdemod-${_origname}-common")
+	groups=("kde" "kde-complete" "kdemultimedia" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kioslave libkcddb libkcompactdisc strigi-analyzer"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+
+	# include our patches into the package
+	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+	if [ "$?" = "0" ]; then
+		warning "incuding patches into package"
+		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+		for i in ${startdir}/*.patch; do
+			msg "$i"
+			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+		done
+	else
+		warning "no patches found, skipping to include them into the package..."
+	fi
+}
+
+package_kdemultimedia-doc()
+{
+	pkgdesc="KDE multimedia - Documentation"
+	depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdemod-${_origname}-doc")
+	groups=("kde-complete" "${_origname}" "kde-doc" "kde-uninstall")
+
+	splitdirs="doc"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdemultimedia-dragonplayer()
+{
+	pkgdesc="Simple video player"
+	depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdemod-${_origname}-dragonplayer")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="dragonplayer"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdemultimedia-juk()
+{
+	pkgdesc="An audio player with music database"
+	depends=("${_origname}-common>=${_kdever}" 'tunepimp')
+	conflicts=("kdmeod-${_origname}-juk")
+	groups=("kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="juk"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdemultimedia-kmix()
+{
+	pkgdesc="Audio mixer"
+	depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdemod-${_origname}-kmix")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kmix"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdemultimedia-kscd()
+{
+	pkgdesc="Audio CD player"
+	depends=("${_origname}-common>=${_kdever}" 'musicbrainz')
+	conflicts=("kdemod-${_origname}-kscd")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kscd"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdemultimedia-thumbnailers()
+{
+	pkgdesc='Video Files (MPlayerThumbs)'
+	depends=("${_origname}-common>=${_kdever}" 'mplayer') 
+	provides=("${_origname}-mplayerthumbs=${_kdever}" 'mplayerthumbs')
+	conflicts=("kdemod-${_origname}-thumbnailers")
+	groups=("kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="mplayerthumbs"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+
+	install -D -m644 ${srcdir}/sprocket-large.png ${pkgdir}/usr/share/apps/videothumbnail/sprocket-large.png
+	install -D -m644 ${srcdir}/sprocket-medium.png ${pkgdir}/usr/share/apps/videothumbnail/sprocket-medium.png
+	install -D -m644 ${srcdir}/sprocket-small.png ${pkgdir}/usr/share/apps/videothumbnail/sprocket-small.png
+
+	cd $srcdir/OpenOfficeorgThumbnail-1.0.0
+	make DESTDIR=${pkgdir} install || return 1
+
+	cd $srcdir/GimpResourcesThumbnailer-2.1.0
+	make DESTDIR=${pkgdir} install || return 1
+
+	cd $srcdir/AudioThumbs-0.1
+	make DESTDIR=${pkgdir} install || return 1
+}

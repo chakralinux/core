@@ -1,0 +1,59 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+# original name
+_origname=KGRUBEditor
+
+
+
+#
+# package info
+#
+pkgname=kgrubeditor
+arch=('i686' 'x86_64')
+pkgver=0.8.5
+pkgrel=1
+
+pkgdesc="A KDE 4 GUI for GRUB"
+url="http://sourceforge.net/projects/${pkgname}"
+license=('GPL')
+
+conflicts=('qgrubeditor' 'kgrubeditor')
+
+depends=('grub' "kdelibs>=${_kdever}")
+
+makedepends=('cmake')
+options=('!splithdr')
+
+groups=('kdemod' 'kde-complete' 'kde-uninstall' 'kde-tools')
+
+install=tools-kgrubeditor.install
+
+source=(http://surfnet.dl.sourceforge.net/sourceforge/kgrubeditor/KGRUBEditor-0.8.5-src.tar.bz2)
+md5sums=('c6d1fb21989f403276103887f344fdf3') # KGRUBEditor-0.8.5-src.tar.bz2
+
+
+#
+# build function
+#
+build()
+{
+	cd $startdir/src/kgrubeditor-0.8.5
+	mkdir -p build/
+	cd build/
+
+	cmake -DCMAKE_INSTALL_PREFIX=${_installprefix} -DCMAKE_BUILD_TYPE=${_build_type} ..
+
+	make || return 1
+	make DESTDIR=${pkgdir} install
+
+	# show in systemsettings only
+	rm -rf ${pkgdir}/usr/share/applications/kde4/kgrubeditor_app.desktop
+	rm -rf ${pkgdir}/usr/share/applications/kgrubeditor_app.desktop
+}

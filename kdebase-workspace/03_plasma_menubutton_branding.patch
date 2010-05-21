@@ -1,0 +1,47 @@
+diff -Naur kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/applet/applet.cpp kdebase-workspace-4.3.90/plasma/desktop/applets/kickoff/applet/applet.cpp
+--- kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/applet/applet.cpp	2010-01-07 21:21:45.000000000 +0100
++++ kdebase-workspace-4.3.90/plasma/desktop/applets/kickoff/applet/applet.cpp	2010-01-09 14:41:52.000000000 +0100
+@@ -27,6 +27,7 @@
+ #include <QtGui/QVBoxLayout>
+ #include <QtGui/QLabel>
+ #include <QtGui/QGraphicsLinearLayout>
++#include <QFile>
+ 
+ // KDE
+ #include <KIcon>
+@@ -103,7 +104,10 @@
+ void LauncherApplet::init()
+ {
+     KConfigGroup cg = config();
+-    setPopupIcon(cg.readEntry("icon", "start-here-kde"));
++    if (QFile::exists("/usr/share/icons/oxygen/scalable/places/start-here-branding.svgz"))
++      setPopupIcon(cg.readEntry("icon", "start-here-branding"));
++    else
++      setPopupIcon(cg.readEntry("icon", "start-here-kde"));
+ 
+     if (KService::serviceByStorageId("kde4-kmenuedit.desktop")) {
+         QAction* menueditor = new QAction(i18n("Menu Editor"), this);
+diff -Naur kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp kdebase-workspace-4.3.90/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp
+--- kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp	2010-01-07 21:21:45.000000000 +0100
++++ kdebase-workspace-4.3.90/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp	2010-01-09 14:46:21.000000000 +0100
+@@ -36,6 +36,7 @@
+ #include <QtGui/QSpacerItem>
+ #include <QtGui/QListWidget>
+ #include <QtGui/QListWidgetItem>
++#include <QFile>
+ 
+ // KDE Libs
+ #include <KActionCollection>
+@@ -290,7 +291,11 @@
+             d->viewtypes << "RunCommand";
+         }
+         d->viewtypes << "Leave";
+-        d->iconname = "start-here-kde";
++        if (QFile::exists("/usr/share/icons/oxygen/scalable/places/start-here-branding.svgz"))
++            d->iconname = "start-here-branding";
++        else
++            d->iconname = "start-here-kde";
++	
+     } else {
+         d->viewtypes << "Applications";
+         d->relativePath = args.value(0).toString();

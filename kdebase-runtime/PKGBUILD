@@ -1,0 +1,154 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+
+
+# original name (used for the source and pkgnames)
+_origname=kdebase-runtime
+
+
+
+#
+# package info
+#
+pkgbase=('kdebase')
+pkgname=('kdebase-runtime'
+         'kdebase-runtime-doc')
+        
+arch=('i686' 'x86_64')
+pkgver=${_kdever}
+pkgrel=1
+
+pkgdesc="split package"
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+
+options=('docs')
+
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdepimlibs>=${_kdever}" 'openslp'
+             'xine-lib')
+
+groups=('kde' 'kde-complete')
+
+noextract=(branding.svgz)
+
+source=($_mirror/${_origname}-$_kdever.tar.bz2
+	branding.svgz
+	01_knetattach_use_sftp.patch
+	02_oxygenify_knetattach_icon.patch
+	03_disable_logout_sound.patch
+	04_disable_nepomuk_popups.patch)
+
+md5sums=('3d5ad5eb5eeef2656cab860ae9f7c079' #  kdebase-runtime-4.4.3.tar.bz2
+        '68cd8eb57db22c2f2ed554b721253bc2' #  branding.svgz
+        '45fa12b8baf21c4fc845147afcea2bc1' #  01_knetattach_use_sftp.patch
+        '1f0225f31d5f44e753e966fd3a032f00' #  02_oxygenify_knetattach_icon.patch
+        'a434bf282ee391b2f857184be59a3b6f' #  03_disable_logout_sound.patch
+        'a3c844d7bbd9a31f39b1b877ae521340') #  04_disable_nepomuk_popups.patch
+
+
+
+#
+# build function
+#
+build()
+{
+	cd ${_origname}-${pkgver}
+
+	# branch update
+	if [ "$_branchupdate" = "yes" ] ; then
+		msg "applying branch update ..."
+		patch -p0 -i $startdir/branch-update-r*.patch || return 1
+	else
+		warning "branch updates disabled ..."
+		warning "if you want to make use of it, run branch_updater.sh"
+		warning "and enable branch updates in _/buildsystem/kdemod.conf"
+	fi
+	
+	msg "applying main patchset ..."
+	#patch -Np1 -i ${srcdir}/01_knetattach_use_sftp.patch || return 1
+	patch -Np1 -i ${srcdir}/02_oxygenify_knetattach_icon.patch || return 1
+	patch -Np1 -i ${srcdir}/03_disable_logout_sound.patch || return 1
+	patch -Np1 -i ${srcdir}/04_disable_nepomuk_popups.patch || return 1
+
+	# copy our branding stuff
+	cp -f ${srcdir}/branding.svgz ${srcdir}/${_origname}-${pkgver}/desktoptheme/oxygen/widgets/
+	cp -f ${srcdir}/branding.svgz ${srcdir}/${_origname}-${pkgver}/desktoptheme/air/widgets/
+
+	msg "starting build ..."
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DWITH_PulseAudio=OFF \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+
+	make || return 1
+}
+
+
+
+#
+# split-install functions
+#
+package_kdebase-runtime()
+{
+	pkgdesc="KDE Base Runtime"
+	depends=("kdelibs>=${_kdever}" 'oxygen-icons' 'xorg-xauth' 'hicolor-icon-theme'
+		 'smbclient' 'rarian' 'libssh')
+	optdepends=('htdig: to build the search index' 'gdb: drkonq crash handler')
+	conflicts=("kdemod-${_origname}")
+	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
+	install=${_origname}.install
+
+	cd ${srcdir}/${_origname}-${pkgver}/
+	make DESTDIR=${pkgdir} install || return 1
+
+	# also in kdebase-runtime-doc
+	rm -rf ${pkgdir}/usr/share/man
+	rm -rf ${pkgdir}/usr/share/doc
+
+	# put kdesu into the path
+	cp ${pkgdir}/usr/lib/kde4/libexec/kdesu ${pkgdir}/usr/bin/kdesu
+
+	# use transparent panel svg's everywhere
+	for n in default oxygen; do
+		cp -f ${pkgdir}/usr/share/apps/desktoptheme/$n/widgets/panel-background.svgz ${pkgdir}/usr/share/apps/desktoptheme/$n/opaque/widgets/panel-background.svgz
+	done
+
+	# include our patches into the package
+	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+	if [ "$?" = "0" ]; then
+		warning "incuding patches into package"
+		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+		for i in ${startdir}/*.patch; do
+			msg "$i"
+			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+		done
+	else
+		warning "no patches found, skipping to include them into the package..."
+	fi
+	
+	# WORKAROUND, conflict with hicolor-icon-theme
+	rm -rf ${pkgdir}/usr/share/icons/hicolor/index.theme
+	rm -rf ${pkgdir}/usr/share/icons/default.kde4
+}
+
+package_kdebase-runtime-doc()
+{
+	pkgdesc="KDE Base Runtime - Documentation"
+	depends=("${_origname}>=${_kdever}")
+	groups=("kde-complete" "kde-uninstall" "kde-doc")
+
+	splitdirs="doc"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
