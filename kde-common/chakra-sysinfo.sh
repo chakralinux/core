@@ -85,19 +85,11 @@ get_data() {
 	echo "--------------------------------------------------------------------------------"
 	cat /etc/rc.conf|sed -e '/^DAEMONS/!d; s/.*(\([^)]*\))/\1/g' |xargs -n 5|awk -- '{ printf("%-15s %-15s %-15s %-15s %-15s\n", $1, $2, $3, $4, $5) }'
 
-
 	echo
 	echo
-	echo "KDEmod Packages"
+	echo "Chakra Packages"
 	echo "--------------------------------------------------------------------------------"
-	pacman -Qg kdemod-uninstall | sed "s/kdemod-uninstall //g"
-
-
-	echo
-	echo
-	echo "Arch Packages"
-	echo "--------------------------------------------------------------------------------"
-	pacman -Q | grep -v -e kdemod
+	pacman -Q
 
 
 	echo

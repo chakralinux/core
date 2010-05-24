@@ -10,7 +10,7 @@
 TempFLDR=~/.backitup
 Date=$(date +%g-%m-%d)
 
-KDEdir=".kdemod4"
+KDEdir=".kde4"
 
 
 if [ -d "$TempFLDR" ] ; then
@@ -323,7 +323,7 @@ done
 qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 26
 qdbus $DBUSREF setLabelText "Cleaning paths ..."
 pushd $TempFLDR/$KDEdir/share/config/
-find ./ -type f -exec sed -i "s/\/.kde4/\/.kdemod4/g" {} \;
+find ./ -type f -exec sed -i "s/\/.kdemod4/\/.kde4/g" {} \;
 popd
 
 qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 27

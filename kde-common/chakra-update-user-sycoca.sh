@@ -6,7 +6,7 @@ rebuild_user_config_cache() {
 
 		for victim in $current_users
 		do
-			if [ -d "/home/$victim/.kdemod4" ] ; then
+			if [ -d "/home/$victim/.kde4" ] ; then
 				echo -e  -n " > Rebuilding configuration cache for user: $victim ..."
 				pushd /home/$victim &> /dev/null
 				su -c kbuildsycoca4 $victim &> /dev/null
