@@ -1,0 +1,11 @@
+--- kdenetwork-4.4.3/kopete/protocols/jabber/googletalk/libjingle/talk/base/openssladapter.cc.orig	2010-05-22 20:00:39.741750290 +0200
++++ kdenetwork-4.4.3/kopete/protocols/jabber/googletalk/libjingle/talk/base/openssladapter.cc	2010-05-22 20:02:33.485071903 +0200
+@@ -648,7 +648,7 @@ OpenSSLAdapter::SSLPostConnectionCheck(S
+     int extension_nid = OBJ_obj2nid(X509_EXTENSION_get_object(extension));
+ 
+     if (extension_nid == NID_subject_alt_name) {
+-      X509V3_EXT_METHOD* meth = X509V3_EXT_get(extension);
++      X509V3_EXT_METHOD* meth = (X509V3_EXT_METHOD *) X509V3_EXT_get(extension);
+       if (!meth)
+         break;
+ 
