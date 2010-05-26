@@ -14,7 +14,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=('networkmanagement')
          
 arch=('i686' 'x86_64')
-pkgver=1129651
+pkgver=1130651
 #pkgver=1030904 # stable snapshot
 pkgrel=1
 
@@ -52,6 +52,7 @@ cd "$srcdir"
 			  -DDBUS_SYSTEM_POLICY_DIR=/etc/dbus-1/system.d \
 			  -DCMAKE_BUILD_TYPE=${_build_type} \
 			  -DCMAKE_SKIP_RPATH=ON \
+#			  -DINSTALL_KNM_AUTOSTART=ON \
 			  -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 	make || return 1
 	
