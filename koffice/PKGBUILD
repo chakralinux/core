@@ -1,0 +1,169 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgbase=koffice
+pkgname=('koffice-common'
+	'koffice-kounavail'
+	'koffice-kspread'
+	'koffice-karbon'
+	'koffice-kexi'
+	'koffice-kplato'
+	'koffice-kword'
+	'koffice-kchart'
+	'koffice-kformula'
+	'koffice-kpresenter'
+	'koffice-krita'
+        'koffice-doc')
+
+pkgver=2.2.0
+pkgrel=1
+arch=('i686' 'x86_64')
+url='http://koffice.kde.org'
+license=('GPL' 'LGPL' 'FDL')
+makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'eigen' \
+  'kdelibs' 'gsl' 'qca' 'lcms' 'glew' 'qimageblitz' \
+  'kdepimlibs' 'pstoedit' 'wv2' 'poppler-qt' 'libwpd' 'openexr' 'kdegraphics-common' 'sqlite3') # 'opengtl'
+groups=('koffice')
+source=("http://download.kde.org/unstable/${pkgbase}-${pkgver}/${pkgbase}-${pkgver}.tar.bz2")
+sha1sums=('274623699eb666730a0c8d92f81fb99680217345')
+	
+build() {
+	cd ${srcdir}/${pkgbase}-${pkgver}
+
+	# buildtime patch
+#  	patch -Np0 -i ${srcdir}/libpng14.patch || return 1
+#        patch -Np0 -i ${srcdir}/koffice-gcc45.patch || return 1	
+
+	cd ${srcdir}
+	mkdir build
+	cd build
+	cmake ../${pkgbase}-${pkgver} \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	make || return 1
+}
+
+package_koffice-common(){
+	pkgdesc="Common files for the KDE office suite"
+	depends=('kdelibs' 'kdepimlibs' 'qca' 'lcms')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+
+	splitdirs="interfaces plugins servicetypes libs templates filters pics tools"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/build/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_koffice-doc()
+{
+	pkgdesc="Documentation for the KDE office suite"
+	depends=("${pkgbase}-common>=${pkgver}")
+	conflicts=("kdemod-${pkgbase}-doc")
+	groups=("kde-complete" "${pkgbase}" "kde-doc" "kde-uninstall")
+
+	splitdirs="karbon kchart kexi kformula koffice kpresenter kspread thesaurus"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/build/doc/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_koffice-kexi(){
+        pkgdesc="Integrated data management application for the KDE office suite"
+        depends=('kdelibs' 'koffice-common' 'koffice-kspread' 'sqlite3')
+        cd ${srcdir}/build/kexi
+        make DESTDIR=${pkgdir} install
+}
+
+package_koffice-kounavail(){
+	pkgdesc="Kounavail for the KDE office suite"
+	depends=('kdelibs' 'koffice-common')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+        cd ${srcdir}/build/kounavail
+        make DESTDIR=${pkgdir} install
+}
+
+package_koffice-kspread(){
+	pkgdesc="Spreadsheet application for KDE"
+	depends=('hicolor-icon-theme' 'gsl' 'koffice-common' 'koffice-kchart')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+	install=koffice.install
+        cd ${srcdir}/build/kspread
+        make DESTDIR=${pkgdir} install
+}
+
+package_koffice-karbon(){
+	pkgdesc="Vector drawing application for KDE"
+	depends=('hicolor-icon-theme' 'koffice-common')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+	install=koffice.install
+        cd ${srcdir}/build/karbon
+        make DESTDIR=${pkgdir} install
+}
+
+package_koffice-kplato(){
+	pkgdesc="Project management application for KDE"
+	depends=('hicolor-icon-theme' 'koffice-common' 'kdepimlibs')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+	install=koffice.install
+        cd ${srcdir}/build/kplato
+        make DESTDIR=${pkgdir} install
+}
+
+package_koffice-kword(){
+	pkgdesc="Wordprocessor for KDE"
+	depends=('hicolor-icon-theme' 'koffice-common' 'koffice-kounavail')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+	install=koffice.install
+        cd ${srcdir}/build/kword
+        make DESTDIR=${pkgdir} install
+}
+
+
+package_koffice-kchart(){
+	pkgdesc="Charting tool for KDE"
+	depends=('hicolor-icon-theme' 'koffice-common')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+	install=koffice.install
+        cd ${srcdir}/build/kchart
+        make DESTDIR=${pkgdir} install
+}
+
+package_koffice-kformula(){
+	pkgdesc="Formula editor for KDE"
+	depends=('hicolor-icon-theme' 'koffice-common')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+	install=koffice.install
+        cd ${srcdir}/build/kformula
+        make DESTDIR=${pkgdir} install
+	# fix install
+	mkdir -p ${pkgdir}/usr/bin
+	cp -v kformula ${pkgdir}/usr/bin
+}
+
+package_koffice-kpresenter(){
+	pkgdesc="Presentation tool for KDE"
+	depends=('hicolor-icon-theme' 'koffice-common')
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+	install=koffice.install
+        cd ${srcdir}/build/kpresenter
+        make DESTDIR=${pkgdir} install
+}
+
+package_koffice-krita(){
+	pkgdesc="Graphics editor for KDE"
+	depends=('hicolor-icon-theme' 'glew' 'qimageblitz' 'koffice-common' \
+		'poppler-qt' 'shared-mime-info' 'openexr') # 'opengtl'
+	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
+	install=krita.install
+        cd ${srcdir}/build/krita
+        make DESTDIR=${pkgdir} install
+}

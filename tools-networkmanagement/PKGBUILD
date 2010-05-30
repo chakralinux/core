@@ -14,7 +14,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=('networkmanagement')
          
 arch=('i686' 'x86_64')
-pkgver=1130651
+pkgver=1131135
 #pkgver=1030904 # stable snapshot
 pkgrel=1
 
@@ -45,7 +45,6 @@ cd "$srcdir"
 	msg "SVN checkout done or server timeout"
 
 	mkdir -p $srcdir/build
-	mkdir -p $srcdir/split
 	cd $srcdir/build
 	
 	cmake ../networkmanagement -DCMAKE_INSTALL_PREFIX=${_installprefix} \
@@ -57,6 +56,9 @@ cd "$srcdir"
 	make || return 1
 	
 	make DESTDIR=${pkgdir} install || return 1
+
+	# remove knetworkmanager.desktop files
+	rm -vR ${pkgdir}/usr/share/applications
 
 	# workaround remove plasmoid files
 	#cd $srcdir/split
