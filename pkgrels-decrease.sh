@@ -205,7 +205,31 @@ MODE=`echo $1`
 
 # we take the repo name + the job/stage to reconstruct the variable name
 # in $repo_pkgs.cfg and echo its contents... damn, eval is evil ;)
-whattodo=($(eval echo "\${_build_${_cur_repo}_${MODE}[@]}"))
+	if [ "$_cur_repo" = "core" ] ; then
+	whattodo=($(eval echo "\${_build_core_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "core-testing" ] ; then
+	whattodo=($(eval echo "\${_build_core_testing_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "platform" ] ; then
+	whattodo=($(eval echo "\${_build_platform_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "platform-testing" ] ; then
+	whattodo=($(eval echo "\${_build_platform_testing_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "desktop" ] ; then
+	whattodo=($(eval echo "\${_build_desktop_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "desktop-testing" ] ; then
+	whattodo=($(eval echo "\${_build_desktop_testing_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "apps" ] ; then
+	whattodo=($(eval echo "\${_build_apps_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "apps-testing" ] ; then
+	whattodo=($(eval echo "\${_build_apps_testing_${MODE}[@]}"))
+
+	fi
 
 decrease_pkgrels
 

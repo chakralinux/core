@@ -44,12 +44,10 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
         'lisa.daemon'
-        "CVE-2010-1000.patch"
         "gcc45.patch")
 
-md5sums=('9e8e285aff018807fd5967806cebf083'  # kdenetwork-4.4.3.tar.bz2
+md5sums=('42619dc65cf8b8a6e483dff23a4a5127'  # kdenetwork-4.4.4.tar.bz2
          '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
-         '897ed3be9919e32f70abf1e85dfd3661'  # CVE-2010-1000.patch
          '8d509b4a541704606f9688bcd4e38a61') # gcc45.patch
 
 
@@ -60,13 +58,10 @@ md5sums=('9e8e285aff018807fd5967806cebf083'  # kdenetwork-4.4.3.tar.bz2
 #
 build()
 {
-	# fix build
-	#export CXXFLAGS="-march=i686 -mtune=generic -O2 -pipe -D__STDC_CONSTANT_MACROS"
-
 	cd ${srcdir}/${_origname}-${pkgver}
 
 	msg "applying patches ..."
-        patch -Np1 -i $startdir/CVE-2010-1000.patch || return 1
+	# this patch is not needed by ArchLinux - we just use an older gcc version
         patch -Np1 -i $startdir/gcc45.patch || return 1
 
 	msg "starting build ..."

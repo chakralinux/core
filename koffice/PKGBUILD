@@ -22,12 +22,12 @@ pkgname=('koffice-common'
         'koffice-doc')
 
 pkgver=2.2.0
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url='http://koffice.kde.org'
 license=('GPL' 'LGPL' 'FDL')
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'eigen' \
-  'kdelibs' 'gsl' 'qca' 'lcms' 'glew' 'qimageblitz' \
+  'kdelibs' 'gsl' 'qca' 'lcms' 'glew' 'qimageblitz' 'libgsf' \
   'kdepimlibs' 'pstoedit' 'wv2' 'poppler-qt' 'libwpd' 'openexr' 'kdegraphics-common' 'sqlite3') # 'opengtl'
 groups=('koffice')
 source=("http://download.kde.org/unstable/${pkgbase}-${pkgver}/${pkgbase}-${pkgver}.tar.bz2")
@@ -52,7 +52,7 @@ build() {
 
 package_koffice-common(){
 	pkgdesc="Common files for the KDE office suite"
-	depends=('kdelibs' 'kdepimlibs' 'qca' 'lcms')
+	depends=('kdelibs' 'kdepimlibs' 'qca' 'lcms' 'libgsf')
 	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
 
 	splitdirs="interfaces plugins servicetypes libs templates filters pics tools"
