@@ -28,7 +28,7 @@ pkgname=('kdenetwork-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -40,7 +40,7 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'qca-ossl' "kdebase-workspace>=${_kdever}" 
              "kdebase>=${_kdever}" 'libvncserver' 'libmsn'
              'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage'
-             'libgadu' 'telepathy-qt4')
+             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart-svn')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
         'lisa.daemon'
@@ -128,7 +128,7 @@ package_kdenetwork-doc()
 package_kdenetwork-kget()
 {
 	pkgdesc="Download manager"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca')
+	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart-svn')
 	conflicts=("kdemod-${_origname}-kget")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
@@ -144,7 +144,7 @@ package_kdenetwork-kopete()
 {
 	pkgdesc="Kopete, the instant messenger"
 	depends=("kdebase-runtime>=${_kdever}" "kdepimlibs>=${_kdever}"
-	         'qca-ossl' 'libotr' 'libmsn' 'libidn' 'qimageblitz' 'libxss' 'libv4l' 'libgadu')
+	         'qca-ossl' 'libotr' 'libmsn' 'libidn' 'qimageblitz' 'libxss' 'libv4l' 'libgadu' 'meanwhile' 'mediastreamer')
 	conflicts=("kdemod-${_origname}-kopete")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
 	replaces=('kdenetwork-kopete-devel')
