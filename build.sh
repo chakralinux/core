@@ -12,7 +12,9 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
-
+#
+# Desktop v.0.06.08
+# by Phil Miller
 #
 # setup
 #
@@ -122,7 +124,7 @@ build_it()
 # 				done
 # 				sudo pacman -Uf $_packages_to_install || exit 1
 
-				sudo pacman -U ../_repo/local/${module}-*.pkg.*
+				sudo pacman -U ../_repo/local/`echo ${module} | sed 's/supportpkg-//g'`-*.pkg.*
 			fi
 
 	popd &>/dev/null
