@@ -7,25 +7,25 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
 #
 # package info
 #
-pkgname=akabeicore
-pkgver=20100524
+pkgname=tribe-partitionmanager
+pkgver=20100606
 pkgrel=1
-pkgdesc="Akabei’s core library"
+pkgdesc="Tribe's partitionmanager"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('sqlite3' 'qt' 'libarchive')
-makedepends=('cmake')
-options=('!splithdr' 'splitdbg')
+depends=('kdebase-workspace' 'parted>=2.2' 'e2fsprogs' 'libatasmart')
+replaces=('kdemod-tribe-partitionmanager')
+makedepends=('cmake' 'automoc4' 'pkgconfig')
+conflicts=('kdemod-tribe-partitionmanager' 'chakra-libpartitionmanager')
+groups=('chakra-uninstall')
 
-groups=('kde-uninstall')
+_gitroot="git://gitorious.org/chakra/tribe-partitionmanager.git"
+_gitname="tribe-partitionmanager"
 
-_gitroot="git://git.chakra-project.org/akabei/akabeicore.git"
-_gitname="akabeicore"
 
 #
 # build function
@@ -36,10 +36,10 @@ build()
         msg "Connecting to GIT server...."
 
         if [ -d $_gitname ] ; then
-        cd $_gitname && git pull
+        cd $_gitname && git pull origin
         msg "The local files are updated."
         else
-	      git clone $_gitroot
+        git clone $_gitroot
         fi
         msg "GIT checkout done or server timeout"
         msg "Starting make..."
