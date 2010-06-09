@@ -69,10 +69,7 @@ build()
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_SKIP_RPATH=ON \
-		# FIXME: this is not tested yet, umbrello need -fno-var-tracking in x86_64 and GCC 4.5
-		[ "${CARCH}" = "i686" ]  && -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-		[ "${CARCH}" = "x86_64" ]  && -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed, -fno-var-tracking'	
-
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 	make || return 1
 }
 
