@@ -13,7 +13,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
-# Desktop v.0.06.08
+# Desktop v.0.06.20
 # by Phil Miller
 #
 # setup
@@ -38,7 +38,8 @@ current_repo="$_cur_repo"
 build_it()
 {
 	_mkpkg_flags=$1
-        [ -n "$MODE" ] || error "you need to specify a package list defined in _/buildsystem/${_cur_repo}-${_build_arch}-pkgs.conf\n -> ${_available_pkglists}"
+        [ -n "$MODE" ] || error "you need to specify a package list defined in _/buildscripts/${_cur_repo}-${_build_arch}-pkgs.conf\n -> 
+${_available_pkglists}" && exit
 
 	cd $_build_work
 
