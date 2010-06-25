@@ -13,7 +13,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
-# Desktop v.0.06.08
+# Desktop v.0.06.20
 # by Phil Miller
 #
 # setup
