@@ -30,7 +30,7 @@ pkgname=('kdegraphics-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -43,11 +43,9 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runti
              'qimageblitz' 'ebook-tools' 'libxxf86vm')
 
 source=("$_mirror/${_origname}-$_kdever.tar.bz2"
-        "fix-libjpeg8-compatibility.patch"
         "update-libkexiv2-libkipi-libdcraw.patch")
 
-md5sums=('4555d85bb1e302d085d14d2c4ad01323'  # kdegraphics-4.4.4.tar.bz2
-         '492dc2dfe799ff81d55fcb488faf2860'  # fix-libjpeg8-compatibility.patch
+md5sums=('e3a1bad9e37b82bd62be00797714f38d'  # kdegraphics-4.4.5.tar.bz2
          'd34f1ac582c1f48023d7e2ec3cf11e2b') # update-libkexiv2-libkipi-libdcraw.patch
 
 
@@ -61,7 +59,6 @@ build()
 	msg "apply patches ..."
         # Fixed in 4.5
         cd ${srcdir}/${pkgbase}-${pkgver}
-        patch -Np1 -i ${srcdir}/fix-libjpeg8-compatibility.patch || return 1
         patch -Np1 -i ${srcdir}/update-libkexiv2-libkipi-libdcraw.patch || return 1
 
 	msg "starting build ..."

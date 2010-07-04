@@ -40,7 +40,7 @@ depends=('polkit-kde' "kdepimlibs>=${_kdever}" "kdepim-runtime>=${_kdever}" "kde
          'libxdamage' 'xorg-utils' 'libxrandr')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'networkmanager' 'bluez' "kdebindings-python>=${_kdever}"
-             "kdebindings-ruby>=${_kdever}" 'google-gadgets-qt>=0.11.1' 'oxygen-icons')
+             "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje') # 'gpsd' 'google-gadgets-qt>=0.11.1'
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -69,10 +69,6 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 	# restart xserver on logout
 	fix_terminate-server.patch
 
-	# http://cvs.fedoraproject.org/viewvc//rpms/kdebase-workspace/devel/
-	# kdebindings-python is only a runtime dependency
-	fix_pykde4-only-runtime-dep.patch
-
 	# if kdm is not loaded, try to shutdown via consolekit
 	fix_ck-shutdown.patch
 
@@ -99,7 +95,7 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 
 	screensaver-sleep.patch)
 
-md5sums=('6ab7328b83caab34b802d7135290f983'  # kdebase-workspace-4.4.4.tar.bz2
+md5sums=('c2fba3b92ae82aa120ac159a3333db28' # kdebase-workspace-4.4.5.tar.bz2
         'f355a658d2e9267fdf4e8d8f88038bcf' # mishaaq-kcm_touchpad-00370b5.tar.gz
         'd4570491bcf9986d84aeb77c939090a9' # 114856-kcm_tablet-1.1.3.tar.gz
         'b60baabccbd302d00923e053db0dc0ae' # 117639-favorites-0.1.tar.bz2
@@ -114,14 +110,13 @@ md5sums=('6ab7328b83caab34b802d7135290f983'  # kdebase-workspace-4.4.4.tar.bz2
         'e2eb9d270fe0e93901b29256bdedd7e2' #  02_sane_env_and_shutdown_path.patch
         'df2e8fe56d5e7912ccd89232ee098da1' #  03_plasma_menubutton_branding.patch
         '522a294c09d88d3d722de3f39fd203c3' #  04_plasma_kickoff_url.patch
-        '192c0b3da6b4334bc3e7b7a3a34dc9db' #  05_plasma_desktop_defaults.patch
-        '5e57f92a9b0f5359678a3b5bb7c57184' #  06_kickoff_default_favourites.patch
+        '0aba9287f038d66afbf545c83a46fd19' #  05_plasma_desktop_defaults.patch
+        '0ee6e12bb9830b4248becb0442dc7e0c' #  06_kickoff_default_favourites.patch
         '89d96455c6a446ef59b0620d1b8606af' #  07_always_show_kickoff_subtext.patch
         '5eb9285268916492012151045bdebd26' #  09_enable_start-shutdown-scripts.patch
 
         'db2d8166f5ea80ecd291deb9c0e2bb71' #  fix_kdm-increase-xserver-timeout-bnc#462478.patch
         '814350c52c135d6f7bdada1e29223d38' #  fix_terminate-server.patch
-        '6febdfac9efb15b8f2c14aa3084b6efc' #  fix_pykde4-only-runtime-dep.patch
         '5d752cf39a28306438bb6d82db6e1696' #  fix_ck-shutdown.patch
         '58eefd448d84fa2c612e27c457c5df9f' #  fix_root-only-kcms.patch
 
@@ -165,7 +160,6 @@ build()
 	msg "applying fixes ..."
 	patch -Np0 -i ${srcdir}/fix_kdm-increase-xserver-timeout-bnc#462478.patch || return 1
 	patch -Np0 -i ${srcdir}/fix_terminate-server.patch || return 1
-	patch -Np1 -i ${srcdir}/fix_pykde4-only-runtime-dep.patch || return 1
 	patch -Np1 -i ${srcdir}/fix_ck-shutdown.patch || return 1
 	patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch || return 1
 
@@ -231,6 +225,7 @@ package_kdebase-workspace()
 {
 	pkgdesc="KDE Workspace"
 
+# FIXME don't find google-gadgets and gpsd can't be build cos of liblesstif
 # NOTE keep in sync with depends
 	depends=('polkit-kde' "kdepimlibs>=${_kdever}" "kdepim-runtime>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qimageblitz'
 	         'libxxf86misc' 'libxcomposite' 'libxss' 'lm_sensors' 'libxklavier' 'libxft' 'oxygen-icons' "xkit"
@@ -238,15 +233,15 @@ package_kdebase-workspace()
 
 	optdepends=("kdebindings-python : Python Support for Plasma"
 		    "kdeedu-marble      : Marble Wallpaper Plugin"
-		    "google-gadgets-qt  : Plasma Support for Google Gadgets"
+		    #"google-gadgets-qt  : Plasma Support for Google Gadgets"
                     "qedje              : Plasma Support for Edje Files"
-		    "gpsd               : Plasma geolocation support"
+		    #"gpsd               : Plasma geolocation support"
 		    "(open)ntp          : Time/Date sync support")
 
-	provides=("${_origname}=${_kdever}" "powerdevil" 'powerdevil' 'policykit-kde' 'policykit-kde' 'kcm_tablet=1.1.3')
-	replaces=('policykit-kde' 'policykit-kde' 'kdebase-workspace-devel' 'guidance-power-manager' 'policykit-kde')
+	provides=("${_origname}=${_kdever}" "powerdevil" 'powerdevil' 'kcm_tablet=1.1.3')
+	replaces=('kdebase-workspace-devel' 'guidance-power-manager')
 	
-	conflicts=("kdemod-${_origname}" "powerdevil" 'powerdevil' "kde-meta-${_origname}" 'kcm_tablet' 'guidance-power-manager' 'policykit-kde')
+	conflicts=("kdemod-${_origname}" "powerdevil" 'powerdevil' "kde-meta-${_origname}" 'kcm_tablet' 'guidance-power-manager')
 	groups=("kde" "kde-complete" "kde-uninstall" "kde-minimal")
 
 	backup=('usr/share/config/kdm/kdmrc'

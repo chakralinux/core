@@ -49,13 +49,14 @@ diff -Naur kdebase-workspace-4.3.90.orig/plasma/desktop/shell/desktopcorona.cpp 
 diff -Naur kdebase-workspace-4.3.90.orig/plasma/generic/applets/systemtray/ui/applet.cpp kdebase-workspace-4.3.90/plasma/generic/applets/systemtray/ui/applet.cpp
 --- kdebase-workspace-4.3.90.orig/plasma/generic/applets/systemtray/ui/applet.cpp	2010-01-06 18:00:20.000000000 +0100
 +++ kdebase-workspace-4.3.90/plasma/generic/applets/systemtray/ui/applet.cpp	2010-01-17 19:14:42.000000000 +0100
-@@ -744,20 +744,21 @@
- void Applet::addDefaultApplets()
- {
+@@ -713,21 +713,22 @@
+ 
+ 
      QStringList applets = s_manager->applets(this);
 -    if (!applets.contains("notifier")) {
 -        s_manager->addApplet("notifier", this);
 -    }
+-
 -    if (!applets.contains("battery")) {
 -        Plasma::DataEngineManager *engines = Plasma::DataEngineManager::self();
 -        Plasma::DataEngine *power = engines->loadEngine("powermanagement");
@@ -67,21 +68,22 @@ diff -Naur kdebase-workspace-4.3.90.orig/plasma/generic/applets/systemtray/ui/ap
 -        }
 -        engines->unloadEngine("powermanagement");
 -    }
-+//     oh bloody hack, we dont want them here
-+//     if (!applets.contains("notifier")) {
-+//         s_manager->addApplet("notifier", this);
-+//     }
-+//     if (!applets.contains("battery")) {
-+//         Plasma::DataEngineManager *engines = Plasma::DataEngineManager::self();
-+//         Plasma::DataEngine *power = engines->loadEngine("powermanagement");
-+//         if (power) {
-+//             const QStringList &batteries = power->query("Battery")["sources"].toStringList();
-+//             if (!batteries.isEmpty()) {
-+//                 s_manager->addApplet("battery", this);
-+//             }
-+//         }
-+//         engines->unloadEngine("powermanagement");
-+//     }
- }
++    //     oh bloody hack, we dont want them here
++    // if (!applets.contains("notifier")) {
++    //     s_manager->addApplet("notifier", this);
++    // }
++    //
++    //if (!applets.contains("battery")) {
++    //  Plasma::DataEngineManager *engines = Plasma::DataEngineManager::self();
++    //  Plasma::DataEngine *power = engines->loadEngine("powermanagement");
++    //  if (power) {
++    //      const QStringList &batteries = power->query("Battery")["sources"].toStringList();
++    //      if (!batteries.isEmpty()) {
++    //          s_manager->addApplet("battery", this);
++    //      }
++    //  }
++    //  engines->unloadEngine("powermanagement");
++    //}
  
- NotificationWidget *Applet::addNotification(Notification *notification)
+     config().writeEntry("DefaultAppletsAdded", true);
+     configChanged();
