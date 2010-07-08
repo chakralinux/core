@@ -1,9 +1,7 @@
-diff -U5 -r kdebase-workspace-4.3.75svn1048496/systemsettings/core/ModuleView.cpp kdebase-workspace-4.3.75svn1048496.rootprivs/systemsettings/core/ModuleView.cpp
---- kdebase-workspace-4.3.75svn1048496/systemsettings/core/ModuleView.cpp	2009-10-26 05:14:41.000000000 -0400
-+++ kdebase-workspace-4.3.75svn1048496.rootprivs/systemsettings/core/ModuleView.cpp	2009-11-21 06:07:10.000000000 -0500
-@@ -38,10 +38,11 @@
- #include <KMessageBox>
- #include <KCModuleInfo>
+diff -Npur kdebase-workspace-4.4.92/systemsettings/core/ModuleView.cpp.orig kdebase-workspace-4.4.92/systemsettings/core/ModuleView.cpp
+--- kdebase-workspace-4.4.92/systemsettings/core/ModuleView.cpp.orig 2010-07-07 19:10:09.000000000 +0200
++++ kdebase-workspace-4.4.92/systemsettings/core/ModuleView.cpp      2010-07-08 04:44:48.626089908 +0200
+@@ -41,6 +41,7 @@
  #include <KCModuleProxy>
  #include <KStandardGuiItem>
  #include <KDialogButtonBox>
@@ -11,14 +9,11 @@ diff -U5 -r kdebase-workspace-4.3.75svn1048496/systemsettings/core/ModuleView.cp
  #include <kauthaction.h>
  
  #include "MenuItem.h"
- 
- class ModuleView::Private {
-@@ -122,10 +123,36 @@
- {
-     if ( !menuItem ) {
+@@ -130,6 +131,32 @@ void ModuleView::loadModule( QModelIndex
+     if ( !menuItem.isValid() ) {
          return;
      }
- 
++    
 +    if ( menuItem->service()->property( "X-KDE-RootOnly", QVariant::Bool ).toBool() ) {
 +        QString kdesu = KStandardDirs::findExe( "kdesu" );
 +        QString cmd = menuItem->service()->exec().trimmed();
@@ -44,11 +39,6 @@ diff -U5 -r kdebase-workspace-4.3.75svn1048496/systemsettings/core/ModuleView.cp
 +
 +        return;
 +    }
-+
-     QList<KCModuleInfo*> modules;
-     if ( menuItem->children().empty() ) {
-         modules << &menuItem->item();
-     } else {
-         foreach ( MenuItem *child, menuItem->children() ) {
-Only in kdebase-workspace-4.3.75svn1048496.rootprivs/systemsettings/core: ModuleView.cpp.orig
-Only in kdebase-workspace-4.3.75svn1048496.rootprivs/systemsettings/core: ModuleView.cpp.rej
+ 
+     QList<QModelIndex> indexes;
+     for ( int done = 0; menuItem.model()->rowCount( menuItem ) > done; done = 1 + done ) {

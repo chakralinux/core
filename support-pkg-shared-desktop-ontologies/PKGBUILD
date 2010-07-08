@@ -1,0 +1,33 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=shared-desktop-ontologies
+pkgver=0.4
+pkgrel=1
+pkgdesc="Ontologies necessary for the Nepomuk semantic desktop"
+arch=('any')
+url="http://sourceforge.net/apps/trac/oscaf/"
+license=('GPL')
+makedepends=("cmake")
+source=("http://downloads.sourceforge.net/oscaf/$pkgname-$pkgver.tar.bz2")
+md5sums=('fa3b458501f08de178a35aaf82346e4f')
+
+build() {
+  cd ${srcdir}
+  mkdir build
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_INSTALL_PREFIX=/usr || return 1
+  make || return 1
+}
+
+package() {
+  cd ${srcdir}/build
+  make DESTDIR=${pkgdir} install
+}

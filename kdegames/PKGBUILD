@@ -72,7 +72,7 @@ options=('docs' '!splithdr')
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo')
 
 source=("$_mirror/${_origname}-$_kdever.tar.bz2")
-md5sums=('720bac51311730cfb36c6082bf85ec60') # kdegames-4.4.5.tar.bz2
+md5sums=('6c883651aba06cce7c4cef539595e66f') #  kdegames-4.4.92.tar.bz2
 
 
 
@@ -117,18 +117,18 @@ package_kdegames-common()
 		install -D -m644 $i $pkgdir/usr/share/apps/cmake/modules/$(basename $i)
 	done
 
-	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	# include our patches into the package
+#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdegames-doc()

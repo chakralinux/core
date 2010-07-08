@@ -57,7 +57,7 @@ build_it()
 					do_makedeps
 					do_deps
 
-                    ../makepkg -f $_mkpkg_flags || BUILD_BROKEN="1"
+                    ../makepkg -L -f $_mkpkg_flags || BUILD_BROKEN="1"
 
 					if [ "$BUILD_BROKEN" = "1" ] ; then
 						if [ "$_build_stop" = "1" ] ; then
@@ -73,7 +73,7 @@ build_it()
 						fi
 					fi
 				else
-                    ../makepkg -f $_mkpkg_flags || BUILD_BROKEN="1"
+                    ../makepkg -L -f $_mkpkg_flags || BUILD_BROKEN="1"
 
 					if [ "$BUILD_BROKEN" = "1" ] ; then
 						if [ "$_build_stop" = "1" ] ; then
@@ -133,7 +133,7 @@ build_it()
 	done
 
 	msg "removing debug packages ..."
-	sudo pacman -Rcs kdemod-debug --noconfirm &>/dev/null
+	sudo pacman -Rcs kde-debug --noconfirm &>/dev/null
 	echo " "
 	echo " "	
 

@@ -48,10 +48,10 @@ license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!splithdr')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' "kdebase-runtime>=${_kdever}" 
-             "kdepimlibs>=${_kdever}" 'subversion' "kdepim-runtime>=${_kdever}" "kdebindings-python>=${_kdever}")
+             "kdepimlibs>=${_kdever}" 'subversion' "kdebindings-python>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=('20453e07a3c5c60bcb0bb46a14f9fb18') # kdesdk-4.4.5.tar.bz2
+md5sums=('ddbc6b24e713b576a00a3dbbddcd567e') #  kdesdk-4.4.92.tar.bz2
 
 
 
@@ -92,18 +92,18 @@ package_kdesdk-common()
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
-	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	# include our patches into the package
+#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdesdk-doc()
@@ -185,7 +185,7 @@ package_kdesdk-lokalize()
 package_kdesdk-kbugbuster()
 {
 	pkgdesc="Frontend for the KDE bug tracker"
-	depends=("${_origname}-common>=${_kdever}" "kdepim-runtime>=${_kdever}")
+	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 	conflicts=("kdemod-${_origname}-kbugbuster")
 	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
 	install=${_origname}.install

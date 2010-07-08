@@ -35,12 +35,12 @@ license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!splithdr')
 
 # NOTE keep in sync with kdebase-workspace-depends
-depends=('polkit-kde' "kdepimlibs>=${_kdever}" "kdepim-runtime>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qimageblitz'
+depends=('polkit-kde' "kdepimlibs>=${_kdever}" 'qimageblitz'
          'libxxf86misc' 'libxcomposite' 'libxss' 'lm_sensors' 'libxklavier' 'libxft' 'oxygen-icons' "xkit"
-         'libxdamage' 'xorg-utils' 'libxrandr')
+         'libxdamage' 'xorg-utils' 'libxrandr') # "kdepim-runtime>=${_kdever}"
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'networkmanager' 'bluez' "kdebindings-python>=${_kdever}"
-             "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje') # 'gpsd' 'google-gadgets-qt>=0.11.1'
+             "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje') # 'gpsd' 'google-gadgets-qt>=0.11.1' "kdebase-runtime>=${_kdever}"
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -57,7 +57,7 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
         02_sane_env_and_shutdown_path.patch
         03_plasma_menubutton_branding.patch
         04_plasma_kickoff_url.patch
-	05_plasma_desktop_defaults.patch
+#	05_plasma_desktop_defaults.patch
 	06_kickoff_default_favourites.patch
 	07_always_show_kickoff_subtext.patch
 	09_enable_start-shutdown-scripts.patch
@@ -73,29 +73,29 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 	fix_ck-shutdown.patch
 
 	# "fix" some sytemsettings modules that need root access
-	fix_root-only-kcms.patch
+# FIXME	fix_root-only-kcms.patch
 
 	# experimental, software transparency for plasma panels
-	feature_plasma-transparent-panel-v4-rb#472.patch
+#	feature_plasma-transparent-panel-v4-rb#472.patch
 
 	# show osd for when setting the brightness
-	feature_brightness-osd.patch
+#	feature_brightness-osd.patch
 
 	# some nice tooltip for the battery applet
-	feature_battery-tooltip.patch
+#	feature_battery-tooltip.patch
 
 	# patch to allow enabling/disabling the notification history
-	feature_history-notifications-enable-disable-kde#119207.patch
+#	feature_history-notifications-enable-disable-kde#119207.patch
 
 	# smaller icons in plasma notifications:
 	# http://chakra-project.org/bbs/viewtopic.php?id=2193
-	feature_smaller-notification-icons.patch
+#	feature_smaller-notification-icons.patch
 
-	feature_kdm-plymouth.patch
+#	feature_kdm-plymouth.patch
 
 	screensaver-sleep.patch)
 
-md5sums=('c2fba3b92ae82aa120ac159a3333db28' # kdebase-workspace-4.4.5.tar.bz2
+md5sums=('8dc81a878fe23220bef7bf2d386779d9' #  kdebase-workspace-4.4.92.tar.bz2
         'f355a658d2e9267fdf4e8d8f88038bcf' # mishaaq-kcm_touchpad-00370b5.tar.gz
         'd4570491bcf9986d84aeb77c939090a9' # 114856-kcm_tablet-1.1.3.tar.gz
         'b60baabccbd302d00923e053db0dc0ae' # 117639-favorites-0.1.tar.bz2
@@ -108,9 +108,9 @@ md5sums=('c2fba3b92ae82aa120ac159a3333db28' # kdebase-workspace-4.4.5.tar.bz2
 
         '721e97031b62aee8914e8617e86f9235' #  01_kdm_zsh_profile.patch
         'e2eb9d270fe0e93901b29256bdedd7e2' #  02_sane_env_and_shutdown_path.patch
-        'df2e8fe56d5e7912ccd89232ee098da1' #  03_plasma_menubutton_branding.patch
+        '8e623bb5608025417ff9ed061e5a03f1' #  03_plasma_menubutton_branding.patch
         '522a294c09d88d3d722de3f39fd203c3' #  04_plasma_kickoff_url.patch
-        '0aba9287f038d66afbf545c83a46fd19' #  05_plasma_desktop_defaults.patch
+#        '0aba9287f038d66afbf545c83a46fd19' #  05_plasma_desktop_defaults.patch
         '0ee6e12bb9830b4248becb0442dc7e0c' #  06_kickoff_default_favourites.patch
         '89d96455c6a446ef59b0620d1b8606af' #  07_always_show_kickoff_subtext.patch
         '5eb9285268916492012151045bdebd26' #  09_enable_start-shutdown-scripts.patch
@@ -118,14 +118,14 @@ md5sums=('c2fba3b92ae82aa120ac159a3333db28' # kdebase-workspace-4.4.5.tar.bz2
         'db2d8166f5ea80ecd291deb9c0e2bb71' #  fix_kdm-increase-xserver-timeout-bnc#462478.patch
         '814350c52c135d6f7bdada1e29223d38' #  fix_terminate-server.patch
         '5d752cf39a28306438bb6d82db6e1696' #  fix_ck-shutdown.patch
-        '58eefd448d84fa2c612e27c457c5df9f' #  fix_root-only-kcms.patch
+# FIXME '6df4a57eb6b5b99df9ec21b76f07c027' #  fix_root-only-kcms.patch
 
-        '13c3203589143e9e2fc757c17375227a' #  feature_plasma-transparent-panel-v4-rb#472.patch
-        '7361012da217f9aeeca61f0e9956e1d0' #  feature_brightness-osd.patch
-        '894815a80f99a9a0dee1adbcda49b161' #  feature_battery-tooltip.patch
-        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
-        '99c4e25e79e75cc5e90c1b66172b1c32' #  feature_smaller-notification-icons.patch
-        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
+#        '13c3203589143e9e2fc757c17375227a' #  feature_plasma-transparent-panel-v4-rb#472.patch
+#        '7361012da217f9aeeca61f0e9956e1d0' #  feature_brightness-osd.patch
+#        '894815a80f99a9a0dee1adbcda49b161' #  feature_battery-tooltip.patch
+#        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
+#        '99c4e25e79e75cc5e90c1b66172b1c32' #  feature_smaller-notification-icons.patch
+#        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
         'bf36e9cc623c7c3da6668e560e29975c') #  screensaver-sleep.patch
 
 #
@@ -151,7 +151,7 @@ build()
 	patch -Np0 -i ${srcdir}/02_sane_env_and_shutdown_path.patch || return 1
 	patch -Np1 -i ${srcdir}/03_plasma_menubutton_branding.patch || return 1
 	patch -Np1 -i ${srcdir}/04_plasma_kickoff_url.patch || return 1
-	patch -Np1 -i ${srcdir}/05_plasma_desktop_defaults.patch || return 1
+#	patch -Np1 -i ${srcdir}/05_plasma_desktop_defaults.patch || return 1
 	patch -Np1 -i ${srcdir}/06_kickoff_default_favourites.patch || return 1
 	patch -Np1 -i ${srcdir}/07_always_show_kickoff_subtext.patch || return 1
 	patch -Np1 -i ${srcdir}/09_enable_start-shutdown-scripts.patch || return 1
@@ -161,15 +161,16 @@ build()
 	patch -Np0 -i ${srcdir}/fix_kdm-increase-xserver-timeout-bnc#462478.patch || return 1
 	patch -Np0 -i ${srcdir}/fix_terminate-server.patch || return 1
 	patch -Np1 -i ${srcdir}/fix_ck-shutdown.patch || return 1
-	patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch || return 1
+#	patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch || return 1
 
-	msg "applying feature patches ..."
- 	patch -Np1 -i ${srcdir}/feature_plasma-transparent-panel-v4-rb#472.patch || return 1
- 	patch -Np1 -i ${srcdir}/feature_brightness-osd.patch || return 1
- 	patch -Np1 -i ${srcdir}/feature_battery-tooltip.patch || return 1
- 	patch -Np1 -i ${srcdir}/feature_history-notifications-enable-disable-kde#119207.patch || return 1
- 	patch -Np0 -i ${srcdir}/feature_smaller-notification-icons.patch || return 1
- 	patch -Np1 -i ${srcdir}/feature_kdm-plymouth.patch || return 1
+# FIXME: update feature patches
+#	msg "applying feature patches ..."
+# 	patch -Np1 -i ${srcdir}/feature_plasma-transparent-panel-v4-rb#472.patch || return 1
+# 	patch -Np1 -i ${srcdir}/feature_brightness-osd.patch || return 1
+# 	patch -Np1 -i ${srcdir}/feature_battery-tooltip.patch || return 1
+# 	patch -Np1 -i ${srcdir}/feature_history-notifications-enable-disable-kde#119207.patch || return 1
+# 	patch -Np0 -i ${srcdir}/feature_smaller-notification-icons.patch || return 1
+# 	patch -Np1 -i ${srcdir}/feature_kdm-plymouth.patch || return 1
 
 	#msg "applying upstream patches ..."
 
@@ -227,9 +228,9 @@ package_kdebase-workspace()
 
 # FIXME don't find google-gadgets and gpsd can't be build cos of liblesstif
 # NOTE keep in sync with depends
-	depends=('polkit-kde' "kdepimlibs>=${_kdever}" "kdepim-runtime>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qimageblitz'
+	depends=('polkit-kde' "kdepimlibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qimageblitz'
 	         'libxxf86misc' 'libxcomposite' 'libxss' 'lm_sensors' 'libxklavier' 'libxft' 'oxygen-icons' "xkit"
-	         'libxdamage' 'xorg-utils' 'libxrandr')
+	         'libxdamage' 'xorg-utils' 'libxrandr') # "kdepim-runtime>=${_kdever}"
 
 	optdepends=("kdebindings-python : Python Support for Plasma"
 		    "kdeedu-marble      : Marble Wallpaper Plugin"

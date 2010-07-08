@@ -39,11 +39,11 @@ license=('GPL' 'LGPL' 'FDL')
 install=${_origname}.install
 options=('docs' '!splithdr')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt' "kdepim-runtime>=${_kdever}"
-             'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}")
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt'
+             'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=('57a56607069d1f80164015c641e127e5') # kdebindings-4.4.5.tar.bz2
+md5sums=('e49eaba1a05956fabd94c17f12053319') #  kdebindings-4.4.92.tar.bz2
 
 
 #
@@ -70,7 +70,6 @@ build()
                 -DBUILD_falcon=OFF \
                 -DENABLE_KROSSRUBY=OFF \
                 -DWITH_PolkitQt=OFF
-		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
 	make || return 1
 }
@@ -94,18 +93,17 @@ package_kdebindings-common()
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
-	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	# include our patches into the package
+#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdebindings-csharp()
@@ -153,7 +151,7 @@ package_kdebindings-php()
 package_kdebindings-python()
 {
 	pkgdesc="KDE Bindings - Python"
-	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}" 'pyqt' "kdepim-runtime>=${_kdever}")
+	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}" 'pyqt') # "kdepim-runtime>=${_kdever}"
 	conflicts=("kdemod-${_origname}-python=${_kdever}")
 	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
 
