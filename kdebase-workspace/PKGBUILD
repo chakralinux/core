@@ -26,7 +26,7 @@ pkgname=('kdebase-workspace'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1.1
+pkgrel=1.2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -76,7 +76,7 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 	fix_kdm_configdef.patch
 
 	# "fix" some sytemsettings modules that need root access
-# FIXME	fix_root-only-kcms.patch
+	fix_root-only-kcms.patch
 
 	# experimental, software transparency for plasma panels
 #	feature_plasma-transparent-panel-v4-rb#472.patch
@@ -122,7 +122,7 @@ md5sums=('8dc81a878fe23220bef7bf2d386779d9' #  kdebase-workspace-4.4.92.tar.bz2
         '814350c52c135d6f7bdada1e29223d38' #  fix_terminate-server.patch
         '5d752cf39a28306438bb6d82db6e1696' #  fix_ck-shutdown.patch
 	'97a5eb51e6f9d460f0d61bb322a1db5e' #  fix_kdm_configdef.patch
-# FIXME '6df4a57eb6b5b99df9ec21b76f07c027' #  fix_root-only-kcms.patch
+	'5f963f80a026f0600edae1b1c70411e5' #  fix_root-only-kcms.patch
 
 #        '13c3203589143e9e2fc757c17375227a' #  feature_plasma-transparent-panel-v4-rb#472.patch
 #        '7361012da217f9aeeca61f0e9956e1d0' #  feature_brightness-osd.patch
@@ -165,8 +165,8 @@ build()
 	patch -Np0 -i ${srcdir}/fix_kdm-increase-xserver-timeout-bnc#462478.patch || return 1
 	patch -Np0 -i ${srcdir}/fix_terminate-server.patch || return 1
 	patch -Np1 -i ${srcdir}/fix_ck-shutdown.patch || return 1
-	patch -p0 -N -i ${srcdir}/kdm_configdef.patch || return 1
-#	patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch || return 1
+	patch -p0 -N -i ${srcdir}/fix_kdm_configdef.patch || return 1
+	patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch || return 1
 
 # FIXME: update feature patches
 #	msg "applying feature patches ..."
