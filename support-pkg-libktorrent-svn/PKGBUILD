@@ -1,0 +1,39 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+pkgname=libktorrent-svn
+pkgver=1148625
+pkgrel=1
+pkgdesc="Library for KDE Bittorrent client."
+depends=('kdelibs')
+makedepends=('autoconf' 'perl' 'automoc4' 'cmake' 'kdepimlibs' 'kdebase-workspace')
+conflicts=('libktorrent')
+provides=('libktorrent')
+url=(http://ktorrent.org)
+license="GPL"
+arch=('i686' 'x86_64')
+ 
+_svntrunk=svn://anonsvn.kde.org/home/kde/trunk/extragear/network/libktorrent
+_svnmod=libktorrent
+ 
+build() {
+ cd $startdir/src
+ 
+ svn co $_svntrunk $_svnmod
+ 
+ msg "SVN checkout done or server timeout"
+ msg "Starting make..."
+ 
+ cp -r $_svnmod $_svnmod-build
+ cd $_svnmod-build
+ 
+ cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=DEB
+ 
+ make || return 1
+ make DESTDIR=$startdir/pkg install || return 1
+ 
+ rm -rf $startdir/src/$_svnmod-build
+}
