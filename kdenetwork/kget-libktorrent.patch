@@ -1,0 +1,25 @@
+--- branches/KDE/4.5/kdenetwork/kget/transfer-plugins/bittorrent/scandlg.h	2010/07/11 11:55:30	1148646
++++ branches/KDE/4.5/kdenetwork/kget/transfer-plugins/bittorrent/scandlg.h	2010/07/11 12:31:55	1148647
+@@ -58,6 +58,8 @@
+ 		 
+ 		/// Handle the close event
+ 		virtual void closeEvent(QCloseEvent* e);
++        
++        virtual void error(const QString&);
+ 
+ 	protected slots:
+ 		virtual void reject();
+--- branches/KDE/4.5/kdenetwork/kget/transfer-plugins/bittorrent/scandlg.cpp	2010/07/11 11:55:30	1148646
++++ branches/KDE/4.5/kdenetwork/kget/transfer-plugins/bittorrent/scandlg.cpp	2010/07/11 12:31:55	1148647
+@@ -157,6 +157,11 @@
+ 			KDialog::reject();
+ 		}
+ 	}
++	
++	void ScanDlg::error(const QString &message)
++    {
++        KMessageBox::error(0,i18n("Error scanning data: %1",message));
++    }
+ 		 
+ 	void ScanDlg::closeEvent(QCloseEvent* )
+ 	{

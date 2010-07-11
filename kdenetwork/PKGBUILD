@@ -28,7 +28,7 @@ pkgname=('kdenetwork-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=1.1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -40,15 +40,15 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'qca-ossl' "kdebase-workspace>=${_kdever}" 
              "kdebase>=${_kdever}" 'libvncserver' 'libmsn'
              'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage'
-             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart-svn')
+             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart-svn' 'libktorrent')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
-        'lisa.daemon')
-#        "gcc45.patch")
+        'lisa.daemon'
+        "kget-libktorrent.patch")
 
 md5sums=('b281a3957ca7ed799cca4f4dca666a5a'  # kdenetwork-4.4.92.tar.bz2
-         '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
-#         '8d509b4a541704606f9688bcd4e38a61') # gcc45.patch
+         '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
+         '2da8050eb20b8f3e45f3b1871df8fa74') # kget-libktorrent.patch
 
 
 
@@ -60,9 +60,8 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-#	msg "applying patches ..."
-#	# this patch is not needed by ArchLinux - we just use an older gcc version
-#        patch -Np1 -i $startdir/gcc45.patch || return 1
+	msg "applying patches ..."
+        patch -Np4 -i $startdir/kget-libktorrent.patch || return 1
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -128,7 +127,7 @@ package_kdenetwork-doc()
 package_kdenetwork-kget()
 {
 	pkgdesc="Download manager"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart-svn')
+	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart-svn'  'libktorrent')
 	conflicts=("kdemod-${_origname}-kget")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
