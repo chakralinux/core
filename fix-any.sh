@@ -36,6 +36,7 @@ sync_up()
 	# get new any-pkgs from selfnet
         title2 "getting any packages from selfnet"
 	cd _repo/local
+	rm -v *any.pkg*
 	wget -v ftp://mirror.selfnet.de/kdemod/newbase/$_cur_repo/i686/*any.pkg*
 	cd ../..
         
