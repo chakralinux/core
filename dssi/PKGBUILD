@@ -1,0 +1,32 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=dssi
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="An API for audio plugins, with particular application for software synthesis plugins with native user interfaces."
+arch=("i686" "x86_64")
+url="http://dssi.sourceforge.net/"
+license=('LGPL' 'BSD' 'custom')
+depends=('gcc-libs' 'liblo>=0.26' 'jack-audio-connection-kit' 'libsamplerate' 'libx11')
+makedepends=('ladspa' 'pkgconfig')
+options=('!libtool')
+source=(http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.gz
+	'LICENSE')
+md5sums=('bc4c50f9f9b3cd13019718266f8f15af'
+	'258ca4d0ca28c5c4d4675147621fac18')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+  . /etc/profile.d/qt3.sh
+  ./configure --prefix=/usr || return 1
+  make || return 1
+  make DESTDIR=$pkgdir install || return 1
+  install -D -m644 $srcdir/LICENSE $pkgdir/usr/share/licenses/$pkgname/LICENSE
+}
