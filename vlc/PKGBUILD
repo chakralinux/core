@@ -8,9 +8,9 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase=vlc
-pkgname=('vlc' 
+pkgname=('vlc'
          'vlc-plugin')
-pkgver=1.1.0
+pkgver=1.1.1
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.videolan.org/vlc/"
@@ -18,49 +18,35 @@ license=('GPL')
 makedepends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'lirc-utils'
              'libdca' 'qt' 'libproxy' 'sdl_image' 'libdvdnav' 'mesa'
              'lua' 'libv4l' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
-             'taglib' 'sysfsutils' 'libmpcdec' 'hal' 'ffmpeg'
+             'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2'
              'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug'
              'avahi' 'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'libxpm'
-             'xulrunner' 'pkgconfig' 'live-media' 'libnotify' 'libcdio')
-source=(http://download.videolan.org/pub/videolan/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2)
-md5sums=('e2142957137b183a5ad0a4827c39f655')
+             'xulrunner' 'pkgconfig' 'live-media' 'libnotify' 'libcdio'
+             'flac' 'libtheora' 'alsa-lib' 'jack' 'udev'
+             'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'chrpath')
+
+source=("http://download.videolan.org/pub/videolan/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2")
+md5sums=('7e177faa61450ce752b0fd89ecc81fed')
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
 
   sed -i -e 's:truetype/freefont:TTF:g' modules/misc/freetype.c
-  [ "${CARCH}" = "i686" ] && EXTRAFEATURES="--enable-loader --enable-live555 --with-live555-tree=/usr/lib/live"
-  [ "${CARCH}" = "x86_64" ] && EXTRAFEATURES="--enable-fast-install --enable-live555 --with-live555-tree=/usr/lib/live"
   ./configure --prefix=/usr \
-              --enable-libass \
-              --enable-dvdread \
-	      --enable-jack \
-              --enable-dvdnav \
               --disable-rpath \
-	      --enable-zvbi \
-              --enable-qt4 \
               --enable-faad \
-              --enable-alsa \
-              --enable-skins2 \
-              --enable-dvb \
               --enable-v4l \
-              --enable-theora \
-              --enable-flac \
               --enable-snapshot \
-              --enable-dbus \
-              --enable-ogg \
               --enable-dbus-control \
-              --enable-shared \
               --enable-nls \
               --enable-lirc \
-              --enable-shout \
               --enable-pvr \
               --enable-ncurses \
               --enable-mozilla \
-              --program-suffix= \
-              --enable-realrtsp ${EXTRAFEATURES} || return 1
+              --with-live555-tree=/usr/lib/live \
+              --enable-realrtsp
   CFLAGS="-fPIC"
-  make || return 1
+  make
 }
 
 package_vlc() {
@@ -68,25 +54,34 @@ package_vlc() {
   depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libcdio'
            'libdca' 'qt' 'libproxy' 'sdl_image' 'libdvdnav' 'mesa'
            'lua' 'libv4l' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
-           'taglib' 'sysfsutils' 'libmpcdec' 'hal' 'ffmpeg'
+           'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2'
            'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug'
            'avahi' 'ttf-freefont' 'libxv' 'libass' 'xdg-utils')
-  optdepends=('libnotify: for notification plugin' 
+  optdepends=('libnotify: for notification plugin'
               'ncurses: for ncurses interface support'
               'libdvdcss: for decoding encrypted DVDs'
-              'lirc-utils: for lirc plugin')
+              'lirc-utils: for lirc plugin'
+              'libavc1394: for devices using the 1394ta AV/C'
+              'libdc1394: for IEEE 1394 plugin'
+              'vdpau-video: VDPAU backend for VA API (for GPU acceleration on Nvidia cards)')
   options=('!libtool')
   install=vlc.install
   cd "${srcdir}/${pkgbase}-${pkgver}"
 
-  make DESTDIR=${pkgdir}/ install || return 1
-  
+  make DESTDIR=${pkgdir}/ install
+
+  for res in 16 32 48 128; do
+    install -D -m644 ${srcdir}/vlc-${pkgver}/share/icons/${res}x${res}/vlc.png \
+        ${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png
+  done
+
   rm -rf ${pkgdir}/usr/lib/mozilla
 }
 
 package_vlc-plugin() {
   pkgdesc="VLC mozilla browser plugin"
-  depends=("${pkgbase}=${pkgver}" 'nspr' 'xulrunner')
+  depends=("${pkgbase}=${pkgver}" 'nspr' 'xulrunner' 'libxpm')
   cd "${srcdir}/${pkgbase}-${pkgver}"
-  install -Dm755 projects/mozilla/.libs/libvlcplugin.so ${pkgdir}/usr/lib/mozilla/plugins/libvlcplugin.so || return 1
+  install -Dm755 projects/mozilla/.libs/libvlcplugin.so ${pkgdir}/usr/lib/mozilla/plugins/libvlcplugin.so
+  chrpath -d ${pkgdir}/usr/lib/mozilla/plugins/libvlcplugin.so
 }
