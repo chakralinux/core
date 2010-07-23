@@ -1,0 +1,25 @@
+# Contributor: Smith Dhumbumroong <zodmaner at gmail dot com>
+
+pkgname=unionfs-fuse
+pkgver=0.23
+pkgrel=2
+pkgdesc="unionfs-fuse is an effort to create a userland unionfs implementation that is way more flexible than the current in-kernel based unionfs solution."
+arch=('i686' 'x86_64')
+url="http://podgorny.cz/moin/UnionFsFuse"
+license=('custom')
+depends=('fuse')
+source=(http://podgorny.cz/unionfs-fuse/releases/$pkgname-$pkgver.tar.bz2)
+md5sums=('479f06c81c49c9c5b4340df44426c52a')
+
+build() {
+    mkdir -p $pkgdir/usr/sbin
+    mkdir -p $pkgdir/usr/share/man/man8
+
+    cd "$srcdir/$pkgname-$pkgver"
+
+    make || return 1
+    make DESTDIR="$pkgdir/usr" install
+    # install license
+    install -Dm644 $srcdir/$pkgname-$pkgver/LICENSE $pkgdir/usr/share/licenses/$pkgname/LICENSE
+}
+
