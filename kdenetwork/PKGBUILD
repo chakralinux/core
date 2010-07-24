@@ -28,7 +28,7 @@ pkgname=('kdenetwork-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1.1
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -46,7 +46,7 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2 \
         'lisa.daemon'
         "kget-libktorrent.patch")
 
-md5sums=('b281a3957ca7ed799cca4f4dca666a5a'  # kdenetwork-4.4.92.tar.bz2
+md5sums=('c4df72e6aa996f1f6ac6d391a7d4b2f4' # kdenetwork-4.4.95.tar.bz2
          '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
          '2da8050eb20b8f3e45f3b1871df8fa74') # kget-libktorrent.patch
 
@@ -60,8 +60,9 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-	msg "applying patches ..."
-        patch -Np4 -i $startdir/kget-libktorrent.patch || return 1
+	# Fixme: seems this patch it's not needed anymore
+	# msg "applying patches ..."
+        # patch -Np4 -i $startdir/kget-libktorrent.patch || return 1
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
