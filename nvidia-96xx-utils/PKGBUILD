@@ -3,7 +3,7 @@
 
 pkgname=nvidia-96xx-utils
 pkgver=96.43.16
-pkgrel=1
+pkgrel=2
 pkgdesc="NVIDIA drivers utilities and libraries, 96xx branch."
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86 	 
@@ -58,6 +58,10 @@ build() {
 	install -D -m644 $srcdir/NVIDIA-Linux-${ARCH}-${pkgver}-pkg0/usr/share/doc/README.txt $pkgdir/usr/share/doc/nvidia-96xx/README || return 1
 
 	find $pkgdir/usr -type d -exec chmod 755 {} \;
+
+	# Blacklist nouveau since 2.6.33
+	mkdir -p $pkgdir/etc/modprobe.d/ || return 1
+	echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf || return 1
 }
 
 
