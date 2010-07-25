@@ -43,12 +43,10 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart-svn' 'libktorrent')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
-        'lisa.daemon'
-        "kget-libktorrent.patch")
+        'lisa.daemon')
 
 md5sums=('c4df72e6aa996f1f6ac6d391a7d4b2f4' # kdenetwork-4.4.95.tar.bz2
-         '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
-         '2da8050eb20b8f3e45f3b1871df8fa74') # kget-libktorrent.patch
+         '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
 
 
 
@@ -60,9 +58,7 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-	# Fixme: seems this patch it's not needed anymore
 	# msg "applying patches ..."
-        # patch -Np4 -i $startdir/kget-libktorrent.patch || return 1
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
