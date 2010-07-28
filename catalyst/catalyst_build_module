@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# Find the kernel name inside the chroot
+kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
+arch=${ARCH:-$(uname -m)}
+arch=${arch/i686/i386}
+
+#patch_files(){
+#    file_patch="${kernver/-*}.patch"
+#    if [[ -f "${file_patch}" ]]; then
+#        patch -Np6 -i ${file_patch} || return 1
+#    fi
+#}
+
+install_module()
+{
+    workdir=$(mktemp -du /tmp/catalyst.XXXXXX)
+    set -x
+    cp "/usr/share/ati/build_mod" "${workdir}" -R
+    cd "$workdir"
+#    patch_files
+    make -C /lib/modules/${kernver}/build  \
+        SUBDIRS="`pwd`" ARCH=${arch} modules &>/dev/null || return 1
+
+    install -m755 -d "/lib/modules/${kernver}/video/"
+    install -m644 fglrx.ko "/lib/modules/${kernver}/video/" || return 1
+
+    depmod ${kernver}
+    rm -rf "${workdir}"
+    set +x
+}
+
+remove_module(){
+    for p in /lib/modules/*; do
+	if [ ! -d $p/kernel ]; then  #check if /lib/modules/p/kernel directory does NOT exist
+	  if [ -e $p/video/fglrx.ko ]; then
+	    echo "+ removing fglrx module from $p"
+	    rm "$p/video/fglrx.ko" &>/dev/null
+	    rmdir -p "$p/video/" --ignore-fail-on-non-empty &>/dev/null
+	  fi
+	  if [ -d $p ]; then   #check if /lib/modules/p exist
+	    if [ -z "$(ls $p)" ]; then   #check if /lib/modules/p is empty
+	      echo "+ removing empty directory: $p"
+	      rm -rf $p
+		else echo "- $p looks like unused, maybe remove it manualy?"
+	    fi
+	  fi
+	fi
+    done
+}
+
+remove_all_modules(){
+    for p in /lib/modules/*; do
+     if [ -e $p/video/fglrx.ko ]; then
+      echo "+ removing fglrx module from $p"
+      rm "$p/video/fglrx.ko" &>/dev/null
+      rmdir -p "$p/video/" --ignore-fail-on-non-empty &>/dev/null
+      depmod $(basename $p)
+     fi
+     if [ -d $p ]; then   #check if /lib/modules/p exist
+      if [ -z "$(ls $p)" ]; then   #check if /lib/modules/p is empty
+	echo "+ removing empty directory: $p"
+	rm -rf $p
+	elif [ ! -d $p/kernel ]; then
+	  echo "- $p looks like unused, maybe remove it manualy?"
+      fi
+     fi
+    done
+}
+
+
+case "$1" in
+    help|--help)
+        echo "usage: $0 {version|remove|remove_all}"
+        echo "- with no specified kernel version it will use the current kernel version to build module;"
+        echo "- remove is removing unused fglrx modules and all empty /lib/modules/* directories;"
+        echo "- remove_all is removing all fglrx modules and all empty /lib/modules/* directories."
+        ;;
+    remove)
+        remove_module
+        ;;
+    remove_all)
+        remove_all_modules
+        ;;
+    *)
+	echo "Building fglrx module ..."
+        test "$1" != "" && kernver="$1"
+        install_module && echo "Ok." || echo "Failed!!"
+        ;;
+esac
+
