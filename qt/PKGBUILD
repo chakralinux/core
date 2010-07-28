@@ -17,7 +17,7 @@ pkgname=('qt'
          'qt-tools')
 
 pkgver=4.6.3
-pkgrel=2
+pkgrel=3
 _kdeqt=0
 
 pkgdesc="A cross-platform application and UI framework"
@@ -66,24 +66,22 @@ source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
 	'enable-qt3support-debug-info.patch'
 	'enable-qtwebkit-debug-info.patch'
 	'qmake-linker-flags-as-needed.patch'
-	'ca-certificates.patch')
+	'ca-certificates.patch'
+	'flash-crash-backport.patch')
 
 
-md5sums=('5c69f16d452b0bb3d44bc3c10556c072
-20d333282c43f9e643cb8e91b6307dcc
-bf89ee0bdd178933f19d8bc4090173ec
-a9bfeeffab8ba103bc8153fdb31474a1
-83b2a4aece6c9d86301c53a979af0b63
-2f3bad0ad2941a0fd0ff5de5f9b828ec
-579e63488320a8d692d25502551787af
-bb99a4ad35f89b0a4f34795ba2ccc776
-9113f9964bdaeb59165b815cce503b4c
-c436732fc467271e8a3838145c122070
-d5c4cad7af93f1d736d4569a207bd739')
-
-
-
-
+md5sums=('5c69f16d452b0bb3d44bc3c10556c072'
+         '20d333282c43f9e643cb8e91b6307dcc'
+         'bf89ee0bdd178933f19d8bc4090173ec'
+         'a9bfeeffab8ba103bc8153fdb31474a1'
+         '83b2a4aece6c9d86301c53a979af0b63'
+         '2f3bad0ad2941a0fd0ff5de5f9b828ec'
+         '579e63488320a8d692d25502551787af'
+         'bb99a4ad35f89b0a4f34795ba2ccc776'
+         '9113f9964bdaeb59165b815cce503b4c'
+         'c436732fc467271e8a3838145c122070'
+         'd5c4cad7af93f1d736d4569a207bd739'
+         'a30a57f6063edbdf3eccd7169bd00444')
 
 build()
 {
@@ -135,6 +133,9 @@ build()
 	# we want our cflags etc
 	sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
 	sed -i "/^QMAKE_RPATH/s| -Wl,-rpath,||g" mkspecs/common/g++.conf
+
+	# backport of fix when webkit crashes with newer flash versions https://bugs.webkit.org/show_bug.cgi?id=40567
+        patch -p1 -i $srcdir/flash-crash-backport.patch || return 1
 	
 	msg "starting configure"
 
