@@ -36,7 +36,7 @@ makedepends=('pkgconfig' 'cmake' 'automoc4')
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	http://chakra-project.org/source/icons/oxygencolors-addon.tar.gz)
 
-md5sums=('313c72930520460480eaa00ed9119d37' #  oxygen-icons-4.4.95.tar.bz2
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
          'da971d7e2c862a6f77fb310a289f5529') #  ../_sources/oxygencolors-addon.tar.gz
 
 
@@ -70,7 +70,7 @@ package_oxygen-icons()
 	make DESTDIR=$pkgdir install || return 1
 	
 	# move out some svg icons
-        mkdir $srcdir/svg
+        mkdir -p $srcdir/svg
         mv $pkgdir/usr/share/icons/oxygen/scalable $srcdir/svg
 
 	# install addons
