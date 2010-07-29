@@ -12,9 +12,7 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
-#
-# Desktop v.0.06.20
-# by Phil Miller
+
 #
 # setup
 #
@@ -22,7 +20,7 @@ _script_name="build(er)"
 _build_arch="$_arch"
 _cur_repo=`pwd | awk -F '/' '{print $NF}'`
 _needed_functions="config_handling messages dependency_handling"
-_available_pkglists=`cat _buildscripts/${_cur_repo}-${_build_arch}-pkgs.conf | grep $(echo "_build_${_cur_repo}"|sed 's/-/_/g') | cut -d "=" -f 1 | awk 'BEGIN {FS="_"} {print $NF}' | sed '/^$/d'`
+_available_pkglists=`cat _buildscripts/${_cur_repo}-${_build_arch}-pkgs.conf | grep "_" | cut -d "=" -f 1 | awk 'BEGIN {FS="_"} {print $NF}' | sed '/^$/d'`
 # load functions
 for subroutine in ${_needed_functions}
 do
@@ -38,7 +36,7 @@ current_repo="$_cur_repo"
 build_it()
 {
 	_mkpkg_flags=$1
-        if [ "$MODE" = "" ] ; then 
+        if [ "$MODE" = "" ] ; then
 		error "you need to specify a package list defined in _/buildscripts/${_cur_repo}-${_build_arch}-pkgs.conf\n -> ${_available_pkglists}" && exit
 	fi
 
@@ -57,7 +55,7 @@ build_it()
 					do_makedeps
 					do_deps
 
-                    ../makepkg -L -f $_mkpkg_flags || BUILD_BROKEN="1"
+                    ../makepkg -f $_mkpkg_flags || BUILD_BROKEN="1"
 
 					if [ "$BUILD_BROKEN" = "1" ] ; then
 						if [ "$_build_stop" = "1" ] ; then
@@ -73,7 +71,7 @@ build_it()
 						fi
 					fi
 				else
-                    ../makepkg -L -f $_mkpkg_flags || BUILD_BROKEN="1"
+                    ../makepkg -f $_mkpkg_flags || BUILD_BROKEN="1"
 
 					if [ "$BUILD_BROKEN" = "1" ] ; then
 						if [ "$_build_stop" = "1" ] ; then
@@ -126,14 +124,14 @@ build_it()
 # 				done
 # 				sudo pacman -Uf $_packages_to_install || exit 1
 
-				sudo pacman -U --noconfirm ../_repo/local/`echo ${module} | sed 's/support-pkg-//g' | sed 's/tools-pkg-//g'`-*.pkg.*
+				sudo pacman -U --noconfirm ../_repo/local/${module}-*.pkg.*
 			fi
 
 	popd &>/dev/null
 	done
 
 	msg "removing debug packages ..."
-	sudo pacman -Rcs kde-debug --noconfirm &>/dev/null
+	sudo pacman -Rcs kdemod-debug --noconfirm &>/dev/null
 	echo " "
 	echo " "	
 
