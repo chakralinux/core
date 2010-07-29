@@ -124,7 +124,7 @@ build_it()
 # 				done
 # 				sudo pacman -Uf $_packages_to_install || exit 1
 
-				sudo pacman -U ../_repo/local/${module}-*.pkg.*
+				sudo pacman -U --noconfirm ../_repo/local/${module}-*.pkg.*
 			fi
 
 	popd &>/dev/null
