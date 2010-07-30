@@ -23,6 +23,7 @@ pkgname=('kdegames-common'
          'kdegames-bomber'
          'kdegames-bovo'
          'kdegames-granatier'
+         'kdegames-kajongg'
          'kdegames-kapman'
          'kdegames-katomic'
          'kdegames-kbattleship'
@@ -69,7 +70,7 @@ license=('GPL' 'LGPL' 'FDL')
 
 options=('docs' '!splithdr')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo')
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted')
 
 source=("$_mirror/${_origname}-$_kdever.tar.bz2")
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -184,6 +185,20 @@ package_kdegames-granatier()
 	install=${_origname}.install
 
 	splitdirs="granatier"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegames-kajongg()
+{
+	pkgdesc="The ancient Chinese board game for 4 players."
+	depends=("${_origname}-common>=${_kdever}" 'twisted')
+	groups=("kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kajongg"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
