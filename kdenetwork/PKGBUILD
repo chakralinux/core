@@ -28,7 +28,7 @@ pkgname=('kdenetwork-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=0.1
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -84,8 +84,8 @@ package_kdenetwork-common()
 	groups=("kde" "complete" "${_origname}" "uninstall")
 	install=${_origname}.install
 
-	# FIXME kdnssd strigi-analyzer
-	splitdirs="filesharing " 
+	# FIXME strigi-analyzer
+	splitdirs="filesharing kdnssd" 
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
