@@ -36,7 +36,7 @@ current_repo="$_cur_repo"
 build_it()
 {
 	_mkpkg_flags=$1
-        if [ "$MODE" = "" ] ; then 
+        if [ "$MODE" = "" ] ; then
 		error "you need to specify a package list defined in _/buildscripts/${_cur_repo}-${_build_arch}-pkgs.conf\n -> ${_available_pkglists}" && exit
 	fi
 
@@ -124,7 +124,7 @@ build_it()
 # 				done
 # 				sudo pacman -Uf $_packages_to_install || exit 1
 
-				sudo pacman -U ../_repo/local/${module}-*.pkg.*
+				sudo pacman -U --noconfirm ../_repo/local/${module}-*.pkg.*
 			fi
 
 	popd &>/dev/null

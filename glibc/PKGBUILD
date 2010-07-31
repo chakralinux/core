@@ -13,7 +13,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=glibc
 pkgver=2.11.1
-pkgrel=4
+pkgrel=4.1
 _glibcdate=20100318
 pkgdesc="GNU C Library"
 arch=('i686' 'x86_64')
@@ -72,8 +72,7 @@ build() {
 
   if [ "${CARCH}" = "i686" ]; then
     # Hack to fix NPTL issues with Xen, only required on 32bit platforms
-    # Plus add sse settings for xbmc
-    export CFLAGS="${CFLAGS} -mno-tls-direct-seg-refs -msse -msse2"
+    export CFLAGS="${CFLAGS} -mno-tls-direct-seg-refs"
   fi
 
   echo "slibdir=/lib" >> configparms
