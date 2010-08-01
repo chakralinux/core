@@ -11,31 +11,30 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # NOTE: libtool requires rebuilt with each new gcc version
 
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada')
-pkgver=4.5.0
-pkgrel=2
-_snapshot=4.5-20100520
-_libstdcppmanver=20100312	# Note: check source directory name when updating this
+pkgver=4.5.1
+pkgrel=1
+#_snapshot=4.5-20100520
+_libstdcppmanver=20100719	# Note: check source directory name when updating this
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('GPL' 'LGPL' 'custom')
 url="http://gcc.gnu.org"
 makedepends=('binutils>=2.20.1' 'libmpc>=0.8.1-2' 'cloog-ppl>=0.15.8' 'libelf' 'gcc-ada')
 options=('!libtool' '!emptydirs')
-source=(#ftp://gcc.gnu.org/pub/gcc/releases/gcc-${pkgver}/gcc-{core,g++,fortran,objc,ada}-${pkgver}.tar.bz2
-	ftp://gcc.gnu.org/pub/gcc/snapshots/${_snapshot}/gcc-{core,g++,fortran,objc,ada}-${_snapshot}.tar.bz2
-	ftp://gcc.gnu.org/pub/gcc/libstdc++/doxygen/libstdc++-man.${_libstdcppmanver}.tar.bz2
+source=(ftp://gcc.gnu.org/pub/gcc/releases/gcc-${pkgver}/gcc-{core,g++,fortran,objc,ada}-${pkgver}.tar.bz2
+	#ftp://gcc.gnu.org/pub/gcc/snapshots/${_snapshot}/gcc-{core,g++,fortran,objc,ada}-${_snapshot}.tar.bz2
+	ftp://gcc.gnu.org/pub/gcc/libstdc++/doxygen/libstdc++-api.${_libstdcppmanver}.man.tar.bz2
 	gcc_pure64.patch
-	gcc-hash-style-both.patch
-        gcc-commit158826.patch)
-md5sums=('dc1490dc7f2a75b751c04836a88cf44b'
-         'cd082a94fedaf17a89ff6f237d4fa513'
-         'a32d7bd7babf3f0c8d96c39675d7feb0'
-         '9c8e2dd4b733d0bc3639c351d88f68bb'
-         '244487eeb6d9af63c51e5c50fecb8131'
-         'f9a21b9dfc174f49a09ddaacfd3ac78f'
+	gcc-hash-style-both.patch)
+md5sums=('dc8959e31b01a65ce10d269614815054' #  ../_sources/gcc-core-4.5.1.tar.bz2
+         'b294953ff0bb2f20c7acb2bf005d832a' #  ../_sources/gcc-g++-4.5.1.tar.bz2       
+         '7567c2f8df8a8bf61b48fe414b88de65' #  ../_sources/gcc-fortran-4.5.1.tar.bz2
+         '3c11b7037896e967eddf8178af2ddd98' #  ../_sources/gcc-objc-4.5.1.tar.bz2
+         'c92111e2e22fc60d1e0adb1b5c7fa4f9' #  ../_sources/gcc-ada-4.5.1.tar.bz2
+         '226ae0c6364cfe2c1f7ac88d06088d5a' #  ../_sources/libstdc++-api.20100719.man.tar.bz2
+
          '4030ee1c08dd1e843c0225b772360e76'
-         '6fd395bacbd7b6e47c7b74854b478363'
-	 'fad48c68e6898735a9e4b47d84558529')
+         '6fd395bacbd7b6e47c7b74854b478363')
 
 if [ -n "${_snapshot}" ]; then
   _basedir="${srcdir}/gcc-${_snapshot}"
@@ -46,6 +45,11 @@ fi
 build() {
   if ! locale -a | grep ^de_DE > /dev/null; then
     echo "You need the de_DE locale to build gcc."
+    echo "Enable followed locales in /etc/locale.gen"
+    echo "    de_DE.UTF-8"
+    echo "    de_DE.ISO-8859-1"
+    echo "    de_DE.ISO-8859-15@euro"
+    echo "and run > sudo locale-gen"
     return 1
   fi
   
@@ -62,12 +66,9 @@ build() {
   fi
   patch -Np0 -i ${srcdir}/gcc-hash-style-both.patch || return 1
 
-  # revert commit 158826, causing creating of broken khtml binaries FS#19633, upstream bug#44258
-  patch -Np2 -R -i ${srcdir}/gcc-commit158826.patch || return 1
-
   echo ${pkgver} > gcc/BASE-VER
 
-  mkdir build && cd build      
+  mkdir build -p && cd build      
   ../configure --prefix=/usr --enable-languages=c,c++,fortran,objc,obj-c++,ada \
       --enable-shared --enable-threads=posix --enable-__cxa_atexit \
       --enable-clocale=gnu --enable-gnu-unique-object \
@@ -163,7 +164,7 @@ EOF
 
   # install the libstdc++ man pages
   install -dm755 ${pkgdir}/usr/share/man/man3
-  install -m644 ${srcdir}/libstdc++-man.${_libstdcppmanver}/man3/* \
+  install -m644 ${srcdir}/libstdc++-api-${_libstdcppmanver}.man/man3/* \
     ${pkgdir}/usr/share/man/man3/
   # deal with conflicts...
   rm -f ${pkgdir}/usr/share/man/man3/{ctime,queue,random,regex,string}.3
