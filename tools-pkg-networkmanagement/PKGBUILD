@@ -14,7 +14,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=('networkmanagement')
          
 arch=('i686' 'x86_64')
-pkgver=1151385
+pkgver=1158147
 #pkgver=1030904 # stable snapshot
 pkgrel=1
 
@@ -24,12 +24,12 @@ license=('GPL')
 
 options=('force')
 
-depends=("kdelibs>=${_kdever}" "kdebase-workspace>=${_kdever}" 'networkmanager>=0.8')
+depends=("kdelibs>=${_kdever}" "kdebase-workspace>=${_kdever}" 'networkmanager>=0.8.1')
 makedepends=('subversion' 'cmake' 'python' 'automoc4')
 replaces=('networkmanagement-networkmanager-plasmoid' 'networkmanagement-knetworkmanager-kde4')
 
 # comment out when using stable snapshot
-_svntrunk=svn://anonsvn.kde.org/home/kde/trunk/kdereview/networkmanagement
+_svntrunk=svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement
 _svnmod=networkmanagement
 
 
@@ -41,7 +41,7 @@ cd "$srcdir"
 
 	# comment out when using stable snapshot
 	svn co $_svntrunk $_svnmod --revision $pkgver
-	#svn co svn://anonsvn.kde.org/home/kde/trunk/kdereview/networkmanagement --revision $pkgver
+	#svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement --revision $pkgver
 	msg "SVN checkout done or server timeout"
 
 	mkdir -p $srcdir/build
