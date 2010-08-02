@@ -72,32 +72,32 @@ hwdetect_graphics()
 					printhl "NVIDIA hardware detected"
 					printhl "Installing driver: nvidia. This can take some seconds."
 			
-					pacman -Udf ${HW_DRIVER_PATH}/nvidia-utils-${NVIDIA_DRV_VER}* &>/dev/null
-					pacman -Udf ${HW_DRIVER_PATH}/nvidia-${NVIDIA_DRV_VER}* &>/dev/null
+					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-utils-${NVIDIA_DRV_VER}* &>/dev/null
+					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-${NVIDIA_DRV_VER}* &>/dev/null
 			
 					# add a status file in /tmp
 					touch /tmp/nvidia
 				
-				# or maybe another legacy card
+				# or maybe a legacy card
 				elif [ $(grep -i "$CARD_NVIDIA" ${HW_DB_PATH}/${NV173XX_DB}) ] 
 				then
 				
 					printhl "NVIDIA hardware detected"
 					printhl "Installing driver: nvidia-173xx. This can take some seconds."
 				
-					pacman -Udf ${HW_DRIVER_PATH}/nvidia-173xx* &>/dev/null
+					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-173xx* &>/dev/null
 				
 					# add a status file in /tmp
 					touch /tmp/nvidia-173xx
 
-				# or maybe a legacy card
+				# or maybe another legacy card
 				elif [ $(grep -i "$CARD_NVIDIA" ${HW_DB_PATH}/${NV96XX_DB}) ] 
 				then
 				
 					printhl "NVIDIA hardware detected"
 					printhl "Installing driver: nvidia-96xx. This can take some seconds."
 				
-					pacman -Udf ${HW_DRIVER_PATH}/nvidia-96xx* &>/dev/null
+					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-96xx* &>/dev/null
 				
 					# add a status file in /tmp
 					touch /tmp/nvidia-96xx
@@ -115,7 +115,7 @@ hwdetect_graphics()
 					printhl "ATI hardware detected"
 					printhl "Installing driver: ATI catalyst. This can take some seconds."
 				
-					pacman -Udf ${HW_DRIVER_PATH}/catalyst* &>/dev/null
+					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/catalyst* &>/dev/null
 				
 					# add a status file in /tmp
 					touch /tmp/catalyst
@@ -144,9 +144,9 @@ hwdetect_graphics()
 #						printhl "Installing driver: nouveau. This can take some seconds."
 #
 #						pacman -Rd libdrm --noconfirm &>/dev/null
-#						pacman -Udf ${HW_DRIVER_PATH}/xf86-video-nouveau* &>/dev/null
-#						pacman -Udf ${HW_DRIVER_PATH}/nouveau-drm* &>/dev/null
-#						pacman -Udf ${HW_DRIVER_PATH}/nouveau-libdrm* &>/dev/null
+#						pacman -Udf --noconfirm ${HW_DRIVER_PATH}/xf86-video-nouveau* &>/dev/null
+#						pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nouveau-drm* &>/dev/null
+#						pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nouveau-libdrm* &>/dev/null
 #
 #					fi
 
