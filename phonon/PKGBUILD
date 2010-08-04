@@ -7,7 +7,7 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-# NOTE: if you build complete new install phonon first before you build mplayer and vlc backend
+# NOTE: if you build complete new dash makedep phonon first and build stock phonon. install that for the vlc/mplayer backends
 
 # original name (used for the source and pkgnames)
 pkgbase=('phonon')
@@ -35,7 +35,8 @@ makedepends=("qt>=${_qtver}"
 	'vlc'
 	'gstreamer0.10'
 	'gstreamer0.10-base'
-	'gstreamer0.10-base-plugins')
+	'gstreamer0.10-base-plugins'
+	'phonon') # for vlc and mplayer backends
 
 source=("http://download.kde.org/stable/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2" \
 	'01-phonon-includes.patch')
@@ -103,7 +104,6 @@ package_phonon-xine()
 package_phonon-mplayer()
 {
 	bename=mplayer
-	pkgver=20100426
 	pkgdesc="The multimedia API for KDE 4, with MPlayer support"
 	arch=("i686" "x86_64")
 	url="http://www.gitorious.org/${pkgbase}/${pkgbase}-${bename}"
@@ -145,7 +145,6 @@ package_phonon-mplayer()
 
 package_phonon-vlc()
 {
-	pkgver=20100627
 	pkgrel=1
 	pkgdesc="VLC backend for Phonon"
 	arch=('i686' 'x86_64')
