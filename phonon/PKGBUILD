@@ -7,11 +7,9 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
+# NOTE: if you build complete new install phonon first before you build mplayer and vlc backend
+
 # original name (used for the source and pkgnames)
-_origname=phonon
-bename=vlc
-
-
 pkgbase=('phonon')
 
 pkgname=('phonon'
@@ -39,7 +37,7 @@ makedepends=("qt>=${_qtver}"
 	'gstreamer0.10-base'
 	'gstreamer0.10-base-plugins')
 
-source=("http://download.kde.org/stable/${_origname}/${pkgver}/${_origname}-${pkgver}.tar.bz2" \
+source=("http://download.kde.org/stable/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2" \
 	'01-phonon-includes.patch')
 
 md5sums=('5a1444f009a77054f16fea38c08e6cb5' '8635288be343c76bb8064e60233248b7')
@@ -47,7 +45,7 @@ md5sums=('5a1444f009a77054f16fea38c08e6cb5' '8635288be343c76bb8064e60233248b7')
 
 
 build() {
-	cd $srcdir/${_origname}-${pkgver}
+	cd $srcdir/${pkgbase}-${pkgver}
 	patch -Np1 -i $srcdir/01-phonon-includes.patch || return 1
 
 	mkdir build
@@ -68,7 +66,7 @@ package_phonon()
 
 	splitdirs="phonon includes"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/build/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -82,7 +80,7 @@ package_phonon-gstreamer()
 	replaces=("phonon-backend-gstreamer" "kdemod-phonon-backend-gstreamer")
 	splitdirs="gstreamer"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/build/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -97,68 +95,92 @@ package_phonon-xine()
 
 	splitdirs="xine"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/build/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
 package_phonon-mplayer()
 {
-	# this is a pure mess, the AUR package doesnt really look any better :)
-	rev=`svn log svn://websvn.kde.org:443/home/kde/trunk/playground/multimedia/phonon-backends -l 1 | grep "|" | cut -d " " -f 1 | cut -d "r" -f 2`
-	pkgver=${rev}
+	bename=mplayer
+	pkgver=20100426
+	pkgdesc="The multimedia API for KDE 4, with MPlayer support"
+	arch=("i686" "x86_64")
+	url="http://www.gitorious.org/${pkgbase}/${pkgbase}-${bename}"
+	license=("LGPL")
+	depends=("${pkgbase}>=${_pkgver}" "${bename}")
+	makedepends=("pkg-config" "cmake" "automoc4" "git")
+	provides=("${pkgbase}-backend")
+	conflicts=("${pkgbase}-${bename}-svn")
+	replaces=("${pkgbase}-${bename}-svn")
 
-	pkgdesc="The multimedia API for Qt 4 and KDE 4 - MPlayer Backend"
-	depends=("phonon>=${_pkgver}" 'mplayer' 'vlc')
-	groups=("kde-complete" "kde-uninstall")
-	conflicts=('phonon-mplayer-svn' 'qtmod-phonon-mplayer')
-	replaces=("phonon-backend-mplayer" "kdemod-phonon-backend-mplayer")
+	_gitroot="git://gitorious.org/${pkgbase}/${pkgbase}-${bename}.git"
+	_gitname="${pkgbase}-${bename}"
 
-	__svntrunk=svn://websvn.kde.org:443/home/kde/trunk/playground/multimedia/phonon-backends
-	__svnmod=phonon-mplayer
-
-	cd ${srcdir}
-
-	# Repository
-	msg "Connecting to Subversion server...."
-	if [ -d ${__svnmod}/.svn ]; then
-		(cd ${__svnmod} && svn up -r ${pkgver})
+	cd "$srcdir"
+	msg "Connecting to GIT server...."
+	if [ -d ${_gitname} ] ; then
+		cd ${_gitname} && git pull origin
+		msg "The local files are updated."
 	else
-		svn co ${__svntrunk} --config-dir ./ -r ${pkgver} ${__svnmod}
+		git clone ${_gitroot} ${_gitname}
 	fi
-	msg "SVN checkout done or server timeout"
+	msg "GIT checkout done or server timeout"
 	msg "Starting make..."
 
-	if [ -d ${srcdir}/${__svnmod}-build ]; then
-		rm -r ${srcdir}/${__svnmod}-build
-	fi
-
-	cp -r ${srcdir}/${__svnmod} ${srcdir}/${__svnmod}-build
-	cd ${srcdir}/${__svnmod}-build
+	rm -rf "${srcdir}/${_gitname}-build"
+	git clone -l "${srcdir}/${_gitname}" "${srcdir}/${_gitname}-build"
+	cd "${srcdir}/${_gitname}-build"
 
 	# Config
-	#sed -i "254,256d" CMakeLists.txt
 	[ ${CARCH} = 'x86_64' ] && CXXFLAGS="$CXXFLAGS -fPIC"
-	echo "add_subdirectory(${bename})" >> CMakeLists.txt
-	#sed -i "s|macro_optional_add_subdirectory(vlc)|#macro_optional_add_subdirectory(${bename})|g" CMakeLists.txt || return 1
 
 	# Build
-	#mkdir -p _build
-	#cd _build
-	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . || return 1
-	cd mplayer
+	cmake -DCMAKE_INSTALL_PREFIX=$(kde4-config --prefix) -DCMAKE_BUILD_TYPE=Release \
+		-DPLUGIN_INSTALL_DIR=/usr/lib/kde4 -DSERVICES_INSTALL_DIR=/usr/share/kde4/services . || return 1
+	make || return 1
 	make DESTDIR=${pkgdir} install || return 1
+	rm -rf "${srcdir}/${_gitname}-build"
 }
 
 package_phonon-vlc()
 {
-	pkgdesc="The multimedia API for Qt 4 and KDE 4 - VLC Backend"
-	depends=("phonon>=${_pkgver}" 'vlc')
-	groups=("kde" "kde-complete" "kde-uninstall")
-	conflicts=('qtmod-phonon-vlc')
-	replaces=("phonon-backend-vlc" "kdemod-phonon-backend-vlc")
+	pkgver=20100627
+	pkgrel=1
+	pkgdesc="VLC backgend for Phonon, git version"
+	arch=('i686' 'x86_64')
+	url="http://gitorious.org/phonon/phonon-vlc"
+	license=('LGPL')
+	depends=('vlc' "phonon>=${_pkgver}")
+	makedepends=('git' 'automoc4')
+	provides=('phonon-vlc' 'phonon-backend')
+	replaces=('phonon-vlc-svn')
+	conflicts=('phonon-vlc-svn')
 
-	cd ${srcdir}/phonon-mplayer-build/vlc
+	_gitroot="git://gitorious.org/phonon/phonon-vlc.git"
+	_gitname="phonon-vlc"
 
-	make DESTDIR=${pkgdir} install || return 1
-}
+	cd "$srcdir"
+	msg "Connecting to GIT server...."
+
+	if [ -d $_gitname ] ; then
+	    cd $_gitname && git pull origin
+	    msg "The local files are updated."
+	else
+	    git clone $_gitroot $_gitname
+	fi
+
+	msg "GIT checkout done or server timeout"
+	msg "Starting make..."
+
+	rm -rf "$srcdir/$_gitname-build"
+	git clone -l "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+	cd "$srcdir/$_gitname-build"
+
+	cmake -DCMAKE_INSTALL_PREFIX=$(kde4-config --prefix) \
+	      -DCMAKE_BUILD_TYPE=Release \
+	      ../${_gitname} || return 1
+	make || return 1
+	make DESTDIR=$pkgdir install || return 1
+	rm -rf "$srcdir/$_gitname-build"
+} 
