@@ -36,7 +36,7 @@ pkgname=('kdeutils-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -50,10 +50,8 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}"
              'system-config-printer-common' 'libarchive' 'qimageblitz'
              'p7zip' 'zip' 'unzip' 'unrar') # "kdepim-runtime>=${_kdever}" 
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2
-	pyqt-4.7.patch)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-	 'e267e0417368856c65adf3020073088a') #  pyqt-4.7.patch
+source=($_mirror/${_origname}-$_kdever.tar.bz2)
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 #
@@ -63,9 +61,8 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-	msg "applying patches ..."
-	# backport workaround for PyQt 4.7 expecting a string not a QString - BUG:245289
-	patch -Np1 -i ${srcdir}/pyqt-4.7.patch || return 1
+#	msg "applying patches ..."
+
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
