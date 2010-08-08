@@ -10,8 +10,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # Find the kernel name inside the chroot
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
-pkgname=catalyst
-pkgver=10.6
+pkgname=catalyst-testing
+pkgver=10.7
 pkgrel=1
 pkgdesc="AMD/ATI drivers for Radeon brand cards"
 arch=('i686' 'x86_64')
@@ -21,14 +21,14 @@ depends=('xorg-server<1.9.0' 'kernel26>=2.6.29' 'kernel26<2.6.35' 'kernel26-head
 
 conflicts=('catalyst' 'catalyst-utils' 'nvidia' 'libgl' 'catalyst-leaked' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri')
 provides=('catalyst' 'libgl' 'libatical')
+replaces=('catalyst')
 install=catalyst.install
 source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
-    catalyst.sh amdcccle.desktop atieventsd.sh fglrx-2.6.34-rc4.patch)
-md5sums=('089967a9aa86ad596884d82bb0b3a382'
+    catalyst.sh amdcccle.desktop atieventsd.sh)
+md5sums=('0855d05f303a442aa493c8542e2993ef'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '4efa8414a8fe9eeb50da38b5522ef81d'
-         'f729bf913613f49b0b9759c246058a87'
-	 '5d464f7068fb45a9d2013cbd6a0b2021')
+         'f729bf913613f49b0b9759c246058a87')
 
 build() {
 
@@ -44,13 +44,6 @@ if [ "${CARCH}" = "i686" ]; then
 BUILDARCH=i386
 _archdir=x86
 fi
-
-#patching for kernel 2.6.33 or 2.6.34 support
-if [ `uname -r |grep -c "2.6.33"` != 0 ] || [ `uname -r |grep -c "2.6.34"` != 0 ]; then
-cd "${srcdir}/archive_files/"
-patch -Np1 -i ../fglrx-2.6.34-rc4.patch || return 1
-fi
-
 
 cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
 cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a.GCC4" . || return 1
