@@ -7,67 +7,39 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
+# NOTE: you have to rebuild aufs2 with every new kernel-build.
+
 pkgbase="kernel26"
-pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -CHAKRA kernel
+pkgname=('kernel26-testing' 'kernel26-testing-firmware' 'kernel26-testing-headers') # Build stock -CHAKRA kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
-_kernelname=${pkgname#kernel26}
-_basekernel=2.6.33
-pkgver=${_basekernel}.5
-pkgrel=6
+#_kernelname=${pkgname#kernel26}
+_kernelname=""
+_basekernel=2.6.35
+pkgver=${_basekernel}.0
+pkgrel=1
 _patchname="patch-${pkgver}-1-CHAKRA"
-_reiser4="reiser4-for-${_basekernel}.patch.bz2"
-_toi="tuxonice-3.1-for-head.patch.bz2"
-_bfs="${_basekernel}-sched-bfs-318.patch"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
 source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         http://chakra-project.org/sources/kernel26/${_patchname}.bz2
-        http://sources.gentoo.org/viewcvs.py/*checkout*/linux-patches/genpatches-2.6/trunk/$_basekernel/4100_dm-bbr.patch
-        http://sources.gentoo.org/viewcvs.py/*checkout*/linux-patches/genpatches-2.6/trunk/$_basekernel/4200_fbcondecor-0.9.6.patch
-        http://www.kernel.org/pub/linux/kernel/people/edward/reiser4/reiser4-for-2.6/${_reiser4}
-        http://www.tuxonice.net/downloads/all/${_toi}
-        http://ck.kolivas.org/patches/bfs/${_bfs}
         # the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
-md5sums=('c3883760b18d50e8d78819c54d579b00'
-         'd06a205390f7a815a56bced9cea574fe'
-         'e501d050605a7399e7b12a6b14903631'
-         'ce66607145ad5e72b50931b9ae291b70'
-         '49da31ea1e6c3ae65f954cd5fc8fcc4e'
-         'c6e0b8c1876794118584a7dedaaeb604'
-         '5d06361612fd2960a0fc9e1f5a2648d6'
-         'f3253b647ca067df974d2259df2d863f'
-         'fd1ac8d78ef9157280ff95178eb77dce'
+md5sums=('091abeb4684ce03d1d936851618687b6'
+         '0761791efdf8385139807797e00fcf27'
+         '98140e0d85eb6731c737f23bc238c159'
+         '59b792a5dc8e7a6d4310059983abf928'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
   cd ${srcdir}/linux-$_basekernel
-  echo "Applying CHAKRA patch"
+  # fix setlocalversion
+  sed -i 's|echo "+"|# echo "+"|g' ./scripts/setlocalversion
+  
+  # Add -CHAKRA patches
   patch -Np1 -i ${srcdir}/${_patchname} || return 1
-
-  # Applying base and extra gentoo patches
-  for i in $(ls $startdir/src/[1-9][0-9][0-9][0-9]*); do
-    echo "Applying $i"
-    patch -Np1 -i $i || return 1
-  done
- 
-  echo "Applying reiser4 patch"
-  bzip2 -dc $startdir/src/${_reiser4} | patch -Np1 || return 1
-
-  echo "Applying tuxonice patch"
-  bzip2 -dck $startdir/src/${_toi} \
-  | sed '/diff --git a\/kernel\/fork.c b\/kernel\/fork.c/,/{/d' \
-  | sed 's/printk(KERN_INFO "PM: Creating hibernation image:\\n/printk(KERN_INFO "PM: Creating hibernation image: \\n/' \
-  | patch -Np1 || return 1
-
-  echo "Applying BFS scheduler patch"
-  ## Delete the Makefile changes that break patching.
-  sed '/Index: linux-2.6.32-ck1\/Makefile/,/To see a list of typical targets execute "make help"/d' \
-  $startdir/src/${_bfs} | patch -Np1 || return 1
-
   if [ "$CARCH" = "x86_64" ]; then
     cat ../config.x86_64 >./.config
   else
@@ -95,11 +67,11 @@ build() {
   make bzImage modules || return 1
 }
 
-package_kernel26() {
+package_kernel26-testing() {
   pkgdesc="The Linux Kernel and modules"
   groups=('base')
-  backup=(etc/mkinitcpio.d/${pkgname}.preset)
-  depends=('coreutils' 'kernel26-firmware>=2.6.33' 'module-init-tools' 'mkinitcpio>=0.6.3')
+  backup=(etc/mkinitcpio.d/kernel26.preset)
+  depends=('coreutils' 'kernel26-testing-firmware>=2.6.35' 'module-init-tools' 'mkinitcpio>=0.6.3')
   # pwc, ieee80211 and hostap-driver26 modules are included in kernel26 now
   # nforce package support was abandoned by nvidia, kernel modules should cover everything now.
   # kernel24 support is dropped since glibc24
@@ -107,7 +79,8 @@ package_kernel26() {
             'alsa-driver' 'ieee80211' 'hostap-driver26'
             'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
-            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500')
+            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26')
+  replaces=(kernel26)
   install=kernel26.install
   optdepends=('crda: to set the correct wireless channels of your country')
 
@@ -122,7 +95,7 @@ package_kernel26() {
   install -m644 -D vmlinux ${pkgdir}/usr/src/linux-${_kernver}/vmlinux
 
   # install fallback mkinitcpio.conf file and preset file for kernel
-  install -m644 -D ${srcdir}/kernel26.preset ${pkgdir}/etc/mkinitcpio.d/${pkgname}.preset || return 1
+  install -m644 -D ${srcdir}/kernel26.preset ${pkgdir}/etc/mkinitcpio.d/kernel26.preset || return 1
   # set correct depmod command for install
   sed \
     -e  "s/KERNEL_NAME=.*/KERNEL_NAME=${_kernelname}/g" \
@@ -130,18 +103,18 @@ package_kernel26() {
     -i $startdir/kernel26.install
   sed \
     -e "s|source .*|source /etc/mkinitcpio.d/kernel26${_kernelname}.kver|g" \
-    -e "s|default_image=.*|default_image=\"/boot/${pkgname}.img\"|g" \
-    -e "s|fallback_image=.*|fallback_image=\"/boot/${pkgname}-fallback.img\"|g" \
-    -i ${pkgdir}/etc/mkinitcpio.d/${pkgname}.preset
+    -e "s|default_image=.*|default_image=\"/boot/kernel26.img\"|g" \
+    -e "s|fallback_image=.*|fallback_image=\"/boot/kernel26-fallback.img\"|g" \
+    -i ${pkgdir}/etc/mkinitcpio.d/kernel26.preset
 
-  echo -e "# DO NOT EDIT THIS FILE\nALL_kver='${_kernver}'" > ${pkgdir}/etc/mkinitcpio.d/${pkgname}.kver
+  echo -e "# DO NOT EDIT THIS FILE\nALL_kver='${_kernver}'" > ${pkgdir}/etc/mkinitcpio.d/kernel26.kver
   # remove build and source links
   rm -f ${pkgdir}/lib/modules/${_kernver}/{source,build}
   # remove the firmware
   rm -rf ${pkgdir}/lib/firmware
 }
 
-package_kernel26-headers() {
+package_kernel26-testing-headers() {
   pkgdesc="Header files and scripts for building modules for kernel26"
   cd ${srcdir}/linux-${_basekernel}/
   make oldconfig && make prepare || return 1
@@ -245,7 +218,7 @@ package_kernel26-headers() {
 }
 
 
-package_kernel26-firmware() {
+package_kernel26-testing-firmware() {
   pkgdesc="The included firmware files of the Linux Kernel"
   groups=('base')
 

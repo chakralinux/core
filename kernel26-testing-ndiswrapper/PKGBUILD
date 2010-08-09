@@ -1,0 +1,43 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=kernel26-testing-ndiswrapper
+pkgver=1.56
+pkgrel=1
+
+# Find the kernel name inside the chroot
+_kernver=`pacman -Qf kernel26-testing | cut -c18-23 | sed 's/kernel26-testing //g'`-CHAKRA
+
+pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For kernel26-testing."
+license=('GPL')
+arch=(i686 x86_64)
+url="http://ndiswrapper.sourceforge.net"
+install="ndiswrapper.install"
+depends=("ndiswrapper-utils=$pkgver" 'kernel26-testing>=2.6.35' 'kernel26-testing<2.6.36')
+makedepends=('kernel26-testing-headers>=2.6.35' 'kernel26-testing-headers<2.6.36')
+source=(http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz)
+md5sums=('1431f7ed5f8e92e752d330bbb3aed333')
+groups=("kernel26-testing-modules")
+conflicts=("ndiswrapper")
+replaces=("ndiswrapper")
+
+build()
+{
+  cd $srcdir/ndiswrapper-$pkgver/driver
+  make KVERS=$_kernver || return 1
+  make DESTDIR=$pkgdir KVERS=$_kernver install || return 1
+  rm $pkgdir/lib/modules/$_kernver/modules.* #wtf?
+
+  sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/*.install
+  # move it to correct kernel directory
+  mkdir -p $pkgdir/lib/modules/$_kernver/kernel/drivers/net/wireless/ndiswrapper
+  mv $pkgdir/lib/modules/$_kernver/misc/* $pkgdir/lib/modules/$_kernver/kernel/drivers/net/wireless/ndiswrapper/
+  rm -r $pkgdir/lib/modules/$_kernver/misc/
+}
+

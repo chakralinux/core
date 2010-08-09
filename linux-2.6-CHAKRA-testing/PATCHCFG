@@ -1,0 +1,50 @@
+# Kernel source file
+SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.35.tar.bz2"
+# Original source directory
+SRCORIG="linux-2.6.35"
+# Our source directory
+SRCNAME="linux-2.6.35-CHAKRA"
+# Patches:
+#   URL%patchlevel
+#  or
+#   filename%patchlevel (file must be in patches/ subdirectory)
+PATCHES=(
+         # add upstream patch from 2.6.35 series
+         # http://www.kernel.org/pub/linux/kernel/v2.6/patch-2.6.35.1.bz2%1
+
+         # add latest fixes from stable queue, if needed
+         # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
+
+         # add aufs2 support, in reference to:
+         # http://aufs.sourceforge.net
+         aufs2-base.patch%1
+         aufs2-standalone.patch%1
+         # squashfs with lzma
+         001-squashfs-lzma-add-support-for-lzma-compressed-filesystems.patch%1
+         002-squashfs-lzma-make-lzma-available-to-non-initramfs-initrd-code.patch%1
+         003-squashfs-lzma-select-decompress-lzma-needed.patch%1
+         004-squashfs-lzma-make-lzma-reentrant.patch%1
+         005-squashfs-lzma-force-lzma-wrapper-to-be-retained.patch%1
+	 006-squashfs-lzma-add-missing-slab.h-include-in-lzma-wrapper.patch%1
+         # Large I/O operations result in poor interactive performance and high iowait times
+         # https://bugzilla.kernel.org/show_bug.cgi?id=12309
+         007-io-fix-for-large-files.patch%1
+        )
+# Name of the resulting patch (will be bzipped afterwards)
+PATCHNAME="patch-2.6.35.0-1-CHAKRA"
+
+# Run this before applying patches
+pre_apply() {
+  :
+}
+
+# Run this after applying patches
+post_apply() {
+  # remove the extraversion from Makefile
+  # this ensures our kernel version is always 2.6.XX-CHAKRA
+  # this way, minor kernel updates will not break external modules
+  sed -i 's|^EXTRAVERSION = .*$|EXTRAVERSION = |g' Makefile
+
+  # Kill some files
+  find . -name '*~' -exec rm -f {} \; 2>/dev/null
+}
