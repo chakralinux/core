@@ -80,7 +80,7 @@ package_kernel26-testing() {
             'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
             'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26')
-  replaces=(kernel26)
+  provides=("kernel26=${pkgver}")
   install=kernel26.install
   optdepends=('crda: to set the correct wireless channels of your country')
 
@@ -116,6 +116,8 @@ package_kernel26-testing() {
 
 package_kernel26-testing-headers() {
   pkgdesc="Header files and scripts for building modules for kernel26"
+  provides=("kernel26-headers=${pkgver}")
+  conflicts=(kernel26-headers)
   cd ${srcdir}/linux-${_basekernel}/
   make oldconfig && make prepare || return 1
   mkdir -p ${pkgdir}/lib/modules/${_kernver}
@@ -221,6 +223,8 @@ package_kernel26-testing-headers() {
 package_kernel26-testing-firmware() {
   pkgdesc="The included firmware files of the Linux Kernel"
   groups=('base')
+  provides=("kernel26-firmware=${pkgver}")
+  conflicts=(kernel26-firmware)
 
   cd ${srcdir}/linux-$_basekernel
   make firmware || return 1
