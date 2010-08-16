@@ -20,7 +20,7 @@ pkgname=('phonon'
 
 pkgver=4.4.1
 _pkgver=4.4.1
-pkgrel=1
+pkgrel=2
 pkgdesc='The multimedia API for Qt 4 and KDE 4'
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
@@ -135,7 +135,7 @@ package_phonon-mplayer()
 	[ ${CARCH} = 'x86_64' ] && CXXFLAGS="$CXXFLAGS -fPIC"
 
 	# Build
-	cmake -DCMAKE_INSTALL_PREFIX=$(kde4-config --prefix) -DCMAKE_BUILD_TYPE=Release \
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release \
 		-DPLUGIN_INSTALL_DIR=/usr/lib/kde4 -DSERVICES_INSTALL_DIR=/usr/share/kde4/services . || return 1
 	make || return 1
 	make DESTDIR=${pkgdir} install || return 1
@@ -173,7 +173,7 @@ package_phonon-vlc()
 	git clone -l "$srcdir/$_gitname" "$srcdir/$_gitname-build"
 	cd "$srcdir/$_gitname-build"
 
-	cmake -DCMAKE_INSTALL_PREFIX=$(kde4-config --prefix) \
+	cmake -DCMAKE_INSTALL_PREFIX=/usr \
 	      -DCMAKE_BUILD_TYPE=Release \
 	      ../${_gitname} || return 1
 	make || return 1
