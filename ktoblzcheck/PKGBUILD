@@ -1,0 +1,26 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=ktoblzcheck
+pkgver=1.27
+pkgrel=1
+pkgdesc="tool for verification of account numbers and bank codes"
+arch=('i686')
+license=('LGPL')
+url="http://ktoblzcheck.sourceforge.net/"
+depends=('python')
+source=("http://downloads.sourceforge.net/project/$pkgname/$pkgname-$pkgver.tar.gz")
+md5sums=('19e93814b7680bb9cf8d04820b3b3b88')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+  ./configure --prefix=/usr --enable-python
+  make
+  make prefix=$pkgdir/usr install
+}

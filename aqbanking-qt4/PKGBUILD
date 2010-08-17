@@ -1,0 +1,48 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=aqbanking-qt4
+pkgver=4.2.4
+pkgrel=1
+pkgdesc="A library for online banking and financial applications"
+arch=(i686 x86_64)
+options=('!libtool')
+url="http://www.aquamaniac.de/aqbanking"
+license=('GPL')
+depends=('ktoblzcheck' 'libofx' 'gwenhywfar>=3.10.0' 'qt' 'gnutls')
+provides=('aqbanking')
+conflicts=('aqbanking')
+options=('!makeflags')
+source=("aqbanking-${pkgver}.tar.gz::http://www2.aquamaniac.de/sites/download/download.php?package=03&release=50&file=01&dummy=aqbanking-${pkgver}.tar.gz")
+
+build() {
+
+    cd ${srcdir}/aqbanking-${pkgver}
+
+    msg "Compile sources"
+    local _CARCH=${CARCH}
+    if [ "$CARCH" = 'x86_64' ]; then
+	_CARCH='x86-64'
+    fi
+
+    # configure Makefile to point to Qt4
+    ./configure --prefix=/usr \
+                --with-frontends="cbanking q4banking" \
+                --with-backends="aqhbci aqofxconnect" \
+		--disable-qt3 \
+		--enable-qt4 \
+                CFLAGS="-Os -march=${_CARCH} -mtune=generic" \
+                CXXFLAGS="-Os -march=${_CARCH} -mtune=generic" \
+                || return 1
+
+    make || return 1
+    make DESTDIR=${pkgdir} install || return 1
+}
+
+md5sums=('244f5c6e470b55452d9f2cb6c081c137')
