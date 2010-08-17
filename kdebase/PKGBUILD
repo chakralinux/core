@@ -101,7 +101,6 @@ package_kdebase()
 	pkgdesc="KDE Base Applications"
 	depends=("kdebase-runtime>=${_kdever}" 'libraw1394') # 'opencv'
 	optdepends=("cdemu-client: Support transparent CD/DVD image mounting in KDE")
-	replaces=('kdebase-devel')
 	conflicts=("kdemod-${_origname}")
 	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
 	install=${_origname}.install
@@ -171,7 +170,6 @@ package_kdebase-konqueror()
 	pkgdesc="KDE Base Applications - Konqueror, the default KDE web browser"
 	depends=("${_origname}>=${_kdever}" "${_origname}-dolphin>=${_kdever}")
 	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
-	replaces=('kdebase-konqueror-devel')
 	conflicts=("kdemod-${_origname}-konqueror")
 	install=${_origname}-konqueror.install
 
@@ -186,7 +184,7 @@ package_kdebase-konsole()
 {
 	pkgdesc="KDE Base Applications - Konsole, the default KDE terminal program"
 	depends=("${_origname}>=${_kdever}")
-	groups=("${_pkgprefix}" "complete" "minimal" "uninstall")
+	groups=("${_pkgprefix}" "kde-complete" "kde-minimal" "kde-uninstall")
 	conflicts=("kdemod-${_origname}-konsole")
 	install=${_origname}-konsole.install
 
@@ -201,7 +199,7 @@ package_kdebase-kwrite()
 {
 	pkgdesc="KDE Base Applications - KWrite, a simple text editor"
 	depends=("${_origname}>=${_kdever}")
-	groups=("complete" "uninstall")
+	groups=("kde-complete" "kde-uninstall")
 	conflicts=("kdemod-${_origname}-kwrite")
 	install=${_origname}-kwrite.install
 
