@@ -20,7 +20,7 @@ pkgname=('phonon'
 
 pkgver=4.4.1
 _pkgver=4.4.1
-pkgrel=2
+pkgrel=3
 pkgdesc='The multimedia API for Qt 4 and KDE 4'
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
@@ -30,13 +30,14 @@ makedepends=("qt>=${_qtver}"
 	'pkgconfig'
 	'cmake'
 	'automoc4'
+	'pulseaudio'
 	'mplayer'
 	'xine-lib'
 	'vlc'
 	'gstreamer0.10'
 	'gstreamer0.10-base'
 	'gstreamer0.10-base-plugins'
-	'phonon') # for vlc and mplayer backends
+	'phonon') #for mplayer/vlc-backends
 
 source=("http://download.kde.org/stable/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2" \
 	'01-phonon-includes.patch')
@@ -61,7 +62,7 @@ build() {
 package_phonon()
 {
 	pkgdesc="The multimedia API for Qt 4 and KDE 4"
-	depends=("qt>=${_qtver}")
+	depends=("qt>=${_qtver}" "pulseaudio")
 	groups=("kde" "kde-complete" "kde-minimal" "kde-uninstall")
 	conficts=("qtmod-phonon=${pkgver}")
 
@@ -117,6 +118,7 @@ package_phonon-mplayer()
 	_gitname="${pkgbase}-${bename}"
 
 	cd "$srcdir"
+
 	msg "Connecting to GIT server...."
 	if [ -d ${_gitname} ] ; then
 		cd ${_gitname} && git pull origin
