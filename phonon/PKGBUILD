@@ -30,7 +30,6 @@ makedepends=("qt>=${_qtver}"
 	'pkgconfig'
 	'cmake'
 	'automoc4'
-	'pulseaudio'
 	'mplayer'
 	'xine-lib'
 	'vlc'
@@ -55,6 +54,7 @@ build() {
 	cmake .. -DCMAKE_BUILD_TYPE=Release \
 		 -DCMAKE_INSTALL_PREFIX=/usr \
 		 -DCMAKE_SKIP_RPATH=ON \
+		 -DWITH_PulseAudio=OFF \
 		 -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 	make
 }
@@ -62,7 +62,7 @@ build() {
 package_phonon()
 {
 	pkgdesc="The multimedia API for Qt 4 and KDE 4"
-	depends=("qt>=${_qtver}" "pulseaudio")
+	depends=("qt>=${_qtver}")
 	groups=("kde" "kde-complete" "kde-minimal" "kde-uninstall")
 	conficts=("qtmod-phonon=${pkgver}")
 
