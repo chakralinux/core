@@ -17,8 +17,8 @@ pkgname=('qt'
          'qt-tools')
 
 pkgver=4.6.3
-pkgrel=3
-_kdeqt=0
+pkgrel=4
+kdeqtver=85067d6afe3ec4899080fc17b9e1fd896ab54c8d
 
 pkgdesc="A cross-platform application and UI framework"
 arch=('i686' 'x86_64')
@@ -57,6 +57,7 @@ makedepends=('inputproto'
 _pkgfqn=${_origname}-everywhere-opensource-src-${pkgver}
 
 source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
+	"http://chakra-project.org/sources/qt/kde-qt-${kdeqtver}.patch.gz"
 	'assistant.desktop'
 	'designer.desktop'
 	'linguist.desktop'
@@ -71,6 +72,7 @@ source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
 
 
 md5sums=('5c69f16d452b0bb3d44bc3c10556c072'
+         'c9b5973fcf791736fa411ddc46fbefef' # kde-qt-85067d6afe3ec4899080fc17b9e1fd896ab54c8d.patch.gz
          '20d333282c43f9e643cb8e91b6307dcc'
          'bf89ee0bdd178933f19d8bc4090173ec'
          'a9bfeeffab8ba103bc8153fdb31474a1'
@@ -83,31 +85,23 @@ md5sums=('5c69f16d452b0bb3d44bc3c10556c072'
          'd5c4cad7af93f1d736d4569a207bd739'
          'a30a57f6063edbdf3eccd7169bd00444')
 
-build()
-{
-	#Create patches
-	if [ "$_kdeqt" == "1" ]; then
-	  msg "creating kde-qt patches"
+# source PKGBUILD && _create-kdeqt-patch
+_create-kdeqt-patch() {
+          #Create patches
+	  echo "creating kde-qt patches"
 	  local codir=$(mktemp -d)
 	  mkdir -p "${codir}/kde-qt"
 	  git clone git://gitorious.org/+kde-developers/qt/kde-qt.git "${codir}/kde-qt"
 	  pushd "${codir}/kde-qt"
 	  git checkout --track -b ${pkgver}-patched origin/${pkgver}-patched
 	  local kdeqtver=$(git --no-pager show --format='%H' "${pkgver}-patched" | head -1)
-	  git diff "v${pkgver}..${pkgver}-patched" > "${codir}/kde-qt-${kdeqtver}.patch"
-	  popd
-	  mv "${codir}/kde-qt-${kdeqtver}.patch" .
+	  git diff "v${pkgver}..${pkgver}-patched" | gzip > "${codir}/kde-qt-${kdeqtver}.patch.gz"
+          popd
+          mv "${codir}/kde-qt-${kdeqtver}.patch.gz" .
 	  rm -rf "${codir}"
-	fi
+}
 
-	# editing qt.install
-	sed -i -e 's/^.*> Qt .*/        echo " > Qt '${pkgver}'"/' $startdir/qt.install
-	if [ "$_kdeqt" == "1" ]; then
-	  sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
-	else
-	  sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt (this time not patched)"/' $startdir/qt.install
-	fi
-
+build() {
 	cd $srcdir/$_pkgfqn
 
 	unset QMAKESPEC
@@ -116,11 +110,12 @@ build()
 	export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
 
 	cd $srcdir/$_pkgfqn
-	if [ "$_kdeqt" == "1" ]; then
-	  msg "applying kde-qt patches"
-	  cd $srcdir/$_pkgfqn
-	  patch -p1 -i $srcdir/kde-qt-${kdeqtver}.patch || return 1
-	fi
+	msg "applying kde-qt patches"
+	cd $srcdir/$_pkgfqn
+	patch -p1 -i $srcdir/kde-qt-${kdeqtver}.patch || return 1
+	# editing qt.install
+	sed -i -e 's/^.*> Qt .*/        echo " > Qt '${pkgver}'"/' $startdir/qt.install
+	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
 
 	msg "apply other patches"
 	patch -Np1 -i ${srcdir}/install-qdoc3.patch || return 1
@@ -178,7 +173,7 @@ build()
 
 	msg "starting the build"
 	make || return 1
-} 
+}
 
 package_qt()
 {
