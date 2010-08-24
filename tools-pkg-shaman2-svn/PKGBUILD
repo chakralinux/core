@@ -11,13 +11,13 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 _origname=shaman2
 
 pkgname=${_origname}-svn
-pkgver=1129707
+pkgver=1163590
 pkgrel=1
 pkgdesc="Pacman frontend based on kdelibs and libaqpm - SVN build"
 url="http://chakra-project.org/tools-shaman.html"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=("aqpm2-git>=2010305" "kdelibs>=4.4.1" 'dbus')
+depends=("akabeicore>=20100824" "akabeiclient>=20100824" "kdelibs>=4.5.0" 'dbus')
 makedepends=('subversion' 'cmake')
 provides=('shaman2')
 conflicts=('shaman' 'kdemod-shaman' 'kdemod-playground-shaman-git' 'kdemod-playground-shaman2-svn')
@@ -40,7 +40,7 @@ build() {
     msg "SVN checkout done or server timeout"
     msg "Starting cmake..."
 
-    cmake . -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSHAMAN_BACKEND=AQPM || return 1
+    cmake . -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSHAMAN_BACKEND=AKABEI || return 1
 
     msg "Starting make..."
 
