@@ -27,9 +27,11 @@ pkgname=('koffice-l10n-ca'
          'koffice-l10n-pl'
          'koffice-l10n-pt'
          'koffice-l10n-pt_br'
+         'koffice-l10n-ru'
          'koffice-l10n-sv'
          'koffice-l10n-tr'
          'koffice-l10n-uk'
+         'koffice-l10n-wa'
          'koffice-l10n-zh_cn'
          'koffice-l10n-zh_tw')
 pkgver=2.2.2
@@ -59,11 +61,14 @@ source=("http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase
         "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-pl-${pkgver}.tar.bz2"
         "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-pt-${pkgver}.tar.bz2"
         "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-pt_BR-${pkgver}.tar.bz2"
+        "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-ru-${pkgver}.tar.bz2"
         "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-sv-${pkgver}.tar.bz2"
         "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-tr-${pkgver}.tar.bz2"
         "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-uk-${pkgver}.tar.bz2"
+        "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-wa-${pkgver}.tar.bz2"
         "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-zh_CN-${pkgver}.tar.bz2"
         "http://download.kde.org/stable/koffice-${pkgver}/koffice-l10n/${pkgbase}-zh_TW-${pkgver}.tar.bz2")
+
 md5sums=('142d0626eac29c19a1d2b66dfc0ded16' #  koffice-l10n-ca-2.2.2.tar.bz2
          '636d71a0cf615287456ec5846e07db39' #  koffice-l10n-ca@valencia-2.2.2.tar.bz2
          '0cd6ff9e2bddf4306c316150e015fc6f' #  koffice-l10n-da-2.2.2.tar.bz2
@@ -246,6 +251,14 @@ build() {
   make || return 1
   cd ../..
 
+  install -d build/ru
+  cd build/ru
+  cmake ${srcdir}/koffice-l10n-ru-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  make || return 1
+  cd ../..
+
   install -d build/sv
   cd build/sv
   cmake ${srcdir}/koffice-l10n-sv-${pkgver} \
@@ -265,6 +278,14 @@ build() {
   install -d build/uk
   cd build/uk
   cmake ${srcdir}/koffice-l10n-uk-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  make || return 1
+  cd ../..
+
+  install -d build/wa
+  cd build/wa
+  cmake ${srcdir}/koffice-l10n-wa-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr
   make || return 1
@@ -385,6 +406,11 @@ package_koffice-l10n-pt_br() {
         cd $srcdir/build/pt_BR
         make DESTDIR=$pkgdir install
 }
+package_koffice-l10n-ru() {
+        pkgdesc=('Russian Localization for Koffice')
+        cd $srcdir/build/ru
+        make DESTDIR=$pkgdir install
+}
 package_koffice-l10n-sv() {
         pkgdesc=('Swedish Localization for Koffice')
         cd $srcdir/build/sv
@@ -398,6 +424,11 @@ package_koffice-l10n-tr() {
 package_koffice-l10n-uk() {
         pkgdesc=('Ukrainian Localization for Koffice')
         cd $srcdir/build/uk
+        make DESTDIR=$pkgdir install
+}
+package_koffice-l10n-wa() {
+        pkgdesc=('Wallonian Localization for Koffice')
+        cd $srcdir/build/wa
         make DESTDIR=$pkgdir install
 }
 package_koffice-l10n-zh_cn() {
