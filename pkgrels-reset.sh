@@ -134,6 +134,26 @@ decrease_pkgrels()
 			status_done
 			done
 		;;
+		
+		*)
+			title2 "Resetting pkgrels"
+			for module in ${whattodo[*]}
+			do
+			status_start "$module"
+			pushd $module &>/dev/null
+
+			REL=1
+			while [ $REL -le 20 ]
+			do
+				sed -i -e "s/\<pkgrel=$REL.*\>/pkgrel=1/g" PKGBUILD
+				
+				REL=$(( $REL + 1 ))
+			done
+
+			popd &>/dev/null
+			status_done
+			done
+		;;
 	esac         
 }
 
