@@ -92,8 +92,7 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 
 #	feature_kdm-plymouth.patch
 
-	screensaver-sleep.patch
-	malloc_check.patch)
+	screensaver-sleep.patch)
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
         'f355a658d2e9267fdf4e8d8f88038bcf' # mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -126,8 +125,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #        '894815a80f99a9a0dee1adbcda49b161' #  feature_battery-tooltip.patch
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
-        'bf36e9cc623c7c3da6668e560e29975c'  #  screensaver-sleep.patch
-        '3d10907980fe73ebbb3e323c69ade74a') #  malloc_check.patch
+        'bf36e9cc623c7c3da6668e560e29975c') #  screensaver-sleep.patch
 
 
 #
@@ -178,10 +176,6 @@ build()
 
 	msg "applying arch patches ..."
         patch -p1 -i ${srcdir}/screensaver-sleep.patch || return 1 # FS#19426  
-        # remove MALLOC_CHECK from startkde script
-        patch -Np0 -i ${srcdir}/malloc_check.patch
-
-
 
 	msg "starting workspace build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
