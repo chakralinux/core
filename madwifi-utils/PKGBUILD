@@ -9,9 +9,10 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 
 pkgname=madwifi-utils
-pkgver=0.9.4.4119
-_kernver=`uname -r`
-pkgrel=2
+pkgver=0.9.4.4133
+# Find the kernel name inside the chroot
+_kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
+pkgrel=1
 pkgdesc="Userspace tools of madwifi drivers for Atheros wireless chipsets."
 arch=(i686 x86_64)
 license=('GPL')
@@ -38,4 +39,4 @@ build() {
        MANDIR=/usr/share/man \
        install-tools
 }
-md5sums=('a720a20264b312c0ff906b9888bb49ae')
+md5sums=('ca3c3504d000e7b3d7063af46271c932')
