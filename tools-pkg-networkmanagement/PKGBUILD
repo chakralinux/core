@@ -15,7 +15,6 @@ pkgname=('networkmanagement')
          
 arch=('i686' 'x86_64')
 pkgver=1158147
-#pkgver=1030904 # stable snapshot
 pkgrel=1
 
 pkgdesc="KDE SC networkmanager plasmoid"
@@ -29,8 +28,8 @@ makedepends=('subversion' 'cmake' 'python' 'automoc4')
 replaces=('networkmanagement-networkmanager-plasmoid' 'networkmanagement-knetworkmanager-kde4')
 
 # comment out when using stable snapshot
-_svntrunk=svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement
-_svnmod=networkmanagement
+#_svntrunk=svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement
+#_svnmod=networkmanagement
 
 
 #
@@ -40,8 +39,8 @@ build() {
 cd "$srcdir"
 
 	# comment out when using stable snapshot
-	svn co $_svntrunk $_svnmod --revision $pkgver
-	#svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement --revision $pkgver
+	#svn co $_svntrunk $_svnmod --revision $pkgver
+	svn co svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement --revision $pkgver
 	msg "SVN checkout done or server timeout"
 
 	mkdir -p $srcdir/build
@@ -56,12 +55,4 @@ cd "$srcdir"
 	make || return 1
 	
 	make DESTDIR=${pkgdir} install || return 1
-
-	# remove knetworkmanager.desktop files
-	#rm -vR ${pkgdir}/usr/share/applications
-
-	# workaround remove plasmoid files
-	#cd $srcdir/split
-	#rm -v usr/lib/kde4/plasma_applet_networkmanagement.so
-	#rm -v usr/share/kde4/services/plasma-applet-networkmanagement.desktop
 }
