@@ -1,26 +1,43 @@
-# Maintainer: Austin ( doorknob60 [at] gmail [dot] com )
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=broadcom-wl
 pkgver=5.60.48.36 
-pkgrel=6.2
+pkgrel=7
 
 # Find the kernel name inside the chroot
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
-pkgdesc="Broadcom 802.11abg Networking Drivers"
+pkgdesc="Broadcom 802.11abg Networking Drivers for kernel26"
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686" ] && ARCH=x86_32
 [ "$CARCH" = "x86_64" ] && ARCH=x86_64
 url="http://www.broadcom.com/support/802.11/linux_sta.php"
 license=('MIXED/Proprietary')
-depends=('kernel26>=2.6.33' 'kernel26<2.6.34')
+depends=('kernel26>=2.6.35' 'kernel26<2.6.36')
 makedepends=(kernel26-headers)
 install=broadcom-wl.install
-source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc-${ARCH}-v${pkgver}.tar.gz")
-md5sums=(0466d863405e1ab99d5e288fe886e852)
-[ "$CARCH" == "x86_64" ] && md5sums=(a78095ddcc30a191f64dccbc31b84de8)
+source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc-${ARCH}-v${pkgver}.tar.gz" 'kernel-2.6.35.patch')
+[ "$CARCH" = 'x86_64' ] && sha1sums=('1174a4d3102aa0ed45003556e03842668ef698b9'
+                                     '43d541063fd91b1fbd5e84310228abafddab7f7e') \
+                        || sha1sums=('07d955afe599466b0e25bcc507186f5b50f1a171'
+                                     '43d541063fd91b1fbd5e84310228abafddab7f7e')
+groups=("kernel26-modules")
+conflicts=("broadcom-wl")
+replaces=("broadcom-wl")
 
 build() {
+
+  cd "$srcdir"
+ 
+  patch -p1 < kernel-2.6.35.patch
+
   # Adding line license
   sed -i '190i\MODULE_LICENSE("Mixed/Proprietary"); \n' ${srcdir}/src/wl/sys/wl_linux.c
   sed -i 's/linux\/autoconf.h/generated\/autoconf.h/' ${srcdir}/src/include/linuxver.h

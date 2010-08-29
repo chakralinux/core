@@ -8,38 +8,37 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=aufs2
-pkgver=2.6.33_20100514
-pkgrel=6
+pkgver=2.6.35_20100809
+pkgrel=1
 _kernver=${pkgver%_*}-CHAKRA
 pkgdesc="Another Unionfs Implementation"
 arch=('i686' 'x86_64')
 url="http://aufs.sourceforge.net/"
 license=('GPL2')
-depends=('kernel26>=2.6.33.6-1.1' 'kernel26<2.6.34')
-makedepends=('kernel26-headers>=2.6.33' 'kernel26-headers<2.6.34')
-replaces=('aufs')
-install=${pkgname}.install
-source=("${pkgname}-${pkgver}.tar.gz" 'writefix.patch')
+depends=('kernel26>=2.6.35' 'kernel26<2.6.36')
+makedepends=('kernel26-headers>=2.6.35' 'kernel26-headers<2.6.36')
+replaces=('aufs' 'aufs2')
+conflicts=('aufs2')
+install=aufs2.install
+source=("http://chakra-project.org/sources/aufs2/aufs2-${pkgver}.tar.gz")
 options=(!makeflags)
-md5sums=('0bf267301bd89f9d64a104b722da9cec'
-         'a31931b296cb37d5c9bec1ffd31e7fc1')
+md5sums=('7fee91c73274151b4a83982771a5c358')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver} || return 1
+  cd ${srcdir}/aufs2-${pkgver} || return 1
 
-  msg "add patches"
-  patch -Np1 -i $startdir/writefix.patch || return 1
+#  msg "add patches"
 
   msg "start config"
-  sed -i 's|CONFIG_AUFS_HNOTIFY =.*|CONFIG_AUFS_HNOTIFY = y|' \
+  sed -i 's|CONFIG_AUFS_HNOTIFY =.*|CONFIG_AUFS_HNOTIFY = y\nCONFIG_INOTIFY = y|' \
      config.mk || return 1
   sed -i 's|CONFIG_AUFS_HFSNOTIFY =.*|CONFIG_AUFS_HFSNOTIFY = y|' \
      config.mk || return 1
-  sed -i 's|CONFIG_AUFS_EXPORT =.*|CONFIG_AUFS_EXPORT = y|' \
+  sed -i 's|CONFIG_AUFS_EXPORT =.*|CONFIG_AUFS_EXPORT = y\nCONFIG_EXPORTFS = y|' \
      config.mk || return 1
   sed -i 's|CONFIG_AUFS_SHWH =.*|CONFIG_AUFS_SHWH = y|' \
      config.mk || return 1
-  sed -i 's|CONFIG_AUFS_BDEV_LOOP =.*|CONFIG_AUFS_BDEV_LOOP = y|' \
+  sed -i 's|CONFIG_AUFS_BDEV_LOOP =.*|CONFIG_AUFS_BDEV_LOOP = y\nCONFIG_BLK_DEV_LOOP = y|' \
      config.mk || return 1
   sed -i 's|CONFIG_AUFS_BR_RAMFS =.*|CONFIG_AUFS_BR_RAMFS = y|' \
      config.mk || return 1
@@ -59,7 +58,7 @@ build() {
     $pkgdir/lib/modules/${_kernver}/kernel/fs/aufs/aufs.ko || return 1
   # tweak the install script for the right kernel version
   sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/g" \
-    $startdir/$pkgname.install || return 1
+    $startdir/aufs2.install || return 1
   # install include files
   install -D -m 644 include/linux/aufs_type.h $pkgdir/usr/src/linux-$_kernver/include/linux/aufs_type.h || return 1
 }
