@@ -12,12 +12,12 @@ _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
 pkgname=catalyst
 pkgver=10.6
-pkgrel=1
+pkgrel=2
 pkgdesc="AMD/ATI drivers for Radeon brand cards"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
-depends=('xorg-server<1.9.0' 'kernel26>=2.6.29' 'kernel26<2.6.35' 'kernel26-headers' 'netkit-bsd-finger' 'libstdc++5' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs')
+depends=('xorg-server<1.9.0' 'kernel26>=2.6.29' 'kernel26<2.6.36' 'kernel26-headers' 'netkit-bsd-finger' 'libstdc++5' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs')
 
 conflicts=('catalyst' 'catalyst-utils' 'nvidia' 'libgl' 'catalyst-leaked' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri')
 provides=('catalyst' 'libgl' 'libatical')
@@ -45,12 +45,8 @@ BUILDARCH=i386
 _archdir=x86
 fi
 
-#patching for kernel 2.6.33 or 2.6.34 support
-if [ `uname -r |grep -c "2.6.33"` != 0 ] || [ `uname -r |grep -c "2.6.34"` != 0 ]; then
 cd "${srcdir}/archive_files/"
 patch -Np1 -i ../fglrx-2.6.34-rc4.patch || return 1
-fi
-
 
 cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
 cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a.GCC4" . || return 1

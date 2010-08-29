@@ -1,4 +1,3 @@
-# $Id: PKGBUILD 28363 2009-03-01 00:06:27Z pierre $
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
@@ -10,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=nvidia-173xx
 pkgver=173.14.27
-pkgrel=1.2
+pkgrel=2
 # Find the kernel name inside the chroot
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 pkgdesc="NVIDIA drivers for kernel26, 173xx branch."
@@ -18,9 +17,9 @@ arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86
 [ "$CARCH" = "x86_64" ] && ARCH=x86_64
 url="http://www.nvidia.com/"
-depends=('kernel26>=2.6.33' 'kernel26<2.6.34' 'nvidia-173xx-utils')
-makedepends=('kernel26-headers>=2.6.33' 'kernel26-headers<2.6.34')
-conflicts=('nvidia-96xx' 'nvidia')
+depends=('kernel26>=2.6.35' 'kernel26<2.6.36' 'nvidia-173xx-utils')
+makedepends=('kernel26-headers>=2.6.35' 'kernel26-headers<2.6.36')
+conflicts=('nvidia-96xx' 'nvidia' 'nvidia-173xx')
 license=('custom')
 install=nvidia.install
 source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run")

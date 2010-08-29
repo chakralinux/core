@@ -11,25 +11,28 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
 pkgname=madwifi
-pkgver=0.9.4.4119
-pkgrel=4.2
-pkgdesc="Madwifi drivers for Atheros wireless chipsets. For stock arch 2.6 kernel"
+pkgver=0.9.4.4133
+pkgrel=5
+pkgdesc="Madwifi drivers for Atheros wireless chipsets. For kernel26"
 arch=(i686 x86_64)
 license=('GPL')
 url="http://madwifi-project.org"
-depends=('madwifi-utils' 'kernel26>=2.6.33' 'kernel26<2.6.34')
-makedepends=('kernel26-headers>=2.6.33' 'kernel26-headers<2.6.34' 'sharutils')
+depends=('madwifi-utils' 'kernel26>=2.6.35' 'kernel26<2.6.36')
+makedepends=('kernel26-headers>=2.6.35' 'kernel26-headers<2.6.36' 'sharutils')
 install=madwifi-ng.install
 # subversion source: svn checkout http:/madwifi-project.org/svn/madwifi/trunk madwifi
 source=(ftp://ftp.archlinux.org/other/madwifi/madwifi-${pkgver}.tar.bz2
 	#http://downloads.sourceforge.net/madwifi/madwifi-${pkgver}.tar.gz
 	)
+groups=("kernel26-modules")
+conflicts=("madwifi")
+replaces=("madwifi")
 
 build() {
   [ "${CARCH}" = "i686" ] && export ARCH=i386
 
-  #cd $startdir/src/$pkgname-$pkgver
-  cd $startdir/src/$pkgname
+  #cd $startdir/src/madwifi-$pkgver
+  cd $startdir/src/madwifi
   sed -i -e 's/-Werror//g' Makefile.inc
   make KERNELPATH=/lib/modules/$_kernver/build KERNELRELEASE=$_kernver modules|| return 1
   make KERNELPATH=/lib/modules/$_kernver/build KERNELRELEASE=$_kernver modules \
@@ -42,4 +45,4 @@ build() {
   rm -r $startdir/pkg/lib/modules/$_kernver/net/
 }
 
-md5sums=('a720a20264b312c0ff906b9888bb49ae')
+md5sums=('ca3c3504d000e7b3d7063af46271c932')
