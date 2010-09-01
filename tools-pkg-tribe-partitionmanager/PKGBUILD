@@ -23,8 +23,8 @@ makedepends=('cmake' 'automoc4' 'pkgconfig')
 conflicts=('kdemod-tribe-partitionmanager' 'chakra-libpartitionmanager')
 groups=('kde-uninstall')
 
-_gitroot="git://gitorious.org/chakra/tribe-partitionmanager.git"
-_gitname="tribe-partitionmanager"
+_gitroot="git://gitorious.org/~djustice/chakra/djustice-tribe.git"
+_gitname="libpartitionmanager"
 
 
 #
@@ -36,7 +36,7 @@ build()
         msg "Connecting to GIT server...."
 
         if [ -d $_gitname ] ; then
-        cd $_gitname && git pull origin
+        cd $_gitname/djustice-tribe && git pull origin
         msg "The local files are updated."
         else
         git clone $_gitroot
@@ -46,7 +46,7 @@ build()
 
         rm -rf "${srcdir}/$_gitname-build"
 
-        cp -r "${srcdir}/$_gitname" "${srcdir}/$_gitname-build"
+        cp -r "${srcdir}/djustice-tribe/$_gitname" "${srcdir}/$_gitname-build"
         cd "${srcdir}/$_gitname-build/"
 
 	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
