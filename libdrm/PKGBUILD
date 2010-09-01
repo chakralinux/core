@@ -1,8 +1,8 @@
-# $Id: PKGBUILD 77295 2010-04-11 20:32:35Z thomas $
+# $Id: PKGBUILD 86650 2010-08-02 19:36:00Z jgc $
 # Maintainer: Jan de Groot <jgc@archlinux.org>
 
 pkgname=libdrm
-pkgver=2.4.19
+pkgver=2.4.21
 pkgrel=2
 pkgdesc="Userspace interface to kernel DRM services"
 arch=(i686 x86_64)
@@ -11,28 +11,28 @@ depends=('glibc')
 options=('!libtool')
 url="http://dri.freedesktop.org/"
 source=(http://dri.freedesktop.org/${pkgname}/${pkgname}-${pkgver}.tar.bz2
+        libdrm-2.4.21-b803918f3f.patch
         no-pthread-stubs.patch
-        COPYING
-        intel-use-the-correct-size-when-allocating-reloc_target_info-array.patch)
-md5sums=('c2699b5d8ebc9e47fb56da15f460107f'
+        COPYING)
+md5sums=('273ed9dad986e3a931649f3d8762ff74'
+         'd67fab8381b371fe2a8f86e2819aef2b'
          '9b5ec3bbebe86921e2057694c42f65b8'
-         'ba65e71c481b94ef0fb6c23c7f21ffa1'
-         '2dd7d84d3ebbc23c92b602104fae5df3')
+         'ba65e71c481b94ef0fb6c23c7f21ffa1')
      
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np1 -i "${srcdir}/no-pthread-stubs.patch" || return 1
-  patch -p1 -i "${srcdir}/intel-use-the-correct-size-when-allocating-reloc_target_info-array.patch" || return 1
-  libtoolize --force || return 1
-  aclocal || return 1
-  autoconf || return 1
-  automake || return 1
+  patch -Np1 -i "${srcdir}/libdrm-2.4.21-b803918f3f.patch"
+  patch -Np1 -i "${srcdir}/no-pthread-stubs.patch"
+  libtoolize --force
+  aclocal
+  autoconf
+  automake
   ./configure --prefix=/usr \
       --enable-intel --enable-radeon \
       --enable-vmwgfx-experimental-api --enable-nouveau-experimental-api \
-      --enable-udev || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+      --enable-udev
+  make
+  make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 "${srcdir}/COPYING" "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+  install -m644 "${srcdir}/COPYING" "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
