@@ -24,7 +24,7 @@ conflicts=('kdemod-tribe-partitionmanager' 'chakra-libpartitionmanager')
 groups=('kde-uninstall')
 
 _gitroot="git://gitorious.org/~djustice/chakra/djustice-tribe.git"
-_gitname="libpartitionmanager"
+_gitname="djustice-tribe"
 
 
 #
@@ -36,7 +36,7 @@ build()
         msg "Connecting to GIT server...."
 
         if [ -d $_gitname ] ; then
-        cd $_gitname/djustice-tribe && git pull origin
+        cd $_gitname && git pull origin
         msg "The local files are updated."
         else
         git clone $_gitroot
@@ -44,10 +44,10 @@ build()
         msg "GIT checkout done or server timeout"
         msg "Starting make..."
 
-        rm -rf "${srcdir}/$_gitname-build"
+        rm -rf "${srcdir}/libpartitionmanager-build"
 
-        cp -r "${srcdir}/djustice-tribe/$_gitname" "${srcdir}/$_gitname-build"
-        cd "${srcdir}/$_gitname-build/"
+        cp -r "${srcdir}/$_gitname/libpartitionmanager" "${srcdir}/libpartitionmanager-build"
+        cd "${srcdir}/libpartitionmanager-build/"
 
 	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_BUILD_TYPE=${_build_type} \
