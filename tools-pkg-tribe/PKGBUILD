@@ -12,7 +12,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgname=tribe
-pkgver=20100902
+pkgver=20100903
 _sver=20100404
 pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
@@ -55,11 +55,11 @@ build()
 
         rm -rf "${srcdir}/tribe-build"
 
-        cp -rv "${srcdir}/$_gitname/tribe" "${srcdir}/tribe-build"
+        cp -r "${srcdir}/$_gitname/tribe" "${srcdir}/tribe-build"
         cd "${srcdir}/tribe-build/"
 
 	msg "replace screenshots"
-	cp -vr "${srcdir}/tribe-screenshots-${_sver}/images/" "${srcdir}/tribe-build/ui"
+	cp -r "${srcdir}/tribe-screenshots-${_sver}/images/" "${srcdir}/tribe-build/ui"
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra-Distro)~g" config-tribe.h.cmake
