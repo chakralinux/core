@@ -7,59 +7,26 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgname=pulseaudio
+pkgbase=pulseaudio
+pkgname=('pulseaudio' 'libpulse')
 pkgver=0.9.21
-pkgrel=1
-__gitcommit=65f89dc
+pkgrel=2
 pkgdesc="A networked sound server"
 arch=(i686 x86_64)
-url="http://pulseaudio.org/"
+url=http://pulseaudio.org/
 license=(GPL LGPL)
-depends=(libasyncns libcap attr libxtst libsm tcp_wrappers libsndfile
-         libtool rtkit speex libsamplerate tdb udev)
-makedepends=(autoconf avahi bluez doxygen gconf intltool jack lirc-utils pkgconfig
-             git rsync)
-optdepends=('alsa-plugins: ALSA support'
-            'avahi: zeroconf support'
-            'bluez: bluetooth support'
-            'gconf: configuration through gconf'
-            'jack: jack support'
-            'lirc-utils: infra-red support')
+makedepends=('autoconf' 'avahi' 'bluez' 'doxygen' 'gconf' 'intltool' 'jack' 'lirc-utils' 'pkgconfig'
+	     'udev' 'libsm' 'libsndfile' 'libasyncns' 'libcap' 'rtkit' 'attr' 'libxtst' 'speex'
+             'libsamplerate' 'tdb' 'libtool' 'tcp_wrappers')
 options=(emptydirs !libtool !makeflags !strip)
-backup=(etc/pulse/{client.conf,daemon.conf,default.pa,system.pa})
-install=pulseaudio.install
-source=(pulseaudio.conf pulseaudio.rc)
-md5sums=('d4a7d4ad51b406588ba7ac7931c5dd88'
+source=("http://0pointer.de/lennart/projects/pulseaudio/${pkgbase}-${pkgver}.tar.gz"
+        'pulseaudio.conf' 'pulseaudio.rc')
+md5sums=('76e623c4c72e2258bc8bdeb1599bad74'
+         'd4a7d4ad51b406588ba7ac7931c5dd88'
          'c5aa09c1d3e2217dc3bb23138e2a5a1d')
 
-__gitroot=git://git.0pointer.de/pulseaudio.git
-__gitname=pulseaudio
-__gitbranch=stable-queue
-
 build() {
-  cd "$srcdir"
-
-  msg2 "Checking out source from git..."
-
-  [[ ! -d $__gitname ]] && git clone $__gitroot $__gitname
-
-  cd $__gitname
-  git fetch origin $__gitbranch || warning 'git fetch failed!'
-
-  if [[ $(git rev-parse $__gitcommit) != $(git rev-parse origin/$__gitbranch) ]]; then
-    warning 'You are not building the latest revision!'
-    warning "Consider updating __gitcommit to $(git rev-parse --short origin/$__gitbranch)."
-    sleep 10
-  fi
-
-  git checkout $__gitcommit
-  cd ..
-
-  rm -rf $__gitname-build
-  rsync -a --exclude='.git/' $__gitname/ $__gitname-build
-  cd "$__gitname-build"
-
-  msg2 "Building..."
+  cd "${srcdir}/${pkgbase}-${pkgver}"
 
   # Fix linking dependency cycle between libpulse and libpulsecommon
   LDFLAGS="${LDFLAGS//-Wl,--as-needed}"
@@ -69,25 +36,70 @@ build() {
   # Fix strict aliasing warnings
   CFLAGS+=" -fno-strict-aliasing"
 
-  echo "$pkgver" > .tarball-version
-
-  sh autogen.sh --disable-hal --disable-rpath \
-    --libexecdir=/usr/lib --localstatedir=/var \
-    --prefix=/usr --sysconfdir=/etc --with-database=tdb
+  ./configure --disable-hal \
+	      --disable-rpath \
+	      --libexecdir=/usr/lib \
+	      --localstatedir=/var \
+	      --prefix=/usr \
+	      --sysconfdir=/etc \
+	      --with-database=tdb
   make
   make doxygen
 }
 
-package() {
-  cd "$srcdir/$__gitname-build"
-  make DESTDIR="$pkgdir" install
+package_pulseaudio() {
+  depends=("libpulse=${pkgver}-${pkgrel}" 'udev')
+  optdepends=('pulseaudio-alsa: ALSA support'
+	      'avahi: zeroconf support'
+	      'bluez: bluetooth support'
+	      'gconf: configuration through gconf'
+	      'jack: jack support'
+	      'lirc-utils: infra-red support')
+  install=pulseaudio.install
+  backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
 
-  install -Dm755 "$srcdir/pulseaudio.rc" "$pkgdir/etc/rc.d/pulseaudio"
-  install -Dm644 "$srcdir/pulseaudio.conf" "$pkgdir/etc/conf.d/pulseaudio"
-  install -dm755 "$pkgdir/var/run/pulse"
+  cd "${srcdir}/${pkgbase}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -Dm755 "${srcdir}/pulseaudio.rc" "${pkgdir}/etc/rc.d/pulseaudio"
+  install -Dm644 "${srcdir}/pulseaudio.conf" "${pkgdir}/etc/conf.d/pulseaudio"
+  install -dm755 "${pkgdir}/var/run/pulse"
 
   # Ugly fix for pulseaudio system users
-  install -dm755 "$pkgdir/var/pulse"
+  install -dm755 "${pkgdir}/var/pulse"
   echo -e '\n### Automatically restore volumes\nload-module module-volume-restore table="/var/pulse/volume-restore.table"' \
-    >> "$pkgdir/etc/pulse/system.pa"
+    >> "${pkgdir}/etc/pulse/system.pa"
+
+  # Remove libpulse
+  rm ${pkgdir}/etc/pulse/client.conf
+  rm -r ${pkgdir}/usr/include/
+  rm ${pkgdir}/usr/lib/libpulse*
+  rm -r ${pkgdir}/usr/lib/pkgconfig
+  rm -r ${pkgdir}/usr/share/locale/
+  rm -r ${pkgdir}/usr/share/vala/
+  rm ${pkgdir}/usr/share/man/man5/pulse-client.conf.5
+
+}
+
+package_libpulse() {
+  depends=('libsm' 'libsndfile' 'libasyncns' 'libcap' 'rtkit' 'attr' 'libxtst' 'speex'
+           'libsamplerate' 'tdb' 'libtool' 'tcp_wrappers')
+  backup='etc/pulse/client.conf'
+  cd "${srcdir}/${pkgbase}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  # Remove everything but the libs
+  rm -r ${pkgdir}/etc/dbus-1/
+  rm ${pkgdir}/etc/pulse/daemon.conf
+  rm ${pkgdir}/etc/pulse/default.pa
+  rm ${pkgdir}/etc/pulse/system.pa
+  rm -r ${pkgdir}/etc/xdg/
+  rm -r ${pkgdir}/lib/
+  rm -r ${pkgdir}/usr/bin
+  rm -r ${pkgdir}/usr/lib/pulse
+  rm -r ${pkgdir}/usr/lib/pulse-$pkgver
+  rm -r ${pkgdir}/usr/share/man/man1
+  rm ${pkgdir}/usr/share/man/man5/default.pa.5
+  rm ${pkgdir}/usr/share/man/man5/pulse-daemon.conf.5
+  rm -r ${pkgdir}/usr/share/pulseaudio
 }

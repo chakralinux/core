@@ -20,7 +20,7 @@ pkgname=('phonon'
 
 pkgver=4.4.1
 _pkgver=4.4.1
-pkgrel=3
+pkgrel=4
 pkgdesc='The multimedia API for Qt 4 and KDE 4'
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
@@ -36,25 +36,30 @@ makedepends=("qt>=${_qtver}"
 	'gstreamer0.10'
 	'gstreamer0.10-base'
 	'gstreamer0.10-base-plugins'
+	'libpulse'
 	'phonon') #for mplayer/vlc-backends
 
 source=("http://download.kde.org/stable/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2" \
-	'01-phonon-includes.patch')
+	'01-phonon-includes.patch' \
+	'02-xine-initialize-volume-to-1.patch'  \
+	'03-pulse-fix-reading-of-stream-information.patch')
 
-md5sums=('5a1444f009a77054f16fea38c08e6cb5' '8635288be343c76bb8064e60233248b7')
-
-
-
+md5sums=('5a1444f009a77054f16fea38c08e6cb5'
+         '8635288be343c76bb8064e60233248b7'
+         '4307acaa2bbef841807bec776124694c'
+         '463d895f29ba195ec35b3f67f01e0876')
 build() {
 	cd $srcdir/${pkgbase}-${pkgver}
 	patch -Np1 -i $srcdir/01-phonon-includes.patch || return 1
+        patch -Np1 -i $srcdir/02-xine-initialize-volume-to-1.patch || return 1
+        patch -Np1 -i $srcdir/03-pulse-fix-reading-of-stream-information.patch || return 1
 
 	mkdir build
 	cd build
 	cmake .. -DCMAKE_BUILD_TYPE=Release \
 		 -DCMAKE_INSTALL_PREFIX=/usr \
 		 -DCMAKE_SKIP_RPATH=ON \
-		 -DWITH_PulseAudio=OFF \
+		 -DWITH_PulseAudio=ON \
 		 -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 	make
 }
