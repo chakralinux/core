@@ -44,7 +44,10 @@ build()
 	cp -vr "${srcdir}/tribe-screenshots-${_sver}/images/" "${srcdir}/$pkgname/ui"
 
 	# add pkgver to tribe
-	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel}~g" config-tribe.h.cmake
+	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
+	# fix theme
+	sed -i -e "s~ashoc~crunchy-branch-blue~g" "${srcdir}/$pkgname/etc/postinstall-functions/job-configure-users"
+	sed -i -e "s~ashoc~crunchy-branch-blue~g" "${srcdir}/$pkgname/etc/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_SKIP_RPATH=ON \
