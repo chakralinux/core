@@ -11,43 +11,26 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgname=tribe-partitionmanager
-pkgver=20100606
+pkgver=0.2.1
 pkgrel=1
 pkgdesc="Tribe's partitionmanager"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdebase-workspace' 'parted>=2.2' 'e2fsprogs' 'libatasmart')
+depends=('kdebase-workspace' 'parted>=2.3' 'e2fsprogs' 'libatasmart')
 replaces=('kdemod-tribe-partitionmanager')
 makedepends=('cmake' 'automoc4' 'pkgconfig')
 conflicts=('kdemod-tribe-partitionmanager' 'chakra-libpartitionmanager')
 groups=('kde-uninstall')
-
-_gitroot="git://gitorious.org/chakra/tribe-partitionmanager.git"
-_gitname="tribe-partitionmanager"
-
+source=("http://chakra-project.org/sources/tribe/tribe-partitionmanager-${pkgver}.tar.xz")
+md5sums=('245c1564ddaa8088ab4c3ff69ac8acd7')
 
 #
 # build function
 #
 build()
 {
-        cd "${srcdir}"
-        msg "Connecting to GIT server...."
-
-        if [ -d $_gitname ] ; then
-        cd $_gitname && git pull origin
-        msg "The local files are updated."
-        else
-        git clone $_gitroot
-        fi
-        msg "GIT checkout done or server timeout"
-        msg "Starting make..."
-
-        rm -rf "${srcdir}/$_gitname-build"
-
-        cp -r "${srcdir}/$_gitname" "${srcdir}/$_gitname-build"
-        cd "${srcdir}/$_gitname-build/"
+        cd "${srcdir}/libpartitionmanager/"
 
 	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_BUILD_TYPE=${_build_type} \
