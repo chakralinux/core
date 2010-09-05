@@ -48,6 +48,7 @@ build()
 	# fix theme
 	sed -i -e "s~ashoc~crunchy-branch-blue~g" "${srcdir}/$pkgname/etc/postinstall-functions/job-configure-users"
 	sed -i -e "s~ashoc~crunchy-branch-blue~g" "${srcdir}/$pkgname/etc/postinstall-functions/job-initialize-target"
+	sed -i -e "s~0.2.831~${pkgver}~g" "${srcdir}/$pkgname/etc/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_SKIP_RPATH=ON \
