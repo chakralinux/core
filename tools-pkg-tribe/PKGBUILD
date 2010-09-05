@@ -14,7 +14,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=tribe
 pkgver=0.2.1
 _sver=20100905
-pkgrel=1
+pkgrel=2
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -26,9 +26,13 @@ replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.xz"
-        "http://chakra-project.org/sources/tribe/tribe-screenshots-${_sver}.tar.gz")
+        "http://chakra-project.org/sources/tribe/tribe-screenshots-${_sver}.tar.gz"
+        "http://chakra-project.org/sources/tribe/bundle-sys.patch"
+        "http://chakra-project.org/sources/tribe/slideshow-timer.patch")
 md5sums=('a91a8195a6fd5c4f5e659fa05448d507'
-         '94779efc8bd491dfe3eaf39d022b8354')
+         '94779efc8bd491dfe3eaf39d022b8354'
+         'b4140b2d2bdc0f55f10a7b1903b4ae0c'
+         '8bdc12ee4b17ced5f1a4a6731b534c18')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -38,6 +42,11 @@ install=tools-tribe.install
 #
 build()
 {
+        cd "${srcdir}"
+        msg "add postfix patches"
+        patch -Np1 -i ${srcdir}/bundle-sys.patch || return 1
+        patch -Np1 -i ${srcdir}/slideshow-timer.patch || return 1
+
         cd "${srcdir}/$pkgname"
 
 	msg "replace screenshots"
