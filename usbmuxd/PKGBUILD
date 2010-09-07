@@ -1,11 +1,6 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# $Id: PKGBUILD 81308 2010-05-28 00:01:31Z ibiru $
+# Maintainer : Ionut Biru <ibiru@archlinux.org>
+# Contributor: Gabriel Martinez < reitaka at gmail dot com >
 
 pkgname=usbmuxd
 pkgver=1.0.5
@@ -18,13 +13,16 @@ depends=('libusb1>=1.0.3')
 makedepends=('cmake')
 install=usbmuxd.install
 source=(http://marcansoft.com/uploads/${pkgname}/${pkgname}-${pkgver}.tar.bz2
-	usbmuxd-udevuser.patch)
-md5sums=('484970632a739206afe86802c6169300'
-	 'dbb0ab80ab70d571fc2113ee72592d5f')
+	usbmuxd-udevuser.patch
+        usbmuxd-soname.patch)
+sha256sums=('3bce652618c0e4add5cdcf2f88d581a5be9c2fe8cd46465d2f71422c262c108c'
+	    '6376057235ee4d6d8a637acf64edc981b36963a95de977c6c9ea506e6b26c821'
+            '8c783e6cf3ee1d057ebfaa68e48f590df002504fbcaa6d506e4541cfcabe96c9')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   patch -Np1 -i "${srcdir}/usbmuxd-udevuser.patch" || return 1
+  patch -Np1 -i "${srcdir}/usbmuxd-soname.patch" || return 1
   mkdir build
   cd build
   cmake ../ -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLIB_SUFFIX=""
