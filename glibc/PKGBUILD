@@ -24,7 +24,6 @@ makedepends=('gcc>=4.4')
 replaces=('glibc-xen')
 backup=(etc/locale.gen
         etc/nscd.conf)
-# disable stripping - breaks build
 options=('!strip')
 install=glibc.install
 source=(http://chakra-project.org/sources/glibc/${pkgname}-${pkgver}_${_glibcdate}.tar.xz
@@ -124,4 +123,25 @@ package() {
     cd ${pkgdir}/lib64
     ln -v -s ../lib/ld* .
   fi
+  
+  # manually strip files as stripping libpthread-*.so and libthread_db.so
+  # with the default $STRIP_SHARED breaks gdb and stripping ld-*.so breaks
+  # valgrind on x86_64
+
+  cd $pkgdir
+  strip $STRIP_BINARIES sbin/{ldconfig,sln} \
+                        usr/bin/{gencat,getconf,getent,iconv,locale} \
+                        usr/bin/{localedef,pcprofiledump,rpcgen,sprof} \
+                        usr/lib/getconf/* \
+                        usr/sbin/{iconvconfig,nscd,rpcinfo}
+  [[ $CARCH = "i686" ]] && strip $STRIP_BINARIES usr/bin/lddlibc4
+
+  strip $STRIP_STATIC usr/lib/*.a \
+                      lib/{{ld,libpthread}-${pkgver},libthread_db-1.0}.so
+
+  strip $STRIP_SHARED lib/{libanl,libBrokenLocale,libc,libcidn,libcrypt}-${pkgver}.so \
+                      lib/libnss_{compat,dns,files,hesiod,nis,nisplus}-${pkgver}.so \
+                      lib/{libdl,libm,libnsl,libresolv,librt,libutil}-${pkgver}.so \
+                      lib/{libmemusage,libpcprofile,libSegFault}.so \
+                      usr/lib/{pt_chown,gconv/*.so}
 }
