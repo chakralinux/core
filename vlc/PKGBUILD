@@ -11,7 +11,7 @@ pkgbase=vlc
 pkgname=('vlc'
          'vlc-plugin')
 pkgver=1.1.4
-pkgrel=2
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.videolan.org/vlc/"
 license=('GPL')
@@ -23,8 +23,8 @@ makedepends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'lirc-utils'
              'avahi' 'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'libxpm'
              'xulrunner' 'pkgconfig' 'live-media' 'libnotify' 'libcdio'
              'flac' 'libtheora' 'alsa-lib' 'jack' 'udev'
-             'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'chrpath')
-
+             'libraw1394' 'libdc1394' 'libavc1394' 'libva')
+options=('!libtool')
 source=("http://download.videolan.org/pub/videolan/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2")
 md5sums=('b71aacaa242f8050a64c6ffe09d6f067')
 
@@ -44,8 +44,7 @@ build() {
               --enable-ncurses \
               --enable-mozilla \
               --with-live555-tree=/usr/lib/live \
-              --enable-realrtsp \
-              --disable-pulse
+              --enable-realrtsp
   CFLAGS="-fPIC"
   make
 }
@@ -57,8 +56,9 @@ package_vlc() {
            'lua' 'libv4l' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
            'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2'
            'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug'
-           'avahi' 'ttf-freefont' 'libxv' 'libass' 'xdg-utils')
-  optdepends=('libnotify: for notification plugin'
+           'ttf-freefont' 'libxv' 'libass' 'xdg-utils')
+  optdepends=('avahi: for service discovery using bonjour protocol'
+              'libnotify: for notification plugin'
               'ncurses: for ncurses interface support'
               'libdvdcss: for decoding encrypted DVDs'
               'lirc-utils: for lirc plugin'
@@ -83,6 +83,12 @@ package_vlc-plugin() {
   pkgdesc="VLC mozilla browser plugin"
   depends=("${pkgbase}=${pkgver}" 'nspr' 'xulrunner' 'libxpm')
   cd "${srcdir}/${pkgbase}-${pkgver}"
-  install -Dm755 projects/mozilla/.libs/libvlcplugin.so ${pkgdir}/usr/lib/mozilla/plugins/libvlcplugin.so
-  chrpath -d ${pkgdir}/usr/lib/mozilla/plugins/libvlcplugin.so
+
+  #for linking against libvlc
+  make -C src DESTDIR="${pkgdir}" install-libLTLIBRARIES
+
+  make -C projects/mozilla DESTDIR=${pkgdir}/ install
+
+  #clean up libvlc
+  make -C src DESTDIR="${pkgdir}" uninstall-libLTLIBRARIES
 }
