@@ -4,7 +4,7 @@
 # Contributor: francois <francois.archlinux.org> 
 pkgname=perl
 pkgver=5.12.2
-pkgrel=5
+pkgrel=1
 pkgdesc="Practical Extraction and Report Language"
 arch=(i686 x86_64)
 license=('GPL' 'PerlArtistic')
@@ -12,7 +12,7 @@ url="http://www.perl.org"
 groups=('base')
 depends=('gdbm' 'db>=4.8' 'coreutils' 'glibc' 'sh')
 source=(http://www.perl.com/CPAN/src/perl-${pkgver}.tar.bz2
-    perlbin.sh perl-5.10.1-archlinux-inc-order.patch)
+    perlbin.sh)
 install=perl.install
 provides=(
 perl-ansicolor=2.00 
@@ -132,7 +132,6 @@ options=('!makeflags' '!purge')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  patch -Np0 -i ../perl-5.10.1-archlinux-inc-order.patch || return 1
 
   if [ "${CARCH}" = "x86_64" ]; then
     # for x86_64
@@ -197,5 +196,4 @@ build() {
   find $pkgdir -name .packlist -delete
 }
 md5sums=('7b018fe9c2f434eff0c629b4c515a8fc'
-         '9c4e3e56d71f123e92a68986df5ea924'
-         '0e4853bd75ee36b8f4c70b78c707b2fa')
+         '9c4e3e56d71f123e92a68986df5ea924')
