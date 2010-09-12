@@ -10,7 +10,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->binutils->glibc
 # NOTE: libtool requires rebuilt with each new gcc version
 
-pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada')
+pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc') #'gcc-ada'
 pkgver=4.5.1
 pkgrel=3
 #_snapshot=4.5-20100520
@@ -69,7 +69,7 @@ build() {
   echo ${pkgver} > gcc/BASE-VER
 
   mkdir build -p && cd build      
-  ../configure --prefix=/usr --enable-languages=c,c++,fortran,objc,obj-c++,ada \
+  ../configure --prefix=/usr --enable-languages=c,c++,fortran,objc,obj-c++ \
       --enable-shared --enable-threads=posix --enable-__cxa_atexit \
       --enable-clocale=gnu --enable-gnu-unique-object \
       --enable-lto --enable-plugin \
@@ -119,13 +119,13 @@ package_gcc()
   
   # much, much easier to install the lot and clean-up the mess
   make -j1 DESTDIR=${pkgdir} install || return 1
-  rm $pkgdir/usr/bin/{*gfortran,gnat*}
-  rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{ada{include,lib},finclude,include/objc}/*
-  rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{cc1obj{,plus},f951,gnat1,libgfortranbegin.a}
-  rm $pkgdir/usr/lib/{*.so*,lib{gfortran,objc}.a}
-  rm $pkgdir/usr/share/info/{gfortran,gnat*,libgomp}.info
-  rm $pkgdir/usr/share/locale/{de,fr}/LC_MESSAGES/libstdc++.mo
-  rm $pkgdir/usr/share/man/man1/gfortran.1
+  rm -rf $pkgdir/usr/bin/*gfortran # ,gnat*}
+  rm -rf $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{ada{include,lib},finclude,include/objc}/*
+  rm -rf $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{cc1obj{,plus},f951,libgfortranbegin.a,gnat1} 
+  rm -rf $pkgdir/usr/lib/{*.so*,lib{gfortran,objc}.a}
+  rm -rf $pkgdir/usr/share/info/{gfortran,libgomp}.info # ,gnat*}
+  rm -rf $pkgdir/usr/share/locale/{de,fr}/LC_MESSAGES/libstdc++.mo
+  rm -rf $pkgdir/usr/share/man/man1/gfortran.1
 
   # many packages require these symlinks
   install -dm755 ${pkgdir}/lib
@@ -167,7 +167,7 @@ EOF
   install -m644 ${srcdir}/libstdc++-api-${_libstdcppmanver}.man/man3/* \
     ${pkgdir}/usr/share/man/man3/
   # deal with conflicts...
-  rm -f ${pkgdir}/usr/share/man/man3/{ctime,queue,random,regex,string}.3
+  rm -rf ${pkgdir}/usr/share/man/man3/{ctime,queue,random,regex,string}.3
 
   # Install Runtime Library Exception
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
@@ -187,7 +187,7 @@ package_gcc-fortran()
   install -Dm755 gcc/f951 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/f951
   
   # remove libraries included in gcc-libs
-  rm -f ${pkgdir}/usr/lib/libgfortran.so*
+  rm -rf ${pkgdir}/usr/lib/libgfortran.so*
   
   # Install Runtime Library Exception
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
@@ -205,7 +205,7 @@ package_gcc-objc()
   install -m755 gcc/cc1obj{,plus} $pkgdir/usr/lib/gcc/$CHOST/$pkgver/
 
   # remove libraries included in gcc-libs
-  rm -f ${pkgdir}/usr/lib/libobjc.so*
+  rm -rf ${pkgdir}/usr/lib/libobjc.so*
 
   # Install Runtime Library Exception
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
