@@ -1,0 +1,32 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=flashplugin-square
+_licensefile='Reader_Player_AIR_WWEULA-Combined-20080204_1313.pdf'
+pkgver=10.2.161.22
+pkgrel=1
+pkgdesc='Adobe Flash Player x86_64'
+url='http://labs.adobe.com/technologies/flashplayer10/ '
+arch=('x86_64')
+depends=('mozilla-common' 'libxt' 'gtk2' 'nss' 'curl')
+replaces=('flashplugin-beta' 'flashplugin')
+license=('custom')
+provides=('flashplugin')
+source=('http://download.macromedia.com/pub/labs/flashplayer10/flashplayer_square_p1_64bit_linux_091510.tar.gz'
+        "http://www.adobe.com/products/eulas/pdfs/${_licensefile}")
+md5sums=('338e954c02ba6776b6b8a908e6f96b5f'
+         '1636037610ee2aa35c5fb736a697b7e0')
+
+build() {
+  install -d -m755 ${pkgdir}/usr/lib/mozilla/plugins/ || return 1
+  install -m755 ${srcdir}/libflashplayer.so ${pkgdir}/usr/lib/mozilla/plugins/ || return 1
+  install -d -m755 "${pkgdir}"/usr/share/licenses/${pkgname}/
+  install -m644 "${_licensefile}" "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE.pdf
+
+}
