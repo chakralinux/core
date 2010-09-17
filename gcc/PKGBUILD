@@ -10,7 +10,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->binutils->glibc
 # NOTE: libtool requires rebuilt with each new gcc version
 
-pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc') #'gcc-ada'
+pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada')
 pkgver=4.5.1
 pkgrel=3
 #_snapshot=4.5-20100520
@@ -69,7 +69,7 @@ build() {
   echo ${pkgver} > gcc/BASE-VER
 
   mkdir build -p && cd build      
-  ../configure --prefix=/usr --enable-languages=c,c++,fortran,objc,obj-c++ \
+  ../configure --prefix=/usr --enable-languages=c,c++,fortran,objc,obj-c++,ada \
       --enable-shared --enable-threads=posix --enable-__cxa_atexit \
       --enable-clocale=gnu --enable-gnu-unique-object \
       --enable-lto --enable-plugin \
