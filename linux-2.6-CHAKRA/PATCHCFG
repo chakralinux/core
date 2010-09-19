@@ -1,37 +1,29 @@
 # Kernel source file
-SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.33.tar.bz2"
+SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.35.tar.bz2"
 # Original source directory
-SRCORIG="linux-2.6.33"
+SRCORIG="linux-2.6.35"
 # Our source directory
-SRCNAME="linux-2.6.33-CHAKRA"
+SRCNAME="linux-2.6.35-CHAKRA"
 # Patches:
 #   URL%patchlevel
 #  or
 #   filename%patchlevel (file must be in patches/ subdirectory)
 PATCHES=(
-         # add upstream patch from 2.6.33 series
-         http://www.kernel.org/pub/linux/kernel/v2.6/patch-2.6.33.7.bz2%1
+         # add upstream patch from 2.6.35 series, if needed
+         # http://www.kernel.org/pub/linux/kernel/v2.6/patch-2.6.35.4.bz2%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
-         # add aufs2 support, in reference to:
-         # http://aufs.sourceforge.net
-         aufs2-base.patch%1
-         aufs2-standalone.patch%1
-         # squashfs with lzma
-         0001-Squashfs-move-zlib-decompression-wrapper-code-into.patch%1
-         0002-Squashfs-Factor-out-remaining-zlib-dependencies-int.patch%1
-         0003-Squashfs-add-a-decompressor-framework.patch%1
-         0004-Squashfs-add-decompressor-entries-for-lzma-and-lzo.patch%1
-         0005-Squashfs-add-LZMA-compression.patch%1
-         0006-Squashfs-Make-unlzma-available-to-non-initramfs-ini.patch%1
-         0007-Squashfs-select-decompress-lzma-needed.patch%1
-         0008-Squashfs-lzma-make-lzma-reentrant.patch%1
-         0009-Squashfs-force-lzma-wrapper-to-be-retained.patch%1
+         # add liquorix patchset:
+         # http://liquorix.net/
+         http://chakra-project.org/sources/linux-2.6-CHAKRA/01-35.4-4.patch%1
+         # add fixes
+         http://chakra-project.org/sources/linux-2.6-CHAKRA/02-linux-2.6.git-c41d68a513c71e35a14f66d71782d27a79a81ea6.patch%1
+
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-2.6.33.7-1-CHAKRA"
+PATCHNAME="patch-2.6.35.4-2-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
@@ -48,3 +40,8 @@ post_apply() {
   # Kill some files
   find . -name '*~' -exec rm -f {} \; 2>/dev/null
 }
+
+# MD5SUMS
+#
+# f70acf64c87afed4c71fd4880ae10c88  01-35.4-4.patch
+# 0672f352de40b0e624b5313388dbaaad  02-linux-2.6.git-c41d68a513c71e35a14f66d71782d27a79a81ea6.patch

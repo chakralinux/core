@@ -7,8 +7,6 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-# NOTE: you have to rebuild aufs2 with every new kernel-build.
-
 pkgbase="kernel26"
 pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -CHAKRA kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
@@ -17,7 +15,7 @@ _kernelname=""
 _basekernel=2.6.35
 pkgver=${_basekernel}.4
 pkgrel=2
-_patchname="patch-${pkgver}-1-CHAKRA"
+_patchname="patch-${pkgver}-2-CHAKRA"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
@@ -26,14 +24,12 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         # the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
-        kernel26.preset
-        http://chakra-project.org/sources/kernel26/linux-2.6.git-c41d68a513c71e35a14f66d71782d27a79a81ea6.patch)
+        kernel26.preset)
 md5sums=('091abeb4684ce03d1d936851618687b6'
-         '9e1791b99cf714f04b7b8face0cfe65d'
-         '64089c741709c21b8e645a49e75ddc55'
-         '8093fff96f915e5353fd07d1a87d2aac'
-         '25584700a0a679542929c4bed31433b6'
-         '0672f352de40b0e624b5313388dbaaad')
+         '949de4fda8c1c3dba527814557721210'
+         '8ad54ce1ce182f86d704e6d31b617e98'
+         'c08713d7c3fa4b26be14f9ae8a2f86a3'
+         '25584700a0a679542929c4bed31433b6')
 
 build() {
   cd ${srcdir}/linux-$_basekernel
@@ -42,9 +38,6 @@ build() {
   
   # Add -CHAKRA patches
   patch -Np1 -i ${srcdir}/${_patchname} || return 1
-
-  # fix Ac1db1tch3z exploit
-  patch -Np1 -i ${srcdir}/linux-2.6.git-c41d68a513c71e35a14f66d71782d27a79a81ea6.patch || return 1
 
   if [ "$CARCH" = "x86_64" ]; then
     cat ../config.x86_64 >./.config
@@ -223,6 +216,8 @@ package_kernel26-headers() {
   find ${pkgdir}/usr/src/linux-${_kernver} -type d -exec chmod 755 {} \;
   # remove unneeded architectures
   rm -rf ${pkgdir}/usr/src/linux-${_kernver}/arch/{alpha,arm,arm26,avr32,blackfin,cris,frv,h8300,ia64,m32r,m68k,m68knommu,mips,microblaze,mn10300,parisc,powerpc,ppc,s390,sh,sh64,sparc,sparc64,um,v850,xtensa}
+  # fix aufs
+  rm -rf ${pkgdir}/usr/src/linux-${_kernver}/include/linux/aufs_type.h
 }
 
 
