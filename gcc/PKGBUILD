@@ -119,11 +119,11 @@ package_gcc()
   
   # much, much easier to install the lot and clean-up the mess
   make -j1 DESTDIR=${pkgdir} install || return 1
-  rm -rf $pkgdir/usr/bin/*gfortran # ,gnat*}
+  rm -rf $pkgdir/usr/bin/{*gfortran,gnat*}
   rm -rf $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{ada{include,lib},finclude,include/objc}/*
   rm -rf $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{cc1obj{,plus},f951,libgfortranbegin.a,gnat1} 
   rm -rf $pkgdir/usr/lib/{*.so*,lib{gfortran,objc}.a}
-  rm -rf $pkgdir/usr/share/info/{gfortran,libgomp}.info # ,gnat*}
+  rm -rf $pkgdir/usr/share/info/{gfortran,libgomp}.info,gnat*}
   rm -rf $pkgdir/usr/share/locale/{de,fr}/LC_MESSAGES/libstdc++.mo
   rm -rf $pkgdir/usr/share/man/man1/gfortran.1
 
