@@ -38,6 +38,9 @@ package() {
   cd ${srcdir}/linux-${_basever}
   make INSTALL_HDR_PATH=${pkgdir}/usr headers_install
 
+  # cp in scsi.h   <- HACK ^ for the above patch
+  cp include/scsi/scsi.h ${pkgdir}/usr/include/scsi
+
   rm -rf ${pkgdir}/usr/include/drm
   
   rm -f $(find ${pkgdir} -name .install -or -name ..install.cmd)
