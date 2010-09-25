@@ -40,7 +40,7 @@ export TEXTDOMAINDIR='/usr/share/locale'
 # file -i does not work on Mac OSX unless legacy mode is set
 export COMMAND_MODE='legacy'
 
-myver='3.4.0'
+myver='3.4.0-chakra-0.1'
 confdir='../_buildscripts'
 BUILDSCRIPT='PKGBUILD'
 startdir="$PWD"
@@ -921,6 +921,7 @@ write_pkginfo() {
 	echo "packager = $packager" >>.PKGINFO
 	echo "size = $size" >>.PKGINFO
 	echo "arch = $PKGARCH" >>.PKGINFO
+	echo "gitfolder = ${startdir##*/}" >>.PKGINFO
 	if [[ $(check_option force) = "y" ]]; then
 		echo "force = true" >> .PKGINFO
 	fi
@@ -981,9 +982,9 @@ check_package() {
 	done
 
 	# check for references to the build directory
-	if grep -R "${srcdir}" "${pkgdir}" &>/dev/null; then
-		warning "$(gettext "Package contains reference to %s")" "\$srcdir"
-	fi
+	#if grep -R "${srcdir}" "${pkgdir}" &>/dev/null; then
+	#	warning "$(gettext "Package contains reference to %s")" "\$srcdir"
+	#fi
 }
 
 create_package() {
