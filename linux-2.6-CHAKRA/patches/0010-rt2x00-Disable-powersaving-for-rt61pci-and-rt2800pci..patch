@@ -1,0 +1,33 @@
+diff --git a/drivers/net/wireless/rt2x00/rt2800lib.c b/drivers/net/wireless/rt2x00/rt2800lib.c
+index 6e13650..fa197ac 100644
+--- a/drivers/net/wireless/rt2x00/rt2800lib.c
++++ b/drivers/net/wireless/rt2x00/rt2800lib.c
+@@ -2022,6 +2022,12 @@ int rt2800_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
+ 	u16 eeprom;
+ 
+ 	/*
++	 * Disable powersaving as default on PCI devices.
++	 */
++	if (rt2x00_intf_is_pci(rt2x00dev))
++		rt2x00dev->hw->wiphy->ps_default = false;
++
++	/*
+ 	 * Initialize all hw fields.
+ 	 */
+ 	rt2x00dev->hw->flags =
+diff --git a/drivers/net/wireless/rt2x00/rt61pci.c b/drivers/net/wireless/rt2x00/rt61pci.c
+index 687e17d..9440a4d 100644
+--- a/drivers/net/wireless/rt2x00/rt61pci.c
++++ b/drivers/net/wireless/rt2x00/rt61pci.c
+@@ -2539,6 +2539,11 @@ static int rt61pci_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
+ 	unsigned int i;
+ 
+ 	/*
++	 * Disable powersaving as default.
++	 */
++	rt2x00dev->hw->wiphy->ps_default = false;
++
++	/*
+ 	 * Initialize all hw fields.
+ 	 */
+ 	rt2x00dev->hw->flags =
