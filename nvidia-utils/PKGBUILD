@@ -8,115 +8,107 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=nvidia-utils
-pkgver=256.52
-pkgrel=1
+pkgver=256.53
+pkgrel=2
 pkgdesc="NVIDIA drivers utilities and libraries."
 arch=('i686' 'x86_64')
-[ "$CARCH" = "i686"   ] && ARCH=x86 && _srcname=NVIDIA-Linux-x86-${pkgver}
-[ "$CARCH" = "x86_64" ] && ARCH=x86_64 && _srcname=NVIDIA-Linux-x86_64-${pkgver}-no-compat32
 url="http://www.nvidia.com/"
-depends=('xorg-server')
-optdepends=('gtk2: nvidia-settings' 'pkgconfig: nvidia-xconfig')
+depends=('xorg-server' 'libxvmc')
+optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig')
 conflicts=('libgl')
 provides=('libgl')
 license=('custom')
 install=nvidia.install
-source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_srcname}.run"
-  	"20-nvidia.conf")
+options=('!strip')
+backup=('etc/X11/xorg.conf.d/20-nvidia.conf')
 
-md5sums=('f26e21bbcaaf5074ac67ecb2d7461c43'
-         '1b758609e48d4c02099a5dd1000e655f')
-[ "$CARCH" = "x86_64" ] && md5sums=('80af7e2b77e434b4321661691ac88403'
-         '1b758609e48d4c02099a5dd1000e655f')
+if [ "$CARCH" = "i686" ]; then
+        _arch='x86'
+        _pkg="NVIDIA-Linux-${_arch}-${pkgver}"
+        source=("ftp://download.nvidia.com/XFree86/Linux-${_arch}/${pkgver}/${_pkg}.run")
+        md5sums=('21fe3fe0afed7818b7adf383477b2155')
+elif [ "$CARCH" = "x86_64" ]; then
+        _arch='x86_64'
+        _pkg="NVIDIA-Linux-${_arch}-${pkgver}-no-compat32"
+        source=("ftp://download.nvidia.com/XFree86/Linux-${_arch}/${pkgver}/${_pkg}.run")
+        md5sums=('73f08a19e00d05165cbbfc74e2fa4bdd')
+fi
+
+source[1]='20-nvidia.conf'
+md5sums[1]='541cb36684b6764ccba73d7afe268bf5'
 
 build() {
-	cd $srcdir
-
-	if [ -d ${srcdir}/${_srcname} ]; then
- 	  rm -rf ${srcdir}/${_srcname}
-	fi	
-	# Extract the source
-	sh ${_srcname}.run --extract-only
+        cd $srcdir
+        sh ${_pkg}.run --extract-only
 }
 
 package() {
+        cd $srcdir/${_pkg}
 
-	cd ${srcdir}/${_srcname}
-	# Create install dirs
-	mkdir -p $pkgdir/usr/{lib,bin,share/applications,share/pixmaps,share/man/man1}
-	mkdir -p $pkgdir/usr/lib/xorg/modules/{extensions,drivers}
-	mkdir -p $pkgdir/usr/lib/vdpau
-	mkdir -p $pkgdir/usr/share/licenses/nvidia
-	mkdir -p $pkgdir/usr/include/{cuda,CL}
-	mkdir -p $pkgdir/etc/OpenCL/vendors
-	mkdir -p $pkgdir/etc/X11/xorg.conf.d
- 
-	# Install OpenCL configuration
-	install nvidia.icd $pkgdir/etc/OpenCL/vendors 
+        # X driver
+        install -D -m755 nvidia_drv.so $pkgdir/usr/lib/xorg/modules/drivers/nvidia_drv.so
+        # GLX extension module for X
+        install -D -m755 libglx.so.$pkgver $pkgdir/usr/lib/xorg/modules/extensions/libglx.so.$pkgver
+        ln -s libglx.so.$pkgver $pkgdir/usr/lib/xorg/modules/extensions/libglx.so       # X doesn't find glx otherwise
+        # OpenGL library
+        install -D -m755 libGL.so.$pkgver $pkgdir/usr/lib/libGL.so.$pkgver
+        # OpenGL core library
+        install -D -m755 libnvidia-glcore.so.$pkgver $pkgdir/usr/lib/libnvidia-glcore.so.$pkgver
+        # XvMC
+        install -D -m644 libXvMCNVIDIA.a $pkgdir/usr/lib/libXvMCNVIDIA.a
+        install -D -m755 libXvMCNVIDIA.so.$pkgver $pkgdir/usr/lib/libXvMCNVIDIA.so.$pkgver
+        # VDPAU
+        install -D -m755 libvdpau_nvidia.so.$pkgver $pkgdir/usr/lib/vdpau/libvdpau_nvidia.so.$pkgver
+        # CUDA
+        install -D -m755 libcuda.so.$pkgver $pkgdir/usr/lib/libcuda.so.$pkgver
+        install -D -m644 cuda.h $pkgdir/usr/include/cuda/cuda.h
+        install -D -m644 cudaGL.h $pkgdir/usr/include/cuda/cudaGL.h
+        install -D -m644 cudaVDPAU.h $pkgdir/usr/include/cuda/cudaVDPAU.h
+        # nvidia-tls library
+        install -D -m755 tls/libnvidia-tls.so.$pkgver $pkgdir/usr/lib/libnvidia-tls.so.$pkgver
+        # OpenCL
+        install -D -m755 libnvidia-compiler.so.$pkgver $pkgdir/usr/lib/libnvidia-compiler.so.$pkgver
+        install -D -m755 libOpenCL.so.1.0.0 $pkgdir/usr/lib/libOpenCL.so.1.0.0
+        install -D -m644 cl.h $pkgdir/usr/include/CL/cl.h
+        install -D -m644 cl_gl.h $pkgdir/usr/include/CL/cl_gl.h
+        install -D -m644 nvidia.icd $pkgdir/etc/OpenCL/vendors/nvidia.icd
+        install -D -m644 cl_platform.h $pkgdir/usr/include/CL/cl_platform.h
 
-	# Install headers
-	install -m644 cuda*.h $pkgdir/usr/include/cuda/
-	install -m644 cl*.h $pkgdir/usr/include/CL/
-  	install -m644 gl*.h $pkgdir/usr/include
-	
-	# Install libraries
-	install {libGL,libnvidia-cfg,libnvidia-compiler,libnvidia-glcore,libcuda,tls/libnvidia-tls,libnvidia-wfb}.so.${pkgver} $pkgdir/usr/lib/ || return 1
-  	install -m755 libvdpau_nvidia.so.${pkgver} "${pkgdir}/usr/lib/vdpau/" || return 1
-	install -m755 libOpenCL.so.1.0.0 $pkgdir/usr/lib || return 1
-	install {libXvMCNVIDIA.a,libXvMCNVIDIA.so.${pkgver}} $pkgdir/usr/lib/ || return 1
-        install nvidia_drv.so $pkgdir/usr/lib/xorg/modules/drivers || return 1
-        install libglx.so.$pkgver $pkgdir/usr/lib/xorg/modules/extensions || return 1
+        install -D -m755 libnvidia-cfg.so.$pkgver $pkgdir/usr/lib/libnvidia-cfg.so.$pkgver
 
-	# Install manpages
-	install -m644 nvidia-{settings,xconfig,smi}.1.gz $pkgdir/usr/share/man/man1/ || return 1
+        # create soname links
+        for _lib in $(find $pkgdir -name '*.so*'); do
+                _soname="$(dirname ${_lib})/$(readelf -d "$_lib" | sed -nr 's/.*Library soname: \[(.*)\].*/\1/p')"
+                if [ ! -e "${_soname}" ]; then
+                        ln -s "$(basename ${_lib})" "${_soname}"
+                        ln -s "$(basename ${_soname})" "${_soname/.[0-9]*/}"
+                fi
+        done
 
-	# Install license
-        install -m644 LICENSE $pkgdir/usr/share/licenses/nvidia/ || return 1
-        ln -s nvidia $startdir/pkg/usr/share/licenses/nvidia-utils || return 1
-	
-	# Install readme
-        install -D -m644 README.txt $pkgdir/usr/share/doc/nvidia/README || return 1
-	
-	# Install .desktop file
-	install -m644 nvidia-settings.desktop $pkgdir/usr/share/applications/ || return 1
-	# Fix nvidia .desktop file
-	sed -e 's:__UTILS_PATH__:/usr/bin:' -e 's:__PIXMAP_PATH__:/usr/share/pixmaps:' -i $pkgdir/usr/share/applications/nvidia-settings.desktop
 
-	# Install pixmaps
-	install -m644 nvidia-settings.png $pkgdir/usr/share/pixmaps/ || return 1
-	
-	# Install binaries
-	install -m755 nvidia-{settings,xconfig,smi,bug-report.sh} $pkgdir/usr/bin/ || return 1
+        # nvidia-xconfig
+        install -D -m755 nvidia-xconfig $pkgdir/usr/bin/nvidia-xconfig
+        install -D -m644 nvidia-xconfig.1.gz $pkgdir/usr/share/man/man1/nvidia-xconfig.1.gz
+        # nvidia-settings
+        install -D -m755 nvidia-settings $pkgdir/usr/bin/nvidia-settings
+        install -D -m644 nvidia-settings.1.gz $pkgdir/usr/share/man/man1/nvidia-settings.1.gz
+        install -D -m644 nvidia-settings.desktop $pkgdir/usr/share/applications/nvidia-settings.desktop
+        install -D -m644 nvidia-settings.png $pkgdir/usr/share/pixmaps/nvidia-settings.png
+        sed -e 's:__UTILS_PATH__:/usr/bin:' -e 's:__PIXMAP_PATH__:/usr/share/pixmaps:' -i $pkgdir/usr/share/applications/nvidia-settings.desktop
+        # nvidia-bug-report
+        install -D -m755 nvidia-bug-report.sh $pkgdir/usr/bin/nvidia-bug-report.sh
+        # nvidia-smi
+        install -D -m755 nvidia-smi $pkgdir/usr/bin/nvidia-smi
+        install -D -m644 nvidia-smi.1.gz $pkgdir/usr/share/man/man1/nvidia-smi.1.gz
 
-	# Create symlinks
-	cd $pkgdir/usr/lib/
-	ln -s libOpenCL.so.1.0.0 libOpenCL.so.1 || return 1
-	ln -s libOpenCL.so.1 libOpenCL.so || return 1
-	ln -s libGL.so.$pkgver libGL.so.1 || return 1
-	ln -s libGL.so.$pkgver libGL.so || return 1
-	ln -s libnvidia-glcore.so.$pkgver libnvidia-glcore.so.1 || return 1
-	ln -s libnvidia-glcore.so.$pkgver libnvidia-glcore.so || return 1
-	ln -s libnvidia-cfg.so.$pkgver libnvidia-cfg.so.1 || return 1
-	ln -s libnvidia-cfg.so.$pkgver libnvidia-cfg.so || return 1
-	ln -s libnvidia-compiler.so.$pkgver libnvidia-compiler.so.1 || return 1
-	ln -s libnvidia-compiler.so.$pkgver libnvidia-compiler.so || return 1
-	ln -s libnvidia-tls.so.$pkgver libnvidia-tls.so.1 || return 1
-	ln -s libnvidia-tls.so.$pkgver libnvidia-tls.so || return 1
-	ln -s libcuda.so.$pkgver libcuda.so.1 || return 1
-	ln -s libcuda.so.$pkgver libcuda.so || return 1
-	ln -s libvdpau_nvidia.so.$pkgver vdpau/libvdpau_nvidia.so.1 || return 1
-	ln -s libvdpau_nvidia.so.$pkgver vdpau/libvdpau_nvidia.so || return 1
-	ln -s libXvMCNVIDIA.so.$pkgver libXvMCNVIDIA_dynamic.so.1 || return 1
-	cd $pkgdir/usr/lib/xorg/modules/extensions
-	ln -s libglx.so.$pkgver libglx.so || return 1
 
-	find $pkgdir/usr -type d -exec chmod 755 {} \;
-	chmod 644 $pkgdir/usr/lib/libXvMCNVIDIA.a || return 1
+        install -D -m644 LICENSE $pkgdir/usr/share/licenses/nvidia/LICENSE
+        ln -s nvidia $pkgdir/usr/share/licenses/nvidia-utils
+        install -D -m644 README.txt $pkgdir/usr/share/doc/nvidia/README
+        install -D -m644 NVIDIA_Changelog $pkgdir/usr/share/doc/nvidia/NVIDIA_Changelog
+        ln -s nvidia $pkgdir/usr/share/doc/nvidia-utils
 
-	# Install nvidia file for xorg autodection
-	install -D -m644 $srcdir/20-nvidia.conf $pkgdir/etc/X11/xorg.conf.d/20-nvidia.conf || return 1
-
-	# Blacklist nouveau since 2.6.33
-	mkdir -p $pkgdir/etc/modprobe.d/ || return 1
-	echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf || return 1
+        # Install xorg.conf.d file for nvidia autodetection in xorg.conf-less configurations
+        install -D -m644 $srcdir/20-nvidia.conf $pkgdir/etc/X11/xorg.conf.d/20-nvidia.conf
 }
+
