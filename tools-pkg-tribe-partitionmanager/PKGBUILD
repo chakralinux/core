@@ -11,7 +11,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgname=tribe-partitionmanager
-pkgver=0.2.1
+pkgver=0.2.2
 pkgrel=1
 pkgdesc="Tribe's partitionmanager"
 url="http://git.chakra-project.org/chakra/"
@@ -22,15 +22,15 @@ replaces=('kdemod-tribe-partitionmanager')
 makedepends=('cmake' 'automoc4' 'pkgconfig')
 conflicts=('kdemod-tribe-partitionmanager' 'chakra-libpartitionmanager')
 groups=('kde-uninstall')
-source=("http://chakra-project.org/sources/tribe/tribe-partitionmanager-${pkgver}.tar.xz")
-md5sums=('245c1564ddaa8088ab4c3ff69ac8acd7')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
+md5sums=('dc18250dbfbb332e3525e79ae8206bb8')
 
 #
 # build function
 #
 build()
 {
-        cd "${srcdir}/libpartitionmanager/"
+        cd "${srcdir}/chakra-tribe/lib/pm/"
 
 	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_BUILD_TYPE=${_build_type} \

@@ -12,27 +12,20 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgname=tribe
-pkgver=0.2.1
-_sver=20100905
-pkgrel=2
+pkgver=0.2.2
+pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.4.5' 'squashfs-tools' "tribe-partitionmanager>=0.2.1")
+depends=('kdelibs' 'kdeedu-marble>=4.4.5' 'squashfs-tools' "tribe-partitionmanager=${pkgver}")
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.4.5' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.xz"
-        "http://chakra-project.org/sources/tribe/tribe-screenshots-${_sver}.tar.gz"
-        "http://chakra-project.org/sources/tribe/bundle-sys.patch"
-        "http://chakra-project.org/sources/tribe/slideshow-timer.patch")
-md5sums=('a91a8195a6fd5c4f5e659fa05448d507'
-         '94779efc8bd491dfe3eaf39d022b8354'
-         '84a626ad71f4b6ef12b03db8d706e188'
-         '8bdc12ee4b17ced5f1a4a6731b534c18')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
+md5sums=('dc18250dbfbb332e3525e79ae8206bb8')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -43,21 +36,16 @@ install=tools-tribe.install
 build()
 {
         cd "${srcdir}"
-        msg "add postfix patches"
-        patch -Np1 -i ${srcdir}/bundle-sys.patch || return 1
-        patch -Np1 -i ${srcdir}/slideshow-timer.patch || return 1
 
-        cd "${srcdir}/$pkgname"
+        # fixes
+        #cd "${srcdir}/$pkgname/src"
+        #patch -Np0 -i ${srcdir}/../usr-cmd-fix.patch || return 1
 
-	msg "replace screenshots"
-	cp -vr "${srcdir}/tribe-screenshots-${_sver}/images/" "${srcdir}/$pkgname/ui"
+        cd "${srcdir}/chakra-$pkgname"
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
-	# fix theme
-	sed -i -e "s~ashoc~crunchy-branch-blue~g" "${srcdir}/$pkgname/etc/postinstall-functions/job-configure-users"
-	sed -i -e "s~ashoc~crunchy-branch-blue~g" "${srcdir}/$pkgname/etc/postinstall-functions/job-initialize-target"
-	sed -i -e "s~0.2.831~${pkgver}~g" "${srcdir}/$pkgname/etc/postinstall-functions/job-initialize-target"
+	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_SKIP_RPATH=ON \
@@ -71,7 +59,9 @@ build()
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
-	
-	# remove release announcement
-	rm $startdir/pkg/usr/share/tribe/config/release_notes.txt
+
+	# make run-script executable
+	chmod a+x $pkgdir/usr/share/tribe/scripts/run-tribe.sh
+	# remove release notes
+	#rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 }
