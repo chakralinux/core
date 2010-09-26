@@ -16,9 +16,9 @@ pkgname=('qt'
          'qt-demos'
          'qt-tools')
 
-pkgver=4.6.3
-pkgrel=4
-kdeqtver=85067d6afe3ec4899080fc17b9e1fd896ab54c8d
+pkgver=4.7.0
+pkgrel=1
+kdeqtver=8fa76375a2f030ecf8aa23c917f51f04333a1b2c
 
 pkgdesc="A cross-platform application and UI framework"
 arch=('i686' 'x86_64')
@@ -62,28 +62,20 @@ source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
 	'designer.desktop'
 	'linguist.desktop'
 	'qtconfig.desktop'
-	'install-qdoc3.patch'
 	'demosexamples-manual-install.patch'
-	'enable-qt3support-debug-info.patch'
-	'enable-qtwebkit-debug-info.patch'
-	'qmake-linker-flags-as-needed.patch'
-	'ca-certificates.patch'
-	'flash-crash-backport.patch')
+	'fix-scroll-when-last-item-is-removed.patch'
+	'qmake-linker-flags-as-needed.patch')
 
 
-md5sums=('5c69f16d452b0bb3d44bc3c10556c072'
-         'c9b5973fcf791736fa411ddc46fbefef' # kde-qt-85067d6afe3ec4899080fc17b9e1fd896ab54c8d.patch.gz
+md5sums=('3a2f25b9b115037277f4fb759194a7a5'
+         '6ef3f787fa5b4651cb2305706861b370' #  kde-qt-8fa76375a2f030ecf8aa23c917f51f04333a1b2c.patch.gz
          '20d333282c43f9e643cb8e91b6307dcc'
          'bf89ee0bdd178933f19d8bc4090173ec'
          'a9bfeeffab8ba103bc8153fdb31474a1'
          '83b2a4aece6c9d86301c53a979af0b63'
-         '2f3bad0ad2941a0fd0ff5de5f9b828ec'
          '579e63488320a8d692d25502551787af'
-         'bb99a4ad35f89b0a4f34795ba2ccc776'
-         '9113f9964bdaeb59165b815cce503b4c'
-         'c436732fc467271e8a3838145c122070'
-         'd5c4cad7af93f1d736d4569a207bd739'
-         'a30a57f6063edbdf3eccd7169bd00444')
+         'ef20c34afc5be5ed62f2935be66d9402'
+         'c436732fc467271e8a3838145c122070')
 
 # source PKGBUILD && _create-kdeqt-patch
 _create-kdeqt-patch() {
@@ -118,19 +110,13 @@ build() {
 	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
 
 	msg "apply other patches"
-	patch -Np1 -i ${srcdir}/install-qdoc3.patch || return 1
-	patch -Np1 -i ${srcdir}/enable-qt3support-debug-info.patch || return 1
-	patch -Np1 -i ${srcdir}/enable-qtwebkit-debug-info.patch || return 1
+	# Already fixed in 4.7.1
+        patch -Np1 -i ${srcdir}/fix-scroll-when-last-item-is-removed.patch || return 1
 	patch -Np1 -i ${srcdir}/qmake-linker-flags-as-needed.patch || return 1
-	# use system ssl cert bundle
-	patch -p1 -i $srcdir/ca-certificates.patch || return 1
 
 	# we want our cflags etc
 	sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
 	sed -i "/^QMAKE_RPATH/s| -Wl,-rpath,||g" mkspecs/common/g++.conf
-
-	# backport of fix when webkit crashes with newer flash versions https://bugs.webkit.org/show_bug.cgi?id=40567
-        patch -p1 -i $srcdir/flash-crash-backport.patch || return 1
 	
 	msg "starting configure"
 
@@ -209,9 +195,9 @@ package_qt()
 
 	# move out some tool binaries and put them into qt-tools
 	# its ugly, but it "feels" cleaner ;)
-	mkdir $srcdir/bin
+	mkdir -p $srcdir/bin
 	mv $pkgdir/usr/bin/assistant $srcdir/bin
-	mv $pkgdir/usr/bin/assistant_adp $srcdir/bin
+	#mv $pkgdir/usr/bin/assistant_adp $srcdir/bin
 	mv $pkgdir/usr/bin/designer $srcdir/bin
 	mv $pkgdir/usr/bin/linguist $srcdir/bin
     
@@ -287,7 +273,7 @@ package_qt-tools()
 	cd $srcdir/$_pkgfqn
 
 	install -D -m755 -o root -g root $srcdir/bin/assistant $pkgdir/usr/bin/assistant
-	install -D -m755 -o root -g root $srcdir/bin/assistant_adp $pkgdir/usr/bin/assistant_adp
+	#install -D -m755 -o root -g root $srcdir/bin/assistant_adp $pkgdir/usr/bin/assistant_adp
 	install -D -m755 -o root -g root $srcdir/bin/designer $pkgdir/usr/bin/designer
 	install -D -m755 -o root -g root $srcdir/bin/linguist $pkgdir/usr/bin/linguist
 
