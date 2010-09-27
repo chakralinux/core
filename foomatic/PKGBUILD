@@ -10,20 +10,32 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgbase="foomatic"
 pkgname=('foomatic-db' 'foomatic-filters' 'foomatic-db-engine' 'foomatic-db-nonfree')
 arch=('i686' 'x86_64') # needs to be changed  in the subpackages when makepkg will support it
-_snapdate=20100608
-_relver=4.0.4
+_snapdate=20100927
+_relver=4.0.5
 pkgver=${_relver}_${_snapdate}
 pkgrel=1
 makedepends=('cups>=1.4.2' 'perl' 'libxml2' 'enscript' 'perl' 'net-snmp' 'bash')
-source=(http://www.openprinting.org/download/foomatic/$pkgbase-{filters,db-engine}-${_relver}.tar.gz
-        http://www.openprinting.org/download/foomatic/$pkgbase-db-4.0-${_snapdate}.tar.gz
-        http://www.openprinting.org/download/foomatic/$pkgbase-db-nonfree-${_snapdate}.tar.gz)
+source=(http://chakra-project.org/sources/foomatic/$pkgbase-{filters,db-engine}-${_relver}.tar.gz
+        http://chakra-project.org/sources/foomatic/$pkgbase-db-4.0-${_snapdate}.tar.gz
+        http://chakra-project.org/sources/foomatic/$pkgbase-db-nonfree-${_snapdate}.tar.gz)
 url="http://www.linuxprinting.org/foomatic.html"
 options=('force' '!emptydirs')
-md5sums=('f67fc793ee8d4d076c6671d6e6a72367'  # foomatic-filters-4.0.4.tar.gz
-         '675999e0ab8d59ad34a805c378830354'  # foomatic-db-engine-4.0.4.tar.gz
-         '07e329f6ff67973108c03c3b9849bf11'  # foomatic-db-4.0-20100608.tar.gz
-         'd4a17e93a0d4ce6739dfbc7517c02f3c') # foomatic-db-nonfree-20100608.tar.gz
+md5sums=('fd99dac3a36807a47ffa4f9eb15c1b07' #  foomatic-filters-4.0.5.tar.gz
+         '0893a4a9705ffd7305bc50cbb951daf9' #  foomatic-db-engine-4.0.5.tar.gz
+         'e6a6c69d4d35579007c716586944cf86' #  foomatic-db-4.0-20100927.tar.gz
+         '6f84a585a1819e491ed0482ce3becea9') #  foomatic-db-nonfree-20100927.tar.gz
+
+
+# source PKGBUILD && _get-tarballs
+_get-tarballs() {
+        wget http://www.openprinting.org/download/foomatic/$pkgbase-{filters,db-engine}-${_relver}.tar.gz
+        wget http://www.openprinting.org/download/foomatic/$pkgbase-db-4.0-${_snapdate}.tar.gz
+        wget http://www.openprinting.org/download/foomatic/$pkgbase-db-nonfree-${_snapdate}.tar.gz
+        md5sum $pkgbase-filters-*
+        md5sum $pkgbase-db-engine-*
+        md5sum $pkgbase-db-4.0-*
+        md5sum $pkgbase-db-nonfree-*
+}
 
 build() {
  /bin/true
