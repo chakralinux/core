@@ -18,9 +18,9 @@ pkgname=('phonon'
 	'phonon-mplayer'
 	'phonon-vlc')
 
-pkgver=4.4.1
-_pkgver=4.4.1
-pkgrel=4
+pkgver=4.4.2
+_pkgver=4.4.2
+pkgrel=1
 pkgdesc='The multimedia API for Qt 4 and KDE 4'
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
@@ -40,19 +40,13 @@ makedepends=("qt>=${_qtver}"
 	'phonon') #for mplayer/vlc-backends
 
 source=("http://download.kde.org/stable/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2" \
-	'01-phonon-includes.patch' \
-	'02-xine-initialize-volume-to-1.patch'  \
-	'03-pulse-fix-reading-of-stream-information.patch')
+	'01-phonon-includes.patch')
 
-md5sums=('5a1444f009a77054f16fea38c08e6cb5'
-         '8635288be343c76bb8064e60233248b7'
-         '4307acaa2bbef841807bec776124694c'
-         '463d895f29ba195ec35b3f67f01e0876')
+md5sums=('d9eab28383783261254f1cef3b92a3fa'
+         '8635288be343c76bb8064e60233248b7')
 build() {
 	cd $srcdir/${pkgbase}-${pkgver}
 	patch -Np1 -i $srcdir/01-phonon-includes.patch || return 1
-        patch -Np1 -i $srcdir/02-xine-initialize-volume-to-1.patch || return 1
-        patch -Np1 -i $srcdir/03-pulse-fix-reading-of-stream-information.patch || return 1
 
 	mkdir build
 	cd build
