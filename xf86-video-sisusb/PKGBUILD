@@ -1,26 +1,32 @@
-# $Id: PKGBUILD 55643 2009-10-13 21:33:52Z andyrtr $
-#Maintainer: Jan de Groot <jgc@archlinux.org>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xf86-video-sisusb
-pkgver=0.9.3
+pkgver=0.9.4
 pkgrel=1
 pkgdesc="X.org SiS USB video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('pkgconfig' 'xorg-server>=1.7.0' 'xineramaproto')
-conflicts=('xorg-server<1.7.0')
+makedepends=('xorg-server')
+conflicts=('xorg-server<1.8.0')
 groups=('xorg-video-drivers')
 options=('!libtool')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 LICENSE)
-md5sums=('be59e9c2d9458cee0b5006549c14a95d'
-         '8ff3e22b7d1443bb88fdf0d822f62730')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('600fd49dffe00121f9042555fea55948653d1a7e')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
-  install -D -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  ./configure --prefix=/usr
+  make
+  make DESTDIR="${pkgdir}" install
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }

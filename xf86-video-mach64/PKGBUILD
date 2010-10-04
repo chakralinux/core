@@ -1,15 +1,22 @@
-# $Id: PKGBUILD 55540 2009-10-13 19:53:07Z andyrtr $
-# Maintainer: Jan de Groot <jgc@archlinux.org>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
 pkgname=xf86-video-mach64
 pkgver=6.8.2
-pkgrel=2
+pkgrel=3
 pkgdesc="X.org mach64 video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc' 'mach64-dri')
-makedepends=('pkgconfig' 'xorg-server>=1.7.0' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
-conflicts=('xorg-server<1.7.0')
+makedepends=('pkgconfig' 'xorg-server>=1.8.0' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
+conflicts=('xorg-server<1.8.0')
 groups=('xorg-video-drivers')
 options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2

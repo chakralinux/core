@@ -1,28 +1,33 @@
-# $Id: PKGBUILD 55545 2009-10-13 19:57:46Z andyrtr $
-# Maintainer: Jan de Groot <jgc@archlinux.org>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xf86-video-mga
-pkgver=1.4.11
-pkgrel=2
+pkgver=1.4.13
+pkgrel=1
 pkgdesc="X.org mga video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc' 'mga-dri')
-makedepends=('pkgconfig' 'xorg-server>=1.7.0' "mesa>=7.6" 'xf86driproto' 'glproto>=1.4.10')
-conflicts=('xorg-server<1.7.0')
+makedepends=('xorg-server' 'libdrm' 'xf86driproto' 'mesa')
+conflicts=('xorg-server<1.8.0')
 options=('!libtool' 'force')
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
-        LICENSE)
-md5sums=('9d1ca965cedb0856296b47442f3c739d'
-         'b71a5cd59dcaa0b7d9bbbfc597915dd6')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('55aa185cf381def4b5905c8b93694b8dfbd5c378')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr \
-              --enable-dri || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
-  install -D -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
+  ./configure --prefix=/usr --enable-dri
+  make
+  make DESTDIR="${pkgdir}" install
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
