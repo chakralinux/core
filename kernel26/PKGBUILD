@@ -13,9 +13,9 @@ pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -CHAKR
 #_kernelname=${pkgname#kernel26}
 _kernelname=""
 _basekernel=2.6.35
-pkgver=${_basekernel}.5
-pkgrel=1
-_patchname="patch-${pkgver}-1-CHAKRA"
+pkgver=${_basekernel}.6
+pkgrel=2
+_patchname="patch-${pkgver}-2-CHAKRA"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
@@ -26,9 +26,9 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
 md5sums=('091abeb4684ce03d1d936851618687b6'
-         'b7653645653befe1dce4d8fada3883c5'
-         '8ad54ce1ce182f86d704e6d31b617e98'
-         'c08713d7c3fa4b26be14f9ae8a2f86a3'
+         'ea0374bd79994493b33ce5b98cba2486'
+         '7a39d24d2f6464537ae8fd14e853447a'
+         '01573effd93ebb1a7b940de6dcfda608'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
@@ -81,7 +81,8 @@ package_kernel26() {
             'alsa-driver' 'ieee80211' 'hostap-driver26'
             'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
-            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26')
+            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26' 'aufs2')
+  provides=('aufs2')
   install=kernel26.install
   optdepends=('crda: to set the correct wireless channels of your country')
 
@@ -217,7 +218,7 @@ package_kernel26-headers() {
   # remove unneeded architectures
   rm -rf ${pkgdir}/usr/src/linux-${_kernver}/arch/{alpha,arm,arm26,avr32,blackfin,cris,frv,h8300,ia64,m32r,m68k,m68knommu,mips,microblaze,mn10300,parisc,powerpc,ppc,s390,sh,sh64,sparc,sparc64,um,v850,xtensa}
   # fix aufs
-  rm -rf ${pkgdir}/usr/src/linux-${_kernver}/include/linux/aufs_type.h
+  #rm -rf ${pkgdir}/usr/src/linux-${_kernver}/include/linux/aufs_type.h
 }
 
 
