@@ -41,7 +41,7 @@
 #
 # preemptive cleanup, just to be sure (tm)
 preemptive_cleanup() {
-		rm -rf /etc/X11/xorg.con* &>/dev/null
+		rm -rf /etc/X11/xorg.conf &>/dev/null
 }
 
 
