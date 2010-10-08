@@ -13,7 +13,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 pkgname=tribe
 pkgver=0.2.1006
-pkgrel=1
+pkgrel=2
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -46,6 +46,9 @@ build()
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
 	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-initialize-target"
+	# fix keyboard routine
+	sed -i -e "s~HAL~XORG~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-setup-xorg"
+	sed -i -e "s~etc/hal/fdi/policy/10-keymap.fdi~etc/X11/xorg.conf.d/10-keyboard.conf~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-setup-xorg"
 	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_SKIP_RPATH=ON \
