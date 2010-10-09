@@ -1,12 +1,21 @@
-# $Id: PKGBUILD 72545 2010-03-18 13:05:20Z ibiru $
-# Maintainer: kevin <kevin@archlinux.org>
-# Contributor: Giovanni Scafora <giovanni@archlinux.org>
-# TU: Kritoke <kritoke@gamebox.net>
-# Contributor: Luca Roccia <little_rock@users.sourceforge.net>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Contributor: Artyom Smirnov <smirnoffjr@gmail.com>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+# Note: you have to rebuild those pkgs
+# Core: repo-clean
+# Platform: akonadi (exempi uses boost just as makedep)
+# Desktop: kdeedu (kdenetwork, kdepimlibs, kdepim, kdesdk and koffice using boost just as makedep)
  
 pkgname=boost
-pkgver=1.41.0
-_boostver=1_41_0
+pkgver=1.44.0
+_boostver=1_44_0
 pkgrel=1
 pkgdesc="Free peer-reviewed portable C++ source libraries"
 arch=('i686' 'x86_64')
@@ -14,16 +23,14 @@ url="http://www.boost.org/"
 depends=('bzip2' 'zlib')
 makedepends=('python>=2.6')
 optdepends=('python: for python bindings')
-source=(http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}_${_boostver}.tar.gz
-	fix-gzip-crc.patch
-	serialization_fix.patch)
+source=(http://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgver}/${pkgname}_${_boostver}.tar.gz)
 license=('custom')
-options=('!ccache' 'force')
+url="http://www.boost.org/"
+options=('!ccache')
+md5sums=('085fce4ff2089375105d72475d730e15')
 
 build() {
   cd "${srcdir}/${pkgname}_${_boostver}"
-  patch -Np1 -i $srcdir/fix-gzip-crc.patch || return 1
-  patch -Np1 -i $srcdir/serialization_fix.patch || return 1
 
   # build bjam
   cd ${srcdir}/${pkgname}_${_boostver}/tools/jam/src
@@ -68,6 +75,3 @@ build() {
   install -m644 ${srcdir}/${pkgname}_${_boostver}/LICENSE_1_0.txt \
                 ${pkgdir}/usr/share/licenses/${pkgname}/ || return 1
 }
-md5sums=('ddb04c9b9164a36a91dcf36819666dd9'
-         '682f124a765b2935c7352f38c08848cc'
-         '01337211d40a4a4c9b83c481baade701')
