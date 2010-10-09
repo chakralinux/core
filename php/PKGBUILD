@@ -21,27 +21,26 @@ pkgname=('php'
          'php-sqlite'
          'php-tidy'
          'php-xsl')
-pkgver=5.3.2
-pkgrel=6
-_suhosinver=${pkgver}-0.9.9.1
+pkgver=5.3.3
+pkgrel=1
+_suhosinver=${pkgver}-0.9.10
 arch=('i686' 'x86_64')
 license=('PHP')
 url='http://www.php.net'
 makedepends=('apache' 'imap' 'postgresql-libs' 'mysql' 'libldap' 'postfix'
              'sqlite3' 'unixodbc' 'net-snmp' 'libzip' 'enchant' 'file'
              'libmcrypt' 'tidyhtml' 'aspell' 'libtool' 'gd'  'icu'
-             'curl' 'libxslt' 'openssl' 'bzip2' 'db' 'gmp')
+             'curl' 'libxslt' 'openssl' 'bzip2' 'db' 'gmp' 'libevent')
 options=('!makeflags')
 source=("http://www.php.net/distributions/${pkgbase}-${pkgver}.tar.bz2"
         "http://download.suhosin.org/suhosin-patch-${_suhosinver}.patch.gz"
-        'php.ini.patch' 'apache.conf' 'db-configure.patch'
-        'mysqlnd_default_port.patch')
-md5sums=('46f500816125202c48a458d0133254a4'
-         '4647b05330862d6a1fc4469245cc6ade'
+        'php.ini.patch' 'apache.conf' 'rc.d.php-fpm' 'php-fpm.conf')
+md5sums=('21ceeeb232813c10283a5ca1b4c87b48'
+         'b66b27c43b1332400ef8982944c3b95b'
          'd6f94150f47047882c6716575e12e99b'
          '96ca078be6729b665be8a865535a97bf'
-         'e04e6a3abf327dd40ddb2b7dc21677c4'
-         'bcf06fcc3324f3443d8402008eb1c01f')
+         'ff8346d57f0bd67c7a383c1561dcd7c1'
+         '0ac88ff88ae951118201d6424eaa426a')
 
 build() {
 	# ldap-sasl does not compile with --as-needed
@@ -136,18 +135,11 @@ build() {
 
 	cd ${srcdir}/${pkgbase}-${pkgver}
 
-	# avoid linking against old db version
-	patch -p0 -i ${srcdir}/db-configure.patch || return 1
-
 	# apply suhosin patch
 	patch -p1 -i ${srcdir}/suhosin-patch-${_suhosinver}.patch || return 1
 
 	# adjust paths
 	patch -p0 -i ${srcdir}/php.ini.patch || return 1
-
-	# fix http://bugs.php.net/51242
-	# remove for next upstream release
-	patch -p0 -i ${srcdir}/mysqlnd_default_port.patch || return 1
 
 	# php
 	mkdir ${srcdir}/build-php
@@ -178,6 +170,18 @@ build() {
 		--disable-cli \
 		${phpextensions} || return 1
 	make || return 1
+
+        # fpm
+        cp -a ${srcdir}/build-php ${srcdir}/build-fpm
+        cd ${srcdir}/build-fpm
+        ./configure ${phpconfig} \
+                --disable-cli \
+                --enable-fpm \
+                --with-libevent-dir=/usr \
+                --with-fpm-user=http \
+                --with-fpm-group=http \
+                ${phpextensions}
+        make
 
 	# embed
 	cp -a ${srcdir}/build-php ${srcdir}/build-embed
@@ -237,6 +241,18 @@ package_php-apache() {
 
 	install -D -m755 ${srcdir}/build-apache/libs/libphp5.so ${pkgdir}/usr/lib/httpd/modules/libphp5.so
 	install -D -m644 ${srcdir}/apache.conf ${pkgdir}/etc/httpd/conf/extra/php5_module.conf
+}
+
+package_php-fpm() {
+        pkgdesc='FastCGI Process Manager for PHP'
+        depends=('php' 'libevent')
+        backup=('etc/php/php-fpm.conf')
+
+        install -D -m755 ${srcdir}/build-fpm/sapi/fpm/php-fpm ${pkgdir}/usr/sbin/php-fpm
+        install -D -m644 ${srcdir}/build-fpm/sapi/fpm/php-fpm.1 ${pkgdir}/usr/share/man/ma$
+        install -D -m644 ${srcdir}/php-fpm.conf ${pkgdir}/etc/php/php-fpm.conf
+        install -D -m755 ${srcdir}/rc.d.php-fpm ${pkgdir}/etc/rc.d/php-fpm
+        install -d -m755 ${pkgdir}/var/run/php-fpm
 }
 
 package_php-embed() {
