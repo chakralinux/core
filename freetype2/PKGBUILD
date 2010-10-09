@@ -1,8 +1,12 @@
-# $Id: PKGBUILD 69127 2010-02-17 20:32:42Z jgc $
-# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=freetype2
-pkgver=2.3.12
+pkgver=2.4.3
 pkgrel=1
 pkgdesc="TrueType font rendering library"
 arch=(i686 x86_64)
@@ -11,24 +15,18 @@ url="http://freetype.sourceforge.net"
 depends=('zlib')
 options=('!libtool')
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
-        bytecode.patch
         freetype-2.3.0-enable-spr.patch
-        freetype-2.2.1-enable-valid.patch
-        freetype-2.2.1-memcpy-fix.patch)
-md5sums=('e974a82e5939be8e05ee65f07275d7c5'
-         '9ff19e742968c29e3ba52b08d6bf0a50'
+        freetype-2.2.1-enable-valid.patch)
+md5sums=('75ac7082bde7b3805dc5d6bc806fa045'
          '816dc8619a6904a7385769433c0a8653'
-         '214119610444c9b02766ccee5e220680'
-         '6fb6606d28082ecb8e0c6d986b0b26aa')
+         '214119610444c9b02766ccee5e220680')
 
 build() {
   cd "${srcdir}/freetype-${pkgver}"
-  patch -Np0 -i "${srcdir}/bytecode.patch" || return 1
-  patch -Np1 -i "${srcdir}/freetype-2.3.0-enable-spr.patch" || return 1
-  patch -Np1 -i "${srcdir}/freetype-2.2.1-enable-valid.patch" || return 1
-  patch -Np1 -i "${srcdir}/freetype-2.2.1-memcpy-fix.patch" || return 1
+  patch -Np1 -i "${srcdir}/freetype-2.3.0-enable-spr.patch"
+  patch -Np1 -i "${srcdir}/freetype-2.2.1-enable-valid.patch"
 
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr
+  make
+  make DESTDIR="${pkgdir}" install
 }
