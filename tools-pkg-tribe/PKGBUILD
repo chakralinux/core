@@ -12,22 +12,20 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgname=tribe
-pkgver=0.2.1017
-pkgrel=2
+pkgver=0.2.65.0
+pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.4.5' 'squashfs-tools' "tribe-partitionmanager>=0.2.1006")
+depends=('kdelibs' 'kdeedu-marble>=4.4.5' 'squashfs-tools' "tribe-partitionmanager>=$pkgver")
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.4.5' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-0.2.3.tar.gz"
-	"http://chakra-project.org/sources/tribe/$pkgver-job-configure-users")
-md5sums=('f8e7c14e1817bde635a69494cdd4d7ad'
-	 '8572ba406347170b9aac67e2f1e8e01e')
+source=("http://chakra-project.org/sources/tribe/tribe-$pkgver.tar.gz")
+md5sums=('cf25fc5cf749c1c5a12f11b5aa995e52')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -71,6 +69,4 @@ build()
 	rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 	# change theme
 	sed -i -e "s~crunchy-branch-blue~NEDA~g" $pkgdir/usr/share/tribe/config/postinstall.conf
-	# fix plasmarc
-	cp -v $startdir/$pkgver-job-configure-users $pkgdir/usr/share/tribe/scripts/job-configure-users
 }
