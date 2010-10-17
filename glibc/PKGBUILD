@@ -12,14 +12,14 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=glibc
 pkgver=2.12.1
-pkgrel=1
-_glibcdate=20100908
+pkgrel=2
+_glibcdate=20101017
 pkgdesc="GNU C Library"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/libc"
 license=('GPL' 'LGPL')
 groups=('base')
-depends=('linux-api-headers>=2.6.35' 'tzdata')
+depends=('linux-api-headers>=2.6.34' 'tzdata')
 makedepends=('gcc>=4.4')
 replaces=('glibc-xen')
 backup=(etc/locale.gen
@@ -30,18 +30,26 @@ source=(http://chakra-project.org/sources/glibc/${pkgname}-${pkgver}_${_glibcdat
         glibc-2.10-dont-build-timezone.patch
         glibc-2.10-bz4781.patch
         glibc-__i686.patch
-        glibc-2.12.1-gcc_fix-1.patch
+        glibc-2.12.1-make-3.82-compatibility.patch
+        glibc-2.12.1-static-shared-getpagesize.patch
+        glibc-2.12.1-but-I-am-an-i686.patch
+        glibc-2.12.1-es_CR.patch
         nscd
         locale.gen.txt
         locale-gen)    
-md5sums=('fba12dad98528242b62e604e40d2fb80'
+md5sums=('c4affa3698ebf172984fde6c900c251e'
          '4dadb9203b69a3210d53514bb46f41c3'
          '0c5540efc51c0b93996c51b57a8540ae'
          '40cd342e21f71f5e49e32622b25acc52'
-         'd1f28cb98acb9417fe52596908bbb9fd'
+         '1deecaa78c0909f7175732da2af796b5'
+         '3215ed6996e7ecdd35bc105937c6e0dc'
+         'de17165e3fa721c4e056dacfc9ee1e52'
+         '8f896f83bd88f83da635593d8a324384'
          'b587ee3a70c9b3713099295609afde49'
          '07ac979b6ab5eeb778d55f041529d623'
          '476e9113489f93b348b21e144b6a8fcf')
+
+# create tarball: source PKGBUILD && mksource
 
 mksource() {
   git clone git://sourceware.org/git/glibc.git
@@ -64,12 +72,23 @@ build() {
   # http://sourceware.org/ml/libc-alpha/2009-07/msg00072.html
   patch -Np1 -i ${srcdir}/glibc-__i686.patch
 
-  patch -Np1 -i ${srcdir}/glibc-2.12.1-gcc_fix-1.patch  
+  # http://sourceware.org/git/?p=glibc.git;a=patch;h=32cf4069
+  patch -Np1 -i ${srcdir}/glibc-2.12.1-make-3.82-compatibility.patch
+
+  # http://sourceware.org/bugzilla/show_bug.cgi?id=11929
+  patch -Np1 -i ${srcdir}/glibc-2.12.1-static-shared-getpagesize.patch
+  
+  # fedora "fix" for excess linker optimization on i686
+  # proper fix will be in binutils-2.21
+  patch -Np1 -i ${srcdir}/glibc-2.12.1-but-I-am-an-i686.patch
+
+  # patch es_CR
+  patch -Np1 -i ${srcdir}/glibc-2.12.1-es_CR.patch
 
   install -dm755 ${pkgdir}/etc
   touch ${pkgdir}/etc/ld.so.conf
 
-  mkdir -p glibc-build
+  mkdir glibc-build
   cd glibc-build
 
   if [[ ${CARCH} = "i686" ]]; then
@@ -81,7 +100,7 @@ build() {
 
   ../configure --prefix=/usr \
       --enable-add-ons=nptl,libidn --without-cvs \
-      --enable-kernel=2.6.22.5 --disable-profile \
+      --enable-kernel=2.6.18 --disable-profile \
       --with-headers=/usr/include --libexecdir=/usr/lib \
       --enable-bind-now --with-tls --with-__thread \
       --libdir=/usr/lib --without-gd --disable-multi-arch
@@ -117,7 +136,7 @@ package() {
 
   if [[ ${CARCH} = "x86_64" ]]; then
     # fix for the linker
-    sed -i '/RTLDLIST/s%/ld-linux.so.2 /lib64%%' ${pkgdir}/usr/bin/ldd
+    sed -i '/RTLDLIST/s%lib64%lib%' ${pkgdir}/usr/bin/ldd
     #Comply with multilib binaries, they look for the linker in /lib64
     mkdir ${pkgdir}/lib64
     cd ${pkgdir}/lib64
