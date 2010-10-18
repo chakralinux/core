@@ -25,7 +25,7 @@ replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-$pkgver.tar.gz")
-md5sums=('cf25fc5cf749c1c5a12f11b5aa995e52')
+md5sums=('e948945e511dceee5ab719bf7d4919b8')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -63,10 +63,6 @@ build()
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
 
-	# make run-script executable
-	chmod a+x $pkgdir/usr/share/tribe/scripts/run-tribe.sh
 	# remove release notes
 	rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
-	# change theme
-	sed -i -e "s~crunchy-branch-blue~NEDA~g" $pkgdir/usr/share/tribe/config/postinstall.conf
 }
