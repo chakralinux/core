@@ -25,11 +25,12 @@ replaces=('catalyst')
 install=catalyst.install
 source=(http://www.ati-forum.de/files/Downloads/Driver/ati-driver-installer-8.783_RC1-x86.x86_64.rar
     #http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
-    catalyst.sh amdcccle.desktop atieventsd.sh)
+    catalyst.sh amdcccle.desktop atieventsd.sh makefile_compat.patch)
 md5sums=('7c3e11ab4ebec6132a578ffe8f2915f9'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '4efa8414a8fe9eeb50da38b5522ef81d'
-         'f729bf913613f49b0b9759c246058a87')
+         'f729bf913613f49b0b9759c246058a87'
+         '3e1b82bd69774ea808da69c983d6a43b')
 
 build() {
 
@@ -44,6 +45,10 @@ unrar e ati-driver-installer-8.783_RC1-x86.x86_64.rar
 if [ "${CARCH}" = "x86_64" ]; then
 BUILDARCH=x86_64
 _archdir=x86_64
+
+# patch makefile
+cd "${srcdir}/archive_files"
+patch -Np1 -i makefile_compat.patch || return 1
 fi
 if [ "${CARCH}" = "i686" ]; then
 BUILDARCH=i386
