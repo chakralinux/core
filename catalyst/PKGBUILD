@@ -24,11 +24,12 @@ provides=('catalyst' 'libgl' 'libatical')
 replaces=('catalyst')
 install=catalyst.install
 source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
-    catalyst.sh amdcccle.desktop atieventsd.sh)
+    catalyst.sh amdcccle.desktop atieventsd.sh arch_compat.patch)
 md5sums=('9ecfa448671925ebb277831fff607689'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '4efa8414a8fe9eeb50da38b5522ef81d'
-         'f729bf913613f49b0b9759c246058a87')
+         'f729bf913613f49b0b9759c246058a87'
+         '30b31b8e78601475061d74deca8833f9')
 
 build() {
 
@@ -44,6 +45,15 @@ if [ "${CARCH}" = "i686" ]; then
 BUILDARCH=i386
 _archdir=x86
 fi
+
+## Patch arch_compat
+    if [ "${BUILDARCH}" = "x86_64" ]; then
+	if [[ $(cat /lib/modules/${_kernver}/build/arch/x86/include/asm/compat.h | grep arch_compat_alloc_user_space) = "" ]]; then echo ""
+	    else
+	    cd "${srcdir}/archive_files/"
+	    patch -Np1 -i ../arch_compat.patch || return 1
+	fi
+    fi
 
 cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
 cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a.GCC4" . || return 1
