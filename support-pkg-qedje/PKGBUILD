@@ -15,40 +15,29 @@ _origname=qedje
 
 
 pkgname=${_origname}
-pkgver=20100627
+pkgver=0.4.0
 pkgrel=1
 
 pkgdesc="Enlightenment Edje bindings for the Qt toolkit."
 url="http://code.openbossa.org/projects/qedje/"
 license=('GPL')
 
-source=()
-md5sums=()
+source=(http://chakra-project.org/sources/qzion/qedje-0.4.0.tar.gz)
+md5sums=(b6a63f587cd0783b855d4a915e291574)
 
 arch=('i686' 'x86_64')
 
-depends=("${_qtpkg}>=${_qtver}" 'eet-svn' "qzion")
+depends=("${_qtpkg}>=${_qtver}" 'eet-svn' "qzion=$pkgver")
 groups=("kde-uninstall" "kde-support")
 options=('!splitdbg' '!splithdr')
 makedepends=('gcc' 'make')
 
-_gitroot="git://code.openbossa.org/qedje/mainline.git"
-_gitname="qedje"
-
 build()
 {
-	# Get the source
-	if [ -d ${_gitname}/.git ]; then
-		( cd ${_gitname} && git pull )
-	else
-		git clone ${_gitroot} ${_gitname}
-	fi
+	mkdir -p ${_origname}-build
+	cd ${_origname}-build
 
-	# Create the build directory
-	mkdir -p ${_gitname}-build
-	cd ${_gitname}-build
-
-	cmake ../$_gitname -DCMAKE_BUILD_TYPE=${_build_type} \
+	cmake ../${_origname}-mainline -DCMAKE_BUILD_TYPE=${_build_type} \
 			-DCMAKE_INSTALL_PREFIX=${_installprefix} \
 			-DCMAKE_SKIP_RPATH=ON \
 			-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'

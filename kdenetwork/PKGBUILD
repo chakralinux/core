@@ -28,7 +28,7 @@ pkgname=('kdenetwork-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -40,7 +40,7 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'qca-ossl' "kdebase-workspace>=${_kdever}" 
              "kdebase>=${_kdever}" 'libvncserver' 'libmsn'
              'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage'
-             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart-svn' 'libktorrent')
+             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
         'lisa.daemon')
@@ -125,7 +125,7 @@ package_kdenetwork-doc()
 package_kdenetwork-kget()
 {
 	pkgdesc="Download manager"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart-svn'  'libktorrent')
+	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
 	conflicts=("kdemod-${_origname}-kget")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
