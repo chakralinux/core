@@ -11,11 +11,14 @@ pkgdesc="GNU flash player and kpath plugin for KDE4"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/gnash/"
 license=('GPL')
-depends=('agg' 'ffmpeg' 'libjpeg' 'libpng' 'giflib' 'zlib')
+depends=('agg' 'ffmpeg' 'libjpeg' 'libpng' 'giflib' 'zlib' 'curl' 'giflib' 'boost' 'libldap' 'sdl'
+         'speex' 'fontconfig' 'libva' 'libxinerama' 'gstreamer0.10-base' 'gstreamer0.10-ffmpeg')
 provides=('gnash' 'gnash-common')
 conflicts=('flashplugin' 'flashplugin-square')
 source=(http://ftp.gnu.org/pub/gnu/gnash/$pkgver/gnash-$pkgver.tar.gz)
 md5sums=('aec414ee3bebb8901054818fae735214')
+options=(!libtool !emptydirs)
+backup=(etc/gnashrc etc/gnashpluginrc)
 build () {
  cd $startdir/src/gnash-$pkgver
  ./autogen.sh
@@ -27,15 +30,15 @@ build () {
 	--enable-jpeg \
 	--enable-png \
 	--enable-z \
-	--prefix="$startdir/pkg/usr"
+	--with-plugins-install=system \
+	--with-npapi-plugindir=/usr/lib/mozilla/plugins \
+	--prefix=/usr \
+	--sysconfdir=/etc
 
- sed -i "s:KDE4_APPSDATADIR =.*:KDE4_APPSDATADIR = $startdir/pkg/usr/share/apps:" ./plugin/klash4/Makefile
- sed -i "s:KDE4_SERVICESDIR =.*:KDE4_SERVICESDIR = $startdir/pkg/usr/share/kde4/services:" ./plugin/klash4/Makefile
- sed -i "s:KDE4_PLUGINDIR =.*:KDE4_PLUGINDIR = $startdir/pkg/usr/lib/kde4:" ./plugin/klash4/Makefile
+ sed -i "s:KDE4_APPSDATADIR =.*:KDE4_APPSDATADIR = /usr/share/apps:" ./plugin/klash4/Makefile
+ sed -i "s:KDE4_SERVICESDIR =.*:KDE4_SERVICESDIR = /usr/share/kde4/services:" ./plugin/klash4/Makefile
+ sed -i "s:KDE4_PLUGINDIR =.*:KDE4_PLUGINDIR = /usr/lib/kde4:" ./plugin/klash4/Makefile
  make || return 1
- make install || return 1
- make install-plugins || return 1
- rm -R $startdir/pkg/usr/include
- rm -R $startdir/pkg/usr/share/apps
- rm -R $startdir/pkg/usr/share/doc
+ make DESTDIR="$pkgdir" install || return 1
+ make DESTDIR="$pkgdir" install-plugins || return 1
 }
