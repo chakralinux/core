@@ -32,11 +32,10 @@ build () {
  sed -i "s:KDE4_APPSDATADIR =.*:KDE4_APPSDATADIR = $startdir/pkg/usr/share/apps:" ./plugin/klash4/Makefile
  sed -i "s:KDE4_SERVICESDIR =.*:KDE4_SERVICESDIR = $startdir/pkg/usr/share/kde4/services:" ./plugin/klash4/Makefile
  sed -i "s:KDE4_PLUGINDIR =.*:KDE4_PLUGINDIR = $startdir/pkg/usr/lib/kde4:" ./plugin/klash4/Makefile
- sed -i "s/Q_MOC_OUTPUT_REVISION != 59/Q_MOC_OUTPUT_REVISION < 59/" ./gui/klash4.moc.in
  make || return 1
  make install || return 1
  make install-plugins || return 1
- rmdir $startdir/pkg/usr/include
+ rm -R $startdir/pkg/usr/include
  rm -R $startdir/pkg/usr/share/apps
  rm -R $startdir/pkg/usr/share/doc
  mkdir $startdir/pkg/etc
