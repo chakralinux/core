@@ -12,6 +12,11 @@
 #
 #    make NOUVEAUROOTDIR=/path/to/nouveau/linux-2.6
 
+# 'make headers' will install the headers by default to
+# $NOUVEAUROOTDIR/usr/include/drm. To use a different location,
+# set HEADERINSDIR:
+#
+#    make HEADERINSDIR=/path/to/install/headers
 
 ifndef LINUXDIR
 RUNNING_REL := $(shell uname -r)
@@ -24,6 +29,8 @@ endif
 NOUVEAUGITREMOTE ?= origin
 NOUVEAUROOTDIR ?= $(CURDIR)/..
 override NOUVEAUROOTDIR := $(abspath $(NOUVEAUROOTDIR))
+HEADERINSDIR ?= $(NOUVEAUROOTDIR)/usr/include/drm
+override HEADERINSDIR := $(abspath $(HEADERINSDIR))
 
 TESTFILE := include/drm/nouveau_drm.h
 ifeq ($(wildcard $(NOUVEAUROOTDIR)/$(TESTFILE)),)
@@ -34,7 +41,7 @@ endif
 GIT_REVISION := $(shell GIT_DIR=$(NOUVEAUROOTDIR)/.git \
 	git describe --always --abbrev=17 2> /dev/null)
 
-DRMINC := -I$(NOUVEAUROOTDIR)/include/drm
+DRMINC := $(NOUVEAUROOTDIR)/include/drm
 DRMDIR := $(NOUVEAUROOTDIR)/drivers/gpu/drm
 DRMCFG := \
 	CONFIG_DRM=m \
@@ -45,6 +52,7 @@ DRMCFG := \
 	CONFIG_DRM_NOUVEAU_BACKLIGHT=y \
 	CONFIG_DRM_NOUVEAU_DEBUG=y \
 	CONFIG_DRM_I2C_CH7006=m \
+	CONFIG_DRM_I2C_SIL164=m \
 	CONFIG_DRM_TDFX=n \
 	CONFIG_DRM_R128=n \
 	CONFIG_DRM_RADEON=n \
@@ -54,7 +62,8 @@ DRMCFG := \
 	CONFIG_DRM_I915=n \
 	CONFIG_DRM_SIS=n \
 	CONFIG_DRM_SAVAGE=n \
-	CONFIG_DRM_VIA=n
+	CONFIG_DRM_VIA=n \
+	CONFIG_DRM_VMWGFX=n
 
 EXTRA_CFLAGS :=
 MYEXTRA_CFLAGS :=
@@ -65,14 +74,19 @@ ifneq ($(GIT_REVISION),)
 MYEXTRA_CFLAGS += '-DGIT_REVISION=\"$(GIT_REVISION)\"'
 endif
 
-MYPARMS := -C $(LINUXDIR) KCPPFLAGS="$(DRMINC)" SUBDIRS="$(DRMDIR)" $(DRMCFG)
+MYPARMS := -C $(LINUXDIR) KCPPFLAGS="-I$(DRMINC)" SUBDIRS="$(DRMDIR)" $(DRMCFG)
 
 MYEXTRA_CFLAGS += $(EXTRA_CFLAGS)
 ifneq ($(MYEXTRA_CFLAGS),)
 MYPARMS += EXTRA_CFLAGS="$(MYEXTRA_CFLAGS)"
 endif
 
-.PHONY: all modules install clean archive FORCE
+# include user headers information
+unifdef-y :=
+include $(DRMINC)/Kbuild
+
+
+.PHONY: all modules install clean archive headers FORCE
 
 all: modules
 FORCE:
@@ -85,6 +99,12 @@ install:
 
 clean:
 	$(MAKE) $(MYPARMS) clean
+
+headers:
+	mkdir -p $(HEADERINSDIR)
+	cd $(LINUXDIR) && \
+	perl scripts/headers_install.pl $(DRMINC) $(HEADERINSDIR) dummy \
+		$(unifdef-y)
 
 archive: newttm-devel-compat.tar.gz newttm-devel.tar.gz master.tar.gz
 

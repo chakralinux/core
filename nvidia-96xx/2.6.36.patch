@@ -1,0 +1,14 @@
+--- nv.c.orig	2010-10-23 10:41:00.433000009 +0200
++++ nv.c	2010-10-23 10:43:54.983000023 +0200
+@@ -249,7 +249,11 @@ static struct pci_driver nv_pci_driver =
+ static struct file_operations nv_fops = {
+     .owner     = THIS_MODULE,
+     .poll      = nv_kern_poll,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)  
++    .unlocked_ioctl     = nv_kern_unlocked_ioctl,
++#else
+     .ioctl     = nv_kern_ioctl,
++#endif
+ #if defined(HAVE_UNLOCKED_IOCTL)
+     .unlocked_ioctl = nv_kern_unlocked_ioctl,
+ #endif

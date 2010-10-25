@@ -11,49 +11,53 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
 pkgname=catalyst
-pkgver=10.8
-pkgrel=2
+pkgver=10.10
+pkgrel=1
 pkgdesc="AMD/ATI drivers for Radeon brand cards"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
-depends=('xorg-server<1.9.0' 'kernel26>=2.6.29' 'kernel26<2.6.36' 'kernel26-headers' 'netkit-bsd-finger' 'libstdc++5' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs')
-
-conflicts=('catalyst' 'catalyst-utils' 'nvidia' 'libgl' 'catalyst-leaked' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri')
+depends=('xorg-server<1.10.0' 'kernel26>=2.6.29' 'kernel26<2.6.37' 'kernel26-headers' 'netkit-bsd-finger' 'libstdc++5' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi')
+makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'unrar')
+conflicts=('catalyst' 'catalyst-utils' 'nvidia' 'libgl' 'catalyst-leaked' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri' 'catalyst')
 provides=('catalyst' 'libgl' 'libatical')
 replaces=('catalyst')
 install=catalyst.install
-source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
-    catalyst.sh amdcccle.desktop atieventsd.sh arch_compat.patch)
-md5sums=('9ecfa448671925ebb277831fff607689'
+source=(https://a248.e.akamai.net/f/674/9206/0/www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
+    #http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
+    catalyst.sh amdcccle.desktop atieventsd.sh makefile_compat.patch fglrx-2.6.36.patch)
+md5sums=('d8e6b65b2e5e18b834287eb79cf086b3'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '4efa8414a8fe9eeb50da38b5522ef81d'
          'f729bf913613f49b0b9759c246058a87'
-         '30b31b8e78601475061d74deca8833f9')
+         '3e1b82bd69774ea808da69c983d6a43b'
+         'eb58dbf993dbf8d77924055cc8caaeb6')
 
 build() {
 
 /bin/sh ./ati-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
+
+# "Unpacking archive ..."
+#unrar e ati-driver-installer-8.783_RC1-x86.x86_64.rar
+#/bin/sh ati-driver-installer-8.783_RC1-x86.x86_64.run --extract archive_files
 
 ##Build kernel modules
 
 if [ "${CARCH}" = "x86_64" ]; then
 BUILDARCH=x86_64
 _archdir=x86_64
+
+# patch makefile
+cd "${srcdir}/archive_files"
+patch -Np1 -i $startdir/makefile_compat.patch || return 1
 fi
 if [ "${CARCH}" = "i686" ]; then
 BUILDARCH=i386
 _archdir=x86
 fi
 
-## Patch arch_compat
-    if [ "${BUILDARCH}" = "x86_64" ]; then
-	if [[ $(cat /lib/modules/${_kernver}/build/arch/x86/include/asm/compat.h | grep arch_compat_alloc_user_space) = "" ]]; then echo ""
-	    else
-	    cd "${srcdir}/archive_files/"
-	    patch -Np1 -i ../arch_compat.patch || return 1
-	fi
-    fi
+cd "${srcdir}/archive_files/"
+patch -Np1 -i ../fglrx-2.6.36.patch || return 1
 
 cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
 cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a.GCC4" . || return 1
