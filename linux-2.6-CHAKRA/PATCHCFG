@@ -1,29 +1,38 @@
 # Kernel source file
-SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.35.tar.bz2"
+SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.36.tar.bz2"
 # Original source directory
-SRCORIG="linux-2.6.35"
+SRCORIG="linux-2.6.36"
 # Our source directory
-SRCNAME="linux-2.6.35-CHAKRA"
+SRCNAME="linux-2.6.36-CHAKRA"
 # Patches:
 #   URL%patchlevel
 #  or
 #   filename%patchlevel (file must be in patches/ subdirectory)
 PATCHES=(
-         # add upstream patch from 2.6.35 series, if needed
-         # http://www.kernel.org/pub/linux/kernel/v2.6/patch-2.6.35.7.bz2%1
+         # add upstream patch from 2.6.36 series
+         #http://www.kernel.org/pub/linux/kernel/v2.6/patch-2.6.36.1.bz2%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
-         # add liquorix patchset:
-         # http://liquorix.net/
-         http://liquorix.net/sources/35.7-1.patch.gz%1
-         # add fixes
-         # none yet
+         # add aufs2 support, in reference to:
+         # http://aufs.sourceforge.net
+         aufs2-base.patch%1
+         #aufs2-standalone.patch2%1
+         aufs2-kbuild.patch%1
+         aufs2.1-standalone.tree-36-UNRELEASED-20101024.patch%1
+         aufs2.1-standalone.tree-36-UNRELEASED-20101024-EXPORT_SYMBOL.patch%1
+         # squashfs with lzma
+         001-add_support_for_LZMA_compressed_filesystems.patch%1
+         002-make_lzma_available_to_non_initramfs_initrd_code.patch%1
+         003-select_DECOMPRESS_LZMA_NEEDED_when_including_support_for_lzma.patch%1
+         004-make_lzma_reentrant.patch%1
+         005-force_lzma_wrapper_to_be_retained.patch%1
+         006-add_missing_slab.h_include_in_lzma_wrapper.patch%1
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-2.6.35.7-1-CHAKRA"
+PATCHNAME="patch-2.6.36-2-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
@@ -40,4 +49,3 @@ post_apply() {
   # Kill some files
   find . -name '*~' -exec rm -f {} \; 2>/dev/null
 }
-

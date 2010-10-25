@@ -7,43 +7,40 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgname=broadcom-wl
-pkgver=5.60.48.36 
-pkgrel=9
-
 # Find the kernel name inside the chroot
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
-pkgdesc="Broadcom 802.11abg Networking Drivers for kernel26"
+pkgname=broadcom-wl
+pkgver=5.60.246.2
+pkgrel=1
+pkgdesc='Broadcom 802.11abg networking drivers'
 arch=('i686' 'x86_64')
-[ "$CARCH" = "i686" ] && ARCH=x86_32
-[ "$CARCH" = "x86_64" ] && ARCH=x86_64
-url="http://www.broadcom.com/support/802.11/linux_sta.php"
+url='http://www.broadcom.com/support/802.11/linux_sta.php'
 license=('MIXED/Proprietary')
-depends=('kernel26>=2.6.35' 'kernel26<2.6.36')
-makedepends=(kernel26-headers)
-install=broadcom-wl.install
-source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc-${ARCH}-v${pkgver}.tar.gz" 'kernel-2.6.35.patch')
-[ "$CARCH" = 'x86_64' ] && sha1sums=('1174a4d3102aa0ed45003556e03842668ef698b9'
-                                     '43d541063fd91b1fbd5e84310228abafddab7f7e') \
-                        || sha1sums=('07d955afe599466b0e25bcc507186f5b50f1a171'
-                                     '43d541063fd91b1fbd5e84310228abafddab7f7e')
-groups=("kernel26-modules")
-conflicts=("broadcom-wl")
-replaces=("broadcom-wl")
+depends=('kernel26>=2.6.36' 'kernel26<2.6.37')
+makedepends=('kernel26-headers')
+[ "$CARCH" = 'x86_64' ] && ARCH=x86-64 \
+                        || ARCH=x86-32
+source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}_v${pkgver}.tar.gz"
+        'license.patch'
+        'semaphore.patch')
+[ "$CARCH" = 'x86_64' ] && sha1sums=('6d82434d8087aba9cbea6b46bcf97f14c4e6c1f0'
+                                     '994f58cdec61165313e1386d6c7e88723e6f27bf'
+                                     '1cc0c33199403f881f1a9947669ad0cf83342592') \
+                        || sha1sums=('53d0a3cbc7c7f5b0b75f8da0480a4069dfc66281'
+                                     '994f58cdec61165313e1386d6c7e88723e6f27bf'
+                                     '1cc0c33199403f881f1a9947669ad0cf83342592')
+
+install=install
 
 build() {
-
-  cd "$srcdir"
- 
-  patch -p1 < kernel-2.6.35.patch
-
-  # Adding line license
-  sed -i '190i\MODULE_LICENSE("Mixed/Proprietary"); \n' ${srcdir}/src/wl/sys/wl_linux.c
-  sed -i 's/linux\/autoconf.h/generated\/autoconf.h/' ${srcdir}/src/include/linuxver.h
-
-  # Building
-  KBUILD_NOPEDANTIC=1 make -C /lib/modules/${_kernver}/build M=`pwd` || return 1
-  install -D -m 755 wl.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/net/wireless/wl.ko || return 1
+	cd "$srcdir"
+	patch -p1 < license.patch
+	patch -p1 < semaphore.patch
+	KBUILD_NOPEDANTIC=1 make -C /lib/modules/${_kernver}/build M=`pwd` || return 1
 }
 
+package() {
+	cd "$srcdir"
+	install -D -m 755 wl.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/net/wireless/wl.ko || return 1
+}

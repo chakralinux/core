@@ -1,0 +1,79 @@
+--- a/fs/open.c	2010-10-25 12:00:14.484000008 +0200
++++ b/fs/open.c	2010-10-25 12:00:50.098000008 +0200
+@@ -61,6 +61,8 @@ int do_truncate(struct dentry *dentry, l
+ 	return ret;
+ }
+ 
++EXPORT_SYMBOL(do_truncate);
++
+ static long do_sys_truncate(const char __user *pathname, loff_t length)
+ {
+ 	struct path path;
+--- a/fs/namei.c	2010-10-25 11:31:57.774000005 +0200
++++ b/fs/namei.c	2010-10-25 11:36:56.506000006 +0200
+@@ -2916,3 +2916,7 @@ EXPORT_SYMBOL(vfs_symlink);
+ EXPORT_SYMBOL(vfs_unlink);
+ EXPORT_SYMBOL(dentry_unhash);
+ EXPORT_SYMBOL(generic_readlink);
++EXPORT_SYMBOL(deny_write_access);
++EXPORT_SYMBOL(lookup_hash);
++EXPORT_SYMBOL(__lookup_one_len);
++
+--- a/fs/splice.c	2010-10-25 11:56:09.020000008 +0200
++++ b/fs/splice.c	2010-10-25 11:58:46.227000008 +0200
+@@ -1117,6 +1117,8 @@ long do_splice_from(struct pipe_inode_in
+ 	return splice_write(pipe, out, ppos, len, flags);
+ }
+ 
++EXPORT_SYMBOL(do_splice_from);
++
+ /*
+  * Attempt to initiate a splice from a file to a pipe.
+  */
+@@ -1143,6 +1145,8 @@ long do_splice_to(struct file *in, loff_
+ 	return splice_read(in, ppos, pipe, len, flags);
+ }
+ 
++EXPORT_SYMBOL(do_splice_to);
++
+ /**
+  * splice_direct_to_actor - splices data directly between two non-pipes
+  * @in:		file to splice from
+--- a/security/security.c	2010-10-25 11:39:49.838000006 +0200
++++ b/security/security.c	2010-10-25 11:48:27.798000008 +0200
+@@ -491,6 +491,8 @@ int security_inode_rmdir(struct inode *d
+ 	return security_ops->inode_rmdir(dir, dentry);
+ }
+ 
++EXPORT_SYMBOL(security_inode_permission);
++
+ int security_inode_mknod(struct inode *dir, struct dentry *dentry, int mode, dev_t dev)
+ {
+ 	if (unlikely(IS_PRIVATE(dir)))
+@@ -515,6 +517,8 @@ int security_inode_readlink(struct dentr
+ 	return security_ops->inode_readlink(dentry);
+ }
+ 
++EXPORT_SYMBOL(security_inode_readlink);
++
+ int security_inode_follow_link(struct dentry *dentry, struct nameidata *nd)
+ {
+ 	if (unlikely(IS_PRIVATE(dentry->d_inode)))
+@@ -628,6 +632,8 @@ int security_file_permission(struct file
+ 	return fsnotify_perm(file, mask);
+ }
+ 
++EXPORT_SYMBOL(security_file_permission);
++
+ int security_file_alloc(struct file *file)
+ {
+ 	return security_ops->file_alloc_security(file);
+@@ -655,6 +661,8 @@ int security_file_mmap(struct file *file
+ 	return ima_file_mmap(file, prot);
+ }
+ 
++EXPORT_SYMBOL(security_file_mmap);
++
+ int security_file_mprotect(struct vm_area_struct *vma, unsigned long reqprot,
+ 			    unsigned long prot)
+ {

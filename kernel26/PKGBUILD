@@ -12,10 +12,10 @@ pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -CHAKR
 # pkgname=kernel26-custom       # Build kernel with a different name
 #_kernelname=${pkgname#kernel26}
 _kernelname=""
-_basekernel=2.6.35
-pkgver=${_basekernel}.7
-pkgrel=1
-_patchname="patch-${pkgver}-1-CHAKRA"
+_basekernel=2.6.36
+pkgver=${_basekernel}
+pkgrel=2
+_patchname="patch-${pkgver}-2-CHAKRA"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
@@ -25,10 +25,10 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
-md5sums=('091abeb4684ce03d1d936851618687b6'
-         '36dcb60b9648c1da122025420ad11484'
-         '6c2bc6a4c8f2b757b9cab6a43c8d18e4'
-         '15163f4a44418c7efd148ac3015f3908'
+md5sums=('61f3739a73afb6914cb007f37fb09b62'
+         '930d7f134f4c53167668b42e9a2c47b9'
+         '3a263275881b62bd4368852bde286d09'
+         'c5502e97bf409a4f5755de1534f5e836'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
@@ -81,8 +81,7 @@ package_kernel26() {
             'alsa-driver' 'ieee80211' 'hostap-driver26'
             'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
-            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26' 'aufs2')
-  provides=('aufs2')
+            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26')
   install=kernel26.install
   optdepends=('crda: to set the correct wireless channels of your country')
 
@@ -158,7 +157,7 @@ package_kernel26-headers() {
   # add headers for lirc package
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video
   cp drivers/media/video/*.h  ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/
-  for i in bt8xx cpia2 cx25840 cx88 em28xx et61x251 pwc saa7134 sn9c102 usbvideo zc0301; do
+  for i in bt8xx cpia2 cx25840 cx88 em28xx et61x251 pwc saa7134 sn9c102 usbvideo; do # zc0301 - damaged
    mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/$i
    cp -a drivers/media/video/$i/*.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/$i
   done
@@ -218,7 +217,7 @@ package_kernel26-headers() {
   # remove unneeded architectures
   rm -rf ${pkgdir}/usr/src/linux-${_kernver}/arch/{alpha,arm,arm26,avr32,blackfin,cris,frv,h8300,ia64,m32r,m68k,m68knommu,mips,microblaze,mn10300,parisc,powerpc,ppc,s390,sh,sh64,sparc,sparc64,um,v850,xtensa}
   # fix aufs
-  #rm -rf ${pkgdir}/usr/src/linux-${_kernver}/include/linux/aufs_type.h
+  # rm -rf ${pkgdir}/usr/src/linux-${_kernver}/include/linux/aufs_type.h
 }
 
 
