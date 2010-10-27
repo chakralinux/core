@@ -1,58 +1,41 @@
+
 KERNEL_VERSION=2.6.36-CHAKRA
 
-pre_install() {
- if [ ! -e /usr/lib/xorg/modules/extensions/libdri.so ]; then
-    ln -sf /usr/lib/xorg/modules/extensions/libdri.xorg /usr/lib/xorg/modules/extensions/libdri.so
- fi
+
+whisperer(){
+    echo "----------------------------------------------------------------"
+    echo "Don't forget to add fglrx into MODULES array of /etc/rc.conf"
+    echo "----------------------------------------------------------------"
+    echo ""
+    echo "--------------------------- == * == ----------------------------"
+    echo "catalyst package has been splited between:"
+    echo "- catalyst (module for stock kernel)"
+    echo "- catalyst-utils (libs and stuff)"
+    echo "----------------------------------------------------------------"
+}
+
+remove_hook(){
+   ##removing hook's entries
+    # remove hook fglrx
+     sed '/^HOOKS/s/ *fglrx//' -i /etc/mkinitcpio.conf
+    # remove heads
+     sed '/^SyncFirst/s/ *kernel26-headers//' -i /etc/pacman.conf
 }
 
 post_install() {
-  depmod $KERNEL_VERSION
- if [ ! -e /usr/lib/xorg/modules/extensions/libdri.so ]; then
-    ln -sf /usr/lib/xorg/modules/extensions/libdri.xorg /usr/lib/xorg/modules/extensions/libdri.so
- fi
-    echo "----------------------------------------------------------------"
-    echo "You can use the tool 'aticonfig' to generate an xorg.conf file."
-    echo "Remember to add fglrx to the MODULES list in /etc/rc.conf."
-    echo "--------------- ^^^^^ ------ ^^^^^^^ ---------------------------"
-    echo "Add nomodeset to your kernel line in /boot/grub/menu.lst , ie.:"
-    echo "kernel /boot/vmlinuz26 root=/dev/sda1 ro nomodeset"
-    echo "---------------------------------------- ^^^^^^^^^ -------------"
-    echo "If experiencing problems with white/gray/black_artifacts you can"
-    echo "[as root] kill Xserver and use this command:"
-    echo "# aticonfig --set-pcs-str=DDX,ForceXAA,TRUE"
-    echo "----------------------------------------------------------------"
-    echo "For more info and more troubleshooting visit:"
-    echo "http://wiki.archlinux.org/index.php/ATI_Catalyst"
-    echo "----------------------------------------------------------------"
+    depmod $KERNEL_VERSION
+    whisperer
 }
 
 post_upgrade() {
-  depmod $KERNEL_VERSION
- if [ ! -e /usr/lib/xorg/modules/extensions/libdri.so ]; then
-    ln -sf /usr/lib/xorg/modules/extensions/libdri.xorg /usr/lib/xorg/modules/extensions/libdri.so
- fi
-    echo "----------------------------------------------------------------"
-    echo "You can use the tool 'aticonfig' to generate an xorg.conf file."
-    echo "Remember to add fglrx to the MODULES list in /etc/rc.conf."
-    echo "--------------- ^^^^^ ------ ^^^^^^^ ---------------------------"
-    echo "Add nomodeset to your kernel line in /boot/grub/menu.lst , ie.:"
-    echo "kernel /boot/vmlinuz26 root=/dev/sda1 ro nomodeset"
-    echo "---------------------------------------- ^^^^^^^^^ -------------"
-    echo "If experiencing problems with white/gray/black_artifacts you can"
-    echo "[as root] kill Xserver and use this command:"
-    echo "# aticonfig --set-pcs-str=DDX,ForceXAA,TRUE"
-    echo "----------------------------------------------------------------"
-    echo "For more info and more troubleshooting visit:"
-    echo "http://wiki.archlinux.org/index.php/ATI_Catalyst"
-    echo "----------------------------------------------------------------"
+    remove_hook
+    depmod $KERNEL_VERSION
+    whisperer
 }
 
 post_remove() {
-  depmod $KERNEL_VERSION
-  # If the symlink is dead, remove it
- if [ ! -e /usr/lib/xorg/modules/extensions/libdri.so ]; then
-    ln -sf /usr/lib/xorg/modules/extensions/libdri.xorg /usr/lib/xorg/modules/extensions/libdri.so
- fi
-  echo "NOTE: Don't forget to recover your original xorg.conf file."
+    depmod $KERNEL_VERSION
+    echo "----------------------------------------------------------------"
+    echo "Don't forget to remove fglrx from MODULES array of /etc/rc.conf"
+    echo "----------------------------------------------------------------"
 }
