@@ -1,14 +1,17 @@
-# $Id: PKGBUILD 75233 2010-04-01 03:37:25Z allan $
-# Maintainer: Dan McGee <dan@archlinux.org>
-# Maintainer: Aaron Griffin <aaron@archlinux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
 pkgname=libarchive
 pkgver=2.8.4
-pkgrel=1
+pkgrel=2
 pkgdesc="library that can create and read several streaming archive formats"
 arch=(i686 x86_64)
 url="http://libarchive.googlecode.com/"
 license=('BSD')
-depends=('zlib' 'bzip2' 'xz-utils' 'acl' 'openssl>=1.0.0' 'expat')
+depends=('zlib' 'bzip2' 'xz>=5.0.0' 'acl' 'openssl>=1.0.0' 'expat')
 source=(http://libarchive.googlecode.com/files/libarchive-$pkgver.tar.gz)
 md5sums=('83b237a542f27969a8d68ac217dc3796')
 
@@ -16,8 +19,11 @@ md5sums=('83b237a542f27969a8d68ac217dc3796')
 # the missing symbols inside the libarchive .a static lib, but that is dirty)
 options=(libtool)
 
-# keep an upgrade path for older installations
+# NOTE: undash it to create a tar.gz after xz pkg build. Build it again after installing libarchive
+
 #PKGEXT='.pkg.tar.gz'
+
+# NOTE: rm symbolic link after install: sudo rm -v /usr/lib/liblzma.so.0
 
 build() {
   cd $startdir/src/$pkgname-$pkgver
