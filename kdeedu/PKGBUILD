@@ -43,7 +43,7 @@ pkgname=('kdeedu-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=3
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -53,7 +53,7 @@ options=('docs' '!splithdr')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'ocaml' 'facile' 'eigen' 'cfitsio' "kdelibs>=${_kdever}"
              "kdebase-runtime>=${_kdever}" 'openbabel' 'libqalculate' 'gsl' 'boost' 'indilib' 'r>=2.11.1'
-             'libspectre' 'python' 'xplanet' 'docbook-xml')
+             'libspectre' 'python' 'xplanet' 'docbook-xml' 'avogadro')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2)
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -179,7 +179,7 @@ package_kdeedu-kalgebra()
 package_kdeedu-kalzium()
 {
 	pkgdesc="Kalzium is an application which will show you some information about the periodic system of the elements"
-	depends=("${_origname}-common>=${_kdever}" 'openbabel')
+	depends=("${_origname}-common>=${_kdever}" 'openbabel' 'avogadro')
 	conflicts=("kdemod-${_origname}-kalzium")
 	groups=("kde-complete" "kdeedu" "kde-uninstall")
 	install=${_origname}.install
