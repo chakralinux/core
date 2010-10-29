@@ -30,7 +30,7 @@ pkgname=('kdebindings-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -43,10 +43,8 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt'
              'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
-	fix-generator-segfaults.patch
 	fix-ruby-bindings.patch)
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-	 e870fe57c933a076c3e8319604edb63d
 	 95efe147489fdd8acb421a0a450e635a)
 
 
@@ -57,8 +55,6 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-	# Already fixed in 4.5.3
-        patch -Np4 -i ${srcdir}/fix-generator-segfaults.patch
         patch -Np3 -i ${srcdir}/fix-ruby-bindings.patch
 
 	#fix ruby
