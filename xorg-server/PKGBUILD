@@ -9,13 +9,13 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xorg-server
 pkgver=1.9.1
-pkgrel=1
+pkgrel=2
 pkgdesc="X.Org X servers"
 arch=('i686' 'x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org"
-depends=('libgl' 'libxfont>=1.4.2' 'libgcrypt>=1.4.5' 'udev>=162' 'libpciaccess>=0.11.0' 'libxv>=1.0.5' 'pixman>=0.19.4' 'xcursor-themes>=1.0.2' 'xkeyboard-config>=2.0' 'xorg-server-utils' 'xorg-fonts-misc' 'xbitmaps' 'diffutils' 'xf86-input-evdev>=2.3.2-2' 'inputproto>=2.0')
-makedepends=('pixman' 'libx11' 'mesa' 'libgl' 'xf86driproto' 'xcmiscproto' 'xtrans' 'bigreqsproto' 'randrproto' 'inputproto' 'fontsproto' 'videoproto' 'compositeproto' 'recordproto' 'scrnsaverproto' 'resourceproto' 'xineramaproto' 'libxkbfile' 'libxfont' 'renderproto' 'libpciaccess' 'libxv' 'xf86dgaproto' 'libxmu' 'libxrender' 'libxi' 'dmxproto' 'libxaw' 'libdmx' 'libxtst' 'libxres')
+depends=('libgl' 'libxfont>=1.4.2' 'libgcrypt>=1.4.5' 'udev>=162' 'libpciaccess>=0.11.0' 'libxv>=1.0.5' 'pixman>=0.19.4' 'xcursor-themes>=1.0.2' 'xkeyboard-config>=2.0' 'xorg-server-utils' 'xorg-fonts-misc' 'xbitmaps' 'diffutils' 'xf86-input-evdev>=2.3.2-2' 'inputproto>=2.0' 'libxres')
+makedepends=('pixman' 'libx11' 'mesa' 'libgl' 'xf86driproto' 'xcmiscproto' 'xtrans' 'bigreqsproto' 'randrproto' 'inputproto' 'fontsproto' 'videoproto' 'compositeproto' 'recordproto' 'scrnsaverproto' 'resourceproto' 'xineramaproto' 'libxkbfile' 'libxfont' 'renderproto' 'libpciaccess' 'libxv' 'xf86dgaproto' 'libxmu' 'libxrender' 'libxi' 'dmxproto' 'libxaw' 'libdmx' 'libxtst')
 conflicts=('catalyst-utils<=9.2' 'xf86-input-calcomp' 'xf86-input-citron' 'xf86-input-digitaledge' 'xf86-input-dmc' 'xf86-input-dynapro' 'xf86-input-elo2300'
         'xf86-input-jamstudio' 'xf86-input-magellan' 'xf86-input-magictouch' 'xf86-input-microtouch' 'xf86-input-palmax' 'xf86-input-spaceorb' 'xf86-input-summa' 'xf86-input-tek4957' 'xf86-input-ur98' 'xf86-video-vga' 'xf86-video-intel-legacy' 'nvidia-96xx-utils<96.43.14' 'nvidia-173xx-utils<173.14.21')
 options=('!libtool')
@@ -69,6 +69,10 @@ build() {
       --with-dri-driver-path=/usr/lib/xorg/modules/dri
 
   make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
   install -m755 "${srcdir}/xvfb-run" "${pkgdir}/usr/bin/"
