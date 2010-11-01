@@ -9,8 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xf86-video-intel
 pkgver=2.13.0
-_gitver=5afc7472b155e8e940f12a38baf80c298dc3b364
-pkgrel=6
+pkgrel=5
 pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
@@ -20,19 +19,16 @@ makedepends=('xorg-server' 'libx11' 'libdrm' 'xf86driproto' 'glproto' 'mesa' 'li
 conflicts=('xorg-server<1.9.1' 'xf86-video-i810' 'xf86-video-intel-legacy')
 options=('!libtool')
 groups=('xorg-video-drivers')
-source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${_gitver}.tar.gz"
-#source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
         git-fixes.patch
         8xx-enable-shadow.patch)
-md5sums=('d1af4352c05f45f8ef4f09692c90a198'
-#md5sums=('de2f8a5836d90c71f3175dcd46d03ec0'
+md5sums=('de2f8a5836d90c71f3175dcd46d03ec0'
          '2be4bf1558b996ad361ed30ce0633e7a'
          'baecc481d73e6fe31dbf6c28b649c5d6')
 
 build() {
-#  cd "${srcdir}/${pkgname}-${pkgver}"
-  cd "${srcdir}/${pkgname}-${_gitver}"
-#  patch -Np1 -i "${srcdir}/git-fixes.patch"
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i "${srcdir}/git-fixes.patch"
   patch -Np0 -i "${srcdir}/8xx-enable-shadow.patch"
   autoreconf --install
   ./configure --prefix=/usr --enable-dri
