@@ -8,16 +8,14 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xorg-server
-pkgver=1.9.1
-pkgrel=2
+pkgver=1.9.2
+pkgrel=1
 pkgdesc="X.Org X servers"
 arch=('i686' 'x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org"
-depends=('libgl' 'libxfont>=1.4.2' 'libgcrypt>=1.4.5' 'udev>=162' 'libpciaccess>=0.11.0' 'libxv>=1.0.5' 'pixman>=0.19.4' 'xcursor-themes>=1.0.2' 'xkeyboard-config>=2.0' 'xorg-server-utils' 'xorg-fonts-misc' 'xbitmaps' 'diffutils' 'xf86-input-evdev>=2.3.2-2' 'inputproto>=2.0' 'libxres')
-makedepends=('pixman' 'libx11' 'mesa' 'libgl' 'xf86driproto' 'xcmiscproto' 'xtrans' 'bigreqsproto' 'randrproto' 'inputproto' 'fontsproto' 'videoproto' 'compositeproto' 'recordproto' 'scrnsaverproto' 'resourceproto' 'xineramaproto' 'libxkbfile' 'libxfont' 'renderproto' 'libpciaccess' 'libxv' 'xf86dgaproto' 'libxmu' 'libxrender' 'libxi' 'dmxproto' 'libxaw' 'libdmx' 'libxtst')
-conflicts=('catalyst-utils<=9.2' 'xf86-input-calcomp' 'xf86-input-citron' 'xf86-input-digitaledge' 'xf86-input-dmc' 'xf86-input-dynapro' 'xf86-input-elo2300'
-        'xf86-input-jamstudio' 'xf86-input-magellan' 'xf86-input-magictouch' 'xf86-input-microtouch' 'xf86-input-palmax' 'xf86-input-spaceorb' 'xf86-input-summa' 'xf86-input-tek4957' 'xf86-input-ur98' 'xf86-video-vga' 'xf86-video-intel-legacy' 'nvidia-96xx-utils<96.43.14' 'nvidia-173xx-utils<173.14.21')
+depends=('libgl' 'libxres' 'dri2proto' 'fontsproto' 'inputproto' 'kbproto' 'libdrm' 'libgcrypt' 'libpciaccess' 'libdmx' 'libxau' 'libxaw' 'libxdmcp' 'libxfixes' 'libxfont' 'libxi' 'libxrender' 'libxv' 'pixman' 'randrproto' 'renderproto' 'udev' 'videoproto' 'xextproto' 'xf86-input-evdev' 'xineramaproto' 'xkeyboard-config' 'xorg-fonts-misc' 'xorg-xkb-utils' 'xorg-util-macros' 'xproto')
+makedepends=('bigreqsproto' 'compositeproto' 'dmxproto' 'libx11' 'libxkbfile' 'libxmu' 'libxtst' 'mesa' 'recordproto' 'resourceproto' 'scrnsaverproto' 'xcmiscproto' 'xf86dgaproto' 'xf86driproto' 'xtrans')
 options=('!libtool')
 provides=('x-server')
 groups=('xorg')
@@ -27,7 +25,7 @@ source=(${url}/releases/individual/xserver/${pkgname}-${pkgver}.tar.bz2
         xvfb-run.1
         10-evdev.conf
         10-quirks.conf)
-md5sums=('64f2a021667ac3a2bc007f2567170f03'
+md5sums=('5c8773499a6a8c1ddaedf33577ec9634'
          '1a336eb22e27cbf443ec5a2ecddfa93c'
          '52fd3effd80d7bc6c1660d4ecf23d31c'
          '376c70308715cd2643f7bff936d9934b'
@@ -40,13 +38,10 @@ build() {
   # Get rid of the ugly pattern
   patch -Np3 -i "${srcdir}/xorg-redhat-die-ugly-pattern-die-die-die.patch"
 
-  sed -i -e 's/\$(prefix)\/etc/\/etc/g' config/Makefile.*
-
-  autoreconf
   ./configure --prefix=/usr \
       --enable-ipv6 \
       --enable-dri \
-      --disable-dmx \
+      --enable-dmx \
       --enable-xvfb \
       --enable-xnest \
       --enable-composite \
@@ -66,9 +61,15 @@ build() {
       --localstatedir=/var \
       --with-xkb-path=/usr/share/X11/xkb \
       --with-xkb-output=/var/lib/xkb \
-      --with-dri-driver-path=/usr/lib/xorg/modules/dri
-
+      --with-dri-driver-path=/usr/lib/xorg/modules/dri \
+      --with-fontrootdir=/usr/share/fonts
   make
+
+  sed -e 's/^DMX_SUBDIRS =.*/DMX_SUBDIRS =/' \
+      -e 's/^XVFB_SUBDIRS =.*/XVFB_SUBDIRS =/' \
+      -e 's/^XNEST_SUBDIRS =.*/XNEST_SUBDIRS = /' \
+      -e 's/^KDRIVE_SUBDIRS =.*/KDRIVE_SUBDIRS =/' \
+      -i hw/Makefile
 }
 
 package() {
