@@ -18,16 +18,17 @@ makedepends=("cmake")
 source=()
 md5sums=()
 
-_svntrunk="https://oscaf.svn.sourceforge.net/svnroot/oscaf"
+# undash the lines when you want to update the pkg and dash them after!
+#_svntrunk="https://oscaf.svn.sourceforge.net/svnroot/oscaf"
 
 build() {
   cd ${srcdir}
 
-  if [[ -d oscaf/.svn ]]; then
-     (cd oscaf && svn up -r $pkgver)
-  else
+#  if [[ -d oscaf/.svn ]]; then
+#     (cd oscaf && svn up -r $pkgver)
+#  else
      svn co ${_svntrunk} --config-dir ./ -r ${pkgver} oscaf
-  fi
+#  fi
 
   mkdir oscaf/trunk/ontologies/build
   cd oscaf/trunk/ontologies/build
