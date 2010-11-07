@@ -1,9 +1,11 @@
-# $Id: PKGBUILD 71150 2010-03-04 21:10:49Z ronald $
-# Maintainer: Ronald van Haren <ronald.archlinux.org>
-# Contributor: Judd Vinet <jvinet@zeroflux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=iproute2
-pkgver=2.6.33
+pkgver=2.6.35
 pkgrel=1
 pkgdesc="IP Routing Utilities"
 arch=('i686' 'x86_64')
@@ -13,28 +15,35 @@ depends=('linux-atm' 'perl')
 provides=('iproute')
 conflicts=('iproute')
 replaces=('iproute')
-
 options=('!makeflags')
 backup=('etc/iproute2/ematch_map' 'etc/iproute2/rt_dsfield' 'etc/iproute2/rt_protos' \
 	'etc/iproute2/rt_realms' 'etc/iproute2/rt_scopes' 'etc/iproute2/rt_tables')
-
 source=(http://devresources.linux-foundation.org/dev/iproute2/download/iproute2-${pkgver}.tar.bz2
-	'iftunnel.patch' 'iproute2-fhs.patch')
-md5sums=('b371fca3fcb5e436e69a7c2111d84a3c'
-         '8b3dab19a03d8d521c690be7bb7b5c2e'
-         '9013aa473d8b06b3bb2420b7ffe60261')
+	'iproute2-fhs.patch' 'iproutegetfix.patch')
+sha1sums=('862b86ac73ea696867675765d119654553a22aeb'
+          '2416b11252364d7a6c742eabb4a6924a75637a46'
+          'cd8c969800a9bd1d4ebba0e1eae69d0892786d60')
 
 build() {
   cd $srcdir/iproute2-${pkgver}
   
   # set correct fhs structure
-  patch -Np1 -i ${srcdir}/iproute2-fhs.patch || return 1
+  patch -Np1 -i ${srcdir}/iproute2-fhs.patch
 
-  # fix missing #include
-  patch -Np0 -R -i ${srcdir}/iftunnel.patch || return 1
+  # fix ip route get breakage
+  patch -Np0 -i ${srcdir}/iproutegetfix.patch
 
-  ./configure || return 1
-  make || return 1
-  make DESTDIR=$pkgdir install || return 1
+  ./configure
 
+  make
+}
+
+package() {
+  cd $srcdir/iproute2-${pkgver}
+
+  make DESTDIR=$pkgdir install
+
+  # libnetlink isn't installed, install it FS#19385
+  install -Dm644 include/libnetlink.h ${pkgdir}/usr/include/libnetlink.h
+  install -Dm644 lib/libnetlink.a ${pkgdir}/usr/lib/libnetlink.a
 }
