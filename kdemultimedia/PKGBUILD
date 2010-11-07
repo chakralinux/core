@@ -28,7 +28,7 @@ pkgname=('kdemultimedia-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -72,6 +72,7 @@ build()
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_SKIP_RPATH=ON \
+		-DWITH_PulseAudio=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
 	make VERBOSE=1 || return 1
@@ -109,7 +110,7 @@ package_kdemultimedia-common()
 	depends=("kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'flac' 'musicbrainz' 'cdparanoia')
 	conflicts=("kdemod-${_origname}-common")
 	groups=("kde" "kde-complete" "kdemultimedia" "kde-uninstall")
-        optdepends=('libpulse: pulseaudio support')
+        optdepends=('pulseaudio: pulseaudio support')
 	install=${_origname}.install
 
 	splitdirs="kioslave libkcddb libkcompactdisc strigi-analyzer"
@@ -182,6 +183,7 @@ package_kdemultimedia-kmix()
 	depends=("${_origname}-common>=${_kdever}")
 	conflicts=("kdemod-${_origname}-kmix")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+        optdepends=('pulseaudio: pulseaudio support')
 	install=${_origname}.install
 
 	splitdirs="kmix"
