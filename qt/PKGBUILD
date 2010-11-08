@@ -17,8 +17,8 @@ pkgname=('qt'
          'qt-tools')
 
 pkgver=4.7.0
-pkgrel=1
-kdeqtver=8fa76375a2f030ecf8aa23c917f51f04333a1b2c
+pkgrel=2
+kdeqtver=7abde40e7484d0ab7d61de3531bc0aeedf24aa85
 
 pkgdesc="A cross-platform application and UI framework"
 arch=('i686' 'x86_64')
@@ -64,18 +64,22 @@ source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
 	'qtconfig.desktop'
 	'demosexamples-manual-install.patch'
 	'fix-scroll-when-last-item-is-removed.patch'
-	'qmake-linker-flags-as-needed.patch')
+	'qmake-linker-flags-as-needed.patch'
+	'appmenu.patch'
+	'fix-multisampling-with-ati-card.patch')
 
 
 md5sums=('3a2f25b9b115037277f4fb759194a7a5'
-         '6ef3f787fa5b4651cb2305706861b370' #  kde-qt-8fa76375a2f030ecf8aa23c917f51f04333a1b2c.patch.gz
+         '9d665e17a64c9e32b374ba5b1eafb350' #  kde-qt-7abde40e7484d0ab7d61de3531bc0aeedf24aa85.patch.gz
          '20d333282c43f9e643cb8e91b6307dcc'
          'bf89ee0bdd178933f19d8bc4090173ec'
          'a9bfeeffab8ba103bc8153fdb31474a1'
          '83b2a4aece6c9d86301c53a979af0b63'
          '579e63488320a8d692d25502551787af'
          'ef20c34afc5be5ed62f2935be66d9402'
-         'c436732fc467271e8a3838145c122070')
+         'c436732fc467271e8a3838145c122070'
+         'dba7f852bce6e1ebd78f6a78f9979c68'
+         'b2e0f134bbb848ebef41134a45a36ee9')
 
 # source PKGBUILD && _create-kdeqt-patch
 _create-kdeqt-patch() {
@@ -91,6 +95,7 @@ _create-kdeqt-patch() {
           popd
           mv "${codir}/kde-qt-${kdeqtver}.patch.gz" .
 	  rm -rf "${codir}"
+	  md5sum kde-qt-${kdeqtver}.patch.gz
 }
 
 build() {
@@ -113,6 +118,10 @@ build() {
 	# Already fixed in 4.7.1
         patch -Np1 -i ${srcdir}/fix-scroll-when-last-item-is-removed.patch || return 1
 	patch -Np1 -i ${srcdir}/qmake-linker-flags-as-needed.patch || return 1
+	patch -Np1 -i ${srcdir}/fix-multisampling-with-ati-card.patch
+
+	# apply appmenu patch from Aurelien Gateau
+	patch -Np1 -i ${srcdir}/appmenu.patch || return 1
 
 	# we want our cflags etc
 	sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
