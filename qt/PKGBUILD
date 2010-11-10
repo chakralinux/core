@@ -64,7 +64,6 @@ source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
 	'linguist.desktop'
 	'qtconfig.desktop'
 	'demosexamples-manual-install.patch'
-	'qmake-linker-flags-as-needed.patch'
 	'appmenu.patch')
 
 
@@ -75,7 +74,6 @@ md5sums=('6f88d96507c84e9fea5bf3a71ebeb6d7'
          'a9bfeeffab8ba103bc8153fdb31474a1'
          '83b2a4aece6c9d86301c53a979af0b63'
          '579e63488320a8d692d25502551787af'
-         'c436732fc467271e8a3838145c122070'
          'dba7f852bce6e1ebd78f6a78f9979c68')
 
 # source PKGBUILD && _create-kdeqt-patch
@@ -112,15 +110,13 @@ build() {
 	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
 
 	msg "apply other patches"
-	# Already fixed in 4.7.2
-	patch -Np1 -i ${srcdir}/qmake-linker-flags-as-needed.patch || return 1
-
 	# apply appmenu patch from Aurelien Gateau
 	patch -Np1 -i ${srcdir}/appmenu.patch || return 1
 
 	# we want our cflags etc
-	sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
-	sed -i "/^QMAKE_RPATH/s| -Wl,-rpath,||g" mkspecs/common/g++.conf
+        sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
+        sed -i "/^QMAKE_RPATH/s| -Wl,-rpath,||g" mkspecs/common/g++.conf
+        sed -i "/^QMAKE_LFLAGS\s/s|+=|+= $LDFLAGS|g" mkspecs/common/g++.conf
 	
 	msg "starting configure"
 
@@ -206,7 +202,7 @@ package_qt()
 	mv $pkgdir/usr/bin/linguist $srcdir/bin
     
 	# move out debug symbols into a temp dir and put them into qt-debug later below
-	mkdir $srcdir/debug
+	mkdir -p $srcdir/debug
 	for x in `find $pkgdir -name *.debug`
 	do
 		basedir=`dirname $x`
