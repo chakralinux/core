@@ -1,16 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 #
 
-doprint = False
+doprint = True
 
 input_files = ( "larch_intro.html",
                 "larch_features.html",
+                "larch_quick-console.html",
                 "larch_quick.html",
-                "larch_overview.html",
-                "larch_profiles.html",
+                "archin.html",
+                "larchify.html",
+                "medium.html",
+                "profiles.html",
                 "larch_live_system.html",
-                "larch_sessionsave.html",
-                "larch_rebuild.html",
                 "larch_ssh.html",
                 "larch_running.html",
                 "larch_gui.html",
@@ -18,9 +19,6 @@ input_files = ( "larch_intro.html",
                 "gui_installation.html",
                 "gui_larchify.html",
                 "gui_medium.html",
-                "gui_tweaks.html",
-                "larch_console.html",
-                "larch_changes.html",
             )
 
 

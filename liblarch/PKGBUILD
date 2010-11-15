@@ -1,0 +1,26 @@
+# Contributor: Michael Towers <larch42 (at) googlemail (dot) com>
+#2010.10.24
+pkgname=liblarch
+pkgver=1.10
+pkgrel=1
+pkgdesc="Support modules for larch-related programs"
+license=('GPL')
+arch=(any)
+depends=()
+optdepends=('python-pexpect: for rootrun, to run shell commands as root via su/sudo'
+            'pyqt: for suim, the gui module'
+    )
+url="http://larch.berlios.de"
+install=liblarch.install
+
+build() {
+  _destdir=opt/apps/liblarch
+  cd $pkgdir
+  mkdir -p $_destdir
+
+  cp $startdir/*.py $_destdir
+  cp -dr $startdir/uim $_destdir
+  cp -dr $startdir/i18n $_destdir
+  cp -dr $startdir/docs $_destdir
+  rm -f $_destdir/i18n/lang
+}

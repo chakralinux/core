@@ -1,4 +1,5 @@
 <div class="larchdocs">
+
 <h2 id="pagetitle" level="2">GUI Tab: Larchify</h2>
 
 <p>You can repeat the 'larchify' command as often as you like,
@@ -54,6 +55,25 @@ options.
 Clicking on an unselected row selects that row.
 </p>
 
+<h3>The kernel</h3>
+<p>By default the standard <em>Arch</em> kernel will be used in the
+<em>live</em> system, but it is also possible to use some other kernel, so
+long as it is suitably configured. In particular it must support
+<em>squashfs</em> and <em>aufs</em>. If you are using a non-standard kernel
+you need to tell <em>larchify</em> where it is (its file name within the
+/boot directory - the default is 'vmlinuz26') and the name of its
+<em>mkinitcpio</em> preset file (default 'kernel26'). These can be entered
+in the corresponding places in the advanced options section of the gui. 
+</p>
+
+<h3>The overlay</h3>
+<p>Apart from the few customization options offered by the GUI directly, it
+is possible to include any files in the <em>live</em> system by adding them
+at the appropriate path within the overlay directory ('rootoverlay') of
+the profile. This button opens a file browser on the 'rootoverlay' directory
+of the current profile.
+</p>
+
 <h3>Locales</h3>
 <p>You can select the (glibc) locales supported by the <em>live</em>
 system by editing the /etc/locale.gen file in the overlay. If there is
@@ -64,29 +84,33 @@ the locale files in the installation itself unchanged, new files are
 placed in the overlay.
 </p>
 
-<h3>/etc/rc.conf</h3>
+<h3><em>Arch</em> configuration: /etc/rc.conf</h3>
 <p>This is the central configuration file for an <em>Arch Linux</em>
 system. You can edit it here (see for example the <em>Arch Wiki</em> for
 more information about this file).
 </p>
 
+<h3>Reuse existing system.sqf</h3>
+
+<p>After 'larchify' has been run, the base installation will have been
+'squashed' into a compressed archive. Setting this option will prevent
+the repetition of this compression (which is quite a lengthy process) on
+the next run of 'larchify'. This should only be enabled if no changes
+have been made to the base installation (otherwise these changes will
+not be picked up).
+</p>
+
 <h3>Advanced options - the defaults are normally fine</h3>
 
 <h4>mkinitcpio.conf</h4>
-<p>Here you can edit the mkinitcpio.conf used for building the <em>initramfs</em>
-for the <em>live</em> system. N.B. The details of mkinitcpio handling in
-<em>larch</em> are a bit complicated, so if you change something here
-please be careful - you are not editing /etc/mkinitcpio.conf, but rather
-etc/mkinitcpio.conf.larch0 in the 'rootoverlay' of the profile. Also, don't
-change the <em>larch</em> hooks.
-</p>
-
-<h4>overlay</h4>
-<p>Apart from the few customization options offered by the GUI directly, it
-is possible to include any files in the <em>live</em> system by adding them
-at the appropriate path within the overlay directory ('rootoverlay') of
-the profile. This button opens a file browser on the 'rootoverlay' directory
-of the current profile.
+<p>Here you can edit the mkinitcpio.conf used for building the
+<em>initramfs</em> for the <em>live</em> system. N.B. The details of
+<em>mkinitcpio</em> handling in <em>larch</em> are a bit complicated,
+so if you change something here please be careful - you are not editing
+'/etc/mkinitcpio.conf', but rather 'etc/mkinitcpio.conf.larch' in the
+'rootoverlay' directory of the profile (see
+<a href="larchify.html#mkinitcpio">here</a> for further details).
+Also, don't change the <em>larch</em> hooks.
 </p>
 
 <h4>ssh-keys</h4>
@@ -94,17 +118,12 @@ of the current profile.
 is to generate these keys (if the <em>openssh</em> package is installed).
 </p>
 
-<h4>Reuse existing system.sqf</h4>
+<h4>Reuse existing locales</h4>
 
-<p>After 'larchify' has been run, the base installation will have been
-'squashed' into a compressed archive. Setting this option will prevent
-the repetition of this compression (which is quite a lengthy process) on
-the next run of 'larchify'. This should only be enabled if no changes
-have been made to the base installation (otherwise these changes will
-not be picked up). This is a very useful option, also for non-'advanced'
-users, but I have put it in the 'advanced' section because you really
-need to consider whether you have changed anything in the installation
-before using it.
+<p>For people generating a lot of locales this can save a bit of time on
+a rerun, so long as nothing significant (like <em>glibc</em>, or
+/etc/locale.gen) has changed in the installation.
 </p>
+
 </div>
 

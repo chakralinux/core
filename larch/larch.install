@@ -1,4 +1,4 @@
-_destdir=opt/apps/larch/modules
+_destdir=opt/apps/larch
 
 post_install() {
   post_upgrade
@@ -6,7 +6,9 @@ post_install() {
 
 post_upgrade() {
   echo "byte-compile python modules ..."
-  python -m compileall $_destdir
+  python2 -m compileall -l ${_destdir}/cli
+  python2 -m compileall -l ${_destdir}/gui
+  python2 -m compileall -l ${_destdir}/gui/front
 }
 
 pre_remove() {
@@ -15,7 +17,9 @@ pre_remove() {
 
 pre_upgrade() {
   echo "Remove .pyc files ..."
-  rm -f $_destdir/*.pyc
+  rm -f ${_destdir}/cli/*.pyc
+  rm -f ${_destdir}/gui/*.pyc
+  rm -f ${_destdir}/gui/front/*.pyc
 }
 
 op=$1

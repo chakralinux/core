@@ -3,45 +3,61 @@
 
 <h3>Projects</h3>
 
-<p><em>larch-7</em> uses 'projects' to gather together a few configuration
-options concerning the build environment. Examples are the location of the
-<em>Arch</em> installation to be 'larchified' (converted to a <em>live</em>
-system), pacman options such as package
-repository locations, which 'profile' (see below) to build with, which boot
-loader to use, and so on. These are all options which don't directly affect
-the essential design of the <em>live</em> system to be built. Most of the
-remaining configuration options do concern the design and are specified in
-the profile.
+<p>The <em>larch-8</em> GUI uses 'projects' to gather together a few
+configuration options concerning the build environment.
+Examples are the location of the <em>Arch</em> installation to be
+'larchified' (converted to a <em>live</em> system), pacman options such
+as package repository locations, which 'profile' (see below) to build with,
+which boot loader to use, and so on. These are all options which don't
+directly affect the design of the live system to be built. Most of the
+remaining configuration options do concern the design and are specified
+in the 'profile', for example the details of which packages to
+install, and how to configure the installed system.
 </p>
 
-<p>All project information is kept in the simply structured configuration
-file '~/.config/larch/larch-config'.
+<p>All project information is kept in a directory within '~/.config/larch'
+whose name is derived from the project name by prefixing it with 'p_'.
+The currently selected project is specified in the file
+'~/.config/larch/app.conf' (the application configuration file), the
+default entry being 'project = larch-0'.
 </p>
 
 <p>A new named project can be created in the advanced options on the
 Project-Settings tab of the GUI. For many purposes this will be unnecessary
-and one can use the default project, 'larch0' (this is why it is among the
+and one can use the default project, 'larch-0' (this is why it is among the
 advanced options). It is also possible to delete projects which are no longer
-needed, and to set the path of the installation to be larchified.
+needed, and to set the path of the installation to be larchified. Note
+that the GUI uses a different default installation path than the command
+line scripts, '~/larch_build' (i.e. within the user's home directory).
+Changing the installation path to an empty one ('') will return to the
+default one.
 </p>
 
 <h4>Installation Path</h4>
 
 <p>The installation that <em>larch</em> turns into a <em>live</em> system
 need not be on a separate partition, it can be placed anywhere convenient.
-The default installation directory ('/home/larchbuild') should normally be
+The default installation directory ('~/larch_build') should normally be
 acceptable, so long as there is enough free space on that partition.
 Note that lots of space is necessary, nearly 4GB for a 700MB CD, for example.
-The <em>live</em> system is built in the '.larch' sub-directory; it must be
-within the installation to be converted because some of the construction work
-is done using <em>chroot</em>.
+The <em>live</em> system is built in the '.larch' sub-directory of the
+installation directory; it must be within the installation to be converted
+because some of the construction work is done using <em>chroot</em>.
 </p>
 
 <p>The installation of the <em>Arch Linux</em> system to be larchified is
 handled on the <a href="gui_installation.html">'Installation'</a> tab of
 the GUI, but an already existing <em>Arch Linux</em> installation can also
-be larchified: see <a href="larch_overview.html#existingSystem">
+be larchified: see <a href="larchify.html#existingSystem">
 Making a live CD from an existing Arch installation</a>
+</p>
+
+<p>As the actual building work is done with admintrator permissions, the
+installation path can actually be anywhere in the file-system - exercise
+caution in entering the path, you could do some real damage to your system
+if you make a mistake. Entering an empty string will cause the default
+path to be chosen, to larchify the running system (not at all recommended!)
+enter '/'.
 </p>
 
 <h3>Profiles</h3>
@@ -59,24 +75,22 @@ configured system, and it also allows various (differently configured)
 without touching the installation itself.
 </p>
 
-<p>Profiles may be added, renamed and deleted at will, but be careful
-when renaming or deleting if other projects are using them. The profiles
-are shared by all projects, so if you delete or rename one that was
-being used by another project, that project will no longer be able to
-use its profile (*** it might be best to make profiles unique to projects?)
-A new profile can be created by copying (probably renaming) and editing
-an existing one. A special directory browser dialog makes it easy to
-do this - you can select the profile directory you want to copy and
-enter the new name in the same dialog.
-</p>
-
 <p>All profile information is kept in the correspondingly named directory
-within the directory '~/.config/larch/working_dir/MyProfiles'.
+within the directory '~/.config/larch/myprofiles'.
 </p>
 
-<h3>Processor architecture</h3>
-<p>I think it should be possible to build an i686 system while running an
-x86_64 one, but I haven't tried this, so it probably won't work!
+<p>The profiles are shared by all projects, so if you change one that is
+in use by another project, it will also be changed for that project.
+Deletion or renaming of a profile that is in use by another project is
+not permitted, but it is possible to 'clone' the current profile (copy it
+within the 'myprofiles' directory to a directory with another name),
+thus creating a new, 'unattached' version.
+A new profile can be also be fetched from anywhere in the file-system,
+using the browse button.
+</p>
+
+<p>When browsing for, renaming, cloning or copying profiles it is possible
+to overwrite existing profiles, but you will be prompted for confirmation.
 </p>
 
 </div>

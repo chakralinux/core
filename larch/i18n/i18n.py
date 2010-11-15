@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 
 # i18n.py
 
-#2009-08-03
-# Copyright 2009 Michael Towers
+#2010.07.14
+# Copyright 2009-2010 Michael Towers
 
 # This file is part of the larch project.
 #
@@ -63,16 +63,32 @@ thisdir = os.path.dirname(os.path.realpath(__file__))
 basedir = os.path.dirname(thisdir)
 os.chdir(basedir)
 
+dbg = False
 if (len(sys.argv) < 2):
     lang = "de"
 else:
-    lang = sys.argv[1]
+    if sys.argv[1] == '-d':
+        lang = "de"
+        dbg = True
+    else:
+        lang = sys.argv[1]
+
 print "Generating internationalization for language '%s'\n" % lang
 print "    If you wanted a different language run 'i18n.py <language>'"
 print "    For example 'i18n.py fr'\n"
 
-dirs = ["", "modules"]
-allpy = [os.path.join(d, "*.py") for d in dirs]
+allpy = ["cli/*.py", "gui/*.py", "gui/front/*.py", "gui/layouts/*.uim"]
+if dbg:
+    print "Debugging ...\n"
+
+    from glob import glob
+    for d in allpy:
+        pys = glob(d)
+        for f in pys:
+            print "Parsing '%s'" % f
+            call(["pygettext.py", "-p", "i18n", "-o", "larch.pot", f])
+    exit()
+
 call(["pygettext.py", "-p", "i18n", "-o", "larch.pot"] + allpy)
 
 os.chdir(thisdir)
