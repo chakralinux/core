@@ -127,8 +127,8 @@ build_it()
 				sudo pacman -U --noconfirm ../_repo/local/`echo ${module} | sed 's/support-pkg-//g' | sed 's/tools-pkg-//g'`-*.pkg.*
 			fi
 			# Upload packages (enable if needed)
-			cd ..
-			./sync-up-nodb.sh
+#			cd ..
+#			./sync-up-nodb.sh
 
 	popd &>/dev/null
 	done
