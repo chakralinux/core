@@ -4,32 +4,26 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
-# Find the kernel name inside the chroot
-_kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
-
 pkgname=broadcom-wl
-pkgver=5.60.246.2
+pkgver=5.60.246.6
 pkgrel=1
 pkgdesc='Broadcom 802.11abg networking drivers'
 arch=('i686' 'x86_64')
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 license=('MIXED/Proprietary')
-depends=('kernel26>=2.6.36' 'kernel26<2.6.37')
+depends=('kernel26')
 makedepends=('kernel26-headers')
 [ "$CARCH" = 'x86_64' ] && ARCH=x86-64 \
                         || ARCH=x86-32
 source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}_v${pkgver}.tar.gz"
         'license.patch'
         'semaphore.patch')
-[ "$CARCH" = 'x86_64' ] && sha1sums=('6d82434d8087aba9cbea6b46bcf97f14c4e6c1f0'
-                                     '994f58cdec61165313e1386d6c7e88723e6f27bf'
-                                     '1cc0c33199403f881f1a9947669ad0cf83342592') \
-                        || sha1sums=('53d0a3cbc7c7f5b0b75f8da0480a4069dfc66281'
-                                     '994f58cdec61165313e1386d6c7e88723e6f27bf'
-                                     '1cc0c33199403f881f1a9947669ad0cf83342592')
+[ "$CARCH" = 'x86_64' ] && sha1sums=('b4ecb6f82fe0f943d40fb85ef7c34eb16fe0abf2'
+                                     'ac57feff458bd03cd5b43a88fc264fcaa61bd156'
+                                     '50654c42a64c078c022148decdf897d586d3e6e0') \
+                        || sha1sums=('5aa9fd0707b1e597c5e0b78866a65d4bca687a0c'
+                                     'ac57feff458bd03cd5b43a88fc264fcaa61bd156'
+                                     '50654c42a64c078c022148decdf897d586d3e6e0')
 
 install=install
 
@@ -37,10 +31,10 @@ build() {
 	cd "$srcdir"
 	patch -p1 < license.patch
 	patch -p1 < semaphore.patch
-	KBUILD_NOPEDANTIC=1 make -C /lib/modules/${_kernver}/build M=`pwd` || return 1
+	KBUILD_NOPEDANTIC=1 make -C /lib/modules/`uname -r`/build M=`pwd`
 }
 
 package() {
 	cd "$srcdir"
-	install -D -m 755 wl.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/net/wireless/wl.ko || return 1
+	install -D -m 755 wl.ko "$pkgdir/lib/modules/`uname -r`/kernel/drivers/net/wireless/wl.ko"
 }
