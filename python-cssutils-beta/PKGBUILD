@@ -1,0 +1,25 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=python-cssutils-beta
+pkgver=0.9.7b4
+pkgrel=1
+pkgdesc="A CSS Cascading Style Sheets library for Python (Beta)"
+arch=('any')
+url="http://code.google.com/p/cssutils/"
+license=('LGPL3')
+conflicts=('python-cssutils-legacy' 'python-cssutils')
+depends=('python')
+makedepends=('unzip' 'setuptools')
+source=(http://cssutils.googlecode.com/files/cssutils-$pkgver.zip)
+md5sums=('ecc1fee61fad1dd0e64e1b1de478b97b')
+
+build() {
+  cd "$srcdir/cssutils-$pkgver"
+  python2 setup.py install --root="$pkgdir" || return 1
+}
