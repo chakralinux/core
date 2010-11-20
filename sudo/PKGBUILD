@@ -8,7 +8,8 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=sudo
-pkgver=1.7.4p2
+_ver=1.7.4p4
+pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
 pkgrel=1
 pkgdesc="Give certain users the ability to run some commands as root"
 arch=('i686' 'x86_64')
@@ -16,25 +17,26 @@ url="http://www.sudo.ws/sudo/"
 license=('custom')
 depends=('glibc' 'pam')
 backup=('etc/sudoers' 'etc/pam.d/sudo')
-source=(ftp://ftp.sudo.ws/pub/sudo/$pkgname-$pkgver.tar.gz 
+source=(ftp://ftp.sudo.ws/pub/sudo/$pkgname-$_ver.tar.gz
         sudo.pam)
-options=('!libtool' '!makeflags' 'force')
-md5sums=('80f3a2506f0ec3e2d75e7d17d95f5341'
+options=('!libtool' '!makeflags')
+md5sums=('55d9906535d70a1de347cd3d3550ee87'
          '4e7ad4ec8f2fe6a40e12bcb2c0b256e3')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver || return 1
+  cd $srcdir/$pkgname-$_ver
 
   ./configure --prefix=/usr --with-pam --libexecdir=/usr/lib \
-    --with-env-editor --with-all-insults --with-logfac=auth || return 1
-  make || return 1
+    --with-env-editor --with-all-insults --with-logfac=auth
+  make
 }
 
 package() {
-  cd $srcdir/$pkgname-$pkgver || return 1
+  cd $srcdir/$pkgname-$_ver
+  install -dm755 $pkgdir/var/lib
 
-  make DESTDIR=$pkgdir install || return 1
-  install -Dm644 $srcdir/sudo.pam $pkgdir/etc/pam.d/sudo || return 1
+  make DESTDIR=$pkgdir install
+  install -Dm644 $srcdir/sudo.pam $pkgdir/etc/pam.d/sudo
 
-  install -Dm644 LICENSE $pkgdir/usr/share/licenses/sudo/LICENSE || return 1
+  install -Dm644 LICENSE $pkgdir/usr/share/licenses/sudo/LICENSE
 }
