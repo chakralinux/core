@@ -1,8 +1,8 @@
-# $Id: PKGBUILD 60615 2009-12-05 19:11:42Z thomas $
+# $Id: PKGBUILD 89940 2010-09-05 11:20:33Z thomas $
 # Maintainer: Thomas Bächler <thomas@archlinux.org>
 
 pkgname=iw
-pkgver=0.9.18
+pkgver=0.9.20
 pkgrel=1
 pkgdesc="nl80211 based CLI configuration utility for wireless devices"
 arch=("i686" "x86_64")
@@ -10,11 +10,16 @@ url="http://wireless.kernel.org/en/users/Documentation/iw"
 license=("GPL")
 depends=("libnl")
 makedepends=("kernel-headers")
-source=(http://wireless.kernel.org/download/$pkgname/$pkgname-$pkgver.tar.bz2)
-sha256sums=('b02e26efc72cb23129431e478dbb2f2abd16e8cc4f4130762d98c54f106aabd0')
+source=(http://wireless.kernel.org/download/$pkgname/$pkgname-$pkgver.tar.bz2
+        version-sh.patch)
+sha256sums=('2d665fbfbe4fd6a40159fb821518fc5337da37448416405b936a393a14cbc7d3'
+	    '1ffbbca148b3c29446e2116e114d30b866dadbdf54cd276db02bd09e52bedf19')
 
 build() {
-  cd $pkgname-$pkgver
+  patch -Np0 -i ${srcdir}/version-sh.patch || return 1
+
+  cd ${pkgname}-${pkgver}
+
   make || return 1
   make DESTDIR=$pkgdir install
 }
