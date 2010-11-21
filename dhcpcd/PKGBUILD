@@ -1,10 +1,11 @@
-# $Id: PKGBUILD 77161 2010-04-11 11:22:03Z ronald $
-# Maintainer: Ronald van Haren <ronald.archlinux.org>
-# Contributor: Tom Killian <tom.archlinux.org>
-# Contributor: Judd Vinet <jvinet.zeroflux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=dhcpcd
-pkgver=5.2.2
+pkgver=5.2.8
 pkgrel=1
 pkgdesc="RFC2131 compliant DHCP client daemon"
 url="http://roy.marples.name/dhcpcd/"
@@ -16,8 +17,8 @@ backup=('etc/conf.d/dhcpcd' 'etc/dhcpcd.conf')
 options=('emptydirs')  # We Need the Empty /var/lib/dhcpcd Directory
 source=("http://roy.marples.name/downloads/$pkgname/$pkgname-$pkgver.tar.bz2" \
         'dhcpcd.conf.d')
-md5sums=('30a161c93bd4548a28d97041329bf335'
-         '372d33485556982b64a97f301e17c5dd')
+sha1sums=('3a7ffc6d3599fd4146791853b083dc577d8dd9c0'
+          'b67b9ce6a2faaca75fea356966a16be2283b7db0')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
@@ -27,6 +28,10 @@ build() {
 
   # Build
   make || return 1
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
   make DESTDIR=${pkgdir} install || return 1
 
   # Create Binary Symlink
@@ -39,7 +44,7 @@ build() {
   # Install License
   install -d $pkgdir/usr/share/licenses/$pkgname || return 1
   awk '{if(FNR<27)print $0}' ${srcdir}/${pkgname}-${pkgver}/configure.h \
-	>> ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE || return 1
+        >> ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE || return 1
 
   # Set Options in /etc/dhcpcd.conf
   echo noipv4ll >> ${pkgdir}/etc/dhcpcd.conf || return 1 # Disable ip4vall

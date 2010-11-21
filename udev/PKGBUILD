@@ -4,13 +4,10 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgbase="udev"
 pkgname=('udev' 'udev-compat')
-pkgver=160
-pkgrel=1.2
+pkgver=164
+pkgrel=1
 arch=(i686 x86_64)
 url="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 license=('GPL')
@@ -19,21 +16,18 @@ groups=('base')
 options=(!makeflags !libtool)
 makedepends=('glibc' 'coreutils' 'util-linux' 'libusb' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgname-$pkgver.tar.bz2
-        81-chakra.rules load-modules.sh cdsymlinks.sh root-link.sh
-        chakra-udev-rules.patch
-        logitech-rules.patch)
-md5sums=('65459a1f090082c0471bf4e5112208d7'
-         '9634ae34dd0c0b134c33a967c832d5f0'
+        80-drivers.rules 
+        81-chakra.rules 
+        load-modules.sh 
+        cdsymlinks.sh)
+md5sums=('cd285a85f969518a671834de2f4d6614'
+         '4427855146513a4703ab5c7eb8a0156e'
+         'a2bf84747f44915ec9c5e6e88b077845'
          'f91fddc67609b45b244a624977c4247b'
-         '2e808ee78d237c478b57af2a68d43769'
-         '2d6dc6842464f107bccc68cd505a6c31'
-         '70198227b7bbe3852e1cd2299693af66'
-         '817537bdcfc1a4fa79e853fd38df4528')
+         '2e808ee78d237c478b57af2a68d43769')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  # fix logitech rules
-  patch -Np0 -i $srcdir/logitech-rules.patch 
   ./configure --prefix="" --mandir=/usr/share/man\
                           --includedir=/usr/include\
                           --libexecdir=/lib/udev\
@@ -58,21 +52,16 @@ package_udev() {
   mv $pkgdir/lib/pkgconfig $pkgdir/usr/lib
   # Fix ConsoleKit path
   mv $pkgdir/lib/ConsoleKit $pkgdir/usr/lib
+  # Replace original 80-drivers.rules with custom one.
+  install -D -m644 $srcdir/80-drivers.rules $pkgdir/lib/udev/rules.d/80-drivers.rules
   # Install our rule for permissions and symlinks
   install -D -m644 $srcdir/81-chakra.rules $pkgdir/lib/udev/rules.d/81-chakra.rules
   # install our module loading subsystem
   install -D -m755 $srcdir/load-modules.sh $pkgdir/lib/udev/load-modules.sh
   # install cdsymlinks.sh
   install -D -m755 $srcdir/cdsymlinks.sh $pkgdir/lib/udev/cdsymlinks.sh
-  # install root-link.sh
-  install -D -m755 $srcdir/root-link.sh $pkgdir/lib/udev/root-link.sh
   # disable error logging to prevent startup failures printed to vc on boot
   sed -i -e 's|udev_log="err"|udev_log="0"|g' $pkgdir/etc/udev/udev.conf
-  # fix standard udev rules to fit to chakra
-  cd $pkgdir/lib/udev/rules.d/
-  patch -Np1 -i $srcdir/chakra-udev-rules.patch
-  # remove .orig files
-  rm -f $pkgdir/lib/udev/rules.d/*.orig
   # disable persistent cdromsymlinks and network by default 
   # and move it to /etc/udev/rules.d
   mv $pkgdir/lib/udev/rules.d/75-persistent-net-generator.rules \
@@ -113,9 +102,11 @@ package_udev() {
   # /dev/ppp
   mknod -m 0600 ${pkgdir}/lib/udev/devices/ppp c 108 0
 
-  # Replace dialout group in rules with uucp group
+  # Replace dialout/tape/cdrom group in rules with uucp/storage/optical group
   for i in $pkgdir/lib/udev/rules.d/*.rules; do
-    sed -i -e 's#GROUP="dialout"#GROUP="uucp"#g' $i
+    sed -i -e 's#GROUP="dialout"#GROUP="uucp"#g;
+               s#GROUP="tape"#GROUP="storage"#g;
+               s#GROUP="cdrom"#GROUP="optical"#g' $i
   done
 
   mv "${pkgdir}/lib/girepository-1.0" "${pkgdir}/usr/lib/"
