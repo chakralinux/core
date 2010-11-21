@@ -1,12 +1,18 @@
-# $Id: PKGBUILD 77602 2010-04-16 11:58:22Z allan $
-# Maintainer: Allan McRae <allan@archlinux.org>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->binutils->glibc
 
 pkgname=binutils
 pkgver=2.20.1
-pkgrel=2
-_date=20100318
+pkgrel=3
+_date=20100908
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/binutils/"
@@ -15,8 +21,8 @@ groups=('base')
 depends=('glibc>=2.11.1-3' 'zlib')
 options=('!libtool' '!distcc' '!ccache')
 install=binutils.install
-source=(ftp://ftp.archlinux.org/other/${pkgname}/${pkgname}-${pkgver}_${_date}.tar.bz2)
-md5sums=('c153213a20a5075bd98d7f12fbd38a51')
+source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}_${_date}.tar.bz2)
+md5sums=('c653cd51d2c23129cb010ac8c9ce0582')
 
 mksource() {
   mkdir ${pkgname}-${_date}
@@ -29,7 +35,7 @@ mksource() {
 
 build() {
   cd ${srcdir}
-  mkdir build && cd build
+  mkdir -p build && cd build
 
   CC="gcc -L`pwd`/bfd/.libs/"
   if [ "${CARCH}" = "x86_64" ]; then
