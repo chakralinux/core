@@ -12,7 +12,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgname=tribe
-pkgver=0.2.3
+pkgver=0.2.4
 pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
@@ -25,7 +25,7 @@ replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('f8e7c14e1817bde635a69494cdd4d7ad')
+md5sums=('d3af1c3d29809764c13ed61fb04f766f')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -60,8 +60,6 @@ build()
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
 
-	# make run-script executable
-	chmod a+x $pkgdir/usr/share/tribe/scripts/run-tribe.sh
 	# remove release notes
 	rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 }
