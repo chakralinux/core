@@ -20,7 +20,7 @@ pkgname=('phonon'
 
 pkgver=4.4.2
 _pkgver=4.4.2
-pkgrel=1
+pkgrel=2
 pkgdesc='The multimedia API for Qt 4 and KDE 4'
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
@@ -61,7 +61,7 @@ build() {
 package_phonon()
 {
 	pkgdesc="The multimedia API for Qt 4 and KDE 4"
-	depends=("qt>=${_qtver}")
+	depends=("qt>=${_qtver}" 'libpulse')
 	groups=("kde" "kde-complete" "kde-minimal" "kde-uninstall")
 	conficts=("qtmod-phonon=${pkgver}")
 
@@ -176,6 +176,7 @@ package_phonon-vlc()
 
 	cmake -DCMAKE_INSTALL_PREFIX=/usr \
 	      -DCMAKE_BUILD_TYPE=Release \
+	      -DPHONON_VLC_NO_EXPERIMENTAL=true \
 	      ../${_gitname} || return 1
 	make || return 1
 	make DESTDIR=$pkgdir install || return 1
