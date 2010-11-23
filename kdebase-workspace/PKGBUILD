@@ -26,7 +26,7 @@ pkgname=('kdebase-workspace'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -304,6 +304,7 @@ package_kdebase-workspace()
 	sed -i -e s,#GUIStyle=.*,GUIStyle=Oxygen,g ${pkgdir}/usr/share/config/kdm/kdmrc
 	sed -i -e s,#ColorScheme=.*,ColorScheme=Oxygen,g ${pkgdir}/usr/share/config/kdm/kdmrc
 	sed -i -e s,Theme=/usr.*,Theme=/usr/share/apps/kdm/themes/oxygen-air,g ${pkgdir}/usr/share/config/kdm/kdmrc
+	sed -i -e s,MinShowUID=.*,MinShowUID=1000,g ${pkgdir}/usr/share/config/kdm/kdmrc
 
 	# WORKAROUND -> put ggl stuff into ggl package
 	rm -rf ${pkgdir}/usr/share/apps/plasma/plasmoids/ggl_photos
