@@ -1,43 +1,45 @@
-# $Id: PKGBUILD 75260 2010-04-01 05:54:56Z pierre $
-# Maintainer: Allan McRae <allan@archlinux.org>
-# Contributor: John Proctor <jproctor@prium.net>
-# Contributor: Jeramy Rutley <jrutley@gmail.com>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # NOTE If fails to compile restart build without clearing src
 
 pkgname=('ruby' 'ruby-docs')
-pkgver=1.9.1_p378
-_pkgver=1.9.1-p378
-pkgrel=2
+pkgver=1.9.2_p0
+_pkgver=1.9.2-p0
+pkgrel=1
 pkgdesc="An object-oriented language for quick and easy programming"
 arch=('i686' 'x86_64')
-license=('custom')
 url="http://www.ruby-lang.org/en/"
-makedepends=('gdbm' 'db' 'openssl' 'zlib' 'readline') #'tk'
-source=("ftp://ftp.ruby-lang.org/pub/ruby/1.9/${pkgname}-${_pkgver}.tar.bz2"
-        'openssl-1.0.patch')
+license=('custom')
+makedepends=('gdbm' 'db' 'openssl' 'zlib' 'readline' 'tk' 'libffi'
+             'doxygen')
 options=('!emptydirs')
-md5sums=('5922459622a23612eb9b68a3586cb5f8'
-         'e22ebf0dbe836f5344682bc5da83dcb5')
+source=("ftp://ftp.ruby-lang.org/pub/ruby/1.9/${pkgname}-${_pkgver}.tar.bz2")
+md5sums=('d8a02cadf57d2571cd4250e248ea7e4b')
+sha256sums=('e9710990ed8c2e794123aba509010471915fb13c27dae0118831d2001a9c8d3b')
 
 build() {
   cd "${srcdir}/${pkgname}-${_pkgver}"
-  # see http://cvs.fedoraproject.org/viewvc/rpms/ruby/devel/
-  patch -p1 -i ${srcdir}/openssl-1.0.patch || return 1
-  ./configure --prefix=/usr --enable-shared --enable-pthread || return 1
-  make || return 1
+  ./configure --prefix=/usr \
+      --enable-shared \
+      --enable-pthread \
+      --disable-rpath
+  make
 }
 
 package_ruby()
 {
-  depends=('gdbm' 'db' 'openssl' 'zlib' 'readline')
+  depends=('gdbm' 'db' 'openssl' 'zlib' 'readline' 'libffi')
   provides=('rubygems' 'rake')
   conflicts=('rubygems' 'rake')
-  #optdepends=('tk: for Ruby/TK')
+  optdepends=('tk: for Ruby/TK')
 
   cd "${srcdir}/${pkgname}-${_pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
-  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING" || return 1
+  make DESTDIR="${pkgdir}" install-nodoc
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
 }
 
 package_ruby-docs()
@@ -47,5 +49,6 @@ package_ruby-docs()
   depends=('ruby')
 
   cd "${srcdir}/${pkgname}-${_pkgver}"
-  make -j1 DESTDIR="${pkgdir}" install-doc || return 1
+  make -j1 DESTDIR="${pkgdir}" install-doc install-capi
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/ruby-docs/COPYING"
 }
