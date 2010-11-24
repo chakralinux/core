@@ -30,7 +30,7 @@ pkgname=('kdebindings-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -42,8 +42,10 @@ options=('docs' '!splithdr')
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt' "kdepim-runtime>=${_kdever}"
              'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}")
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=('57a56607069d1f80164015c641e127e5') # kdebindings-4.4.5.tar.bz2
+source=($_mirror/${_origname}-$_kdever.tar.bz2
+	fix-ruby-bindings.patch)
+md5sums=('57a56607069d1f80164015c641e127e5' # kdebindings-4.4.5.tar.bz2
+	 95efe147489fdd8acb421a0a450e635a)
 
 
 #
@@ -52,6 +54,9 @@ md5sums=('57a56607069d1f80164015c641e127e5') # kdebindings-4.4.5.tar.bz2
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
+
+        patch -Np3 -i ${srcdir}/fix-ruby-bindings.patch
+
 	#fix ruby
 	for f in `find ruby -name CMakeLists.txt`; do
 		sed -i "s|\${RUBY_INCLUDE_PATH}|\${RUBY_INCLUDE_PATH} /usr/include/ruby-1.9.1/${_ARCHITECTURE}-linux|" "${f}"
@@ -70,7 +75,6 @@ build()
                 -DBUILD_falcon=OFF \
                 -DENABLE_KROSSRUBY=OFF \
                 -DWITH_PolkitQt=OFF
-		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
 	make || return 1
 }
