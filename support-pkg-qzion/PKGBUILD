@@ -15,15 +15,17 @@ _origname=qzion
 
 
 pkgname=${_origname}
-pkgver=20100627
+pkgver=0.4.0
 pkgrel=1
 
 pkgdesc="A canvas abstraction used by and made for QEdje."
 url="http://dev.openbossa.org/trac/qedje"
 license=('GPL')
 
-source=()
-md5sums=()
+source=(http://chakra-project.org/sources/qzion/qzion-0.4.0.tar.gz
+	http://chakra-project.org/sources/qzion/qzion-0.4.0-gcc44.patch)
+md5sums=(b9b61cf7dc6dc1720c5957cfa57c244a
+	 5cbe03205622ee541e83085fc0584df1)
 
 arch=('i686' 'x86_64')
 
@@ -32,23 +34,15 @@ groups=("kde-uninstall" "kde-support")
 options=('!splitdbg' '!splithdr')
 makedepends=('gcc' 'make')
 
-_gitroot="git://code.openbossa.org/qzion/mainline.git"
-_gitname="qzion"
-
 build()
 {
-	# Get the source
-	if [ -d ${_gitname}/.git ]; then
-		( cd ${_gitname} && git pull )
-	else
-		git clone ${_gitroot} ${_gitname}
-	fi
-
+	cd ${srcdir}/
+	patch -Np0 -i ${srcdir}/qzion-0.4.0-gcc44.patch || return 1
 	# Create the build directory
-	mkdir -p ${_gitname}-build
-	cd ${_gitname}-build
+	mkdir -p ${_origname}-build
+	cd ${_origname}-build
 
-	cmake ../$_gitname -DCMAKE_BUILD_TYPE=${_build_type} \
+	cmake ../${_origname}-mainline -DCMAKE_BUILD_TYPE=${_build_type} \
 			-DCMAKE_INSTALL_PREFIX=${_installprefix} \
 			-DCMAKE_SKIP_RPATH=ON \
 			-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
