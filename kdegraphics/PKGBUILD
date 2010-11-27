@@ -36,17 +36,15 @@ pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
-options=('docs' '!splithdr')
+options=('docs' '!splithdr' 'splitdbg')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}"
              'poppler-qt' 'libspectre' 'sane' 'chmlib' 'libdjvu' 'lcms' 'qca'
              'qimageblitz' 'ebook-tools' 'libxxf86vm')
 
-source=("$_mirror/${_origname}-$_kdever.tar.bz2"
-        "update-libkexiv2-libkipi-libdcraw.patch")
+source=("$_mirror/${_origname}-$_kdever.tar.bz2")
 
-md5sums=('e3a1bad9e37b82bd62be00797714f38d'  # kdegraphics-4.4.5.tar.bz2
-         'd34f1ac582c1f48023d7e2ec3cf11e2b') # update-libkexiv2-libkipi-libdcraw.patch
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 
@@ -56,10 +54,7 @@ md5sums=('e3a1bad9e37b82bd62be00797714f38d'  # kdegraphics-4.4.5.tar.bz2
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
-	msg "apply patches ..."
-        # Fixed in 4.5
-        cd ${srcdir}/${pkgbase}-${pkgver}
-        patch -Np1 -i ${srcdir}/update-libkexiv2-libkipi-libdcraw.patch || return 1
+#	msg "apply patches ..."
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -82,7 +77,7 @@ package_kdegraphics-common()
 	#       not detected by namcap because libgl depends on it
 	#       but nvidia providing libgl does not depend on libxxf86vm
 	depends=("kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'libxxf86vm' 'sane' 'lcms')
-	replaces=('kdegraphics-common-devel' 'libkexiv2' 'libkdcraw')
+	replaces=('libkexiv2' 'libkdcraw')
 	conflicts=("kdemod-${_origname}-common")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
@@ -97,18 +92,18 @@ package_kdegraphics-common()
 	install -D -m644 $srcdir/${_origname}-${pkgver}/cmake/modules/FindKSane.cmake \
 		$pkgdir/usr/share/apps/cmake/modules/FindKSane.cmake
 
-	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	# include our patches into the package
+#	ls -1 ${startdir}/* | grep patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdegraphics-doc()
@@ -222,7 +217,6 @@ package_kdegraphics-okular()
                  'chmlib' 'libdjvu' 'libspectre' 'ebook-tools')
 	conflicts=("kdemod-${_origname}-okular")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
-	replaces=('kdegraphics-okular-devel')
 	install=${_origname}.install
 
 	splitdirs="okular"

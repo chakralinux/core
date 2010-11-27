@@ -25,7 +25,7 @@ pkgname=('kdeaccessibility-common'
          'kdeaccessibility-kmag'
          'kdeaccessibility-kmousetool'
          'kdeaccessibility-kmouth'
-         'kdeaccessibility-kttsd')
+         'kdeaccessibility-jovie')
 
 # Disabled
 #         'kdeaccessibility-ksayit'
@@ -39,12 +39,12 @@ url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
 install=${_origname}.install
-options=('docs')
+options=('docs' '!splithdr' 'splitdbg')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7")
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=('c8034d8475185faad52556ab61c55c56') # kdeaccessibility-4.4.5.tar.bz2
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 
@@ -174,28 +174,15 @@ package_kdeaccessibility-kmouth()
 		done
 }
 
-package_kdeaccessibility-kttsd()
+package_kdeaccessibility-jovie()
 {
 	pkgdesc="Text-to-speech system"
 	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7")
-	conflicts=("kdemod-${_origname}-kttsd")
+	conflicts=("kdemod-${_origname}-kttsd" "kdemod-${_origname}-ksayit"" ${_origname}-kttsd" "${_origname}-ksayit")
+	replaces=("${_origname}-kttsd" "${_origname}-ksayit")
 	groups=("${_origname}" "kde-complete" "kde-uninstall")
 
-	splitdirs="kttsd"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install
-		done
-}
-
-package_kdeaccessibility-ksayit()
-{
-	pkgdesc="Text-to-speech system frontend"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "kdeaccessibility-kttsd")
-	conflicts=("kdemod-${_origname}-ksayit")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
-
-	splitdirs="ksayit"
+	splitdirs="jovie"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install

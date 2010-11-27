@@ -1,16 +1,18 @@
-diff -Naur kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/applet/applet.cpp kdebase-workspace-4.3.90/plasma/desktop/applets/kickoff/applet/applet.cpp
---- kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/applet/applet.cpp	2010-01-07 21:21:45.000000000 +0100
-+++ kdebase-workspace-4.3.90/plasma/desktop/applets/kickoff/applet/applet.cpp	2010-01-09 14:41:52.000000000 +0100
-@@ -27,6 +27,7 @@
- #include <QtGui/QVBoxLayout>
- #include <QtGui/QLabel>
- #include <QtGui/QGraphicsLinearLayout>
-+#include <QFile>
+diff -Naur kdebase-workspace-4.4.92.orig/plasma/desktop/applets/kickoff/applet/applet.cpp kdebase-workspace-4.4.92/plasma/desktop/applets/kickoff/applet/applet.cpp
+--- kdebase-workspace-4.4.92.orig/plasma/desktop/applets/kickoff/applet/applet.cpp     2010-07-07 19:10:16.000000000 +0200
++++ kdebase-workspace-4.4.92/plasma/desktop/applets/kickoff/applet/applet.cpp  2010-07-08 03:42:54.993128535 +0200
+@@ -45,6 +45,9 @@
+ #include "ui/launcher.h"
+ #include "core/recentapplications.h"
  
- // KDE
- #include <KIcon>
-@@ -103,7 +104,10 @@
- void LauncherApplet::init()
++// Branding
++#include <QFile>
++
+ class LauncherApplet::Private
+ {
+ public:
+@@ -187,7 +190,10 @@
+ void LauncherApplet::configChanged()
  {
      KConfigGroup cg = config();
 -    setPopupIcon(cg.readEntry("icon", "start-here-kde"));
@@ -18,12 +20,12 @@ diff -Naur kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/applet/a
 +      setPopupIcon(cg.readEntry("icon", "start-here-branding"));
 +    else
 +      setPopupIcon(cg.readEntry("icon", "start-here-kde"));
+     constraintsEvent(Plasma::ImmutableConstraint);
+ }
  
-     if (KService::serviceByStorageId("kde4-kmenuedit.desktop")) {
-         QAction* menueditor = new QAction(i18n("Menu Editor"), this);
-diff -Naur kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp kdebase-workspace-4.3.90/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp
---- kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp	2010-01-07 21:21:45.000000000 +0100
-+++ kdebase-workspace-4.3.90/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp	2010-01-09 14:46:21.000000000 +0100
+diff -Naur kdebase-workspace-4.4.92.orig/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp kdebase-workspace-4.4.92/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp
+--- kdebase-workspace-4.4.92.orig/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp       2010-07-07 19:10:15.000000000 +0200
++++ kdebase-workspace-4.4.92/plasma/desktop/applets/kickoff/simpleapplet/simpleapplet.cpp    2010-07-08 03:44:38.979784323 +0200
 @@ -36,6 +36,7 @@
  #include <QtGui/QSpacerItem>
  #include <QtGui/QListWidget>
@@ -32,16 +34,25 @@ diff -Naur kdebase-workspace-4.3.90.orig/plasma/desktop/applets/kickoff/simpleap
  
  // KDE Libs
  #include <KActionCollection>
-@@ -290,7 +291,11 @@
-             d->viewtypes << "RunCommand";
+@@ -74,6 +75,9 @@
+ #include "core/urlitemlauncher.h"
+ #include "ui/contextmenufactory.h"
+ 
++// Branding
++#include <QFile>
++
+ #ifndef KDE_USE_FINAL
+ Q_DECLARE_METATYPE(QPersistentModelIndex)
+ #endif
+@@ -305,7 +309,10 @@
+                 d->viewtypes << "RunCommand";
+             }
+             d->viewtypes << "Leave";
+-            d->iconname = "start-here-kde";
++            if (QFile::exists("/usr/share/icons/oxygen/scalable/places/start-here-branding.svgz"))
++              d->iconname = "start-here-branding";
++            else
++              d->iconname = "start-here-kde";
          }
-         d->viewtypes << "Leave";
--        d->iconname = "start-here-kde";
-+        if (QFile::exists("/usr/share/icons/oxygen/scalable/places/start-here-branding.svgz"))
-+            d->iconname = "start-here-branding";
-+        else
-+            d->iconname = "start-here-kde";
-+	
-     } else {
-         d->viewtypes << "Applications";
-         d->relativePath = args.value(0).toString();
+     }
+     d->formattype = NameDescription;

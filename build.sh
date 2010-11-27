@@ -124,14 +124,17 @@ build_it()
 # 				done
 # 				sudo pacman -Uf $_packages_to_install || exit 1
 
-				sudo pacman -U --noconfirm ../_repo/local/${module}-*.pkg.*
+				sudo pacman -U --noconfirm ../_repo/local/`echo ${module} | sed 's/support-pkg-//g' | sed 's/tools-pkg-//g'`-*.pkg.*
 			fi
+			# Upload packages (enable if needed)
+			cd ..
+			./sync-up-nodb.sh
 
 	popd &>/dev/null
 	done
 
 	msg "removing debug packages ..."
-	sudo pacman -Rcs kdemod-debug --noconfirm &>/dev/null
+	sudo pacman -Rcs kde-debug --noconfirm &>/dev/null
 	echo " "
 	echo " "	
 

@@ -23,7 +23,7 @@ pkgname=('kdeutils-common'
          'kdeutils-ark'
          'kdeutils-kcalc'
          'kdeutils-kcharselect'
-	 'kdeutils-kdelirc'
+#	 'kdeutils-kdelirc'
          'kdeutils-kdf'
          'kdeutils-kfloppy'
          'kdeutils-kgpg'
@@ -42,16 +42,16 @@ pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
-options=('docs')
+options=('docs' '!splithdr' 'splitdbg')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}"
              "kdepimlibs>=${_kdever}" "kdebase>=${_kdever}"
              "kdebase-workspace>=${_kdever}" "kdebindings-python>=${_kdever}"
              'system-config-printer-common' 'libarchive' 'qimageblitz'
-             "kdepim-runtime>=${_kdever}" 'p7zip' 'zip' 'unzip' 'unrar')
+             'p7zip' 'zip' 'unzip' 'unrar') # "kdepim-runtime>=${_kdever}" 
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=('3c8cf4cc05eb9f5ee065de8f472e0390') # kdeutils-4.4.5.tar.bz2
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 #
@@ -60,6 +60,9 @@ md5sums=('3c8cf4cc05eb9f5ee065de8f472e0390') # kdeutils-4.4.5.tar.bz2
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
+
+#	msg "applying patches ..."
+
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -84,18 +87,18 @@ package_kdeutils-common()
 	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
 	install=${_origname}.install
 
-	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	# include our patches into the package
+#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdeutils-doc()
@@ -234,7 +237,7 @@ package_kdeutils-kgpg()
 	pkgdesc="GPG encryption and key management"
 	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
 		 "kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}" 'kde-agent'
-		 "kdepim-runtime>=${_kdever}")
+		 ) # "kdepim-runtime>=${_kdever}"
 	conflicts=("kdemod-${_origname}-kgpg")
 	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
 	install=${_origname}.install

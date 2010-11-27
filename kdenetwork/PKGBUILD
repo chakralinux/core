@@ -34,21 +34,19 @@ pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
-options=('docs' '!splithdr')
+options=('docs' '!splithdr' 'splitdbg')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'qca-ossl' "kdebase-workspace>=${_kdever}" 
              "kdebase>=${_kdever}" 'libvncserver' 'libmsn'
              'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage'
-             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart-svn')
+             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
-        'lisa.daemon'
-        "gcc45.patch")
+        'lisa.daemon')
 
-md5sums=('597e8c8259a625088defbaed322119f6'  # kdenetwork-4.4.5.tar.bz2
-         '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
-         '8d509b4a541704606f9688bcd4e38a61') # gcc45.patch
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+         '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
 
 
 
@@ -60,9 +58,7 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-	msg "applying patches ..."
-	# this patch is not needed by ArchLinux - we just use an older gcc version
-        patch -Np1 -i $startdir/gcc45.patch || return 1
+	# msg "applying patches ..."
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -85,10 +81,11 @@ package_kdenetwork-common()
 	pkgdesc="KDE Network - Common files and libraries"
 	depends=("kdelibs>=${_kdever}" 'smbclient')
 	conflicts=("kdemod-${_origname}-common")
-	groups=("kde" "complete" "${_origname}" "uninstall")
+	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
 
-	splitdirs="filesharing kdnssd strigi-analyzer"
+	# FIXME strigi-analyzer
+	splitdirs="filesharing kdnssd" 
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
@@ -99,17 +96,17 @@ package_kdenetwork-common()
 	install -D -m 755 ${srcdir}/lisa.daemon ${pkgdir}/etc/rc.d/kde-lisa
 
 	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdenetwork-doc()
@@ -128,7 +125,7 @@ package_kdenetwork-doc()
 package_kdenetwork-kget()
 {
 	pkgdesc="Download manager"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart-svn')
+	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
 	conflicts=("kdemod-${_origname}-kget")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
@@ -147,7 +144,6 @@ package_kdenetwork-kopete()
 	         'qca-ossl' 'libotr' 'libmsn' 'libidn' 'qimageblitz' 'libxss' 'libv4l' 'libgadu' 'meanwhile' 'mediastreamer')
 	conflicts=("kdemod-${_origname}-kopete")
 	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
-	replaces=('kdenetwork-kopete-devel')
 	install=${_origname}.install
 
 	splitdirs="kopete"
@@ -178,7 +174,6 @@ package_kdenetwork-krdc()
 	depends=("${_origname}-common>=${_kdever}" 'libvncserver' 'rdesktop' 'telepathy-qt4')
 	conflicts=("kdemod-${_origname}-krdc")
 	groups=("kde-complete" "${_origname}" "kde-uninstall")
-	replaces=('kdenetwork-krdc-devel')
 	install=${_origname}.install
 
 	splitdirs="krdc"

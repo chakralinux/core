@@ -23,6 +23,7 @@ pkgname=('kdegames-common'
          'kdegames-bomber'
          'kdegames-bovo'
          'kdegames-granatier'
+         'kdegames-kajongg'
          'kdegames-kapman'
          'kdegames-katomic'
          'kdegames-kbattleship'
@@ -67,12 +68,12 @@ pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
-options=('docs' '!splithdr')
+options=('docs' '!splithdr' 'splitdbg')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo')
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted')
 
 source=("$_mirror/${_origname}-$_kdever.tar.bz2")
-md5sums=('720bac51311730cfb36c6082bf85ec60') # kdegames-4.4.5.tar.bz2
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 
@@ -101,7 +102,6 @@ package_kdegames-common()
 {
 	pkgdesc="KDE games - Common files and libraries"
 	depends=("kdelibs>=${_kdever}")
-	replaces=('kdegames-common-devel')
 	conflicts=("kdemod-${_origname}-common")
 	groups=("kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
@@ -117,18 +117,18 @@ package_kdegames-common()
 		install -D -m644 $i $pkgdir/usr/share/apps/cmake/modules/$(basename $i)
 	done
 
-	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	# include our patches into the package
+#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdegames-doc()
@@ -184,6 +184,20 @@ package_kdegames-granatier()
 	install=${_origname}.install
 
 	splitdirs="granatier"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdegames-kajongg()
+{
+	pkgdesc="The ancient Chinese board game for 4 players."
+	depends=("${_origname}-common>=${_kdever}" 'twisted')
+	groups=("kde-complete" "${_origname}" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="kajongg"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1

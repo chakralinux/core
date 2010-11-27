@@ -30,21 +30,21 @@ pkgname=('kdebindings-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
 install=${_origname}.install
-options=('docs' '!splithdr')
+options=('docs' '!splithdr' 'splitdbg')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt' "kdepim-runtime>=${_kdever}"
-             'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}")
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt'
+             'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	fix-ruby-bindings.patch)
-md5sums=('57a56607069d1f80164015c641e127e5' # kdebindings-4.4.5.tar.bz2
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 	 95efe147489fdd8acb421a0a450e635a)
 
 
@@ -88,7 +88,6 @@ package_kdebindings-common()
 {
 	pkgdesc="KDE Bindings - Common files and libraries"
 	depends=("kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}" 'qscintilla' 'qimageblitz')
-	replaces=('kdebindings-common-devel')
 	conflicts=("kdemod-${_origname}")
 	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
 
@@ -98,18 +97,17 @@ package_kdebindings-common()
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
-	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	# include our patches into the package
+#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdebindings-csharp()
@@ -157,7 +155,7 @@ package_kdebindings-php()
 package_kdebindings-python()
 {
 	pkgdesc="KDE Bindings - Python"
-	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}" 'pyqt' "kdepim-runtime>=${_kdever}")
+	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}" 'pyqt') # "kdepim-runtime>=${_kdever}"
 	conflicts=("kdemod-${_origname}-python=${_kdever}")
 	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
 
