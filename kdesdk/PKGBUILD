@@ -24,7 +24,8 @@ pkgname=('kdesdk-common'
          'kdesdk-cervisia'
          'kdesdk-kapptemplate'
          'kdesdk-lokalize'
-         'kdesdk-kbugbuster'
+#         'kdesdk-kbugbuster'
+         'kdesdk-okteta'
          'kdesdk-kdeaccounts-plugin'
          'kdesdk-kcachegrind'
          'kdesdk-kmtrace'
@@ -190,6 +191,23 @@ package_kdesdk-kbugbuster()
 	install=${_origname}.install
 
 	splitdirs="kbugbuster"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdesdk-okteta()
+{
+	pkgdesc="Okteta is a simple editor for the raw data of files, also known as a hex editor."
+	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
+		 "kdebase>=${_kdever}")
+	conflicts=("kdemod-${_origname}-okteta" 'kdeutils-okteta')
+	replaces=('kdeutils-okteta')
+	groups=("kde-complete" "kdesdk" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="okteta"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1

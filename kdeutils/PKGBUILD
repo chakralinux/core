@@ -29,7 +29,6 @@ pkgname=('kdeutils-common'
          'kdeutils-kgpg'
          'kdeutils-ktimer'
          'kdeutils-kwallet'
-         'kdeutils-okteta'
 	 'kdeutils-printer-applet'
          'kdeutils-superkaramba'
          'kdeutils-sweeper')
@@ -275,22 +274,6 @@ package_kdeutils-kwallet()
 	install=${_origname}.install
 
 	splitdirs="kwallet"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdeutils-okteta()
-{
-	pkgdesc="Okteta is a simple editor for the raw data of files, also known as a hex editor."
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-okteta")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
-
-	splitdirs="okteta"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
