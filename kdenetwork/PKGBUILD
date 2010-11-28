@@ -43,10 +43,12 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
-        'lisa.daemon')
+        'lisa.daemon'
+        'kdenetwork-4.5.80-libktorrent-stable.patch')
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-         '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
+         '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
+         'cb18a7286a6a1900062408ce90d89125')
 
 
 
@@ -58,7 +60,8 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-	# msg "applying patches ..."
+	msg "applying patches ..."
+	patch -Np1 -i ${srcdir}/kdenetwork-4.5.80-libktorrent-stable.patch || return 1
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
