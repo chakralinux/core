@@ -17,7 +17,7 @@
 # setup
 #
 
-_build_sh_ver="0.5.2"
+_build_sh_ver="0.5.3"
 
 _script_name="build(er)"
 _build_arch="$_arch"
@@ -120,6 +120,8 @@ build_it()
 			echo "# $(LC_ALL=C date -u)" >>.PKGINFO
 			echo "pkgname = $module-log" >>.PKGINFO
 			echo "pkgver = $pkgver-$pkgrel" >>.PKGINFO
+			echo "pkgdesc = Build logs of $module" >>.PKGINFO
+			echo "url = http://chakra-project.org" >>.PKGINFO
 			echo "builddate = $builddate" >>.PKGINFO
 			echo "packager = $packager" >>.PKGINFO
 			echo "size = $size" >>.PKGINFO
