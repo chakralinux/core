@@ -37,7 +37,7 @@ options=('docs' '!splithdr' 'splitdbg')
 # NOTE keep in sync with kdebase-workspace-depends
 depends=('polkit-kde' "kdepimlibs>=${_kdever}" 'qimageblitz'
          'libxxf86misc' 'libxcomposite' 'libxss' 'lm_sensors' 'libxklavier' 'libxft' 'oxygen-icons' "xkit"
-         'libxdamage' 'xorg-utils' 'libxrandr') # "kdepim-runtime>=${_kdever}"
+         'libxdamage' 'xorg-utils' 'libxrandr' "kdepim-runtime>=${_kdever}")
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'networkmanager' 'bluez' "kdebindings-python>=${_kdever}"
              "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje' "kdebase-runtime>=${_kdever}") # 'gpsd' 'google-gadgets-qt>=0.11.1'
@@ -70,13 +70,13 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 	fix_terminate-server.patch
 
 	# if kdm is not loaded, try to shutdown via consolekit
-	fix_ck-shutdown.patch
+#	fix_ck-shutdown.patch
 
 	# fix kdm default user for greeter
 	fix_kdm_configdef.patch
 
 	# "fix" some sytemsettings modules that need root access
-	fix_root-only-kcms.patch
+	fix_root-only-kcms.patch)
 
 	# experimental, software transparency for plasma panels
 #	feature_plasma-transparent-panel-v4-rb#472.patch
@@ -91,8 +91,6 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 #	feature_history-notifications-enable-disable-kde#119207.patch
 
 #	feature_kdm-plymouth.patch
-
-	screensaver-sleep.patch)
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
         'f355a658d2e9267fdf4e8d8f88038bcf' # mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -116,16 +114,15 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 
         'db2d8166f5ea80ecd291deb9c0e2bb71' #  fix_kdm-increase-xserver-timeout-bnc#462478.patch
         '814350c52c135d6f7bdada1e29223d38' #  fix_terminate-server.patch
-        '5d752cf39a28306438bb6d82db6e1696' #  fix_ck-shutdown.patch
+#        '5d752cf39a28306438bb6d82db6e1696' #  fix_ck-shutdown.patch
 	'97a5eb51e6f9d460f0d61bb322a1db5e' #  fix_kdm_configdef.patch
-	'5f963f80a026f0600edae1b1c70411e5' #  fix_root-only-kcms.patch
+	'5f963f80a026f0600edae1b1c70411e5') #  fix_root-only-kcms.patch
 
 #        '13c3203589143e9e2fc757c17375227a' #  feature_plasma-transparent-panel-v4-rb#472.patch
 #        '7361012da217f9aeeca61f0e9956e1d0' #  feature_brightness-osd.patch
 #        '894815a80f99a9a0dee1adbcda49b161' #  feature_battery-tooltip.patch
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
-        'bf36e9cc623c7c3da6668e560e29975c') #  screensaver-sleep.patch
 
 
 #
@@ -160,7 +157,7 @@ build()
 	msg "applying fixes ..."
 	patch -Np0 -i ${srcdir}/fix_kdm-increase-xserver-timeout-bnc#462478.patch || return 1
 	patch -Np0 -i ${srcdir}/fix_terminate-server.patch || return 1
-	patch -Np1 -i ${srcdir}/fix_ck-shutdown.patch || return 1
+#	patch -Np1 -i ${srcdir}/fix_ck-shutdown.patch || return 1
 	patch -p0 -N -i ${srcdir}/fix_kdm_configdef.patch || return 1
 	patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch || return 1
 
@@ -174,8 +171,8 @@ build()
 
 	#msg "applying upstream patches ..."
 
-	msg "applying arch patches ..."
-        patch -p1 -i ${srcdir}/screensaver-sleep.patch || return 1 # FS#19426  
+	#msg "applying arch patches ..."
+
 
 	msg "starting workspace build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -227,7 +224,7 @@ package_kdebase-workspace()
 # NOTE keep in sync with depends
 	depends=('polkit-kde' "kdepimlibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qimageblitz'
 	         'libxxf86misc' 'libxcomposite' 'libxss' 'lm_sensors' 'libxklavier' 'libxft' 'oxygen-icons' "xkit"
-	         'libxdamage' 'xorg-utils' 'libxrandr') # "kdepim-runtime>=${_kdever}"
+	         'libxdamage' 'xorg-utils' 'libxrandr' "kdepim-runtime>=${_kdever}")
 
 	optdepends=("kdebindings-python : Python Support for Plasma"
 		    "kdeedu-marble      : Marble Wallpaper Plugin"
@@ -270,8 +267,10 @@ package_kdebase-workspace()
 	install -d -m755 ${pkgdir}/etc/kde/{env,shutdown}
 
 	# install session
-	install -D -m 644 ${srcdir}/${_origname}-${pkgver}/kdm/kfrontend/sessions/kde.desktop \
-	${pkgdir}/etc/X11/sessions/kde.desktop
+	install -D -m 644 ${srcdir}/${_origname}-${pkgver}/kdm/kfrontend/sessions/kde-plasma.desktop \
+	${pkgdir}/etc/X11/sessions/kde-plasma.desktop
+	install -D -m 644 ${srcdir}/${_origname}-${pkgver}/kdm/kfrontend/sessions/kde-plasma-safe.desktop \
+	${pkgdir}/etc/X11/sessions/kde-plasma-safe.desktop
 
 	# also install kdm clean default config
 	cd ${srcdir}/${_origname}-${pkgver}/kdm 
@@ -331,6 +330,8 @@ package_kdebase-workspace()
 
 	# FIXME: duplicates in kdebase-workspace-doc
 	rm -rf $pkgdir/usr/share/man/man1/plasmaengineexplorer.1
+	rm -rf $pkgdir/usr/share/man/man1/plasmapkg.1.gz  
+	rm -rf $pkgdir/usr/share/man/man1/plasmoidviewer.1.gz
 }
 
 package_kdebase-workspace-doc()

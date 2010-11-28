@@ -17,7 +17,7 @@
 # setup
 #
 
-_build_sh_ver="0.5.1"
+_build_sh_ver="0.5.2"
 
 _script_name="build(er)"
 _build_arch="$_arch"
@@ -103,10 +103,10 @@ build_it()
 			# Create log package
 			ls *.log
 			mkdir -p log/var/log/chakra/$module
-			mv -v *.log log/var/log/chakra/$module
+			mv *.log log/var/log/chakra/$module
 			cd log
 			# Create .PKGINFO
-			source ../PKGBUILD
+			echo "Create log packages for $module"
 			local builddate=$(date -u "+%s")
 			if [[ -n $PACKAGER ]]; then
 			  local packager="$PACKAGER"
@@ -128,7 +128,7 @@ build_it()
 			# Create tarball
 			tar -cJf $module-log-$pkgver-$pkgrel-$CARCH.pkg.tar.xz var .PKGINFO
 			# Move pkg
-			mv -v $module-log-$pkgver-$pkgrel-$CARCH.pkg.tar.xz ../../_repo/local
+			mv $module-log-$pkgver-$pkgrel-$CARCH.pkg.tar.xz ../../_repo/local
 			cd ..
 
 			# Install packages	
