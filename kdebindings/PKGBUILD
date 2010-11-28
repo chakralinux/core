@@ -42,8 +42,10 @@ options=('docs' '!splithdr' 'splitdbg')
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt>=4.8.1'
              'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}" "kdepim-runtime>=${_kdever}")
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+source=($_mirror/${_origname}-$_kdever.tar.bz2
+        perl-qtdbus.patch)
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+         42a6ecd926b051b6c7a23d3988c7ebcf)
 
 
 #
@@ -52,6 +54,9 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
+
+	msg "applying upstream patches ..."
+	patch -Np3 -i ${startdir}/perl-qtdbus.patch || return 1
 
 	#fix ruby
 	for f in `find ruby -name CMakeLists.txt`; do
