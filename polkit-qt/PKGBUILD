@@ -8,31 +8,26 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=polkit-qt
-pkgver=0.96.1
+pkgver=0.98.1
 pkgrel=1
+_gitver=4c12d78
 pkgdesc='A library that allows developers to access PolicyKit API with a nice Qt-style API'
 arch=('i686' 'x86_64')
 url='http://www.kde.org'
 license=('LGPL')
 depends=('polkit' 'qt')
 makedepends=('cmake' 'automoc4')
-source=("ftp://ftp.kde.org/pub/kde/stable/apps/KDE4.x/admin/${pkgname}-1-${pkgver}.tar.bz2"
-	'fix-deprecated-warnings.patch'
-	'null-checking.patch')
-md5sums=('7d122aa67c6786ea7d0bb023701693a1'
-         '374d07ff3fb9984f71681bb719813bc4'
-         'a34dfa8408cf7add41dd2c9c522a61ce')
+#source=("ftp://ftp.kde.org/pub/kde/stable/apps/KDE4.x/admin/${pkgname}-1-${pkgver}.tar.bz2"
+source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-1-${pkgver}.tar.gz")
+md5sums=('c1b73dfa912f70afb07fbd6b4ef99159')
 
 build() {
-	cd ${srcdir}/${pkgname}-1-${pkgver}
-
-	patch -Np0 -i ${srcdir}/fix-deprecated-warnings.patch
-	patch -Np0 -i ${srcdir}/null-checking.patch
+	cd ${srcdir}/${pkgname}-1-${_gitver}
 
 	cd ${srcdir}
 	mkdir build
 	cd build
-	cmake ../${pkgname}-1-${pkgver} \
+	cmake ../${pkgname}-1-${_gitver} \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=/usr
 	make
