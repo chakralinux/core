@@ -1,35 +1,30 @@
-# $Id: PKGBUILD 79120 2010-04-30 10:16:21Z andrea $
-# Maintainer: Andrea Scarpino <andrea@archlinux.org>
-# Contributor: Douglas Soares de Andrade <douglas@archlinux.org>
-# Contributor: riai <riai@bigfoot.com>, Ben <ben@benmazer.net>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=sip
-pkgver=4.10.2
-_pkgver=4.10.2
+pkgver=4.11.2
 pkgrel=1
 pkgdesc="A tool that makes it easy to create Python bindings for C and C++ libraries"
 arch=('i686' 'x86_64')
 url="http://www.riverbankcomputing.com/software/sip/"
 license=('custom:"sip"')
-depends=('python' 'gcc-libs')
-source=(http://riverbankcomputing.com/static/Downloads/${pkgname}4/${pkgname}-${_pkgver}.tar.gz)
-md5sums=('52d11ca9c1a0d0cddc9b89268bff5929')
+depends=('python2' 'gcc-libs')
+source=("http://www.riverbankcomputing.com/static/Downloads/sip4/${pkgname}-${pkgver}.tar.gz")
+md5sums=('d799804ca0a88bd76c6c2cdf8935c3cb')
 
 build() {
-  cd ${srcdir}/${pkgname}-${_pkgver}
+  cd ${srcdir}/${pkgname}-${pkgver}
 
-  python configure.py -b /usr/bin \
-    -d /usr/lib/python2.6/site-packages \
-    -e /usr/include/python2.6 \
-    -v /usr/share/sip || return 1
-
-  make || return 1
+  python2 configure.py
+  make
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${_pkgver}
-  make DESTDIR=${pkgdir} install || return 1
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
 
-  install -Dm644 LICENSE \
-    ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE || return 1
+  install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }
