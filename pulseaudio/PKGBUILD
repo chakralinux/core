@@ -8,98 +8,88 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase=pulseaudio
-pkgname=('pulseaudio' 'libpulse')
-pkgver=0.9.21
-pkgrel=2
-pkgdesc="A networked sound server"
+pkgname=(pulseaudio libpulse)
+pkgver=0.9.22
+pkgrel=1
 arch=(i686 x86_64)
-url=http://pulseaudio.org/
+url="http://pulseaudio.org/"
 license=(GPL LGPL)
-makedepends=('autoconf' 'avahi' 'bluez' 'doxygen' 'gconf' 'intltool' 'jack' 'lirc-utils' 'pkgconfig'
-	     'udev' 'libsm' 'libsndfile' 'libasyncns' 'libcap' 'rtkit' 'attr' 'libxtst' 'speex'
-             'libsamplerate' 'tdb' 'libtool' 'tcp_wrappers')
-options=(emptydirs !libtool !makeflags !strip)
-source=("http://0pointer.de/lennart/projects/pulseaudio/${pkgbase}-${pkgver}.tar.gz"
-        'pulseaudio.conf' 'pulseaudio.rc')
-md5sums=('76e623c4c72e2258bc8bdeb1599bad74'
-         'd4a7d4ad51b406588ba7ac7931c5dd88'
-         'c5aa09c1d3e2217dc3bb23138e2a5a1d')
+makedepends=(libasyncns libcap attr libxtst libsm tcp_wrappers libsndfile
+             libtool rtkit speex libsamplerate tdb udev dbus-core xcb-util
+             avahi bluez gconf intltool jack lirc-utils pkgconfig openssl)
+options=(!emptydirs !libtool !makeflags)
+source=("http://0pointer.de/lennart/projects/$pkgbase/$pkgbase-$pkgver.tar.gz"
+        $pkgbase.xinit)
+md5sums=('ca85ab470669b05e100861654cf5eb3c'
+         'eb1cfae28eb2e4d3fdbe45a90e4318ab')
 
 build() {
-  cd "${srcdir}/${pkgbase}-${pkgver}"
+  cd "$srcdir/$pkgbase-$pkgver"
 
-  # Fix linking dependency cycle between libpulse and libpulsecommon
+  # Don't break circular dependency between libpulse and libpulsecommon
   LDFLAGS="${LDFLAGS//-Wl,--as-needed}"
-  LDFLAGS="${LDFLAGS//,--as-needed}"
-  LDFLAGS="${LDFLAGS//--as-needed}"
 
-  # Fix strict aliasing warnings
-  CFLAGS+=" -fno-strict-aliasing"
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --libexecdir=/usr/lib \
+    --localstatedir=/var \
+    --with-database=tdb \
+    --disable-hal \
+    --disable-rpath \
+    --disable-default-build-tests
 
-  ./configure --disable-hal \
-	      --disable-rpath \
-	      --libexecdir=/usr/lib \
-	      --localstatedir=/var \
-	      --prefix=/usr \
-	      --sysconfdir=/etc \
-	      --with-database=tdb
   make
-  make doxygen
 }
 
 package_pulseaudio() {
-  depends=("libpulse=${pkgver}-${pkgrel}" 'udev')
-  optdepends=('pulseaudio-alsa: ALSA support'
-	      'avahi: zeroconf support'
-	      'bluez: bluetooth support'
-	      'gconf: configuration through gconf'
-	      'jack: jack support'
-	      'lirc-utils: infra-red support')
-  install=pulseaudio.install
+  pkgdesc="A featureful, general-purpose sound server"
+  depends=("libpulse=$pkgver-$pkgrel" rtkit libtool speex libsamplerate tdb
+           udev)
+  optdepends=('avahi: zeroconf support'
+              'bluez: bluetooth support'
+              'gconf: configuration through gconf'
+              'jack: jack support'
+              'lirc-utils: infra-red support'
+              'openssl: RAOP support')
   backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
+  install=pulseaudio.install
+  cd "$srcdir/$pkgbase-$pkgver"
+  make DESTDIR="$pkgdir" install
 
-  cd "${srcdir}/${pkgbase}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  # Lower resample quality
+  sed -e '/resample-method/iresample-method=speex-float-0' \
+      -i "$pkgdir/etc/pulse/daemon.conf"
 
-  install -Dm755 "${srcdir}/pulseaudio.rc" "${pkgdir}/etc/rc.d/pulseaudio"
-  install -Dm644 "${srcdir}/pulseaudio.conf" "${pkgdir}/etc/conf.d/pulseaudio"
-  install -dm755 "${pkgdir}/var/run/pulse"
+  sed -e 's|/usr/bin/pactl load-module module-x11-cork-request|#&|' \
+      -i "$pkgdir/usr/bin/start-$pkgbase-x11"
 
-  # Ugly fix for pulseaudio system users
-  install -dm755 "${pkgdir}/var/pulse"
-  echo -e '\n### Automatically restore volumes\nload-module module-volume-restore table="/var/pulse/volume-restore.table"' \
-    >> "${pkgdir}/etc/pulse/system.pa"
+  install -Dm755 "$srcdir/$pkgbase.xinit" "$pkgdir/etc/X11/xinit/xinitrc.d/$pkgbase"
 
-  # Remove libpulse
-  rm ${pkgdir}/etc/pulse/client.conf
-  rm -r ${pkgdir}/usr/include/
-  rm ${pkgdir}/usr/lib/libpulse*
-  rm -r ${pkgdir}/usr/lib/pkgconfig
-  rm -r ${pkgdir}/usr/share/locale/
-  rm -r ${pkgdir}/usr/share/vala/
-  rm ${pkgdir}/usr/share/man/man5/pulse-client.conf.5
+  rm "$pkgdir/etc/dbus-1/system.d/$pkgbase-system.conf"
 
+### Split libpulse
+
+  mkdir -p "$srcdir"/libpulse/{etc/pulse,usr/{lib,share/{man/man5,vala/vapi}}}
+
+  mv {"$pkgdir","$srcdir/libpulse"}/etc/pulse/client.conf
+
+  mv "$pkgdir"/usr/lib/libpulse{,dsp,-simple,-browse,-mainloop-glib}.so* \
+     "$pkgdir"/usr/lib/libpulsecommon-*.so \
+     "$srcdir/libpulse/usr/lib"
+
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/lib/pkgconfig
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/include
+
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/share/man/man5/pulse-client.conf.5
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/share/vala/vapi/libpulse.vapi
 }
 
 package_libpulse() {
-  depends=('libsm' 'libsndfile' 'libasyncns' 'libcap' 'rtkit' 'attr' 'libxtst' 'speex'
-           'libsamplerate' 'tdb' 'libtool' 'tcp_wrappers')
-  backup='etc/pulse/client.conf'
-  cd "${srcdir}/${pkgbase}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-
-  # Remove everything but the libs
-  rm -r ${pkgdir}/etc/dbus-1/
-  rm ${pkgdir}/etc/pulse/daemon.conf
-  rm ${pkgdir}/etc/pulse/default.pa
-  rm ${pkgdir}/etc/pulse/system.pa
-  rm -r ${pkgdir}/etc/xdg/
-  rm -r ${pkgdir}/lib/
-  rm -r ${pkgdir}/usr/bin
-  rm -r ${pkgdir}/usr/lib/pulse
-  rm -r ${pkgdir}/usr/lib/pulse-$pkgver
-  rm -r ${pkgdir}/usr/share/man/man1
-  rm ${pkgdir}/usr/share/man/man5/default.pa.5
-  rm ${pkgdir}/usr/share/man/man5/pulse-daemon.conf.5
-  rm -r ${pkgdir}/usr/share/pulseaudio
+  pkgdesc="A featureful, general-purpose sound server (client library)"
+  depends=(tcp_wrappers dbus-core xcb-util libasyncns libcap libxtst libsm
+           libsndfile)
+  optdepends=('alsa-plugins: ALSA support'
+              'avahi: zeroconf support')
+  backup=(etc/pulse/client.conf)
+  mv "$srcdir"/libpulse/* "$pkgdir"
 }
