@@ -13,8 +13,8 @@ pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -CHAKR
 #_kernelname=${pkgname#kernel26}
 _kernelname=""
 _basekernel=2.6.36
-pkgver=${_basekernel}
-pkgrel=8
+pkgver=${_basekernel}.1
+pkgrel=1
 _patchname="patch-${pkgver}-${pkgrel}-CHAKRA"
 arch=(i686 x86_64)
 license=('GPL2')
@@ -26,9 +26,9 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
 md5sums=('61f3739a73afb6914cb007f37fb09b62'
-         'b5f2c25178676613ad114b6db3765d3e'
-         '8356222147b4ccf3ab545ce1daee2b20'
-         '318770b743975d2e65b3acce1836397a'
+         '19064f47b7e7a7931961e1cf3d2d78f5'
+         '6a15f7d4f7c88fa7894b3a353548fa55'
+         '9dc3149aea0be00a570fa81319588acc'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
@@ -82,7 +82,8 @@ package_kernel26() {
             'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
             'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26'
-            'aufs2' 'acerhk')
+            'aufs2')
+  provides=('aufs2')
   install=kernel26.install
   optdepends=('crda: to set the correct wireless channels of your country')
 
