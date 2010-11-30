@@ -44,8 +44,7 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt'
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	fix-ruby-bindings.patch)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-	 95efe147489fdd8acb421a0a450e635a)
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 #
@@ -54,8 +53,6 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
-
-        patch -Np3 -i ${srcdir}/fix-ruby-bindings.patch
 
 	#fix ruby
 	for f in `find ruby -name CMakeLists.txt`; do
