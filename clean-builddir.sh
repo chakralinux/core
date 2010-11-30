@@ -35,7 +35,7 @@ cleanup_pkgs() {
 		pushd _repo/local/ &>/dev/null
 
 		status_start "_repo/local"
-		rm -rf *.pkg.tar.* &>/dev/null
+		rm -rf *.pkg.tar.* *.log* &>/dev/null
 		status_done
         
 		popd &>/dev/null
