@@ -32,10 +32,10 @@ done
 cleanup_pkgs() { 
 		title2 "Cleaning build packages"
 
-		pushd _repo/build/ &>/dev/null
+		pushd _repo/local/ &>/dev/null
 
-		status_start "_repo/build"
-		rm -rf *.tar.gz &>/dev/null
+		status_start "_repo/local"
+		rm -rf *.pkg.tar.* &>/dev/null
 		status_done
         
 		popd &>/dev/null
