@@ -5,26 +5,26 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # include global config
-#source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 #
 # package info
 #
 pkgname=tribe
-pkgver=0.2.4.1
+pkgver=0.2.85
 pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.4.5' 'squashfs-tools' "tribe-partitionmanager=${pkgver}")
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.4.5' 'kdebase-workspace')
+depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' "tribe-partitionmanager=${pkgver}")
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.4' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
-#options=('!splithdr' '!splitdbg')
+options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('52d681104e065556d9d4b7e318611e37')
+md5sums=('bf5c0e6b2a3f5b8a1a9ee94d61f707ba')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -60,5 +60,5 @@ build()
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
 
 	# remove release notes
-	rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	#rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 }
