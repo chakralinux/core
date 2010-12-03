@@ -11,8 +11,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgname=tribe
-pkgver=0.2.85
-pkgrel=1
+pkgver=0.2.85.1
+pkgrel=0.1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -24,7 +24,7 @@ replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('7b4978e8bafd220e02e330de3d506a41')
+md5sums=('5724babf973a98bfbb44f713363d97f7')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -39,6 +39,8 @@ build()
         # fixes
         #cd "${srcdir}/chakra-$pkgname/src"
         #patch -Np0 -i ${srcdir}/../root-pw.patch || return 1
+
+	sed -i -e "s~addGeoDataFile~addPlacemarkFile~g" "${srcdir}/chakra-$pkgname/src/pages/localepage.cpp"
 
         cd "${srcdir}/chakra-$pkgname"
 
