@@ -12,7 +12,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 pkgname=tribe-partitionmanager
 pkgver=0.2.85.1
-pkgrel=0.2
+pkgrel=0.3
 pkgdesc="Tribe's partitionmanager"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -24,7 +24,7 @@ conflicts=('kdemod-tribe-partitionmanager' 'chakra-libpartitionmanager')
 groups=('kde-uninstall')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('d31f6c40905f89cfb2e54ad58e917f10')
+md5sums=('c91493054a3801c12d365f604371bba8')
 
 #
 # build function
@@ -46,4 +46,12 @@ build()
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
+	# fix file conflicts
+	rm -v $startdir/pkg/usr/share/icons/hicolor/128x128/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/16x16/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/22x22/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/32x32/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/48x48/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/64x64/apps/partitionmanager.png
+
 }
