@@ -12,7 +12,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 pkgname=tribe-partitionmanager
 pkgver=0.3.45
-pkgrel=1
+pkgrel=2
 pkgdesc="Tribe's partitionmanager"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -45,4 +45,11 @@ build()
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
+        # fix file conflicts
+	rm -v $startdir/pkg/usr/share/icons/hicolor/128x128/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/16x16/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/22x22/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/32x32/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/48x48/apps/partitionmanager.png
+	rm -v $startdir/pkg/usr/share/icons/hicolor/64x64/apps/partitionmanager.png
 }
