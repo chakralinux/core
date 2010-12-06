@@ -12,7 +12,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 pkgname=tribe
 pkgver=0.2.85.1
-pkgrel=0.4
+pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -23,8 +23,9 @@ provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('b7e2e21dc0037708f7217f17a25a8e2e')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz"
+         root-pw.patch)
+md5sums=('01b5aa31d525eb5fa752e2ef25667a43')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -37,8 +38,8 @@ build()
         cd "${srcdir}"
 
         # fixes
-        #cd "${srcdir}/chakra-$pkgname/src"
-        #patch -Np0 -i ${srcdir}/../root-pw.patch || return 1
+        #cd "${srcdir}/chakra-$pkgname"
+        #patch -Np1 -i ${srcdir}/root-pw.patch || return 1
 
         cd "${srcdir}/chakra-$pkgname"
 
