@@ -4,14 +4,11 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 #
 # package info
 #
 pkgname=tribe
-pkgver=0.2.85.1
+pkgver=0.2.85.3
 pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
@@ -23,9 +20,8 @@ provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz"
-         root-pw.patch)
-md5sums=('01b5aa31d525eb5fa752e2ef25667a43')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
+md5sums=('c242e4455a69d60966c8b1ec26ac721f')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -39,15 +35,16 @@ build()
 
         # fixes
         #cd "${srcdir}/chakra-$pkgname"
-        #patch -Np1 -i ${srcdir}/root-pw.patch || return 1
+        #patch -Np1 -i ${srcdir}/fix.patch || return 1
+        #patch -Np1 -i ${srcdir}/drake#2.patch || return 1
 
         cd "${srcdir}/chakra-$pkgname"
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
 	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-initialize-target"
-	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DCMAKE_BUILD_TYPE=${_build_type} \
+	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=RELEASE \
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' || return 1
 

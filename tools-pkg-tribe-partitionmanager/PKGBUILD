@@ -4,14 +4,11 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 #
 # package info
 #
 pkgname=tribe-partitionmanager
-pkgver=0.2.85.1
+pkgver=0.2.85.3
 pkgrel=1
 pkgdesc="Tribe's partitionmanager"
 url="http://git.chakra-project.org/chakra/"
@@ -24,7 +21,7 @@ conflicts=('kdemod-tribe-partitionmanager' 'chakra-libpartitionmanager')
 groups=('kde-uninstall')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('01b5aa31d525eb5fa752e2ef25667a43')
+md5sums=('c242e4455a69d60966c8b1ec26ac721f')
 
 #
 # build function
@@ -33,8 +30,8 @@ build()
 {
         cd "${srcdir}/chakra-tribe/lib/"
 
-	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DCMAKE_BUILD_TYPE=${_build_type} \
+	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=RELEASE \
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' || return 1
 
