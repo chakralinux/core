@@ -4,28 +4,26 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
-
 #
 # package info
 #
 pkgname=tribe
-pkgver=0.3.40
+pkgver=0.3.45.4
 pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.80' 'squashfs-tools' "tribe-partitionmanager>=$pkgver")
+depends=('kdelibs' 'kdeedu-marble>=4.5.80' 'squashfs-tools' "tribe-partitionmanager=${pkgver}" 'imagemagick' 'partitionmanager')
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.80' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-$pkgver.tar.gz")
-md5sums=('366779bc66699708838a82dfa5dda060')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz"
+        'http://chakra-project.org/sources/tribe/mirrorlist')
+md5sums=('3e696afafc897fb4c462c1fc9e322f2f'
+         'dfb3c82b5b1fbc2fccba8725c74dab7a')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -38,19 +36,17 @@ build()
         cd "${srcdir}"
 
         # fixes
-        #cd "${srcdir}/chakra-$pkgname/src"
-        #patch -Np0 -i ${srcdir}/../root-pw.patch || return 1
+        #cd "${srcdir}/chakra-$pkgname"
+        #patch -Np1 -i ${srcdir}/fix.patch || return 1
+        #patch -Np1 -i ${srcdir}/drake#2.patch || return 1
 
         cd "${srcdir}/chakra-$pkgname"
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
 	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-initialize-target"
-	# fix keyboard routine
-	sed -i -e "s~HAL~XORG~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-setup-xorg"
-	sed -i -e "s~etc/hal/fdi/policy/10-keymap.fdi~etc/X11/xorg.conf.d/10-keyboard.conf~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-setup-xorg"
-	cmake . -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DCMAKE_BUILD_TYPE=${_build_type} \
+	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' || return 1
 
@@ -60,9 +56,18 @@ build()
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
 
+	msg "fix selfnet issue..."
+	mkdir -p $startdir/pkg/etc/skel
+	cp -v $srcdir/mirrorlist $startdir/pkg/etc/skel
+	sed -i -e 's~rankmirrors -t -n 5 ${mountpoint}/etc/pacman.d/mirrorlist~rankmirrors -t -n 5 /etc/skel/mirrorlist~g' $startdir/pkg/usr/share/tribe/scripts/job-configure-pacman
+	sed -i -e "s/@carch@/${CARCH}/g" $startdir/pkg/etc/skel/mirrorlist
+
+	msg "fix postinstall.conf..."
+	sed -i -e 's~256~260~g' $startdir/pkg/usr/share/tribe/config/postinstall.conf
+
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
 
 	# remove release notes
-	rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	#rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 }
