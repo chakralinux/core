@@ -9,7 +9,7 @@
 #
 pkgname=tribe
 pkgver=0.2.95
-pkgrel=1
+pkgrel=2
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -21,7 +21,7 @@ replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('ddad8f084fbf331029107330e450b9ea')
+md5sums=('ec4ff2afe5cdcd83ae288f67714272af')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -44,7 +44,7 @@ build()
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
 	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
-		-DCMAKE_BUILD_TYPE=RELEASE \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' || return 1
 
