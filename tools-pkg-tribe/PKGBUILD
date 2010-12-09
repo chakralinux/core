@@ -20,8 +20,10 @@ provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('90fd55ca84002515a47449e723937995')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz"
+        'http://chakra-project.org/sources/tribe/mirrorlist')
+md5sums=('90fd55ca84002515a47449e723937995'
+         'dfb3c82b5b1fbc2fccba8725c74dab7a')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -53,6 +55,11 @@ build()
 
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
+
+	msg "fix selfnet issue..."
+	mkdir -p $startdir/pkg/etc/skel
+	cp -v $startdir/mirrorlist $startdir/pkg/etc/skel
+	sed -i -e 's~rankmirrors -t -n 5 ${mountpoint}/etc/pacman.d/mirrorlist~rankmirrors -t -n 5 ${mountpoint}/etc/skel/mirrorlist~g' $startdir/pkg/usr/share/tribe/scripts/job-configure-pacman
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
