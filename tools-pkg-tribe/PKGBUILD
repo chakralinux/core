@@ -59,7 +59,8 @@ build()
 	msg "fix selfnet issue..."
 	mkdir -p $startdir/pkg/etc/skel
 	cp -v $startdir/mirrorlist $startdir/pkg/etc/skel
-	sed -i -e 's~rankmirrors -t -n 5 ${mountpoint}/etc/pacman.d/mirrorlist~rankmirrors -t -n 5 ${mountpoint}/etc/skel/mirrorlist~g' $startdir/pkg/usr/share/tribe/scripts/job-configure-pacman
+	sed -i -e 's~rankmirrors -t -n 5 ${mountpoint}/etc/pacman.d/mirrorlist~rankmirrors -t -n 5 /etc/skel/mirrorlist~g' $startdir/pkg/usr/share/tribe/scripts/job-configure-pacman
+	sed -i -e "s/@carch@/${CARCH}/g" $startdir/pkg/etc/skel/mirrorlist
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
