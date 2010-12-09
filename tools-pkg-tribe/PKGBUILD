@@ -14,7 +14,7 @@ pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' "tribe-partitionmanager=${pkgver}" 'imagemagick')
+depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' "tribe-partitionmanager=${pkgver}" 'imagemagick' 'partitionmanager')
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.4' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
@@ -58,7 +58,7 @@ build()
 
 	msg "fix selfnet issue..."
 	mkdir -p $startdir/pkg/etc/skel
-	cp -v $startdir/mirrorlist $startdir/pkg/etc/skel
+	cp -v $srcdir/mirrorlist $startdir/pkg/etc/skel
 	sed -i -e 's~rankmirrors -t -n 5 ${mountpoint}/etc/pacman.d/mirrorlist~rankmirrors -t -n 5 /etc/skel/mirrorlist~g' $startdir/pkg/usr/share/tribe/scripts/job-configure-pacman
 	sed -i -e "s/@carch@/${CARCH}/g" $startdir/pkg/etc/skel/mirrorlist
 
