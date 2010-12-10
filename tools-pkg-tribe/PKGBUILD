@@ -8,13 +8,13 @@
 # package info
 #
 pkgname=tribe
-pkgver=0.2.95
-pkgrel=3
+pkgver=0.2.95.1
+pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' "tribe-partitionmanager=${pkgver}" 'imagemagick' 'partitionmanager')
+depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' 'partitionmanager')
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.4' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
@@ -22,7 +22,7 @@ conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' '
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz"
         'http://chakra-project.org/sources/tribe/mirrorlist')
-md5sums=('90fd55ca84002515a47449e723937995'
+md5sums=('17a5667be4eb29fecaa871757ef088cb'
          'dfb3c82b5b1fbc2fccba8725c74dab7a')
 
 groups=('kde-uninstall')
@@ -37,7 +37,7 @@ build()
 
         # fixes
         #cd "${srcdir}/chakra-$pkgname"
-        #patch -Np1 -i ${srcdir}/fix.patch || return 1
+        #patch -Np1 -i ${srcdir}/fix-partition-page.patch || return 1
         #patch -Np1 -i ${srcdir}/drake#2.patch || return 1
 
         cd "${srcdir}/chakra-$pkgname"
