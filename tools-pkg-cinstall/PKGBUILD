@@ -1,0 +1,43 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# (c) 2010 Drake Justice
+
+pkgname=cinstall
+pkgver=20101208
+pkgrel=1
+depends=('squashfs-tools' 'xz>=5.0.0' 'fakechroot' 'unionfs-fuse')
+makedeps=('kdelibs' 'qt')
+pkgdesc="Bundle Creator/Launcher and Package-Manager"
+arch=("i686" "x86_64")
+license=('GPL')
+install=$pkgname.install
+url="http://chakra-project.org/"
+optdepends=('akabei: for akabei support'
+            'pacman: for pacman support')
+
+source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz)
+md5sums=(24c11f065fae3f54b2b6d0bd84f5f54d)
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+  git clone git://gitorious.org/cinstall/cinstall.git
+  pushd cinstall
+  popd
+  tar -cvJf ${pkgname}-${pkgver}.tar.xz cinstall/*
+  md5sum ${pkgname}-${pkgver}.tar.xz
+}
+
+build() {
+        cd "${srcdir}/cinstall"
+
+        cmake  \
+          -DCMAKE_INSTALL_PREFIX=/usr \
+          -DCMAKE_BUILD_TYPE=Release
+        make || return 1
+        make DESTDIR=${pkgdir} install || return 1
+}
+
