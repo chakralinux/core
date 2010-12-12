@@ -7,11 +7,12 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgname=nvidia
-pkgver=260.19.12
 # Find the kernel name inside the chroot
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
-pkgrel=2
+
+pkgname=nvidia
+pkgver=260.19.21
+pkgrel=1
 pkgdesc="NVIDIA drivers for kernel26."
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -22,15 +23,15 @@ license=('custom')
 install=nvidia.install
 
 if [ "$CARCH" = "i686" ]; then
-        _barch='x86'
-        _pkg="NVIDIA-Linux-${_barch}-${pkgver}"
-        source=("ftp://download.nvidia.com/XFree86/Linux-${_barch}/${pkgver}/${_pkg}.run")
-        md5sums=('8bcefb2423908160d3676200650ad5c9')
+        _arch='x86'
+        _pkg="NVIDIA-Linux-${_arch}-${pkgver}"
+        source=("ftp://download.nvidia.com/XFree86/Linux-${_arch}/${pkgver}/${_pkg}.run")
+        md5sums=('2ec917f51e752802646920e9bcd747e7')
 elif [ "$CARCH" = "x86_64" ]; then
-        _barch='x86_64'
-        _pkg="NVIDIA-Linux-${_barch}-${pkgver}-no-compat32"
-        source=("ftp://download.nvidia.com/XFree86/Linux-${_barch}/${pkgver}/${_pkg}.run")
-        md5sums=('111da94be1ea21c0531b6e1c45d01b9b')
+        _arch='x86_64'
+        _pkg="NVIDIA-Linux-${_arch}-${pkgver}-no-compat32"
+        source=("ftp://download.nvidia.com/XFree86/Linux-${_arch}/${pkgver}/${_pkg}.run")
+        md5sums=('9db612fb5679249627d52bfff0e16f4f')
 fi
 
 build() {
@@ -47,4 +48,5 @@ package() {
         echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf
         sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/nvidia.install
 }
+
 
