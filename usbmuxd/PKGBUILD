@@ -3,8 +3,8 @@
 # Contributor: Gabriel Martinez < reitaka at gmail dot com >
 
 pkgname=usbmuxd
-pkgver=1.0.5
-pkgrel=2
+pkgver=1.0.6
+pkgrel=1
 pkgdesc="USB Multiplex Daemon"
 url="http://marcansoft.com/blog/iphonelinux/usbmuxd/"
 arch=('i686' 'x86_64')
@@ -13,16 +13,13 @@ depends=('libusb1>=1.0.3')
 makedepends=('cmake')
 install=usbmuxd.install
 source=(http://marcansoft.com/uploads/${pkgname}/${pkgname}-${pkgver}.tar.bz2
-	usbmuxd-udevuser.patch
-        usbmuxd-soname.patch)
-sha256sums=('3bce652618c0e4add5cdcf2f88d581a5be9c2fe8cd46465d2f71422c262c108c'
-	    '6376057235ee4d6d8a637acf64edc981b36963a95de977c6c9ea506e6b26c821'
-            '8c783e6cf3ee1d057ebfaa68e48f590df002504fbcaa6d506e4541cfcabe96c9')
+	usbmuxd-udevuser.patch)
+sha256sums=('b2b8a094fef7f1d250f20eba8fa8ff3cf1696b5c62543de2740b2b5dc2de40a7'
+            '254b3b88cc39892be119f27de5376951855707860fe0ee412616d36bd8cee83a')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   patch -Np1 -i "${srcdir}/usbmuxd-udevuser.patch" || return 1
-  patch -Np1 -i "${srcdir}/usbmuxd-soname.patch" || return 1
   mkdir build
   cd build
   cmake ../ -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLIB_SUFFIX=""
