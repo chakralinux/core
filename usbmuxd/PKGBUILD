@@ -1,7 +1,3 @@
-# $Id: PKGBUILD 81308 2010-05-28 00:01:31Z ibiru $
-# Maintainer : Ionut Biru <ibiru@archlinux.org>
-# Contributor: Gabriel Martinez < reitaka at gmail dot com >
-
 pkgname=usbmuxd
 pkgver=1.0.6
 pkgrel=1
@@ -9,20 +5,27 @@ pkgdesc="USB Multiplex Daemon"
 url="http://marcansoft.com/blog/iphonelinux/usbmuxd/"
 arch=('i686' 'x86_64')
 license=('GPL2' 'GPL3' 'LGPL2.1')
-depends=('libusb1>=1.0.3')
+depends=('libusb>=1.0.8')
 makedepends=('cmake')
 install=usbmuxd.install
 source=(http://marcansoft.com/uploads/${pkgname}/${pkgname}-${pkgver}.tar.bz2
-	usbmuxd-udevuser.patch)
-sha256sums=('b2b8a094fef7f1d250f20eba8fa8ff3cf1696b5c62543de2740b2b5dc2de40a7'
-            '254b3b88cc39892be119f27de5376951855707860fe0ee412616d36bd8cee83a')
+        usbmuxd-udevuser.patch)
+md5sums=('c8909cfd9253d8d1a5e26f2ff7e5908b'
+         '299349dcacd60af9dceecec1ceebce06')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np1 -i "${srcdir}/usbmuxd-udevuser.patch" || return 1
+  patch -Np1 -i "${srcdir}/usbmuxd-udevuser.patch"
   mkdir build
   cd build
   cmake ../ -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLIB_SUFFIX=""
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  make
+  make DESTDIR="${pkgdir}" install
+
+  # Fix dirty versioning
+  sed -i -e "s~-dirty~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
+  mv ${pkgdir}/usr/lib/libusbmuxd.so.-dirty ${pkgdir}/usr/lib/libusbmuxd.so.${pkgver}
+  cd ${pkgdir}/usr/lib/
+  ln -sfv libusbmuxd.so.${pkgver} libusbmuxd.so.1
 }
+
