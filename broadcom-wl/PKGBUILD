@@ -1,32 +1,41 @@
-# Maintainer: Austin ( doorknob60 [at] gmail [dot] com )
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=broadcom-wl
-pkgver=5.60.48.36 
-pkgrel=6.2
-
-# Find the kernel name inside the chroot
-_kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
-
-pkgdesc="Broadcom 802.11abg Networking Drivers"
+pkgver=5.60.246.6
+_kernver='2.6.35-CHAKRA'
+pkgrel=1
+pkgdesc='Broadcom 802.11abg networking drivers'
 arch=('i686' 'x86_64')
-[ "$CARCH" = "i686" ] && ARCH=x86_32
-[ "$CARCH" = "x86_64" ] && ARCH=x86_64
-url="http://www.broadcom.com/support/802.11/linux_sta.php"
+url='http://www.broadcom.com/support/802.11/linux_sta.php'
 license=('MIXED/Proprietary')
-depends=('kernel26>=2.6.33' 'kernel26<2.6.34')
-makedepends=(kernel26-headers)
-install=broadcom-wl.install
-source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc-${ARCH}-v${pkgver}.tar.gz")
-md5sums=(0466d863405e1ab99d5e288fe886e852)
-[ "$CARCH" == "x86_64" ] && md5sums=(a78095ddcc30a191f64dccbc31b84de8)
+depends=('kernel26')
+makedepends=('kernel26-headers')
+[ "$CARCH" = 'x86_64' ] && ARCH=x86-64 \
+                        || ARCH=x86-32
+source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}_v${pkgver}.tar.gz"
+        'license.patch'
+        'semaphore.patch')
+[ "$CARCH" = 'x86_64' ] && sha1sums=('b4ecb6f82fe0f943d40fb85ef7c34eb16fe0abf2'
+                                     'ac57feff458bd03cd5b43a88fc264fcaa61bd156'
+                                     '50654c42a64c078c022148decdf897d586d3e6e0') \
+                        || sha1sums=('5aa9fd0707b1e597c5e0b78866a65d4bca687a0c'
+                                     'ac57feff458bd03cd5b43a88fc264fcaa61bd156'
+                                     '50654c42a64c078c022148decdf897d586d3e6e0')
+
+install=install
 
 build() {
-  # Adding line license
-  sed -i '190i\MODULE_LICENSE("Mixed/Proprietary"); \n' ${srcdir}/src/wl/sys/wl_linux.c
-  sed -i 's/linux\/autoconf.h/generated\/autoconf.h/' ${srcdir}/src/include/linuxver.h
-
-  # Building
-  KBUILD_NOPEDANTIC=1 make -C /lib/modules/${_kernver}/build M=`pwd` || return 1
-  install -D -m 755 wl.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/net/wireless/wl.ko || return 1
+	cd "$srcdir"
+	patch -p1 < license.patch
+	patch -p1 < semaphore.patch
+	KBUILD_NOPEDANTIC=1 make -C /lib/modules/${_kernver}/build M=`pwd`
 }
 
+package() {
+	cd "$srcdir"
+	install -D -m 755 wl.ko "$pkgdir/lib/modules/${_kernver}/kernel/drivers/net/wireless/wl.ko"
+}

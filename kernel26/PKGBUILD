@@ -13,9 +13,9 @@ pkgbase="kernel26"
 pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -CHAKRA kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
 _kernelname=${pkgname#kernel26}
-_basekernel=2.6.33
-pkgver=${_basekernel}.7
-pkgrel=3
+_basekernel=2.6.35
+pkgver=${_basekernel}.9
+pkgrel=1
 _patchname="patch-${pkgver}-${pkgrel}-CHAKRA"
 arch=(i686 x86_64)
 license=('GPL2')
@@ -26,10 +26,10 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
-md5sums=('c3883760b18d50e8d78819c54d579b00'
-         '86f67431ff6f94be41fcbb909a3ffde5'
-         '4d9cd43c8c2e1b6a939418e3ddb97348'
-         'a5cff7dfcd7b6448d787c9fb770be42a'
+md5sums=('091abeb4684ce03d1d936851618687b6'
+         '152a15757c6a7df85cf60bcf7d4ea4d0'
+         'aee5c9e6ef90b8b2afc18fac2028ff84'
+         '899b27740995db879de010769dfe5d51'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
@@ -44,6 +44,8 @@ build() {
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
   fi
+  # fix localversion in setlocalversion
+  sed -i 's|echo "+"|#echo "+"|g' ./scripts/setlocalversion
   # get kernel version  
   make prepare
   # load configuration
@@ -67,7 +69,7 @@ package_kernel26() {
   pkgdesc="The Linux Kernel and modules"
   groups=('base')
   backup=(etc/mkinitcpio.d/${pkgname}.preset)
-  depends=('coreutils' 'kernel26-firmware>=2.6.33' 'module-init-tools' 'mkinitcpio>=0.6.3')
+  depends=('coreutils' 'kernel26-firmware>=2.6.35' 'module-init-tools' 'mkinitcpio>=0.6.3')
   # pwc, ieee80211 and hostap-driver26 modules are included in kernel26 now
   # nforce package support was abandoned by nvidia, kernel modules should cover everything now.
   # kernel24 support is dropped since glibc24
@@ -75,7 +77,9 @@ package_kernel26() {
             'alsa-driver' 'ieee80211' 'hostap-driver26'
             'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
-            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500')
+            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500'
+            'aufs2')
+  provides=('aufs2')
   install=kernel26.install
   optdepends=('crda: to set the correct wireless channels of your country')
 

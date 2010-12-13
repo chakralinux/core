@@ -53,6 +53,8 @@ done
 
 post_apply
 
+rm -v $(find . -type f -name '*.orig')
+
 cd ${startdir}/src
 diff -Nur ${SRCORIG} ${SRCNAME} > $startdir/${PATCHNAME}
 bzip2 --best $startdir/${PATCHNAME}
