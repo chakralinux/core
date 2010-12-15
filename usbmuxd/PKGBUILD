@@ -23,8 +23,8 @@ build() {
   make DESTDIR="${pkgdir}" install
 
   # Fix dirty versioning
-  sed -i -e "s~-dirty~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
   mv ${pkgdir}/usr/lib/libusbmuxd.so.-dirty ${pkgdir}/usr/lib/libusbmuxd.so.${pkgver}
+  sed -i -e "s~-dirty~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
   cd ${pkgdir}/usr/lib/
   ln -sfv libusbmuxd.so.${pkgver} libusbmuxd.so.1
 }
