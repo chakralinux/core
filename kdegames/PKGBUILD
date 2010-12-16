@@ -47,7 +47,7 @@ pkgname=('kdegames-common'
          'kdegames-konquest'
          'kdegames-kpat'
          'kdegames-kreversi'
-#         'kdegames-ksame'
+         'kdegames-ksame'
          'kdegames-kshisen'
          'kdegames-ksirk'
          'kdegames-kspaceduel'
@@ -68,9 +68,9 @@ pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
-options=('docs' '!splithdr' 'splitdbg')
+options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted')
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted' 'openal')
 
 source=("$_mirror/${_origname}-$_kdever.tar.bz2")
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -178,7 +178,7 @@ package_kdegames-bovo()
 package_kdegames-granatier()
 {
 	pkgdesc="Granatier is a clone of the classic Bomberman game, inspired by the work of the Clanbomber clone."
-	depends=("${_origname}-common>=${_kdever}")
+	depends=("${_origname}-common>=${_kdever}" 'openal')
 	conflicts=("kdemod-${_origname}-granatier")
 	groups=("kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
