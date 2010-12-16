@@ -1,0 +1,23 @@
+pkgname=udisks
+pkgver=1.0.2
+pkgrel=1
+pkgdesc="Disk Management Service"
+arch=('i686' 'x86_64')
+url="http://www.freedesktop.org/wiki/Software/udisks"
+license=('GPL')
+depends=('udev>=151' 'sg3_utils>=1.28' 'glib2>=2.23.4' 'dbus-glib>=0.82' 'polkit>=0.96' 'parted>=2.2' 'device-mapper>=2.02.60' 'libatasmart>=0.17' 'lsof')
+options=(!libtool)
+makedepends=('intltool' 'docbook-xsl')
+replaces=('devicekit-disks')
+source=(http://hal.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz)
+sha256sums=('7dc1a150a6a31b2727144603fa5a8f9852696fc5bdc4a11917b9b0f1b8e3dcf1')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  export CFLAGS="$CFLAGS -fno-strict-aliasing"
+
+  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+      --libexecdir=/usr/lib/udisks --disable-static || return 1
+  make || return 1
+  make DESTDIR="${pkgdir}" install || return 1
+}
