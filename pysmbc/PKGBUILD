@@ -1,20 +1,26 @@
-# $Id: $
-# Maintainer: Andrea Scarpino <andrea@archlinux.org>
-# Contributor: Shane Peelar <lookatyouhacker@gm@il(d0t)c0m>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=pysmbc
-pkgver=1.0.6
-pkgrel=3
+pkgver=1.0.9
+pkgrel=1
 pkgdesc="Python libsmbclient bindings"
 arch=('i686' 'x86_64')
 url="http://cyberelk.net/tim/software/pysmbc/"
 license=('GPL')
-depends=('python' 'smbclient')
+depends=('python2' 'smbclient')
 source=("http://cyberelk.net/tim/data/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('ac8f98a40b0fc4b6ab4470f10489887a')
+md5sums=('32b995dbf8419128f652279881b9023d')
 
 build(){
   cd ${srcdir}/${pkgname}-${pkgver}
-  make || return 1
-  install -Dm644 smbc.so $pkgdir/usr/lib/python2.6/site-packages/smbc.so || return 1
+  python2 setup.py build
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  python2 setup.py install --root="$pkgdir"
 }
