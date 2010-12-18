@@ -1,14 +1,15 @@
 --- src/pages/localepage.cpp.orig	2010-12-16 21:23:36.873333336 -0500
 +++ src/pages/localepage.cpp	2010-12-16 21:24:04.696666671 -0500
-@@ -146,7 +146,7 @@
- bool LocalePage::eventFilter(QObject * object, QEvent * event)
- {
+@@ -149,7 +149,7 @@ bool LocalePage::eventFilter(QObject * o
+     // if mouse was pressed on the marble widget
      if (object == marble && event->type() == QEvent::MouseButtonPress) {
+         // if an actual place was clicked
 -        QVector<QModelIndex> indexes = marble->whichFeatureAt(marble->mapFromGlobal(QCursor::pos()));
 +        QVector<QModelIndex> indexes = marble->model()->whichFeatureAt(marble->mapFromGlobal(QCursor::pos()));
          if (!indexes.isEmpty()) {
+             // check the place against the data, and set the combo box accordingly
              QHash<QString, QStringList>::const_iterator it;
- 
+
 --- src/pages/localepage.cpp.orig	2010-12-18 08:12:39.583334081 -0500
 +++ src/pages/localepage.cpp	2010-12-18 08:13:09.600000747 -0500
 @@ -66,7 +66,7 @@
