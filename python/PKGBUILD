@@ -6,7 +6,7 @@
 
 pkgname=python
 pkgver=2.7.1
-pkgrel=1
+pkgrel=2
 _pybasever=2.7
 pkgdesc="A high-level scripting language"
 arch=('i686' 'x86_64')
@@ -25,9 +25,16 @@ build() {
 
   patch -Np1 -i ../python-2.7-db51.diff
 
-  export OPT="${CFLAGS}"
-  ./configure --prefix=/usr --enable-shared --with-threads --enable-unicode
+  # Ensure that we are using the system copy of various libraries (expat, zlib and libffi),
+  # rather than copies shipped in the tarball
+  rm -r Modules/expat
+  rm -r Modules/zlib
+  rm -r Modules/_ctypes/{darwin,libffi}*
 
+  export OPT="${CFLAGS}"
+ ./configure --prefix=/usr --enable-shared --with-threads --enable-ipv6 \
+              --enable-unicode=ucs4 --with-system-expat --with-system-ffi
+  
   make || return 1
   make DESTDIR=${pkgdir} install
 
