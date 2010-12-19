@@ -8,13 +8,13 @@
 # package info
 #
 pkgname=tribe
-pkgver=0.2.98.1
-pkgrel=0.4.5
+pkgver=0.3.0
+pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' 'partitionmanager>=1196188' 'cinstall>=0.3')
+depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' 'partitionmanager>=1196188' 'cinstall>=0.3' 'rsync')
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.4' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
@@ -22,7 +22,7 @@ conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' '
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz"
         'tribe_4.5.patch')
-md5sums=('323805835707127ca8e3023bf4b74b4d'
+md5sums=('496127fc3d2d88e67fb9bd8ce191fdbe'
          '168a949a78621df376e3a4b2c26ecac5')
 
 groups=('kde-uninstall')
@@ -37,6 +37,9 @@ build()
 
 	# 4.5 backports
 	patch -Np0 -i ${srcdir}/tribe_4.5.patch || return 1
+
+	# cheats
+	sed -i -e "s~m_currentAction = MainWindow::Partition;~m_currentAction = MainWindow::Configuration;~g" src/mainwindow.cpp
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
