@@ -19,9 +19,11 @@ makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.4' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
-options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('2a955963cd2f623c954e753a5bcc0d65')
+#options=('!splithdr' '!splitdbg')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz"
+        tribe_4.5.patch)
+md5sums=('2a955963cd2f623c954e753a5bcc0d65'
+         '39546fae89e44608a3e408cec5d85d51')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -33,9 +35,8 @@ build()
 {
         cd "${srcdir}"
 
-        # fixes
-        #cd "${srcdir}/chakra-$pkgname"
-        #patch -Np1 -i ${srcdir}/a.patch || return 1
+        # 4.5 backports
+        patch -Np0 -i ${srcdir}/tribe_4.5.patch || return 1
 
         cd "${srcdir}/chakra-$pkgname"
 
@@ -43,7 +44,7 @@ build()
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
 	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
-		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' || return 1
 
@@ -55,7 +56,4 @@ build()
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
-
-	# remove release notes
-	#rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 }
