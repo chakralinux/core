@@ -3,13 +3,13 @@
 
 pkgname=tunepimp
 pkgver=0.5.3
-pkgrel=7
+pkgrel=8
 pkgdesc="The TunePimp library (also referred to as libtunepimp) is a development library geared towards developers who wish to create MusicBrainz enabled tagging applications"
 url="http://www.musicbrainz.org/products/tunepimp/"
 arch=('i686' 'x86_64')
 license=('GPL')
 options=('!libtool' '!makeflags')
-makedepends=('python')
+makedepends=('python2')
 depends=('curl' 'musicbrainz' 'zlib' 'libmad' 'flac' 'libvorbis' 'readline' 'libmpcdec' 'libofa' 'taglib' 'libmp4v2')
 replaces=('trm')
 source=(ftp://ftp.musicbrainz.org/pub/musicbrainz/lib${pkgname}-${pkgver}.tar.gz
@@ -29,7 +29,7 @@ source=(ftp://ftp.musicbrainz.org/pub/musicbrainz/lib${pkgname}-${pkgver}.tar.gz
   make DESTDIR=${pkgdir} install
   # install python bindings
   cd python
-  python setup.py install --root=${pkgdir}
+  python2 setup.py install --root=${pkgdir}
 
   # fix includes for kdemultimedia
   cd ${pkgdir}/usr/include
