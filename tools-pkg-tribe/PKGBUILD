@@ -38,6 +38,14 @@ build()
 	# 4.5 backports
 	patch -Np0 -i ${srcdir}/tribe_4.5.patch || return 1
 
+	# remove unsupported pkgs for x64
+	if [ "${CARCH}" = "x86_64" ]; then
+	    rm -v ${srcdir}/chakra-$pkgname/data/appIcons/wine.png
+	    rm -v ${srcdir}/chakra-$pkgname/data/appIcons/skype.png
+	    sed -i -e '/wine/d' ${srcdir}/chakra-$pkgname/data/configPagePkgData
+	    sed -i -e '/skype/d' ${srcdir}/chakra-$pkgname/data/configPagePkgData
+	fi
+
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
 	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-initialize-target"
