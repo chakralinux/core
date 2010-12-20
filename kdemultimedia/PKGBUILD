@@ -28,7 +28,7 @@ pkgname=('kdemultimedia-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -37,7 +37,7 @@ license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}"
-             'tunepimp' 'cdparanoia' 'mplayer' 'libpulse' 'musicbrainz>=3.0.3')
+             'cdparanoia' 'mplayer' 'libpulse' 'musicbrainz>=3.0.3') # Fixme: tunepimp does not compile anymore
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	http://kenai.com/projects/kde-odf-thumbnail/downloads/download/1.0.0/kde-odf-thumbnail-1.0.0.tar.gz
@@ -165,7 +165,7 @@ package_kdemultimedia-dragonplayer()
 package_kdemultimedia-juk()
 {
 	pkgdesc="An audio player with music database"
-	depends=("${_origname}-common>=${_kdever}" 'tunepimp')
+	depends=("${_origname}-common>=${_kdever}") # Fixme: tunepimp 
 	conflicts=("kdmeod-${_origname}-juk")
 	groups=("kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
