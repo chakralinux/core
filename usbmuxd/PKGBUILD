@@ -24,11 +24,13 @@ build() {
 
   # Fix dirty versioning
   if [ -e ${pkgdir}/usr/lib/libusbmuxd.so.-dirty ] ; then
+	sed -i -e "s~-dirty~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
 	mv ${pkgdir}/usr/lib/libusbmuxd.so.-dirty ${pkgdir}/usr/lib/libusbmuxd.so.${pkgver}
   elif [ -e ${pkgdir}/usr/lib/libusbmuxd.so.UNKNOWN ] ; then
+	sed -i -e "s~-UNKNOWN~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
         mv ${pkgdir}/usr/lib/libusbmuxd.so.UNKNOWN ${pkgdir}/usr/lib/libusbmuxd.so.${pkgver}
   fi
-  sed -i -e "s~-dirty~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
+  
   cd ${pkgdir}/usr/lib/
   ln -sfv libusbmuxd.so.${pkgver} libusbmuxd.so.1
 }
