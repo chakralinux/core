@@ -8,22 +8,20 @@
 # package info
 #
 pkgname=tribe
-pkgver=0.3.45.6
+pkgver=0.3.45.7
 pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.80' 'squashfs-tools' 'partitionmanager>=1196188')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.80' 'kdebase-workspace')
+depends=('kdelibs' 'kdeedu-marble>=4.5.85' 'squashfs-tools' 'partitionmanager>=1196188' 'rsync')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.85' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz"
-        'http://chakra-project.org/sources/tribe/mirrorlist')
-md5sums=('d2729edab1c98f499493ac312f5f4a46'
-         'dfb3c82b5b1fbc2fccba8725c74dab7a')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
+md5sums=('bfd52a21a325d768965e7a67862b07a5')
 
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -55,18 +53,9 @@ build()
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
 
-	msg "fix selfnet issue..."
-	mkdir -p $startdir/pkg/etc/skel
-	cp -v $srcdir/mirrorlist $startdir/pkg/etc/skel
-	sed -i -e 's~rankmirrors -t -n 5 ${mountpoint}/etc/pacman.d/mirrorlist~rankmirrors -t -n 5 /etc/skel/mirrorlist~g' $startdir/pkg/usr/share/tribe/scripts/job-configure-pacman
-	sed -i -e "s/@carch@/${CARCH}/g" $startdir/pkg/etc/skel/mirrorlist
-
-	msg "fix postinstall.conf..."
-	sed -i -e 's~256~260~g' $startdir/pkg/usr/share/tribe/config/postinstall.conf
-
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
 
 	# remove release notes
-	rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	#rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 }
