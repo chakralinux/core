@@ -8,32 +8,29 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=polkit-qt
-pkgver=0.98.1
+pkgver=0.99.0
 pkgrel=1
-_gitver=4c12d78
 pkgdesc='A library that allows developers to access PolicyKit API with a nice Qt-style API'
 arch=('i686' 'x86_64')
 url='http://www.kde.org'
 license=('LGPL')
 depends=('polkit' 'qt')
 makedepends=('cmake' 'automoc4')
-#source=("ftp://ftp.kde.org/pub/kde/stable/apps/KDE4.x/admin/${pkgname}-1-${pkgver}.tar.bz2"
-source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-1-${pkgver}.tar.gz")
-md5sums=('c1b73dfa912f70afb07fbd6b4ef99159')
+source=("ftp://ftp.kde.org/pub/kde/stable/apps/KDE4.x/admin/${pkgname}-1-${pkgver}.tar.bz2")
+md5sums=('1c5b4113a2a167624b5f716b4f03a219')
 
 build() {
-	cd ${srcdir}/${pkgname}-1-${_gitver}
-
-	cd ${srcdir}
-	mkdir build
-	cd build
-	cmake ../${pkgname}-1-${_gitver} \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_INSTALL_PREFIX=/usr
-	make
+        cd ${srcdir}
+        mkdir build
+        cd build
+        cmake ../${pkgname}-1-${pkgver} \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_INSTALL_PREFIX=/usr
+        make
 }
 
 package() {
-	cd ${srcdir}/build
-	make DESTDIR=$pkgdir install
+        cd ${srcdir}/build
+        make DESTDIR=$pkgdir install
 }
+
