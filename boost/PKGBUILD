@@ -16,12 +16,12 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=boost
 pkgver=1.44.0
 _boostver=1_44_0
-pkgrel=1
+pkgrel=2
 pkgdesc="Free peer-reviewed portable C++ source libraries"
 arch=('i686' 'x86_64')
 url="http://www.boost.org/"
 depends=('bzip2' 'zlib')
-makedepends=('python>=2.6')
+makedepends=('python2')
 optdepends=('python: for python bindings')
 source=(http://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgver}/${pkgname}_${_boostver}.tar.gz)
 license=('custom')
@@ -61,7 +61,7 @@ build() {
             cflags=-fno-strict-aliasing \
             --prefix=${pkgdir}/usr \
             -sPYTHON_ROOT=/usr \
-            -sPYTHON_VERSION=2.6 \
+            -sPYTHON_VERSION=2.7 \
             -sTOOLS=gcc \
             --layout=tagged \
             install || return 1
