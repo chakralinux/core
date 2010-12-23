@@ -40,7 +40,8 @@ depends=('polkit-kde' "kdepimlibs>=${_kdever}" 'qimageblitz'
          'libxdamage' 'xorg-utils' 'libxrandr' "kdepim-runtime>=${_kdever}")
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'networkmanager' 'bluez' "kdebindings-python>=${_kdever}"
-             "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje' "kdebase-runtime>=${_kdever}") # 'gpsd' 'google-gadgets-qt>=0.11.1'
+             "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje' "kdebase-runtime>=${_kdever}" 'gpsd' 'samba' 'libraw1394' 'libdmtx' 'consolekit') 
+  	    # 'google-gadgets-qt>=0.11.1' needs gtk :/
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -76,10 +77,10 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 	fix_kdm_configdef.patch
 
 	# "fix" some sytemsettings modules that need root access
-	fix_root-only-kcms.patch
+	fix_root-only-kcms.patch)
 
 	# fix powerdevil
-	trunk_powerdevil.patch)
+#	trunk_powerdevil.patch
 
 	# experimental, software transparency for plasma panels
 #	feature_plasma-transparent-panel-v4-rb#472.patch
@@ -110,18 +111,18 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
         'e2eb9d270fe0e93901b29256bdedd7e2' #  02_sane_env_and_shutdown_path.patch
         '8e623bb5608025417ff9ed061e5a03f1' #  03_plasma_menubutton_branding.patch
         '522a294c09d88d3d722de3f39fd203c3' #  04_plasma_kickoff_url.patch
-#        '0aba9287f038d66afbf545c83a46fd19' #  05_plasma_desktop_defaults.patch
+#       '0aba9287f038d66afbf545c83a46fd19' #  05_plasma_desktop_defaults.patch
         '0ee6e12bb9830b4248becb0442dc7e0c' #  06_kickoff_default_favourites.patch
         '89d96455c6a446ef59b0620d1b8606af' #  07_always_show_kickoff_subtext.patch
         '5eb9285268916492012151045bdebd26' #  09_enable_start-shutdown-scripts.patch
 
         'db2d8166f5ea80ecd291deb9c0e2bb71' #  fix_kdm-increase-xserver-timeout-bnc#462478.patch
         '814350c52c135d6f7bdada1e29223d38' #  fix_terminate-server.patch
-#        '5d752cf39a28306438bb6d82db6e1696' #  fix_ck-shutdown.patch
+#        '5d752cf39a28306438bb6d82db6e1696'#  fix_ck-shutdown.patch
 	'97a5eb51e6f9d460f0d61bb322a1db5e' #  fix_kdm_configdef.patch
-	'5f963f80a026f0600edae1b1c70411e5' #  fix_root-only-kcms.patch
+	'5f963f80a026f0600edae1b1c70411e5') #  fix_root-only-kcms.patch
 
-	'c6b58eb228d16c77d692df655046ee9f') #  trunk_powerdevil.patch
+#	'c6b58eb228d16c77d692df655046ee9f' #  trunk_powerdevil.patch
 
 
 #        '13c3203589143e9e2fc757c17375227a' #  feature_plasma-transparent-panel-v4-rb#472.patch
@@ -175,10 +176,10 @@ build()
 # 	patch -Np1 -i ${srcdir}/feature_history-notifications-enable-disable-kde#119207.patch || return 1
 # 	patch -Np1 -i ${srcdir}/feature_kdm-plymouth.patch || return 1
 
-	msg "applying upstream patches ..."
-	patch -Np1 -i ${srcdir}/trunk_powerdevil.patch || return 1
+#	msg "applying upstream patches ..."
+#	patch -Np1 -i ${srcdir}/trunk_powerdevil.patch || return 1
 
-	#msg "applying arch patches ..."
+#	msg "applying chakra patches ..."
 
 
 	msg "starting workspace build ..."
