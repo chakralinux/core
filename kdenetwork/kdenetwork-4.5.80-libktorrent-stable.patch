@@ -1,14 +1,14 @@
-diff -ur kdenetwork-4.5.80/kget/transfer-plugins/bittorrent/bttransferfactory.cpp kdenetwork-4.5.80-libktorrent-stable/kget/transfer-plugins/bittorrent/bttransferfactory.cpp
---- kdenetwork-4.5.80/kget/transfer-plugins/bittorrent/bttransferfactory.cpp	2010-09-20 10:50:33.000000000 +0200
-+++ kdenetwork-4.5.80-libktorrent-stable/kget/transfer-plugins/bittorrent/bttransferfactory.cpp	2010-11-22 21:46:11.000000000 +0100
-@@ -18,18 +18,12 @@
+--- kdenetwork-4.5.90-libktorrent-stable/kget/transfer-plugins/bittorrent/bttransferfactory.cpp.orig	2010-12-10 16:18:46.000000000 +0100
++++ kdenetwork-4.5.90-libktorrent-stable/kget/transfer-plugins/bittorrent/bttransferfactory.cpp	2010-12-24 23:38:25.853333340 +0100
+@@ -19,7 +19,6 @@
  #include "advanceddetails/btadvanceddetailswidget.h"
  
  #include <kdebug.h>
 -#include <util/functions.h>
+ #include <version.h>
+ #include <torrent/job.h>
  
- KGET_EXPORT_PLUGIN(BTTransferFactory)
- 
+@@ -28,11 +27,6 @@ KGET_EXPORT_PLUGIN(BTTransferFactory)
  BTTransferFactory::BTTransferFactory(QObject *parent, const QVariantList &args)
    : TransferFactory(parent, args)
  {
@@ -17,6 +17,6 @@ diff -ur kdenetwork-4.5.80/kget/transfer-plugins/bittorrent/bttransferfactory.cp
 -        kError(5001) << "Failed to initialize libktorrent";
 -        KGet::showNotification(0, "error", i18n("Cannot initialize libktorrent. Torrent support might not work."));
 -    }
- }
- 
- BTTransferFactory::~BTTransferFactory()
+ #if LIBKTORRENT_VERSION >= 0x010100
+     bt::Job::setJobTracker(new BTJobTracker(this));
+ #endif
