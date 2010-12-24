@@ -1,10 +1,12 @@
-# $Id: PKGBUILD 2058 2009-09-07 21:22:13Z ibiru $
-# Maintainer: Ionut Biru <ibiru@archlinux.org>
-# Contributor: William Díaz <wdiaz@archlinux.us>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=farsight2
-pkgver=0.0.18
-pkgrel=2
+pkgver=0.0.22
+pkgrel=1
 pkgdesc="Audio/Video conference software for Instant Messengers"
 arch=('i686' 'x86_64')
 url="http://farsight.freedesktop.org"
@@ -14,16 +16,23 @@ optdepends=('gstreamer0.10-good: for RTP plugin'
             'gstreamer0.10-bad: for RTP plugin')
 options=('!libtool' '!emptydirs')
 source=(http://farsight.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz)
-sha256sums=('884ced1e495865a0876bbeb133aa33e1ef5981b0bcd17b038ab7f232386c1878')
+md5sums=('e1f540cf3ebab06c3d7db1f46b44ac88')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
+  sed -i -e 's#python-config#python2-config#' python/Makefile.in
+  # this makefile is broken
+  sed -i -e 's#        #        #' docs/libs/Makefile.in
+
   ./configure --prefix=/usr \
-      --with-package-name='Arch Linux farsight2 package' \
+      --with-package-name='Chakra Linux farsight2 package' \
       --with-package-origin='http://chakra-project.org' \
       --disable-static -disable-valgrind --disable-debug
+  make
+}
 
-  make || return 1
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR=${pkgdir} install || return 1
 }
