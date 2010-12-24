@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=('mesa-demos')
 pkgver=8.0.1
-pkgrel=2
+pkgrel=2.1
 arch=(i686 x86_64)
 pkgdesc="Mesa demos and tools"
 url="http://mesa3d.sourceforge.net"
@@ -32,4 +32,6 @@ package() {
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/mesa-demos"
   install -m755 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/mesa-demos/"
+  rm -v ${pkgdir}/usr/bin/line
+  rm -v ${pkgdir}/usr/bin/clear
 }
