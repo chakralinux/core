@@ -40,7 +40,7 @@ cleanup_src()
 	do
 		status_start "${module}"
 		pushd $module &>/dev/null
-		rm -rf pkg src dbg hdr *.pkg.* *log* &>/dev/null
+		rm -rf pkg src dbg hdr *.pkg.* *.log.* log &>/dev/null
 		popd &>/dev/null
 		status_done
 	done
