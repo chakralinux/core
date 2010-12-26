@@ -8,21 +8,22 @@
 # package info
 #
 pkgname=tribe
-pkgver=0.3.45.7
+pkgver=0.3.45.8
 pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.85' 'squashfs-tools' 'partitionmanager>=1196188' 'rsync')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.85' 'kdebase-workspace')
+depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' 'partitionmanager>=1196188' 'cinstall>=0.3' 'rsync' 'burg' 'os-prober')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.4' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
-md5sums=('9ef865e620ae42baa205a5cab339485a')
-
+ 
+md5sums=('af6c0efdf1af7e2b53e4a711bd9d6874')
+         
 groups=('kde-uninstall')
 install=tools-tribe.install
 
@@ -31,13 +32,18 @@ install=tools-tribe.install
 #
 build()
 {
-        cd "${srcdir}"
-
-        # fixes
-        #cd "${srcdir}/chakra-$pkgname"
-        #patch -Np1 -i ${srcdir}/fix.patch || return 1
-
         cd "${srcdir}/chakra-$pkgname"
+
+	# 4.5 backports
+	#patch -Np0 -i ${srcdir}/tribe_4.5.patch || return 1
+
+	# remove unsupported pkgs for x64
+	if [ "${CARCH}" = "x86_64" ]; then
+	    rm -v ${srcdir}/chakra-$pkgname/data/appIcons/wine.png
+	    rm -v ${srcdir}/chakra-$pkgname/data/appIcons/skype.png
+	    sed -i -e '/wine/d' ${srcdir}/chakra-$pkgname/data/configPagePkgData
+	    sed -i -e '/skype/d' ${srcdir}/chakra-$pkgname/data/configPagePkgData
+	fi
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
@@ -55,7 +61,4 @@ build()
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
-
-	# remove release notes
-	#rm -v $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 }
