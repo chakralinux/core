@@ -28,7 +28,7 @@ pkgname=('kdenetwork-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -40,7 +40,7 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'qca-ossl' "kdebase-workspace>=${_kdever}" 
              "kdebase>=${_kdever}" 'libvncserver' 'libmsn'
              'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage'
-             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart>=0.9.6')   # Lukas it's fixing this -> 'libktorrent>=1.0.4')
+             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
         'lisa.daemon'
@@ -48,13 +48,8 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2 \
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
          '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
-<<<<<<< HEAD
-         '396537b1a8805672b3a7968378136105')
+         '2a8101ce78abd99565a796e620877098')
 
-
-=======
-         '61f5d6b91832e321cf4179bbee5203e6')
->>>>>>> f024646226e8eba08d9c67470abf5a969b18ac9e
 
 
 #
@@ -65,7 +60,7 @@ build()
 	cd ${srcdir}/${_origname}-${pkgver}
 
 	msg "applying patches ..."
-#	patch -Np1 -i ${srcdir}/kdenetwork-4.5.80-libktorrent-stable.patch || return 1
+	patch -Np1 -i ${srcdir}/kdenetwork-4.5.80-libktorrent-stable.patch || return 1
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
