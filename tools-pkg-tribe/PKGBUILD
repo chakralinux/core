@@ -8,8 +8,8 @@
 # package info
 #
 pkgname=tribe
-pkgver=0.3.0.1
-pkgrel=2
+pkgver=0.3.0.2
+pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -56,7 +56,11 @@ build()
 
 	msg "Starting make..."
 	make || return 1
+}
 
+package()
+{
+        cd "${srcdir}/chakra-$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
 
