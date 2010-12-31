@@ -38,6 +38,7 @@ pkgname=('kdegames-common'
          'kdegames-killbots'
          'kdegames-kiriki'
          'kdegames-kjumpingcube'
+         'kdegames-klickety'
          'kdegames-klines'
          'kdegames-kmahjongg'
          'kdegames-kmines'
@@ -47,7 +48,6 @@ pkgname=('kdegames-common'
          'kdegames-konquest'
          'kdegames-kpat'
          'kdegames-kreversi'
-#        'kdegames-ksame'
          'kdegames-kshisen'
          'kdegames-ksirk'
          'kdegames-kspaceduel'
@@ -62,7 +62,7 @@ pkgname=('kdegames-common'
         
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -70,7 +70,8 @@ license=('GPL' 'LGPL' 'FDL')
 
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted' 'openal' 'qhull')
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted' 'openal' 'qhull' 'pyqt' 
+"kdebindings-python>=${_kdever}")
 
 source=("$_mirror/${_origname}-$_kdever.tar.bz2")
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -557,15 +558,16 @@ package_kdegames-kreversi()
 	install -D -m644 ${srcdir}/${_origname}-${pkgver}/kreversi/module.dsc ${pkgdir}/usr/share/ggz/kreversi.dsc
 }
 
-package_kdegames-ksame()
+package_kdegames-klickety()
 {
-	pkgdesc="SameGame clone, which is only really famous on the Macintosh"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-ksame")
+	pkgdesc="CoKlickety is an adaptation of the clickomania game"
+        depends=("${_origname}-common>=${_kdever}")
+	conflicts=("kdegames-${_origname}-ksame")
+        replaces=("kdegames-${_origname}-ksame")
 	groups=("kde-complete" "${_origname}" "kde-uninstall")
 	install=${_origname}.install
 
-	splitdirs="ksame"
+	splitdirs="klickety"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
