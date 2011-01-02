@@ -9,20 +9,23 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=vhba-module
 pkgver=1.2.1
-_kernver='2.6.35-CHAKRA'
-pkgrel=11
-pkgdesc="Kernel module that emulates SCSI devices"
+_kernver='2.6.36-CHAKRA'
+pkgrel=12
+pkgdesc="Kernel26 module that emulates SCSI devices"
 arch=('i686' 'x86_64')
 url="http://cdemu.sourceforge.net/"
 license=('GPL2')
-depends=('kernel26>=2.6.35' 'kernel26<2.6.36')
-makedepends=('kernel26-headers>=2.6.35')
+depends=('kernel26>=2.6.36' 'kernel26<2.6.37')
+makedepends=('kernel26-headers>=2.6.36')
 install=vhba-module.install
-source=(http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2 vhba-kernel26-2.6.34.patch)
-md5sums=('a3b6ad798f2b72ef599df797ef79e5ec' 'de68d2e744885faade0b03baff52f4a8')
+source=(http://downloads.sourceforge.net/cdemu/vhba-module-$pkgver.tar.bz2 vhba-kernel26-2.6.34.patch vhba-kernel26-2.6.36.patch)
+md5sums=('a3b6ad798f2b72ef599df797ef79e5ec' 'de68d2e744885faade0b03baff52f4a8' '5960ac48a487ff5a4d767ed1f5eaf904')
+groups=("kernel26-modules")
+conflicts=("vhba-module")
+replaces=("vhba-module")
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/vhba-module-$pkgver"
   #workaround to fix compilation against 2.6.33
   #http://bugs.gentoo.org/233910
   for i in kat/*.c; do
@@ -30,6 +33,7 @@ build() {
   done
 
   patch -Np0 -i ${srcdir}/vhba-kernel26-2.6.34.patch || return 1
+  patch -Np0 -i ${srcdir}/vhba-kernel26-2.6.36.patch || return 1
 
   make -j1 KDIR=/usr/src/linux-${_kernver} || return 1
   install -D vhba.ko "$pkgdir/lib/modules/${_kernver}/extra/vhba.ko" || return 1

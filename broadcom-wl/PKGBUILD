@@ -4,27 +4,30 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
+# Find the kernel name inside the chroot
+_kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
+
 pkgname=broadcom-wl
-pkgver=5.60.246.6
-_kernver='2.6.35-CHAKRA'
+pkgver=5.100.82.38
 pkgrel=1
-pkgdesc='Broadcom 802.11abg networking drivers'
+pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 arch=('i686' 'x86_64')
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
-license=('MIXED/Proprietary')
+license=('custom')
 depends=('kernel26')
 makedepends=('kernel26-headers')
-[ "$CARCH" = 'x86_64' ] && ARCH=x86-64 \
-                        || ARCH=x86-32
-source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}_v${pkgver}.tar.gz"
+
+[ "$CARCH" = 'x86_64' ] && ARCH=x86_64 || ARCH=x86_32
+source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz"
         'license.patch'
-        'semaphore.patch')
-[ "$CARCH" = 'x86_64' ] && sha1sums=('b4ecb6f82fe0f943d40fb85ef7c34eb16fe0abf2'
-                                     'ac57feff458bd03cd5b43a88fc264fcaa61bd156'
-                                     '50654c42a64c078c022148decdf897d586d3e6e0') \
-                        || sha1sums=('5aa9fd0707b1e597c5e0b78866a65d4bca687a0c'
-                                     'ac57feff458bd03cd5b43a88fc264fcaa61bd156'
-                                     '50654c42a64c078c022148decdf897d586d3e6e0')
+        'semaphore.patch'
+        'mutex-sema.patch')
+
+sha1sums=('3062830f86c5f1f41d8a4b26d6e0072dc989c7ba'
+          'ea7b67982ddc0f56fd3becb9914fd4458fe7d373'
+          '105f8e1d48ebe1f25d53859e5ab9326a27435c66'
+          'adf0138194ae204ad70ce44e98b2dc18ead4ae2a')
+[ "$CARCH" = 'x86_64' ] && sha1sums[0]='6076de3bd8206b3e7b8bfc2eadbe3a97eec4e735'
 
 install=install
 
@@ -32,10 +35,12 @@ build() {
 	cd "$srcdir"
 	patch -p1 < license.patch
 	patch -p1 < semaphore.patch
-	KBUILD_NOPEDANTIC=1 make -C /lib/modules/${_kernver}/build M=`pwd`
+	patch -p1 < mutex-sema.patch
+	make -C /lib/modules/$_kernver/build M=`pwd`
 }
 
 package() {
 	cd "$srcdir"
-	install -D -m 755 wl.ko "$pkgdir/lib/modules/${_kernver}/kernel/drivers/net/wireless/wl.ko"
+	install -D -m 755 wl.ko "$pkgdir/lib/modules/`uname -r`/kernel/drivers/net/wireless/wl.ko"
+	install -D -m 644 lib/LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

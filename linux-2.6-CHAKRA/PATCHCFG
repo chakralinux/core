@@ -1,44 +1,34 @@
 # Kernel source file
-SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.35.tar.bz2"
+SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.36.tar.bz2"
 # Original source directory
-SRCORIG="linux-2.6.35"
+SRCORIG="linux-2.6.36"
 # Our source directory
-SRCNAME="linux-2.6.35-CHAKRA"
+SRCNAME="linux-2.6.36-CHAKRA"
 # Patches:
 #   URL%patchlevel
 #  or
-#   filename%patchlevel (file must be in patches/ subdirectory)
+#   filename%patchlevel (file must be in patches subdirectory)
 PATCHES=(
-         # add upstream patch from 2.6.35 series
-         http://www.kernel.org/pub/linux/kernel/v2.6/longterm/v2.6.35/patch-2.6.35.10.bz2%1
+         # add upstream patch from 2.6.36 series
+         http://www.kernel.org/pub/linux/kernel/v2.6/patch-2.6.36.2.bz2%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
          # add aufs2 support, in reference to:
          # http://aufs.sourceforge.net
-         http://chakra-project.org/sources/kernel26/patches/35/aufs2/aufs2-base.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/aufs2/aufs2-standalone.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/aufs2/aufs2-kbuild.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/aufs2/aufs2.1-standalone.tree-35-20101206.patch.bz2%1
-
+         http://chakra-project.org/sources/kernel26/patches/36/aufs2.1/aufs2-kbuild.patch%1
+         http://chakra-project.org/sources/kernel26/patches/36/aufs2.1/aufs2-base.patch%1
+         http://chakra-project.org/sources/kernel26/patches/36/aufs2.1/aufs2-standalone.patch%1
+         http://chakra-project.org/sources/kernel26/patches/36/aufs2.1/aufs2.1-standalone.tree-36-20101220.patch.bz2%1
          # squashfs with lzma
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/001-squashfs-lzma-add-support-for-lzma-compressed-filesystems.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/002-squashfs-lzma-make-lzma-available-to-non-initramfs-initrd-code.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/003-squashfs-lzma-select-decompress-lzma-needed.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/004-squashfs-lzma-make-lzma-reentrant.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/005-squashfs-lzma-force-lzma-wrapper-to-be-retained.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/006-squashfs-lzma-add-missing-slab.h-include-in-lzma-wrapper.patch%1
+         http://chakra-project.org/sources/kernel26/patches/36/squashfs-lzma/kernel-squashfs-lzma-v1.7-2.6.36.patch.bz2%1
+         # sched_autogroup
+         http://chakra-project.org/sources/kernel26/patches/36/autogroup/autogroup-2.6.36-Galbraith-lnet.1.patch.bz2%1
 
-         # autogroup scheduler
-         http://chakra-project.org/sources/kernel26/patches/35/autogroup/2.6.35-sched-automated-per-tty-task-groups.patch%1
-
-         # upstream patches
-         http://chakra-project.org/sources/kernel26/patches/35/upstream/v3-mac80211-remove-wep-dependency.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/upstream/mac80211-refuse-shared-key-auth-when-WEP-is-unavailable.patch%1
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-2.6.35.10-2-CHAKRA"
+PATCHNAME="patch-2.6.36.2-2-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
