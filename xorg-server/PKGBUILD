@@ -4,18 +4,19 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=xorg-server
 pkgver=1.9.3
-pkgrel=1
+pkgrel=2
 pkgdesc="X.Org X servers"
 arch=('i686' 'x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org"
-depends=('libgl' 'libxres' 'dri2proto' 'fontsproto' 'inputproto' 'kbproto' 'libdrm' 'libgcrypt' 'libpciaccess' 'libdmx' 'libxau' 'libxaw' 'libxdmcp' 'libxfixes' 'libxfont' 'libxi' 'libxrender' 'libxv' 'pixman' 'randrproto' 'renderproto' 'udev' 'videoproto' 'xextproto' 'xf86-input-evdev' 'xineramaproto' 'xkeyboard-config' 'xorg-fonts-misc' 'xorg-xkb-utils' 'xorg-util-macros' 'xproto')
-makedepends=('bigreqsproto' 'compositeproto' 'dmxproto' 'libx11' 'libxkbfile' 'libxmu' 'libxtst' 'mesa' 'recordproto' 'resourceproto' 'scrnsaverproto' 'xcmiscproto' 'xf86dgaproto' 'xf86driproto' 'xtrans')
+depends=('xproto' 'randrproto' 'renderproto' 'xextproto' 'inputproto' 'kbproto' 'fontsproto' 'videoproto' 'dri2proto' 'xineramaproto' 'xorg-util-macros' \
+         'pixman' 'libpciaccess' 'libxfont' 'libxi' 'libgl' 'libgcrypt' 'libxv' 'libxau' 'libxaw' 'libxrender' 'libdmx' 'libdrm' 'libxfixes' 'pixman' \
+         'libxext' 'libxdmcp' 'libxau' 'udev' 'xf86-input-evdev' 'xkeyboard-config' 'xorg-xkb-utils' 'xorg-fonts-misc')
+makedepends=('pixman' 'libx11' 'mesa' 'libgl' 'xf86driproto' 'xcmiscproto' 'xtrans' 'bigreqsproto' 'randrproto' 'inputproto' 'fontsproto' 'videoproto' \
+             'compositeproto' 'recordproto' 'scrnsaverproto' 'resourceproto' 'xineramaproto' 'libxkbfile' 'libxfont' 'renderproto' 'libpciaccess' \ 
+             'libxv' 'xf86dgaproto' 'libxmu' 'libxrender' 'libxi' 'dmxproto' 'libxaw' 'libdmx' 'libxtst' 'libxres')
 options=('!libtool')
 provides=('x-server')
 groups=('xorg')
@@ -33,7 +34,7 @@ md5sums=('5bef6839a76d029204ab31aa2fcb5201'
          'd4f7dfc6be4ef4e2c6dd7632a9d88abe')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgbase}-${pkgver}"
 
   # Get rid of the ugly pattern
   patch -Np3 -i "${srcdir}/xorg-redhat-die-ugly-pattern-die-die-die.patch"
@@ -73,11 +74,27 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  # xorg-server-xephyr
+  cd "${srcdir}/${pkgbase}-${pkgver}/hw/kdrive"
   make DESTDIR="${pkgdir}" install
 
+  # xorg-server-xdmx
+  cd "${srcdir}/${pkgbase}-${pkgver}/hw/dmx"
+  make DESTDIR="${pkgdir}" install
+
+  # xorg-server-xvfb
+  cd "${srcdir}/${pkgbase}-${pkgver}/hw/vfb"
+  make DESTDIR="${pkgdir}" install
   install -m755 "${srcdir}/xvfb-run" "${pkgdir}/usr/bin/"
   install -m644 "${srcdir}/xvfb-run.1" "${pkgdir}/usr/share/man/man1/"
+
+  # xorg-server-xnest
+  cd "${srcdir}/${pkgbase}-${pkgver}/hw/xnest"
+  make DESTDIR="${pkgdir}" install
+
+  # xorg-server
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 
   rm -rf "${pkgdir}/var/log"
 
