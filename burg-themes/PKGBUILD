@@ -1,14 +1,12 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Core Packages for Chakra, part of chakra-project.org
 #
-# contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer (i686):   Phil Miller <philm[at]chakra-project[dot]org
+# maintainer (x86_64): Giuseppe Calà <jiveaxe[at]gmail[dot]com>
 
 pkgname=burg-themes
 pkgver=20100623
-pkgrel=2
+pkgrel=1
 pkgdesc="Themes for Burg Bootloader"
 arch=('any')
 url="https://launchpad.net/burg"
@@ -16,11 +14,13 @@ license=('GPL')
 depends=('zip' 'unzip')
 backup=('boot/burg/gui.cfg' 'boot/burg/burgenv' )
 source=(http://burg.googlecode.com/files/burg-theme-$pkgver.zip
+	http://chakra-project.org/sources/burg-themes/neda-0.1.tar.gz
 	add-chakra-class.patch
 	large_chakra.png
 	grey_chakra.png
 	small_chakra.png)
 md5sums=('dffc236d8766e575982b9310d9d02ee1'
+	'4912263a4fcd48c6acb0d0bc2a193416'
 	'3322ad1e3544c53efb1f612e14100a08'
 	'd2ea7d992b299e0a791ec61456deb97f'
 	'7571a9950ce4fb656e0452d4f69c60e8'
@@ -31,6 +31,9 @@ install='burg-themes.install'
 package() {
   mkdir -p $pkgdir/boot/burg 
   unzip burg-theme-$pkgver.zip -d $pkgdir/boot/burg
+
+  msg "add neda theme"
+  cp -vR $srcdir/neda $pkgdir/boot/burg/themes
   
   msg "Applying patch..."
   cd $pkgdir/boot/burg
