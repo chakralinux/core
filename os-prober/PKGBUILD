@@ -4,11 +4,8 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=os-prober
-pkgver=1.39
+pkgver=1.42
 pkgrel=1
 pkgdesc="Utility to detect other OSes on a set of drives"
 url="http://joey.kitenet.net/code/os-prober/"
@@ -19,39 +16,39 @@ optdepends=()
 makedepends=('gcc' 'sed')
 install=
 source=(ftp://ftp.us.debian.org/debian/pool/main/o/${pkgname}/${pkgname}_${pkgver}.tar.gz)
-md5sums=('42a9d530e3b317a822fd7418686e091d')
 
+md5sums=('8c208654327df559884a54b69d840219')
 build() {
   cd $srcdir/${pkgname}
 
   # adjust lib dir to allow detection of 64-bit distros
   sed -i -e "s:/lib/ld\*\.so\*:/lib*/ld*.so*:g" os-probes/mounted/common/90linux-distro  || die "sed failed on 90linux-distro"
 
-  make || return 1
-  
-  install -Dm755 linux-boot-prober $startdir/pkg/usr/bin/linux-boot-prober
-  install -Dm755 os-prober $startdir/pkg/usr/bin/os-prober
-  install -Dm755 newns $startdir/pkg/usr/lib/os-prober/newns
+  make
 
-  install -Dm755 linux-boot-probes/common/50mounted-tests $startdir/pkg/usr/lib/linux-boot-probes/50mounted-tests
-  install -Dm755 linux-boot-probes/mounted/x86/40grub $startdir/pkg/usr/lib/linux-boot-probes/mounted/40grub
-  install -Dm755 linux-boot-probes/mounted/x86/50lilo $startdir/pkg/usr/lib/linux-boot-probes/mounted/50lilo
-  install -Dm755 linux-boot-probes/mounted/common/40grub2 $startdir/pkg/usr/lib/linux-boot-probes/mounted/40grub2
-  install -Dm755 linux-boot-probes/mounted/common/90fallback $startdir/pkg/usr/lib/linux-boot-probes/mounted/90fallback
+  install -Dm755 linux-boot-prober $pkgdir/usr/bin/linux-boot-prober
+  install -Dm755 os-prober $pkgdir/usr/bin/os-prober
+  install -Dm755 newns $pkgdir/usr/lib/os-prober/newns
 
-  install -Dm755 os-probes/common/50mounted-tests $startdir/pkg/usr/lib/os-probes/50mounted-tests
-  install -Dm755 os-probes/init/common/10filesystems $startdir/pkg/usr/lib/os-probes/init/10filesystems
+  install -Dm755 linux-boot-probes/common/50mounted-tests $pkgdir/usr/lib/linux-boot-probes/50mounted-tests
+  install -Dm755 linux-boot-probes/mounted/x86/40grub $pkgdir/usr/lib/linux-boot-probes/mounted/40grub
+  install -Dm755 linux-boot-probes/mounted/x86/50lilo $pkgdir/usr/lib/linux-boot-probes/mounted/50lilo
+  install -Dm755 linux-boot-probes/mounted/common/40grub2 $pkgdir/usr/lib/linux-boot-probes/mounted/40grub2
+  install -Dm755 linux-boot-probes/mounted/common/90fallback $pkgdir/usr/lib/linux-boot-probes/mounted/90fallback
+
+  install -Dm755 os-probes/common/50mounted-tests $pkgdir/usr/lib/os-probes/50mounted-tests
+  install -Dm755 os-probes/init/common/10filesystems $pkgdir/usr/lib/os-probes/init/10filesystems
   for f in os-probes/mounted/x86/* ; do 
-    install -Dm755 $f $startdir/pkg/usr/lib/os-probes/mounted/`basename $f`
+    install -Dm755 $f $pkgdir/usr/lib/os-probes/mounted/`basename $f`
   done
-  install -Dm755 os-probes/mounted/common/40lsb $startdir/pkg/usr/lib/os-probes/mounted/40lsb
-  install -Dm755 os-probes/mounted/common/90linux-distro $startdir/pkg/usr/lib/os-probes/mounted/90linux-distro
+  install -Dm755 os-probes/mounted/common/40lsb $pkgdir/usr/lib/os-probes/mounted/40lsb
+  install -Dm755 os-probes/mounted/common/90linux-distro $pkgdir/usr/lib/os-probes/mounted/90linux-distro
 
-  install -Dm755 common.sh $startdir/pkg/usr/share/os-prober/common.sh  
-  install -Dm644 debian/copyright $startdir/pkg/usr/share/doc/os-prober/copyright  
+  install -Dm755 common.sh $pkgdir/usr/share/os-prober/common.sh  
+  install -Dm644 debian/copyright $pkgdir/usr/share/doc/os-prober/copyright  
   
   # create a empty labels file, will be used by os-prober at execution
-  mkdir -p $startdir/pkg/var/lib/os-prober
-  touch $startdir/pkg/var/lib/os-prober/labels 
-  chmod 644 $startdir/pkg/var/lib/os-prober/labels
+  mkdir -p $pkgdir/var/lib/os-prober
+  touch $pkgdir/var/lib/os-prober/labels 
+  chmod 644 $pkgdir/var/lib/os-prober/labels
 }
