@@ -15,28 +15,30 @@ pkgname=('koffice-common'
 	'koffice-kexi'
 	'koffice-kplato'
 	'koffice-kword'
-	'koffice-kchart'
+#	'koffice-kchart' hopefully fixed in 2.3.1
 	'koffice-kformula'
 	'koffice-kpresenter'
 	'koffice-krita'
         'koffice-doc')
 
-pkgver=2.2.2
-pkgrel=2
+pkgver=2.3.0
+pkgrel=1
 arch=('i686' 'x86_64')
 url='http://koffice.kde.org'
 license=('GPL' 'LGPL' 'FDL')
 depends=('fftw')
-makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'eigen' \
-  'kdelibs' 'gsl' 'qca' 'lcms' 'glew' 'qimageblitz' 'libgsf' \
-  'kdepimlibs' 'pstoedit' 'wv2' 'poppler-qt' 'libwpd' 'openexr' 'kdegraphics-common' 'sqlite3') # 'opengtl'
+makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'eigen' 'lcms' 'lcms2' \
+  'kdelibs' 'gsl' 'qca' 'glew' 'qimageblitz' 'libgsf' 'libspnav' \
+  'kdepimlibs' 'pstoedit' 'wv2' 'poppler-qt' 'libwpd' 'libwpg' 'openexr' \
+  'kdegraphics-common' 'sqlite3' 'libpqxx' 'create-resources' 'freetds') # 'opengtl'
 groups=('koffice')
 source=("http://download.kde.org/stable/${pkgbase}-${pkgver}/${pkgbase}-${pkgver}.tar.bz2")
-md5sums=('f987ef488888311db04f313ef2c1ed74')
-options=('!splithdr' 'splitdbg')
+md5sums=('4f99a44b004e4a237890e0834a09964b')
+options=('docs' '!splithdr' 'splitdbg' 'log')
 	
 build() {
 	cd ${srcdir}
+
 	mkdir -p build
 	cd build
 	cmake ../${pkgbase}-${pkgver} \
@@ -48,7 +50,8 @@ build() {
 
 package_koffice-common(){
 	pkgdesc="Common files for the KDE office suite"
-	depends=('kdelibs' 'kdepimlibs' 'qca' 'lcms' 'libgsf')
+	depends=('kdelibs' 'kdepimlibs' 'qca' 'libgsf' 'create-resources' 'libspnav' \
+		 'libwpd' 'libwpg' 'lcms' 'lcms2')
 	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
 
 	splitdirs="interfaces plugins servicetypes libs templates filters pics tools"
@@ -65,7 +68,7 @@ package_koffice-doc()
 	conflicts=("kdemod-${pkgbase}-doc")
 	groups=("kde-complete" "${pkgbase}" "kde-doc" "kde-uninstall")
 
-	splitdirs="karbon kchart kexi kformula koffice kpresenter kspread thesaurus"
+	splitdirs="karbon kexi kformula koffice kpresenter kspread thesaurus" # kchart
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/build/doc/${i}
 			make DESTDIR=${pkgdir} install || return 1
@@ -74,7 +77,8 @@ package_koffice-doc()
 
 package_koffice-kexi(){
         pkgdesc="Integrated data management application for the KDE office suite"
-        depends=('kdelibs' 'koffice-common' 'koffice-kspread' 'sqlite3')
+        depends=('kdelibs' 'koffice-common' 'koffice-kspread' 'sqlite3' 'libpqxx' \
+                 'freetds')
         cd ${srcdir}/build/kexi
         make DESTDIR=${pkgdir} install
 }
@@ -89,7 +93,7 @@ package_koffice-kounavail(){
 
 package_koffice-kspread(){
 	pkgdesc="Spreadsheet application for KDE"
-	depends=('hicolor-icon-theme' 'gsl' 'koffice-common' 'koffice-kchart')
+	depends=('hicolor-icon-theme' 'gsl' 'koffice-common') # 'koffice-kchart'
 	groups=("kde-complete" "${pkgbase}" "kde-uninstall")
 	install=koffice.install
         cd ${srcdir}/build/kspread
