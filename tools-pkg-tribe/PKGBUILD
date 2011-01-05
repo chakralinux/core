@@ -22,7 +22,7 @@ conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' '
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-$pkgver.tar.xz"
         'tribe_4.5.patch')
-md5sums=('7473da35f6606428fcf4c93005e09271'
+md5sums=('88e02924e01c8f848a92503f40006206'
          '168a949a78621df376e3a4b2c26ecac5')
 
 groups=('kde-uninstall')
@@ -31,7 +31,9 @@ install=tools-tribe.install
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
+	  rm -vRf tribe
 	  git clone git://gitorious.org/chakra/tribe.git
+	  rm -vRf tribe/.git
 	  pushd ${pkgname}
 	  popd
 	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
