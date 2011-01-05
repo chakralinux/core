@@ -38,3 +38,10 @@ build() {
 	patch -p1 < mutex-sema.patch
 	make -C /lib/modules/$_kernver/build M=`pwd`
 }
+
+
+package() {
+	cd "$srcdir"
+	install -D -m 755 wl.ko "$pkgdir/lib/modules/`uname -r`/kernel/drivers/net/wireless/wl.ko"
+	install -D -m 644 lib/LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
