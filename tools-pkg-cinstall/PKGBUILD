@@ -5,8 +5,11 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 # (c) 2010 Drake Justice
 
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
 pkgname=cinstall
-pkgver=20110104
+pkgver=0.3.0
 pkgrel=1
 depends=('squashfs-tools' 'xz>=5.0.0' 'fakechroot' 'unionfs-fuse')
 makedeps=('kdelibs' 'qt')
@@ -18,23 +21,14 @@ url="http://chakra-project.org/"
 optdepends=('akabei: for akabei support'
             'pacman: for pacman support')
 
-source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz)
-md5sums=('15278e0cf47b6581a005adc5dc089042')
-
-# create tarball: source PKGBUILD && mksource
-
-mksource() {
-  git clone git://gitorious.org/cinstall/cinstall.git
-  pushd cinstall
-  popd
-  tar -cvJf ${pkgname}-${pkgver}.tar.xz cinstall/*
-  md5sum ${pkgname}-${pkgver}.tar.xz
-}
+source=("http://chakra-project.org/sources/cinstall/cinstall-$pkgver.tar.gz")
+md5sums=('4f06339cc3e329d69d28ab3b93353510')
 
 build() {
-        cd "${srcdir}/cinstall"
+        mkdir -p $srcdir/build
+        cd $srcdir/build
 
-        cmake  \
+        cmake ../cinstall-${pkgname} \
           -DCMAKE_INSTALL_PREFIX=/usr \
           -DCMAKE_BUILD_TYPE=Release
         make || return 1
