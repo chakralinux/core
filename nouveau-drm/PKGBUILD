@@ -8,15 +8,15 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=nouveau-drm
-_snapdate=20101022
+_snapdate=20110105
 pkgver=0.0.16_${_snapdate} # see master/drivers/gpu/drm/nouveau/nouveau_drv.h for version
-_kernver='2.6.36-CHAKRA'
-pkgrel=2
+_kernver='2.6.37-CHAKRA'
+pkgrel=1
 pkgdesc="nvidia opensource X driver"
 arch=('i686' 'x86_64')
 url="http://nouveau.freedesktop.org/"
-depends=("kernel26>=2.6.36" "kernel26<2.6.37")
-makedepends=("kernel26-headers>=2.6.36" "kernel26-headers<2.6.37")
+depends=("kernel26")
+makedepends=("kernel26-headers")
 # http://nouveau.freedesktop.org/wiki/InstallDRM#head-771a47a133fba6a5a70253656e76c61e9bff93bd
 optdepends=('nouveau-firmware: needed for very new card (NV50 family and above) to work properly where the OSS replacement does not work well')
 #makedepends=('git' 'autoconf' 'pkgconfig')
@@ -27,7 +27,7 @@ source=(http://chakra-project.org/sources/nouveau-drm/nouveau-drm-${_snapdate}.t
 	# http://people.freedesktop.org/~pq/nouveau-drm/master.tar.gz
 	# get the Makefile from http://cgit.freedesktop.org/nouveau/linux-2.6/plain/nouveau/Makefile?h=master-compat
 	Makefile)
-md5sums=('cfe89e94b384a92559ae528a39435dbe'
+md5sums=('4797a1c40cd303c65358d13205d77a30'
          '948f121d9fbbbaed0d06cb7fa1c9c5b7')
 conflicts=('nouveau-drm')
 replaces=('nouveau-drm')
