@@ -14,7 +14,7 @@ license=('GPL')
 groups=('base')
 # older initscripts versions required start_udev
 options=(!makeflags !libtool)
-makedepends=('glibc' 'coreutils' 'util-linux' 'libusb-compat' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection>=0.10.0')
+makedepends=('glibc' 'coreutils' 'util-linux' 'libusb-compat' 'pciutils' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection>=0.10.0')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgname-$pkgver.tar.bz2
         80-drivers.rules 
         81-chakra.rules 
@@ -35,7 +35,7 @@ build() {
   
 package_udev() {
   pkgdesc="The userspace dev tools (udev)"
-  depends=('glibc' 'coreutils' 'util-linux' 'libusb-compat' 'glib2'
+  depends=('glibc' 'coreutils' 'util-linux' 'libusb-compat' 'pciutils' 'glib2'
            'module-init-tools>=3.11')
   install=udev.install
   backup=(etc/udev/udev.conf
