@@ -12,7 +12,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 _origname=kdebase-workspace
 
 # default wallpaper to be kept in kdebase-workspace main package
-_default_wp="Ethais"
+_default_wp="Horos"
 
 
 
@@ -40,8 +40,8 @@ depends=('polkit-kde' "kdepimlibs>=${_kdever}" 'qimageblitz'
          'libxdamage' 'xorg-utils' 'libxrandr' 'gpsd' 'samba' 'libraw1394' 'libdmtx' 'consolekit') # "kdepim-runtime>=${_kdever}"
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'networkmanager' 'bluez' "kdebindings-python>=${_kdever}"
-             "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje' "kdebase-runtime>=${_kdever}" 'gpsd' 'samba' 'libraw1394' 'libdmtx' 'consolekit') 
-  	    # 'google-gadgets-qt>=0.11.1' needs gtk :/
+             "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje' "kdebase-runtime>=${_kdever}" 'gpsd' 'samba' 'libraw1394' 'libdmtx' 'consolekit' 
+  	     'google-gadgets-qt>=0.11.2')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -228,7 +228,7 @@ package_kdebase-workspace()
 {
 	pkgdesc="KDE Workspace"
 
-# FIXME don't find google-gadgets and gpsd can't be build cos of liblesstif
+# FIXME don't find google-gadgets
 # NOTE keep in sync with depends
 	depends=('polkit-kde' "kdepimlibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qimageblitz'
 	         'libxxf86misc' 'libxcomposite' 'libxss' 'lm_sensors' 'libxklavier' 'libxft' 'oxygen-icons' "xkit"
@@ -236,9 +236,9 @@ package_kdebase-workspace()
 
 	optdepends=("kdebindings-python : Python Support for Plasma"
 		    "kdeedu-marble      : Marble Wallpaper Plugin"
-		    #"google-gadgets-qt  : Plasma Support for Google Gadgets"
+		    "google-gadgets-qt  : Plasma Support for Google Gadgets"
                     "qedje              : Plasma Support for Edje Files"
-		    #"gpsd               : Plasma geolocation support"
+		    "gpsd               : Plasma geolocation support"
 		    "(open)ntp          : Time/Date sync support")
 
 	provides=("${_origname}=${_kdever}" "powerdevil" 'powerdevil' 'kcm_tablet=1.1.3')
