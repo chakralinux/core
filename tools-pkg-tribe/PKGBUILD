@@ -9,20 +9,22 @@
 #
 pkgname=tribe
 pkgver=0.3.1pre2
-pkgrel=1
+pkgrel=2
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' 'partitionmanager>=1196188-2' 'cinstall>=0.3' 'rsync')
+depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' 'partitionmanager>=1196188-2'
+         'cinstall>=0.3' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.4' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
-conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
+conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 
+           'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-$pkgver.tar.xz"
+source=("http://chakra-project.org/sources/tribe/tribe-$pkgver-$pkgrel.tar.xz"
         'tribe_4.5.patch')
-md5sums=('88e02924e01c8f848a92503f40006206'
+md5sums=('6fbb03f3f53487c7af64471e035c5580'
          '168a949a78621df376e3a4b2c26ecac5')
 
 groups=('kde-uninstall')
@@ -36,8 +38,8 @@ mksource() {
 	  rm -vRf tribe/.git
 	  pushd ${pkgname}
 	  popd
-	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
-	  md5sum ${pkgname}-${pkgver}.tar.xz
+	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz ${pkgname}/*
+	  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
 }
 
 #
