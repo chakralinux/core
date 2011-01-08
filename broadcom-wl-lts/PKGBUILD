@@ -44,4 +44,5 @@ package() {
 	cd "$srcdir"
 	install -D -m 755 wl.ko "$pkgdir/lib/modules/$_kernver/kernel/drivers/net/wireless/wl.ko"
 	install -D -m 644 lib/LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+	sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/*.install
 }
