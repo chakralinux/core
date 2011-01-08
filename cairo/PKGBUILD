@@ -7,23 +7,24 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=cairo
-pkgver=1.10.0
+pkgver=1.10.2
 pkgrel=1
 pkgdesc="Cairo vector graphics library"
 arch=(i686 x86_64)
 license=('LGPL' 'MPL')
 url="http://cairographics.org/"
-depends=('libpng>=1.4.0' 'libxrender' 'fontconfig>=2.8.0' 'pixman>=0.19.4' 'xcb-util>=0.3.6')
-makedepends=('pkgconfig' 'gtk-doc')
+depends=('libpng>=1.4.0' 'libxrender' 'fontconfig>=2.8.0' 'pixman>=0.18.4' 'glib2>=2.24.0')
+makedepends=('pkgconfig')
 options=('!libtool')
-source=(http://cairographics.org/releases/${pkgname}-${pkgver}.tar.gz)
-sha1sums=('efe7e47408d5188690228ccadc8523652f6bf702')
-
+source=(http://cairographics.org/releases/${pkgname}-${pkgver}.tar.gz
+        cairo-1.10.0-buggy_gradients.patch)
+sha1sums=('ccce5ae03f99c505db97c286a0c9a90a926d3c6e'
+          'e867f1020391686b972d5bedcce3c6d1193d7953')
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  sed -i -e 's/libpng13/libpng14/g' configure || return 1
+  patch -Np1 -i "${srcdir}/cairo-1.10.0-buggy_gradients.patch"
   ./configure --prefix=/usr --sysconfdir=/etc \
-    --localstatedir=/var --enable-xcb --disable-static || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+    --localstatedir=/var --disable-static
+  make
+  make DESTDIR="${pkgdir}" install
 }
