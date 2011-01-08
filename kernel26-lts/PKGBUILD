@@ -42,9 +42,6 @@ build() {
   else
     cat ../config >./.config
   fi
-  if [ "${_kernelname}" != "" ]; then
-    sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
-  fi
 
   # hack to prevent output kernel from being marked as dirty or git
   echo "" > ${srcdir}/linux-${_basekernel}/.scmversion
