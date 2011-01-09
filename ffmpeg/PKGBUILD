@@ -4,20 +4,21 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
+# FIXME libvpx
 pkgname=ffmpeg
-pkgver=32772
+pkgver=30526
 pkgrel=1
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('i686' 'x86_64')
 url="http://ffmpeg.org/"
 license=('GPL')
-depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'faac' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx' 'libva>=1.0.4' 'openjpeg')
+depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'faac' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libva>=1.0.7' 'openjpeg') # 'libvpx'
 makedepends=('yasm')
 #remake snapshot with: svn export svn://svn.ffmpeg.org/ffmpeg/trunk/@24460
-source=(http://chakra-project.org/sources/ffmpeg/ffmpeg-${pkgver}.tar.xz)
+source=(http://chakra-project.org/sources/ffmpeg/ffmpeg-${pkgver}.tar.bz2)
 options=('force')
 #source=(http://ffmpeg.org/releases//releases/ffmpeg-${pkgver}.tar.bz2)
-md5sums=('76874176d05577ddedcdbea630be24c5')
+md5sums=('36710a8fa2bb91556c355aeb0e662c81')
 
 build() {
   cd "$srcdir/$pkgname"
@@ -30,7 +31,6 @@ build() {
     --enable-libfaac \
     --enable-libxvid \
     --enable-libx264 \
-    --enable-libvpx \
     --enable-libtheora \
     --enable-postproc \
     --enable-shared \
@@ -43,7 +43,7 @@ build() {
     --enable-version3 \
     --enable-nonfree \
     --enable-runtime-cpudetect \
-    --disable-debug  # libfaac is nonfree
+    --disable-debug  # libfaac is nonfree  --enable-libvpx \
 
   make
   make tools/qt-faststart
