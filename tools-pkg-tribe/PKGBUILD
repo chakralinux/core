@@ -14,40 +14,51 @@ pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.4' 'squashfs-tools' 'partitionmanager>=1196188' 'cinstall>=0.3' 'rsync' 'burg' 'os-prober')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.4' 'kdebase-workspace')
+depends=('kdelibs' 'kdeedu-marble>=4.5.95' 'squashfs-tools' 'partitionmanager>=1196188' 'cinstall>=0.3' 'rsync')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.95' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.gz")
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_0350.html")
  
-md5sums=('bc0f5b8528159d6c46a4e26ba38e4cd2')
+md5sums=('d7d07bca28c1b1632753ffb1b4a47670'
+         '11cca06c219d7ed6604c04918a51d23b')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf tribe
+	  git clone git://gitorious.org/chakra/tribe.git
+	  rm -vRf tribe/.git
+	  pushd ${pkgname}
+	  popd
+	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz ${pkgname}/*
+	  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
+}
 
 #
 # build function
 #
 build()
 {
-        cd "${srcdir}/chakra-$pkgname"
-
-	# 4.5 backports
-	#patch -Np0 -i ${srcdir}/tribe_4.5.patch || return 1
+        cd "${srcdir}/$pkgname"
 
 	# remove unsupported pkgs for x64
 	if [ "${CARCH}" = "x86_64" ]; then
-	    rm -v ${srcdir}/chakra-$pkgname/data/appIcons/wine.png
-	    rm -v ${srcdir}/chakra-$pkgname/data/appIcons/skype.png
-	    sed -i -e '/wine/d' ${srcdir}/chakra-$pkgname/data/configPagePkgData
-	    sed -i -e '/skype/d' ${srcdir}/chakra-$pkgname/data/configPagePkgData
+	    rm -v ${srcdir}/$pkgname/data/appIcons/wine.png
+	    rm -v ${srcdir}/$pkgname/data/appIcons/skype.png
+	    sed -i -e '/wine/d' ${srcdir}/$pkgname/data/configPagePkgData
+	    sed -i -e '/skype/d' ${srcdir}/$pkgname/data/configPagePkgData
 	fi
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Chakra)~g" config-tribe.h.cmake
-	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/chakra-$pkgname/scripts/postinstall-functions/job-initialize-target"
+	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_SKIP_RPATH=ON \
@@ -55,9 +66,14 @@ build()
 
 	msg "Starting make..."
 	make || return 1
+}
 
+package()
+{
+        cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
+	cp -vf ${srcdir}/RELEASE_NOTES_0350.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +

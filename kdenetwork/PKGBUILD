@@ -40,16 +40,13 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'qca-ossl' "kdebase-workspace>=${_kdever}" 
              "kdebase>=${_kdever}" 'libvncserver' 'libmsn'
              'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage'
-             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
+             'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.5')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2 \
-        'lisa.daemon'
-        'kdenetwork-4.5.80-libktorrent-stable.patch')
+        'lisa.daemon')
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-         '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
-         '2a8101ce78abd99565a796e620877098')
-
+         '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
 
 
 #
@@ -58,9 +55,6 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
-
-	msg "applying patches ..."
-	patch -Np1 -i ${srcdir}/kdenetwork-4.5.80-libktorrent-stable.patch || return 1
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
