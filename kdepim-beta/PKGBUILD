@@ -41,25 +41,25 @@ pkgname=('kdepim-common'
         
 arch=('i686' 'x86_64')
 #pkgver=${_kdever}
-pkgver=4.6beta3
-_pkgver=4.6beta3
+pkgver=4.6beta4
+_pkgver=4.5.94
 pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
-options=('docs' '!splithdr' 'splitdbg' 'log')
+options=('!docs' '!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' "kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}"
-             "kdepim-runtime>=${pkgver}" 'gnokii' 'libxss' "kdebase-runtime>=${_kdever}" 'pilot-link' 
+             "kdepim-runtime>=${pkgver}" 'libxss' "kdebase-runtime>=${_kdever}" 
 	     'kde-agent' 'libindicate-qt>=0.2.2' 'docbook-xml')
 
 #source=($_mirror/${_origname}-$_kdever.tar.bz2)
-source=($_mirror/${_origname}-4.6beta3.tar.bz2)
+source=($_mirror/${_origname}-4.5.94.tar.bz2)
 
 #md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
-md5sums=('200ce58974f0e3694a575dd86ba6e62a')
+md5sums=('6cf425aedc31e0567ee32277e93751ac')
 
 #
 # build function
@@ -67,6 +67,10 @@ md5sums=('200ce58974f0e3694a575dd86ba6e62a')
 build()
 {
 	cd ${srcdir}/${_origname}-${_pkgver}
+
+	# Documents translations don't compile atm
+	rm ${startdir}/src/kdepim-4.5.94/doc-translations/CMakeLists.txt
+        touch ${startdir}/src/kdepim-4.5.94/doc-translations/CMakeLists.txt
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -85,7 +89,7 @@ build()
 package_kdepim-common()
 {
 	pkgdesc="KDE PIM - Common files and libraries"
-	depends=("kdepimlibs>=${_kdever}" 'gnokii' 'libxss' "kdebase-runtime>=${_kdever}" 'pilot-link' 'kde-agent'
+	depends=("kdepimlibs>=${_kdever}" 'libxss' "kdebase-runtime>=${_kdever}" 'kde-agent'
                  'libxss' 'libindicate-qt>=0.2.2' "kdepim-runtime>=${_pkgver}")
 
 	conflicts=("kdmeod-${_origname}-common")
