@@ -4,26 +4,22 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=xf86-video-nouveau
-_gitdate=20101217
-_gitdate2=20110105
+_gitdate=20110110
 pkgver=0.0.16_git${_gitdate} # see configure.ac
 pkgrel=1
 pkgdesc="Open Source 3D acceleration driver for nVidia cards (experimental)"
 arch=('i686' 'x86_64')
 url="http://nouveau.freedesktop.org/wiki/"
 license=('GPL') #and MIT, not yet a license file, see http://nouveau.freedesktop.org/wiki/FAQ#head-09f75d03eb30011c754038a3893119a70745de4e
-depends=("nouveau-drm>=0.0.16_${_gitdate2}" 'udev' 'libdrm>=2.4.19')
+depends=("nouveau-drm>=0.0.16_${_gitdate}" 'udev' 'libdrm>=2.4.23')
 optdepends=('nouveau-dri:	highly experimental gallium3d features')
 makedepends=('pkgconfig' 'xorg-server>=1.9.0' 'mesa>=7.10' 'glproto>=1.4.11' 'xorg-util-macros' 'xf86driproto' 'autoconf' 'nouveau-dri')
 conflicts=('xorg-server<1.9.0')
 options=('!libtool') # 'force'
 install=xf86-video-nouveau.install
 source=(http://chakra-project.org/sources/xf86-video-nouveau/xf86-video-nouveau-${_gitdate}.tar.bz2)
-md5sums=('34b0238a941fe85ca45898dfcc47df0e')
+md5sums=('3103fbf4efab8cb41eefbaf4c5fd49e8')
 
 # source PKGBUILD && mksource
 mksource() {
@@ -37,6 +33,8 @@ mksource() {
 
 build() {
   cd ${srcdir}/xf86-video-nouveau-${_gitdate}
+  # fix build
+  sed -i -e "s~nv04_pushbuf.h~nouveau_pushbuf.h~g" src/*
   ./autogen.sh --prefix=/usr || return 1
   make || return 1
 }
