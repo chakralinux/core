@@ -16,12 +16,14 @@ groups=('base')
 options=(!makeflags !libtool)
 makedepends=('glibc' 'coreutils' 'util-linux' 'libusb' 'pciutils' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection>=0.10.0')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgname-$pkgver.tar.bz2
+        http://chakra-project.org/sources/udev/udev-165-remove-buggy-code.patch
         http://chakra-project.org/sources/udev/udev-165-ata-pass-through-memalign.patch
         80-drivers.rules 
         81-chakra.rules 
         load-modules.sh 
         cdsymlinks.sh)
 md5sums=('74c62aa82969278960b7ee81e94b6d8f'
+         '068c17ba922a0802ea88565485f2f741'
          '6e9b693ec3d2c3dadff240094d1cb09a'
          '4427855146513a4703ab5c7eb8a0156e'
          'a2bf84747f44915ec9c5e6e88b077845'
@@ -30,6 +32,7 @@ md5sums=('74c62aa82969278960b7ee81e94b6d8f'
 
 build() {
   cd $srcdir/$pkgname-$pkgver
+  patch -p1 < $srcdir/udev-165-remove-buggy-code.patch || exit 1
   patch -p1 < $srcdir/udev-165-ata-pass-through-memalign.patch || exit 1
   ./configure --sysconfdir=/etc --with-rootlibdir=/lib --libexecdir=/lib/udev\
               --sbindir=/sbin --with-systemdsystemunitdir=/lib/systemd/system
