@@ -30,7 +30,6 @@ md5sums=('74c62aa82969278960b7ee81e94b6d8f'
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  patch -p1 < $srcdir/udev-165-remove-buggy-code.patch || exit 1
   patch -p1 < $srcdir/udev-165-ata-pass-through-memalign.patch || exit 1
   ./configure --sysconfdir=/etc --with-rootlibdir=/lib --libexecdir=/lib/udev\
               --sbindir=/sbin --with-systemdsystemunitdir=/lib/systemd/system
