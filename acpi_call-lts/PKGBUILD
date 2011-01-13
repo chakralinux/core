@@ -7,6 +7,7 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
+_kernver=2.6.35-CHAKRA-LTS
 pkgname=acpi_call-lts
 pkgver=20101109
 pkgrel=1
@@ -52,17 +53,14 @@ package() {
   ln -s /usr/share/$pkgname/test_off.sh \
     ${pkgdir}/usr/bin/test_off-lts.sh || return 1
   install -Dm644 README \
-    ${pkgdir}/usr/share/$pkgname/README
+  ${pkgdir}/usr/share/$pkgname/README
 
-  for _kernver in $(file /boot/* | sed -n '/Linux kernel/s/.* version \(2\.6\.[-[:alnum:]_]\+\).*/\1/p'); do
-    msg2 "Building module for $_kernver..."
+  msg2 "Building module for $_kernver..."
 
-    # KDIR is necessary even when cleaning
-    make KDIR=/usr/src/linux-${_kernver} clean
-    make KDIR=/usr/src/linux-${_kernver}
+  # KDIR is necessary even when cleaning
+  make KDIR=/usr/src/linux-${_kernver} clean
+  make KDIR=/usr/src/linux-${_kernver}
 
-    install -D -m644 acpi_call.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/acpi/acpi_call.ko
-
-  done
+  install -D -m644 acpi_call.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/acpi/acpi_call.ko
   sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/acpi_call.install
 }
