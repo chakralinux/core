@@ -8,14 +8,14 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase="kernel26"
-pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -CHAKRA kernel
+pkgname=('kernel26' 'kernel26-headers') # Build stock -CHAKRA kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
 #_kernelname=${pkgname#kernel26}
 _kernelname=""
 _basekernel=2.6.37
 pkgver=${_basekernel}
-pkgrel=1
-_patchname="patch-${pkgver}-${pkgrel}-CHAKRA"
+pkgrel=2
+_patchname="patch-${pkgver}-1-CHAKRA"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
@@ -28,7 +28,7 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
 md5sums=('c8ee37b4fdccdb651e0603d35350b434'
          '8ed301302d7b2cb31ef0c7293ce4f5bb'
          '1daf0dc043949ecc4f48afa4260e952a'
-         '9dc3149aea0be00a570fa81319588acc'
+         '92f1276655f801d4cb7a80eb481b9226'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
@@ -73,7 +73,7 @@ build() {
 package_kernel26() {
   pkgdesc="The Linux Kernel and modules"
   backup=(etc/mkinitcpio.d/kernel26.preset)
-  depends=('coreutils' "kernel26-firmware>=${pkgver}" 'module-init-tools' 'mkinitcpio>=0.6.3')
+  depends=('coreutils' 'linux-firmware' 'module-init-tools' 'mkinitcpio>=0.6.3')
   # pwc, ieee80211 and hostap-driver26 modules are included in kernel26 now
   # nforce package support was abandoned by nvidia, kernel modules should cover everything now.
   # kernel24 support is dropped since glibc24
@@ -228,11 +228,11 @@ package_kernel26-headers() {
 }
 
 
-package_kernel26-firmware() {
-  pkgdesc="The included firmware files of the Linux Kernel"
-
-  cd ${srcdir}/linux-$_basekernel
-  make firmware || return 1
-  make INSTALL_MOD_PATH=${pkgdir} firmware_install || return 1
-}
+# package_kernel26-firmware() {     ##### This package miss important firmwares!!! it's deprecated, use linux-firmware instead.
+#   pkgdesc="The included firmware files of the Linux Kernel"
+#
+#   cd ${srcdir}/linux-$_basekernel
+#   make firmware || return 1
+#   make INSTALL_MOD_PATH=${pkgdir} firmware_install || return 1
+# }
 
