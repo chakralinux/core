@@ -7,7 +7,7 @@
 pkgbase="udev"
 pkgname=('udev' 'udev-compat')
 pkgver=165
-pkgrel=2
+pkgrel=3
 arch=(i686 x86_64)
 url="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 license=('GPL')
@@ -16,13 +16,13 @@ groups=('base')
 options=(!makeflags !libtool)
 makedepends=('glibc' 'coreutils' 'util-linux' 'libusb' 'pciutils' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection>=0.10.0')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgname-$pkgver.tar.bz2
-        http://chakra-project.org/sources/udev/udev-165-ata-pass-through-memalign.patch
+        http://chakra-project.org/sources/udev/udev.git-560de575148b7efda3b34a7f7073abd483c5f08e.patch.gz
         80-drivers.rules 
         81-chakra.rules 
         load-modules.sh 
         cdsymlinks.sh)
 md5sums=('74c62aa82969278960b7ee81e94b6d8f'
-         '6e9b693ec3d2c3dadff240094d1cb09a'
+         '12d2e29dc8619fe540efba11abeb92f5'
          '4427855146513a4703ab5c7eb8a0156e'
          'a2bf84747f44915ec9c5e6e88b077845'
          'f91fddc67609b45b244a624977c4247b'
@@ -30,7 +30,10 @@ md5sums=('74c62aa82969278960b7ee81e94b6d8f'
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  patch -p1 < $srcdir/udev-165-ata-pass-through-memalign.patch || exit 1
+  # So this is a major bug.  At least, it triggers one in the kernel.
+  # We'll revert it for now.  If left in place, machines using ATA
+  # (especially PATA) are liable to randomly crash on reboot.
+  zcat $srcdir/udev.git-560de575148b7efda3b34a7f7073abd483c5f08e.patch.gz | patch -p1 -R
   ./configure --sysconfdir=/etc --with-rootlibdir=/lib --libexecdir=/lib/udev\
               --sbindir=/sbin --with-systemdsystemunitdir=/lib/systemd/system
   make
