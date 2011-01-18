@@ -7,29 +7,26 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgname=polkit-kde
-pkgver=0.95.1
-pkgrel=3
+pkgname=polkit-kde-agent
+pkgver=0.99.0
+pkgrel=1
 pkgdesc='KDE PolicyKit Authentication Agent'
 arch=('i686' 'x86_64')
 url='http://www.kde.org'
 license=('GPL')
 depends=('kdelibs')
+replaces=('polkit-kde')
 makedepends=('cmake' 'automoc4')
 groups=("kde-uninstall" "kde-support")
-source=("ftp://ftp.kde.org/pub/kde/stable/apps/KDE4.x/admin/${pkgname}-1-${pkgver}.tar.bz2"
-        'xdg-path.patch'
-        'gcc45.patch')
-md5sums=('68e40d2a43335cb5876a1c8bc51c461b'
-         '84d4873e60c1b628bcbaaf38c7ab2f44'
-	 'f00a359d35bfbedb47662341d5fd160e')
+source=("ftp://ftp.kde.org/pub/kde/stable/apps/KDE4.x/admin/${pkgname}-1-${pkgver}.tar.bz2')
+
+md5sums=('a02d3fddc6270a88bceaf3ba604c92f8')
 
 build() {
 	cd ${srcdir}/${pkgname}-1-${pkgver}
-	patch -p0 -i ${srcdir}/xdg-path.patch || return 1
-	patch -p0 -i ${srcdir}/gcc45.patch || return 1
+
 	cd ..
-	mkdir build
+	mkdir -p build
 	cd build
 	export XDG_CONFIG_DIRS=/etc/xdg
 	cmake ../${pkgname}-1-${pkgver} \
