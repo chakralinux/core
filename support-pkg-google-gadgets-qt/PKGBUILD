@@ -16,7 +16,7 @@ _origname=google-gadgets-qt
 
 pkgname=${_origname}
 pkgver=0.11.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Desktop Widgets (engine) from Google"
 arch=(i686 x86_64)
 url="http://code.google.com/p/google-gadgets-for-linux/"
@@ -53,12 +53,16 @@ build()
                     || return 1
 
         make || return 1
-	
+}
+
+package()
+{	
+	cd "${srcdir}/google-gadgets-for-linux-$pkgver"
         make DESTDIR="${pkgdir}" install || return 1
 
-        rm -r ${pkgdir}/usr/include/libltdl/
-        rm ${pkgdir}/usr/include/ltdl.h
-        rm ${pkgdir}/usr/lib/libltdl.*
+#        rm -r ${pkgdir}/usr/include/libltdl/
+#        rm ${pkgdir}/usr/include/ltdl.h
+#        rm ${pkgdir}/usr/lib/libltdl.*
 
         install -Dm0644 "${srcdir}/ggl-qt.desktop" "${pkgdir}/usr/share/applications/ggl-qt.desktop"
 
