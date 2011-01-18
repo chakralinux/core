@@ -1,21 +1,31 @@
-# $Id: PKGBUILD 82564 2010-08-09 
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 # Contributer: Joshua L. Blocher <verbalshadow@gmail.com>
 
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
 pkgname=bzr
-pkgver=2.2.0
+pkgver=2.2.2
 pkgrel=1
 pkgdesc="A decentralized revision control system (bazaar)"
 arch=('i686' 'x86_64')
 url="http://www.bazaar-vcs.org"
 license=('GPL')
-depends=('python')
-source=(http://launchpad.net/bzr/2.2/${pkgver}/+download/${pkgname}-${pkgver}.tar.gz)
-md5sums=('e47fa50e1fedc01c4761925e9d0d39ac')
+depends=('python2')
+source=(http://launchpad.net/bzr/2.2/${pkgver}/+download/${pkgname}-${pkgver}.tar.gz
+        bzr-2.2.2-python-2.7.patch)
+md5sums=('d1bfa2fd1aad282c423c78d62ebacb21'
+         '0f0d8e0d31032cde59565b6c74a37e41')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
+  patch -Np0 -i ${startdir}/bzr-2.2.2-python-2.7.patch || return 1
   sed -i 's|man/man1|share/man/man1|' setup.py
-  python setup.py install --prefix=/usr --root=${pkgdir}
+  python2 setup.py install --prefix=/usr --root=${pkgdir}
 
   # bash-completion
   install -D -m644 contrib/bash/bzr ${pkgdir}/etc/bash_completion.d/bzr

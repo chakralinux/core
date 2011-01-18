@@ -8,14 +8,14 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase="kernel26"
-pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -CHAKRA kernel
+pkgname=('kernel26' 'kernel26-headers') # Build stock -CHAKRA kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
 #_kernelname=${pkgname#kernel26}
 _kernelname=""
-_basekernel=2.6.36
-pkgver=${_basekernel}.3
-pkgrel=1
-_patchname="patch-${pkgver}-${pkgrel}-CHAKRA"
+_basekernel=2.6.37
+pkgver=${_basekernel}
+pkgrel=2
+_patchname="patch-${pkgver}-1-CHAKRA"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
@@ -25,10 +25,10 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
-md5sums=('61f3739a73afb6914cb007f37fb09b62'
-         'b03f895f885b1b0fcf4335cfbb1f7aa4'
-         '6a15f7d4f7c88fa7894b3a353548fa55'
-         '9dc3149aea0be00a570fa81319588acc'
+md5sums=('c8ee37b4fdccdb651e0603d35350b434'
+         '8ed301302d7b2cb31ef0c7293ce4f5bb'
+         '1daf0dc043949ecc4f48afa4260e952a'
+         '92f1276655f801d4cb7a80eb481b9226'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
@@ -43,6 +43,9 @@ build() {
     cat ../config.x86_64 >./.config
   else
     cat ../config >./.config
+  fi
+  if [ "${_kernelname}" != "" ]; then
+    sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
   fi
 
   # hack to prevent output kernel from being marked as dirty or git
@@ -70,7 +73,7 @@ build() {
 package_kernel26() {
   pkgdesc="The Linux Kernel and modules"
   backup=(etc/mkinitcpio.d/kernel26.preset)
-  depends=('coreutils' "kernel26-firmware>=${pkgver}" 'module-init-tools' 'mkinitcpio>=0.6.3')
+  depends=('coreutils' 'linux-firmware' 'module-init-tools' 'mkinitcpio>=0.6.3')
   # pwc, ieee80211 and hostap-driver26 modules are included in kernel26 now
   # nforce package support was abandoned by nvidia, kernel modules should cover everything now.
   # kernel24 support is dropped since glibc24
@@ -217,14 +220,19 @@ package_kernel26-headers() {
   rm -rf ${pkgdir}/usr/src/linux-${_kernver}/arch/{alpha,arm,arm26,avr32,blackfin,cris,frv,h8300,ia64,m32r,m68k,m68knommu,mips,microblaze,mn10300,parisc,powerpc,ppc,s390,sh,sh64,sparc,sparc64,um,v850,xtensa}
   # fix aufs
   # rm -rf ${pkgdir}/usr/src/linux-${_kernver}/include/linux/aufs_type.h
+
+  # fix io.h
+  sed \
+    -e  "s~#include <xen/xen.h>~~g" \
+    -i ${pkgdir}/usr/src/linux-${_kernver}/arch/x86/include/asm/io.h
 }
 
 
-package_kernel26-firmware() {
-  pkgdesc="The included firmware files of the Linux Kernel"
-
-  cd ${srcdir}/linux-$_basekernel
-  make firmware || return 1
-  make INSTALL_MOD_PATH=${pkgdir} firmware_install || return 1
-}
+# package_kernel26-firmware() {     ##### This package miss important firmwares!!! it's deprecated, use linux-firmware instead.
+#   pkgdesc="The included firmware files of the Linux Kernel"
+#
+#   cd ${srcdir}/linux-$_basekernel
+#   make firmware || return 1
+#   make INSTALL_MOD_PATH=${pkgdir} firmware_install || return 1
+# }
 

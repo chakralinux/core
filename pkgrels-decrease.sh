@@ -67,105 +67,12 @@ decrease_pkgrels()
 			done
 		;;
 		
-		support)
-			title2 "Decreasing support pkgrels"
-		for module in ${whattodo[*]}
-			do
-			status_start "$module"
-			pushd $module &>/dev/null
-				sed -i -e 's/\<pkgrel=2\>/pkgrel=1/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=3\>/pkgrel=2/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=4\>/pkgrel=3/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=5\>/pkgrel=4/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=6\>/pkgrel=5/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=7\>/pkgrel=6/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=8\>/pkgrel=7/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=9\>/pkgrel=8/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=10\>/pkgrel=9/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=11\>/pkgrel=10/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=12\>/pkgrel=11/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=13\>/pkgrel=12/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=14\>/pkgrel=13/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=15\>/pkgrel=14/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=16\>/pkgrel=15/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=17\>/pkgrel=16/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=18\>/pkgrel=17/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=19\>/pkgrel=18/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=20\>/pkgrel=19/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=21\>/pkgrel=20/g' PKGBUILD
-			popd &>/dev/null
-			status_done
-			done
-		;;
-
-		qt)
-			title2 "Decreasing Qt pkgrels"
+		*)
+			title2 "Decreasing pkgrels"
 			for module in ${whattodo[*]}
 			do
 			status_start "$module"
-			pushd $module &>/dev/null
-				sed -i -e 's/\<pkgrel=2\>/pkgrel=1/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=3\>/pkgrel=2/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=4\>/pkgrel=3/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=5\>/pkgrel=4/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=6\>/pkgrel=5/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=7\>/pkgrel=6/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=8\>/pkgrel=7/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=9\>/pkgrel=8/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=10\>/pkgrel=9/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=11\>/pkgrel=10/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=12\>/pkgrel=11/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=13\>/pkgrel=12/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=14\>/pkgrel=13/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=15\>/pkgrel=14/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=16\>/pkgrel=15/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=17\>/pkgrel=16/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=18\>/pkgrel=17/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=19\>/pkgrel=18/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=20\>/pkgrel=19/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=21\>/pkgrel=20/g' PKGBUILD
-			popd &>/dev/null
-			status_done
-			done
-		;;
-		
-		kde)
-			title2 "Decreasing KDE pkgrels"
-			for module in ${whattodo[*]}
-			do
-			status_start "$module"
-			pushd $module &>/dev/null
-				sed -i -e 's/\<pkgrel=2\>/pkgrel=1/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=3\>/pkgrel=2/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=4\>/pkgrel=3/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=5\>/pkgrel=4/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=6\>/pkgrel=5/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=7\>/pkgrel=6/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=8\>/pkgrel=7/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=9\>/pkgrel=8/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=10\>/pkgrel=9/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=11\>/pkgrel=10/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=12\>/pkgrel=11/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=13\>/pkgrel=12/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=14\>/pkgrel=13/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=15\>/pkgrel=14/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=16\>/pkgrel=15/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=17\>/pkgrel=16/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=18\>/pkgrel=17/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=19\>/pkgrel=18/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=20\>/pkgrel=19/g' PKGBUILD
-				sed -i -e 's/\<pkgrel=21\>/pkgrel=20/g' PKGBUILD
-			popd &>/dev/null
-			status_done
-			done
-		;;
-		
-		tools)
-			title2 "Decreasing tool pkgrels"
-			for module in ${whattodo[*]}
-			do
-			status_start "$module"
-			pushd $module &>/dev/null
+						pushd $module &>/dev/null
 				sed -i -e 's/\<pkgrel=2\>/pkgrel=1/g' PKGBUILD
 				sed -i -e 's/\<pkgrel=3\>/pkgrel=2/g' PKGBUILD
 				sed -i -e 's/\<pkgrel=4\>/pkgrel=3/g' PKGBUILD
@@ -205,7 +112,31 @@ MODE=`echo $1`
 
 # we take the repo name + the job/stage to reconstruct the variable name
 # in $repo_pkgs.cfg and echo its contents... damn, eval is evil ;)
-whattodo=($(eval echo "\${_build_${_cur_repo}_${MODE}[@]}"))
+	if [ "$_cur_repo" = "core" ] ; then
+	whattodo=($(eval echo "\${_build_core_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "core-testing" ] ; then
+	whattodo=($(eval echo "\${_build_core_testing_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "platform" ] ; then
+	whattodo=($(eval echo "\${_build_platform_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "platform-testing" ] ; then
+	whattodo=($(eval echo "\${_build_platform_testing_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "desktop" ] ; then
+	whattodo=($(eval echo "\${_build_desktop_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "desktop-testing" ] ; then
+	whattodo=($(eval echo "\${_build_desktop_testing_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "apps" ] ; then
+	whattodo=($(eval echo "\${_build_apps_${MODE}[@]}"))
+
+	elif [ "$_cur_repo" = "apps-testing" ] ; then
+	whattodo=($(eval echo "\${_build_apps_testing_${MODE}[@]}"))
+
+	fi
 
 decrease_pkgrels
 

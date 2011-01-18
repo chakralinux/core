@@ -95,7 +95,7 @@ sync_down
 
 # Generate the list of packages to remove
 newline
-GET_PKGS=$GET_PKGS*
+GET_PKGS=$GET_PKGS-*
 PKGS_TO_REMOVE=`ls _repo/remote/$GET_PKGS | cut -d "/" -f3`
 
 if [ "$PKGS_TO_REMOVE" = "" ] ; then

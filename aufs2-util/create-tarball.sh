@@ -1,15 +1,13 @@
 #!/bin/sh
 #AUFS2VERSION=""
-#KERNELVERSION=2.6.33
-GITSNAPSHOT=20101206
+#KERNELVERSION=2.6.35
+GITSNAPSHOT=20101025
 # aufs2 (no -xx) for the latest -rc version.
-if [ ! -d aufs2-util.git/.git ]; then
-	git clone http://git.c3sl.ufpr.br/pub/scm/aufs/aufs2-util.git aufs2-util.git
-else
-	git pull
-fi
+rm -R aufs2-util.git
+git clone http://git.c3sl.ufpr.br/pub/scm/aufs/aufs2-util.git aufs2-util.git
 cd aufs2-util.git
 #git checkout origin/aufs2${AUFS2VERSION}
+git checkout origin/aufs2.1
 #*** apply "aufs2-base.patch" and "aufs2-standalone.patch" to your kernel source files.
 cd ..
 rm -rf aufs2-util-${GITSNAPSHOT}
