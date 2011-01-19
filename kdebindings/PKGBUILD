@@ -39,11 +39,13 @@ license=('GPL' 'LGPL' 'FDL')
 install=${_origname}.install
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt' 'qwt'
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt' 'qwt' 'qscintilla'
              'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+source=($_mirror/${_origname}-$_kdever.tar.bz2
+        pykde4-typedefs-fix.patch)
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+         7b1539232edcbce8753d2f6ae100c858)
 
 
 #
@@ -57,6 +59,9 @@ build()
 	for f in `find ruby -name CMakeLists.txt`; do
 		sed -i "s|\${RUBY_INCLUDE_PATH}|\${RUBY_INCLUDE_PATH} /usr/include/ruby-1.9.1/${_ARCHITECTURE}-linux|" "${f}"
 	done
+
+	msg "applying main patchset ..."
+	patch -Np1 -i ${startdir}/pykde4-typedefs-fix.patch || return 1
 
 	msg "starting build ..."
 	export JAVA_HOME=/opt/java
