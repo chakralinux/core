@@ -8,9 +8,8 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=bluedevil
-pkgver=1.0rc4
-_ver=rc4-1
-pkgrel=2
+pkgver=1.0.1
+pkgrel=1
 pkgdesc='The new bluetooth stack for KDE, it’s composed of: KCM, KDED, KIO, Library and some other small applications'
 arch=('i686' 'x86_64')
 url="http://gitorious.org/bluedevil"
@@ -20,8 +19,8 @@ makedepends=('cmake')
 provides=(bluedevil)
 conflicts=(bluedevil-git)
 
-source=("http://www.afiestas.org/files/bluedevil-v$pkgver-$pkgrel.tgz")
-md5sums=("c967bce0edd20c2937db5071c7b735df")
+source=("http://www.afiestas.org/files/bluedevil/bluedevil-$pkgver.tar.bz2")
+md5sums=("4558dd739a58978b93d513a45d6e6b35")
 
 build(){
   cd ${srcdir}
@@ -29,7 +28,7 @@ build(){
   mkdir -p build
   cd build
 
-  cmake ../$pkgname-$_ver \
+  cmake ../$pkgname-$pkgver \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_SKIP_RPATH=ON \
     -DCMAKE_INSTALL_PREFIX=/usr
