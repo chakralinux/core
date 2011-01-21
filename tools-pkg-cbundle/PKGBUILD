@@ -1,38 +1,34 @@
-#
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 # (c) 2010 Drake Justice
 
-pkgname=cinstall
+pkgname=cbundle
 pkgver=0.3.2
 pkgrel=1
-depends=('squashfs-tools' 'xz>=5.0.0' 'fakechroot' 'unionfs-fuse' 'cbundle')
-makedeps=('kdelibs' 'qt')
-pkgdesc="Bundle Creator/Launcher and Package-Manager"
+depends=('squashfs-tools' 'fakechroot' 'unionfs-fuse')
+makedeps=('qt')
+pkgdesc="A shared library for using Chakra software bundles"
 arch=("i686" "x86_64")
 license=('GPL')
-install=$pkgname.install
 url="http://chakra-project.org/"
-optdepends=('akabei: for akabei support'
-            'pacman: for pacman support')
 
-source=(http://chakra-project.org/sources/cinstall/cinstall-$pkgver.tar.xz)
-md5sums=('cb42da50e849f8ba51fee3e78457ba60')
+source=(http://chakra-project.org/sources/cinstall/cbundle-$pkgver.tar.xz)
+md5sums=('40080675d6a3debaff8fd239d5547be1')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-  git clone git://gitorious.org/cinstall/cinstall.git
-  pushd cinstall
+  git clone git://gitorious.org/cinstall/cbundle.git
+  pushd cbundle
   popd
-  tar -cvJf ${pkgname}-${pkgver}.tar.xz cinstall/*
+  tar -cvJf ${pkgname}-${pkgver}.tar.xz cbundle/*
   md5sum ${pkgname}-${pkgver}.tar.xz
 }
 
 build() {
-        cd "${srcdir}/cinstall"
+        cd "${srcdir}/cbundle"
 
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \
