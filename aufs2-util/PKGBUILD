@@ -8,22 +8,22 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=aufs2-util
-pkgver=20101025
+pkgver=20110121
 pkgrel=1
 pkgdesc="Another Unionfs Implementation that supports NFS branches"
 arch=('i686' 'x86_64')
 url="http://aufs.sourceforge.net/"
 license=('GPL2')
 depends=('glibc')
-makedepends=('kernel26>=2.6.36-2' 'kernel26-headers')
+makedepends=('kernel26>=2.6.37' 'kernel26-headers')
 replaces=('aufs-utils')
 source=(http://chakra-project.org/sources/aufs2-util/aufs2-util-$pkgver.tar.gz)
-md5sums=('c0fba9fed0d0bc7ae6a5582fb324655d')
+md5sums=('3f1b07cc4b973a6def7fb726efd2567a')
 
 build() {
   cd $srcdir/aufs2-util-$pkgver || return 1
   # fix KDIR
-  export CPPFLAGS="-I /usr/src/linux-2.6.36-CHAKRA/include/"
+  export CPPFLAGS="-I /usr/src/linux-2.6.37-CHAKRA/include/"
   #sed  -i 's|$(shell uname -r)|2.6.36-CHAKRA|g' ./Makefile
   
   # build
