@@ -128,7 +128,7 @@ build_it()
 			fi
 			# Upload packages (enable if needed)
 			cd ..
-			./sync-up-nodb.sh
+			# ./sync-up-nodb.sh
 
 	popd &>/dev/null
 	done
