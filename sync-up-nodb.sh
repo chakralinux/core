@@ -16,35 +16,40 @@
 #
 # setup
 #
-_script_name="sync down nodb"
-_build_arch="$_arch"
+_script_name="sync up nodb"
 _cur_repo=`pwd | awk -F '/' '{print $NF}'`
-_needed_functions="config_handling helpers messages"
-# load functions
-for subroutine in ${_needed_functions}
-do
-    source _buildscripts/functions/${subroutine}
-done
 
-#
-# main
-#
+source _buildscripts/functions/config_handling
+source _buildscripts/functions/helpers
+source _buildscripts/functions/messages
+
+if [[ ${_cur_repo} = *-testing ]] && [[ ${_cur_repo} != lib32-testing ]] ; then
+    _sync_folder="_testing/"
+else
+    _sync_folder="_repo/remote/"
+fi
+
+
 sync_up()
 {
-        export RSYNC_PASSWORD=`echo $_rsync_pass`
-        
-        # move new packages from $ROOT/repos/$REPO/build into thr repo dir 
-        title2 "adding new packages"
-        mv -v _repo/local/*.pkg* _repo/remote/
+    export RSYNC_PASSWORD=$(echo ${_rsync_pass})
 
-        # sync local -> server
-        title2 "upload pkgs to server"
-	rsync -avh --progress --delay-updates _repo/remote/ $_rsync_user@$_rsync_server::$_rsync_dir
+    # move new packages from $ROOT/repos/$REPO/build into thr repo dir
+    msg "adding new packages"
+    mv -v _repo/local/*.pkg.* ${_sync_folder}
+
+    # sync local -> server
+    msg "upload pkgs to server"
+    if [ "${_sync_folder}" == "_testing/" ] ; then 
+	rsync -avh --progress --delay-updates ${_sync_folder} ${_rsync_user}@${_rsync_server}::dev/testing/$_arch/
+    else
+	rsync -avh --progress --delay-updates ${_sync_folder} ${_rsync_user}@${_rsync_server}::${_rsync_dir}
+    fi
+
 }
 
-#
-# startup
-#
+
+
 title "${_script_name} - $_cur_repo"
 
 check_configs
