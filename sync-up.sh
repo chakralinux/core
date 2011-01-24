@@ -16,6 +16,7 @@
 
 _script_name="sync up"
 _cur_repo=`pwd | awk -F '/' '{print $NF}'`
+_build_arch="$_arch"
 
 source _buildscripts/functions/config_handling
 source _buildscripts/functions/helpers
@@ -53,9 +54,9 @@ sync_up()
     # sync local -> server
     msg "sync local -> server"
     if [ "${_sync_folder}" == "_testing/" ] ; then 
-	rsync -avh --progress --delay-updates --delete-after ${_sync_folder} ${_rsync_user}@${_rsync_server}::dev/testing/$_build_arch/
+	rsync -avh --progress --delay-updates --delete-after  ${_sync_folder} ${_rsync_user}@${_rsync_server}::dev/testing/$_arch/
     else
-	rsync -avh --progress --delay-updates --delete-after _repo/remote/ ${_rsync_user}@${_rsync_server}::${_rsync_dir}
+	rsync -avh --progress --delay-updates --delete-after  ${_sync_folder} ${_rsync_user}@${_rsync_server}::${_rsync_dir}
     fi
 }
 

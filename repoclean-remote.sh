@@ -13,39 +13,27 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-#
-# setup
-#
+
 _script_name="repoclean remote"
-_build_arch="$_arch"
-_cur_repo=`pwd | awk -F '/' '{print $NF}'`
-_needed_functions="config_handling messages"
-# load functions
-for subroutine in ${_needed_functions}
-do
-    source _buildscripts/functions/${subroutine}
-done
+_cur_repo=$(pwd | awk -F '/' '{print $NF}')
 
-#
-# main
-#
-cleanup_pkgs()
-{ 
-	title2 "Cleaning repo packages"
+source _buildscripts/functions/config_handling
+source _buildscripts/functions/messages
 
-	title2 "running repo-clean"
-	repo-clean -m c -s _repo/remote/
-}
+if [[ ${_cur_repo} = *-testing ]] && [[ ${_cur_repo} != lib32-testing ]] ; then
+    _sync_folder="_testing/"
+else
+    _sync_folder="_repo/remote/"
+fi
 
-#
-# startup
-#
 title "${_script_name}"
 
 check_configs
 load_configs
 
-cleanup_pkgs
+msg "running repo-clean"
+
+repo-clean -m c -s ${_sync_folder}
 
 title "All done"
 newline

@@ -16,72 +16,87 @@
 #   (c) 2010 - Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 #
-# Global setup
+# global vars
 #
 _script_name="Remove Package(s)"
-_build_arch="$_arch"
 _cur_repo=`pwd | awk -F '/' '{print $NF}'`
 _needed_functions="config_handling helpers messages"
+_args=`echo $1`
+_build_arch="$_arch"
 
-GET_PKGS=`echo $1`
+# helper functions
 
-# Load functions
-for subroutine in ${_needed_functions}
-do
+for subroutine in ${_needed_functions} ; do
     source _buildscripts/functions/${subroutine}
 done
 
-question() {
-	local mesg=$1; shift
-	echo -e -n "\033[1;32m::\033[1;0m\033[1;0m ${mesg}\033[1;0m"
-}
+# Determine the sync folder
+if [[ ${_cur_repo} = *-testing ]] && [[ ${_cur_repo} != lib32-testing ]] ; then
+    _sync_folder="_testing/"
+else
+    _sync_folder="_repo/remote/"
+fi
 
 #
 # main
 #
+
 sync_down()
 {
-	# download all the packages from the repo
-	title2 "syncing down, please wait..."
-        export RSYNC_PASSWORD=`echo $_rsync_pass`
-        rsync -avh --progress $_rsync_user@$_rsync_server::$_rsync_dir/* _repo/remote/
+    msg "syncing down"
+    export RSYNC_PASSWORD=$(echo ${_rsync_pass})
+    if [ "${_sync_folder}" == "_testing/" ] ; then 
+	rsync -avh --progress ${_rsync_user}@${_rsync_server}::dev/testing/$_build_arch/* ${_sync_folder}
+    else
+	rsync -avh --progress ${_rsync_user}@${_rsync_server}::${_rsync_dir}/* ${_sync_folder}
+    fi
 }
 
 remove_packages()
 {
-	# remove the package(s) from _repo/remote
-	title2 "removing the packages(s) from _repo/remote"
-	pushd _repo/remote &>/dev/null
-	rm -rf $PKGS_TO_REMOVE
-	popd &>/dev/null
+    # remove the package(s) from sync folder
+    msg "removing the packages(s) from ${_sync_folder}"
+    pushd $_sync_folder &>/dev/null
+        rm -rf ${_pkgz_to_remove}
+    popd &>/dev/null
 }
 
 sync_up()
 {
-	# create new pacman database
-        title2 "creating pacman database, please wait..."
-	rm -rf _repo/remote/*.db.tar.gz &>/dev/null
-        pushd _repo/remote/ &>/dev/null
-        repo-add $_cur_repo.db.tar.gz *.pkg.* &>/dev/null
-        popd &>/dev/null
+    # create new pacman database
+    msg "creating pacman database"
+    rm -rf ${_sync_folder}*.db.tar.*
+    pushd ${_sync_folder}
+	if [ "${_sync_folder}" == "_testing/" ] ; then 
+	    repo-add testing.db.tar.gz *.pkg.*
+	else
+	    repo-add ${_cur_repo}.db.tar.gz *.pkg.*
+	fi
+    popd
 
-        # sync local -> server, removing the packages
-        title2 "syncing up"
-        rsync -avh --progress --delay-updates --delete-after _repo/remote/ $_rsync_user@$_rsync_server::$_rsync_dir
+    # sync local -> server, removing the packages
+    msg "sync local -> server"
+    if [ "${_sync_folder}" == "_testing/" ] ; then 
+	rsync -avh --progress --delay-updates --delete-after ${_sync_folder} ${_rsync_user}@${_rsync_server}::dev/testing/$_arch/
+    else
+	rsync -avh --progress --delay-updates --delete-after ${_sync_folder} ${_rsync_user}@${_rsync_server}::${_rsync_dir}
+    fi
 }
 
 
 #
 # startup
 #
+
 clear
+
 title "${_script_name} - $_cur_repo-$_build_arch"
 
-if [ "$GET_PKGS" = "" ] ; then
-	error "You need to especify a target to remove,"
-	error "single names like \"attica\" or wildcards (*) are allowed." 
-	newline
-	exit 1
+if [ "${_args}" = "" ] ; then
+    error " !! You need to specify a target to remove,"
+    error "    single names like \"attica\" or wildcards (*) are allowed."
+    newline
+    exit 1
 fi
 
 check_configs
@@ -95,47 +110,44 @@ sync_down
 
 # Generate the list of packages to remove
 newline
-GET_PKGS=$GET_PKGS-*
-PKGS_TO_REMOVE=`ls _repo/remote/$GET_PKGS | cut -d "/" -f3`
+_args=${_args}*
+_pkgz_to_remove=`ls ${_sync_folder}${_args} | cut -d/ -f3`
 
-if [ "$PKGS_TO_REMOVE" = "" ] ; then
-	error "exiting..."
-	exit
+if [ "${_pkgz_to_remove}" = "" ] ; then
+    exit
 fi
 
-title2 "The following packages will be removed:"
+warning "The following packages will be removed:"
 newline
-echo "$PKGS_TO_REMOVE"
+echo "${_pkgz_to_remove}"
 
 newline
-question "Do you really want to remove the package(s)? (y/n)"
-while true; do
-	read yn
-	case $yn in
-		y* | Y* ) 
-		newline ;
-		remove_packages ;
-		sync_up ;
-		newline ;
-		title "All done" ;
-		newline ;
-		break 
-		;;
-		
-		[nN]* )   
-		newline ;
-		title "Removal avorted, exiting..." ; 
-		newline ;
-		break 
-		;;
-		
-		q* ) 
-		exit 
-		;;
-		
-		* ) 
-		echo "Enter yes or no" 
-		;;
-	esac
+msg "Do you really want to remove the package(s)? (y/n)"
+
+while true ; do
+    read yn
+
+    case $yn in
+        [yY]* )
+            newline ;
+            remove_packages ;
+            sync_up ;
+            newline ;
+            title "All done" ;
+            newline ;
+            break
+        ;;
+
+        [nN]* )
+            exit
+        ;;
+
+        q* )
+            exit
+        ;;
+
+        * )
+            echo "Enter (y)es or (n)o"
+        ;;
+    esac
 done
-
