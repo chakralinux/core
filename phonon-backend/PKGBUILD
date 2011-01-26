@@ -1,0 +1,147 @@
+#
+# Phonon Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+# NOTE: if you build complete new dash makedep phonon first and build stock phonon. install that for the vlc/mplayer backends
+
+# original name (used for the source and pkgnames)
+pkgbase=('phonon-backend')
+
+pkgname=('phonon-backend-gstreamer'
+	'phonon-backend-mplayer'
+	'phonon-backend-vlc')
+
+pkgver=4.4.4
+pkgrel=1
+pkgdesc='The multimedia API for Qt 4 and KDE 4'
+arch=('i686' 'x86_64')
+url='http://phonon.kde.org'
+license=('LGPL')
+
+makedepends=("qt>=${_qtver}"
+	'pkgconfig'
+	'cmake'
+	'automoc4'
+	'git'
+	'mesa'
+	'mplayer'
+	'xine-lib'
+	'vlc'
+	'gstreamer0.10'
+	'gstreamer0.10-base'
+	'gstreamer0.10-base-plugins'
+	'libpulse'
+	"phonon>=${_pkgver}")
+
+source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.bz2")
+
+md5sums=('fa313a77db3da9df20bc8991352378cb')
+
+build() {
+	cd ${srcdir}
+	mkdir -p build-phonon-gst
+	cd build-phonon-gst
+	cmake ../phonon-backend-gstreamer-${pkgver} \
+		 -DCMAKE_BUILD_TYPE=Release \
+		 -DCMAKE_INSTALL_PREFIX=/usr
+	make
+}
+
+package_phonon-backend-gstreamer()
+{
+	url="http://phonon.kde.org"
+	pkgdesc="Phonon GStreamer backend"
+	license=('LGPL')
+	depends=('gstreamer0.10-base-plugins' "phonon>=${_pkgver}")
+	groups=("kde-complete" "kde-uninstall")
+	conflicts=('phonon-gstreamer')
+	replaces=('phonon-gstreamer')
+
+	cd ${srcdir}/build-phonon-gst
+	make DESTDIR=${pkgdir} install
+}
+
+package_phonon-backend-mplayer()
+{
+	bename=mplayer
+	pkgdesc="Phonon MPlayer backend"
+	url="http://www.gitorious.org/phonon/phonon-${bename}"
+	license=("LGPL")
+	depends=("phonon>=${_pkgver}" "${bename}")
+	groups=("kde-complete" "kde-uninstall")
+	conflicts=("phonon-${bename}-svn" 'phonon-mplayer')
+	replaces=("phonon-${bename}-svn" 'phonon-mplayer')
+
+	_gitroot="git://anongit.kde.org/phonon-${bename}.git"
+	_gitname="phonon-${bename}"
+
+	cd "$srcdir"
+
+	msg "Connecting to GIT server...."
+	if [ -d ${_gitname} ] ; then
+		cd ${_gitname} && git pull origin
+		msg "The local files are updated."
+	else
+		git clone ${_gitroot} ${_gitname}
+	fi
+	msg "GIT checkout done or server timeout"
+	msg "Starting make..."
+
+	rm -rf "${srcdir}/${_gitname}-build"
+	git clone -l "${srcdir}/${_gitname}" "${srcdir}/${_gitname}-build"
+	cd "${srcdir}/${_gitname}-build"
+
+	# Config
+	[ ${CARCH} = 'x86_64' ] && CXXFLAGS="$CXXFLAGS -fPIC"
+
+	# Build
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release \
+		-DPLUGIN_INSTALL_DIR=/usr/lib/kde4 -DSERVICES_INSTALL_DIR=/usr/share/kde4/services . || return 1
+	make || return 1
+	make DESTDIR=${pkgdir} install || return 1
+	rm -rf "${srcdir}/${_gitname}-build"
+}
+
+package_phonon-backend-vlc()
+{
+	pkgdesc="Phonon VLC backend"
+	url="http://gitorious.org/phonon/phonon-vlc"
+	license=('LGPL')
+	depends=('vlc' "phonon>=${_pkgver}")
+	groups=("kde-complete" "kde-uninstall")
+	replaces=('phonon-vlc-svn' 'phonon-vlc')
+	conflicts=('phonon-vlc-svn' 'phonon-vlc')
+
+	_gitroot="git://anongit.kde.org/phonon-vlc.git"
+	_gitname="phonon-vlc"
+
+	cd "$srcdir"
+	msg "Connecting to GIT server...."
+
+	if [ -d $_gitname ] ; then
+	    cd $_gitname && git pull origin
+	    msg "The local files are updated."
+	else
+	    git clone $_gitroot $_gitname
+	fi
+
+	msg "GIT checkout done or server timeout"
+	msg "Starting make..."
+
+	rm -rf "$srcdir/$_gitname-build"
+	git clone -l "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+	cd "$srcdir/$_gitname-build"
+
+	cmake -DCMAKE_INSTALL_PREFIX=/usr \
+	      -DCMAKE_BUILD_TYPE=Release \
+	      -DPHONON_VLC_NO_EXPERIMENTAL=true \
+	      ../${_gitname} || return 1
+	make || return 1
+	make DESTDIR=$pkgdir install || return 1
+	rm -rf "$srcdir/$_gitname-build"
+} 
