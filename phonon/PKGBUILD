@@ -13,7 +13,6 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgbase=('phonon')
 
 pkgname=('phonon'
-	'phonon-xine'
 	'phonon-gstreamer'
 	'phonon-mplayer'
 	'phonon-vlc')
@@ -81,21 +80,6 @@ package_phonon-gstreamer()
 	conflicts=('qtmod-phonon-gstreamer')
 	replaces=("phonon-backend-gstreamer" "kdemod-phonon-backend-gstreamer")
 	splitdirs="gstreamer"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/build/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_phonon-xine()
-{
-	pkgdesc="The multimedia API for Qt 4 and KDE 4 - Xine Backend"
-	depends=("phonon>=${pkgver}" 'xine-lib')
-	groups=("kde" "kde-complete" "kde-minimal" "kde-uninstall")
-	conflicts=('qtmod-phonon-xine')
-	replaces=("phonon-backend-xine" "kdemod-phonon-backend-xine")
-
-	splitdirs="xine"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
