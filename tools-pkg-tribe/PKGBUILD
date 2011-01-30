@@ -8,8 +8,8 @@
 # package info
 #
 pkgname=tribe
-pkgver=0.3.50
-pkgrel=2
+pkgver=0.3.60
+pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
@@ -21,12 +21,11 @@ provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-#source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-1.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_0350.html")
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_0360.html")
  
-md5sums=('b3d072ff8fc07a55fb2708afff8be92e'
-         '11cca06c219d7ed6604c04918a51d23b')
+md5sums=('b2c19231af9d3c94c2512aae651d1f0b'
+         'af5133e36cb935ea526e1e47fb1bf9d8')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -75,7 +74,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_0350.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_0360.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
