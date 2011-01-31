@@ -4,33 +4,33 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
+# Find the kernel name inside the chroot
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
 pkgname=catalyst
-pkgver=10.12
-pkgrel=2
+pkgver=11.1
+pkgrel=1
 pkgdesc="AMD/ATI Catalyst drivers for kernel26. fglrx kernel module only"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
-depends=('kernel26>=2.6.26' 'kernel26<2.6.38' 'kernel26-headers' "catalyst-utils=${pkgver}" 'gcc-libs' 'gcc>4.0.0' 'make')
+depends=('kernel26>=2.6.37' 'kernel26<2.6.39' "catalyst-utils=${pkgver}")
+makedepends=('kernel26-headers'  'gcc-libs' 'gcc>4.0.0' 'make')
 conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri')
 install=${pkgname}.install
 
-patch_file="fglrx-2.6.36.patch"
-patch_md5="eb58dbf993dbf8d77924055cc8caaeb6"
-patch_target="2.6.36"
+#patch_file="fglrx-2.6.36.patch"
+#patch_md5="eb58dbf993dbf8d77924055cc8caaeb6"
+#patch_target="2.6.36"
 
 source=(
     http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
-    makefile_compat.patch
-    sema_init.patch
-    ${patch_file})
+    makefile_compat.patch)
+#    ${patch_file})
 
-md5sums=('debf1518bd58c49b49aafddbae60b748'
-	 '3e1b82bd69774ea808da69c983d6a43b'
-	 'ae25aec26013bdd541441617bb112a24'
-         ${patch_md5})
+md5sums=('f28f358b3a40a0a06e16f45925d9a875'
+	 '3e1b82bd69774ea808da69c983d6a43b')
+#         ${patch_md5}
 
 
 
@@ -54,11 +54,9 @@ build() {
 
     patch -Np1 -i ../makefile_compat.patch || return 1
 
-    patch -Np1 -i ../fglrx-2.6.36.patch || return 1
-
-    if [[ ${_kernver:0:6} == "2.6.37" ]]; then
-        patch -Np1 -i ../sema_init.patch || return 1
-    fi
+#    if [[ ${_kernver:0:6} == "2.6.37" ]] || [[ ${_kernver:0:6} > "2.6.37" ]]; then
+#        patch -Np1 -i ../sema_init.patch || return 1
+#    fi
 
 ###--- cut ---### ati's code from their make.sh file
 
