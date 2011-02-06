@@ -98,7 +98,8 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 #	feature_kdm-plymouth.patch
 
 	#upstream patches
-	fix-plasma-crash-on-exit.patch)
+	fix-plasma-crash-on-exit.patch
+	fix-MALLOC_CHECK.patch)
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
         'f355a658d2e9267fdf4e8d8f88038bcf' # mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -134,8 +135,8 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #        '894815a80f99a9a0dee1adbcda49b161' #  feature_battery-tooltip.patch
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
-	 '274125012429317ebda1a4923d3d5770') #  fix-plasma-crash-on-exit.patch
-
+	 '274125012429317ebda1a4923d3d5770' #  fix-plasma-crash-on-exit.patch
+	 '3f6b21d5163d3cb26fb4d33f2114ef7f') # fix-MALLOC_CHECK.patch
 
 #
 # build function
@@ -183,6 +184,7 @@ build()
 
 	msg "applying upstream patches ..."
 	patch -Np1 -i ${srcdir}/fix-plasma-crash-on-exit.patch || return 1
+	patch -Np0 -i ${srcdir}/fix-MALLOC_CHECK.patch || return 1
 
 #	msg "applying chakra patches ..."
 
