@@ -8,7 +8,7 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=pacman-mirrorlist
-pkgver=20100829
+pkgver=20110206
 pkgrel=1
 pkgdesc="Chakra Linux mirror list for use by pacman"
 arch=('i686' 'x86_64')
@@ -18,17 +18,6 @@ groups=('base')
 backup=(etc/pacman.d/mirrorlist)
 source=(mirrorlist)
 
-# NOTE on building this package:
-# * Go to the trunk/ directory
-# * Run bash -c ". PKGBUILD; updatelist"
-# * Update the checksums, update pkgver
-# * Build the package
-
-updatelist() {
-  wget -O mirrorlist http://www.archlinux.org/mirrorlist/i686/all/
-  sed -i 's/i686/@carch@/' mirrorlist
-}
-
 build() {
   mkdir -p $pkgdir/etc/pacman.d
   install -m644 $srcdir/mirrorlist $pkgdir/etc/pacman.d/
@@ -36,4 +25,5 @@ build() {
   sed -i -e "s/@carch@/${CARCH}/g" $pkgdir/etc/pacman.d/mirrorlist
 }
 
-md5sums=('0940b2a66de2ca7f9466b3477977ea8d')
+md5sums=('ffe7036ed79ef42585818d915ccd6bee')
+sha1sums=('86132454fcebe2f111151ac31c7d8ef51541fd3b')
