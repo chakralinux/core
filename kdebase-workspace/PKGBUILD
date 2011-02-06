@@ -99,7 +99,8 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 
 	#upstream patches
 	fix-plasma-crash-on-exit.patch
-	fix-MALLOC_CHECK.patch)
+	fix-MALLOC_CHECK.patch
+	set-horos-theme.patch)
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
         'f355a658d2e9267fdf4e8d8f88038bcf' # mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -136,8 +137,8 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
 	 '274125012429317ebda1a4923d3d5770' #  fix-plasma-crash-on-exit.patch
-	 '3f6b21d5163d3cb26fb4d33f2114ef7f') # fix-MALLOC_CHECK.patch
-
+	 '172ea190664f4bdadd38406caf9a7597' # fix-MALLOC_CHECK.patch
+	 '66520736dc79f5a12f0bb12502146244') # set-horos-theme.patch
 #
 # build function
 #
@@ -185,6 +186,7 @@ build()
 	msg "applying upstream patches ..."
 	patch -Np1 -i ${srcdir}/fix-plasma-crash-on-exit.patch || return 1
 	patch -Np0 -i ${srcdir}/fix-MALLOC_CHECK.patch || return 1
+	patch -Np0 -i ${srcdir}/set-horos-theme.patch || return 1
 
 #	msg "applying chakra patches ..."
 
@@ -311,11 +313,10 @@ package_kdebase-workspace()
 	mkdir -p ${pkgdir}/usr/share/apps/ksplash/Themes
 	mv -fv ${srcdir}/kdemod-themes/Default-Light ${pkgdir}/usr/share/apps/ksplash/Themes
 
-	# WORKAROUND -> install oxygen-air kdm theme
-	cp -frv ${srcdir}/${_origname}-${pkgver}/kdm/kfrontend/themes/oxygen-air ${pkgdir}/usr/share/apps/kdm/themes
+	# edit kdmrc
 	sed -i -e s,#GUIStyle=.*,GUIStyle=Oxygen,g ${pkgdir}/usr/share/config/kdm/kdmrc
 	sed -i -e s,#ColorScheme=.*,ColorScheme=Oxygen,g ${pkgdir}/usr/share/config/kdm/kdmrc
-	sed -i -e s,Theme=/usr.*,Theme=/usr/share/apps/kdm/themes/oxygen-air,g ${pkgdir}/usr/share/config/kdm/kdmrc
+	sed -i -e s,Theme=/usr.*,Theme=/usr/share/apps/kdm/themes/horos,g ${pkgdir}/usr/share/config/kdm/kdmrc
 	sed -i -e s,MinShowUID=.*,MinShowUID=1000,g ${pkgdir}/usr/share/config/kdm/kdmrc
 
 	# WORKAROUND -> put ggl stuff into ggl package
