@@ -9,28 +9,33 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 _origname=initscripts
 pkgname=chakra-initscripts
-pkgver=2010.07
-pkgrel=4
+pkgver=2011.02
+pkgrel=1
 pkgdesc="System initialization/bootup scripts"
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://www.chakra-project.org"
-license=('GPL')
+license=('GPL2')
 groups=('livecd')
-depends=('glibc' 'bash' 'awk' 'grep' 'coreutils' 'sed' 'udev>=157-1'
-         'net-tools' 'ncurses' 'kbd' 'findutils' 'sysvinit')
-install=initscripts.install
-source=(http://chakra-project.org/sources/initscripts/initscripts-${pkgver}-2.tar.gz)
-md5sums=('ba097b052aa713456c9898c07851675f')
 provides=("initscripts=${pkgver}")
 conflicts=('initscripts')
+backup=(etc/inittab etc/rc.conf etc/rc.local etc/rc.local.shutdown etc/conf.d/wireless)
+depends=('bash' 'awk' 'grep' 'coreutils' 'sed' 'udev'
+         'net-tools' 'ncurses' 'kbd' 'findutils' 'sysvinit')
+optdepends=('bridge-utils: Network bridging support'
+            'dhcpcd: DHCP network configuration'
+            'wireless_tools: Wireless networking')
+install=initscripts.install
+source=("http://chakra-project.org/sources/initscripts/initscripts-${pkgver}.tar.xz"
+        'http://chakra-project.org/sources/initscripts/wireless.conf.d'
+        'http://chakra-project.org/sources/initscripts/chakra-initscripts-2011.02-1.patch')
+sha256sums=('0734166a2fd170a8b144a51d8be5ac3773f8c1381240a744cfd05005464aabda'
+            '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f'
+            '9acb9c575317fb4e2aa1ec69a6b93959c2b520d938af3b17502677af2187ba82')
 
-build() {
-	cd ${srcdir}/${_origname}-${pkgver}-1/
-
-	DESTDIR=$startdir/pkg ./install.sh
-	cp -rf ${startdir}/etc ${startdir}/pkg
-
-	#remove nasty .svn folders
-	cd ${startdir}/pkg
-	rm -rfv `find . -type d -name .svn`
+package() {
+  cd ${srcdir}/${_origname}-${pkgver}
+  DESTDIR=${pkgdir} ./install.sh
+  install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
+  cd ${pkgdir}
+  patch -Np1 -i ${srcdir}/chakra-initscripts-2011.02-1.patch || return 1
 }
