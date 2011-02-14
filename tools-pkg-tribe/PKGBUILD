@@ -8,27 +8,25 @@
 # package info
 #
 pkgname=tribe
-pkgver=0.3.2
-pkgrel=2
+pkgver=0.3.60
+pkgrel=1
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.5.5' 'squashfs-tools' 'partitionmanager>=1196188-2'
-         'cinstall>=0.3' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.5' 'kdebase-workspace')
+depends=('kdelibs' 'kdeedu-marble>=4.5.95' 'squashfs-tools' 'partitionmanager>=1196188-2'
+        'cinstall>=0.3.50' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.5.95' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
-conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 
-           'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
+conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-$pkgver-$pkgrel.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_032.html"
-        'tribe_4.5.patch')
-md5sums=('4738421afe17eeee299c3b676b1baef9'
-         '1c70811b17f70d0f76c51e00699ab506'
-         '168a949a78621df376e3a4b2c26ecac5')
-
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_0360.html")
+ 
+md5sums=('b2c19231af9d3c94c2512aae651d1f0b'
+         'af5133e36cb935ea526e1e47fb1bf9d8')
+         
 groups=('kde-uninstall')
 install=tools-tribe.install
 
@@ -50,9 +48,6 @@ mksource() {
 build()
 {
         cd "${srcdir}/$pkgname"
-
-	# 4.5 backports
-	patch -Np0 -i ${srcdir}/tribe_4.5.patch || return 1
 
 	# remove unsupported pkgs for x64
 	if [ "${CARCH}" = "x86_64" ]; then
@@ -79,7 +74,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_032.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_0360.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +

@@ -14,8 +14,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=('networkmanagement')
          
 arch=('i686' 'x86_64')
-pkgver=20101201
-_ver=d6cd761
+pkgver=1193251
 pkgrel=1
 
 pkgdesc="KDE SC networkmanager plasmoid"
@@ -24,12 +23,14 @@ license=('GPL')
 
 options=('force')
 
-depends=("kdelibs>=${_kdever}" "kdebase-workspace>=${_kdever}" 'networkmanager>=0.8.2' 'mobile-broadband-provider-info')
+depends=("kdelibs>=${_kdever}" "kdebase-workspace>=${_kdever}" 'networkmanager>=0.8.2')
 makedepends=('subversion' 'cmake' 'python' 'automoc4')
 replaces=('networkmanagement-networkmanager-plasmoid' 'networkmanagement-knetworkmanager-kde4')
 
-source=("http://chakra-project.org/sources/$pkgname/$pkgname-$_ver.tar.gz")
-md5sums=('d7335fdf815ecbc4edbd4f09a716bfbb')  
+# comment out when using stable snapshot
+#_svntrunk=svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement
+#_svnmod=networkmanagement
+
 
 #
 # build function
@@ -37,11 +38,15 @@ md5sums=('d7335fdf815ecbc4edbd4f09a716bfbb')
 build() {
 cd "$srcdir"
 
+	# comment out when using stable snapshot
+	#svn co $_svntrunk $_svnmod --revision $pkgver
+	svn co svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement --revision $pkgver
+	msg "SVN checkout done or server timeout"
 
 	mkdir -p $srcdir/build
 	cd $srcdir/build
 	
-	cmake ../networkmanagement-$_ver -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+	cmake ../networkmanagement -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 			  -DDBUS_SYSTEM_POLICY_DIR=/etc/dbus-1/system.d \
 			  -DCMAKE_BUILD_TYPE=${_build_type} \
 			  -DCMAKE_SKIP_RPATH=ON \

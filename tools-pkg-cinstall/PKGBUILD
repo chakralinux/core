@@ -6,8 +6,8 @@
 # (c) 2010 Drake Justice
 
 pkgname=cinstall
-pkgver=0.3.2
-pkgrel=3
+pkgver=0.3.53
+pkgrel=1
 depends=('squashfs-tools' 'xz>=5.0.0' 'fakechroot' 'unionfs-fuse' 'cbundle')
 makedepends=('kdelibs' 'qt')
 pkgdesc="Bundle Creator/Launcher and Package-Manager"
@@ -18,20 +18,17 @@ url="http://chakra-project.org/"
 optdepends=('akabei: for akabei support'
             'pacman: for pacman support')
 
-source=(http://chakra-project.org/sources/cinstall/cinstall-${pkgver}-${pkgrel}.tar.xz)
-md5sums=('49bb5e9c59c8d1a83c35d5bc4267ac0b')
+source=("http://chakra-project.org/sources/cinstall/cinstall-$pkgver.tar.xz")
+md5sums=('c9f1d1d57866fd321fd0c6089dec6e21')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-  rm -vRf cinstall
   git clone git://gitorious.org/cinstall/cinstall.git
   pushd cinstall
   popd
-  # fix version
-  sed -i -e "s~0.3.0~${pkgver}-${pkgrel}~g" cinstall/main.cpp
-  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz cinstall/*
-  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
+  tar -cvJf ${pkgname}-${pkgver}.tar.xz cinstall/*
+  md5sum ${pkgname}-${pkgver}.tar.xz
 }
 
 build() {

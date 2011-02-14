@@ -24,7 +24,8 @@ pkgname=('kdesdk-common'
          'kdesdk-cervisia'
          'kdesdk-kapptemplate'
          'kdesdk-lokalize'
-         'kdesdk-kbugbuster'
+#        'kdesdk-kbugbuster'
+         'kdesdk-okteta'
          'kdesdk-kdeaccounts-plugin'
          'kdesdk-kcachegrind'
          'kdesdk-kmtrace'
@@ -39,7 +40,7 @@ pkgname=('kdesdk-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -50,17 +51,17 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' "kdebase-runtime>=${_kdever}" 'antlr2'
              "kdepimlibs>=${_kdever}" 'subversion' "kdebindings-python>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
-
-
-
+source=("$_mirror/${_origname}-$_kdever.tar.bz2"
+	'fix-antlr2-executable.patch')
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+         '2545efa41b5fcb5fec53c453d0f23c25')
 #
 # build function
 #
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
+        #patch -Np1 -i ${srcdir}/fix-antlr2-executable.patch
 
 	# FIXME: plugin doesnt build: https://bugs.kde.org/show_bug.cgi?id=217769
 	sed -i -e "/snippets_tng/d" kate/plugins/CMakeLists.txt || return 1
@@ -190,6 +191,23 @@ package_kdesdk-kbugbuster()
 	install=${_origname}.install
 
 	splitdirs="kbugbuster"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdesdk-okteta()
+{
+	pkgdesc="Okteta is a simple editor for the raw data of files, also known as a hex editor."
+	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
+		 "kdebase>=${_kdever}")
+	conflicts=("kdemod-${_origname}-okteta" 'kdeutils-okteta')
+	replaces=('kdeutils-okteta')
+	groups=("kde-complete" "kdesdk" "kde-uninstall")
+	install=${_origname}.install
+
+	splitdirs="okteta"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1

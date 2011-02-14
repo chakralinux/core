@@ -29,7 +29,7 @@ pkgname=('kdeadmin-common'
       
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org/"
@@ -41,11 +41,9 @@ options=('!splithdr' 'splitdbg' 'log')
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdepimlibs>=${_kdever}"  "kdebase-runtime>=${_kdever}"
 	     "kdebindings-python>=${_kdever}" 'system-config-printer-common') # "kdepim-runtime>=${_kdever}"
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2
-	fix-syslog-path.patch)
+source=($_mirror/${_origname}-$_kdever.tar.bz2)
 
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-         '41b71823c7a33975ec08aaf75d67a374')  # fix-syslog-path.patch
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 
@@ -56,8 +54,6 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
-
-	patch -Np1 -i ${srcdir}/fix-syslog-path.patch || return 1
 	
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -88,18 +84,18 @@ package_kdeadmin-common()
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
-	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-	if [ "$?" = "0" ]; then
-		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
-			msg "$i"
-			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
-		done
-	else
-		warning "no patches found, skipping to include them into the package..."
-	fi
+#	# include our patches into the package
+#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+#	if [ "$?" = "0" ]; then
+#		warning "incuding patches into package"
+#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+#		for i in ${startdir}/*.patch; do
+#			msg "$i"
+#			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+#		done
+#	else
+#		warning "no patches found, skipping to include them into the package..."
+#	fi
 }
 
 package_kdeadmin-doc()

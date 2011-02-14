@@ -27,7 +27,7 @@ pkgname=('kdebase'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -38,8 +38,8 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 makedepends=("kdebase-workspace>=${_kdever}" 'pkgconfig' 'cmake' 'automoc4' 'libraw1394' 'ruby') # 'opencv'
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
-	http://chakra-project.org/sources/${_origname}/99752-kde_cdemu-0.3.tar.gz
-	01_dolphin_add_toolbar_buttons.patch
+	http://kde-apps.org/CONTENT/content-files/99752-kde_cdemu-0.3.tar.gz
+#	01_dolphin_add_toolbar_buttons.patch
 	02_dolphin_properties.patch
 	03_konsole_defaults.patch)
 #	04_konq_scan_nsplugins_at_startup.patch)
@@ -47,7 +47,7 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
          'f98c26deff86b32a26e0238896d49382' # 99752-kde_cdemu-0.3.tar.gz
-         '12d902dd5d090b146676231c5163bc4f' # 01_dolphin_add_toolbar_buttons.patch
+#         '12d902dd5d090b146676231c5163bc4f' # 01_dolphin_add_toolbar_buttons.patch
          '92a47ed820a541b34dd220e1da5649b7' # 02_dolphin_properties.patch
          '8ab6f508a4e04517dd51ac3ab2eb01ef') # 03_konsole_defaults.patch
 #         'a8dc0bddce464af5846ac722007e0b59') # 04_konq_scan_nsplugins_at_startup.patch
@@ -75,7 +75,7 @@ build()
 	fi
 
 	msg "applying main patchset ..."
-	patch -Np1 -i ${startdir}/01_dolphin_add_toolbar_buttons.patch || return 1
+#	patch -Np1 -i ${startdir}/01_dolphin_add_toolbar_buttons.patch || return 1
 	patch -Np1 -i ${startdir}/02_dolphin_properties.patch || return 1
 	patch -Np1 -i ${startdir}/03_konsole_defaults.patch || return 1
 #	patch -Np1 -i ${startdir}/04_konq_scan_nsplugins_at_startup.patch || return 1

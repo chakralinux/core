@@ -1,33 +1,32 @@
 #
-# KDE SC Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=musicbrainz
-pkgver=2.1.5
-pkgrel=4
-pkgdesc="The second generation incarnation of the CD Index"
+pkgver=3.0.3
+pkgrel=1
+pkgdesc="Library That Provides Access to the MusicBrainz Server  "
+url="http://musicbrainz.org/"
 arch=('i686' 'x86_64')
-url="http://www.musicbrainz.org/index.html"
-license=('LGPL')
-depends=('expat>=2.0')
-makedepends=('python')
-options=('!libtool')
-source=(ftp://ftp.musicbrainz.org/pub/$pkgname/libmusicbrainz-${pkgver}.tar.gz
-	'gcc4.3.patch')
-
-
+license=('LGPL2.1')
+depends=('neon' 'libdiscid')
+makedepends=('cmake')
+source=(ftp://ftp.musicbrainz.org/pub/musicbrainz/libmusicbrainz-$pkgver.tar.gz)
+md5sums=('f4824d0a75bdeeef1e45cc88de7bb58a')
 build() {
-  cd ${srcdir}/lib${pkgname}-${pkgver}
-
-  patch -p1 -i ${srcdir}/gcc4.3.patch
-  ./configure --prefix=/usr
-  make || return 1
-  make DESTDIR=${pkgdir} install
-
-  cd python
-  python setup.py install --root=${pkgdir} || return 1
+  cd ${srcdir}
+  mkdir build
+  cd build
+  cmake ../libmusicbrainz-${pkgver} \
+      -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+      -DBUILD_SHARED_LIBS:BOOL=ON \
+      -DBUILD_STATIC_LIBS:BOOL=OFF
+  make
 }
-md5sums=('d5e19bb77edd6ea798ce206bd05ccc5f'
-         '9455555d03e3bd15d488ffdb2287ffa7')
+
+package() {
+  cd ${srcdir}/build
+  make DESTDIR=${pkgdir} install
+}

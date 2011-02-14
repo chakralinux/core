@@ -6,7 +6,14 @@ post_install() {
 			if [ "$UPDATE_XDG_ICON_DB" = "yes" ]; then
 				/usr/bin/chakra-update-icons
 			fi
-	
+
+			if [ "$UPDATE_GLOBAL_CONFIG" = "yes" ]; then
+				/usr/bin/chakra-update-sycoca
+			fi
+
+			if [ "$UPDATE_USER_CONFIG" = "yes" ]; then
+				/usr/bin/chakra-update-user-sycoca
+			fi
 		else
 			echo " > WARNING"
 			echo "   The package kde-common seems not to be installed,"
@@ -28,6 +35,13 @@ post_upgrade() {
 				/usr/bin/chakra-update-icons
 			fi
 
+			if [ "$UPDATE_GLOBAL_CONFIG" = "yes" ]; then
+				/usr/bin/chakra-update-sycoca
+			fi
+
+			if [ "$UPDATE_USER_CONFIG" = "yes" ]; then
+				/usr/bin/chakra-update-user-sycoca
+			fi
 		else
 			echo " > WARNING"
 			echo "   The package kde-common seems not to be installed,"
@@ -49,6 +63,13 @@ post_remove() {
 				/usr/bin/chakra-update-icons
 			fi
 
+			if [ "$UPDATE_GLOBAL_CONFIG" = "yes" ]; then
+				/usr/bin/chakra-update-sycoca
+			fi
+
+			if [ "$UPDATE_USER_CONFIG" = "yes" ]; then
+				/usr/bin/chakra-update-user-sycoca
+			fi
 		else
 			echo " > WARNING"
 			echo "   The package kde-common seems not to be installed,"

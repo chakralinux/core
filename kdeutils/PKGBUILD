@@ -29,14 +29,13 @@ pkgname=('kdeutils-common'
          'kdeutils-kgpg'
          'kdeutils-ktimer'
          'kdeutils-kwallet'
-         'kdeutils-okteta'
 	 'kdeutils-printer-applet'
          'kdeutils-superkaramba'
          'kdeutils-sweeper')
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -48,7 +47,7 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}"
              "kdepimlibs>=${_kdever}" "kdebase>=${_kdever}"
              "kdebase-workspace>=${_kdever}" "kdebindings-python>=${_kdever}"
              'system-config-printer-common' 'libarchive' 'qimageblitz'
-             'p7zip' 'zip' 'unzip' 'unrar') # "kdepim-runtime>=${_kdever}" 
+             'p7zip' 'zip' 'unzip' 'unrar') # "kdepim-runtime>=${_kdever}"
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2)
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -60,9 +59,6 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
-
-#	msg "applying patches ..."
-
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -275,22 +271,6 @@ package_kdeutils-kwallet()
 	install=${_origname}.install
 
 	splitdirs="kwallet"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdeutils-okteta()
-{
-	pkgdesc="Okteta is a simple editor for the raw data of files, also known as a hex editor."
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-okteta")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
-
-	splitdirs="okteta"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
