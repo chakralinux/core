@@ -13,6 +13,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgbase=('phonon-backend')
 
 pkgname=('phonon-backend-gstreamer'
+	'phonon-backend-xine'
 	'phonon-backend-mplayer'
 	'phonon-backend-vlc')
 
@@ -38,15 +39,26 @@ makedepends=("qt>=${_qtver}"
 	'libpulse'
 	"phonon>=${_pkgver}")
 
-source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.bz2")
+source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.bz2"
+        "http://download.kde.org/stable/phonon/phonon-backend-xine/${pkgver}/src/phonon-backend-xine-${pkgver}.tar.bz2")
 
-md5sums=('fa313a77db3da9df20bc8991352378cb')
+
+
+md5sums=('fa313a77db3da9df20bc8991352378cb'
+         'b127104e67538e573adeed3b2fb3bf55')
 
 build() {
 	cd ${srcdir}
 	mkdir -p build-phonon-gst
 	cd build-phonon-gst
 	cmake ../phonon-backend-gstreamer-${pkgver} \
+		 -DCMAKE_BUILD_TYPE=Release \
+		 -DCMAKE_INSTALL_PREFIX=/usr
+	make
+	cd ${srcdir}
+	mkdir -p build-phonon-xine
+	cd build-phonon-xine
+	cmake ../phonon-backend-xine-${pkgver} \
 		 -DCMAKE_BUILD_TYPE=Release \
 		 -DCMAKE_INSTALL_PREFIX=/usr
 	make
@@ -63,6 +75,20 @@ package_phonon-backend-gstreamer()
 	replaces=('phonon-gstreamer')
 
 	cd ${srcdir}/build-phonon-gst
+	make DESTDIR=${pkgdir} install
+}
+
+package_phonon-backend-xine()
+{
+	url="http://phonon.kde.org"
+	pkgdesc="Phonon Xine backend"
+	license=('LGPL')
+	depends=('xine-lib' "phonon>=${_pkgver}")
+	groups=("kde-complete" "kde-uninstall")
+	conflicts=('phonon-xine')
+	replaces=('phonon-xine')
+
+	cd ${srcdir}/build-phonon-xine
 	make DESTDIR=${pkgdir} install
 }
 
