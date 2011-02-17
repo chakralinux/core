@@ -10,8 +10,9 @@
 #
 
 pkgname=linux-firmware
-pkgver=20101228
-pkgrel=2
+pkgver=20110125
+_header=2fab483
+pkgrel=1
 pkgdesc="Firmware files for Linux"
 arch=('any')
 url="http://git.kernel.org/?p=linux/kernel/git/dwmw2/linux-firmware.git;a=summary"
@@ -43,12 +44,12 @@ replaces=('kernel26-firmware'
            'rt2x00-rt61-fw'
            'rt2x00-rt71w-fw')
 options=(!strip)
-source=(http://chakra-project.org/sources/linux-firmware/$pkgname-$pkgver.tar.xz
+source=(http://chakra-project.org/sources/linux-firmware/$pkgname-$pkgver.tar.gz
         http://www.kernel.org/pub/linux/kernel/people/mcgrof/firmware/ar9170/ar9170.fw)
-sha256sums=('489dd4c607826ef9c15fa9befcff7a97b59c3c1d23670e9d330962c8935c8a44'
+sha256sums=('9585b5858d1e54c9732d08b06ae8fd1cb99ad1615660ab9bd592a32b7ad7e299'
             '1b379c5a8d6ab3a43911f7949d6306fe2dae3afb1368be5452a8fc7d9c54e0a0')
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${_header}"
 
   install -d -m755 "${pkgdir}/lib/firmware"
   cp -a * "${pkgdir}/lib/firmware/"
