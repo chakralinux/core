@@ -6,12 +6,12 @@
 
 pkgname=acerhk
 pkgver=0.5.35
-pkgrel=7
+pkgrel=8
 pkgdesc="Acer hotkey driver"
 url="http://www.cakey.de/acerhk/"
 arch=('i686') # Unavailable for x86_64
 license=('GPL')
-depends=('kernel26')
+depends=('kernel26>=2.6.38rc5')
 makedepends=('kernel26-headers')
 source=(http://www.cakey.de/acerhk/archives/${pkgname}-${pkgver}.tgz acerhk.rc
         2.6.30.patch kernelversion.patch 2.6.36.patch)
@@ -22,6 +22,9 @@ _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   sed -i 's/CFLAGS/EXTRA_CFLAGS/' Makefile
+  sed \
+    -e  's~#include <linux/config.h>~~g' \
+    -i acerhk.c
   patch -Np1 -i "${srcdir}/2.6.30.patch" || return 1
   patch -Np0 -i "${srcdir}/2.6.36.patch" || return 1
   patch -N -p1 < "$srcdir/kernelversion.patch" || return 1
