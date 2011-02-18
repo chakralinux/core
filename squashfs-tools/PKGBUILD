@@ -7,7 +7,7 @@
 pkgname=squashfs-tools
 pkgver=4.1
 _gitcheckout=20101231
-pkgrel=1
+pkgrel=2
 pkgdesc="Tools for squashfs, a highly compressed read-only filesystem for Linux."
 url="http://squashfs.sourceforge.net"
 license=("GPL")
@@ -22,6 +22,8 @@ build() {
     sed -i -e 's/BUFFER_DEFAULT [0-9]*/BUFFER_DEFAULT 32/' ${srcdir}/squashfs-${pkgver}-${_gitcheckout}/${pkgname}/unsquashfs.h
     sed -i 's|^#XZ_SUPPORT = 1|XZ_SUPPORT = 1|' Makefile
     sed -i 's|^#LZO_SUPPORT = 1|LZO_SUPPORT = 1|' Makefile
+    #set xz as default
+    sed -i 's|^COMP_DEFAULT = gzip|COMP_DEFAULT = xz|' Makefile
     make
 }
 
