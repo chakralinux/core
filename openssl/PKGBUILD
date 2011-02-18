@@ -4,14 +4,11 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=openssl
-_ver=1.0.0a
+_ver=1.0.0d
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=2
+pkgrel=1
 pkgdesc='The Open Source toolkit for Secure Sockets Layer and Transport Layer Security'
 arch=('i686' 'x86_64')
 url='https://www.openssl.org'
@@ -24,8 +21,8 @@ source=("https://www.openssl.org/source/${pkgname}-${_ver}.tar.gz"
         'fix-manpages.patch'
         'no-rpath.patch'
         'ca-dir.patch')
-md5sums=('e3873edfffc783624cfbdb65e2249cbd'
-         'f540cd9e0e3047d589d0581fe7a2d0f2'
+md5sums=('40b6ea380cc8a5bf9734c2f8bf7e701e'
+         '5bbc0655bda2af95bc8eb568963ce8ba'
          'dc78d3d06baffc16217519242ce92478'
          '3bf51be3a1bbd262be46dc619f92aa90')
 
@@ -34,21 +31,21 @@ build() {
 
 	# avoid conflicts with other man pages
 	# see http://www.linuxfromscratch.org/patches/downloads/openssl/
-	patch -p0 -i $srcdir/fix-manpages.patch || return 1
+	patch -p1 -i $srcdir/fix-manpages.patch
 	# remove rpath: http://bugs.archlinux.org/task/14367
-	patch -p0 -i $srcdir/no-rpath.patch || return 1
+	patch -p0 -i $srcdir/no-rpath.patch
 	# set ca dir to /etc/ssl by default
-	patch -p0 -i $srcdir/ca-dir.patch || return 1
+	patch -p0 -i $srcdir/ca-dir.patch
 	# mark stack as non-executable: http://bugs.archlinux.org/task/12434
 	./config --prefix=/usr --openssldir=/etc/ssl --libdir=lib \
-		shared zlib enable-md2 -Wa,--noexecstack || return 1
+		shared zlib enable-md2 -Wa,--noexecstack
 
-	make || return 1
+	make
 
 	# the test fails due to missing write permissions in /etc/ssl
 	# revert this patch for make test
 	#patch -p0 -R -i $srcdir/ca-dir.patch
-	#make test || return 1
+	#make test
 	#patch -p0 -i $srcdir/ca-dir.patch
 }
 
