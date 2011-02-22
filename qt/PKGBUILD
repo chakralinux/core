@@ -63,7 +63,7 @@ source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
 	'linguist.desktop'
 	'qtconfig.desktop'
 	'http://chakra-project.org/sources/qt/qt-any-demosexamples-manual-install.patch'
-	"http://chakra-project.org/sources/qt/qt-any-appmenu-${pkgver}.patch")
+	"http://chakra-project.org/sources/qt/qt-4.7.0-appmenu.patch")
 
 md5sums=('6f88d96507c84e9fea5bf3a71ebeb6d7'
          'cc361e2dff48a56cff9a1649cfc004b2'  #  kde-qt-b427b5e64483612122e56104552a9704f6013680.patch.gz
@@ -72,7 +72,7 @@ md5sums=('6f88d96507c84e9fea5bf3a71ebeb6d7'
          'a9bfeeffab8ba103bc8153fdb31474a1'
          '83b2a4aece6c9d86301c53a979af0b63'
          '579e63488320a8d692d25502551787af'
-         '9458362dac9e59871c908addc915c118')
+         'dba7f852bce6e1ebd78f6a78f9979c68')
 
 # source PKGBUILD && _create-kdeqt-patch
 _create-kdeqt-patch() {
@@ -110,7 +110,7 @@ build() {
 
 	msg "apply other patches"
 	# apply appmenu patch from Aurelien Gateau
-	patch -Np1 -i ${srcdir}/qt-any-appmenu-${pkgver}.patch || return 1
+	patch -Np1 -i ${srcdir}/qt-4.7.0-appmenu.patch || return 1
 
 	# we want our cflags etc
         sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
