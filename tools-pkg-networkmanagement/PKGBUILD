@@ -4,46 +4,27 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
-
-#
-# package info
-#
-pkgname=('networkmanagement')
-         
-arch=('i686' 'x86_64')
-pkgver=1193251
+pkgname=networkmanagement
+pkgver=git20110126
 pkgrel=1
-
-pkgdesc="KDE SC networkmanager plasmoid"
-url="http://plasma.kde.org"
+pkgdesc="KDE4 Network Management and plasmoid"
+arch=('i686' 'x86_64')
+url="http://www.kde.org/"
 license=('GPL')
+depends=('kdebase-workspace' 'networkmanager')
+makedepends=('cmake' 'python2' 'automoc4')
+optdepends=('mobile-broadband-provider-info: allow to add new mobile connection')
+provides=('knetworkmanagement')
+conflicts=('networkmanager-plasmoid-svn' 'kdeplasma-applets-networkmanager')
+replaces=('networkmanager-plasmoid-svn' 'kdeplasma-applets-networkmanager')
+install=${pkgname}.install
+#git clone git://anongit.kde.org/networkmanagement.git
+source=("http://chakra-project.org/sources/networkmanagement/networkmanagement-${pkgver}.tar.xz")
+md5sums=('f52a100b064527eca7b83086605dbee0')
 
-options=('force')
-
-depends=("kdelibs>=${_kdever}" "kdebase-workspace>=${_kdever}" 'networkmanager>=0.8.2')
-makedepends=('subversion' 'cmake' 'python' 'automoc4')
-replaces=('networkmanagement-networkmanager-plasmoid' 'networkmanagement-knetworkmanager-kde4')
-
-# comment out when using stable snapshot
-#_svntrunk=svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement
-#_svnmod=networkmanagement
-
-
-#
-# build function
-#
 build() {
-cd "$srcdir"
-
-	# comment out when using stable snapshot
-	#svn co $_svntrunk $_svnmod --revision $pkgver
-	svn co svn://anonsvn.kde.org/home/kde/trunk/extragear/base/networkmanagement --revision $pkgver
-	msg "SVN checkout done or server timeout"
-
-	mkdir -p $srcdir/build
+  cd ${srcdir}
+  	mkdir -p $srcdir/build
 	cd $srcdir/build
 	
 	cmake ../networkmanagement -DCMAKE_INSTALL_PREFIX=${_installprefix} \
