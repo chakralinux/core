@@ -1,0 +1,15 @@
+post_upgrade() {
+  KERNEL_VERSION='2.6.35-CHAKRA-LTS'
+  depmod -ae $KERNEL_VERSION > /dev/null 2>&1 
+}
+
+post_install() {
+	cat <<EOF
+==> If the modules do not load at boot, add to your /etc/rc.conf:
+==> MODULES=(lib80211 wl !b43 !ssb ...)
+==>
+==> If you have problems with interfaces swapped, read:
+==> http://wiki.archlinux.org/index.php/Broadcom_BCM4312#Interfaces_swapped_every_time
+EOF
+	post_upgrade
+}
