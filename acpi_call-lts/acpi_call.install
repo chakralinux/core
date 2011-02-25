@@ -1,0 +1,24 @@
+post_install() {
+  KERNEL_VERSION='2.6.35-CHAKRA-LTS'
+  depmod $KERNEL_VERSION > /dev/null 2>&1 
+  echo ""
+  echo "[+] modprobe acpi_call"
+  echo ">>> run /usr/bin/test_off.sh to test/view different acpi_call functions to see if it disables your secondary/hybrid video card"
+}
+
+post_upgrade() {
+  KERNEL_VERSION='2.6.35-CHAKRA-LTS'
+  depmod $KERNEL_VERSION > /dev/null 2>&1 
+  echo ""
+  echo "[+] modprobe acpi_call"
+  echo ">>> run /usr/bin/test_off.sh to test/view different acpi_call functions to see if it disables your secondary/hybrid video card"
+}
+
+post_remove() {
+  KERNEL_VERSION='2.6.35-CHAKRA-LTS'
+  depmod $KERNEL_VERSION > /dev/null 2>&1 
+}
+
+op=$1
+shift
+$op $*
