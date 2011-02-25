@@ -1,0 +1,17 @@
+post_install() {
+	KERNEL_VERSION='2.6.35-CHAKRA-LTS'
+	depmod $KERNEL_VERSION
+        mkdir -p /etc/modprobe.d
+        echo "blacklist nouveau" > /etc/modprobe.d/nouveau_blacklist.conf
+
+}
+
+post_upgrade() {
+	post_install
+	rmmod nvidia || echo 'In order to use the new nvidia module, exit Xserver and unload it manually.'
+}
+
+post_remove() {
+	KERNEL_VERSION='2.6.35-CHAKRA-LTS'
+	depmod $KERNEL_VERSION
+}
