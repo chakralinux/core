@@ -28,7 +28,7 @@ get_file() {
   cd ${OPWD}
 }
 
-source ../_buildscripts/core-testing-${_arch}-makepkg.conf
+source ../_buildscripts/core-${_arch}-makepkg.conf
 source PATCHCFG
 
 export SRCNAME
@@ -52,6 +52,8 @@ for p in ${PATCHES[@]}; do
 done
 
 post_apply
+
+rm -v $(find . -type f -name '*.orig')
 
 cd ${startdir}/src
 diff -Nur ${SRCORIG} ${SRCNAME} > $startdir/${PATCHNAME}
