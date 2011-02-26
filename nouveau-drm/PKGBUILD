@@ -11,7 +11,7 @@ pkgname=nouveau-drm
 _snapdate=20110110
 pkgver=0.0.16_${_snapdate} # see master/drivers/gpu/drm/nouveau/nouveau_drv.h for version
 _kernver='2.6.37-CHAKRA'
-pkgrel=1
+pkgrel=2
 pkgdesc="nvidia opensource X driver"
 arch=('i686' 'x86_64')
 url="http://nouveau.freedesktop.org/"
@@ -29,12 +29,10 @@ source=(http://chakra-project.org/sources/nouveau-drm/nouveau-drm-${_snapdate}.t
 	Makefile)
 md5sums=('562240412d9688fe620950b6f47994cf'
          '948f121d9fbbbaed0d06cb7fa1c9c5b7')
-conflicts=('nouveau-drm')
-replaces=('nouveau-drm')
 
 build() {
   cd ${srcdir}/master
-  mkdir nouveau
+  mkdir -p nouveau
   cp $srcdir/Makefile ${srcdir}/master/nouveau/
   cd nouveau
   make LINUXDIR=/lib/modules/${_kernver}/build DRM_MODULES="nouveau" || return 1
