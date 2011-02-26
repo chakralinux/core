@@ -4,26 +4,41 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=xf86-video-siliconmotion
-pkgver=1.7.4
-pkgrel=2
+pkgver=1.7.4.99
+pkgrel=1
 pkgdesc="X.org siliconmotion video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
 makedepends=('xorg-server')
-conflicts=('xorg-server<1.9.1')
+conflicts=('xorg-server<1.10.0')
 options=('!libtool')
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('3c0fd42fbd301e66104e4b9190796d102a034787')
+#source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+#sha1sums=('3c0fd42fbd301e66104e4b9190796d102a034787')
+source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
+md5sums=("a7f119d2380618f340e9c1880eb9fbad") #  xf86-video-siliconmotion-1.7.4.99-1.tar.xz
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf ${pkgname}
+	  git clone git://anongit.freedesktop.org/xorg/driver/${pkgname}
+	  rm -vRf ${pkgname}/.git
+	  pushd ${pkgname}
+	  popd
+	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz ${pkgname}/*
+	  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  #cd "${srcdir}/${pkgname}-${pkgver}"
+
+  # enable on git version
+  cd ${srcdir}/${pkgname}
+  autoreconf -v --install
   ./configure --prefix=/usr
   make
   make DESTDIR="${pkgdir}" install
