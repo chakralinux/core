@@ -8,7 +8,7 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xf86-video-ati
-pkgver=6.14.0
+pkgver=6.14.0.99
 pkgrel=1
 pkgdesc="X.org ati video driver"
 arch=(i686 x86_64)
@@ -16,12 +16,13 @@ url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=(libpciaccess libdrm udev pixman ati-dri)
 makedepends=('xorg-server' 'libdrm' 'xf86driproto' 'mesa')
-conflicts=('xorg-server<1.9.4')
+conflicts=('xorg-server<1.10.0')
 groups=('xorg-video-drivers')
 options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-#source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
-md5sums=('b64bf8939f9f8fb518baf858f8b6ca73')
+source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
+md5sums=("f2651e27aed68807218b73fa13a203c9") #  xf86-video-ati-6.14.0.99-1.tar.xz
+#md5sums=('b64bf8939f9f8fb518baf858f8b6ca73')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -42,8 +43,8 @@ build()
 
     msg "Starting make for: ${pkgname}"
     
-#    cd ${srcdir}/${pkgname}
-    cd ${srcdir}/${pkgname}-${pkgver}
+    cd ${srcdir}/${pkgname}
+#    cd ${srcdir}/${pkgname}-${pkgver}
         
     msg "Starting configure..."
 
@@ -63,8 +64,8 @@ build()
 package()
 
 {
-#    cd ${srcdir}/${pkgname}
-    cd ${srcdir}/${pkgname}-${pkgver}
+    cd ${srcdir}/${pkgname}
+#    cd ${srcdir}/${pkgname}-${pkgver}
     make DESTDIR=${pkgdir} install 
  
     msg "Copying license..."
