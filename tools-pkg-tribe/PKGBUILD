@@ -24,7 +24,7 @@ options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
         "http://chakra-project.org/sources/tribe/RELEASE_NOTES_TB110222.html")
   
-md5sums=('c48ee70c9c3081803cf09bed4d48ea70'
+md5sums=('89e6ea99c68f036a58ad2c98a6d8d36e'
          'a319d3fcfbe6fdf312cdeec1bfbff90b')
          
 groups=('kde-uninstall')
@@ -54,7 +54,7 @@ build()
 
 	# patches
 	#patch -Np1 -i ${srcdir}/oops.patch || return 1
-	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
+	patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
 
 	# remove unsupported pkgs for x64
 	if [ "${CARCH}" = "x86_64" ]; then

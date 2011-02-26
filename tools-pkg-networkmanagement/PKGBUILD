@@ -4,36 +4,65 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgname=networkmanagement
-pkgver=git20110126
-pkgrel=1
-pkgdesc="KDE4 Network Management and plasmoid"
-arch=('i686' 'x86_64')
-url="http://www.kde.org/"
-license=('GPL')
-depends=('kdebase-workspace' 'networkmanager')
-makedepends=('cmake' 'python2' 'automoc4')
-optdepends=('mobile-broadband-provider-info: allow to add new mobile connection')
-provides=('knetworkmanagement')
-conflicts=('networkmanager-plasmoid-svn' 'kdeplasma-applets-networkmanager')
-replaces=('networkmanager-plasmoid-svn' 'kdeplasma-applets-networkmanager')
-install=${pkgname}.install
-#git clone git://anongit.kde.org/networkmanagement.git
-source=("http://chakra-project.org/sources/networkmanagement/networkmanagement-${pkgver}.tar.xz")
-md5sums=('f52a100b064527eca7b83086605dbee0')
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
+
+#
+# package info
+#
+pkgname=('networkmanagement')
+         
+arch=('i686' 'x86_64')
+pkgver=20110226
+pkgrel=1
+
+pkgdesc="KDE SC networkmanager plasmoid"
+url="http://plasma.kde.org"
+license=('GPL')
+
+options=('force')
+
+depends=("kdelibs>=${_kdever}" "kdebase-workspace>=${_kdever}" 'networkmanager>=0.8.2')
+makedepends=('subversion' 'cmake' 'python' 'automoc4')
+replaces=('networkmanagement-networkmanager-plasmoid' 'networkmanagement-knetworkmanager-kde4')
+
+install=${pkgname}.install
+source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz"
+md5sums=('826923cde4d9904dd8a6750beac98e39') # networkmanagement-20110226.tar.xz
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf ${pkgname}
+	  git clone git://anongit.kde.org/${pkgname}
+	  cd ${pkgname}
+	  git checkout ${pkgver}
+	  cd ..
+	  rm -vRf ${pkgname}/.git
+	  pushd ${pkgname}
+	  popd
+	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
+	  md5sum ${pkgname}-${pkgver}.tar.xz
+}
+
+#
+# build function
+#
 build() {
-  cd ${srcdir}
-  	mkdir -p $srcdir/build
+	mkdir -p $srcdir/build
 	cd $srcdir/build
 	
-	cmake ../networkmanagement -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+	cmake ../${pkgname} -DCMAKE_INSTALL_PREFIX=${_installprefix} \
 			  -DDBUS_SYSTEM_POLICY_DIR=/etc/dbus-1/system.d \
 			  -DCMAKE_BUILD_TYPE=${_build_type} \
 			  -DCMAKE_SKIP_RPATH=ON \
 			  -DINSTALL_KNM_AUTOSTART=OFF \
 			  -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 	make || return 1
-	
+}
+
+package() {
+	cd $srcdir/build
 	make DESTDIR=${pkgdir} install || return 1
 }
