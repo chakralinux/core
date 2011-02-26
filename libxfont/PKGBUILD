@@ -4,27 +4,24 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=libxfont
-pkgver=1.4.2
+pkgver=1.4.3
 pkgrel=1
 pkgdesc="X11 font rasterisation library"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('libfontenc>=1.0.5' 'freetype2>=2.3.9' 'fontsproto>=2.1.0')
-makedepends=('pkgconfig' 'xtrans' 'fontcacheproto' 'xproto')
+depends=('freetype2' 'libfontenc' 'xproto' 'fontsproto')
+makedepends=('xorg-util-macros' 'xtrans')
 options=('!libtool')
 source=(${url}/archive/individual/lib/libXfont-${pkgver}.tar.bz2)
-md5sums=('503911759734998f9235b926eed82eb8')
+sha1sums=('191b40c566f80737cf6838747d86ebaee7b0c7d7')
 
 build() {
   cd "${srcdir}/libXfont-${pkgver}"
-  ./configure --prefix=/usr --sysconfdir=/etc --disable-static || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr --sysconfdir=/etc --disable-static
+  make
+  make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
