@@ -9,23 +9,23 @@
 #
 pkgname=tribe
 pkgver=2011.03
-pkgrel=0.20110222
+pkgrel=0.20110301
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.6.0' 'squashfs-tools' 'partitionmanager>=1196188-2'
+depends=('kdelibs' 'kdeedu-marble>=4.6.1' 'squashfs-tools' 'partitionmanager>=1216949'
         'cinstall>=0.3.50' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.0' 'kdebase-workspace')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.1' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_TB110222.html")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_TB110301.html")
   
-md5sums=('89e6ea99c68f036a58ad2c98a6d8d36e'
-         'a319d3fcfbe6fdf312cdeec1bfbff90b')
+md5sums=('72ec4aeb2a422fd13cb06c00d644e549'
+         '9edec8f7e13dc1f0a5dedb0807844eea')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -54,7 +54,7 @@ build()
 
 	# patches
 	#patch -Np1 -i ${srcdir}/oops.patch || return 1
-	patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
+	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
 
 	# remove unsupported pkgs for x64
 	if [ "${CARCH}" = "x86_64" ]; then
@@ -81,7 +81,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_TB110222.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_TB110301.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
