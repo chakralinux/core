@@ -16,8 +16,8 @@ pkgname=('qt'
          'qt-demos'
          'qt-tools')
 
-pkgver=4.7.1
-pkgrel=2
+pkgver=4.7.2
+pkgrel=1
 kdeqtver=b427b5e64483612122e56104552a9704f6013680
 
 pkgdesc="A cross-platform application and UI framework"
@@ -63,7 +63,7 @@ source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
 	'linguist.desktop'
 	'qtconfig.desktop'
 	'http://chakra-project.org/sources/qt/qt-any-demosexamples-manual-install.patch'
-	"http://chakra-project.org/sources/qt/qt-4.7.0-appmenu.patch")
+	"http://chakra-project.org/sources/qt/qt-4.7.2-appmenu.patch")
 
 md5sums=('6f88d96507c84e9fea5bf3a71ebeb6d7'
          'cc361e2dff48a56cff9a1649cfc004b2'  #  kde-qt-b427b5e64483612122e56104552a9704f6013680.patch.gz
@@ -103,14 +103,15 @@ build() {
 	cd $srcdir/$_pkgfqn
 	msg "applying kde-qt patches"
 	cd $srcdir/$_pkgfqn
-	patch -p1 -i $srcdir/kde-qt-${kdeqtver}.patch || return 1
+	patch -p1 -i $srcdir/kde-qt-${kdeqtver}.patch
 	# editing qt.install
 	sed -i -e 's/^.*> Qt .*/        echo " > Qt '${pkgver}'"/' $startdir/qt.install
 	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
 
 	msg "apply other patches"
 	# apply appmenu patch from Aurelien Gateau
-	patch -Np1 -i ${srcdir}/qt-4.7.0-appmenu.patch || return 1
+	patch -Np1 -i ${srcdir}/qt-4.7.2-appmenu.patch
+	cp ${srcdir}/${_pkgfqn}/src/gui/widgets/qabstractmenubarimpl_p.h ${srcdir}/${_pkgfqn}/include/QtGui/private/
 
 	# we want our cflags etc
         sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
@@ -153,13 +154,13 @@ build() {
 		-no-gtkstyle \
 		-opengl \
 		-glib \
-		-ptmalloc || return 1
+		-ptmalloc
 
 	# disable automatic installation of demos and examples, we want to do that manually
-	patch -p0 -i $srcdir/qt-any-demosexamples-manual-install.patch || return 1
+	patch -p0 -i $srcdir/qt-any-demosexamples-manual-install.patch
 
 	msg "starting the build"
-	make || return 1
+	make
 }
 
 package_qt()
@@ -179,7 +180,7 @@ package_qt()
 	cd $srcdir/$_pkgfqn
 
 	# install it
-	make INSTALL_ROOT=$pkgdir install || return 1
+	make INSTALL_ROOT=$pkgdir install
 
 	# cleanup and path fixes
 	find $pkgdir/usr/lib -type f -name '*prl' -print -exec sed -i -e "/^QMAKE_PRL_BUILD_DIR/d" {} \;
@@ -253,11 +254,11 @@ package_qt-demos()
 	cd $srcdir/$_pkgfqn
 
 	pushd demos
-	make INSTALL_ROOT=$pkgdir install || return 1
+	make INSTALL_ROOT=$pkgdir install
 	popd
     
 	pushd examples
-	make INSTALL_ROOT=$pkgdir install || return 1
+	make INSTALL_ROOT=$pkgdir install
 	popd
 }
 
