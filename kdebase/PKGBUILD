@@ -27,7 +27,7 @@ pkgname=('kdebase'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -41,19 +41,17 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 	http://kde-apps.org/CONTENT/content-files/99752-kde_cdemu-0.3.tar.gz
 #	01_dolphin_add_toolbar_buttons.patch
 	02_dolphin_properties.patch
-	03_konsole_defaults.patch
+	03_konsole_defaults.patch)
 #	04_konq_scan_nsplugins_at_startup.patch)
 #	feature_user-image-from-webcam.patch)
-        http://chakra-project.org/sources/kdebase/konsole-kde46-20110227.patch.tar.gz)
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
          'f98c26deff86b32a26e0238896d49382' # 99752-kde_cdemu-0.3.tar.gz
 #         '12d902dd5d090b146676231c5163bc4f' # 01_dolphin_add_toolbar_buttons.patch
          '92a47ed820a541b34dd220e1da5649b7' # 02_dolphin_properties.patch
-         '8ab6f508a4e04517dd51ac3ab2eb01ef' # 03_konsole_defaults.patch
+         '8ab6f508a4e04517dd51ac3ab2eb01ef') # 03_konsole_defaults.patch
 #         'a8dc0bddce464af5846ac722007e0b59') # 04_konq_scan_nsplugins_at_startup.patch
 #         '52cfd4456f8ec830b8d49c8aaa40b539') # feature_user-image-from-webcam.patch
-          'eb22843058c44409ef2cf6adb381e222') # konsole-kde46-20110227.patch.tar.gz
 
 
 #
@@ -82,9 +80,6 @@ build()
 #	patch -Np1 -i ${srcdir}/04_konq_scan_nsplugins_at_startup.patch || return 1
 # disabled - needs opencv which depends on gtk2
 #	patch -Np1 -i ${srcdir}/feature_user-image-from-webcam.patch || return 1
-
-        msg "applying temp git patches"
-        patch -Np0 -i ${srcdir}/konsole-kde46-20110227.patch || return 1
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
