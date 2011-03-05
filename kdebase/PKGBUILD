@@ -27,7 +27,7 @@ pkgname=('kdebase'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -54,7 +54,6 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #         '52cfd4456f8ec830b8d49c8aaa40b539') # feature_user-image-from-webcam.patch
 
 
-
 #
 # build function
 #
@@ -75,12 +74,12 @@ build()
 	fi
 
 	msg "applying main patchset ..."
-#	patch -Np1 -i ${startdir}/01_dolphin_add_toolbar_buttons.patch || return 1
-	patch -Np1 -i ${startdir}/02_dolphin_properties.patch || return 1
-	patch -Np1 -i ${startdir}/03_konsole_defaults.patch || return 1
-#	patch -Np1 -i ${startdir}/04_konq_scan_nsplugins_at_startup.patch || return 1
+#	patch -Np1 -i ${srcdir}/01_dolphin_add_toolbar_buttons.patch || return 1
+	patch -Np2 -i ${srcdir}/02_dolphin_properties.patch || return 1
+	patch -Np2 -i ${srcdir}/03_konsole_defaults.patch || return 1
+#	patch -Np1 -i ${srcdir}/04_konq_scan_nsplugins_at_startup.patch || return 1
 # disabled - needs opencv which depends on gtk2
-#	patch -Np1 -i ${startdir}/feature_user-image-from-webcam.patch || return 1
+#	patch -Np1 -i ${srcdir}/feature_user-image-from-webcam.patch || return 1
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -100,14 +99,14 @@ package_kdebase()
 {
 	pkgdesc="KDE Base Applications"
 	depends=("kdebase-runtime>=${_kdever}" 'libraw1394') # 'opencv'
-	optdepends=("cdemu-client: Support transparent CD/DVD image mounting in KDE")
+	optdepends=("cdemu-client: Support transparent CD/DVD image mounting in KDE, kdebase-konqueror: To configure network for kde applications")
 	conflicts=("kdemod-${_origname}")
 	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
 	install=${_origname}.install
 
 	splitdirs="kdepasswd kdialog keditbookmarks kfind lib nsplugins plasma" #kinfocenter 
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 		
@@ -124,11 +123,11 @@ package_kdebase()
 	rm -rf ${pkgdir}/usr/share/applications/kde4/kde_cdemu.desktop
 
 	# include our patches into the package
-	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
+	ls -1 ${srcdir}/*.patch &>/dev/null 2>&1
 	if [ "$?" = "0" ]; then
 		warning "incuding patches into package"
 		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
-		for i in ${startdir}/*.patch; do
+		for i in ${srcdir}/*.patch; do
 			msg "$i"
 			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
 		done
@@ -145,7 +144,7 @@ package_kdebase-doc()
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -160,7 +159,7 @@ package_kdebase-dolphin()
 
 	splitdirs="dolphin"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -175,7 +174,7 @@ package_kdebase-konqueror()
 
 	splitdirs="konqueror"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -190,7 +189,7 @@ package_kdebase-konsole()
 
 	splitdirs="konsole"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -205,7 +204,7 @@ package_kdebase-kwrite()
 
 	splitdirs="kwrite"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/apps/${i}
+			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
