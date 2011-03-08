@@ -21,7 +21,7 @@ pkgname=('koffice-common'
 	'koffice-krita'
         'koffice-doc')
 
-pkgver=2.3.0
+pkgver=2.3.3
 pkgrel=1
 arch=('i686' 'x86_64')
 url='http://koffice.kde.org'
@@ -30,14 +30,16 @@ depends=('fftw')
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'eigen' 'lcms' 'lcms2' \
   'kdelibs' 'gsl' 'qca' 'glew' 'qimageblitz' 'libgsf' 'libspnav' \
   'kdepimlibs' 'pstoedit' 'wv2' 'poppler-qt' 'libwpd' 'libwpg' 'openexr' \
-  'kdegraphics-common' 'sqlite3' 'libpqxx' 'create-resources' 'freetds') # 'opengtl'
+  'kdegraphics-common' 'sqlite3' 'libpqxx' 'create-resources' 'freetds' 'docbook-xsl') # 'opengtl'
 groups=('koffice')
-source=("http://download.kde.org/stable/${pkgbase}-${pkgver}/${pkgbase}-${pkgver}.tar.bz2")
-md5sums=('4f99a44b004e4a237890e0834a09964b')
+source=("ftp://ftp.kde.org/pub/kde/stable/${pkgbase}-${pkgver}/${pkgbase}-${pkgver}.tar.bz2")
+sha256sums=('31ba0d98c0d29c7b8ab97efdeb6c618b82177b2b0ec85da088178254da43c099')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 	
 build() {
 	cd ${srcdir}
+
+        #patch -Np1 -i "${srcdir}/kde4-koffice-libwpg02.patch"
 
 	mkdir -p build
 	cd build
