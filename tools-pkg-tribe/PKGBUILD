@@ -8,24 +8,24 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.02
-pkgrel=1
+pkgver=2011.03
+pkgrel=0.20110301
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.6.0' 'squashfs-tools' 'partitionmanager>=1196188-2'
+depends=('kdelibs' 'kdeedu-marble>=4.6.1' 'squashfs-tools' 'partitionmanager>=1216949'
         'cinstall>=0.3.50' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.0' 'kdebase-workspace')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.1' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg')
-source=("http://chakra-project.org/sources/tribe/tribe-0.3.70-2.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201102.html")
- 
-md5sums=('fcd1ea5d2648d1055a12f65c0d2ada8f'
-         '19e3a9d97f967d870b9baa8a6356d09d')
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_TB110301.html")
+  
+md5sums=('72ec4aeb2a422fd13cb06c00d644e549'
+         '9edec8f7e13dc1f0a5dedb0807844eea')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -35,6 +35,9 @@ install=tools-tribe.install
 mksource() {
 	  rm -vRf tribe
 	  git clone git://gitorious.org/chakra/tribe.git
+	  cd ${pkgname}
+	  git checkout ${pkgver}
+	  cd ..
 	  rm -vRf tribe/.git
 	  pushd ${pkgname}
 	  popd
@@ -49,6 +52,10 @@ build()
 {
         cd "${srcdir}/$pkgname"
 
+	# patches
+	#patch -Np1 -i ${srcdir}/oops.patch || return 1
+	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
+
 	# remove unsupported pkgs for x64
 	if [ "${CARCH}" = "x86_64" ]; then
 	    rm -v ${srcdir}/$pkgname/data/appIcons/wine.png
@@ -58,8 +65,8 @@ build()
 	fi
 
 	# add pkgver to tribe
-	sed -i -e "s~source build/from git~Build: ${pkgver}-${pkgrel} (Cyrus)~g" config-tribe.h.cmake
-	sed -i -e "s~git-checkout~${pkgver}~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
+	sed -i -e "s~source build/from git~Build: ${pkgver} (Testbuild)~g" config-tribe.h.cmake
+	sed -i -e "s~git-checkout~${pkgver}-${pkgrel}~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_SKIP_RPATH=ON \
@@ -74,7 +81,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_201102.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_TB110301.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
