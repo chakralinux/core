@@ -8,24 +8,25 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.03
-pkgrel=0.20110301
+pkgver=2011.04
+pkgrel=milestone.3
+_codename=Aida
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.6.1' 'squashfs-tools' 'partitionmanager>=1216949'
-        'cinstall>=0.3.50' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
+depends=('kdelibs' 'kdeedu-marble>=4.6.1' 'squashfs-tools' 'partitionmanager>=1216949-2'
+        'cinstall>=0.3.58' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.1' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_TB110301.html")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS3.html")
   
-md5sums=('72ec4aeb2a422fd13cb06c00d644e549'
-         '9edec8f7e13dc1f0a5dedb0807844eea')
+md5sums=('4a7a90164b232d04c6751a48d51ecad3'
+         '240c4337499e66b07c5f54644ffa0df2')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -36,7 +37,7 @@ mksource() {
 	  rm -vRf tribe
 	  git clone git://gitorious.org/chakra/tribe.git
 	  cd ${pkgname}
-	  git checkout ${pkgver}
+	  git checkout 2011.03
 	  cd ..
 	  rm -vRf tribe/.git
 	  pushd ${pkgname}
@@ -65,7 +66,7 @@ build()
 	fi
 
 	# add pkgver to tribe
-	sed -i -e "s~source build/from git~Build: ${pkgver} (Testbuild)~g" config-tribe.h.cmake
+	sed -i -e "s~source build/from git~Build: ${pkgver} ($_codename)~g" config-tribe.h.cmake
 	sed -i -e "s~git-checkout~${pkgver}-${pkgrel}~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE=Release \
