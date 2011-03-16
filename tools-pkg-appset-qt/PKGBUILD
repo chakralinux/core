@@ -3,7 +3,7 @@
 
 pkgname=appset-qt
 pkgver=0.2.3
-pkgrel=1
+pkgrel=2
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -11,13 +11,16 @@ license=('GPL2')
 depends=('qt>=4.6')
 install=${pkgname}.install
 source=(http://sourceforge.net/projects/appset/files/appset-qt/0.2/$pkgver/$pkgname-$pkgver-sources.tar.gz
-        http://chakra-project.org/sources/$pkgname/chakra.patch)
+        http://chakra-project.org/sources/$pkgname/chakra.patch
+        http://chakra-project.org/sources/$pkgname/remove-as.tmp-msg.patch)
 md5sums=(40cd816562398ebc173d69a26618b315
-         cb98674a96eadcc4dd3fddaefa293961)
+         cb98674a96eadcc4dd3fddaefa293961
+         36522cae0ea605a7c825a67a8b2254f4)
 
 build() {
   cd $srcdir/$pkgname-$pkgver-sources
   patch -Np1 -i ${startdir}/src/chakra.patch
+  patch -Np1 -i ${startdir}/src/remove-as.tmp-msg.patch
   qmake PREFIX=/usr -Wnone
   make || return 1
 }
