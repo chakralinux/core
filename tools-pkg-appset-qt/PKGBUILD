@@ -3,7 +3,7 @@
 
 pkgname=appset-qt
 pkgver=0.2.4
-pkgrel=1
+pkgrel=2
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -11,13 +11,20 @@ license=('GPL2')
 depends=('qt>=4.7')
 install=${pkgname}.install
 source=(http://sourceforge.net/projects/appset/files/appset-qt/0.2/$pkgver/$pkgname-$pkgver-sources.tar.gz
+        http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
         http://chakra-project.org/sources/$pkgname/chakra.patch)
 md5sums=(d440f2ba87183ba5babe29d2e2382bae
+         87f5f278e3fe67ed2cd6165c2835d81b  
          cb98674a96eadcc4dd3fddaefa293961)
 
 build() {
   cd $srcdir/$pkgname-$pkgver-sources
+  # copy oxygen icons
+  cp ../*png Qt/AppSet-Qt
+
+  # patch it for Chakra GNU/Linux
   patch -Np1 -i ${startdir}/src/chakra.patch
+
   qmake PREFIX=/usr -Wnone
 
   #localization
