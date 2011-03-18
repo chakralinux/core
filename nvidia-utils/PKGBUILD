@@ -5,12 +5,12 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=nvidia-utils
-pkgver=270.30
+pkgver=260.19.44
 pkgrel=1
 pkgdesc="NVIDIA drivers utilities and libraries."
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-depends=('xorg-server>=1.10.0' 'libxvmc')
+depends=('xorg-server' 'libxvmc')
 optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig')
 conflicts=('libgl')
 provides=('libgl')
@@ -20,15 +20,15 @@ options=('!strip')
 backup=('etc/X11/xorg.conf.d/20-nvidia.conf')
 
 if [ "$CARCH" = "i686" ]; then
-        ARCH='x86'
-        _pkg="NVIDIA-Linux-${ARCH}-${pkgver}"
-        source=("http://us.download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
-        md5sums=('ff319212b9ac52d645df31027c31ee45')
+	ARCH='x86'
+	_pkg="NVIDIA-Linux-${ARCH}-${pkgver}"
+        source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
+        md5sums=('c99b0710a43db3aafb4f27408194e910')
 elif [ "$CARCH" = "x86_64" ]; then
-        ARCH='x86_64'
-        _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-        source=("http://us.download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
-        md5sums=('780ba735bda572fc10a3515a15c49404')
+	ARCH='x86_64'
+	_pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
+        source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
+        md5sums=('3dfce350616ad70d626b531a15c8604f')
 fi
 
 source[1]='20-nvidia.conf'
