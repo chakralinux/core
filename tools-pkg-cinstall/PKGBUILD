@@ -6,7 +6,7 @@
 # (c) 2010 Drake Justice
 
 pkgname=cinstall
-pkgver=0.3.59
+pkgver=0.4.0
 pkgrel=1
 depends=('squashfs-tools' 'xz>=5.0.0' 'fakechroot' 'unionfs-fuse' 'cbundle')
 makedepends=('kdelibs' 'qt' 'automoc4')
@@ -18,21 +18,21 @@ url="http://chakra-project.org/"
 optdepends=('akabei: for akabei support'
             'pacman: for pacman support')
 
-source=("jmc-88-jmc-88-cinstall-master.tar.gz")
-md5sums=('dbed95e539d57ba9688e76e10ccb91e4')
+source=("http://chakra-project.org/sources/cinstall/jmc-88-cinstall-$pkgver.tar.xz")
+md5sums=('b78b7bccfc8911834e8ad4677ff51b8f')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-  git clone git://gitorious.org/cinstall/cinstall.git
-  pushd cinstall
+  git clone git://gitorious.org/~jmc-88/cinstall/jmc-88-cinstall.git
+  pushd jmc-88-cinstall
   popd
-  tar -cvJf ${pkgname}-${pkgver}.tar.xz cinstall/*
-  md5sum ${pkgname}-${pkgver}.tar.xz
+  tar -cvJf jmc-88-cinstall-${pkgver}.tar.xz jmc-88-cinstall/*
+  md5sum jmc-88-cinstall-${pkgver}.tar.xz
 }
 
 build() {
-        cd "${srcdir}/cinstall-jmc-88-cinstall"
+        cd "${srcdir}/jmc-88-cinstall"
 
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \
