@@ -3,7 +3,7 @@
 # Contributor: Morgan LEFIEUX <comete@archlinuxfr.org>
 
 pkgname=hplip
-pkgver=3.10.9
+pkgver=3.11.3
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('i686' 'x86_64')
@@ -11,7 +11,7 @@ url="http://hplipopensource.com"
 license=('GPL')
 makedepends=('pyqt' 'pygobject' 'pkgconfig' 'sane' 'rpcbind' 'dbus-python' 'cups')
 depends=('python2' 'ghostscript>=8.64-6' 'foomatic-db' 'foomatic-db-engine'
-	'libcups>=1.3.10-3' 'net-snmp>=5.5')
+	'libcups>=1.3.10-3' 'net-snmp>=5.5' 'libusb-compat')
 replaces=('hpijs')
 options=('!libtool')
 install=hplip.install
@@ -33,6 +33,7 @@ build() {
              --enable-cups-drv-install \
              --enable-hpijs-install \
              --enable-foomatic-drv-install \
+             --enable-pp-build \
              --enable-udev-acl-rules
 
  make || return 1
@@ -50,4 +51,4 @@ build() {
  # fix sysfs rules
  sed -i -e "s|SYSFS|ATTRS|g" -e "s|sysfs|attrs|g" $pkgdir/lib/udev/rules.d/56-hpmud_support.rules || return 1
 }
-md5sums=('609718830a26874fc0ea84a47b8132f3')
+md5sums=('9a2f39cb02214ee0def550defac0d240')
