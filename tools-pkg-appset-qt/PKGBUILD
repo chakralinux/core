@@ -2,8 +2,8 @@
 # Committer: Simone Tobia <simone.tobia at gmail dot com>
 
 pkgname=appset-qt
-pkgver=0.2.4
-pkgrel=7
+pkgver=0.3.0
+pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -11,26 +11,18 @@ license=('GPL2')
 depends=('qt>=4.7')
 optdepends=('kdebase-konqueror: For displaying Webpages in fullscreen')
 install=${pkgname}.install
-source=(http://sourceforge.net/projects/appset/files/appset-qt/0.2/$pkgver/$pkgname-$pkgver-sources.tar.gz
+source=(http://sourceforge.net/projects/appset/files/appset-qt/0.3/$pkgver/$pkgname-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
-        http://chakra-project.org/sources/$pkgname/icons-rearrangement.patch
-        http://chakra-project.org/sources/$pkgname/chakra.patch
-        http://chakra-project.org/sources/$pkgname/minimum-size-950x540.patch
-        http://chakra-project.org/sources/$pkgname/add-other-languages.patch
-        http://chakra-project.org/sources/$pkgname/appset-qt_de-0.2.4.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.2.4.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.2.4.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_el-0.2.4.tar.gz)
-md5sums=(d440f2ba87183ba5babe29d2e2382bae
+        http://chakra-project.org/sources/$pkgname/$pkgname-$pkgver-chakra.patch
+#        http://chakra-project.org/sources/$pkgname/add-other-languages.patch
+        http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.2.4-7.tar.gz
+        http://chakra-project.org/sources/$pkgname/appset-qt_el-0.2.4-7.tar.gz)
+md5sums=(130ca03294d8f8493382a1a0e4bdd43d
          87f5f278e3fe67ed2cd6165c2835d81b
-         753f0a9bb8dc9a849faa7b0877b324fb 
-         cb98674a96eadcc4dd3fddaefa293961
-         39d6f5669249c6b902434990ac753d0f
-         d03e0c2a679770f978469db7dca92024 
-         b1c271e44fe4e1e70e46aa9a88751767  
-         dfe1da52624c180f53d80122d956ab96
-         4cd013c19d1174a0bbfa04102e8590aa
-         812e70f4c93deac7998b7c1b692aad32)
+         91a5c84e31cb0f412bb56539cdf428c1 
+#         39d6f5669249c6b902434990ac753d0f
+         4b1f0ca7f96a2333e0bef3b4ec11eb79
+         ce3bd4bc2e462bb509486e34a4863ab3)
 
 build() {
   cd $srcdir/$pkgname-$pkgver-sources
@@ -38,13 +30,10 @@ build() {
   cp -v ../*png Qt/AppSet-Qt
 
   # patch it for Chakra GNU/Linux
-  patch -Np1 -i ${startdir}/src/chakra.patch
-  patch -Np1 -i ${startdir}/src/icons-rearrangement.patch
-  patch -Np1 -i ${startdir}/src/minimum-size-950x540.patch
-
+  patch -Np1 -i ${startdir}/src/$pkgname-$pkgver-chakra.patch
 
   # add chakra translations (check upstream)
-  patch -Np1 -i ${startdir}/src/add-other-languages.patch
+#  patch -Np1 -i ${startdir}/src/add-other-languages.patch
   cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
   cp -v ../appset-qt*.ts Qt/AppSet-Qt
 
@@ -65,6 +54,4 @@ package() {
     #helper daemon
     install -m 755 -d "$pkgdir/etc/rc.d" || return 1
     install -m 755 "$srcdir/$pkgname-$pkgver-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
-    #clean arch stuff
-    rm -r "$pkgdir/etc/appset/Arch"
 }
