@@ -3,31 +3,34 @@
 
 pkgname=appset-qt
 pkgver=0.2.4
-pkgrel=6
+pkgrel=7
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
 license=('GPL2')
 depends=('qt>=4.7')
+optdepends=('kdebase-konqueror: For displaying Webpages in fullscreen')
 install=${pkgname}.install
 source=(http://sourceforge.net/projects/appset/files/appset-qt/0.2/$pkgver/$pkgname-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
         http://chakra-project.org/sources/$pkgname/icons-rearrangement.patch
         http://chakra-project.org/sources/$pkgname/chakra.patch
         http://chakra-project.org/sources/$pkgname/minimum-size-950x540.patch
-        http://chakra-project.org/sources/$pkgname/add-catalan.patch
+        http://chakra-project.org/sources/$pkgname/add-other-languages.patch
         http://chakra-project.org/sources/$pkgname/appset-qt_de-0.2.4.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.2.4.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.2.4.tar.gz)
+        http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.2.4.tar.gz
+        http://chakra-project.org/sources/$pkgname/appset-qt_el-0.2.4.tar.gz)
 md5sums=(d440f2ba87183ba5babe29d2e2382bae
          87f5f278e3fe67ed2cd6165c2835d81b
          753f0a9bb8dc9a849faa7b0877b324fb 
          cb98674a96eadcc4dd3fddaefa293961
-         39d6f5669249c6b902434990ac753d0f  
-         c55efede964828899af5258fbf268f89  
-         b1c271e44fe4e1e70e46aa9a88751767
+         39d6f5669249c6b902434990ac753d0f
+         d03e0c2a679770f978469db7dca92024 
+         b1c271e44fe4e1e70e46aa9a88751767  
          dfe1da52624c180f53d80122d956ab96
-         4cd013c19d1174a0bbfa04102e8590aa)
+         4cd013c19d1174a0bbfa04102e8590aa
+         812e70f4c93deac7998b7c1b692aad32)
 
 build() {
   cd $srcdir/$pkgname-$pkgver-sources
@@ -41,7 +44,7 @@ build() {
 
 
   # add chakra translations (check upstream)
-  patch -Np1 -i ${startdir}/src/add-catalan.patch
+  patch -Np1 -i ${startdir}/src/add-other-languages.patch
   cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
   cp -v ../appset-qt*.ts Qt/AppSet-Qt
 
