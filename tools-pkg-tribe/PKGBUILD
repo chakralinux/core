@@ -9,14 +9,14 @@
 #
 pkgname=tribe
 pkgver=2011.04
-pkgrel=milestone.3
+pkgrel=ms3
 _codename=Aida
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
 depends=('kdelibs' 'kdeedu-marble>=4.6.1' 'squashfs-tools' 'partitionmanager>=1216949-2'
-        'cinstall>=0.3.58' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
+        'cinstall>=0.4.0' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.1' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
@@ -25,8 +25,8 @@ options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
         "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS3.html")
   
-md5sums=('4a7a90164b232d04c6751a48d51ecad3'
-         '240c4337499e66b07c5f54644ffa0df2')
+md5sums=('70e4867847a6c0c07e9dfd2c029ce2ee'
+         'e35cc70e87250559edfe952e46b6b994')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -82,7 +82,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_TB110301.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_201104MS3.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
