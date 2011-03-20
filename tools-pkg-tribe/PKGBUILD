@@ -59,8 +59,6 @@ build()
 
 	# workaround for bug https://bugzilla.novell.com/show_bug.cgi?id=656144
 	sed -i -e "s~sudo~kdesu~g" "${srcdir}/$pkgname/tribe.desktop"
-	# workaround for bundles issue
-	cp -v ${srcdir}/configPageBundleData-$arch ${srcdir}/$pkgname/data/configPageBundleData
 
 	# patches
 	#patch -Np1 -i ${srcdir}/oops.patch || return 1
@@ -95,4 +93,8 @@ package()
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
+
+	# workaround for bundles issue
+	cp -v ${srcdir}/configPageBundleData-$arch ${pkgdir}/usr/share/tribe/config/configPageBundleData
+	rename .png -testing.png ${pkgdir}/usr/share/tribe/config/*
 }
