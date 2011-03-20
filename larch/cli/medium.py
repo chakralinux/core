@@ -2,7 +2,7 @@
 #
 # medium.py
 #
-# (c) Copyright 2010 Michael Towers (larch42 at googlemail dot com)
+# (c) Copyright 2010-2011 Michael Towers (larch42 at googlemail dot com)
 #
 # This file is part of the larch project.
 #
@@ -21,7 +21,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2010.11.09
+# 2011.01.29
 
 """This is a command line script to place a larch system on a medium.
 It can handle a larchified Arch installation for the initial creation of
@@ -99,12 +99,12 @@ def build_medium(options, device):
                     modsdst = build
                     runcomd('mkdir -p %s/larch' % modsdst)
                 if not runcmd('%s/boot/support/support mksquashfs %s %s/larch/mods.sqf'
-                        ' -wildcards -e %s'
+                        ' -b 256K -Xbcj x86 -wildcards -e %s'
                         % (build, medium_dir, modsdst, IGNOREDIRS),
                         filter=mksquashfs_filter_gen())[0]:
                     errout(_("Squashing mods.sqf failed"))
                 # remove execute attrib
-                runcmd('chmod oga-x %s/mods.sqf' % modsdst)
+                runcmd('chmod oga-x %s/larch/mods.sqf' % modsdst)
 
         elif device and options.persist and (medium.fstype != 'vfat'):
             # mods.sqf must be unpacked onto the medium
@@ -172,7 +172,8 @@ if __name__ == '__main__':
 
     parser.add_option('-S', '--source', action='store', type="string",
             dest='source', default='',
-            help=_("Specify source medium, an iso-file (path ending '.iso'), device"
+            help=_("Specify source medium: base directory (mount point) starting '/',"
+                    " an iso-file (path ending '.iso'), device"
                     " (starting '/dev/') or volume label"))
     parser.add_option("-l", "--label", action="store", type="string",
             default="", dest="label",
@@ -231,6 +232,7 @@ if __name__ == '__main__':
 
     (options, args) = parser.parse_args()
     options.force = False
+    init('live_medium', options)
 
     if options.bootiso:
         if args:
@@ -256,15 +258,14 @@ if __name__ == '__main__':
     if args:
         device = args[0]
         if device.startswith('/dev/'):
-            print '##', ((_("Testing output medium: %s\n")
+            comment((_("Testing output medium: %s\n")
                     if options.testmedium
                     else _("Creating larch medium on: %s\n")) % device)
         else:
-            print '##', (_("Invalid partition: '%s'") % device)
-            sys.exit(1)
+            errout(_("Invalid partition: '%s'") % device)
     else:
         options.isofile = os.path.join(os.getcwd(), options.isofile)
-        print '##', ((_("Testing source medium: %s\n") % options.source)
+        comment((_("Testing source medium: %s\n") % options.source)
                 if options.testmedium
                 else (greet % options.isofile))
         device = ''
@@ -273,5 +274,4 @@ if __name__ == '__main__':
         print _("This application must be run as root")
         sys.exit(1)
 
-    init('live_medium', options)
     build_medium(options, device)

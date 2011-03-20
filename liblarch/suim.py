@@ -3,7 +3,7 @@
 #
 # suim.py
 #
-# (c) Copyright 2010 Michael Towers (larch42 at googlemail dot com)
+# (c) Copyright 2010-2011 Michael Towers (larch42 at googlemail dot com)
 #
 # This file is part of the larch project.
 #
@@ -22,7 +22,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2010.10.24
+# 2011.02.01
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++
 #TODO
@@ -161,6 +161,10 @@ icondict = {    "left"      : QtGui.QStyle.SP_ArrowLeft,
                 "down"      : QtGui.QStyle.SP_ArrowDown,
                 "up"        : QtGui.QStyle.SP_ArrowUp,
                 "reload"    : QtGui.QStyle.SP_BrowserReload,
+                "critical"  : QtGui.QStyle.SP_MessageBoxCritical,
+                "apply"     : QtGui.QStyle.SP_DialogApplyButton,
+                "close"     : QtGui.QStyle.SP_DialogCloseButton,
+                "cancel"    : QtGui.QStyle.SP_DialogCancelButton,
         }
 
 class Container:
@@ -685,6 +689,16 @@ class ComboBox(QtGui.QComboBox, WBase):                     #qt
     def x__setindex(self, index):
         return self.setCurrentIndex(index)                  #qt
 
+#    def x__colour(self, index, colour):
+# Unfortunately this doesn't set the colour of the item when it is
+# selected, only in the list.
+#        model = self.model()
+#        mitem = model.item(index)
+#        mitem.setForeground(QtGui.QColor(colour))
+
+    def x__icon(self, index, icon):
+        self.setItemIcon(index, self.style().standardIcon(icondict[icon])) #qt
+
 
 class ListChoice(QtGui.QListWidget, WBase):                 #qt
     def __init__(self):
@@ -776,6 +790,49 @@ class List(QtGui.QTreeWidget, WBase):                       #qt
         for i in range(self.columnCount()):                 #qt
             self.resizeColumnToContents(i)                  #qt
 
+    def x__single_icon(self, row, column, icon):
+        """Set the icon for the given cell.
+        <icon> is the file-path of the icon, the icons being cached to
+        avoid duplication.
+        Only the setting of a single icon is supported,
+        so this is unlikely to be useful in a layout definition.
+        """
+        item = self.topLevelItem(row)                       #qt
+        item.setIcon(column, _Icons(icon))                  #qt
+        if self._hcompact:
+            self._compact()
+
+    def x__single_disable(self, row, disable=True):
+        """Disable (or reenable) the given item.
+        For the moment only the setting of a single item is supported,
+        so this is unlikely to be useful in a layout definition.
+        """
+        item = self.topLevelItem(row)                       #qt
+        item.setDisabled(disable)                           #qt
+
+    def x__icon(self, row, column, icon):
+        """Set the icon for the given cell.
+        <icon> is the name of a standard icon.
+        Only the setting of a single icon is supported,
+        so this is unlikely to be useful in a layout definition.
+        """
+        item = self.topLevelItem(row)                       #qt
+        item.setIcon(column, self.style().standardIcon(icondict[icon])) #qt
+        if self._hcompact:
+            self._compact()
+
+    def x__scroll_to(self, row):
+        model = self.model()                                #qt
+        self.scrollTo(model.index(row, 0), self.PositionAtTop) #qt
+
+
+_iconcache = {}
+def _Icons(filepath):
+    icon = _iconcache.get(filepath)
+    if not icon:
+        icon = QtGui.QIcon(filepath)                        #qt
+    return icon
+
 
 class LineEdit(QtGui.QLineEdit, WBase):                     #qt
     def __init__(self):
@@ -864,6 +921,7 @@ class TextEdit(QtGui.QTextEdit, WBase):                     #qt
 class HtmlView(QtWebKit.QWebView, WBase):                   #qt
     def __init__(self):
         QtWebKit.QWebView.__init__(self)                    #qt
+        self.settings().setDefaultTextEncoding('utf-8')     #qt
 
     def x__html(self, content):
         self.setHtml(content)                               #qt

@@ -2,7 +2,7 @@
 #
 # translation.py   --  Translation services
 #
-# (c) Copyright 2010 Michael Towers (larch42 at googlemail dot com)
+# (c) Copyright 2010-2011 Michael Towers (larch42 at googlemail dot com)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #-------------------------------------------------------------------
-# 2010.08.14
+# 2011.01.16
 
 import os, gettext
 from liblarch_conf import liblarchdir
@@ -58,8 +58,17 @@ def i18ndoc(doc):
     p = i18nurl(doc)
     if not p:
         return _("Document '%s' not found") % i18npath
-    fh = open(p)
-    data = fh.read().decode('utf-8')
-    fh.close()
+    with open(p) as fh:
+        data = fh.read().decode('utf-8')
+    if p != doc:
+        with open(doc) as fh:
+            version = fh.readline().strip().decode('utf-8')
+        if (version.startswith(u'<!-- Version ')
+                and (not data.startswith(version))):
+            warning = _("This translation is not up-to-date, see %s for the"
+                    " original, untranslated version.") % (
+                            '<a href="file://%s">%s</a>' % (doc, doc))
+            data = ('<div style="color: red; "><p>%s</p></div>'
+                    % warning) + data
     return data
 

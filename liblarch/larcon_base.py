@@ -2,7 +2,7 @@
 #
 # larcon_base.py   --  Basic backend framework for larcon applications
 #
-# (c) Copyright 2010 Michael Towers (larch42 at googlemail dot com)
+# (c) Copyright 2010-2011 Michael Towers (larch42 at googlemail dot com)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #-------------------------------------------------------------------
-# 2010.08.14
+# 2011.02.01
 
 import os, threading
 from liblarch_conf import liblarchdir
@@ -55,9 +55,9 @@ class Backend:
     def setuisig(self, fn):
         self.ui_signal = fn
 
-    def rootcall(self, cmd, fn_done):
+    def rootcall(self, cmd, fn_done, line_cb=None):
         self.rcall = init_rootrun(self._pwget)
-        self.rcall.run(cmd, fn_done)
+        self.rcall.run(cmd, fn_done, line_cb)
 
     def _pwget(self, cb, prompt):
         self.pw_event = threading.Event()
@@ -71,4 +71,14 @@ class Backend:
         self.pw_returned = (ok, pw)
         self.pw_event.set()
         return None
+
+    def fss_header(self):
+        """Override this to get a more verbose header.
+        """
+        return ""
+
+    def fss_pixmaps(self, name):
+        icon = name + '.png'
+        logo = name + '_logo.png'
+        return (icon, logo if os.path.isfile(logo) else icon)
 

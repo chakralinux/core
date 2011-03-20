@@ -19,7 +19,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2010.10.24
+# 2010.12.03
 
 from config import *
 import os, shutil, pwd
@@ -421,7 +421,7 @@ class ProjectManager:
         if len(l) > 32:
             l = l[:32]
         self.set('bootisolabel', l)
-        return self.get_mediumlabel()
+        return self.get_bootisolabel()
 
 
     def getisosavedir(self):

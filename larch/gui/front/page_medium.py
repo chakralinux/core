@@ -19,7 +19,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2010.10.25
+# 2010.12.27
 
 """This page takes a directory processed by larchify. It produces a bootable
 larch medium, or, in the case of CD/DVD, an iso image.
@@ -289,6 +289,7 @@ class Medium:
                 self.data('prompt_label'),
                 None, fss('get_%slabel' % labelsrc))
         if ok:
+            l = l.replace(' ', '_')
             self.showlabel(fss('set_%slabel' % labelsrc, l))
 
 
@@ -310,12 +311,14 @@ class Medium:
 
         elif self.medium == 'medium-boot':
             # Pop up a file browser
-            path = self.isopath(self, mode='bootiso')
+            path = self.isopath(mode='bootiso')
             if path:
                 self.setdestinationpath(path)
 
     def _sd_line(self, line):
         if line == None:
+            if not self.devices:
+                return
             nmdevices = []
             for part in fss('get_partitions'):  # ->(dev, size in MiB(int))
                 if part[0] == self.sourcepath:
@@ -350,7 +353,12 @@ class Medium:
                         ls.append('-')  # signifies 'no label'
                 else:
                     ls = l.split(None, 2)
-                    ls[2] = None    # mark the partition as mounted
+                    try:
+                        ls[2] = None    # mark the partition as mounted
+                    except:
+                        #run_error("Bad device data: %s" % l)
+                        while len(ls) < 3:
+                            ls.append(None)
                 self.devices.append(ls)
 
 
@@ -379,7 +387,7 @@ class Medium:
         sdir = fss('getisosavedir')
         ifname = fss('getbootisofile' if mode=='bootiso' else 'getisofile')
         path = ui.fileDialog(self.data('isoget' if mode=='source' else 'isopath'),
-            startdir=sdir, create=(mode=='source'),
+            startdir=sdir, create=(mode!='source'),
             file=ifname, filter=(self.data('iso_type'), '*.iso'))
         if path:
             f = os.path.basename(path)

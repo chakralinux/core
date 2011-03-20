@@ -2,7 +2,7 @@
 #
 # rootrun.py   --  Running commands as root, using pexpect with su or sudo
 #
-# (c) Copyright 2010 Michael Towers (larch42 at googlemail dot com)
+# (c) Copyright 2010-2011 Michael Towers (larch42 at googlemail dot com)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #-------------------------------------------------------------------
-# 2010.08.08
+# 2011.01.10
 
 
 import os, threading, pexpect
@@ -87,6 +87,8 @@ class _RootCommand:
     line-by-line basis, if desired, using callbacks.
     The call method is a non-interactive wrapper to allow simple running
     of shell scripts as root, returning completion code and output text.
+    N.B. IT IS NOT POSSIBLE TO USE UNESCAPED SINGLE QUOTES IN THE COMMAND.
+    See the way the call is performed, using "bash -c 'cmd'", below.
     """
     def __init__(self, callback_pw):
         """Initialize the instance
@@ -114,14 +116,14 @@ class _RootCommand:
 
     def _run_start(self, message=None):
         if sudo:
-            self.process = pexpect.spawn('sudo -p "%s" bash -c "echo ___ && %s"'
+            self.process = pexpect.spawn("sudo -p '%s' bash -c 'echo ___ && %s'"
                     % (sudoprompt, self.cmd), cwd=self.cwd, timeout=None)
             self.password_prompt = sudoprompt
             if not message:
                 message = _("Please enter (sudo) password:")
 
         else:       # use su
-            self.process = pexpect.spawn('su -c "echo ___ && %s"' % self.cmd,
+            self.process = pexpect.spawn("su -c 'echo ___ && %s'" % self.cmd,
                     cwd=self.cwd, timeout=None)
             self.password_prompt = ':'
             if not message:
@@ -240,6 +242,8 @@ def runasroot(cmd, cwd=None, pwget=None):
     to a previous call, or is known to be unnecessary (unlikely, but possible).
     The cwd parameter allows the current working directory to be changed
     for the call.
+    N.B. Because of the threading it is not possible to use this with
+    (most?) gui libraries, if a graphical callback is needed.
     """
     if not _rc:
         init_rootrun(pwget)

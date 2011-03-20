@@ -3,8 +3,8 @@
 
 # i18n.py
 
-#2010.07.14
-# Copyright 2009-2010 Michael Towers
+#2011.01.07
+# Copyright 2009-2011 Michael Towers
 
 # This file is part of the larch project.
 #
@@ -56,6 +56,7 @@ gettext.install('larch', 'i18n', unicode=1)
 LANG=de_DE larchin.py
 """
 
+pygettext = '/usr/lib/python2.7/Tools/i18n/pygettext.py'
 import sys, os, shutil
 from subprocess import call
 
@@ -86,10 +87,10 @@ if dbg:
         pys = glob(d)
         for f in pys:
             print "Parsing '%s'" % f
-            call(["pygettext.py", "-p", "i18n", "-o", "larch.pot", f])
+            call([pygettext, "-p", "i18n", "-o", "larch.pot", f])
     exit()
 
-call(["pygettext.py", "-p", "i18n", "-o", "larch.pot"] + allpy)
+call([pygettext, "-p", "i18n", "-o", "larch.pot"] + allpy)
 
 os.chdir(thisdir)
 langfile = lang + ".po"

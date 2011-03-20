@@ -2,7 +2,7 @@
 #
 # larchify.py
 #
-# (c) Copyright 2009-2010 Michael Towers (larch42 at googlemail dot com)
+# (c) Copyright 2009-2011 Michael Towers (larch42 at googlemail dot com)
 #
 # This file is part of the larch project.
 #
@@ -21,7 +21,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2010.11.05
+# 2011.01.30
 
 # This is a command line script to prepare a larch live system from an
 # Arch Linux installation. All needed parameters are passed as options.
@@ -128,7 +128,7 @@ class Builder:
                 fh.close()
 
             if not chroot(self.installation0,
-                    "/sbin/mksquashfs '/' '%s' -wildcards -e %s"
+                    "/sbin/mksquashfs '/' '%s' -b 256K -Xbcj x86 -wildcards -e %s"
                     % (CHROOT_SYSTEMSQF, ignoredirs),
                     filter=mksquashfs_filter_gen()):
                 errout(_("Squashing system.sqf failed"))
@@ -148,7 +148,7 @@ class Builder:
         runcmd("mkdir -p %s/etc" % self.overlay)
         # Check there is no /boot
         if os.path.exists(self.overlay + '/boot'):
-            errout(_("The profile's overlay may not contain /boot"))
+            error0(_("Warning: /boot in the profile's overlay will not be used"))
 #        # Fix access permission on /root
 #        if os.path.isdir("%s/root" % self.overlay):
 #            runcmd("chmod 0750 %s/root" % self.overlay)
@@ -186,6 +186,8 @@ class Builder:
                 runcmd('rm -rf %s/usr/lib/locale' % self.overlay)
                 runcmd('mkdir -p %s/usr/lib' % self.overlay)
                 runcmd('cp -a %s %s/usr/lib' % (lpath, self.overlay))
+                runcmd('cp %s/locale.gen %s/etc'% (self.locales_base,
+                        self.overlay))
             else:
                 comment("Generating glibc locales")
                 runcmd('rm -rf %s' % lpath)
@@ -193,6 +195,8 @@ class Builder:
                         self.overlay))
                 # Save the generated locales for possible reuse
                 runcmd('cp -a %s/usr/lib/locale %s' % (self.overlay,
+                        self.locales_base))
+                runcmd('cp %s/etc/locale.gen %s'% (self.overlay,
                         self.locales_base))
 
         if (os.path.isfile(self.installation0 + '/usr/bin/ssh-keygen')
@@ -249,7 +253,7 @@ class Builder:
 
         comment("Squashing mods.sqf")
         if not chroot(self.installation0,
-                "/sbin/mksquashfs '%s' '%s/larch/mods.sqf' -wildcards -e %s"
+                "/sbin/mksquashfs '%s' '%s/larch/mods.sqf' -b 256K -Xbcj x86 -wildcards -e %s"
                 % (CHROOT_DIR_OVERLAY, CHROOT_DIR_MEDIUM, IGNOREDIRS),
                 filter=mksquashfs_filter_gen()):
             errout(_("Squashing mods.sqf failed"))

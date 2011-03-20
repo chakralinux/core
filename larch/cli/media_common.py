@@ -2,7 +2,7 @@
 #
 # media_common.py  - support functions for medium creation
 #
-# (c) Copyright 2009 - 2010 Michael Towers (larch42 at googlemail dot com)
+# (c) Copyright 2009 - 2011 Michael Towers (larch42 at googlemail dot com)
 #
 # This file is part of the larch project.
 #
@@ -21,9 +21,10 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2010.11.09
+# 2011.01.07
 
 import os, re
+from glob import glob
 from config import *
 from backend import *
 
@@ -130,9 +131,11 @@ class Medium:
         if os.path.isdir(psource):
             runcmd('bash -c "cp -rf %s/* %s/boot"' % (psource, self.build))
 
-        # Copy vesamenu.c32 to the boot directory and rename base config file
-        runcmd('cp %s/vesamenu.c32 %s/boot/isolinux' %
-                (self.chrootpath + SYSLINUXDIR, self.build))
+        # Copy vesamenu.c32, chain.c32 to the boot directory
+        for slfile in ('vesamenu.c32', 'chain.c32'):
+            runcmd('cp %s/%s %s/boot/isolinux' %
+                    (self.chrootpath + SYSLINUXDIR, slfile, self.build))
+        # and rename base config file
         runcmd(('mv %s/boot/isolinux/isolinux.cfg'
                 ' %s/boot/isolinux/isolinux.cfg_0')
                 % (self.build, self.build))
@@ -157,8 +160,17 @@ class Medium:
 
             chroot(self.chrootpath, 'cp %s %s' % (runnable, supportlibdir))
 
-        chroot(self.chrootpath, 'bash -c "cp /lib/ld-linux*.so.2 %s/loader"'
-                % supportlibdir)
+        loader = None
+        for l in glob(self.chrootpath + '/lib/ld-linux*.so.2'):
+# Could use os.readlink() as alternative, just returning the link
+            lrp = os.path.realpath(l)
+            if lrp.split('/')[-2] == 'lib':
+                loader = lrp
+                break
+        if loader:
+            runcmd('cp %s %s%s/loader' % (loader, self.chrootpath, supportlibdir))
+        else:
+            errout(_("No loader binary, ") + u'/lib/ld-linux*.so.2')
 
         runcmd('cp %s/mbr.bin %s/boot/support' %
                 (self.chrootpath + SYSLINUXDIR, self.build))
@@ -343,6 +355,7 @@ def get_device_label(device):
 def check_label(l, n):
     if isinstance(l, unicode):
         l = l.encode('utf8')
+    l = l.replace(' ', '_')
     if len(l) > n:
         if query_yn(_("The volume label is too long. Use the default (%s)?")
                 % LABEL):
@@ -369,7 +382,7 @@ def bootconfig(medium, label='', device='', detection=''):
     elif detection == 'label':
         if not label:
             errout(_("Can't boot to label - device has no label"))
-        bootp = 'label=' + label
+        bootp = 'label=%s' % label
     elif detection == 'partition':
         bootp = 'root=' + device
     else:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 
-#2010.08.15
+#2011.01.16
 # Copyright 2010 Michael Towers
 
 """
@@ -25,7 +25,13 @@ cd i18n ; msgfmt -c -v -o liblarch.mo liblarch.po
 """
 
 import sys, os, shutil
-from subprocess import call
+from subprocess import call, Popen, PIPE, STDOUT
+
+pygettext = Popen(['which', 'pygettext.py'],
+        stdout=PIPE, stderr=PIPE).communicate()[0].strip()
+if not pygettext:
+    v1, v2 = sys.version_info[0:2]
+    pygettext = '/usr/lib/python%d.%d/Tools/i18n/pygettext.py' % (v1, v2)
 
 thisdir = os.path.dirname(os.path.realpath(__file__))
 basedir = os.path.dirname(thisdir)

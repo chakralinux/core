@@ -2,7 +2,7 @@
 #
 # larcon_self.py   --  Frame for a single larcon tool
 
-# (c) Copyright 2009-2010 Michael Towers (larch42 at googlemail dot com)
+# (c) Copyright 2009-2011 Michael Towers (larch42 at googlemail dot com)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,23 +19,46 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #-------------------------------------------------------------------
-# 2010.08.14
+# 2011.01.16
 
 from suim import Suim
 
 class LarconGui(Suim):
     def __init__(self, appname, backend):
         self.appname = appname
-        self.backend = backend
+        self.app_backend = backend
+        # Tell the backend how to send signals to the GUI
+        self.app_backend.setuisig(self.sigin)
+
         self._running = False
         Suim.__init__(self, appname, [appname])
         self.widgetlist(self.fss('uim_fetch', 'larcon.uim'))
         self.connect('$$$uiquit$$$', self.quit)
         self.command('larcon.title', appname)
-        self.command('larcon.icon', appname + '.png')
+        icon, logo = self.fss('pixmaps', appname)
+        self.command('larcon.icon', icon)
+        self.command('larcon:pixmap.image', logo)
+        self.command('larcon:header.markup', ['h3', ['color', '#c55500',
+                ['em', appname], self.fss('header')]])
         self.command('larcon:main.layout', ['VBOX', appname])
         self.connect('larcon:docs*clicked', self._showdocs)
         self._showdocs(init=True)
+
+
+    def quit(self):
+        Suim.quit(self)
+
+
+    def interface(self, func, *args):
+        """Interface between GUI and file-system accessing functions (normally
+        the main, functional part of the application). The first argument is the
+        function name. There may be any number of arguments, including none.
+        The simplest functions, those completing quickly and without interaction,
+        return a non-<None> result - the type of the result is open.
+        Longer running functions, or those that require some interaction return
+        <None>, and then communicate subsequently using 'signals'.
+        """
+        return getattr(self.app_backend, 'fss_' + func)(*args)
 
 
     def fss(self, func, *args):
@@ -45,8 +68,7 @@ class LarconGui(Suim):
             if self._running and (func[0] != '_'):
                 self.busy(True)
             # (Repeated setting or unsetting of the busy state is just ignored)
-            result = self.backend(func, *args)
-            # When the function is not finished, it returns None, otherwise (ok, val)
+            result = self.interface(func, *args)
         else:
             result = True
         if self._running and result != None:
@@ -60,15 +82,24 @@ class LarconGui(Suim):
 
     def _showdocs(self, init=False):
         if init:
-            self.command('larcon:docview.html', self.fss('about'))
+            self.helptext = self.fss('about')
             self.helpstate = False
         else:
             self.helpstate = not self.helpstate
-        self.command('larcon:stack.set', 1 if self.helpstate else 0)
-        self.command('larcon:docs.text', self.data('hidetext')
-                if self.helpstate else self.data('showtext'))
-        self.command('larcon:docs.tt', self.data('hidett')
-                if self.helpstate else self.data('showtt'))
+
+        if self.helpstate:
+            self.command('larcon:docview.html', self.helptext)
+            state = 1
+            buttontext = self.data('hidetext')
+            tooltip = self.data('hidett')
+        else:
+            state = 0
+            buttontext = self.data('showtext')
+            tooltip = self.data('showtt')
+
+        self.command('larcon:stack.set', state)
+        self.command('larcon:docs.text', buttontext)
+        self.command('larcon:docs.tt', tooltip)
 
 
     def go(self):
@@ -78,7 +109,8 @@ class LarconGui(Suim):
 
 
     def sigin(self, signal, *args):
-        self.idle_add(getattr(self, 'sig_' + signal), *args)
+        if signal:
+            self.idle_add(getattr(self, 'sig_' + signal), *args)
 
 
     def sig_get_password(self, message):
