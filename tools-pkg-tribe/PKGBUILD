@@ -53,6 +53,9 @@ build()
 {
         cd "${srcdir}/$pkgname"
 
+	# workaround for bug https://bugzilla.novell.com/show_bug.cgi?id=656144
+	sed -i -e "s~sudo~kdesu~g" "${srcdir}/$pkgname/tribe.desktop"
+
 	# patches
 	#patch -Np1 -i ${srcdir}/oops.patch || return 1
 	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
