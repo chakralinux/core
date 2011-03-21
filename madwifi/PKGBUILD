@@ -35,7 +35,7 @@ build() {
   cd $startdir/src/madwifi
     sed \
     -e  's~#include <linux/config.h>~~g' \
-    -i */*.c
+    -i */*.c */*/*.c
   sed -i -e 's/-Werror//g' Makefile.inc
   make KERNELPATH=/lib/modules/$_kernver/build KERNELRELEASE=$_kernver modules|| return 1
   make KERNELPATH=/lib/modules/$_kernver/build KERNELRELEASE=$_kernver modules \
