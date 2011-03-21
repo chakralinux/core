@@ -1,8 +1,9 @@
 # Maintainer: Phil Miller <philm[at]chakra-project[dot]org>
 # Committer: Simone Tobia <simone.tobia at gmail dot com>
+# Translators: http://chakra-project.org/bbs/viewtopic.php?pid=29626#p29626
 
 pkgname=appset-qt
-pkgver=0.3.0
+pkgver=0.3.1
 pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
@@ -14,19 +15,17 @@ install=${pkgname}.install
 source=(http://sourceforge.net/projects/appset/files/appset-qt/0.3/$pkgver/$pkgname-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
         http://chakra-project.org/sources/$pkgname/$pkgname-$pkgver-chakra.patch
-#        http://chakra-project.org/sources/$pkgname/add-other-languages.patch
-        http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.3.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_el-0.3.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_de-0.3.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.3.0.tar.gz)
-md5sums=(130ca03294d8f8493382a1a0e4bdd43d
+        http://chakra-project.org/sources/$pkgname/add-spanish.patch
+        http://chakra-project.org/sources/$pkgname/appset-qt_es-0.3.0.tar.gz
+        http://chakra-project.org/sources/$pkgname/appset-qt_nl-0.3.0.tar.gz
+        http://chakra-project.org/sources/$pkgname/appset-qt_de-0.3.1.tar.gz)
+md5sums=(9ae7e86884b716fbf338b8ecdad786e9
          87f5f278e3fe67ed2cd6165c2835d81b
-         91a5c84e31cb0f412bb56539cdf428c1 
-#         39d6f5669249c6b902434990ac753d0f
-         dc3238d53055168cbf4c15f4f7de4ef6
-         70457f1b5b5d0accb9c27a39d794c679
-         176a00956b5b9f8810908173e44d2833
-         355c7bfe92c9143dc9af0b406f8d349d)
+         03a45d193324ba9aee983c5de25b9dfe 
+         0bebc346942eec90bb6a99f2f58e477f
+         0d4d86427bcbee1e4e4f53c6da55d31d
+         67b182714c5e4e2abb13d454ca00b266
+         9995c78c733e14a7945501d9a30f4d61)
 
 build() {
   cd $srcdir/$pkgname-$pkgver-sources
@@ -37,7 +36,7 @@ build() {
   patch -Np1 -i ${startdir}/src/$pkgname-$pkgver-chakra.patch
 
   # add chakra translations (check upstream)
-#  patch -Np1 -i ${startdir}/src/add-other-languages.patch
+  patch -Np1 -i ${startdir}/src/add-spanish.patch
   cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
   cp -v ../appset-qt*.ts Qt/AppSet-Qt
 
