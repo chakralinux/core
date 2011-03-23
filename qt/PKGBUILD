@@ -16,9 +16,9 @@ pkgname=('qt'
          'qt-demos'
          'qt-tools')
 
-pkgver=4.7.1
-pkgrel=2
-kdeqtver=b427b5e64483612122e56104552a9704f6013680
+pkgver=4.7.2
+pkgrel=1
+#kdeqtver=b427b5e64483612122e56104552a9704f6013680
 
 pkgdesc="A cross-platform application and UI framework"
 arch=('i686' 'x86_64')
@@ -57,7 +57,7 @@ makedepends=('inputproto'
 _pkgfqn=${_origname}-everywhere-opensource-src-${pkgver}
 
 source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
-	"http://chakra-project.org/sources/qt/kde-qt-${kdeqtver}.patch.gz"
+#	"http://chakra-project.org/sources/qt/kde-qt-${kdeqtver}.patch.gz"
 	'assistant.desktop'
 	'designer.desktop'
 	'linguist.desktop'
@@ -65,14 +65,14 @@ source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
 	'http://chakra-project.org/sources/qt/qt-any-demosexamples-manual-install.patch'
 	"http://chakra-project.org/sources/qt/qt-${pkgver}-appmenu.patch")
 
-md5sums=('6f88d96507c84e9fea5bf3a71ebeb6d7'
-         'cc361e2dff48a56cff9a1649cfc004b2'  #  kde-qt-b427b5e64483612122e56104552a9704f6013680.patch.gz
+md5sums=('66b992f5c21145df08c99d21847f4fdb'
+#         'cc361e2dff48a56cff9a1649cfc004b2'  #  kde-qt-b427b5e64483612122e56104552a9704f6013680.patch.gz
          '20d333282c43f9e643cb8e91b6307dcc'
          'bf89ee0bdd178933f19d8bc4090173ec'
          'a9bfeeffab8ba103bc8153fdb31474a1'
          '83b2a4aece6c9d86301c53a979af0b63'
          '579e63488320a8d692d25502551787af'
-         '1dcc17ba88785aaf29eb056e66726fed')
+         '7ca519c824d67cfae0281ec50af24ad8')
 
 # source PKGBUILD && _create-kdeqt-patch
 _create-kdeqt-patch() {
@@ -103,14 +103,18 @@ build() {
 	cd $srcdir/$_pkgfqn
 	msg "applying kde-qt patches"
 	cd $srcdir/$_pkgfqn
-	patch -p1 -i $srcdir/kde-qt-${kdeqtver}.patch || return 1
+#	patch -p1 -i $srcdir/kde-qt-${kdeqtver}.patch || return 1
 	# editing qt.install
 	sed -i -e 's/^.*> Qt .*/        echo " > Qt '${pkgver}'"/' $startdir/qt.install
-	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
+#	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
+
+	echo "This build don't get patched with kde-qt patches"
+	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt: not patched in this release"/' $startdir/qt.install
 
 	msg "apply other patches"
 	# apply appmenu patch from Aurelien Gateau
 	patch -Np1 -i ${srcdir}/qt-${pkgver}-appmenu.patch || return 1
+	cp ${srcdir}/${_pkgfqn}/src/gui/widgets/qabstractmenubarimpl_p.h ${srcdir}/${_pkgfqn}/include/QtGui/private/
 
 	# we want our cflags etc
         sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
