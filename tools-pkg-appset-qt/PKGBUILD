@@ -4,7 +4,7 @@
 
 pkgname=appset-qt
 pkgver=0.3.2
-pkgrel=0.4
+pkgrel=0.5
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -20,7 +20,7 @@ source=(http://sourceforge.net/projects/appset/files/appset-qt/0.3/$pkgver/$pkgn
         http://chakra-project.org/sources/$pkgname/appset-qt_nl-0.3.1.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt_de-0.3.1.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt_el-0.3.2.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.3.1.tar.gz
+        http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.3.2.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt_de-0.3.2.tar.gz)
 md5sums=(d9f73e42b24951c66cfc8fefeba8bfb3
          87f5f278e3fe67ed2cd6165c2835d81b
@@ -30,7 +30,7 @@ md5sums=(d9f73e42b24951c66cfc8fefeba8bfb3
          cee9fc739e72b71f1bfc9143bdd893d2
          9995c78c733e14a7945501d9a30f4d61
          1430cc3bc501369f835917890f9d513e
-         381bc20d224135cdcb3bf22e36eedf28
+         6dfcdf59d40f029a54ff0edfeea6f6ce
          3e814e261d72a1ecd7adb83ecbb322ce)
 
 build() {
@@ -45,6 +45,13 @@ build() {
   patch -Np1 -i ${startdir}/src/add-spanish.patch
   cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
   cp -v ../appset-qt*.ts Qt/AppSet-Qt
+
+  # check for updated strings
+  cd Qt/AppSet-Qt
+  lupdate *.cpp *.ui *.h -ts appset*-qt_*.ts
+  cd ../AppSetTray-Qt
+  lupdate *.cpp *.h -ts appsettay*-qt_*.ts
+  cd ../..
 
   qmake PREFIX=/usr -Wnone
 
