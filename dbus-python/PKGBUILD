@@ -2,8 +2,8 @@
 # Contributor: Jan de Groot <jgc@archlinux.org>
 
 pkgname=dbus-python
-pkgver=0.83.1
-pkgrel=3
+pkgver=0.83.2
+pkgrel=1
 pkgdesc="Python bindings for DBUS"
 arch=(i686 x86_64)
 license=('GPL' 'LGPL')
@@ -12,11 +12,11 @@ depends=('dbus-glib>=0.82' 'python>=2.7')
 makedepends=('pkgconfig') # 'docutils'
 options=('!libtool')
 source=(http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz)
-md5sums=('5fdf3970aa0c00020289de7ba8f3be18')
+md5sums=('4ebcaa905bdcb4132b915196b0a3691b')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  PYTHON=python2 ./configure --prefix=/usr || return 1
+  PYTHON=python ./configure --prefix=/usr || return 1
   make || return 1
   make DESTDIR="${pkgdir}" install || return 1
 }
