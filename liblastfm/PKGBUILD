@@ -1,10 +1,15 @@
-# $Id: $
-# Maintainer: Andrea Scarpino <andrea@archlinux.org>
-# Contributor: XazZ <xazz.xazz [AT] googlemail.com>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=liblastfm
-pkgver=0.3.0
-pkgrel=5
+pkgver=0.3.3
+pkgrel=1
 pkgdesc="A collection of libraries to help you integrate Last.fm services into your rich desktop software"
 arch=('i686' 'x86_64')
 url="http://github.com/mxcl/liblastfm/"
@@ -12,19 +17,22 @@ license=('GPL')
 depends=('libsamplerate' 'fftw' 'qt' 'openssl')
 makedepends=('ruby')
 options=('!libtool')
-source=(http://static.last.fm/src/$pkgname-$pkgver.tar.bz2)
-md5sums=('3f73222ebc31635941832b01e7a494b6')
+source=(${pkgname}-${pkgver}.tar.gz::"https://github.com/mxcl/${pkgname}/tarball/${pkgver}"
+        'no-ftools.patch')
+sha1sums=('f2e9705c9c2cbeaa14f46da9bd35ab36fe710392'
+          '9bfaf116ec4abb58dc7e6f4f516e4c766fccb57a')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${srcdir}/mxcl-${pkgname}-1c739eb
 
-  sed -i "s/require 'ftools'//g" admin/*
+  patch -Np1 -i ${srcdir}/no-ftools.patch
 
-  ./configure --prefix /usr
-  make || return 1
+  ruby configure --release --prefix /usr
+  make
 }
 
 package(){
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${srcdir}/mxcl-${pkgname}-1c739eb
   make DESTDIR=${pkgdir} install
 }
+
