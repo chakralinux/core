@@ -9,27 +9,28 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase="kernel26"
 pkgname=('kernel26' 'kernel26-headers' 'kernel26-docs') # Build stock -CHAKRA kernel
-# pkgname=kernel26-custom       # Build kernel with a different name
+#pkgname=kernel26-mainline       # Build kernel with a different name
 #_kernelname=${pkgname#kernel26}
 _kernelname=""
-_basekernel=2.6.37
-pkgver=${_basekernel}.4
-pkgrel=1
+_basekernel=2.6.38
+pkgver=${_basekernel}.1
+pkgrel=2
+makedepends=('xmlto' 'docbook-xsl')
 _patchname="patch-${pkgver}-${pkgrel}-CHAKRA"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
 options=(!strip sign)
-source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
+source=(http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-$_basekernel.tar.bz2
         http://chakra-project.org/sources/kernel26/${_patchname}.bz2
         # the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
-md5sums=('c8ee37b4fdccdb651e0603d35350b434'
-         'fe8b4592733c86b3f739d29eab1d5577'
-         '1daf0dc043949ecc4f48afa4260e952a'
-         '92f1276655f801d4cb7a80eb481b9226'
+md5sums=('7d471477bfa67546f902da62227fa976'
+         '4cbdaad7cfb833ac9c4910e37e1d80db'
+         '1a62b8c0831761170402e43089758bb3'
+         'b6c68233947b3742f339c8804940d4e3'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
@@ -246,3 +247,4 @@ package_kernel26-docs() {
   rm -f $pkgdir/usr/src/linux-$_kernver/Documentation/DocBook/Makefile
 }
 
+# vim:set ts=2 sw=2 et:

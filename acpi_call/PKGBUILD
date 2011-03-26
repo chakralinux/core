@@ -4,21 +4,21 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# Find the kernel name inside the chroot
+_kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
 pkgname=acpi_call
-pkgver=20101109
-pkgrel=4
+pkgver=20110323
+pkgrel=1
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('i686' 'x86_64')
 url=("http://github.com/mkottman/acpi_call")
 license=('GPL')
-depends=('kernel26' 'kernel26-headers')
+depends=('kernel26>=2.6.38' 'kernel26-headers')
 makedepends=('git')
 install=acpi_call.install
 source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz)
-md5sums=('79e7a95ebeff1df29201cae22067921f')
+md5sums=('974c77c6e4b8f0599072c8c05691a2d7')
 
 
 # create tarball: source PKGBUILD && mksource
@@ -39,6 +39,9 @@ build() {
   cp -r ${srcdir}/$pkgname ${srcdir}/$pkgname-build
   cd ${srcdir}/$pkgname-build
 
+  sed \
+    -e  's/$(shell uname -r)/2.6.38-CHAKRA/g' \
+    -i Makefile
   make
 }
 package() {
@@ -53,14 +56,11 @@ package() {
   install -Dm644 README \
     ${pkgdir}/usr/share/$pkgname/README
 
-  for _kernver in $(file /boot/* | sed -n '/Linux kernel/s/.* version \(2\.6\.[-[:alnum:]_]\+\).*/\1/p'); do
-    msg2 "Building module for $_kernver..."
+  msg2 "Building module for $_kernver..."
 
-    # KDIR is necessary even when cleaning
-    make KDIR=/usr/src/linux-${_kernver} clean
-    make KDIR=/usr/src/linux-${_kernver}
+  # KDIR is necessary even when cleaning
+  make KDIR=/usr/src/linux-${_kernver} clean
+  make KDIR=/usr/src/linux-${_kernver}
 
-    install -D -m644 acpi_call.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/acpi/acpi_call.ko
-
-  done
+  install -D -m644 acpi_call.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/acpi/acpi_call.ko
 }
