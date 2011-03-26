@@ -5,30 +5,31 @@
 # (c) 2010 Drake Justice
 
 pkgname=cbundle
-pkgver=0.3.55
+pkgver=0.4.2
 pkgrel=1
 depends=('squashfs-tools' 'fakechroot' 'unionfs-fuse')
-makedepends=('qt')
+makedepends=('qt' 'automoc4' 'kdebase-workspace')
 pkgdesc="A shared library for using Chakra software bundles"
 arch=("i686" "x86_64")
 license=('GPL')
 url="http://chakra-project.org/"
 
-source=(jmc-88-jmc-88-cbundle-master.tar.gz)
-md5sums=('e140440ec3cc830ee671767766a3e598')
+source=("http://chakra-project.org/sources/cinstall/jmc-88-cbundle-$pkgver.tar.xz")
+md5sums=('8c36f1fc34f0da841644ac1e512df667')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
   git clone git://gitorious.org/~jmc-88/cinstall/jmc-88-cbundle.git
-  pushd cbundle
+  pushd jmc-88-cbundle
   popd
-  tar -cvJf ${pkgname}-${pkgver}.tar.xz cbundle/*
-  md5sum ${pkgname}-${pkgver}.tar.xz
+  tar -cvJf jmc-88-cbundle-${pkgver}.tar.xz jmc-88-cbundle/*
+  md5sum jmc-88-cbundle-${pkgver}.tar.xz
 }
 
 build() {
-        cd "${srcdir}/cinstall-jmc-88-cbundle"
+        cd "${srcdir}/jmc-88-cbundle"
+        
 
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \
