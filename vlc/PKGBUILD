@@ -10,7 +10,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgbase=vlc
 pkgname=('vlc'
          'vlc-plugin')
-pkgver=1.1.6
+pkgver=1.1.8
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.videolan.org/vlc/"
@@ -25,15 +25,11 @@ makedepends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'lirc-utils'
              'flac' 'libtheora' 'alsa-lib' 'jack' 'udev'
              'libraw1394' 'libdc1394' 'libavc1394' 'libva')
 options=('!libtool')
-source=("http://download.videolan.org/pub/videolan/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2"
-        lirc-build.patch)
-md5sums=('c47f3ebc886f2aff8c95b98c564d1759'
-         'f276f5bec6e9d00058548cea1070dd2c')
+source=("http://download.videolan.org/pub/videolan/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.bz2")
+md5sums=('c0065ec11b6fd12167cd440cbe0ef0d9')
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
-
-  patch -Np1 -i "${srcdir}/lirc-build.patch"
 
   sed -i -e 's:truetype/freefont:TTF:g' modules/misc/freetype.c
   ./configure --prefix=/usr \
