@@ -6,7 +6,8 @@
 
 # FIXME libvpx
 pkgname=ffmpeg
-pkgver=30526
+pkgver=20110327
+_head=HEAD-3c84930
 pkgrel=1
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('i686' 'x86_64')
@@ -14,14 +15,14 @@ url="http://ffmpeg.org/"
 license=('GPL')
 depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'faac' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libva>=1.0.7' 'openjpeg') # 'libvpx'
 makedepends=('yasm')
-#remake snapshot with: svn export svn://svn.ffmpeg.org/ffmpeg/trunk/@24460
-source=(http://chakra-project.org/sources/ffmpeg/ffmpeg-${pkgver}.tar.bz2)
+#remake snapshot with: http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=HEAD;sf=tgz
+source=(http://chakra-project.org/sources/ffmpeg/ffmpeg-${_head}.tar.gz)
 options=('force')
 #source=(http://ffmpeg.org/releases//releases/ffmpeg-${pkgver}.tar.bz2)
-md5sums=('36710a8fa2bb91556c355aeb0e662c81')
+md5sums=('be05186a08fa5352a628e057563e3105')
 
 build() {
-  cd "$srcdir/$pkgname"
+  cd "$srcdir/$pkgname-$_head"
 
   ./configure \
     --prefix=/usr \
@@ -48,7 +49,10 @@ build() {
   make
   make tools/qt-faststart
   make doc/ff{mpeg,play,server}.1
+}
 
+package(){
+  cd "$srcdir/$pkgname-$_head"
   make DESTDIR="$pkgdir" install install-man
   install -D -m755 tools/qt-faststart "$pkgdir/usr/bin/qt-faststart"
 }
