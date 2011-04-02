@@ -23,10 +23,9 @@ pkgname=('kdebindings-common'
          'kdebindings-python'
 	 'kdebindings-ruby')
 
-          # disabled:
+	  # disabled:
           # kdebindings-java
-          # kdebindings-php
-
+	  # kdebindings-php
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
@@ -39,12 +38,14 @@ license=('GPL' 'LGPL' 'FDL')
 install=${_origname}.install
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt>=4.8.1' 'qwt'
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt>=4.8.1' 'qwt' 'qscintilla'
              'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
+source=("$_mirror/${_origname}-$_kdever.tar.bz2"
+        "fix_phonon_includes.diff")
 
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+md5sums=("`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`"
+         'bdc1a18d9e4e4686cbb680e824cd6a8b')
     
 #
 # build function
@@ -53,25 +54,20 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-#	msg "applying upstream patches ..."
-
-	#fix ruby
-	for f in `find ruby -name CMakeLists.txt`; do
-		sed -i "s|\${RUBY_INCLUDE_PATH}|\${RUBY_INCLUDE_PATH} /usr/include/ruby-1.9.1/${_ARCHITECTURE}-linux|" "${f}"
-	done
+	msg "applying upstream patches ..."
+	patch -Np2 -i ${startdir}/fix_phonon_includes.diff
 
 	msg "starting build ..."
-	export JAVA_HOME=/opt/java
-  	export MAKEFLAGS="-j1"
-	export MONO_SHARED_DIR=${srcdir}/.wabi
-	mkdir -p "${MONO_SHARED_DIR}"
-
+	export MONO_SHARED_DIR="${srcdir}/build/.mono"
+	mkdir -p "$MONO_SHARED_DIR"
+	
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        	-DRUBY_SITE_LIB_DIR="/usr/lib/ruby/site_ruby/1.9.1" \
+	        -DRUBY_SITE_ARCH_DIR="/usr/lib/ruby/site_ruby/1.9.1/${CARCH}-linux" \
                 -DBUILD_java=OFF \
-                -DBUILD_php=OFF \
+                -DBUILD_php=ON \
                 -DBUILD_falcon=OFF \
-                -DENABLE_KROSSRUBY=OFF \
                 -DWITH_PolkitQt=OFF
 
 	make || return 1
@@ -153,7 +149,7 @@ package_kdebindings-php()
 package_kdebindings-python()
 {
 	pkgdesc="KDE Bindings - Python"
-	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}" 'pyqt>=4.8.1') # "kdepim-runtime>=${_kdever}"
+	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}" 'pyqt>=4.8.1' 'qscintilla') # "kdepim-runtime>=${_kdever}"
 	conflicts=("kdemod-${_origname}-python=${_kdever}")
 	groups=("kde" "kde-devel" "${_origname}" "kde-uninstall")
 
