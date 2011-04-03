@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm -vR aufs2-standalone.git
 # clone the aufs repository to the local disk
 git clone http://git.c3sl.ufpr.br/pub/scm/aufs/aufs2-standalone.git aufs2-standalone.git
 cd aufs2-standalone.git
