@@ -9,28 +9,24 @@
 #
 pkgname=tribe
 pkgver=2011.04
-pkgrel=ms3.20110325
+pkgrel=ms3.902
 _codename=Aida
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.6.1' 'squashfs-tools' 'partitionmanager>=1216949-3'
-        'cinstall>=0.4.1' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.1' 'kdebase-workspace')
+depends=('kdelibs' 'kdeedu-marble>=4.6.2' 'squashfs-tools' 'partitionmanager>=1216949-4'
+        'cinstall>=0.4.5' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.2' 'kdebase-workspace')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS3.html"
-        "http://chakra-project.org/sources/tribe/configPageBundleData-i686"
-        "http://chakra-project.org/sources/tribe/configPageBundleData-x86_64")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS3901.html")
   
-md5sums=('ba92554ea90074b7e2f77c737fe35849'
-         'e35cc70e87250559edfe952e46b6b994'
-         'd8a2440c030405a4be214fc0c8995640'
-         '99b99d7454dbd1c2fcbbd6830928cab2')
+md5sums=('500a355f08692ce2b385137676bcdad2'
+         'c990f939d3c10493b903e29e449b452b')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -56,9 +52,6 @@ mksource() {
 build()
 {
         cd "${srcdir}/$pkgname"
-
-	# workaround for bug https://bugzilla.novell.com/show_bug.cgi?id=656144
-	sed -i -e "s~sudo~kdesu~g" "${srcdir}/$pkgname/tribe.desktop"
 
 	# patches
 	#patch -Np1 -i ${srcdir}/oops.patch || return 1
@@ -89,12 +82,8 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_201104MS3.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_201104MS3901.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
-
-	# workaround for bundles issue
-	cp -v ${srcdir}/configPageBundleData-${CARCH} ${pkgdir}/usr/share/tribe/config/configPageBundleData
-	rename .png -testing.png ${pkgdir}/usr/share/tribe/config/*
 }
