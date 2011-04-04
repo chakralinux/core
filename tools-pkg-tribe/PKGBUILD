@@ -25,8 +25,8 @@ options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
         "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS4.html")
   
-md5sums=('5c5539e89c6eabb8a2512508b5003fb2'
-         '220b913ead350d912c4e145857f40ae3')
+md5sums=('2bc2479db83206c293fd1ef3ef43047b'
+         'a3f94d4d4bdd91dca3683d4f05c30910')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -54,7 +54,7 @@ build()
         cd "${srcdir}/$pkgname"
 
 	# patches
-	patch -Np1 -i ${srcdir}/fake-progress.patch || return 1
+	#patch -Np1 -i ${srcdir}/fake-progress.patch || return 1
 	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
 
 	# remove unsupported pkgs for x64
@@ -82,7 +82,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_201104MS3904.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_201104MS4.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
