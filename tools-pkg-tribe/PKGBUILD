@@ -9,7 +9,7 @@
 #
 pkgname=tribe
 pkgver=2011.04
-pkgrel=ms3.902
+pkgrel=ms3.904
 _codename=Aida
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
@@ -23,10 +23,12 @@ replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS3901.html")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS3904.html"
+fake-progress.patch)
   
-md5sums=('500a355f08692ce2b385137676bcdad2'
-         'c990f939d3c10493b903e29e449b452b')
+md5sums=('5c5539e89c6eabb8a2512508b5003fb2'
+         '220b913ead350d912c4e145857f40ae3'
+0c7a1f4a7eebcdee41e144c0f10f99e3  )
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -54,7 +56,7 @@ build()
         cd "${srcdir}/$pkgname"
 
 	# patches
-	#patch -Np1 -i ${srcdir}/oops.patch || return 1
+	patch -Np1 -i ${srcdir}/fake-progress.patch || return 1
 	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
 
 	# remove unsupported pkgs for x64
@@ -82,7 +84,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_201104MS3901.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_201104MS3904.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +

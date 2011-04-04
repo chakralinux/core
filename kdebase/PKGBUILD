@@ -27,7 +27,7 @@ pkgname=('kdebase'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -104,11 +104,49 @@ package_kdebase()
 	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
 	install=${_origname}.install
 
-	splitdirs="kdepasswd kdialog keditbookmarks kfind lib nsplugins plasma" #kinfocenter 
+	splitdirs="kdepasswd kdialog keditbookmarks kfind lib nsplugins plasma konqueror" #kinfocenter 
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
+
+	# prepare konqueror
+	msg "splitting konqueror ..."
+	mkdir -p ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/{include,lib/kde4,share/config,share/autostart,share/applications,share/apps/konqsidebartng,share/apps/konqueror,share/apps/khtml,share/icons/hicolor/32x32/apps,share/icons/hicolor/scalable/apps,share/icons/hicolor/128x128/apps,share/icons/hicolor/22x22/apps,share/icons/hicolor/64x64/apps,share/icons/hicolor/48x48/apps,share/icons/hicolor/16x16/apps,share/dbus-1/interfaces,bin}
+	mv -v ${pkgdir}/usr/include/konqsidebarplugin.h ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/include
+	mv -v ${pkgdir}/usr/lib/libkonqsidebarplugin.so* ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib
+	mv -v ${pkgdir}/usr/lib/libkdeinit4_konqueror.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib
+	mv -v ${pkgdir}/usr/lib/libkonquerorprivate.so* ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib
+	mv -v ${pkgdir}/usr/lib/kde4/konq_aboutpage.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/konqsidebar_web.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/konq_sidebartree_bookmarks.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/konq_sidebartree_dirtree.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/konq_sidebar.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/khtmlkttsdplugin.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/konqsidebar_history.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/kded_konqy_preloader.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/konq_shellcmdplugin.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/konqsidebar_places.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/lib/kde4/konqsidebar_tree.so ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/lib/kde4
+	mv -v ${pkgdir}/usr/share/config/konqsidebartngrc ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/config
+	mv -v ${pkgdir}/usr/share/config.kcfg/konqueror.kcfg ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/config
+	mv -v ${pkgdir}/usr/share/autostart/konqy_preload.desktop ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/autostart
+	mv -v ${pkgdir}/usr/share/applications/kde4/konquerorsu.desktop ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/applications
+	mv -v ${pkgdir}/usr/share/applications/kde4/konqbrowser.desktop ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/applications
+	mv -v ${pkgdir}/usr/share/apps/kwebkitpart/kpartplugins/khtmlkttsd.desktop ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/apps
+	mv -v ${pkgdir}/usr/share/apps/kwebkitpart/kpartplugins/khtmlkttsd.rc ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/apps
+	mv -v ${pkgdir}/usr/share/apps/konqsidebartng  ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/apps/konqsidebartng
+	mv -v ${pkgdir}/usr/share/apps/konqueror ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/apps/konqueror
+	mv -v ${pkgdir}/usr/share/apps/khtml ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/apps/khtml
+	mv -v ${pkgdir}/usr/share/icons/hicolor/32x32/apps/konqueror.png ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/icons/hicolor/32x32/apps
+	mv -v ${pkgdir}/usr/share/icons/hicolor/scalable/apps/konqueror.svgz ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/icons/hicolor/scalable/apps
+	mv -v ${pkgdir}/usr/share/icons/hicolor/128x128/apps/konqueror.png ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/icons/hicolor/128x128/apps
+	mv -v ${pkgdir}/usr/share/icons/hicolor/22x22/apps/konqueror.png ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/icons/hicolor/22x22/apps
+	mv -v ${pkgdir}/usr/share/icons/hicolor/64x64/apps/konqueror.png ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/icons/hicolor/64x64/apps
+	mv -v ${pkgdir}/usr/share/icons/hicolor/48x48/apps/konqueror.png ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/icons/hicolor/48x48/apps
+	mv -v ${pkgdir}/usr/share/icons/hicolor/16x16/apps/konqueror.png ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/icons/hicolor/16x16/apps
+	mv -v ${pkgdir}/usr/share/dbus-1/interfaces/org.kde.konqueror* ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/share/dbus-1/interfaces
+	mv -v ${pkgdir}/usr/bin/konqueror ${srcdir}/${_origname}-${pkgver}/konqueror-split/usr/bin
 		
 	# install cdemu frontend
 	cd ${srcdir}/kde_cdemu-0.3
@@ -172,11 +210,13 @@ package_kdebase-konqueror()
 	conflicts=("kdemod-${_origname}-konqueror")
 	install=${_origname}-konqueror.install
 
-	splitdirs="konqueror"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
+#	splitdirs="konqueror"
+#		for i in ${splitdirs} ; do
+#			cd ${srcdir}/${_origname}-${pkgver}/${i}
+#			make DESTDIR=${pkgdir} install || return 1
+#		done
+
+	cp -vR ${srcdir}/${_origname}-${pkgver}/konqueror-split/* ${pkgdir}
 }
 
 package_kdebase-konsole()
