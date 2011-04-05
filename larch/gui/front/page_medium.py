@@ -305,7 +305,7 @@ class Medium:
 
         elif self.medium == 'medium-iso':
             # Pop up a file browser
-            path = self.isopath(mode='source')
+            path = self.isopath(mode='iso')
             if path:
                 self.setdestinationpath(path)
 
