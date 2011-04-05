@@ -30,7 +30,7 @@ pkgname=('kdegraphics-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -42,13 +42,9 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runti
              'poppler-qt' 'libspectre' 'sane' 'chmlib' 'libdjvu' 'lcms' 'qca'
              'qimageblitz' 'ebook-tools' 'libxxf86vm')
 
-source=("$_mirror/${_origname}-$_kdever.tar.bz2"
-	fix-kruler-docs.diff
-	fix-ksnapshot-docs.diff)
+source=("$_mirror/${_origname}-$_kdever.tar.bz2")
 
-md5sums=("`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`"
-         '5a00ce9c73737ee109d7a0c9fb0b43db'
-         '4f24ab2693b24214ed68eff2ef80a5b2')
+md5sums=("`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`")
 
 #
 # build function
@@ -56,9 +52,7 @@ md5sums=("`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`"
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
-	msg "apply patches ..."
-	patch -Np2 -i ${startdir}/fix-kruler-docs.diff
-	patch -Np2 -i ${startdir}/fix-ksnapshot-docs.diff
+	#msg "apply patches ..."
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \

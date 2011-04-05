@@ -29,7 +29,7 @@ pkgname=('kdebindings-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -41,11 +41,9 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" 'pyqt>=4.8.1' 'qwt' 'qscintilla'
              'ruby' 'mono' "kdegraphics-okular>=${_kdever}" "kdegraphics-common>=${_kdever}") # "kdepim-runtime>=${_kdever}"
 
-source=("$_mirror/${_origname}-$_kdever.tar.bz2"
-        "fix_phonon_includes.diff")
+source=("$_mirror/${_origname}-$_kdever.tar.bz2")
 
-md5sums=("`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`"
-         'bdc1a18d9e4e4686cbb680e824cd6a8b')
+md5sums=("`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`")
     
 #
 # build function
@@ -54,8 +52,7 @@ build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
 
-	msg "applying upstream patches ..."
-	patch -Np2 -i ${startdir}/fix_phonon_includes.diff
+	#msg "applying upstream patches ..."
 
 	msg "starting build ..."
 	export MONO_SHARED_DIR="${srcdir}/build/.mono"
