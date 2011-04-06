@@ -102,7 +102,9 @@ class Builder:
                 (self.installation0, self.kname, self.medium_dir))                
         if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
             runcmd('cp -f %s/boot/%s %s/boot' %
-                (self.installation0, 'vmlinuz26-lts', self.medium_dir))            
+                (self.installation0, 'vmlinuz26-lts', self.medium_dir))
+            runcmd('ln -sfv %s %s/boot/%s' %
+                ('vmlinuz26-lts', self.medium_dir, 'vmlinuz26_lts'))
                 
         # Remember file name
         writefile(self.kname, self.medium_dir + '/boot/kernelname')
@@ -549,6 +551,7 @@ class Builder:
         comment("Kernel: %s   -   version: %s" % (self.kname, self.kversion))
         chroot(self.installation0, "depmod %s" % self.kversion)
         if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
+            comment("LTS-Kernel: %s   -   version: %s" % ('vmlinuz26-lts', self.kversionlts))
             chroot(self.installation0, "depmod %s" % self.kversionlts)
         return True
 
@@ -587,7 +590,9 @@ class Builder:
             chroot(self.installation0,
                 "mkinitcpio -k %s -c %s -g %s" %
                 (self.kversionlts, conf,
-                 CHROOT_DIR_MEDIUM + "/boot/larch-lts.img"))                 
+                 CHROOT_DIR_MEDIUM + "/boot/larch-lts.img"))
+            runcmd('ln -sfv %s %s/boot/%s' %
+                ('larch-lts.img', self.medium_dir, 'larch_lts.img'))
         return True
 
 
