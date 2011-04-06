@@ -9,7 +9,7 @@
 #
 pkgname=tribe
 pkgver=2011.04_ms4
-pkgrel=1
+pkgrel=2
 _codename=Aida
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
@@ -25,7 +25,7 @@ options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
         "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS4.html")
   
-md5sums=('dc6b505219a46c934ddec522f3a08819'
+md5sums=('34146b44bd0425f72c12a2c101a04b62'
          '77351a268878e2a493bfd8c89fac1e41')
          
 groups=('kde-uninstall')
@@ -52,6 +52,9 @@ mksource() {
 build()
 {
         cd "${srcdir}/$pkgname"
+
+	# workaround for bug https://bugzilla.novell.com/show_bug.cgi?id=656144
+	sed -i -e "s~sudo~kdesu~g" "${srcdir}/$pkgname/tribe.desktop"
 
 	# patches
 	#patch -Np1 -i ${srcdir}/fake-progress.patch || return 1
