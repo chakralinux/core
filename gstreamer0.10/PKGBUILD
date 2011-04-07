@@ -6,7 +6,7 @@
 
 pkgname=gstreamer0.10
 pkgver=0.10.31
-pkgrel=1
+pkgrel=2
 pkgdesc="GStreamer Multimedia Framework"
 arch=('i686' 'x86_64')
 license=('LGPL')
@@ -23,6 +23,10 @@ build() {
 	--with-package-name="GStreamer (Chakra GNU/Linux)" \
 	--with-package-origin="http://www.chakra-project.org/" || return 1
   make || return 1
+}
+
+package() {
+  cd "${srcdir}/gstreamer-${pkgver}"
   make DESTDIR="${pkgdir}" install || return 1
   cd "${pkgdir}/usr/bin"
 

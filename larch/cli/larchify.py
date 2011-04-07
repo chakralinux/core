@@ -99,9 +99,17 @@ class Builder:
 
         # Copy kernel to medium boot directory
         runcmd('cp -f %s/boot/%s %s/boot' %
-                (self.installation0, self.kname, self.medium_dir))
+                (self.installation0, self.kname, self.medium_dir))                
+        if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
+            runcmd('cp -f %s/boot/%s %s/boot' %
+                (self.installation0, 'vmlinuz26-lts', self.medium_dir))
+            runcmd('ln -sfv %s %s/boot/%s' %
+                ('vmlinuz26-lts', self.medium_dir, 'vmlinuz26_lts'))
+                
         # Remember file name
         writefile(self.kname, self.medium_dir + '/boot/kernelname')
+        if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
+            writefile('vmlinuz26-lts', self.medium_dir + '/boot/kernelname-lts')
 
         # if no saved system.sqf, squash the Arch installation at self.installation_dir
         if not os.path.isfile(self.system_sqf):
@@ -463,9 +471,17 @@ class Builder:
             comment("(WARNING): More than one kernel found:\n  %s" %
                     "\n  ".join(kernels))
         self.kname = vmlinuz
-
+        
         # Try to read the kernel version from a *.kver file
         self.kversion = None
+        if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
+            self.kversionlts = None
+            verfile = self.installation0 + '/etc/mkinitcpio.d/kernel26-lts.kver'
+            if os.path.isfile(verfile):
+                gvars = {}
+                execfile(verfile, gvars)
+                self.kversionlts = gvars.get('ALL_kver')
+                
         verfile = self.installation0 + '/etc/mkinitcpio.d/%s.kver' % self.kernel
         if os.path.isfile(verfile):
             gvars = {}
@@ -534,6 +550,9 @@ class Builder:
 
         comment("Kernel: %s   -   version: %s" % (self.kname, self.kversion))
         chroot(self.installation0, "depmod %s" % self.kversion)
+        if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
+            comment("LTS-Kernel: %s   -   version: %s" % ('vmlinuz26-lts', self.kversionlts))
+            chroot(self.installation0, "depmod %s" % self.kversionlts)
         return True
 
 
@@ -549,16 +568,32 @@ class Builder:
         olpreset = '%s/%s.preset' % (oldir, self.kernel)
         if not os.path.isfile("%s.larchsave" % self.presetfile):
             runcmd("cp %s %s.larchsave" % (self.presetfile, olpreset))
-
+        if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
+            self.presetfilelts = self.installation0 + '/etc/mkinitcpio.d/kernel26-lts.preset'
+            olpresetlts = '%s/%s.preset' % (oldir, 'kernel26-lts')
+            if not os.path.isfile("%s.larchsave" % self.presetfilelts):
+                runcmd("cp %s %s.larchsave" % (self.presetfilelts, olpresetlts))
+            
         # Adapt larch.preset file for kernel name and replace standard preset
         writefile(readfile(self.installation0 + '/etc/mkinitcpio.d/larch.preset'
                 ).replace('_k_', self.kernel), olpreset)
+        if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
+            writefile(readfile(self.installation0 + '/etc/mkinitcpio.d/larch.preset'
+                    ).replace('_k_', 'kernel26-lts').replace('larch.img', 'larch-lts.img'), olpresetlts)
 
         # Generate initramfs
-        return chroot(self.installation0,
+        chroot(self.installation0,
                 "mkinitcpio -k %s -c %s -g %s" %
                 (self.kversion, conf,
-                 CHROOT_DIR_MEDIUM + "/boot/larch.img"))
+                 CHROOT_DIR_MEDIUM + "/boot/larch.img"))            
+        if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
+            chroot(self.installation0,
+                "mkinitcpio -k %s -c %s -g %s" %
+                (self.kversionlts, conf,
+                 CHROOT_DIR_MEDIUM + "/boot/larch-lts.img"))
+            runcmd('ln -sfv %s %s/boot/%s' %
+                ('larch-lts.img', self.medium_dir, 'larch_lts.img'))
+        return True
 
 
 def encryptPW(pw):
