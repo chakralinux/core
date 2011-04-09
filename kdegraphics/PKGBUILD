@@ -44,9 +44,7 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runti
 
 source=("$_mirror/${_origname}-$_kdever.tar.bz2")
 
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
-
-
+md5sums=("`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`")
 
 #
 # build function
@@ -54,7 +52,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 build()
 {
 	cd ${srcdir}/${_origname}-${pkgver}
-#	msg "apply patches ..."
+	#msg "apply patches ..."
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -148,6 +146,11 @@ package_kdegraphics-kamera()
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
+
+	# Fix duplicated docs in 4.6.2
+	sudo rm -rf ${pkgdir}/usr/share/doc/kde/html/en/kcontrol/kamera/common
+	sudo rm -rf ${pkgdir}/usr/share/doc/kde/html/en/kcontrol/kamera/index.cache.bz2
+	sudo rm -rf ${pkgdir}/usr/share/doc/kde/html/en/kcontrol/kamera/index.docbook
 }
 
 package_kdegraphics-kcolorchooser()

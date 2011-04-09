@@ -8,24 +8,25 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.03
-pkgrel=0.20110301
+pkgver=2011.04_ms4
+pkgrel=2
+_codename=Aida
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.6.1' 'squashfs-tools' 'partitionmanager>=1216949'
-        'cinstall>=0.3.50' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.1' 'kdebase-workspace')
+depends=('kdelibs' 'kdeedu-marble>=4.6.2' 'squashfs-tools' 'partitionmanager>=1216949-4'
+        'cinstall>=0.4.5' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.2' 'kdebase-workspace' 'automoc4')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
-options=('!splithdr' '!splitdbg')
+options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_TB110301.html")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS4.html")
   
-md5sums=('72ec4aeb2a422fd13cb06c00d644e549'
-         '9edec8f7e13dc1f0a5dedb0807844eea')
+md5sums=('34146b44bd0425f72c12a2c101a04b62'
+         '77351a268878e2a493bfd8c89fac1e41')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -35,9 +36,9 @@ install=tools-tribe.install
 mksource() {
 	  rm -vRf tribe
 	  git clone git://gitorious.org/chakra/tribe.git
-	  cd ${pkgname}
-	  git checkout ${pkgver}
-	  cd ..
+	  #cd ${pkgname}
+	  #git checkout 2011.03
+	  #cd ..
 	  rm -vRf tribe/.git
 	  pushd ${pkgname}
 	  popd
@@ -52,8 +53,11 @@ build()
 {
         cd "${srcdir}/$pkgname"
 
+	# workaround for bug https://bugzilla.novell.com/show_bug.cgi?id=656144
+	sed -i -e "s~sudo~kdesu~g" "${srcdir}/$pkgname/tribe.desktop"
+
 	# patches
-	#patch -Np1 -i ${srcdir}/oops.patch || return 1
+	#patch -Np1 -i ${srcdir}/fake-progress.patch || return 1
 	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
 
 	# remove unsupported pkgs for x64
@@ -65,7 +69,7 @@ build()
 	fi
 
 	# add pkgver to tribe
-	sed -i -e "s~source build/from git~Build: ${pkgver} (Testbuild)~g" config-tribe.h.cmake
+	sed -i -e "s~source build/from git~Build: ${pkgver} ($_codename)~g" config-tribe.h.cmake
 	sed -i -e "s~git-checkout~${pkgver}-${pkgrel}~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE=Release \
@@ -81,7 +85,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_TB110301.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_201104MS4.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
