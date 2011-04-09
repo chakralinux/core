@@ -27,7 +27,7 @@ pkgname=('kdebase'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=4
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -104,11 +104,42 @@ package_kdebase()
 	groups=("kde" "kde-minimal" "kde-complete" "kde-uninstall")
 	install=${_origname}.install
 
-	splitdirs="kdepasswd kdialog keditbookmarks kfind lib nsplugins plasma" #kinfocenter 
+	splitdirs="kdepasswd kdialog keditbookmarks kfind lib nsplugins plasma konqueror" #kinfocenter 
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
+
+	# prepare konqueror
+	msg "splitting konqueror ..."
+	rm -vR ${pkgdir}/usr/include/konqsidebarplugin.h 
+	rm -vR ${pkgdir}/usr/lib/libkonqsidebarplugin.so*
+	rm -vR ${pkgdir}/usr/lib/libkdeinit4_konqueror.so
+	rm -vR ${pkgdir}/usr/lib/libkonquerorprivate.so*
+	rm -vR ${pkgdir}/usr/lib/kde4/konq_aboutpage.so
+	rm -vR ${pkgdir}/usr/lib/kde4/konqsidebar_web.so
+	rm -vR ${pkgdir}/usr/lib/kde4/konq_sidebartree_bookmarks.so
+	rm -vR ${pkgdir}/usr/lib/kde4/konq_sidebartree_dirtree.so
+	rm -vR ${pkgdir}/usr/lib/kde4/konq_sidebar.so
+	rm -vR ${pkgdir}/usr/lib/kde4/khtmlkttsdplugin.so
+	rm -vR ${pkgdir}/usr/lib/kde4/konqsidebar_history.so
+	rm -vR ${pkgdir}/usr/lib/kde4/kded_konqy_preloader.so
+	rm -vR ${pkgdir}/usr/lib/kde4/konq_shellcmdplugin.so
+	rm -vR ${pkgdir}/usr/lib/kde4/konqsidebar_places.so
+	rm -vR ${pkgdir}/usr/lib/kde4/konqsidebar_tree.so
+	rm -vR ${pkgdir}/usr/share/config/konqsidebartngrc
+	rm -vR ${pkgdir}/usr/share/config.kcfg/konqueror.kcfg
+	rm -vR ${pkgdir}/usr/share/autostart/konqy_preload.desktop
+	rm -vR ${pkgdir}/usr/share/applications/kde4/konquerorsu.desktop
+	rm -vR ${pkgdir}/usr/share/applications/kde4/konqbrowser.desktop
+	rm -vR ${pkgdir}/usr/share/apps/kwebkitpart
+	rm -vR ${pkgdir}/usr/share/apps/konqsidebartng
+	rm -vR ${pkgdir}/usr/share/apps/konqueror
+	rm -vR ${pkgdir}/usr/share/apps/khtml
+	rm -vR ${pkgdir}/usr/share/icons/
+	rm -vR ${pkgdir}/usr/share/dbus-1/interfaces/org.kde.Konq*
+	rm -vR ${pkgdir}/usr/share/dbus-1/interfaces/org.kde.konq*
+	rm -vR ${pkgdir}/usr/bin/konqueror
 		
 	# install cdemu frontend
 	cd ${srcdir}/kde_cdemu-0.3
@@ -177,6 +208,24 @@ package_kdebase-konqueror()
 			cd ${srcdir}/${_origname}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
+
+	msg "remove conflicting files ..."
+	rm -vR ${pkgdir}/usr/bin/kfmclient
+	rm -vR ${pkgdir}/usr/lib/kde4/kcm_history.so
+	rm -vR ${pkgdir}/usr/lib/kde4/kcm_kio.so
+	rm -vR ${pkgdir}/usr/lib/kde4/kcm_konq.so
+	rm -vR ${pkgdir}/usr/lib/kde4/kcm_konqhtml.so
+	rm -vR ${pkgdir}/usr/lib/kde4/kcm_kurifilt.so
+	rm -vR ${pkgdir}/usr/lib/kde4/kcm_performance.so
+	rm -vR ${pkgdir}/usr/lib/libkdeinit4_kfmclient.so
+	rm -vR ${pkgdir}/usr/share/applications/kde4/Home.desktop
+	rm -vR ${pkgdir}/usr/share/applications/kde4/kfmclient*
+	rm -vR ${pkgdir}/usr/share/apps/dolphinpart/kpartplugins/kshellcmdplugin*
+	rm -vR ${pkgdir}/usr/share/apps/kcmcss/template.css
+	rm -vR ${pkgdir}/usr/share/apps/kconf_update/kfmclient*
+	rm -vR ${pkgdir}/usr/share/apps/kcontrol/pics/onlyone.png
+	rm -vR ${pkgdir}/usr/share/apps/kcontrol/pics/overlapping.png
+	rm -vR ${pkgdir}/usr/share/kde4/service*
 }
 
 package_kdebase-konsole()
