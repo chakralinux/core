@@ -4,20 +4,16 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-#
-# Create a new tarball from the linux-firmware git tree with the following command:
-# git archive --format=tar --prefix linux-firmware-$(date +%Y%m%d)/ master | xz -9 > linux-firmware-$(date +%Y%m%d).tar.xz
-#
-
 pkgname=linux-firmware
-pkgver=20110125
-_header=2fab483
+pkgver=20110410
+_b43=4.178.10.4
+_legacy=3.130.20.0
 pkgrel=1
 pkgdesc="Firmware files for Linux"
 arch=('any')
 url="http://git.kernel.org/?p=linux/kernel/git/dwmw2/linux-firmware.git;a=summary"
 license=('GPL2' 'GPL3' 'custom')
-provides=('kernel26-firmware=2.6.35.99')
+provides=('kernel26-firmware=2.6.38.99')
 conflicts=('linux-firmware-git'
            'kernel26-firmware'
            'ar9170-fw'
@@ -30,7 +26,9 @@ conflicts=('linux-firmware-git'
            'rt2860-firmware'
            'rt2870usb-fw'
            'rt2x00-rt61-fw'
-           'rt2x00-rt71w-fw')
+           'rt2x00-rt71w-fw'
+           'b43-firmware'
+           'b43-firmware-legacy')
 replaces=('kernel26-firmware'
            'ar9170-fw'
            'iwlwifi-1000-ucode'
@@ -42,14 +40,33 @@ replaces=('kernel26-firmware'
            'rt2860-firmware'
            'rt2870usb-fw'
            'rt2x00-rt61-fw'
-           'rt2x00-rt71w-fw')
+           'rt2x00-rt71w-fw'
+           'b43-firmware'
+           'b43-firmware-legacy')
+makedepends=("b43-fwcutter=013")
 options=(!strip)
-source=(http://chakra-project.org/sources/linux-firmware/$pkgname-$pkgver.tar.gz
-        http://www.kernel.org/pub/linux/kernel/people/mcgrof/firmware/ar9170/ar9170.fw)
-sha256sums=('9585b5858d1e54c9732d08b06ae8fd1cb99ad1615660ab9bd592a32b7ad7e299'
-            '1b379c5a8d6ab3a43911f7949d6306fe2dae3afb1368be5452a8fc7d9c54e0a0')
+source=(http://chakra-project.org/sources/linux-firmware/$pkgname-$pkgver.tar.xz
+        http://www.kernel.org/pub/linux/kernel/people/mcgrof/firmware/ar9170/ar9170.fw
+        http://mirror2.openwrt.org/sources/broadcom-wl-${_b43}.tar.bz2
+        http://downloads.openwrt.org/sources/wl_apsta-${_legacy}.o)
+sha256sums=('1b55425d7d84e377c5d65618670911633d7482412f69f8bb63d46c8e06be8d04'
+            '1b379c5a8d6ab3a43911f7949d6306fe2dae3afb1368be5452a8fc7d9c54e0a0'
+            '32f6ad98facbb9045646fdc8b54bb03086d204153253f9c65d0234a5d90ae53f'
+            '7dba610b1d96dd14e901bcbce14cd6ecd1b1ac6f5c0035b0d6b6dc46a7c3ef90')
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf linux-firmware
+	  git clone git://git.kernel.org/pub/scm/linux/kernel/git/dwmw2/linux-firmware.git
+	  pushd ${pkgname}
+          git archive --format=tar --prefix linux-firmware-$(date +%Y%m%d)/ master | xz -9 > ../linux-firmware-$(date +%Y%m%d).tar.xz
+	  popd
+	  sha256sum linux-firmware-$(date +%Y%m%d).tar.xz
+}
+
 package() {
-  cd "${srcdir}/${pkgname}-${_header}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   install -d -m755 "${pkgdir}/lib/firmware"
   cp -a * "${pkgdir}/lib/firmware/"
@@ -63,5 +80,11 @@ package() {
 
   # https://bugs.archlinux.org/task/20064
   install -m644 "${srcdir}/ar9170.fw" "${pkgdir}/lib/firmware/"
+
+  # install b43-firmware
+  b43-fwcutter -w "${pkgdir}/lib/firmware/" ${srcdir}/broadcom-wl-${_b43}/linux/wl_apsta.o
+
+  # install b43-legacy-firmware
+  b43-fwcutter -w "${pkgdir}/lib/firmware/" ${srcdir}/wl_apsta-${_legacy}.o
 }
 # vim:set ts=2 sw=2 et:
