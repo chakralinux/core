@@ -5,7 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=ntfs-3g
-pkgver=2011.1.15
+_realname=ntfs-3g_ntfsprogs
+pkgver=2011.4.12
 pkgrel=1
 pkgdesc="Stable read and write NTFS driver"
 url="http://www.tuxera.com"
@@ -14,19 +15,22 @@ license=('GPL2')
 depends=('glibc')
 makedepends=('pkgconfig')
 options=('!libtool')
-source=(http://www.tuxera.com/opensource/${pkgname}-${pkgver}.tgz
+conflicts=('ntfsprogs')
+provides=("ntfsprogs=${pkgver}")
+source=(http://www.tuxera.com/opensource/${_realname}-${pkgver}.tgz
         25-ntfs-config-write-policy.fdi)
-sha1sums=('d7cf0c5e8730568f5fa8802869d6fe8cdd4a0213'
+sha1sums=('a4340ae611a3f26089f7d5601a86a5847517bff7'
           '200029f2999a2c284fd30ae25734abf6459c3501')
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${_realname}-${pkgver}"
   ac_cv_path_LDCONFIG=/bin/true ./configure --prefix=/usr \
-    --with-fuse=internal --disable-static
+    --with-fuse=internal --disable-static --disable-gnome-vfs \
+    --mandir=/usr/share/man
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${_realname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
   ln -s /bin/ntfs-3g "${pkgdir}/sbin/mount.ntfs"
   install -m755 -d "${pkgdir}/usr/share/hal/fdi/policy/10osvendor"
