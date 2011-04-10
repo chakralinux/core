@@ -1,6 +1,7 @@
 #! /bin/sh
 # Autodetection script for scanning /sys for hardware
 # for Archlinux by Tobias Powalowski <tpowa@archlinux.org>
+# '--modules-not-loaded' patch by Grzegorz Wierzowiecki <grzegorz.wierzowiecki_4t_pjwstk.edu.pl>
 usage () {
 	echo "$0 [options]"
 	echo ""
@@ -50,12 +51,14 @@ usage () {
 	echo "    --fw                   add fw to HOOKS="
 	echo "    --pcmcia               add pcmcia to HOOKS="
 	echo "    --nfs                  add net to HOOKS="
+	echo "    --btrfs                add btrfs to HOOKS="
 	echo ""
 	echo "  For /etc/rc.conf use:"
 	echo "    --net                  show network MODULES"
 	echo "    --sound                show sound MODULES"
 	echo "    --usbhost              show usb hostcontroller MODULES"
 	echo "    --modules              show all detected MODULES"
+	echo "    --modules-not-loaded   show all detected MODULES but not actually loaded"
 	echo ""
 	exit 1
 }
@@ -104,6 +107,9 @@ fi
 
 # nfs switch
 [ "$(echo $* | grep '\-nfs')" ] && NFS=1
+
+# nfs switch
+[ "$(echo $* | grep '\-btrfs')" ] && BTRFS=1
 
 # vmware switch
 [ "$(echo $* | grep '\-vmware')" ] && VMWARE=1
@@ -376,6 +382,20 @@ showlist3() {
 	echo ""
 }
 
+showlist4() {
+	cat=$1 ; shift
+	[ $# -gt 0 ] || return
+	echo -n "$cat=(\${MODULES[*]} "
+	lsmod > /tmp/modules-showlist4-$$
+	for i in $*; do
+		if ! grep -sq $(echo $i|tr - _) /tmp/modules-showlist4-$$ ; then
+			echo -n "$i ";
+		fi
+	done
+	echo ")"
+	rm /tmp/modules-showlist4-$$
+}
+
 # starting different actions
 while [ $# -gt 0 ]; do
 	case $1 in
@@ -441,14 +461,15 @@ while [ $# -gt 0 ]; do
 		--show-staging) showlist "STAGING" $(listmods staging/) ;;
 		--show-video)  showlist "VIDEO  " $(listmods video/) ;;
 		--show-other)  showlist "OTHER  " $(listmods .ko agp/ acpi/ ide/ scsi/ message/fusion block/sx8 block/cciss block/cpqarray block/DAC960 block/virtio virtio/virtio_pci ata/ usb/ ieee1394 net/ isdn/ input/ irda/ pcmcia/ sound/ video/ firewire/ hid/ staging/) ;;
-		--filesystem)   FILESYSTEM="ext2 ext3 ext4 reiserfs xfs jfs vfat"
+		--filesystem)   FILESYSTEM="ext2 ext3 ext4 nilfs2 btrfs reiserfs xfs jfs vfat"
 				for i in $FILESYSTEM; do
 					 [ "$(grep $i /tmp/.blkid)" ] && FS="$FS $i"
 				done
+				[ "$(echo $FS | grep btrfs)" ] && FS="$FS crc32c"
 				MODULES_INITRAMFS="$MODULES_INITRAMFS $FS"
 				showlist2 "MODULES" \"$MODULES_INITRAMFS\" | sed -e 's/(\  /(/g' -e 's/"\ /"/g' -e 's/\ "/"/g' -e 's/\ \ /\ /g'
 				;;
-		--hostcontroller)HOSTCONTROLLER="$(listmods virtio/virtio_pci) $(listmods ide/ ide-) $(listmods ata/pata pata_acpi) $(listmods scsi/ /sg.ko /st.ko scsi_mod sr_mod sd_mod) $(listmods message/fusion/) $(listmods drivers/block/ virtio_blk nbd pktcdvd sx8 floppy) $(listmods ata/ pata ata_generic) $(listmods drivers/block/sx8) $(listmods ehci-hcd) $(listmods uhci-hcd) $(listmods ohci-hcd) $(listmods virtio_blk)"
+		--hostcontroller)HOSTCONTROLLER="$(listmods virtio/virtio_pci) $(listmods ide/ ide-) $(listmods ata/pata pata_acpi) $(listmods scsi/ /sg.ko /st.ko scsi_mod sr_mod sd_mod) $(listmods message/fusion/) $(listmods drivers/block/ virtio_blk nbd pktcdvd sx8 floppy) $(listmods ata/ pata ata_generic) $(listmods drivers/block/sx8) $(listmods xhci-hcd) $(listmods ehci-hcd) $(listmods uhci-hcd) $(listmods ohci-hcd) $(listmods virtio_blk)"
 				 MODULES_INITRAMFS="$MODULES_INITRAMFS $HOSTCONTROLLER"
 				 showlist2 "MODULES" \"$MODULES_INITRAMFS\" | sed -e 's/(\  /(/g' -e 's/"\ /"/g' -e 's/\ "/"/g' -e 's/\ \ /\ /g'
 				 ;;
@@ -513,7 +534,7 @@ while [ $# -gt 0 ]; do
 			 done
 			 showlist2 "MODULES" \($BLACKLIST_UDEV $MODULES_EXPORTED\) | sed -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
 			 ;;
-		--usbhost) MODULES_EXPORTED="$MODULES_EXPORTED $(listmods ehci-hcd) $(listmods uhci-hcd) $(listmods ohci-hcd)"
+		--usbhost) MODULES_EXPORTED="$MODULES_EXPORTED $(listmods xhci-hcd) $(listmods ehci-hcd) $(listmods uhci-hcd) $(listmods ohci-hcd)"
 			 BLACKLIST_UDEV=""
 			 for i in $MODULES_EXPORTED; do
 				BLACKLIST_UDEV="$BLACKLIST_UDEV !$i"
@@ -522,11 +543,13 @@ while [ $# -gt 0 ]; do
 			 ;;
 		--modules) showlist2 "MODULES" \($(listmods modules/)\) | sed -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
 			 ;;
+		--modules-not-loaded) showlist4 "MODULES" $(listmods modules/) | sed -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
+			 ;;
 		--hooks) 
 			if [ "$HOOKS_DIR" = "" ]; then
 				HOOKS_DIR="/lib/initcpio/install"
 			fi
-			START_HOOKS="base v86d udev keymap autodetect ide pata scsi sata usb fw pcmcia net dmraid usbinput $ADVANCED filesystems"
+			START_HOOKS="base v86d udev keymap autodetect ide pata scsi sata usb fw pcmcia net dmraid usbinput $ADVANCED btrfs filesystems"
 			# remove the ones that don't exist on the system
 			for i in ${START_HOOKS}; do
 				if ! [ -e "${HOOKS_DIR}/$i" ]; then 
@@ -562,6 +585,9 @@ while [ $# -gt 0 ]; do
 			fi
 			if ! [ "$NFS" = "1" ]; then
 				START_HOOKS=$(echo $START_HOOKS | sed -e "s/net//g")
+			fi
+			if ! [ "$BTRFS" = "1" ]; then
+				START_HOOKS=$(echo $START_HOOKS | sed -e "s/btrfs//g")
 			fi
 			echo "HOOKS=\"$START_HOOKS\"" | sed -e 's/"\ /"/g' -e 's/\ "/"/g' -e 's/\ \ /\ /g'
 		;;
