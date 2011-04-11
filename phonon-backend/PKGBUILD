@@ -17,7 +17,8 @@ pkgname=('phonon-backend-gstreamer'
 	'phonon-backend-mplayer'
 	'phonon-backend-vlc')
 
-pkgver=4.4.4
+pkgver=4.5.0
+_pkgver=4.4.4
 pkgrel=1
 pkgdesc='The multimedia API for Qt 4 and KDE 4'
 arch=('i686' 'x86_64')
@@ -37,14 +38,14 @@ makedepends=("qt>=${_qtver}"
 	'gstreamer0.10-base'
 	'gstreamer0.10-base-plugins'
 	'libpulse'
-	"phonon>=${_pkgver}")
+	"phonon>=${pkgver}")
 
 source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.bz2"
-        "http://download.kde.org/stable/phonon/phonon-backend-xine/${pkgver}/src/phonon-backend-xine-${pkgver}.tar.bz2")
+        "http://download.kde.org/stable/phonon/phonon-backend-xine/${_pkgver}/src/phonon-backend-xine-${_pkgver}.tar.bz2")
 
 
 
-md5sums=('fa313a77db3da9df20bc8991352378cb'
+md5sums=('2875139f2b7b649396125f4acc66de67'
          'b127104e67538e573adeed3b2fb3bf55')
 
 build() {
@@ -58,7 +59,7 @@ build() {
 	cd ${srcdir}
 	mkdir -p build-phonon-xine
 	cd build-phonon-xine
-	cmake ../phonon-backend-xine-${pkgver} \
+	cmake ../phonon-backend-xine-${_pkgver} \
 		 -DCMAKE_BUILD_TYPE=Release \
 		 -DCMAKE_INSTALL_PREFIX=/usr
 	make
@@ -69,7 +70,7 @@ package_phonon-backend-gstreamer()
 	url="http://phonon.kde.org"
 	pkgdesc="Phonon GStreamer backend"
 	license=('LGPL')
-	depends=('gstreamer0.10-base-plugins' "phonon>=${_pkgver}")
+	depends=('gstreamer0.10-base-plugins' "phonon>=${pkgver}")
 	groups=("kde-complete" "kde-uninstall")
 	conflicts=('phonon-gstreamer')
 	replaces=('phonon-gstreamer')
@@ -83,10 +84,12 @@ package_phonon-backend-xine()
 	url="http://phonon.kde.org"
 	pkgdesc="Phonon Xine backend"
 	license=('LGPL')
-	depends=('xine-lib' "phonon>=${_pkgver}")
+	depends=('xine-lib' "phonon>=${pkgver}")
 	groups=("kde-complete" "kde-uninstall")
 	conflicts=('phonon-xine')
 	replaces=('phonon-xine')
+	pkgver=4.4.4
+	pkgrel=2
 
 	cd ${srcdir}/build-phonon-xine
 	make DESTDIR=${pkgdir} install
@@ -98,7 +101,7 @@ package_phonon-backend-mplayer()
 	pkgdesc="Phonon MPlayer backend"
 	url="http://www.gitorious.org/phonon/phonon-${bename}"
 	license=("LGPL")
-	depends=("phonon>=${_pkgver}" "${bename}")
+	depends=("phonon>=${pkgver}" "${bename}")
 	groups=("kde-complete" "kde-uninstall")
 	conflicts=("phonon-${bename}-svn" 'phonon-mplayer')
 	replaces=("phonon-${bename}-svn" 'phonon-mplayer')
@@ -138,7 +141,7 @@ package_phonon-backend-vlc()
 	pkgdesc="Phonon VLC backend"
 	url="http://gitorious.org/phonon/phonon-vlc"
 	license=('LGPL')
-	depends=('vlc' "phonon>=${_pkgver}")
+	depends=('vlc' "phonon>=${pkgver}")
 	groups=("kde-complete" "kde-uninstall")
 	replaces=('phonon-vlc-svn' 'phonon-vlc')
 	conflicts=('phonon-vlc-svn' 'phonon-vlc')
