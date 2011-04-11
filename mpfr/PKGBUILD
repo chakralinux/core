@@ -5,25 +5,26 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=mpfr
-pkgver=3.0.0
+pkgver=3.0.1
 pkgrel=1
 pkgdesc="Multiple-precision floating-point library"
 arch=('i686' 'x86_64')
-license=('LGPL')
 url="http://www.mpfr.org/"
+license=('LGPL')
 depends=('gmp>=5.0')
 options=('!libtool')
 install=mpfr.install
-source=(http://www.mpfr.org/mpfr-current/mpfr-${pkgver}.tar.xz
-        mpfr-3.0.0-p3.patch)
-md5sums=('8ab3bef2864b8c6e6a291f5603141bbd'
-         '4aa20e509e3117b04deae64c1be6ac62')
+source=(http://www.mpfr.org/mpfr-current/mpfr-${pkgver}.tar.xz)
+md5sums=('645882d9d179113a70af84d27086ed9f')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np1 -i ${srcdir}/mpfr-3.0.0-p3.patch
   ./configure --prefix=/usr --enable-thread-safe --enable-shared
   make
+}
+
+check() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make check
 }
 

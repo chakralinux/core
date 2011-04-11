@@ -7,41 +7,36 @@
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->binutils->glibc
 
 pkgname=linux-api-headers
-pkgver=2.6.35
-_basever=2.6.35
-pkgrel=2
+pkgver=2.6.38.2
+_basever=2.6.38
+pkgrel=1
 pkgdesc="Kernel headers sanitized for use in userspace"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/libc"
-license=('GPL')
+license=('GPL2')
 provides=("kernel-headers=${pkgver}")
-conflicts=("glibc<=2.10.1-4" 'kernel-headers')
+conflicts=('kernel-headers')
 replaces=('kernel-headers')
-source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-${pkgver}.tar.bz2
-	#http://www.kernel.org/pub/linux/kernel/v2.6/patch-${pkgver}.bz2
-	scsi.patch)
-md5sums=('091abeb4684ce03d1d936851618687b6'
-         'b6d05566fcfe07770d9386f0588f8758')
+source=(http://www.kernel.org/pub/linux/kernel/v2.6/linux-${_basever}.tar.bz2
+	http://www.kernel.org/pub/linux/kernel/v2.6/patch-${pkgver}.bz2)
+md5sums=('7d471477bfa67546f902da62227fa976'
+         '599badab31c4920d4122133208c810d7')
 
 build() {
   cd ${srcdir}/linux-${_basever}
-  #patch -Np1 -i ${srcdir}/patch-${pkgver} || return 1
-  
-  # fix issues with transition of scsi.h from glibc
-  patch -Np1 -i ${srcdir}/scsi.patch || return 1
+  [[ $pkgver != $_basever ]] && patch -Np1 -i ${srcdir}/patch-${pkgver}
 
   make mrproper
-  make headers_check || return 1
+  make headers_check
 }
 
 package() {
   cd ${srcdir}/linux-${_basever}
   make INSTALL_HDR_PATH=${pkgdir}/usr headers_install
 
-  # cp in scsi.h   <- HACK ^ for the above patch
-  cp include/scsi/scsi.h ${pkgdir}/usr/include/scsi
-
+  # use headers from libdrm
   rm -rf ${pkgdir}/usr/include/drm
   
-  rm -f $(find ${pkgdir} -name .install -or -name ..install.cmd)
+  # clean-up unnecessary files generated during install
+  find ${pkgdir} -name .install -or -name ..install.cmd | xargs rm -f
 }
