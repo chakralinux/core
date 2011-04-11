@@ -9,12 +9,12 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=gluon
 pkgver=0.70.0
-pkgrel=3
+pkgrel=4
 pkgdesc="A high-level game development library for the KDE desktop enviornment."
 arch=('i686' 'x86_64')
 url="http://gluon.gamingfreedom.org/"
 license=('GPL')
-depends=('glew' 'kdelibs' 'libsndfile' 'openal')
+depends=('glew' 'kdelibs' 'libsndfile' 'openal' 'alure')
 makedepends=('git' 'eigen' 'cmake' 'automoc4')
 provides=('gluon')
 conflicts=('gluon')
@@ -29,7 +29,7 @@ build() {
 
   cd "$srcdir/$pkgname-$pkgname"
 
-  cmake -DCMAKE_INSTALL_PREFIX=/usr "$srcdir/$pkgname-$pkgname"
+  cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_PHYSICS_COMPONENTS=ON -DBUILD_PHYSICS_ASSETS=ON "$srcdir/$pkgname-$pkgname"
   make || return 1
   make DESTDIR="$pkgdir/" install
 }
