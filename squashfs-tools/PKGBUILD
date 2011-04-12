@@ -4,32 +4,31 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=squashfs-tools
-pkgver=4.0.lzma
-pkgrel=1
+pkgver=4.1
+_gitcheckout=20101231
+pkgrel=2
 pkgdesc="Tools for squashfs, a highly compressed read-only filesystem for Linux."
 url="http://squashfs.sourceforge.net"
 license=("GPL")
 arch=('i686' 'x86_64')
-depends=('zlib' 'glibc')
-source=(squashfs4.0-lzma-snapshot.tgz 
-	http://downloads.sourceforge.net/sevenzip/lzma465.tar.bz2
-	Makefile)
+depends=('zlib' 'glibc' 'lzo2' 'xz')
+source=("http://chakra-project.org/sources/${pkgname}/squashfs-${pkgver}-${_gitcheckout}.tar.xz")
+md5sums=('98e880d4b3f2bc282f35a29116c6663a')
 
-build()
-{
-    cd $startdir/src/squashfs4.0-lzma-snapshot/$pkgname
+build() {
+    cd ${srcdir}/squashfs-${pkgver}-${_gitcheckout}/${pkgname}
     #reduce memory requirements of unsquashfs to support installation on systems with 256 MB RAM 
-    sed -i -e 's/BUFFER_DEFAULT [0-9]*/BUFFER_DEFAULT 32/' $startdir/src/squashfs4.0-lzma-snapshot/$pkgname/unsquashfs.h
-    cp -f $srcdir/Makefile $srcdir/squashfs4.0-lzma-snapshot/$pkgname
-    make || return 1
-    mkdir -p $startdir/pkg/sbin
-    cp -a mksquashfs unsquashfs $startdir/pkg/sbin
+    sed -i -e 's/BUFFER_DEFAULT [0-9]*/BUFFER_DEFAULT 32/' ${srcdir}/squashfs-${pkgver}-${_gitcheckout}/${pkgname}/unsquashfs.h
+    sed -i 's|^#XZ_SUPPORT = 1|XZ_SUPPORT = 1|' Makefile
+    sed -i 's|^#LZO_SUPPORT = 1|LZO_SUPPORT = 1|' Makefile
+    #set xz as default
+    sed -i 's|^COMP_DEFAULT = gzip|COMP_DEFAULT = xz|' Makefile
+    make
 }
-md5sums=('a2e01bcd59a56cf17587d6481f341b64'
-         '29d5ffd03a5a3e51aef6a74e9eafb759'
-         '06a8f904515801c8a66c7b806b0f901a')
 
+package() {
+    cd ${srcdir}/squashfs-${pkgver}-${_gitcheckout}/${pkgname}
+    install -Dm755 mksquashfs ${pkgdir}/sbin/mksquashfs
+    install -m755 unsquashfs ${pkgdir}/sbin/unsquashfs
+}

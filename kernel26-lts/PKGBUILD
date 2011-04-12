@@ -7,31 +7,27 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgbase="kernel26"
-pkgname=('kernel26' 'kernel26-headers' 'kernel26-docs') # Build stock -CHAKRA kernel
-#pkgname=kernel26-mainline       # Build kernel with a different name
-#_kernelname=${pkgname#kernel26}
-_kernelname=""
-_basekernel=2.6.38
-pkgver=${_basekernel}.2
+pkgbase="kernel26-lts"
+pkgname=('kernel26-lts' 'kernel26-lts-headers') # 'kernel26-lts-firmware' -  Build stock -CHAKRA-LTS kernel
+_kernelname=${pkgname#kernel26}
+_basekernel=2.6.35
+pkgver=${_basekernel}.12
 pkgrel=1
-makedepends=('xmlto' 'docbook-xsl')
-_patchname="patch-${pkgver}-${pkgrel}-CHAKRA"
+_patchname="patch-${pkgver}-${pkgrel}-CHAKRA-LTS"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
-options=(!strip sign)
-source=(http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-$_basekernel.tar.bz2
+source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         http://chakra-project.org/sources/kernel26/${_patchname}.bz2
         # the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
-        kernel26.preset)
-md5sums=('7d471477bfa67546f902da62227fa976'
-         'a30a3285eadc5da1dd0c151cda5dc17c'
-         '1a62b8c0831761170402e43089758bb3'
-         'b6c68233947b3742f339c8804940d4e3'
-         '25584700a0a679542929c4bed31433b6')
+        ${pkgname}.preset)
+md5sums=('091abeb4684ce03d1d936851618687b6'
+         '0dd0074dbd2ebfcb4d6d289c90933ca9'
+         'f031e498b280fe3448f4ef45f3cd803e'
+         '71ae55a833f298c0579617853d8c8b02'
+         'a69bba023ee617a2b8f32296d7d46d0f')
 
 build() {
   cd ${srcdir}/linux-$_basekernel
@@ -47,20 +43,16 @@ build() {
     cat ../config >./.config
   fi
 
-  sed -i 's|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|' .config
-  if [ "${_kernelname}" != "" ]; then
-    sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
-  fi
-  sed -i "s|/sbin/lsmod|/bin/lsmod|" scripts/kconfig/streamline_config.pl # Fix localmodconfig
+  # hack to prevent output kernel from being marked as dirty or git
+  echo "" > ${srcdir}/linux-${_basekernel}/.scmversion
+
+  # get kernel version  
+  make prepare
   # load configuration
   # Configure the kernel. Replace the line below with one of your choice.
-  #make localmodconfig # Configure automaticly for the local machine
   #make menuconfig # CLI menu for configuration
-  #make nconfig # new CLI menu for configuration
-  #make xconfig # X-based configuration, needs qt3 to be installed
-  #make gconfig # GTK based configuration, needs gtk2 to be installed
-  make oldconfig # using old config from previous kernel version
-  #yes ""|make oldconfig # lazy version of the above
+  #make xconfig # X-based configuration
+  #make oldconfig # using old config from previous kernel version
   # ... or manually edit .config
   ####################
   # stop here
@@ -70,46 +62,43 @@ build() {
   ####################
   yes "" | make config
   # build!
-  make ${MAKEFLAGS} bzImage modules
+  make bzImage modules || return 1
 }
 
-package_kernel26() {
-  pkgdesc="The Linux Kernel and modules (mainline)"
-  groups=('base')
-  backup=(etc/mkinitcpio.d/${pkgname}.preset)
-  depends=('coreutils' 'linux-firmware' 'module-init-tools>=3.12' 'mkinitcpio>=0.6.8')
-  # pwc, ieee80211 and hostap-driver26 modules are included in kernel26 now
+package_kernel26-lts() {
+  pkgdesc="The Linux Longterm Support Kernel and modules"
+  backup=(etc/mkinitcpio.d/kernel26-lts.preset)
+  depends=('coreutils' "kernel26-firmware>=${pkgver}" 'module-init-tools' 'mkinitcpio>=0.6.3')
+  # pwc, ieee80211 and hostap-driver26 modules are included in kernel26-lts now
   # nforce package support was abandoned by nvidia, kernel modules should cover everything now.
   # kernel24 support is dropped since glibc24
-  replaces=('kernel24' 'kernel24-scsi' 'kernel26-scsi'
+  replaces=('kernel24' 'kernel24-scsi' 'kernel26-lts-scsi'
             'alsa-driver' 'ieee80211' 'hostap-driver26'
             'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
-            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500'
+            'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26-lts'
             'aufs2')
-  provides=('aufs2')
-  install=kernel26.install
+  provides=('aufs2' "kernel26=${pkgver}")
+  install=kernel26-lts.install
   optdepends=('crda: to set the correct wireless channels of your country')
 
   KARCH=x86
   cd ${srcdir}/linux-$_basekernel
-  # get kernel version
-  make prepare
   _kernver="$(make kernelrelease)"
-  mkdir -p ${pkgdir}/{lib/modules,lib/firmware,boot}
-  make INSTALL_MOD_PATH=${pkgdir} modules_install
+  mkdir -p ${pkgdir}/{lib/modules,boot}
+  make INSTALL_MOD_PATH=${pkgdir} modules_install || return 1
   cp System.map ${pkgdir}/boot/System.map26${_kernelname}
   cp arch/$KARCH/boot/bzImage ${pkgdir}/boot/vmlinuz26${_kernelname}
   #  # add vmlinux
   install -m644 -D vmlinux ${pkgdir}/usr/src/linux-${_kernver}/vmlinux
 
   # install fallback mkinitcpio.conf file and preset file for kernel
-  install -m644 -D ${srcdir}/kernel26.preset ${pkgdir}/etc/mkinitcpio.d/${pkgname}.preset
+  install -m644 -D ${srcdir}/kernel26-lts.preset ${pkgdir}/etc/mkinitcpio.d/kernel26-lts.preset || return 1
   # set correct depmod command for install
   sed \
     -e  "s/KERNEL_NAME=.*/KERNEL_NAME=${_kernelname}/g" \
     -e  "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/g" \
-    -i $startdir/kernel26.install
+    -i $startdir/kernel26-lts.install
   sed \
     -e "s|source .*|source /etc/mkinitcpio.d/kernel26${_kernelname}.kver|g" \
     -e "s|default_image=.*|default_image=\"/boot/${pkgname}.img\"|g" \
@@ -121,13 +110,13 @@ package_kernel26() {
   rm -f ${pkgdir}/lib/modules/${_kernver}/{source,build}
   # remove the firmware
   rm -rf ${pkgdir}/lib/firmware
-  # gzip -9 all modules to safe 100MB of space
-  find "$pkgdir" -name '*.ko' -exec gzip -9 {} \;
 }
 
-package_kernel26-headers() {
-  pkgdesc="Header files and scripts for building modules for kernel26"
-
+package_kernel26-lts-headers() {
+  pkgdesc="Header files and scripts for building modules for kernel26-lts"
+  provides="kernel26-headers=${pkgver}"
+  cd ${srcdir}/linux-${_basekernel}/
+  make oldconfig && make prepare || return 1
   mkdir -p ${pkgdir}/lib/modules/${_kernver}
   cd ${pkgdir}/lib/modules/${_kernver}
   ln -sf ../../../usr/src/linux-${_kernver} build
@@ -139,11 +128,11 @@ package_kernel26-headers() {
   install -D -m644 .config \
     ${pkgdir}/usr/src/linux-${_kernver}/.config
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/include
-
-  for i in acpi asm-generic config generated linux math-emu media net pcmcia scsi sound trace video xen; do
+  
+  for i in acpi asm-generic config generated linux math-emu media net pcmcia scsi sound trace video; do
     cp -a include/$i ${pkgdir}/usr/src/linux-${_kernver}/include/
   done
-
+  
   # copy arch includes for external modules
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/arch/x86
   cp -a arch/x86/include ${pkgdir}/usr/src/linux-${_kernver}/arch/x86/
@@ -166,7 +155,7 @@ package_kernel26-headers() {
   # add headers for lirc package
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video
   cp drivers/media/video/*.h  ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/
-  for i in bt8xx cpia2 cx25840 cx88 em28xx et61x251 pwc saa7134 sn9c102; do
+  for i in bt8xx cpia2 cx25840 cx88 em28xx et61x251 pwc saa7134 sn9c102 usbvideo; do # zc0301 - damaged
    mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/$i
    cp -a drivers/media/video/$i/*.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/$i
   done
@@ -198,20 +187,11 @@ package_kernel26-headers() {
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/
   cp drivers/media/dvb/frontends/lgdt330x.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/
   cp drivers/media/video/msp3400-driver.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/
-  # add dvb headers  
-  # in reference to:
-  # http://bugs.archlinux.org/task/20402
-  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-usb
-  cp drivers/media/dvb/dvb-usb/*.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-usb/
-  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends
-  cp drivers/media/dvb/frontends/*.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/
-  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/common/tuners
-  cp drivers/media/common/tuners/*.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/common/tuners/
   # add xfs and shmem for aufs building
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/fs/xfs
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/mm
   cp fs/xfs/xfs_sb.h ${pkgdir}/usr/src/linux-${_kernver}/fs/xfs/xfs_sb.h
-  # add headers vor virtualbox
+  # add headers for virtualbox
   # in reference to:
   # http://bugs.archlinux.org/task/14568
   cp -a include/drm $pkgdir/usr/src/linux-${_kernver}/include/
@@ -219,32 +199,33 @@ package_kernel26-headers() {
   # in reference to:
   # http://bugs.archlinux.org/task/14568
   cp -a include/trace $pkgdir/usr/src/linux-${_kernver}/include/
-  # add headers for crypto modules
-  # in reference to:
-  # http://bugs.archlinux.org/task/22081
-  cp -a include/crypto $pkgdir/usr/src/linux-${_kernver}/include/
   # copy in Kconfig files
   for i in `find . -name "Kconfig*"`; do 
     mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/`echo $i | sed 's|/Kconfig.*||'`
     cp $i ${pkgdir}/usr/src/linux-${_kernver}/$i
   done
 
+  #cd ${pkgdir}/usr/src/linux-${_kernver}/include && ln -s asm-$KARCH asm
+  # add header for aufs2-util
+  #mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/include/asm
+  #cp -a ${srcdir}/linux-$_basekernel/include/asm-generic/bitsperlong.h ${pkgdir}/usr/src/linux-${_kernver}/include/asm/
+
   chown -R root.root ${pkgdir}/usr/src/linux-${_kernver}
   find ${pkgdir}/usr/src/linux-${_kernver} -type d -exec chmod 755 {} \;
   # remove unneeded architectures
   rm -rf ${pkgdir}/usr/src/linux-${_kernver}/arch/{alpha,arm,arm26,avr32,blackfin,cris,frv,h8300,ia64,m32r,m68k,m68knommu,mips,microblaze,mn10300,parisc,powerpc,ppc,s390,sh,sh64,sparc,sparc64,um,v850,xtensa}
+  # fix aufs
+  # rm -rf ${pkgdir}/usr/src/linux-${_kernver}/include/linux/aufs_type.h
 }
 
-package_kernel26-docs() {
-  pkgdesc="Kernel hackers manual - HTML documentation that comes with the Linux kernel."
+
+package_kernel26-lts-firmware() {
+  pkgdesc="The included firmware files of the Linux Longterm Support Kernel"
+  provides="kernel26-firmware=${pkgver}"
+  conflicts="kernel26-firmware"
 
   cd ${srcdir}/linux-$_basekernel
-  mkdir -p $pkgdir/usr/src/linux-$_kernver
-  mv Documentation $pkgdir/usr/src/linux-$_kernver
-  find $pkgdir -type f -exec chmod 444 {} \;
-  find $pkgdir -type d -exec chmod 755 {} \;
-  # remove a file already in kernel26 package
-  rm -f $pkgdir/usr/src/linux-$_kernver/Documentation/DocBook/Makefile
+  make firmware || return 1
+  make INSTALL_MOD_PATH=${pkgdir} firmware_install || return 1
 }
 
-# vim:set ts=2 sw=2 et:
