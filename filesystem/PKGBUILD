@@ -1,3 +1,4 @@
+#
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
@@ -5,24 +6,24 @@
 
 pkgname=filesystem
 pkgver=2011.04
-_codename="Aida"
-pkgrel=1
-pkgdesc='Base filesystem'
+pkgrel=2
+_codename=Aida
+pkgdesc="Base filesystem"
 arch=('any')
 license=('GPL')
-url='http://www.chakra-project.org'
+url="http://www.chakra-project.org"
 groups=('base')
-options=('sign')
-install='filesystem.install'
-depends=('iana-etc' 'bash' 'coreutils')
-backup=('etc/fstab' 'etc/crypttab' 'etc/group' 'etc/hosts' 'etc/ld.so.conf' 'etc/passwd'
-        'etc/shadow' 'etc/gshadow' 'etc/resolv.conf' 'etc/motd' 'etc/nsswitch.conf'
-        'etc/shells' 'etc/host.conf' 'etc/securetty' 'etc/profile' 'etc/issue')
+install=filesystem.install
+#depends=('sh' 'coreutils')
+backup=(etc/fstab etc/crypttab etc/group etc/hosts etc/ld.so.conf etc/passwd
+        etc/shadow etc/gshadow etc/resolv.conf etc/motd etc/nsswitch.conf
+        etc/shells etc/host.conf etc/securetty etc/profile etc/issue
+        etc/chakra-release)
 source=('group' 'issue' 'nsswitch.conf' 'securetty' 'host.conf' 'ld.so.conf'
         'passwd' 'shadow' 'fstab' 'crypttab' 'hosts' 'motd' 'resolv.conf' 'shells'
         'gshadow' 'profile' 'modprobe.d.usb-load-ehci-first')
-md5sums=('9f726377379ca186e988aeae8e925693'
-         '1b5ea62cf6d6e636f8eb6337e1205be2'
+md5sums=('d91ae4ba0cbbca99ce4095ff6da8be46'
+         '363f25fe6f857261b8933b8420924e0a'
          '13753e4e0964f3652b0cc60a28528bdf'
          '4c4540eeb748bf1f71d631b8c1dcf0b3'
          'f28150d4c0b22a017be51b9f7f9977ed'
@@ -35,8 +36,8 @@ md5sums=('9f726377379ca186e988aeae8e925693'
          'd41d8cd98f00b204e9800998ecf8427e'
          '6f48288b6fcaf0065fcb7b0e525413e0'
          '40dac0de4c6b99c8ca97effbd7527c84'
-         '59768b5f4080b96b67bcde5f66984ad5'
-         '51ac5c337236235bf8fe85a9b07b6db1'
+         '41afb80637b3b989e4f8bacfd80b0818'
+         'f3b6ae7db8adffaaa4bffc6099dcbd50'
          '8098ffd9fbf890468d3198277596b85a')
 
 package() {
@@ -62,7 +63,7 @@ package() {
 	for f in gshadow shadow crypttab; do
 		install -m600 ${srcdir}/${f} ${pkgdir}/etc/
 	done
-	echo "$pkgver ($_codename)" > ${pkgdir}/etc/chakra-release
+	touch ${pkgdir}/etc/arch-release
 	install -D -m644 ${srcdir}/modprobe.d.usb-load-ehci-first ${pkgdir}/etc/modprobe.d/usb-load-ehci-first.conf
 
 	# setup /var
@@ -95,4 +96,8 @@ package() {
 		install -d -m755 ${pkgdir}/usr/local/${d}
 	done
 	ln -s ../man ${pkgdir}/usr/local/share/man
+
+	# setup chakra tags
+	echo "Chakra Linux release ${pkgver} (${_codename})" > "${pkgdir}/etc/chakra-release"
+	sed -i -e "s~Chakra Linux~Chakra Linux (${pkgver} - ${_codename})~g" "${pkgdir}/etc/issue"
 }
