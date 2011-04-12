@@ -4,9 +4,6 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->binutils->glibc
 # NOTE: valgrind requires rebuilt with each new glibc version
 
@@ -21,7 +18,6 @@ license=('GPL' 'LGPL')
 groups=('base')
 depends=('linux-api-headers>=2.6.38' 'tzdata')
 makedepends=('gcc>=4.6')
-replaces=('glibc-xen')
 backup=(etc/locale.gen
         etc/nscd.conf)
 options=('!strip')
@@ -58,6 +54,8 @@ mksource() {
 
 build() {
   cd ${srcdir}/glibc
+  
+  pacman -Q prelink && { msg "Remove prelink"; return 1; }
 
   # timezone data is in separate package (tzdata)
   patch -Np1 -i ${srcdir}/glibc-2.10-dont-build-timezone.patch
