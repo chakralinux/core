@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=lsb-release
 pkgver=1.4
-pkgrel=1
+pkgrel=2
 pkgdesc="LSB version query program"
 arch=('i686' 'x86_64')
 url="http://www.linuxbase.org/"
@@ -25,7 +25,10 @@ build() {
 package() {
   cd "$srcdir/$pkgname-$pkgver"
   install -dm755 "$pkgdir/etc"
-  echo "DISTRIB_DESCRIPTION=\"Chakra Linux\"" > "$pkgdir/etc/lsb-release"
+  echo "DISTRIB_ID=\"Chakra\"" > "$pkgdir/etc/lsb-release"
+  echo "DISTRIB_RELEASE=\"2011.04\"" >> "$pkgdir/etc/lsb-release"
+  echo "DISTRIB_CODENAME=\"Aida\"" >> "$pkgdir/etc/lsb-release"
+  echo "DISTRIB_DESCRIPTION=\"Chakra Linux\"" >> "$pkgdir/etc/lsb-release"
 
   install -Dm 644 lsb_release.1.gz "$pkgdir/usr/share/man/man1/lsb_release.1.gz"
   install -Dm 755 lsb_release "$pkgdir/usr/bin/lsb_release"
