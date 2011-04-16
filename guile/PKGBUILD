@@ -12,15 +12,12 @@ arch=(i686 x86_64)
 license=('GPL')
 depends=('gmp' 'libtool' 'ncurses>=5.7' 'texinfo')
 install=guile.install
-source=(ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz
-	doc-snarfing-fix.patch)
+source=(ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz)
 options=('!libtool' '!makeflags')
-md5sums=('4f91ca29077aca32e1e28f70220dfd9b'
-	 '3d6f6a4670a8e933a760ff076ff40d2a')
+md5sums=('4f91ca29077aca32e1e28f70220dfd9b')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np1 -i ${srcdir}/doc-snarfing-fix.patch || return 1
   ./configure --prefix=/usr --disable-error-on-warning || return 1
   make LDFLAGS+="-lpthread" || return 1
   make DESTDIR="${pkgdir}" install || return 1
