@@ -1,0 +1,33 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+pkgname=libbluedevil
+pkgver=1.8.1
+pkgrel=1
+pkgdesc='A Qt wrapper for bluez used in the new KDE bluetooth stack'
+arch=('i686' 'x86_64')
+url="https://projects.kde.org/projects/playground/libs/libbluedevil"
+license=('GPL')
+depends=('qt' 'bluez')
+makedepends=('cmake')
+source=("http://media.ereslibre.es/2011/03/${pkgname}-v${pkgver}.tar.bz2")
+md5sums=('70eee9877228411e6e36a8b64b89bf9a')
+
+
+build(){
+  cd ${srcdir}
+  mkdir build
+  cd build
+  cmake ../${pkgname}-v${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  make
+}
+
+package() {
+  cd ${srcdir}/build
+  make DESTDIR=${pkgdir} install
+}
