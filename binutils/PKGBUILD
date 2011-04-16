@@ -4,27 +4,27 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->binutils->glibc
 
 pkgname=binutils
 pkgver=2.21
 pkgrel=1
-_date=20110411
+_date=20110416
+# dash the next line if you want to skip the tests
+_test=1
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/binutils/"
 license=('GPL')
 groups=('base')
 depends=('glibc>=2.12.1' 'zlib')
-options=('!libtool' '!distcc' '!ccache')
+options=('!libtool' '!distcc' '!ccache' 'log')
 install=binutils.install
 source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}_${_date}.tar.bz2)
-md5sums=('2378156df1c2bfe349e12d3f1dd8f78f')
+md5sums=('2858722a3f3e0cc7f81a36e6920c17e3')
 
 mksource() {
+  rm -vRf ${pkgname}-${_date}
   mkdir ${pkgname}-${_date}
   cd ${pkgname}-${_date}
   export _TAG=binutils-2_21-branch
@@ -32,10 +32,13 @@ mksource() {
   cvs -z9 co -r $_TAG binutils || return 1
   mv src binutils
   tar -cvjf ../binutils-${pkgver}_${_date}.tar.bz2 binutils/*
+  cd ..
+  md5sum binutils-${pkgver}_${_date}.tar.bz2
 }
 
 build() {
   cd ${srcdir}
+  rm -vRf binutils-build
   mkdir binutils-build && cd binutils-build
 
   [[ $CARCH == "x86_64" ]] && CONFIGFLAG="--enable-64-bit-bfd --disable-multilib"
@@ -49,6 +52,14 @@ build() {
   make configure-host
 
   make tooldir=${pkgdir}/usr
+  make tooldir=${pkgdir}/usr || return 1
+
+  if [ -n "${_test}" ]; then
+     echo "<<< STARTING TESTS >>>"
+     # do not abort on errors - manually check log files
+     make -k -j1 check || true
+     echo "<<< ENDING TESTS >>>"
+  fi
 }
 
 check() {

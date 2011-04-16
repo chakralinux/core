@@ -7,11 +7,13 @@
 pkgname=isl
 pkgver=0.06
 pkgrel=1
+# dash the next line if you want to skip the tests
+_test=1
 pkgdesc="Library for manipulating sets and relations of integer points bounded by linear constraints"
 arch=('i686' 'x86_64')
 url="http://www.kotnet.org/~skimo/isl/"
 license=('LGPL2.1')
-options=('!libtool')
+options=('!libtool' 'log')
 source=(http://www.kotnet.org/~skimo/isl/$pkgname-$pkgver.tar.bz2)
 md5sums=('504f054eaffdd8d07c497ebe3ebc7e04')
 
@@ -19,11 +21,12 @@ build() {
   cd "$srcdir/$pkgname-$pkgver"
   ./configure --prefix=/usr
   make
-}
 
-check() {
-  cd "$srcdir/$pkgname-$pkgver"
-  make check
+  if [ -n "${_test}" ]; then
+     echo "<<< STARTING TESTS >>>"
+     make check
+     echo "<<< ENDING TESTS >>>"
+  fi
 }
 
 package() {

@@ -1,0 +1,21 @@
+diff -Naur guile-1.8.7-orig/scripts/snarf-check-and-output-texi guile-1.8.7/scripts/snarf-check-and-output-texi
+--- guile-1.8.7-orig/scripts/snarf-check-and-output-texi	2009-07-03 22:19:00.000000000 +0000
++++ guile-1.8.7/scripts/snarf-check-and-output-texi	2010-11-20 17:34:34.283333394 +0000
+@@ -267,6 +267,17 @@
+       (set! *file* file)
+       (set! *line* line))
+ 
++     ;; newer gccs like to throw around more location markers into the
++     ;; preprocessed source; these (hash . hash) bits are what they translate to
++     ;; in snarfy terms.
++     (('location ('string . file) ('int . line) ('hash . 'hash))
++      (set! *file* file)
++      (set! *line* line))
++
++     (('location ('hash . 'hash) ('string . file) ('int . line) ('hash . 'hash))
++      (set! *file* file)
++      (set! *line* line))
++
+      (('arglist rest ...)
+       (set! *args* (do-arglist rest)))
+ 

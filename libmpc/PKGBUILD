@@ -7,12 +7,14 @@
 pkgname=libmpc
 pkgver=0.9
 pkgrel=1
+# dash the next line if you want to skip the tests
+_test=1
 pkgdesc="Library for the arithmetic of complex numbers with arbitrarily high precision"
 arch=('i686' 'x86_64')
 url="http://www.multiprecision.org"
 license=('LGPL')
 depends=('mpfr>=3.0.1')
-options=('!libtool')
+options=('!libtool' 'log')
 install=libmpc.install
 source=(http://www.multiprecision.org/mpc/download/mpc-${pkgver/_/-}.tar.gz
         libmpc-0.9-configure_cflags_egrep_issue.patch)
@@ -28,7 +30,12 @@ build() {
   
   ./configure --prefix=/usr
   make
-  make check
+
+  if [ -n "${_test}" ]; then
+     echo "<<< STARTING TESTS >>>"
+     make check
+     echo "<<< ENDING TESTS >>>"
+  fi
 }
 
 package() {

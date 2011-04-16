@@ -1,5 +1,5 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Core Packages for Chakra, part of chakra-project.org
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
@@ -8,21 +8,23 @@
 # NOTE: valgrind requires rebuilt with each new glibc version
 
 pkgname=glibc
-pkgver=2.12.2
+pkgver=2.13
 pkgrel=1
-_glibcdate=20110412
+_glibcdate=20110416
+# dash the next line if you want to skip the tests
+_test=1
 pkgdesc="GNU C Library"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/libc"
 license=('GPL' 'LGPL')
 groups=('base')
 depends=('linux-api-headers>=2.6.38' 'tzdata')
-makedepends=('gcc>=4.6')
+makedepends=('gcc>=4.4')
 backup=(etc/locale.gen
         etc/nscd.conf)
-options=('!strip')
+options=('!strip' 'log')
 install=glibc.install
-source=(http://chakra-project.org/sources/glibc/${pkgname}-${pkgver}_${_glibcdate}.tar.xz
+source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}_${_glibcdate}.tar.xz
         glibc-2.10-dont-build-timezone.patch
         glibc-2.10-bz4781.patch
         glibc-__i686.patch
@@ -31,7 +33,7 @@ source=(http://chakra-project.org/sources/glibc/${pkgname}-${pkgver}_${_glibcdat
         nscd
         locale.gen.txt
         locale-gen)
-md5sums=('9f89cce4ad9e81e59854598a96bbb173'
+md5sums=('36f3344815f0f9a0e105a3855453663c'
          '4dadb9203b69a3210d53514bb46f41c3'
          '0c5540efc51c0b93996c51b57a8540ae'
          '40cd342e21f71f5e49e32622b25acc52'
@@ -42,10 +44,10 @@ md5sums=('9f89cce4ad9e81e59854598a96bbb173'
          '476e9113489f93b348b21e144b6a8fcf')
 
 mksource() {
+  rm -vRf glibc
   git clone git://sourceware.org/git/glibc.git
   pushd glibc
-  git checkout -b glibc-2.12-arch origin/release/2.12/master
-  rm -vRf .git
+  git checkout -b glibc-2.13-arch origin/release/2.13/master
   popd
   tar -cvJf glibc-${pkgver}_${_glibcdate}.tar.xz glibc/*
   md5sum glibc-${pkgver}_${_glibcdate}.tar.xz
@@ -76,6 +78,7 @@ build() {
   touch ${pkgdir}/etc/ld.so.conf
 
   cd ${srcdir}
+  rm -vRf glibc-build
   mkdir glibc-build
   cd glibc-build
 
@@ -97,6 +100,13 @@ build() {
       --disable-multi-arch
         
   make
+
+  if [ -n "${_test}" ]; then
+     echo "<<< STARTING TESTS >>>"
+     # some errors are expected - manually check log files
+     make -k check || true
+     echo "<<< ENDING TESTS >>>"
+  fi
 }
 
 package() {
