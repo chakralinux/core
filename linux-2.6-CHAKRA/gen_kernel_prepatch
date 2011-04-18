@@ -1,0 +1,17 @@
+#!/bin/bash
+_patch="2.6.38.4-pre"
+_queue="2.6.38"
+if [ -d stable-queue ] ;
+then
+  cd stable-queue
+  git pull
+  cd ..
+else
+  git clone http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
+fi
+cd stable-queue/queue-$_queue
+
+for i in $(cat ./series); 
+do 
+   cat $i >> ../../$_patch.patch; 
+done
