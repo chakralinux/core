@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=dssi
 pkgver=1.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="An API for audio plugins, with particular application for software synthesis plugins with native user interfaces."
 arch=("i686" "x86_64")
 url="http://dssi.sourceforge.net/"
@@ -24,7 +24,6 @@ md5sums=('bc4c50f9f9b3cd13019718266f8f15af'
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  . /etc/profile.d/qt3.sh
   ./configure --prefix=/usr || return 1
   make || return 1
   make DESTDIR=$pkgdir install || return 1
