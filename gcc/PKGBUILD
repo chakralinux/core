@@ -7,11 +7,11 @@
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->binutils->glibc
 # NOTE: libtool requires rebuilt with each new gcc version
 
-pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada' 'gcc-go')
-pkgver=4.6.0
-pkgrel=1
-_snapshot=4.6-20110415
-_libstdcppmanver=20110201		# Note: check source directory name when updating this
+pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada')
+pkgver=4.5.2
+pkgrel=2
+_snapshot=4.5-20110414
+_libstdcppmanver=4.5.2		# Note: check source directory name when updating this
 # dash the next line if you want to skip the tests
 _test=1
 pkgdesc="The GNU Compiler Collection"
@@ -20,21 +20,20 @@ license=('GPL' 'LGPL' 'FDL' 'custom')
 url="http://gcc.gnu.org"
 makedepends=('binutils>=2.21' 'libmpc' 'cloog' 'ppl' 'gcc-ada' 'dejagnu' 'autogen')
 options=('!libtool' '!emptydirs' 'log')
-source=(#ftp://gcc.gnu.org/pub/gcc/releases/gcc-${pkgver}/gcc-{ada,core,fortran,g++,go,objc,testsuite}-${pkgver}.tar.bz2
-	ftp://gcc.gnu.org/pub/gcc/snapshots/${_snapshot}/gcc-{ada,core,fortran,g++,go,objc,testsuite}-${_snapshot}.tar.bz2
-	ftp://gcc.gnu.org/pub/gcc/libstdc++/doxygen/libstdc++-api.${_libstdcppmanver}.man.tar.bz2
+source=(#ftp://gcc.gnu.org/pub/gcc/releases/gcc-${pkgver}/gcc-{ada,core,fortran,g++,objc,testsuite}-${pkgver}.tar.bz2
+	ftp://gcc.gnu.org/pub/gcc/snapshots/${_snapshot}/gcc-{ada,core,fortran,g++,objc,testsuite}-${_snapshot}.tar.bz2
+	ftp://gcc.gnu.org/pub/gcc/libstdc++/doxygen/libstdc++-api-${_libstdcppmanver}.man.tar.bz2
 	gcc_pure64.patch
 	gcc-hash-style-both.patch)
-md5sums=('0c2d89f9e2e614ad84c6e2aa239c5c1c' # gcc-ada-4.6-20110415.tar.bz2
-         'aed037654091d1f478dfcb6e13444325' # gcc-core-4.6-20110415.tar.bz2
-         'c346e76014569b25e2869ff986d2ac2d' # gcc-fortran-4.6-20110415.tar.bz2
-         '8d4b78c03c1d477c6cb562d42f461958' # gcc-g++-4.6-20110415.tar.bz2
-         '50bab6a0c9e5403ea77f57361dec5436' # gcc-go-4.6-20110415.tar.bz2
-         '8376485de1c7aa90bb32f52f2372d451' # gcc-objc-4.6-20110415.tar.bz2
-         '6e0032461f87ce60db6302ca652ae9d8' # gcc-testsuite-4.6-20110415.tar.bz2
-         '1e9fd2eaf0ee47ea64e82c48998f1999'
+md5sums=('ade664262a1ba3ffe225736015f9838c' # gcc-ada-4.5-20110414.tar.bz2
+         '106576d9f0199aabf4502595df7a4e2f' # gcc-core-4.5-20110414.tar.bz2
+         'cb08be45a9076ede7f07df09b94b69cb' # gcc-fortran-4.5-20110414.tar.bz2
+         'afba04145c112809cd53d38b1acb66fb' # gcc-g++-4.5-20110414.tar.bz2
+         'a94a001b90d1b1fa8ba67166a0f27e7d' # gcc-objc-4.5-20110414.tar.bz2
+         '478c563e98b13ef150529bb851b83a21' # gcc-testsuite-4.5-20110414.tar.bz2
+         '2776eab5ebb7f9cc62dd2199a3a24382'
          '4030ee1c08dd1e843c0225b772360e76'
-         '4df25b623799b148a0703eaeec8fdf3f')
+         '6fd395bacbd7b6e47c7b74854b478363')
 
 
 if [ -n "${_snapshot}" ]; then
@@ -69,7 +68,7 @@ build() {
       --libdir=/usr/lib --libexecdir=/usr/lib \
       --mandir=/usr/share/man --infodir=/usr/share/info \
       --with-bugurl=http://chakra-project.org/bugs/ \
-      --enable-languages=c,c++,ada,fortran,go,lto,objc,obj-c++ \
+      --enable-languages=c,c++,ada,fortran,lto,objc,obj-c++ \
       --enable-shared --enable-threads=posix \
       --with-system-zlib --enable-__cxa_atexit \
       --disable-libunwind-exceptions --enable-clocale=gnu \
@@ -95,7 +94,7 @@ build() {
 
 package_gcc-libs()
 {
-  pkgdesc="Runtime libraries shipped by GCC"
+  pkgdesc="Runtime libraries shipped by GCC for C and C++ languages"
   groups=('base')
   depends=('glibc>=2.11.1-2')
   install=gcc-libs.install
@@ -108,12 +107,11 @@ package_gcc-libs()
   make -j1 -C $CHOST/libstdc++-v3/po DESTDIR=${pkgdir} install
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
 
-  make -j1 DESTDIR=${pkgdir} install-target-libquadmath  
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
-  make -j1 DESTDIR=${pkgdir} install-target-libobjc
 
-  # remove unnecessary files installed by install-target-{libquadmath,libgfortran,libobjc}
-  rm -rf ${pkgdir}/usr/lib/{gcc/,libgfortran.spec}
+  make -j1 DESTDIR=${pkgdir} install-target-libobjc
+  # I thought I said to only install the lib...
+  rm -rf ${pkgdir}/usr/lib/gcc/
 
   # remove static libraries
   find ${pkgdir} -name *.a -delete
@@ -125,27 +123,21 @@ package_gcc-libs()
 
 package_gcc()
 {
-  pkgdesc="The GNU Compiler Collection - C and C++ frontends"
-  depends=('binutils>=2.20.1' 'libmpc>=0.8.1-2' 'cloog' 'ppl')
+  depends=('binutils>=2.20.1' 'libmpc>=0.8.1-1' 'cloog-ppl>=0.15.9-2' 'elfutils')
   groups=('base-devel')
   install=gcc.install
 
   cd gcc-build
   
-  # unfortunately it is much, much easier to install the lot and clean-up the mess...
+  # much, much easier to install the lot and clean-up the mess
   make -j1 DESTDIR=${pkgdir} install
-  rm $pkgdir/usr/bin/{{$CHOST-,}gfortran,{$CHOST-,}gccgo,gnat*}
-  rm $pkgdir/usr/lib/*.so*
-  rm $pkgdir/usr/lib/lib{ffi,gfortran,go{,begin},objc,quadmath}.a
-  rm $pkgdir/usr/lib/libgfortran.spec
-  rm -r $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{ada{include,lib},finclude,include/objc}
-  rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/include/{ffi{,target}.h,quadmath{,_weak}.h}
-  rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{cc1obj{,plus},f951,gnat1,go1,libgfortranbegin.a}
-  rm -r $pkgdir/usr/lib/go
-  rm $pkgdir/usr/share/info/{gccgo,gfortran,gnat*,libgomp,libquadmath}.info
+  rm $pkgdir/usr/bin/{*gfortran,gnat*}
+  rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{ada{include,lib},finclude,include/objc}/*
+  rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{cc1obj{,plus},f951,gnat1,libgfortranbegin.a}
+  rm $pkgdir/usr/lib/{*.so*,lib{gfortran,objc}.a}
+  rm $pkgdir/usr/share/info/{gfortran,gnat*,libgomp}.info
   rm $pkgdir/usr/share/locale/{de,fr}/LC_MESSAGES/libstdc++.mo
-  rm $pkgdir/usr/share/man/man1/{gccgo,gfortran}.1
-  rm $pkgdir/usr/share/man/man3/ffi*
+  rm $pkgdir/usr/share/man/man1/gfortran.1
 
   # many packages require these symlinks
   install -dm755 ${pkgdir}/lib
@@ -184,7 +176,12 @@ EOF
 
   # install the libstdc++ man pages
   install -dm755 ${pkgdir}/usr/share/man/man3
-  install -m644 ${srcdir}/man/man3/* ${pkgdir}/usr/share/man/man3/
+  install -m644 ${srcdir}/libstdc++-api-${_libstdcppmanver}.man/man3/* \
+    ${pkgdir}/usr/share/man/man3/
+  # deal with conflicts...
+  rm -f ${pkgdir}/usr/share/man/man3/{ctime,queue,random,regex,string}.3
+  rm -f ${pkgdir}/usr/lib/libffi.a
+  rm -f ${pkgdir}/usr/share/man/man3/{ffi,ffi_call,ffi_prep_cif}.3
 
   # Install Runtime Library Exception
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
@@ -198,15 +195,13 @@ package_gcc-fortran()
   install=gcc-fortran.install
 
   cd gcc-build
-  make -j1 DESTDIR=${pkgdir} install-target-libquadmath
   make -j1 DESTDIR=$pkgdir install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=$pkgdir install-nodist_fincludeHEADERS
   make -j1 -C gcc DESTDIR=$pkgdir fortran.install-{common,man,info}
   install -Dm755 gcc/f951 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/f951
   
   # remove libraries included in gcc-libs
-  rm ${pkgdir}/usr/lib/lib{gfortran,quadmath}.so*
-  rm ${pkgdir}/usr/share/info/libquadmath.info
+  rm -f ${pkgdir}/usr/lib/libgfortran.so*
   
   # Install Runtime Library Exception
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
@@ -224,7 +219,7 @@ package_gcc-objc()
   install -m755 gcc/cc1obj{,plus} $pkgdir/usr/lib/gcc/$CHOST/$pkgver/
 
   # remove libraries included in gcc-libs
-  rm ${pkgdir}/usr/lib/libobjc.so*
+  rm -f ${pkgdir}/usr/lib/libobjc.so*
 
   # Install Runtime Library Exception
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
@@ -245,20 +240,3 @@ package_gcc-ada()
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
     ${pkgdir}/usr/share/licenses/gcc-ada/RUNTIME.LIBRARY.EXCEPTION
 }
-
-package_gcc-go()
-{
-  pkgdesc="Go front-end for GCC"
-  depends=("gcc=$pkgver-$pkgrel")
-  install=gcc-go.install
-
-  cd gcc-build
-  make -j1 DESTDIR=$pkgdir install-target-libgo
-  make -j1 -C gcc DESTDIR=$pkgdir go.install-{common,man,info}
-  install -Dm755 gcc/go1 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/go1
-
-  # Install Runtime Library Exception
-  install -Dm644 ${_basedir}/COPYING.RUNTIME \
-    ${pkgdir}/usr/share/licenses/gcc-go/RUNTIME.LIBRARY.EXCEPTION
-}
-
