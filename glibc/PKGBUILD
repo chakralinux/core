@@ -9,7 +9,7 @@
 
 pkgname=glibc
 pkgver=2.13
-pkgrel=1
+pkgrel=2
 _glibcdate=20110416
 # dash the next line if you want to skip the tests
 _test=1
@@ -30,6 +30,7 @@ source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}_${_gli
         glibc-__i686.patch
         glibc-2.12.1-static-shared-getpagesize.patch
         glibc-2.12.2-ignore-origin-of-privileged-program.patch
+        glibc-2.13-nlist1failed.patch
         nscd
         locale.gen.txt
         locale-gen)
@@ -39,6 +40,7 @@ md5sums=('36f3344815f0f9a0e105a3855453663c'
          '40cd342e21f71f5e49e32622b25acc52'
          'a3ac6f318d680347bb6e2805d42b73b2'
          'b042647ea7d6f22ad319e12e796bd13e'
+         '295e04008f0c2417430b063776f43b84'
          'b587ee3a70c9b3713099295609afde49'
          '07ac979b6ab5eeb778d55f041529d623'
          '476e9113489f93b348b21e144b6a8fcf')
@@ -73,6 +75,9 @@ build() {
   # http://www.exploit-db.com/exploits/15274/
   # http://sourceware.org/git/?p=glibc.git;a=patch;h=d14e6b09 (only fedora branch...)
   patch -Np1 -i ${srcdir}/glibc-2.12.2-ignore-origin-of-privileged-program.patch
+
+  # http://sourceware.org/bugzilla/show_bug.cgi?id=12454
+  patch -Np1 -i ${srcdir}/glibc-2.13-nlist1failed.patch
 
   install -dm755 ${pkgdir}/etc
   touch ${pkgdir}/etc/ld.so.conf
