@@ -18,7 +18,7 @@ pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('GPL' 'LGPL' 'FDL' 'custom')
 url="http://gcc.gnu.org"
-makedepends=('binutils>=2.21' 'libmpc' 'cloog' 'ppl' 'gcc-ada' 'dejagnu' 'autogen')
+makedepends=('binutils>=2.20.2' 'libmpc' 'cloog' 'ppl' 'gcc-ada' 'dejagnu' 'autogen')
 options=('!libtool' '!emptydirs' 'log')
 source=(#ftp://gcc.gnu.org/pub/gcc/releases/gcc-${pkgver}/gcc-{ada,core,fortran,g++,objc,testsuite}-${pkgver}.tar.bz2
 	ftp://gcc.gnu.org/pub/gcc/snapshots/${_snapshot}/gcc-{ada,core,fortran,g++,objc,testsuite}-${_snapshot}.tar.bz2
@@ -96,7 +96,7 @@ package_gcc-libs()
 {
   pkgdesc="Runtime libraries shipped by GCC for C and C++ languages"
   groups=('base')
-  depends=('glibc>=2.11.1-2')
+  depends=('glibc>=2.12.2')
   install=gcc-libs.install
 
   cd gcc-build
@@ -123,7 +123,7 @@ package_gcc-libs()
 
 package_gcc()
 {
-  depends=('binutils>=2.20.1' 'libmpc>=0.8.1-1' 'cloog-ppl>=0.15.9-2' 'elfutils')
+  depends=('binutils>=2.20.2' 'libmpc>=0.9' 'cloog' 'ppl')
   groups=('base-devel')
   install=gcc.install
 
