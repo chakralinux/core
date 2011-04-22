@@ -6,7 +6,7 @@
 
 pkgname=cbundle
 pkgver=0.4.5.1
-pkgrel=2
+pkgrel=3
 depends=('squashfs-tools' 'fakechroot' 'unionfs-fuse')
 makedepends=('qt' 'automoc4' 'kdebase-workspace')
 pkgdesc="A shared library for using Chakra software bundles"
@@ -29,7 +29,7 @@ mksource() {
 
 build() {
         cd "${srcdir}/cbundle"
-        
+        patch -Np0 -i ${startdir}/debug-env.patch
 
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \
