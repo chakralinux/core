@@ -5,8 +5,8 @@
 # (c) 2010 Drake Justice
 
 pkgname=cbundle
-pkgver=0.4.5
-pkgrel=1
+pkgver=0.4.5.1
+pkgrel=2
 depends=('squashfs-tools' 'fakechroot' 'unionfs-fuse')
 makedepends=('qt' 'automoc4' 'kdebase-workspace')
 pkgdesc="A shared library for using Chakra software bundles"
@@ -15,13 +15,13 @@ license=('GPL')
 url="http://chakra-project.org/"
 
 source=("http://chakra-project.org/sources/cinstall/cbundle-$pkgver.tar.xz")
-md5sums=('0c762b2fd4219a48b413bb46f23d828b')
+md5sums=('d4ff21cbf6293edd9f134889768d1bbc')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
   git clone git://gitorious.org/chakra/cbundle.git
-  pushd jmc-88-cbundle
+  pushd cbundle
   popd
   tar -cvJf cbundle-${pkgver}.tar.xz cbundle/*
   md5sum cbundle-${pkgver}.tar.xz
@@ -29,7 +29,6 @@ mksource() {
 
 build() {
         cd "${srcdir}/cbundle"
-        
 
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \

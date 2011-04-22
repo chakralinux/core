@@ -4,34 +4,23 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
-
-# original name (used for the source and pkgnames)
-_origname=mediastreamer
-
-pkgname=${_origname}
-pkgver=2.3.0
-pkgrel=1
-pkgdesc='A powerful and lightweighted streaming engine specialized for voice/video telephony applications'
+pkgname=mediastreamer
+pkgver=2.7.3
+pkgrel=2
+pkgdesc="A library written in C that allows you to create and run audio and video streams."
 arch=('i686' 'x86_64')
-url="http://www.linphone.org/index.php/eng/code_review/mediastreamer2"
+url="http://www.linphone.org"
 license=('GPL')
-depends=('ortp>=0.15.0' 'sdl>=1.2.14' 'libv4l>=0.6.3' 'speex' 'libtheora>=1.1.1' "ffmpeg>=0.5")
-makedepends=()
-groups=("kde-uninstall" "kde-support")
-options=('!splitdbg' '!splithdr')
-
-provides=("${_origname}=$pkgver")
-conflicts=("${_origname}")
-
-source=(http://mirror.cinquix.com/pub/savannah/linphone/mediastreamer/${_origname}-$pkgver.tar.gz)
-md5sums=('867d539cf11e942dcbfd08d4b3182397') # mediastreamer-2.3.0.tar.gz
+depends=('ortp' 'speex' 'v4l-utils' 'ffmpeg' 'libxv')
+makedepends=('cmake' 'automoc4')
+source=("http://download-mirror.savannah.gnu.org/releases/linphone/mediastreamer/mediastreamer-$pkgver.tar.gz")
+md5sums=('5213307f557d86aa648f1a53a885138c')
 
 build() {
-  cd "$srcdir"/${_origname}-$pkgver
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="$pkgdir" install || return 1
+
+  cd "$srcdir"/$pkgname-$pkgver/
+  ./configure --prefix=/usr
+  make
+  make DESTDIR=${pkgdir} install
+
 }

@@ -3,8 +3,8 @@
 # Translators: http://chakra-project.org/bbs/viewtopic.php?pid=29626#p29626
 
 pkgname=appset-qt
-pkgver=0.4.0
-pkgrel=1
+pkgver=0.4.2
+pkgrel=2
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -14,23 +14,25 @@ optdepends=('ccr: For Community Repository support')
 install=${pkgname}.install
 source=(http://sourceforge.net/projects/appset/files/appset-qt/0.4/$pkgver/$pkgname-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
-        http://chakra-project.org/sources/$pkgname/$pkgname-0.4.0-chakra.patch
-        http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.4.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_de-0.4.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_el-0.4.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_es-0.4.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.4.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_nl-0.4.0.tar.gz
+        http://chakra-project.org/sources/$pkgname/$pkgname-0.4.2-chakra.patch
+        #http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.4.1.tar.gz
+        #http://chakra-project.org/sources/$pkgname/appset-qt_de-0.4.1.tar.gz
+        #http://chakra-project.org/sources/$pkgname/appset-qt_el-0.4.1.tar.gz
+        #http://chakra-project.org/sources/$pkgname/appset-qt_es-0.4.1.tar.gz
+        #http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.4.1.tar.gz
+        #http://chakra-project.org/sources/$pkgname/appset-qt_nl-0.4.1.tar.gz
+        http://chakra-project.org/sources/$pkgname/appset-qt_pl-0.4.2.tar.gz
         )
-md5sums=(4d0500ae33c8250dfa24c9b696ba7e30
+md5sums=(672dc9475c94baf614dd12922782c522
          87f5f278e3fe67ed2cd6165c2835d81b
-         724e4cea62d3b95dd63573e75dffe783
-         44ba1b52c438e05853fbaf202ae243b6  #appset-qt_ca-0.4.0.tar.gz
-         3b5c5027609eef9b43ad0f98c137c094  #appset-qt_de-0.4.0.tar.gz
-         84542e24121e93dc1c84b63c940c60e0  #appset-qt_el-0.4.0.tar.gz
-         ffb9f62a72805a1613a8847598e353ea  #appset-qt_es-0.4.0.tar.gz
-         f64d3552553bf28d12358aba2db4ca2a  #appset-qt_fr-0.4.0.tar.gz
-         b9238caf3c0bf3f7f2258c052d8addf6  #appset-qt_nl-0.4.0.tar.gz
+         eb097d3ceeae3d05eefc0a5717ced010
+         #8c3833816b9270c175636a7bc7fce544 # appset-qt_ca.0.4.1.tar.gz
+         #275ce0fe7db802558340c5c234a66249 # appset-qt_de-0.4.1.tar.gz
+         #b9ffe714c1c1d76a9df7f0784c9e62d5 # appset-qt_el.0.4.1.tar.gz
+         #033278244a74b198f386766abbb9fc50 # appset-qt_es.0.4.1.tar.gz
+         #676f758716610442b0ef873c1d2974f1 # appset-qt_fr.0.4.1.tar.gz
+         #2acb9e2ac0e6d75f3d97148a621a5539 # appset-qt_nl-0.4.1.tar.gz
+         53efb5cc093a97ebeff33e1d25f05a76 # appset-qt_pl-0.4.2.tar.gz
          )
 
 build() {
@@ -39,7 +41,7 @@ build() {
   cp -v ../*png Qt/AppSet-Qt
 
   # patch it for Chakra GNU/Linux
-  patch -Np1 -i ${startdir}/src/$pkgname-0.4.0-chakra.patch
+  patch -Np1 -i ${startdir}/src/$pkgname-0.4.2-chakra.patch
 
   # add chakra translations (check upstream)
   #patch -Np1 -i ${startdir}/src/add-spanish.patch
