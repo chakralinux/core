@@ -3,8 +3,8 @@
 # Translators: http://chakra-project.org/bbs/viewtopic.php?pid=29626#p29626
 
 pkgname=appset-qt
-pkgver=0.4.2
-pkgrel=2
+pkgver=0.4.3
+pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -14,25 +14,25 @@ optdepends=('ccr: For Community Repository support')
 install=${pkgname}.install
 source=(http://sourceforge.net/projects/appset/files/appset-qt/0.4/$pkgver/$pkgname-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
-        http://chakra-project.org/sources/$pkgname/$pkgname-0.4.2-chakra.patch
+        $pkgname/$pkgname-0.4.3-chakra.patch
         #http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.4.1.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_de-0.4.1.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_el-0.4.1.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_es-0.4.1.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.4.1.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_nl-0.4.1.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_pl-0.4.2.tar.gz
+        #http://chakra-project.org/sources/$pkgname/appset-qt_pl-0.4.2.tar.gz
         )
-md5sums=(672dc9475c94baf614dd12922782c522
+md5sums=(ad4d2811b5c0b756e0b79139c9332a60
          87f5f278e3fe67ed2cd6165c2835d81b
-         eb097d3ceeae3d05eefc0a5717ced010
+         0781a4f583b645d1be29689822f568b0
          #8c3833816b9270c175636a7bc7fce544 # appset-qt_ca.0.4.1.tar.gz
          #275ce0fe7db802558340c5c234a66249 # appset-qt_de-0.4.1.tar.gz
          #b9ffe714c1c1d76a9df7f0784c9e62d5 # appset-qt_el.0.4.1.tar.gz
          #033278244a74b198f386766abbb9fc50 # appset-qt_es.0.4.1.tar.gz
          #676f758716610442b0ef873c1d2974f1 # appset-qt_fr.0.4.1.tar.gz
          #2acb9e2ac0e6d75f3d97148a621a5539 # appset-qt_nl-0.4.1.tar.gz
-         53efb5cc093a97ebeff33e1d25f05a76 # appset-qt_pl-0.4.2.tar.gz
+         #53efb5cc093a97ebeff33e1d25f05a76 # appset-qt_pl-0.4.2.tar.gz
          )
 
 build() {
@@ -41,12 +41,12 @@ build() {
   cp -v ../*png Qt/AppSet-Qt
 
   # patch it for Chakra GNU/Linux
-  patch -Np1 -i ${startdir}/src/$pkgname-0.4.2-chakra.patch
+  patch -Np1 -i ${startdir}/src/$pkgname-0.4.3-chakra.patch
 
   # add chakra translations (check upstream)
   #patch -Np1 -i ${startdir}/src/add-spanish.patch
-  cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
-  cp -v ../appset-qt*.ts Qt/AppSet-Qt
+  #cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
+  #cp -v ../appset-qt*.ts Qt/AppSet-Qt
 
   # check for updated strings
   cd Qt/AppSet-Qt
@@ -73,3 +73,4 @@ package() {
     install -m 755 -d "$pkgdir/etc/rc.d" || return 1
     install -m 755 "$srcdir/$pkgname-$pkgver-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
 }
+
