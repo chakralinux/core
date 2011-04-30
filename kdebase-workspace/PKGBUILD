@@ -41,8 +41,7 @@ depends=('polkit-kde-agent' "kdepimlibs>=${_kdever}" "kdebase-runtime>=${_kdever
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'networkmanager' 'bluez' "kdebindings-python>=${_kdever}"
              "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje' "kdebase-runtime>=${_kdever}" 'gpsd' 'samba' 
-	     'libraw1394' 'libdmtx' 'consolekit' 'docbook-xsl') 
-#  	     'google-gadgets-qt>=0.11.2')
+	     'libraw1394' 'libdmtx' 'consolekit' 'docbook-xsl' 'google-gadgets-qt>=0.11.2')
 
 source=($_mirror/${_origname}-$_kdever.tar.bz2
 	mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -96,7 +95,7 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 #	feature_history-notifications-enable-disable-kde#119207.patch
 
 #	feature_kdm-plymouth.patch
-	shutdown-fix.patch
+#	shutdown-fix.patch
 	sensors-fix.patch
 	)
 
@@ -134,7 +133,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #        '894815a80f99a9a0dee1adbcda49b161' #  feature_battery-tooltip.patch
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
-         'c542f58979cf9cb2299dd42f63e6fd72' #  shutdown-fix.patch
+#        'c542f58979cf9cb2299dd42f63e6fd72' #  shutdown-fix.patch
          'ecf3a9d6af9bdd3db0189e06ddf21034' #  sensors-fix.patch
          )
 
@@ -172,8 +171,8 @@ build()
 	patch -Np0 -i ${srcdir}/fix_terminate-server.patch
 #	patch -Np1 -i ${srcdir}/fix_ck-shutdown.patch
 	patch -p0 -N -i ${srcdir}/fix_kdm_configdef.patch
-	patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch
-	patch -Np1 -i ${srcdir}/shutdown-fix.patch
+        patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch
+#	patch -Np1 -i ${srcdir}/shutdown-fix.patch
 
 # FIXME: update feature patches
 #	msg "applying feature patches ..."
@@ -183,8 +182,8 @@ build()
 # 	patch -Np1 -i ${srcdir}/feature_history-notifications-enable-disable-kde#119207.patch
 # 	patch -Np1 -i ${srcdir}/feature_kdm-plymouth.patch
 
-	msg "applying upstream patches ..."
-	patch -Np1 -i ${srcdir}/sensors-fix.patch
+#	msg "applying upstream patches ..."
+#	patch -Np1 -i ${srcdir}/sensors-fix.patch
 
 
 	msg "starting workspace build ..."
@@ -241,7 +240,7 @@ package_kdebase-workspace()
 
 	optdepends=("kdebindings-python : Python Support for Plasma"
 		    "kdeedu-marble      : Marble Wallpaper Plugin"
-#		    "google-gadgets-qt  : Plasma Support for Google Gadgets"
+		    "google-gadgets-qt  : Plasma Support for Google Gadgets"
                     "qedje              : Plasma Support for Edje Files"
 		    "gpsd               : Plasma geolocation support"
 		    "(open)ntp          : Time/Date sync support")
