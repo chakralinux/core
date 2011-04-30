@@ -1,0 +1,26 @@
+diff --git a/drkonqi/reportassistantpages_bugzilla.cpp b/drkonqi/reportassistantpages_bugzilla.cpp
+index b4f8bc2..b282305 100644
+--- a/drkonqi/reportassistantpages_bugzilla.cpp
++++ b/drkonqi/reportassistantpages_bugzilla.cpp
+@@ -424,6 +424,8 @@ void BugzillaInformationPage::aboutToShow()
+             ui.m_distroChooserCombo->addItem(i18nc("@label:listbox KDE distribution method",
+                                                    "Pardus"), "Pardus Packages");
+             ui.m_distroChooserCombo->addItem(i18nc("@label:listbox KDE distribution method",
++                                                   "Chakra"), "Chakra");
++            ui.m_distroChooserCombo->addItem(i18nc("@label:listbox KDE distribution method",
+                                                    "Archlinux"), "Archlinux Packages");
+             ui.m_distroChooserCombo->addItem(i18nc("@label:listbox KDE distribution method",
+                                                    "FreeBSD (Ports)"), "FreeBSD Ports");
+diff --git a/drkonqi/systeminformation.cpp b/drkonqi/systeminformation.cpp
+index d43094a..6d86d2c 100644
+--- a/drkonqi/systeminformation.cpp
++++ b/drkonqi/systeminformation.cpp
+@@ -92,6 +92,8 @@ void SystemInformation::lsbReleaseFinished()
+         setBugzillaPlatform(QLatin1String("OpenBSD Packages"));
+     } else if ( m_lsbRelease.contains("solaris",Qt::CaseInsensitive) ) {
+         setBugzillaPlatform(QLatin1String("Solaris Packages"));
++    } else if ( m_lsbRelease.contains("chakra",Qt::CaseInsensitive) ) {
++        setBugzillaPlatform(QLatin1String("Chakra"));
+     } else if ( m_lsbRelease.contains("arch",Qt::CaseInsensitive) ) {
+         setBugzillaPlatform(QLatin1String("Archlinux Packages"));
+     } else if ( m_lsbRelease.contains("debian",Qt::CaseInsensitive) ) {
