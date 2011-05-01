@@ -18,10 +18,12 @@ url="http://mesa3d.sourceforge.net"
 license=('custom')
 source=(ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/MesaLib-${pkgver}.tar.bz2
         http://chakra-project.org/sources/mesa/gl-manpages-1.0.1.tar.bz2
-        LICENSE)
+        LICENSE
+        nouveau-fix-header.patch)
 md5sums=('f5de82852f1243f42cc004039e10b771'
          '6ae05158e678f4594343f32c2ca50515'
-         '5c65a0fe315dd347e09b1f2826a1df5a')
+         '5c65a0fe315dd347e09b1f2826a1df5a'
+         '67c87b77cc2236b52a3b47dad3fbb5d4')
 
 build() {
   # python2 build fixes
@@ -31,6 +33,9 @@ build() {
   sed -i -e "s|python|python2|" "${srcdir}/Mesa-${pkgver}"/src/gallium/auxiliary/Makefile
 
   cd "${srcdir}/Mesa-${pkgver}"
+
+  patch -Np1 -i "${srcdir}/nouveau-fix-header.patch"
+
   ./configure --prefix=/usr \
     --with-dri-driverdir=/usr/lib/xorg/modules/dri \
     --disable-egl \

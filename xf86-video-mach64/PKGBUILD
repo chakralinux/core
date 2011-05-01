@@ -5,26 +5,26 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=xf86-video-mach64
-pkgver=6.8.2.99
-pkgrel=1
+pkgver=6.8.2
+pkgrel=5
 pkgdesc="X.org mach64 video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc' 'mach64-dri')
-makedepends=('pkgconfig' 'xorg-server=>1.10.0' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
-conflicts=('xorg-server<1.10.0')
+makedepends=('pkgconfig' 'xorg-server=>1.9.5' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
+conflicts=('xorg-server<1.9.5')
 groups=('xorg-video-drivers')
 options=('!libtool')
-#source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
-#       LICENSE)
-#md5sums=('6c0522b2b72a0a47c48d718443616651'
-#         '901824dae8053c63ef9d313cdaa129a0')
-
-source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz"
-        LICENSE)
-md5sums=("f454570563bf5adfe6ea3f6340ff188b" #  xf86-video-mach64-6.8.2.99-1.tar.xz
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
+       LICENSE)
+md5sums=('6c0522b2b72a0a47c48d718443616651'
          '901824dae8053c63ef9d313cdaa129a0')
+
+#source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz"
+#        LICENSE)
+#md5sums=("f454570563bf5adfe6ea3f6340ff188b" #  xf86-video-mach64-6.8.2.99-1.tar.xz
+#         '901824dae8053c63ef9d313cdaa129a0')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -39,10 +39,10 @@ mksource() {
 }
 
 build() {
-  #cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   # enable on git version
-  cd ${srcdir}/${pkgname}
+  #cd ${srcdir}/${pkgname}
   autoreconf -v --install
   ./configure --prefix=/usr \
               --enable-dri || return 1
