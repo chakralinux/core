@@ -8,7 +8,7 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xf86-video-chips
-pkgver=1.2.3.99
+pkgver=1.2.4
 pkgrel=1
 pkgdesc="X.org Chips and Technologies video driver"
 arch=(i686 x86_64)
@@ -16,13 +16,13 @@ url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=(glibc)
 makedepends=('xorg-server')
-conflicts=('xorg-server<1.10.0')
+conflicts=('xorg-server<1.9.5')
 groups=('xorg-video-drivers')
 options=('!libtool')
-#source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-#sha1sums=('79d1592dacbdd5ff0419dcb2fef2a2ca541dd329')
-source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
-md5sums=("c476696b7bf6c6431eaedf1eda0a751d") # xf86-video-chips-1.2.3.99-1.tar.xz
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('71f474335d05f93b2451a7a0750c4409669641a4')
+#source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
+#md5sums=("c476696b7bf6c6431eaedf1eda0a751d") # xf86-video-chips-1.2.3.99-1.tar.xz
 
 # create tarball: source PKGBUILD && mksource
 
@@ -37,10 +37,10 @@ mksource() {
 }
 
 build() {
-  #cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   # enable on git version
-  cd ${srcdir}/${pkgname}
+  #cd ${srcdir}/${pkgname}
   autoreconf -v --install
   ./configure --prefix=/usr
   make

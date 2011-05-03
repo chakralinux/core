@@ -17,7 +17,7 @@ pkgname=('qt'
          'qt-tools')
 
 pkgver=4.7.2
-pkgrel=1
+pkgrel=2
 #kdeqtver=b427b5e64483612122e56104552a9704f6013680
 
 pkgdesc="A cross-platform application and UI framework"
@@ -123,41 +123,44 @@ build() {
 	
 	msg "starting configure"
 
-	./configure -opensource \
-		-confirm-license \
-		-debug \
-		-separate-debug-info \
+	./configure -confirm-license -opensource \
 		-prefix /usr \
-		-sysconfdir /etc \
-		-plugindir /usr/lib/qt/plugins \
-		-translationdir /usr/share/qt/translations \
-		-datadir /usr/share/qt \
 		-docdir /usr/share/doc/qt \
+		-plugindir /usr/lib/qt/plugins \
+		-importdir /usr/lib/qt/imports \
+		-datadir /usr/share/qt \
+		-translationdir /usr/share/qt/translations \
+		-sysconfdir /etc \
 		-examplesdir /usr/share/doc/qt/examples \
 		-demosdir /usr/share/doc/qt/demos \
+		-largefile \
 		-plugin-sql-{psql,mysql,sqlite,odbc} \
 		-system-sqlite \
-		-openssl-linked \
-		-largefile \
-		-nomake docs \
+		-xmlpatterns \
 		-no-phonon \
 		-no-phonon-backend \
-		-optimized-qmake \
-		-reduce-relocations \
-		-xmlpatterns \
+		-debug \
 		-svg \
 		-webkit \
+		-script \
 		-scripttools \
 		-system-zlib \
 		-system-libtiff \
 		-system-libpng \
 		-system-libmng \
 		-system-libjpeg \
+		-nomake docs \
 		-no-rpath \
 		-no-gtkstyle \
+		-openssl-linked \
+		-silent \
+		-optimized-qmake \
+		-dbus \
+		-reduce-relocations \
+		-no-separate-debug-info \
 		-opengl \
-		-glib \
-		-ptmalloc || return 1
+		-no-openvg \
+		-glib
 
 	# disable automatic installation of demos and examples, we want to do that manually
 	patch -p0 -i $srcdir/qt-any-demosexamples-manual-install.patch || return 1

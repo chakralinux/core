@@ -8,31 +8,36 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=libx11
-pkgver=1.4.1
+pkgver=1.4.3
 pkgrel=1
 pkgdesc="X11 client-side library"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
-depends=('libxcb>=1.7' 'kbproto>=1.0.4')
-makedepends=('xproto>=7.0.18' 'xextproto>=7.1.2' 'xf86bigfontproto>=1.2.0' 'xtrans>=1.2.5' 'inputproto>=2.0' 'xorg-util-macros>=1.12.0')
+depends=('libxcb' 'xproto' 'kbproto')
+makedepends=('xorg-util-macros' 'xextproto' 'xtrans' 'inputproto')
 options=('!libtool')
-license=('custom:XFREE86')
+license=('custom')
 source=(${url}/releases/individual/lib/libX11-${pkgver}.tar.bz2
-        xorg.sh)
-sha1sums=('83590cdac5071b7154b223d73655edcfc82095c1'
-          '4b756387426afb2a5bb7a155631ec42348abf5c1')
+        xorg.sh
+        xorg.csh)
+sha1sums=('174270a0e51614b5077026fc6c20701d4e09aef8'
+          '4b756387426afb2a5bb7a155631ec42348abf5c1'
+          '45b0b310776cf5d9a94b4a18a5c63ddad9de6ba8')
 
 build() {
   cd "${srcdir}/libX11-${pkgver}"
   ./configure --prefix=/usr --disable-static --disable-xf86bigfont
   make
   make check
+}
+
+package() {
+  cd "${srcdir}/libX11-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
   install -m755 -d "${pkgdir}/etc/profile.d"
-  install -m755 "${srcdir}/xorg.sh" "${pkgdir}/etc/profile.d/"
+  install -m755 "${srcdir}/"xorg.{sh,csh} "${pkgdir}/etc/profile.d/"
 
   install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
-
