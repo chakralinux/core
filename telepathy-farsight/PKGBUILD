@@ -1,15 +1,17 @@
-# $Id: PKGBUILD 64330 2010-01-19 20:00:30Z ibiru $
-# Maintainer: Biru Ionut <ionut@archlinux.ro>
-# Contributor: Ju Liu <liuju86 at gmail dot com>
-# Contributor: Denis Zawada <deno@rootnode.net>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
 pkgname=telepathy-farsight
-pkgver=0.0.15
-pkgrel=2
+pkgver=0.0.17
+pkgrel=1
 pkgdesc="A telepathy-backend to use stream engine."
 arch=('i686' 'x86_64')
 url="http://telepathy.freedesktop.org"
 license=('GPL')
-depends=('telepathy-glib>=0.10.6' 'farsight2>=0.0.17' 'gstreamer0.10-base')
+depends=('telepathy-glib' 'farsight2' 'gstreamer0.10-base')
 makedepends=('libxslt' 'python2')
 groups=('telepathy')
 options=('!libtool')
@@ -17,9 +19,14 @@ source=(http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  ./configure --prefix=/usr --libexecdir=/usr/lib/telepathy
-  make || return 1
-  make DESTDIR=$pkgdir install || return 1
+  ./configure --prefix=/usr --libexecdir=/usr/lib/telepathy \
+  --enable-static=no
+  make
 }
-md5sums=('8a15bad987579656be38df237d302610')
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
+md5sums=('f98377802d38333924f6f1a955a2d42a')
 
