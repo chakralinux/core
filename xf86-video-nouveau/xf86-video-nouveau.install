@@ -1,7 +1,8 @@
 post_install () {
    cat << _EOF
   ==> make sure you use KernelModeSetting (KMS)
-  ==> see http://wiki.archlinux.org/index.php/Nouveau#KMS for more
+  ==> see http://www.chakra-project.org/wiki/index.php/Nouveau#KMS for more
+  ==> This driver replaces nvidia-96xx. Please change your driver to nouveau in your xorg.conf
 _EOF
 }
 
@@ -10,7 +11,9 @@ post_upgrade() {
     cat << _EOF
   ==> ATTENTION: Usermode support has been dropped
   ==> make sure you use KernelModeSetting (KMS)
-  ==> see http://wiki.archlinux.org/index.php/Nouveau#KMS for more
+  ==> see http://www.chakra-project.org/wiki/index.php/Nouveau#KMS for more
 _EOF
+ else
+  post_install $1
  fi
 }

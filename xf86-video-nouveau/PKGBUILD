@@ -5,41 +5,40 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=xf86-video-nouveau
-_gitdate=20110505
+_gitdate=20110316
 pkgver=0.0.16_git${_gitdate} # see configure.ac
-pkgrel=2
+pkgrel=1
 pkgdesc="Open Source 3D acceleration driver for nVidia cards (experimental)"
 arch=('i686' 'x86_64')
 url="http://nouveau.freedesktop.org/wiki/"
 license=('GPL') #and MIT, not yet a license file, see http://nouveau.freedesktop.org/wiki/FAQ#head-09f75d03eb30011c754038a3893119a70745de4e
-depends=("nouveau-drm" 'udev' 'libdrm')
-optdepends=('nouveau-dri:	highly experimental gallium3d features')
-makedepends=('pkgconfig' 'xorg-server>=1.10.1' 'mesa>=7.10' 'glproto>=1.4.11' 'xorg-util-macros' 'xf86driproto' 'autoconf' 'nouveau-dri')
+depends=('libdrm' 'udev' 'libgl')
+optdepends=('nouveau-dri:	experimental gallium3d features')
+makedepends=('xorg-server' 'libdrm>=2.4.24' 'xf86driproto')
 conflicts=('xorg-server<1.10.1')
-options=('!libtool') # 'force'
-install=xf86-video-nouveau.install
+replaces=('nvidia-96xx' 'nvidia-96xx-utils')
+options=('!libtool') # 'force')
+install=${pkgname}.install
 source=(http://chakra-project.org/sources/xf86-video-nouveau/xf86-video-nouveau-${_gitdate}.tar.bz2)
-md5sums=('725e71d37702a4db5a6f0755367ecd23')
+md5sums=('0ab7a1c9d3ec5dd020c09212a58ca801')
 
 # source PKGBUILD && mksource
 mksource() {
-	mkdir -p /tmp/xf86-video-nouveau-${_gitdate}
-	pushd /tmp/xf86-video-nouveau-${_gitdate}
+	mkdir /tmp/${pkgname}-${_gitdate}
+	pushd /tmp/${pkgname}-${_gitdate}
 	git clone -v --depth 1 git://anongit.freedesktop.org/nouveau/xf86-video-nouveau
 	cd xf86-video-nouveau
-	git archive --prefix=xf86-video-nouveau-${_gitdate}/ --format=tar HEAD | bzip2 > /tmp/xf86-video-nouveau-${_gitdate}/xf86-video-nouveau-${_gitdate}.tar.bz2
+	git archive --prefix=xf86-video-nouveau-${_gitdate}/ --format=tar HEAD | bzip2 > /tmp/${pkgname}-${_gitdate}/${pkgname}-${_gitdate}.tar.bz2
 	popd
 }
 
 build() {
   cd ${srcdir}/xf86-video-nouveau-${_gitdate}
-  # fix build
-  sed -i -e "s~nv04_pushbuf.h~nouveau_pushbuf.h~g" src/*
-  ./autogen.sh --prefix=/usr || return 1
-  make || return 1
+  ./autogen.sh --prefix=/usr
+  make
 }
 
 package() {
   cd ${srcdir}/xf86-video-nouveau-${_gitdate}
-  make DESTDIR=${pkgdir} install || return 1
+  make DESTDIR=${pkgdir} install
 }
