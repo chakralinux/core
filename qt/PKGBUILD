@@ -4,39 +4,124 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgbase=qt
-pkgname=('qt' 'qt-private-headers')
-pkgver=4.7.3
-pkgrel=1
+# original name (used for the source and pkgnames)
+_origname=qt
+
+
+
+pkgbase=('qt')
+pkgname=('qt'
+         'qt-doc'
+         'qt-debug'
+         'qt-demos'
+         'qt-tools')
+
+pkgver=4.7.2
+pkgrel=2
+#kdeqtver=b427b5e64483612122e56104552a9704f6013680
+
+pkgdesc="A cross-platform application and UI framework"
 arch=('i686' 'x86_64')
-url='http://qt.nokia.com/'
-license=('GPL3' 'LGPL')
-makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
-    'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
-    'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
-    'mysql' 'unixodbc' 'cups')
-options=('!libtool')
-_pkgfqn="qt-everywhere-opensource-src-${pkgver}"
+url="http://qt.nokia.com/"
+license=('LGPL')
+
+# because qt has its own "create debug files" implementation,
+# we can disable our splithdr option and create qt-debug directly
+# inside the PKGBUILD. This works even with the standard arch makepkg.
+options=('!libtool' 'docs' '!strip')
+
+makedepends=('inputproto'
+	'postgresql-libs'
+	'mysql>=5.5.10'
+	'apr-util' # needed for soprano/virtuoso backend, libiodbc is compatible to unixodbc
+	'libiodbc' # needed for soprano/virtuoso backend, libiodbc is compatible to unixodbc
+	'cups'
+	'libxfixes'
+	'libpng'
+	'libxi'
+	'mesa'
+	'fontconfig'
+	'libxrandr'
+	'glib2'
+	'libtiff>=3.9.2-2'
+	'libmng>=1.0.10-3'
+	'libpng>=1.4.0'
+	'libjpeg>=8'
+	'sqlite3'
+	'dbus'
+	'libxcursor'
+	'libxinerama'
+	'libmysqlclient>=5.5.10'
+ 	'git') # 'gconf'
+
+_pkgfqn=${_origname}-everywhere-opensource-src-${pkgver}
+
 source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
-        'assistant.desktop' 'designer.desktop' 'linguist.desktop'
-        'qtconfig.desktop')
-md5sums=('49b96eefb1224cc529af6fe5608654fe'
-         'fc211414130ab2764132e7370f8e5caa'
-         '85179f5e0437514f8639957e1d8baf62'
-         'f11852b97583610f3dbb669ebc3e21bc'
-         '6b771c8a81dd90b45e8a79afa0e5bbfd')
+#	"http://chakra-project.org/sources/qt/kde-qt-${kdeqtver}.patch.gz"
+	'assistant.desktop'
+	'designer.desktop'
+	'linguist.desktop'
+	'qtconfig.desktop'
+	'http://chakra-project.org/sources/qt/qt-any-demosexamples-manual-install.patch'
+	"http://chakra-project.org/sources/qt/qt-${pkgver}-appmenu.patch")
+
+md5sums=('66b992f5c21145df08c99d21847f4fdb'
+#         'cc361e2dff48a56cff9a1649cfc004b2'  #  kde-qt-b427b5e64483612122e56104552a9704f6013680.patch.gz
+         '20d333282c43f9e643cb8e91b6307dcc'
+         'bf89ee0bdd178933f19d8bc4090173ec'
+         'a9bfeeffab8ba103bc8153fdb31474a1'
+         '83b2a4aece6c9d86301c53a979af0b63'
+         '579e63488320a8d692d25502551787af'
+         '7ca519c824d67cfae0281ec50af24ad8')
+
+# source PKGBUILD && _create-kdeqt-patch
+_create-kdeqt-patch() {
+          #Create patches
+	  echo "creating kde-qt patches"
+	  local codir=$(mktemp -d)
+	  mkdir -p "${codir}/kde-qt"
+	  git clone git://gitorious.org/+kde-developers/qt/kde-qt.git "${codir}/kde-qt"
+	  pushd "${codir}/kde-qt"
+	  git checkout --track -b ${pkgver}-patched origin/${pkgver}-patched
+	  local kdeqtver=$(git --no-pager show --format='%H' "${pkgver}-patched" | head -1)
+	  git diff "v${pkgver}..${pkgver}-patched" | gzip > "${codir}/kde-qt-${kdeqtver}.patch.gz"
+          popd
+          mv "${codir}/kde-qt-${kdeqtver}.patch.gz" .
+	  rm -rf "${codir}"
+	  md5sum kde-qt-${kdeqtver}.patch.gz
+	  echo "change kdeqtver to $kdeqtver"
+}
 
 build() {
+	cd $srcdir/$_pkgfqn
+
 	unset QMAKESPEC
 	export QT4DIR=$srcdir/$_pkgfqn
 	export PATH=${QT4DIR}/bin:${PATH}
 	export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
 
 	cd $srcdir/$_pkgfqn
-	
-    sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
-	sed -i "/^QMAKE_RPATH/s| -Wl,-rpath,||g" mkspecs/common/g++.conf
+	msg "applying kde-qt patches"
+	cd $srcdir/$_pkgfqn
+#	patch -p1 -i $srcdir/kde-qt-${kdeqtver}.patch || return 1
+	# editing qt.install
+	sed -i -e 's/^.*> Qt .*/        echo " > Qt '${pkgver}'"/' $startdir/qt.install
+#	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
+
+	echo "This build don't get patched with kde-qt patches"
+	sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt: not patched in this release"/' $startdir/qt.install
+
+	msg "apply other patches"
+	# apply appmenu patch from Aurelien Gateau
+	patch -Np1 -i ${srcdir}/qt-${pkgver}-appmenu.patch || return 1
+	cp ${srcdir}/${_pkgfqn}/src/gui/widgets/qabstractmenubarimpl_p.h ${srcdir}/${_pkgfqn}/include/QtGui/private/
+
+	# we want our cflags etc
+        sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
+        sed -i "/^QMAKE_RPATH/s| -Wl,-rpath,||g" mkspecs/common/g++.conf
 	sed -i "/^QMAKE_LFLAGS\s/s|+=|+= $LDFLAGS|g" mkspecs/common/g++.conf
+	
+	msg "starting configure"
 
 	./configure -confirm-license -opensource \
 		-prefix /usr \
@@ -54,6 +139,8 @@ build() {
 		-xmlpatterns \
 		-no-phonon \
 		-no-phonon-backend \
+                -debug \
+		-separate-debug-info \
 		-svg \
 		-webkit \
 		-script \
@@ -63,156 +150,144 @@ build() {
 		-system-libpng \
 		-system-libmng \
 		-system-libjpeg \
-		-nomake demos \
-		-nomake examples \
 		-nomake docs \
 		-no-rpath \
+		-no-gtkstyle \
 		-openssl-linked \
 		-silent \
 		-optimized-qmake \
 		-dbus \
 		-reduce-relocations \
-		-no-separate-debug-info \
 		-opengl \
 		-no-openvg \
 		-glib
-	make
+
+	# disable automatic installation of demos and examples, we want to do that manually
+	patch -p0 -i $srcdir/qt-any-demosexamples-manual-install.patch || return 1
+
+	msg "starting the build"
+	make || return 1
 }
 
-package_qt() {
-    pkgdesc='A cross-platform application and UI framework'
-    depends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
-      'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
-      'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils')
-    optdepends=('postgresql-libs: PostgreSQL driver'
-	  'libmysqlclient: MySQL driver'
-	  'unixodbc: ODBC driver'
-	  'libxinerama: Xinerama support'
-	  'libxcursor: Xcursor support'
-	  'libxfixes: Xfixes support')
-    install='qt.install'
+package_qt()
+{
+	pkgdesc="A cross-platform application and UI framework"
+	depends=('libpng>=1.4.0' 'libxi' 'mesa' 'fontconfig' 'libxrandr' 'glib2' 'libtiff>=3.9.2-2' 'libmng>=1.0.10-3' 'libjpeg>=8' 'sqlite3' 'dbus' 'libxcursor' 'libxinerama')
+	optdepends=('postgresql-libs : PostgreSQL support' 
+	'libmysqlclient  : MySQL support'
+	'iodbc/unixodbc  : ODBC support')
+#	'gconf           : qgtkstyle theme support for GTK')
+	provides=("qt4=${pkgver}" "qt=${pkgver}") # "phonon=4.3.80"
+	replaces=('qt-devel' 'qtmod')
+	conflicts=('qt4' 'qtmod')
+	groups=("kde" "kde-complete" "kde-uninstall" "kde-minimal")
+	install=qt.install
+
+	cd $srcdir/$_pkgfqn
+
+	# install it
+	make INSTALL_ROOT=$pkgdir install || return 1
+
+	# cleanup and path fixes
+	find $pkgdir/usr/lib -type f -name '*prl' -print -exec sed -i -e "/^QMAKE_PRL_BUILD_DIR/d" {} \;
+	sed -i -e "s|-L$srcdir/${_pkgfqn}/lib||g" $pkgdir/usr/lib/pkgconfig/*.pc
+	sed -i -e "s|$srcdir/${_pkgfqn}/bin/moc|/usr/bin/moc|g" $pkgdir/usr/lib/pkgconfig/*.pc
+	sed -i -e "s|$srcdir/${_pkgfqn}/bin/uic|/usr/bin/uic|g" $pkgdir/usr/lib/pkgconfig/*.pc
+
+	# icon and desktop file for qtconfig
+	install -D -m644 src/gui/dialogs/images/qtlogo-64.png ${pkgdir}/usr/share/pixmaps/qtlogo.png
+	install -D -m644 ${srcdir}/qtconfig.desktop ${pkgdir}/usr/share/applications/qtconfig.desktop
 	
-    cd $srcdir/$_pkgfqn
-	make INSTALL_ROOT=$pkgdir install
-
-	# install missing icons and desktop files
-	for icon in tools/linguist/linguist/images/icons/linguist-*-32.png ; do
-		size=$(echo $(basename ${icon}) | cut -d- -f2)
-		install -p -D -m644 ${icon} ${pkgdir}/usr/share/icons/hicolor/${size}x${size}/apps/linguist.png
-	done
-	install -p -D -m644 src/gui/dialogs/images/qtlogo-64.png ${pkgdir}/usr/share/icons/hicolor/64x64/apps/qtlogo.png
-	install -p -D -m644 tools/assistant/tools/assistant/images/assistant.png ${pkgdir}/usr/share/icons/hicolor/32x32/apps/assistant.png
-	install -p -D -m644 tools/designer/src/designer/images/designer.png ${pkgdir}/usr/share/icons/hicolor/128x128/apps/designer.png
-	install -d ${pkgdir}/usr/share/applications
-	install -m644 ${srcdir}/{linguist,designer,assistant,qtconfig}.desktop ${pkgdir}/usr/share/applications/
-
-	# install license addition
+	# licensing
 	install -D -m644 LGPL_EXCEPTION.txt ${pkgdir}/usr/share/licenses/qt/LGPL_EXCEPTION.txt
 
-	# Fix wrong path in pkgconfig files
-	find ${pkgdir}/usr/lib/pkgconfig -type f -name '*.pc' \
-		-exec perl -pi -e "s, -L${srcdir}/?\S+,,g" {} \;
-	# Fix wrong path in prl files
-	find ${pkgdir}/usr/lib -type f -name '*.prl' \
-		-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
+	# move out some tool binaries and put them into qt-tools
+	# its ugly, but it "feels" cleaner ;)
+	mkdir -p $srcdir/bin
+	mv $pkgdir/usr/bin/assistant $srcdir/bin
+	#mv $pkgdir/usr/bin/assistant_adp $srcdir/bin
+	mv $pkgdir/usr/bin/designer $srcdir/bin
+	mv $pkgdir/usr/bin/linguist $srcdir/bin
+    
+	# move out debug symbols into a temp dir and put them into qt-debug later below
+	mkdir -p $srcdir/debug
+	for x in `find $pkgdir -name *.debug`
+	do
+		basedir=`dirname $x`
+		targetdir=`echo $basedir | awk -F "/usr" '{print $NF}'`
+		mkdir -p $srcdir/debug${targetdir}
+		mv $x $srcdir/debug${targetdir}
+	done
 }
 
-package_qt-private-headers(){
-    pkgdesc="Qt private headers for development"
-    depends=("qt=${pkgver}")
-
-    install -d ${pkgdir}/usr/include/phonon/private
-    cd ${srcdir}/$_pkgfqn/src/3rdparty/phonon/phonon/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/phonon/private/ \; &> /dev/null
+package_qt-debug()
+{
+	pkgdesc="A cross-platform application and UI framework - Debugging Symbols"
+	depends=("qt=${pkgver}")
+	optdepends=()
+	groups=("kde-debug" "kde-uninstall")
     
-    install -d ${pkgdir}/usr/include/Qt3Support/private
-    cd ${srcdir}/$_pkgfqn/src/qt3support/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/Qt3Support/private/ \; &> /dev/null
+	mkdir $pkgdir/usr
+	cd $srcdir
+	cp -r debug/* $pkgdir/usr
+}
 
-    install -d ${pkgdir}/usr/include/QtCore/private
-    cd ${srcdir}/$_pkgfqn/src/corelib/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtCore/private/ \; &> /dev/null
+package_qt-doc()
+{
+	pkgdesc="A cross-platform application and UI framework - Documentation"
+	depends=("qt=${pkgver}")
+	optdepends=()
+	provides=("qt4-doc=${pkgver}" "qt-doc=${pkgver}")
+	conflicts=('qt4-doc' 'qtmod-doc')
+	groups=("kde-complete" "kde-doc" "kde-uninstall")
     
-    install -d ${pkgdir}/usr/include/QtDBus/private
-    cd ${srcdir}/$_pkgfqn/src/dbus/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtDBus/private/ \; &> /dev/null
+	cd $srcdir/$_pkgfqn
 
-    install -d ${pkgdir}/usr/include/QtDeclarative/private
-    cd ${srcdir}/$_pkgfqn/src/declarative/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtDeclarative/private/ \; &> /dev/null
+	mkdir -p $pkgdir/usr/share/doc/qt
+	cp -r doc/* $pkgdir/usr/share/doc/qt
+}
 
-    install -d ${pkgdir}/usr/include/QtDesigner/private
-    cd ${srcdir}/$_pkgfqn/tools/designer/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtDesigner/private/ \; &> /dev/null
-
-    install -d ${pkgdir}/usr/include/QtGui/private
-    cd ${srcdir}/$_pkgfqn/src/gui/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtGui/private/ \; &> /dev/null
-
-    install -d ${pkgdir}/usr/include/QtHelp/private
-    cd ${srcdir}/$_pkgfqn/tools/assistant/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtHelp/private/ \; &> /dev/null
+package_qt-demos()
+{
+	pkgdesc="A cross-platform application and UI framework - Demos & Examples"
+	depends=("qt=${pkgver}")
+	optdepends=()
+	provides=()
+	replaces=('qtmod-demos')
+	conflicts=()
+	groups=("kde-uninstall")
     
-    install -d ${pkgdir}/usr/include/QtMultimedia/private
-    cd ${srcdir}/$_pkgfqn/src/multimedia/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtMultimedia/private/ \; &> /dev/null
+	cd $srcdir/$_pkgfqn
 
-    install -d ${pkgdir}/usr/include/QtNetwork/private
-    cd ${srcdir}/$_pkgfqn/src/network/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtNetwork/private/ \; &> /dev/null
+	pushd demos
+	make INSTALL_ROOT=$pkgdir install || return 1
+	popd
+    
+	pushd examples
+	make INSTALL_ROOT=$pkgdir install || return 1
+	popd
+}
 
-    install -d ${pkgdir}/usr/include/QtOpenGL/private
-    cd ${srcdir}/$_pkgfqn/src/opengl/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtOpenGL/private/ \; &> /dev/null
+package_qt-tools()
+{
+	pkgdesc="A cross-platform application and UI framework - Tools (Linguist, Designer, Assistant)"
+	depends=("qt=${pkgver}")
+	optdepends=()
+	provides=()
+	replaces=('qtmod-tools')
+	conflicts=()
+	groups=("kde-uninstall" "kde-devel")
 
-    install -d ${pkgdir}/usr/include/QtScript/private
-    cd ${srcdir}/$_pkgfqn/src/script/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtScript/private/ \; &> /dev/null
+	cd $srcdir/$_pkgfqn
 
-    install -d ${pkgdir}/usr/include/QtScriptTools/private
-    cd ${srcdir}/$_pkgfqn/src/scripttools/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtScriptTools/private/ \; &> /dev/null
+	install -D -m755 -o root -g root $srcdir/bin/assistant $pkgdir/usr/bin/assistant
+	#install -D -m755 -o root -g root $srcdir/bin/assistant_adp $pkgdir/usr/bin/assistant_adp
+	install -D -m755 -o root -g root $srcdir/bin/designer $pkgdir/usr/bin/designer
+	install -D -m755 -o root -g root $srcdir/bin/linguist $pkgdir/usr/bin/linguist
 
-    install -d ${pkgdir}/usr/include/QtSql/private
-    cd ${srcdir}/$_pkgfqn/src/sql/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtSql/private/ \; &> /dev/null
-
-    install -d ${pkgdir}/usr/include/QtSvg/private
-    cd ${srcdir}/$_pkgfqn/src/svg/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtSvg/private/ \; &> /dev/null
-
-    install -d ${pkgdir}/usr/include/QtTest/private
-    cd ${srcdir}/$_pkgfqn/src/testlib/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtTest/private/ \; &> /dev/null
-
-    install -d ${pkgdir}/usr/include/QtUiTools/private
-    cd ${srcdir}/$_pkgfqn/tools/designer/src/uitools
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtUiTools/private/ \; &> /dev/null
-
-    install -d ${pkgdir}/usr/include/QtWebKit/private
-    cd ${srcdir}/$_pkgfqn/src/3rdparty/webkit
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtWebKit/private/ \; &> /dev/null
-
-    install -d ${pkgdir}/usr/include/QtXmlPatterns/private
-    cd ${srcdir}/$_pkgfqn/src/xmlpatterns/
-    find . -name "*_p.h" -exec install -m644 {} \
-      ${pkgdir}/usr/include/QtXmlPatterns/private/ \; &> /dev/null
+	install -D -m644 -o root -g root tools/assistant/tools/assistant/images/assistant.png ${pkgdir}/usr/share/pixmaps/assistant.png
+	install -D -m644 -o root -g root tools/linguist/linguist/images/appicon.png ${pkgdir}/usr/share/pixmaps/linguist.png
+	install -D -m644 -o root -g root tools/designer/src/designer/images/designer.png ${pkgdir}/usr/share/pixmaps/designer.png
+	install -d -o root -g root ${pkgdir}/usr/share/applications
+	install -m644 -o root -g root ${srcdir}/{linguist,designer,assistant}.desktop ${pkgdir}/usr/share/applications/
 }
