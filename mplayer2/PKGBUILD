@@ -6,7 +6,7 @@
  
 pkgname=mplayer2
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A media player for Linux, Uoti Urpala's fork"
 arch=('i686' 'x86_64')
 license=('GPL')
@@ -19,13 +19,16 @@ makedepends=('live-media' 'mesa' 'unzip' 'yasm')
 backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
 provides=('mplayer')
 conflicts=('mplayer' 'mplayer2-git')
-source=(http://ftp.mplayer2.org/pub/release/${pkgname}-build-${pkgver/_/-}.tar.xz)
+#source=(http://ftp.mplayer2.org/pub/release/${pkgname}-build-${pkgver/_/-}.tar.xz)
 md5sums=('05b93784de995235e2758f182de15f73')
+source=(https://launchpad.net/debian/experimental/+source/mplayer2/2.0-54-gd33877a-1/+files/mplayer2_2.0-54-gd33877a.orig.tar.gz)
+md5sums=('3ccc86e8c340edd37697178a7dba471a')
 
 build() {
     unset CFLAGS LDFLAGS
 
-    cd ${srcdir}/${pkgname}-build-${pkgver/_/-}/${pkgname/2/}
+    #cd ${srcdir}/${pkgname}-build-${pkgver/_/-}/${pkgname/2/}
+    cd ${srcdir}/mplayer2-build-2.0-54-gd33877a/mplayer
 
     ./configure --prefix=/usr \
                 --enable-runtime-cpudetection \
@@ -48,7 +51,8 @@ build() {
 }
 
 package() {
-    cd ${srcdir}/${pkgname}-build-${pkgver/_/-}/${pkgname/2/}
+    #cd ${srcdir}/${pkgname}-build-${pkgver/_/-}/${pkgname/2/}
+    cd ${srcdir}/mplayer2-build-2.0-54-gd33877a/mplayer
 
     make DESTDIR="${pkgdir}" install
     install -Dm644 etc/{codecs.conf,input.conf,example.conf} ${pkgdir}/etc/mplayer/
