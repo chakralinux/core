@@ -43,7 +43,7 @@ pkgname=('kdeedu-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -55,18 +55,14 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'ocaml' 'facile' 'eigen' 'cfitsio' "
              "kdebase-runtime>=${_kdever}" 'openbabel' 'libqalculate' 'gsl' 'boost' 'indilib' 'r>=2.11.1'
              'libspectre' 'python' 'xplanet' 'docbook-xml' 'avogadro')
 
-#source=($_mirror/${_origname}-$_kdever.tar.bz2)
-source=($_mirror/${_origname}-4.6.2.tar.bz2)
-# md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
-md5sums=('282a7fdd582718575e376e033ec8a049')
-
+source=($_mirror/${_origname}-$_kdever.tar.bz2)
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 #
 # build function
 #
 build()
 {
-        mv -fv ${srcdir}/${_origname}-4.6.2 ${srcdir}/${_origname}-${pkgver}
 	cd ${srcdir}/${_origname}-${pkgver}
 
         # parallel build breaks kalzium
