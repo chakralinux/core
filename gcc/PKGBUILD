@@ -8,9 +8,9 @@
 # NOTE: libtool requires rebuilt with each new gcc version
 
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada')
-pkgver=4.5.2
-pkgrel=2
-_snapshot=4.5-20110414
+pkgver=4.5.3
+pkgrel=1
+#_snapshot=4.5-20110414
 _libstdcppmanver=4.5.2		# Note: check source directory name when updating this
 # dash the next line if you want to skip the tests
 _test=1
@@ -18,19 +18,20 @@ pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('GPL' 'LGPL' 'FDL' 'custom')
 url="http://gcc.gnu.org"
-makedepends=('binutils>=2.20.2' 'libmpc' 'cloog' 'ppl' 'gcc-ada' 'dejagnu' 'autogen')
+makedepends=('binutils>=2.20.2' 'libmpc' 'cloog' 'ppl' 'gcc-ada' 'dejagnu' 'autogen' 'elfutils')
 options=('!libtool' '!emptydirs' 'log')
-source=(#ftp://gcc.gnu.org/pub/gcc/releases/gcc-${pkgver}/gcc-{ada,core,fortran,g++,objc,testsuite}-${pkgver}.tar.bz2
-	ftp://gcc.gnu.org/pub/gcc/snapshots/${_snapshot}/gcc-{ada,core,fortran,g++,objc,testsuite}-${_snapshot}.tar.bz2
+source=(ftp://gcc.gnu.org/pub/gcc/releases/gcc-${pkgver}/gcc-{ada,core,fortran,g++,objc,testsuite}-${pkgver}.tar.bz2
+	#ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-4.5/gcc-{ada,core,fortran,g++,objc,testsuite}-${_snapshot}.tar.bz2
+	#http://chakra-project.org/sources/${pkgname}/gcc-{ada,core,fortran,g++,objc,testsuite}-${_snapshot}.tar.bz2
 	ftp://gcc.gnu.org/pub/gcc/libstdc++/doxygen/libstdc++-api-${_libstdcppmanver}.man.tar.bz2
 	gcc_pure64.patch
 	gcc-hash-style-both.patch)
-md5sums=('ade664262a1ba3ffe225736015f9838c' # gcc-ada-4.5-20110414.tar.bz2
-         '106576d9f0199aabf4502595df7a4e2f' # gcc-core-4.5-20110414.tar.bz2
-         'cb08be45a9076ede7f07df09b94b69cb' # gcc-fortran-4.5-20110414.tar.bz2
-         'afba04145c112809cd53d38b1acb66fb' # gcc-g++-4.5-20110414.tar.bz2
-         'a94a001b90d1b1fa8ba67166a0f27e7d' # gcc-objc-4.5-20110414.tar.bz2
-         '478c563e98b13ef150529bb851b83a21' # gcc-testsuite-4.5-20110414.tar.bz2
+md5sums=('318aa27364afc9e0109027007fada947' # gcc-ada-4.5.3.tar.bz2
+         '98be5094b5b5a7b9087494291bc7f522' # gcc-core-4.5.3.tar.bz2
+         '351fda9e20552357bb8f64e74d2f19f1' # gcc-fortran-4.5.3.tar.bz2
+         '2c78bf1d5f08a0b116f280de88d3ffe7' # gcc-g++-4.5.3.tar.bz2
+         '9bb53e37e589515ba55979a19be9c036' # gcc-objc-4.5.3.tar.bz2
+         'e7b2eeb71a001a88f0c8435a40c10073' # gcc-testsuite-4.5.3.tar.bz2
          '2776eab5ebb7f9cc62dd2199a3a24382'
          '4030ee1c08dd1e843c0225b772360e76'
          '6fd395bacbd7b6e47c7b74854b478363')
@@ -123,7 +124,7 @@ package_gcc-libs()
 
 package_gcc()
 {
-  depends=('binutils>=2.20.2' 'libmpc>=0.9' 'cloog' 'ppl')
+  depends=('binutils>=2.20.2' 'libmpc>=0.9' 'cloog' 'ppl' 'elfutils')
   groups=('base-devel')
   install=gcc.install
 
