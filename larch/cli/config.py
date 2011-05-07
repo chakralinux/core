@@ -52,7 +52,7 @@ PACMAN_CONF = '/tmp/larch_pacman.conf'
 # Medium detection alternatives
 detection_methods = 'label|uuid|device|search'
 # Directories to ignore when squashing mods.sqf
-IGNOREDIRS = 'boot dev larch media proc sys tmp .*'
+IGNOREDIRS = 'dev larch media proc sys tmp .*'
 # Valid file-system types for extlinux
 OKFS = ('ext2', 'ext3', 'ext4', 'btrfs')
 

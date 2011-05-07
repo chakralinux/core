@@ -110,6 +110,17 @@ class Builder:
         writefile(self.kname, self.medium_dir + '/boot/kernelname')
         if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
             writefile('vmlinuz26-lts', self.medium_dir + '/boot/kernelname-lts')
+            
+        # if burg folder found we backup it and restore it
+        if os.path.isfile("%s/boot/burg" % (self.installation0)):
+            comment("Remove any /boot folder but restore found burg folder")
+            runcmd("cp -Rv %s/boot/burg %s/tmp" % (self.installation0, self.installation0))
+            runcmd("rm -Rfv %s/boot" % (self.installation0))
+            runcmd("mkdir -p %s/boot" % (self.installation0))
+            runcmd("cp -Rv %s/tmp/burg %s/boot" % (self.installation0, self.installation0))
+        else:
+            comment("Remove any /boot folder")
+            runcmd("rm -Rfv %s/boot" % (self.installation0))
 
         # if no saved system.sqf, squash the Arch installation at self.installation_dir
         if not os.path.isfile(self.system_sqf):
