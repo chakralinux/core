@@ -6,9 +6,9 @@
 
 pkgbase=libcanberra
 pkgname=(libcanberra libcanberra-pulse libcanberra-gstreamer)
-pkgver=0.26
-pkgrel=2
-pkgdesc="A small and lightweight implementation of the XDG Sound Theme Specification without gtk support"
+pkgver=0.28
+pkgrel=1
+pkgdesc="A small and lightweight implementation of the XDG Sound Theme Specification"
 arch=(i686 x86_64)
 license=('LGPL')
 depends=('libvorbis>=1.3.1' 'libtool' 'alsa-lib>=1.0.23' 'tdb>=1.2.1')
@@ -16,13 +16,13 @@ makedepends=('libpulse' 'gstreamer0.10>=0.10.30')
 options=(!emptydirs)
 url=http://0pointer.de/lennart/projects/libcanberra
 source=(http://0pointer.de/lennart/projects/${pkgbase}/${pkgbase}-${pkgver}.tar.gz)
-md5sums=('ee2c66ada7c851a4e7b6eb1682285a24')
+md5sums=('c198b4811598c4c161ff505e4531b02c')
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
   ./configure --sysconfdir=/etc --prefix=/usr --localstatedir=/var \
       --disable-static --with-builtin=dso --enable-null --disable-oss \
-      --enable-alsa --enable-gstreamer --enable-pulse --disable-gtk
+      --enable-alsa --enable-gstreamer --enable-pulse --disable-gtk 
   make
 }
 
