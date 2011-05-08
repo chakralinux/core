@@ -1,0 +1,251 @@
+<div class="larchdocs">
+<h2 id="pagetitle" level="1">Introduction</h2>
+
+<blockquote>
+<h3>Warning</h3>
+
+<p><em>Before we get started I should point out that most of the
+<em>larch</em> scripts must be run as root in order to do their work,
+and that much of this work consists of deleting and overwriting files
+and even complete directories. If just one of these is wrong it might make
+quite a mess of your system. That is quite normal for an installer,
+but you will be using it on a system that
+is already configured and this is somewhat risky - if you set up your
+configuration wrong (or if you or I made some other mistake ...), you
+might find you have destroyed some important data and/or your system
+doesn't work any more. But that's life - <strong>Share and
+Enjoy!</strong></em>
+</p>
+</blockquote>
+
+<p>Below is the general introductory blurb, but for those who want to jump
+straight in and try it out I would suggest the following pages as possible
+starting points:
+<ul>
+  <li><a href="larch_quick.html" >Quick Start with the GUI</a>
+  </li>
+  <li><a href="larch_quick-console.html" >Quick Start on the command line</a>
+  </li>
+</ul>
+</p>
+
+<h3><a name="live_system"></a>What is a <em>live</em> system?</h3>
+
+<p><em>larch</em> is a collection of scripts designed around the creation and
+use of custom <em>live</em> media (USB-stick/CD/DVD) of <em>Arch Linux</em>.
+A <em>live</em> operating system is one which can reside on a removable medium
+and boot on (ideally) any computer (of compatible architecture) into which
+it is inserted. This can be useful in quite a variety of situations, for
+example for testing purposes, for rescue purposes on machines whose
+installed operating system is broken, or as an installation medium (many
+linux distributions use <em>live</em> systems as installers). But there
+are also situations where a permanently installed <em>live</em> system
+can offer advantages over a normal installation, perhaps because of the
+compression or because a <em>live</em> system is quite robust - it is
+in essence read-only (though there are ways of supporting data persistence),
+and can be quite insensitive to hardware changes.
+</p>
+
+<p>The main features of the <em>larch</em> system are listed on the
+<a href="larch_features.html">Features</a> page, among the most
+significant might be the use of <a href="profiles.html">'profiles'</a>
+to define the characteristics of the system to be built, the ability
+to install the <em>live</em> system to various media and simple support
+of data persistence. In addition it tries to remain as close
+to standard Arch Linux as possible, using (by default) the standard
+kernel, the same initscripts, <em>mkinitcpio</em> for building the
+<em>initramfs</em>, etc.
+</p>
+
+<h3><a name="requirements"></a>Build system requirements</h3>
+
+<p><em>larch</em> has been designed to work without extensive demands on
+the build system. Although it has been developed under <em>Arch Linux</em>,
+<em>larch</em> should run on other <em>GNU/Linux</em> systems. By means
+of a sort of bootstrapping, the required software has been kept to a
+minimum - many of the build functions are carried out on the newly
+installed <em>Arch</em> system using <em>chroot</em>.
+For example, you do not need support for <em>squashfs</em> or <em>aufs</em>
+on the build system. But basic utilities which are normally available on any
+<em>GNU/Linux</em> system, such as <em>bash</em>, <em>file</em>,
+<em>find</em>, <em>blkid</em>, <em>mkisofs</em> - and
+of course <em>chroot</em> - are assumed to be present (on <em>Arch</em>
+that is packages 'bash', 'e2fsprogs', 'util-linux-ng',
+'coreutils', 'findutils', 'file', 'cdrkit').
+</p>
+
+<p> The <em>larch</em> scripts are written mainly in python, but snippets
+of bash crop up here and there.
+In addition to python you must also have the pexpect module available
+(in <em>Arch</em> the 'python-pexpect' package). The (optional) GUI
+requires pyqt. I'm not sure what the oldest supported versions are,
+development was done using python-2.6 and pyqt-4.7.
+I think python-2.5 should be alright, and I have heard that
+pyqt-4.4 probably doesn't work.
+</p>
+
+<h3><a name="cli_gui"></a>Command line vs. GUI</h3>
+
+<p>
+The basic functionality of <em>larch</em> is provided by command-line scripts,
+but a graphical user interface is available, to make it easier to see what
+options are available and to avoid the need to remember and not mistype
+obscure command line parameters. In addition to providing a front-end to the
+main scripts the GUI also provides help with organising the configuration
+files.
+</p>
+
+<h3><a name="overview"></a>Overview</h3>
+
+<p>One design aim was easy customisation, so that even relatively inexperienced
+users could build personalised <em>live</em> systems on USB-stick or CD/DVD,
+containing whatever
+packages they wanted and with their own personal configurations. The resulting
+medium should also be usable for installation purposes, so that one has a
+customised <em>Arch Linux</em> installation/rescue medium. As the content can
+be chosen freely, a comfortable working environment is possible - in contrast
+to the rather Spartan standard <em>Arch</em> installation CD. However, note
+that it is also possible, using the officially supported <em>archiso</em>, to
+produce a customised <em>Arch Linux</em> installation/rescue medium (see the
+corresponding <em>Arch wiki</em> page). The approach taken by the two projects
+is somewhat different so do have a look at both. Note that at the latest since
+version 7, <em>larch</em> makes no pretence of a 'KISS' approach. The code is,
+I'm afraid, rather complicated. The resulting <em>live</em> system should,
+however, be very close to a normal non-<em>live Arch Linux</em> system (as
+far as the <em>squashfs + aufs</em> basis allows).
+</p>
+
+<p><em>larch</em> offers a flexible approach to building your
+<em>live</em> media. You can use 'profiles' to determine what gets installed,
+and how it is configured. The advantage of this method is that all your
+specifications are kept together in a folder which can be used to rebuild the
+same or a similar system at a later date. Alternatively you can do a normal
+<em>Arch Linux</em> installation (if there is such a thing!) and then make a
+<em>live</em> medium from this (e.g. by running <em>larch</em> on it from a
+<em>live</em> medium).
+</p>
+
+<p>The use of <em>squashfs</em> in the resulting system means that the space
+occupied will be significantly less than in the 'raw' state, normally about a
+third of the original. As a result of this decision, it is not possible to write
+directly to the system - which would seem to be quite a drawback, though in
+some situations it can even be an advantage. The use of <em>aufs</em> (a
+'unification' file-system, originally based on <em>unionfs</em>) allows the
+resulting system to use a writeable 'overlay', so that the system behaves in
+most respects like a normal installation. Of course if the boot medium is not
+writeable (e.g. a CD) it may be difficult to provide a persistent writeable
+layer (full persistence, which would include kernel updates, is completely
+impossible in such a situation). In that case, or in general if it is
+desired that there is no
+persistence (e.g. for 'kiosk' type situations), <em>tmpfs</em> (a
+memory-based file-system) can be used for the writeable layer.
+</p>
+
+<p>If the <em>larch</em> system is used in the same way as a normal
+<em>Arch</em> installation, including package updates, the space saving
+effect of the <em>squashfs</em> archive can be lost (updates cannot
+modify the base archive, so they occupy additional space). At some point
+it would then be desirable to rebuild the system. This should be fairly
+straightforward, but it is not really the envisioned use of <em>larch</em>
+media.
+</p>
+
+<p>Hardware detection is provided by the same <em>udev</em> approach as is
+used in a standard <em>Arch Linux</em> system.
+</p>
+
+<p>The <em>larch</em> project comprises several components. The scripts for
+building a <em>larch live</em> medium are in the <em>larch</em> package, which
+need not itself be installed in the <em>live</em> system, though it may be
+useful (and is indeed installed by default). Scripts and data for the
+<em>live</em> environment are provided in the
+<em>larch-live</em> package, which must be installed in the <em>live</em>
+system. There is also an optional installer (<em>larchin</em>) which can
+install the <em>live</em> system to hard disk, providing a convenient way
+to install a ready-configured <em>Arch Linux</em> system.
+</p>
+
+<p>As with <em>Arch Linux</em> in general <em>larch</em> is not really
+designed for beginners - you should know your way around a
+<em>GNU/Linux</em> system (preferably <em>Arch</em>!), and be aware of the
+dangers of running such programs, such as corrupting your whole system.
+In any case, I hope that the
+documentation will be clear enough to help anyone who wants to exploit
+<em>larch</em> to the full (feedback is welcome!).</p>
+
+<p><b>Space Requirements:</b>
+You need quite a lot of space to create a <em>live Arch Linux</em> system.
+Bear in mind that a complete <em>Arch Linux</em> system is installed, then,
+additionally, a compressed ('squashed') version is made, and then perhaps
+even a CD image (<em>iso</em>).
+Building for a USB-stick requires slightly less space, as the iso-image is
+not built. If building a <em>live</em> version of an existing
+<em>Arch Linux</em> system, much less space is required as no new
+system must be installed.
+</p>
+
+<h3><a name="larch_installation"></a>Installation of the <em>larch</em> build
+system</h3>
+
+<p>The recommended way of installing <em>larch</em> is by means of the setup
+script, see <a href="larch_quick-console.html">here</a> for details.
+This installs all the necessary packages to a working directory, and it
+should also work on non-<em>Arch</em> linux systems.
+</p>
+
+<p>The <em>larch</em> package may, however, be installed in the normal
+<em>Arch Linux</em> way using <em>pacman</em>. This method will only work on
+an <em>Arch</em> system, of course. The <em>larch</em> repository is at
+<a href="ftp://ftp.berlios.de/pub/larch/larch8/i686/">
+<strong>berlios</strong></a>.
+</p>
+
+<p>The <em>larch</em> command line scripts need to be started as root, and
+each has a usage message (run with the '-h' option). The gui should be
+started as a normal user (it uses <em>su</em>, or can be configured to
+use <em>sudo</em> instead, to get administrator rights when needed).
+</p>
+
+<h3><a name="larch_profiles"></a>Profiles</h3>
+
+<p>A <em>larch</em> 'profile' is a directory containing the information
+needed to build a particular 'flavour' of <em>Arch Linux</em> as a
+<em>live</em> system - which packages to install, and how it should be
+set up. For details see <a href="profiles.html">Profiles</a>.
+</p>
+
+<h3><a name="stages"></a>The stages of the build process</h3>
+
+<p>The starting point is an <em>Arch Linux</em> installation. This can
+be an already existing one from which you want to make a <em>live</em>
+version, or - the recommended approach - you can use the
+'Installation' stage of the <em>larch</em> system
+(using the <strong>archin.py</strong> script) to prepare this.
+<em>archin</em> downloads all the desired packages (if they are not already
+in the host's package cache) and installs them to a directory on the host.
+See <a href="archin.html">this page</a> for details.
+</p>
+
+<p>Once we have the <em>Arch Linux</em> installation this can be
+processed to build the basis components for the <em>live</em> medium. The
+installation is compressed into a <em>squashfs</em> archive, and an
+overlay directory containing the necessary modifications to the base
+system is built - a sort of 'patch' directory for the basic installation.
+The latter contains a few necessary
+adjustments for running as a <em>live</em> system and also the
+customisations specified in the <em>profile</em>. The other important
+component is the <em>initramfs</em>, which also needs to be adapted
+to boot the <em>live</em> system. This processing is performed by the
+<strong>larchify.py</strong> script, see
+<a href="larchify.html">this page</a> for details.
+</p>
+
+<p>When the 'larchification' has been completed, the components can
+be packed together onto a boot medium together with a bootloader. The
+<strong>live_iso.py</strong> script creates an <em>iso</em> file, which
+can then be written to a CD or DVD, the <strong>live_part.py</strong>
+script sets up a bootable partition on a disk(-like) device, such as a
+USB stick. See <a href="medium.html">this page</a> for details.
+</p>
+
+</div>

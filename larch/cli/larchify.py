@@ -111,7 +111,7 @@ class Builder:
         if os.path.isfile("%s/boot/%s" % (self.installation0, 'vmlinuz26-lts')):
             writefile('vmlinuz26-lts', self.medium_dir + '/boot/kernelname-lts')
             
-        # if burg folder found we backup it up and restore with tribe later
+        # if burg folder found we back it up and restore with tribe later
         if os.path.isfile("%s/boot/burg" % (self.installation0)):
             comment("Backup any found burg folder for tribe to restore")
             runcmd("mkdir -p %s/opt/chakra/restore" % (self.installation0))
