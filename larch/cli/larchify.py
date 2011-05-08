@@ -112,10 +112,10 @@ class Builder:
             writefile('vmlinuz26-lts', self.medium_dir + '/boot/kernelname-lts')
             
         # if burg folder found we back it up and restore with tribe later
-        if os.path.isfile("%s/boot/burg" % (self.installation0)):
+        if os.path.isdir("%s/boot/burg" % (self.installation0)):
             comment("Backup any found burg folder for tribe to restore")
             runcmd("mkdir -p %s/opt/chakra/restore" % (self.installation0))
-            runcmd("cp -Rv %s/boot/burg %s/opt/chakra/restore" % (self.installation0, self.installation0))
+            runcmd("cp -R %s/boot/burg %s/opt/chakra/restore" % (self.installation0, self.installation0))
 
         # if no saved system.sqf, squash the Arch installation at self.installation_dir
         if not os.path.isfile(self.system_sqf):
