@@ -72,6 +72,10 @@ hwdetect_graphics()
 					printhl "NVIDIA hardware detected"
 					printhl "Installing driver: nvidia. This can take some seconds."
 			
+					rmmod nouveau
+					rmmod ttm
+					rmmod drm_kms_helper
+					rmmod drm
 					pacman -Rd --noconfirm libgl &>/dev/null
 					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-utils-${NVIDIA_DRV_VER}* &>/dev/null
 					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia*${NVIDIA_DRV_VER}* &>/dev/null
@@ -86,6 +90,10 @@ hwdetect_graphics()
 					printhl "NVIDIA hardware detected"
 					printhl "Installing driver: nvidia-173xx. This can take some seconds."
 				
+					rmmod nouveau
+					rmmod ttm
+					rmmod drm_kms_helper
+					rmmod drm
 					pacman -Rd --noconfirm libgl &>/dev/null
 					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-173xx* &>/dev/null
 				
@@ -93,17 +101,17 @@ hwdetect_graphics()
 					touch /tmp/nvidia-173xx
 
 				# or maybe another legacy card
-				elif [ $(grep -i "$CARD_NVIDIA" ${HW_DB_PATH}/${NV96XX_DB}) ] 
-				then
-				
-					printhl "NVIDIA hardware detected"
-					printhl "Installing driver: nvidia-96xx. This can take some seconds."
-				
-					pacman -Rd --noconfirm libgl &>/dev/null
-					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-96xx* &>/dev/null
-				
-					# add a status file in /tmp
-					touch /tmp/nvidia-96xx
+				#elif [ $(grep -i "$CARD_NVIDIA" ${HW_DB_PATH}/${NV96XX_DB}) ] 
+				#then
+				#
+				#	printhl "NVIDIA hardware detected"
+				#	printhl "Installing driver: nvidia-96xx. This can take some seconds."
+				#
+				#	pacman -Rd --noconfirm libgl &>/dev/null
+				#	pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-96xx* &>/dev/null
+				#
+				#	# add a status file in /tmp
+				#	touch /tmp/nvidia-96xx
 				else
 					printhl "No non-free drivers available for this hardware"
 				fi
