@@ -10,13 +10,13 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse)
 pkgver=0.9.22
-pkgrel=1
+pkgrel=2
 arch=(i686 x86_64)
 url="http://pulseaudio.org/"
 license=(GPL LGPL)
 makedepends=(libasyncns libcap attr libxtst libsm tcp_wrappers libsndfile
              libtool rtkit speex libsamplerate tdb udev dbus-core xcb-util
-             avahi bluez gconf intltool jack lirc-utils pkgconfig openssl)
+             avahi bluez intltool jack lirc-utils pkgconfig openssl)
 options=(!emptydirs !libtool !makeflags)
 source=("http://0pointer.de/lennart/projects/$pkgbase/$pkgbase-$pkgver.tar.gz"
         $pkgbase.xinit)
@@ -36,6 +36,7 @@ build() {
     --with-database=tdb \
     --disable-hal \
     --disable-rpath \
+    --disable-gconf \
     --disable-default-build-tests
 
   make
@@ -47,7 +48,7 @@ package_pulseaudio() {
            udev)
   optdepends=('avahi: zeroconf support'
               'bluez: bluetooth support'
-              'gconf: configuration through gconf'
+#             'gconf: configuration through gconf'
               'jack: jack support'
               'lirc-utils: infra-red support'
               'openssl: RAOP support')
@@ -86,8 +87,7 @@ package_pulseaudio() {
 
 package_libpulse() {
   pkgdesc="A featureful, general-purpose sound server (client library)"
-  depends=(tcp_wrappers dbus-core xcb-util libasyncns libcap libxtst libsm
-           libsndfile)
+  depends=(tcp_wrappers dbus-core xcb-util libasyncns libcap libxtst libsm libsndfile)
   optdepends=('alsa-plugins: ALSA support'
               'avahi: zeroconf support')
   backup=(etc/pulse/client.conf)
