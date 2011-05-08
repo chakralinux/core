@@ -1,0 +1,109 @@
+<div class="larchdocs">
+<h2 id="pagetitle" level="1">Preparing the <em>larch live</em> medium</h2>
+
+
+<p>The building blocks for the preparation of a <em>live</em> medium are
+produced by the 'larchification' process: the <em>squashfs</em>
+archive, 'system.sqf', the 'boot' directory, containing the kernel and
+<em>initramfs</em>, and the modifications overlay, 'mods.sqf'.
+</p>
+
+<p>This stage adds the bootloader files and user-defined customisations
+which are directly copied to the medium rather than being included in
+the overlay (essentially the stuff from the 'cd-root' directory in the
+profile. See the <a href="profiles.html#cd-root">cd-root</a> section in the
+profiles documentation for details on how to customise this data. On
+writeable media it is also possible to specify that the medium be used
+as a writeable overlay branch in the <em>aufs</em> root ('/') file-system.
+Finally the system is written to
+the medium, if it is a partition (USB-stick, etc.), or - in the case
+of a CD/DVD - an <em>iso</em> file is created. 
+</p>
+
+<p>The structure of the <em>live</em> system is such that it is fairly
+easy to transfer a <em>larch</em> system from one medium to another,
+including the preservation of changes that have been made using the
+data persistence facility, and including the possibility of transferring
+a non-writeable system to a writeable medium and then enabling data
+persistence. Support files for these operations are saved in the
+'/boot/support' directory of the medium - these are mostly binary executables
+which may not be available (in the correct version) on the machine used
+to perform the operations. The libraries they need are also included, and the
+applications must be run as
+</p>
+<pre>    path/to/support/support application-name arguments</pre>
+<p>The applications supported in this way are <em>mksquashfs</em>, <em>unsquashfs</em>,
+<em>extlinux</em> and <em>syslinux</em>.
+Also the binaries 'mbr.bin' and 'isolinux.bin' from the <em>syslinux</em>
+package are made available here. The copying process can, however, be delegated to
+the 'larch-medium' script, the source medium being specified using the '-S'
+option (run 'larch-medium -h' for all options).
+</p>
+
+<h3><a name="overlay_persist"></a>Data Persistence: The Writeable Overlay</h3>
+
+<p>The medium (partition) containing the <em>larch</em> system can be used
+as a writeable overlay branch for the <em>live</em> system (assuming the
+partition actually is writeable), causing changes made while running the
+system to be preserved from one boot to the next, basically the same as
+in a 'normal' linux system. The advantage this has over just installing a
+normal linux system on the partition is that the bulk of the underlying
+system is highly compressed, allowing smaller devices to be used than would
+otherwise be possible. It is also relatively straightforward to transfer
+such a system to and from non-writeable media, such as CD/DVD.
+</p>
+
+<p>If the medium is not writeable (or if the 'nw' boot parameter is passed)
+then a writeable layer is created in <em>tmpfs</em>, a memory based file-system,
+allowing the system to act 'normally' (i.e. the file-system appears
+writeable) while running. However any changes will be lost on shutdown.
+There are situations (e.g. 'kiosk'-systems) where this behaviour can even
+be an advantage.
+</p>
+
+<h3><a name="media_scripts"></a>Command-line Scripts</h3>
+
+<p>The command line script for building a <em>larch live</em> is
+<strong>larch-medium</strong>. Run 'larch-medium -h' to get a
+usage message.
+</p>
+
+<p>When the <em>live</em> system is installed to a partition (e.g.
+USB-stick) it is possible to choose how the boot partition will be
+recognized.
+The options available are via UUID, partition label, partition path
+(e.g. '/dev/sdb1'), or by searching for a partition
+containing the file 'larch/larchboot'. See also
+<a href="larch_running.html#bootparm">'Boot parameters'</a>.
+</p>
+
+<p>The 'bootlines' file allows the boot options to be specified in an
+easily parseable, bootloader independent way. The default version
+is supplied in the 'larch' package (in the 'cd-root/boot0' directory),
+but this will be overridden by a version supplied in the profile.
+The unprocessed version is also retained in the 'boot' directory of
+the created medium, for later reference.
+</p>
+
+<p>It is possible to repeat the installation onto various media, changing
+the configuration, without needing to rerun the 'larchification' stage.
+The constituent <em>larch</em> files remain unchanged.
+</p>
+
+<h3><a name="usb2bootiso"></a>Building a boot CD for a USB-stick</h3>
+
+<p>Older computers may not be able to boot from USB devices, so the
+possibility of generating a small <em>boot iso</em> is provided. This can
+be burned to CD and can be used to boot your <em>larch</em> system on a
+USB-stick. On the command line this is managed by passing the '-b' option
+to the <strong>larch-medium</strong> script.
+As this function uses the system on the USB-stick, this needs to be
+plugged in (not mounted!) and selected in the 'Partition' entry.
+</p>
+
+<p>As the kernel and <em>initramfs</em> are now taken from the CD rather
+than from the USB device, an update of the kernel on the actual <em>larch</em>
+medium would require the creation of a new boot-CD.
+</p>
+
+</div>

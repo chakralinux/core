@@ -1,0 +1,67 @@
+<div class="larchdocs">
+<h2 id="pagetitle" level="1">Quick Start - Console</h2>
+
+<p>This is a quick run through of the steps needed to download <em>larch</em>
+and use it to build a <em>live</em> system from one of the example profiles
+provided in the 'larch-profiles' package. You can use this as an introduction
+to <em>larch</em>, and as a basis for your own customised system if you like.
+</p>
+
+<ul>
+   <li>Make sure you have 'python' and 'python-pexpect' packages installed.
+   </li>
+   <li>Download the latest
+   <a href="ftp://ftp.berlios.de/pub/larch/larch8/i686/larch-setup">
+   <strong>larch-setup</strong></a> script
+   to an empty working directory. Then run it (it is a shell script).
+   It will download and prepare the 'larch', 'liblarch' and 'larch-profiles'
+   packages so that they can be used within this directory.
+   </li>
+   <li>Several links will appear in the working directory. These point at the
+   individual <em>larch</em> scripts. Each has a usage message which you
+   can read by running the script with the '-h' option (e.g.
+   './larch-archin -h')
+   </li>
+   <li>For this example run I will use the 'xmini' profile (which builds a
+   simple XFCE based system). The following steps must be carried out as root.
+   </li>
+   <li>Install the base <em>Arch</em> system to the default location
+   ('/home/larchbuild'):
+   <ul>
+      <li>If you are running <em>Arch</em> the default package mirror is taken
+      from /etc/pacman.d/mirrorlist. On a non-<em>Arch</em> system this file
+      (probably) won't exist, in which case the first uncommented server in
+      larch0/data/mirrorlist is used (this file comes from the 'pacman-allin'
+      package, which should be downloaded automatically in this case). The
+      default server might be alright, but if not you should edit this file.
+      </li>
+      <li><pre>./larch-archin -p larch0/profiles/xmini install</pre>
+      </li>
+   </ul>
+   </li>
+   <li>Prepare the <em>live</em> system. This script compresses the
+   installation using squashfs and also builds a squashed overlay containing
+   all the customisations necessary for the <em>live</em> system, plus those
+   specified in the profile:
+   <pre>./larch-larchify -p larch0/profiles/xmini</pre>
+   </li>
+   <li>Create a bootable 'iso' containing the <em>live</em> system:
+   <pre>./larch-medium -p larch0/profiles/xmini</pre>
+   </li>
+   <li>As an alternative to the last step, make a bootable USB-stick:
+   Insert the stick and double-check the name of the partition to install to.
+   I will assume /dev/sdb1 here:
+   <pre>./larch-medium -p larch0/profiles/xmini /dev/sdb1</pre>
+   </li>
+   <li>If all that worked, you can test the resulting 'iso' in (for example)
+   <em>virtualbox</em> (select the 'vesa' option from the boot menu, otherwise
+   <em>xorg</em> might not start), or try to boot from the USB-stick.
+   </li>
+   <li>If you want to try your hand at designing your own system, the main
+   place to look for details of the customisation process is the
+   section <a href="profiles.html">Profiles</a>.
+   </li>
+   <li>  Share and Enjoy!</li>
+</ul>
+
+</div>
