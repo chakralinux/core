@@ -3,62 +3,53 @@
 #
 # contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=ghostscript
-pkgver=9.00
+pkgver=9.02
 pkgrel=1
 pkgdesc="An interpreter for the PostScript language"
 arch=('i686' 'x86_64')
 license=('GPL3' 'custom')
-depends=('libxext' 'libxt' 'libcups>=1.4.2-3' 'fontconfig>=2.8.0' 'gnutls>=2.8.5' 'cairo>=1.8.8-2'
-          'jasper>=1.900.1-4' 'zlib' 'libpng>=1.4.0' 'libjpeg>=8')
-makedepends=('automake' 'autoconf' 'gtk2>=2.18.6')
-optdepends=('texlive-core:	dvipdf'
-            'gtk2:		gsx')
-replaces=('ghostscript-lrpng')
-provides=('ghostscript-lprng')
+depends=('libxt' 'libcups' 'fontconfig' 'jasper' 'zlib' 'libpng' 'libjpeg' 'libtiff')
+makedepends=('gnutls')
+optdepends=('texlive-core:      needed for dvipdf')
 url="http://www.ghostscript.com/"
-source=(http://ghostscript.com/releases/ghostscript-${pkgver}.tar.xz
-	ghostscript-fPIC.patch
-	ghostscript-system-jasper.patch)
+source=(http://downloads.ghostscript.com/public/ghostscript-${pkgver}.tar.bz2)
 options=('!libtool' '!makeflags')
-md5sums=('1ca5f245677f78f573e6490bdb40702f'
-         '66e250a6d8e7ca0c7689b9a4f4da58fc'
-         '03e27cd02471ab3b642c344fa06b623e')
+md5sums=('f67151444bd56a7904579fc75a083dd6')
 
 build() {
   cd ${srcdir}/ghostscript-${pkgver}
+
   # force it to use system-libs
-  rm -rf jpeg libpng zlib jasper expat
+  rm -rf jpeg libpng zlib jasper expat tiff
 
-  # fix build with systems jasper
-  patch -Np1 -i ${srcdir}/ghostscript-system-jasper.patch || return 1
+  ./configure --prefix=/usr \
+	--enable-dynamic \
+	--with-ijs \
+	--with-jbig2dec \
+	--with-omni \
+	--with-x \
+	--with-drivers=ALL\
+	--with-fontpath=/usr/share/fonts/Type1:/usr/share/fonts \
+	--disable-compile-inits \
+	--disable-gtk
 
-  if [ "$CARCH" = "x86_64" ]; then
-    patch -Np1 -i ${srcdir}/ghostscript-fPIC.patch || return 1
-  fi
-
+  make || return 1
+  
   # Build IJS
   cd ${srcdir}/ghostscript-${pkgver}/ijs
   ./autogen.sh
   ./configure --prefix=/usr --enable-shared --disable-static
-  make || return 1
-  make -j1 DESTDIR=${pkgdir} install || return 1
+  make
+}
 
-  cd ..
-  ./autogen.sh
-  ./configure --prefix=/usr --enable-dynamic --with-ijs \
-              --with-jbig2dec --with-omni --with-x --with-drivers=ALL\
-	      --with-fontpath=/usr/share/fonts/Type1:/usr/share/fonts \
-	      --disable-compile-inits # needed for linking with system-zlib
-  make || return 1
-  make -j1 DESTDIR=${pkgdir} \
+package() {
+  cd ${srcdir}/ghostscript-${pkgver}
+  make DESTDIR=${pkgdir} \
 	cups_serverroot=${pkgdir}/etc/cups \
 	cups_serverbin=${pkgdir}/usr/lib/cups install soinstall
 
-  # install a missing doc files # http://bugs.archlinux.org/task/18023
+  # install missing doc files # http://bugs.archlinux.org/task/18023
   install -m 644 ${srcdir}/ghostscript-${pkgver}/doc/{Ps2ps2.htm,gs-vms.hlp,gsdoc.el,pscet_status.txt} ${pkgdir}/usr/share/ghostscript/$pkgver/doc/
   
   mkdir -p ${pkgdir}/usr/share/licenses/${pkgname}
@@ -66,4 +57,8 @@ build() {
 
   # remove unwanted localized man-pages
   rm -rf $pkgdir/usr/share/man/[^man1]*
+
+  # install IJS
+  cd ${srcdir}/ghostscript-${pkgver}/ijs
+  make DESTDIR=${pkgdir} install
 }
