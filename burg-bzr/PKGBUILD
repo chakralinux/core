@@ -6,7 +6,7 @@
 
 pkgname=burg-bzr
 pkgver=1844
-pkgrel=1
+pkgrel=2
 pkgdesc="A brand-new boot loader based on GRUB."
 url="https://launchpad.net/burg"
 license="GPL3"
@@ -51,6 +51,8 @@ build() {
   # some random patches to facilitate automatic creation of grub.cfg
   patch -Np1 -i  ${srcdir}/arch-burg-detection-folding.patch
   cd "${srcdir}/${_bzrmod}"
+  # disable floppy probing in grub-mkdevicemap
+  sed -i 's|int floppy_disks = 1;|int floppy_disks = 0;|' ${srcdir}/${_bzrmod}/util/grub-mkdevicemap.c
   ## Archlinux changed default /usr/bin/python to 3.1.2, need to use /usr/bin/python2 instead
   sed -i 's|python|python2|' ${srcdir}/${_bzrmod}/autogen.sh
   ./autogen.sh || return 1
