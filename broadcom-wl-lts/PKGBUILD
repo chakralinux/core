@@ -4,8 +4,8 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# use ../fakeuname -r 2.6.35-CHAKRA-LTS ../makepkg
-_kernver=`uname -r`
+# use ../makepkg
+_kernver="2.6.35-CHAKRA-LTS"
 
 pkgname=broadcom-wl-lts
 pkgver=5.100.82.38
@@ -44,5 +44,5 @@ package() {
 	cd "$srcdir"
 	install -D -m 755 wl.ko "$pkgdir/lib/modules/$_kernver/kernel/drivers/net/wireless/wl.ko"
 	install -D -m 644 lib/LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-	sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/*.install
+	sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/*install
 }
