@@ -23,7 +23,7 @@ pkgname=('oxygen-icons'
 	 
 arch=('any')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -33,13 +33,15 @@ install=oxygen-icons.install
 
 makedepends=('pkgconfig' 'cmake' 'automoc4')
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2
-	http://chakra-project.org/source/icons/oxygencolors-addon.tar.gz)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-         'da971d7e2c862a6f77fb310a289f5529') #  ../_sources/oxygencolors-addon.tar.gz
+# source=($_mirror/${_origname}-$_kdever.tar.bz2
+source=("$_mirror/${_origname}-4.6.2.tar.bz2"
+	"http://chakra-project.org/source/icons/oxygencolors-addon.tar.gz")
+#md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+#         'da971d7e2c862a6f77fb310a289f5529') #  ../_sources/oxygencolors-addon.tar.gz
 
-
-
+    
+md5sums=('c46e7e51c5dde641f1e4c6bba0f2852f'
+         'da971d7e2c862a6f77fb310a289f5529')
 
 
 #
@@ -47,6 +49,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #
 build()
 {
+        mv -f $srcdir/$_origname-4.6.2 $srcdir/$_origname-$pkgver
 	cd $srcdir/$_origname-$pkgver
 	
 	patch -Np0 -i $startdir/install_svg_icons_too.patch || return 1
