@@ -8,27 +8,42 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ffmpeg
-pkgver=20110330
-_head=HEAD-da3534b
-pkgrel=4
-pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
+pkgver=0.6.3
+pkgrel=1
+pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix."
 arch=('i686' 'x86_64')
 url="http://ffmpeg.org/"
 license=('GPL3')
 depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libva>=1.0.7' 'openjpeg' 'libvpx')
 makedepends=('yasm')
-#remake snapshot with: http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=HEAD;sf=tgz
-source=(http://chakra-project.org/sources/ffmpeg/ffmpeg-${_head}.tar.gz)
 options=('force')
-#source=(http://ffmpeg.org/releases//releases/ffmpeg-${pkgver}.tar.bz2)
-md5sums=('fcd523f02061aa03a3a81dd022bac640')
 
 build() {
-  cd "$srcdir/$pkgname-$_head"
+  cd "${srcdir}"
+
+  msg "Connecting to GIT server...."
+ 
+  if [ -d "${pkgname}" ] ; then
+    cd "${pkgname}" && git pull origin
+    msg "The local files are updated."
+  else
+    # Fetch the required tag from Git
+    git clone --no-checkout git://git.videolan.org/ffmpeg.git
+    cd "${pkgname}"
+    git checkout -q "${pkgname}-${pkgver}"
+  fi
+ 
+  msg "GIT checkout done or server timeout"
+  msg "Starting make..."
+ 
+  rm -rf "${srcdir}/${pkgname}-build"
+  git clone "${srcdir}/${pkgname}" "${srcdir}/${pkgname}-build"
+  cd "${srcdir}/${pkgname}-build"
 
   ./configure \
     --prefix=/usr \
     --enable-gpl \
+    --enable-version3 \
     --enable-libmp3lame \
     --enable-libvorbis \
     --enable-libxvid \
@@ -42,9 +57,9 @@ build() {
     --enable-libopencore_amrwb \
     --enable-libschroedinger \
     --enable-libopenjpeg \
-    --enable-version3 \
     --enable-runtime-cpudetect \
     --enable-libvpx \
+    --enable-libgsm \
     --disable-debug
 
   make
@@ -52,10 +67,11 @@ build() {
   make doc/ff{mpeg,play,server}.1
 }
 
-package(){
-  cd "$srcdir/$pkgname-$_head"
-  make DESTDIR="$pkgdir" install install-man
-  install -D -m755 tools/qt-faststart "$pkgdir/usr/bin/qt-faststart"
+package() {
+  cd "${srcdir}/${pkgname}-build"
+
+  make DESTDIR="${pkgdir}" install install-man
+  install -D -m755 tools/qt-faststart "${pkgdir}/usr/bin/qt-faststart"
 }
 
 # vim:set ts=2 sw=2 et:
