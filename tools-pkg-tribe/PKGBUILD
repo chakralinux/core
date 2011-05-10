@@ -8,25 +8,25 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.04_ms6
-pkgrel=4
+pkgver=2011.04_r0
+pkgrel=1
 _codename=Aida
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.6.2' 'squashfs-tools' 'partitionmanager>=1216949-4'
+depends=('kdelibs' 'kdeedu-marble>=4.6.3' 'squashfs-tools' 'partitionmanager>=1216949-4'
         'cinstall>=0.4.5' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
-makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.2' 'kdebase-workspace' 'automoc4')
+makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.3' 'kdebase-workspace' 'automoc4')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104MS6.html")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104R0.html")
   
-md5sums=('a9560c8b4b0737d19aa06a967db37eea'
-         '416c5c801e34113b48055fc24d395cd9')
+md5sums=('28f4c2ee7f5a103bb9ab642aa1db87d4'
+         'fb75ac0ce37b6ad838f667b415f5a2e0')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -85,7 +85,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_201104MS6.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_201104R0.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
