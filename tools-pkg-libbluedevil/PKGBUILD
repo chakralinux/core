@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=libbluedevil
-pkgver=1.8
+pkgver=1.9
 pkgrel=1
 pkgdesc='A Qt wrapper for bluez used in the new KDE bluetooth stack'
 arch=('i686' 'x86_64')
@@ -13,14 +13,15 @@ url="https://projects.kde.org/projects/playground/libs/libbluedevil"
 license=('GPL')
 depends=('qt' 'bluez')
 makedepends=('cmake')
-source=("http://media.ereslibre.es/2010/11/${pkgname}-v${pkgver}-1.tar.bz2")
-md5sums=('03c79dd8a6d40e2872fee27c9b81190d')
+# source=("http://download.kde.org/unstable/${pkgname}/${pkgver}/src/${pkgname}-${pkgver}.tar.bz2")
+source=("ftp://ftp.belnet.be/packages/kde/unstable/libbluedevil/1.9/src/libbluedevil-1.9.tar.bz2")
+md5sums=('5f22614dfb840734da6e8b8710c2472e')
 
 build(){
   cd ${srcdir}
   mkdir build
   cd build
-  cmake ../${pkgname}-v${pkgver}-1 \
+  cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr
   make

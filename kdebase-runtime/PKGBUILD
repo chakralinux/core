@@ -43,15 +43,16 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 #	01_knetattach_use_sftp.patch
 #	02_oxygenify_knetattach_icon.patch
 	03_disable_logout_sound.patch
-	04_disable_nepomuk_popups.patch)
+	04_disable_nepomuk_popups.patch
+	05_add_chakra_to_drkonqui.patch)
 
 md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
         '68cd8eb57db22c2f2ed554b721253bc2' #  branding.svgz
 #        '45fa12b8baf21c4fc845147afcea2bc1' #  01_knetattach_use_sftp.patch
 #        '1f0225f31d5f44e753e966fd3a032f00' #  02_oxygenify_knetattach_icon.patch
         'a434bf282ee391b2f857184be59a3b6f'  #  03_disable_logout_sound.patch
-        'a3c844d7bbd9a31f39b1b877ae521340')  #  04_disable_nepomuk_popups.patch
-
+        'a3c844d7bbd9a31f39b1b877ae521340'  #  04_disable_nepomuk_popups.patch
+        '63082e4f07e5840ae7ff3b42c015d72b') #  05_add_chakra_to_drkonqui.patch 
 
 
 #
@@ -72,10 +73,9 @@ build()
 	fi
 	
 	msg "applying main patchset ..."
-	#patch -Np1 -i ${srcdir}/01_knetattach_use_sftp.patch || return 1
-	#patch -Np1 -i ${srcdir}/02_oxygenify_knetattach_icon.patch || return 1
 	patch -Np1 -i ${srcdir}/03_disable_logout_sound.patch || return 1
 	patch -Np1 -i ${srcdir}/04_disable_nepomuk_popups.patch || return 1
+	patch -Np1 -i ${srcdir}/05_add_chakra_to_drkonqui.patch || return 1
 
 	# copy our branding stuff
 	cp -f ${srcdir}/branding.svgz ${srcdir}/${_origname}-${pkgver}/desktoptheme/oxygen/widgets/
