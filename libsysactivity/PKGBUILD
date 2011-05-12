@@ -18,7 +18,8 @@ md5sums=('a81fc993489dafd5308347b3a48525a5')
 
 build(){
   cd ${srcdir}
-   mkdir ${srcdir}/build
+  unset LDFLAGS
+  mkdir ${srcdir}/build
   cd ${srcdir}/build 
   cmake ${srcdir}/libsysactivity-${pkgver} -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` -DCMAKE_BUILD_TYPE=Release
   make
