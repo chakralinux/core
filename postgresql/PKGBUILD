@@ -1,17 +1,21 @@
-# $Id: PKGBUILD 75281 2010-04-01 07:02:49Z pierre $
-# Maintainer: Douglas Soares de Andrade <douglas@archlinux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgbase=('postgresql')
 pkgname=('postgresql-libs' 'postgresql')
-pkgver=8.4.3
-pkgrel=2
+pkgver=9.0.4
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.postgresql.org"
 license=('BSD')
-makedepends=('libxml2' 'python')
+makedepends=('libxml2' 'python2')
 options=('!makeflags')
 source=(ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar.bz2 \
-        postgresql postgresql.confd build.patch postgresql.pam)
+        postgresql postgresql.confd build.patch postgresql.pam postgresql.logrotate)
+install=postgresql.install
 
 build() {
   cd ${srcdir}/${pkgbase}-${pkgver} || return 1
@@ -46,7 +50,7 @@ build() {
 
 package_postgresql-libs() {
   pkgdesc="Libraries for use with PostgreSQL"
-  depends=('openssl>=0.9.8b' 'readline>=6.0')
+  depends=('openssl>=1.0.0' 'readline>=6.0')
 
   cd ${srcdir}/${pkgbase}-${pkgver} || return 1
 
@@ -81,8 +85,8 @@ package_postgresql-libs() {
 package_postgresql() {
   pkgdesc="A sophisticated object-relational DBMS"
   backup=('etc/conf.d/postgresql' 'etc/pam.d/postgresql')
-  depends=("postgresql-libs>=${pkgver}" 'libxml2' 'python')
-  optdepends=('python: for PL/Python support')
+  depends=("postgresql-libs>=${pkgver}" 'libxml2' 'python2')
+  optdepends=('python2: for PL/Python support')
   provides=('postgresql-client')
   conflicts=('postgresql-client')
 
@@ -98,10 +102,7 @@ package_postgresql() {
   # clean up unneeded installed items
   rm -rf ${pkgdir}/usr/include/postgresql/internal || return 1
   rm -rf ${pkgdir}/usr/include/libpq || return 1
-  # the below line is expected to produce an error; fix this one day
-  #rm -f ${pkgdir}/usr/include/*
-  find ${pkgdir}/usr/include -maxdepth 1 -type f -execdir rm {} + || return 1
-  rm -f ${pkgdir}/usr/bin/pg_config || return 1
+  find "${pkgdir}/usr/include" -maxdepth 1 -type f -execdir rm {} +|| return 1
   
   # Maintaining the lib below because of qt
   #rm -f ${pkgdir}/usr/lib/libpgport.a || return 1
@@ -119,11 +120,13 @@ package_postgresql() {
   install -D -m644 ${srcdir}/postgresql.pam \
     ${pkgdir}/etc/pam.d/postgresql || return 1
 
-  chown root:root ${pkgdir}/usr/share/doc/postgresql/html/*
+  install -D -m644 ${srcdir}/postgresql.logrotate \
+    "${pkgdir}/etc/logrotate.d/postgresql"
 }
 
-md5sums=('7f70e7b140fb190f268837255582b07e'
-         'de8da7eb3a2aa02d284bf904b2af4d20'
+md5sums=('80390514d568a7af5ab61db1cda27e29'
+         'eacf91f987d230f2dc2d040618ea1817'
          'd63a05943cf0a2726aa2070f3033c569'
          '4d74f4227dc5e12bf95b3490758d86c9'
-         '96f82c38f3f540b53f3e5144900acf17')
+         '96f82c38f3f540b53f3e5144900acf17'
+         'd28e443f9f65a5712c52018b84e27137')
