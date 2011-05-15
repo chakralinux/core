@@ -1,9 +1,11 @@
-# New Contributor: Andre Klitzing <aklitzing () online () de>
-# Maintainer : Allan McRae <mcrae_allan@hotmail.com>
-# Contributor: Mikko Seppälä <t-r-a-y@mbnet.fi> aka Neverth
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=po4a
-pkgver=0.40
+pkgver=0.41
 pkgrel=1
 pkgdesc="po4a - tools for helping translation of documentation"
 arch=('i686' 'x86_64')
@@ -12,16 +14,21 @@ url="http://po4a.alioth.debian.org/"
 depends=('perl' 'gettext')
 makedepends=('docbook-xsl' 'perl-text-wrapi18n' 'perl-module-build' 'perl-locale-gettext' 'perl-term-readkey' 'perl-sgmls')
 options=(!emptydirs)
-source=(http://ftp.debian.org/debian/pool/main/p/${pkgname}/${pkgname}_${pkgver}.orig.tar.gz)
+source=(https://alioth.debian.org/frs/download.php/3472/${pkgname}-${pkgver}.tar.gz)
+md5sums=('93b3137502a749bdc3a059466f2a19d2')
 
 build()
 {
-  cd "$srcdir/$pkgname-$pkgver"
-  perl Build.PL || return 1
-  perl Build || return 1
-  chmod 777 po/pod/*  || return 1
-  make || return 1
-  make install DESTDIR="$pkgdir/" prefix="/usr" || return 1
-  find ${pkgdir} -name .packlist -delete
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  perl Build.PL installdirs=vendor destdir=${pkgdir} create_packlist=0
+  perl Build
 }
-md5sums=('847ed8e41279394d3b160e9bc1dd7970')
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  perl Build install
+
+# remove perllocal.pod and .packlist
+  find ${pkgdir} -name .packlist -o -name perllocal.pod -delete
+}
