@@ -1,22 +1,27 @@
-# $Id: PKGBUILD 74603 2010-03-31 18:55:53Z giovanni $
-# Maintainer: Aaron Griffin <aaron@archlinux.org>
-# Committer: Judd Vinet <jvinet@zeroflux.org>
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=nasm
-pkgver=2.08.01
+pkgver=2.09.08
 pkgrel=1
 pkgdesc="80x86 assembler designed for portability and modularity"
 url="http://www.nasm.us"
-license=('LGPL')
+license=('BSD')
 arch=('i686' 'x86_64')
 depends=('glibc')
+makedepends=('ghostscript')
+install=nasm.install
 source=(http://www.nasm.us/pub/nasm/releasebuilds/${pkgver}/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('1e3ebc1289c2be5963571c0937b7a211')
+md5sums=('6abfa388a74ee47e163fdb30ecfd40f9')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   ./configure --prefix=/usr || return 1
   make || return 1
-  make INSTALLROOT="${pkgdir}" install || return 1
+  make INSTALLROOT="${pkgdir}" install install_rdf
+  install -d "${pkgdir}/usr/share/info"
+  install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/nasm/LICENSE" || return 1
 }

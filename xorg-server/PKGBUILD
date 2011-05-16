@@ -5,8 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=xorg-server
-pkgver=1.9.5
-pkgrel=2
+pkgver=1.10.1
+pkgrel=1
 pkgdesc="X.Org X servers"
 arch=('i686' 'x86_64')
 license=('custom')
@@ -20,24 +20,37 @@ makedepends=('pixman' 'libx11' 'mesa' 'libgl' 'xf86driproto' 'xcmiscproto' 'xtra
 options=('!libtool')
 provides=('x-server')
 groups=('xorg')
-source=(${url}/releases/individual/xserver/${pkgname}-${pkgver}.tar.bz2
+source=(${url}/releases/individual/xserver/xorg-server-${pkgver}.tar.bz2
+        bg-none-revert.patch
+        glx-pixmap-crash.patch
+        xserver-1.10-pointer-barriers.patch
         xorg-redhat-die-ugly-pattern-die-die-die.patch
         xvfb-run
         xvfb-run.1
         10-evdev.conf
         10-quirks.conf)
-md5sums=('662566559f4f27638658b50632ce98de'
-         '1a336eb22e27cbf443ec5a2ecddfa93c'
-         '52fd3effd80d7bc6c1660d4ecf23d31c'
-         '376c70308715cd2643f7bff936d9934b'
-         'e930e153d69968a795fe4e2ef5d9a5dc'
-         'd4f7dfc6be4ef4e2c6dd7632a9d88abe')
+sha1sums=('59ada4c9a59f7f1eb4b68c359e9cd58272aa4809'
+          '629c6d8d52126eab81ee1b72a9e4209535f8cb81'
+          '19e7164dcf9814ad64231b50a46f651b0e68a27a'
+          '1b95e91384a57d966428c7db98ed06f4cc562f91'
+          '0efcdf61bde3c0cd813072b94e2b30ab922775b9'
+          'c94f742d3f9cabf958ae58e4015d9dd185aabedc'
+          '6838fc00ef4618c924a77e0fb03c05346080908a'
+          '56224adfce729782d3a0351abd07928911aa17c5'
+          '993798f3d22ad672d769dae5f48d1fa068d5578f')
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
 
   # Get rid of the ugly pattern
   patch -Np3 -i "${srcdir}/xorg-redhat-die-ugly-pattern-die-die-die.patch"
+
+  # Add pointer barrier support, patch from Fedora
+  patch -Np1 -i "${srcdir}/xserver-1.10-pointer-barriers.patch"
+
+  # Patches from ~ajax/xserver xserver-next branch
+  patch -Np1 -i "${srcdir}/bg-none-revert.patch"
+  patch -Np1 -i "${srcdir}/glx-pixmap-crash.patch"
 
   ./configure --prefix=/usr \
       --enable-ipv6 \

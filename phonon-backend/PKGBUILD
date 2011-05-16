@@ -7,8 +7,6 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-# NOTE: if you build complete new dash makedep phonon first and build stock phonon. install that for the vlc/mplayer backends
-
 # original name (used for the source and pkgnames)
 pkgbase=('phonon-backend')
 
@@ -18,8 +16,9 @@ pkgname=('phonon-backend-gstreamer'
 	'phonon-backend-vlc')
 
 pkgver=4.5.0
-_pkgver=4.4.4
-pkgrel=2
+_xine=4.4.4
+_vlc=0.4.0
+pkgrel=3
 pkgdesc='The multimedia API for Qt 4 and KDE 4'
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
@@ -41,12 +40,12 @@ makedepends=("qt>=${_qtver}"
 	"phonon>=${pkgver}")
 
 source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.bz2"
-        "http://download.kde.org/stable/phonon/phonon-backend-xine/${_pkgver}/src/phonon-backend-xine-${_pkgver}.tar.bz2")
-
-
+        "http://download.kde.org/stable/phonon/phonon-backend-xine/${_xine}/src/phonon-backend-xine-${_xine}.tar.bz2"
+        "http://download.kde.org/stable/phonon/phonon-backend-vlc/${_vlc}/src/phonon-backend-vlc-${_vlc}.tar.bz2")
 
 md5sums=('2875139f2b7b649396125f4acc66de67'
-         'b127104e67538e573adeed3b2fb3bf55')
+         'b127104e67538e573adeed3b2fb3bf55'
+         'e6ef8c5b54a49610d4dad67754392420')
 
 build() {
 	cd ${srcdir}
@@ -59,7 +58,14 @@ build() {
 	cd ${srcdir}
 	mkdir -p build-phonon-xine
 	cd build-phonon-xine
-	cmake ../phonon-backend-xine-${_pkgver} \
+	cmake ../phonon-backend-xine-${_xine} \
+		 -DCMAKE_BUILD_TYPE=Release \
+		 -DCMAKE_INSTALL_PREFIX=/usr
+	make
+	cd ${srcdir}
+	mkdir -p build-phonon-vlc
+	cd build-phonon-vlc
+	cmake ../phonon-backend-vlc-${_vlc} \
 		 -DCMAKE_BUILD_TYPE=Release \
 		 -DCMAKE_INSTALL_PREFIX=/usr
 	make
@@ -88,7 +94,7 @@ package_phonon-backend-xine()
 	groups=("kde-complete" "kde-uninstall")
 	conflicts=('phonon-xine')
 	replaces=('phonon-xine')
-	pkgver=4.4.4
+	pkgver=$_xine
 	pkgrel=2
 
 	cd ${srcdir}/build-phonon-xine
@@ -145,32 +151,9 @@ package_phonon-backend-vlc()
 	groups=("kde-complete" "kde-uninstall")
 	replaces=('phonon-vlc-svn' 'phonon-vlc')
 	conflicts=('phonon-vlc-svn' 'phonon-vlc')
+	pkgver=$_vlc
+	pkgrel=1
 
-	_gitroot="git://anongit.kde.org/phonon-vlc.git"
-	_gitname="phonon-vlc"
-
-	cd "$srcdir"
-	msg "Connecting to GIT server...."
-
-	if [ -d $_gitname ] ; then
-	    cd $_gitname && git pull origin
-	    msg "The local files are updated."
-	else
-	    git clone $_gitroot $_gitname
-	fi
-
-	msg "GIT checkout done or server timeout"
-	msg "Starting make..."
-
-	rm -rf "$srcdir/$_gitname-build"
-	git clone -l "$srcdir/$_gitname" "$srcdir/$_gitname-build"
-	cd "$srcdir/$_gitname-build"
-
-	cmake -DCMAKE_INSTALL_PREFIX=/usr \
-	      -DCMAKE_BUILD_TYPE=Release \
-	      -DPHONON_VLC_NO_EXPERIMENTAL=true \
-	      ../${_gitname} || return 1
-	make || return 1
-	make DESTDIR=$pkgdir install || return 1
-	rm -rf "$srcdir/$_gitname-build"
+	cd ${srcdir}/build-phonon-vlc
+	make DESTDIR=${pkgdir} install
 } 

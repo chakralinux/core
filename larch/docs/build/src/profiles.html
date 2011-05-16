@@ -1,0 +1,271 @@
+<div class="larchdocs">
+<h2 id="pagetitle" level="1">Profiles</h2>
+
+<p>This feature of the <em>larch</em> build system allows bundling
+all the configuration information for a particular <em>live</em> system
+'design' into a single directory, a <em>larch profile</em>, and the
+name of the profile is the directory's name. This directory includes
+the list of packages to be installed, locale information and the
+particular tweaks and additions needed
+to customize the system, in particular a subdirectory containing the
+'overlay' files - those files which have been changed from their initial
+fresh state after installation and those which have simply been added.
+</p>
+
+<p>Note that of all the profile files and directories mentioned here
+only 'addedpacks' is not optional.
+</p>
+
+<h3><a name="overlay"></a>The overlay directory</h3>
+
+<p>One of the simplest features of the profile is perhaps the
+'<em>rootoverlay</em>' subdirectory:
+everything in this directory is copied directly to the
+<em>live</em> system's overlay, so that the a file 'a/b/c' within this
+directory will appear at '/a/b/c' in the <em>live</em> system, regardless
+of whether this file previously existed. Note however that all ownerships
+are changed to 'root:root'. The bulk of the customizations for the
+<em>live</em> system would normally be placed in this directory.
+</p>
+
+<p>It would be possible to make the desired alterations directly to the
+base system, and there are situations in which one would pretty well
+have to do it this way (for example if a modified or added file was to
+have some ownership other than 'root:root'). But another advantage (apart
+from the encapsulation of the customizations in the profile directory) of
+keeping the modifications in a separate directory is that the base
+installation can be kept 'clean' and thus it is easily reusable.
+</p>
+
+<p>If you would like to have a look at a profile, look in the 'profiles'
+directory in the 'larch-profiles' package (if you have downloaded
+<em>larch</em> by means of the 'larch-setup' script that will be
+'larch0/profiles'). Each of its subdirectories is a profile.
+If you want to make your own profile, it is probably easiest to start with
+one of the examples. Copy one of these directories to your working directory
+and rename it (to avoid confusion). The GUI offers some help with profile
+management.
+</p>
+
+<h3><a name="cd-root"></a>The <strong>cd-root</strong> directory</h3>
+
+<p>This directory contains files that are intended for more or less
+direct copying to the <em>larch</em> medium, without being incorporated in
+the squashed archives. This only applies to the subdirectories 'boot0',
+'boot' and 'larch'.
+
+<h4>Boot files</h4>
+
+Everything in the 'boot0' directory is copied to the medium's
+'boot' directory. If this directory doesn't exist, the default version
+supplied in the 'larch' package (at 'cd-root/boot0') is used.
+</p>
+
+<p>Subsequently everything in the 'boot' directory is copied to the medium's
+'boot' directory, potentially overwriting what was there before.
+</p>
+
+<p>Files specific to the syslinux family of bootloaders are kept in the
+medium's 'boot/isolinux' directory. <em>larch</em> provides a default version
+(in 'cd-root/boot0/isolinux'. To extend this, or
+replace individual files, read the description of boot directory handling
+above.
+</p>
+
+<h4>Specification of boot options and choices</h4>
+<p>The file which ends up on the medium as 'boot/bootlines' is an easily
+parseable, bootloader independent representation of the boot menu choices
+for the <em>larch</em> system. The default version is supplied in the 'larch'
+package as 'cd-root/boot0/bootlines', but this can be overridden in the
+profile, as described above. The gui provides a button to edit this file
+(cd-root/boot/bootlines in the profile). To get an idea of what should be
+in here look at the default version, or just click on the edit button.
+</p>
+
+<h3><a name="larch-dir"></a>Special files in the <strong>cd-root/larch</strong> directory</h3>
+<p>This directory is copied as is to the medium. Only the files of interest
+in connection with the profile are mentioned here. Those generated during
+larchification and medium construction are documented in the corresponding
+sections.
+</p>
+
+<ul>
+  <li><a name="delarch"></a><strong>delarch</strong>
+    <p>This bash script is run by the <em>larchin</em> installer during
+    the tidy-up phase. It should remove/undo any profile-specific elements
+    of the <em>live</em> system which should not be present in a normal
+    installation. It receives a single argument, the path to the new
+    installation.
+    </p>
+  </li>
+  <li><a name="boot-init"></a><strong>boot-init</strong>
+    <p>Used in the 'larch' initramfs hook, this optional script allows
+    adjustment of the overlay handling during the boot process, e.g.
+    getting them from another path.
+    Note that the shell environment here is that of the initramfs and thus
+    very limited. This option is for experts only and it is assumed that
+    the user will be able to determine what is possible and necessary
+    by reading the corresponding code of the hook.
+    </p>
+  </li>
+</ul>
+
+<h3><a name="other-files"></a>Other important files within a profile</h3>
+
+<ul>
+  <li><strong>addedpacks</strong> - This is the only compulsory file in
+  the profile (it must even be present if you are not using the
+  installation stage, but it can be empty in that case). It contains
+  a list of packages and package groups to be installed to the 'base'
+  system. Here you can enter all the applications
+  you would like in your <em>live</em> CD/USB system (and subsequently
+  installed to a hard disk partition, if that was your intention).
+  Thanks to <em>pacman</em> you don't need to sort out dependencies,
+  these should all be included automatically. See
+  <a href="archin.html#package_selection">here</a> for details.
+  </li>
+  <li><strong>vetopacks</strong> - Allows 'vetoing' of packages included
+  indirectly in the installation list from 'addedpacks'. See
+  <a href="archin.html#package_selection">here</a> for details.
+  </li>
+  <li><strong>pacman.conf.repos</strong> - Set the repository part of
+  'pacman.conf' for the <em>live</em> system, and possibly also for
+  installation of the base system (See
+  <a href="archin.html#pacman_conf">here</a> for further details).
+  The default version will be adequate for many situations, but you
+  will need to supply this file if you use the 'testing' repository,
+  for example.
+  </li>
+  <li><strong>pacman.conf.options</strong> - Set the options part of
+  'pacman.conf' for the <em>live</em> system and for
+  installation of the base system (See
+  <a href="archin.html#pacman_conf">here</a> for further details).
+  This will generally not be needed as the default version will be
+  adequate for most purposes.
+  </li>
+
+  <li><strong>rootoverlay/etc/rc.conf</strong> - As a major point of
+  configuration in an <em>Arch</em> system this is important enough
+  to get a button in the <em>larch</em> gui to edit it.
+  </li>
+
+  <li><strong>rootoverlay/etc/locale.gen</strong> - For convenience, the
+  <em>larch</em> gui provides a button to edit this file, which determines
+  which glibc locales are supported in the <em>live</em> system. The
+  corresponding files are generated (to the overlay) by the 'larchify'
+  script, which has an option (for experts only) to reuse the locale
+  files from a previous run (in order to reduce generation time in
+  cases where the locales are unchanged).
+  </li>
+
+  <li><strong>rootoverlay/etc/mkinitcpio.conf.larch</strong> - Again for
+  convenience, the <em>larch</em> gui provides a button to edit this file,
+  which allows you to tweak the <em>initramfs</em>. This is a special version of
+  '/etc/mkinitcpio.conf' which is used to generate the <em>initramfs</em> for the
+  <em>larch live</em> system. The default version is supplied as
+  '/etc/mkinitcpio.conf.larch' in the 'larch-live' package. Whatever else
+  you change, don't change the larch hook.
+  </li>
+
+  <li><strong>rootoverlay/etc/inittab.larch</strong> - If this file is
+  present it will cause the original /etc/inittab to be saved with a
+  '.larchsave' suffix, and this new version will be used for the
+  <em>live</em> 'inittab'. This allows a special version of this file to
+  be used just for the <em>live</em> system, an installer
+  can replace it by the original during the installation process.
+  </li>
+
+  <li><strong>users</strong> - It is possible to add user accounts to the
+  system during building. See below.
+  </li>
+
+  <li><strong>rootpw</strong> - If this file is present it should contain
+  the root password (plain-text).
+  </li>
+
+  <li><strong>skel_*</strong> (directory) - Customized '/etc/skel' substitutes
+  for use at build time only. See below.
+  </li>
+
+  <li><strong>kernel</strong> - If a kernel other than the standard
+  <em>Arch</em> 'kernel26' is used the name of the kernel binary in '/boot'
+  and of the <em>mkinitcpio</em> preset file in '/etc/mkinitcpio.d' need
+  to be supplied in this file, in the form 'kernel-binary preset-name'
+  (the default value is supplied in the 'larch' package as 'data/kernel').
+  </li>
+
+  <li><strong>vetodirs</strong> - Do not use this unless you really know what
+  you are doing. Each directory listed in this file (one entry per line,
+  comment lines start with '#') will be excluded from the live system. The
+  directories are relative to the installation root.
+  </li>
+
+  <li><strong>build-tweak</strong> - Do not use this unless you really know
+  what you are doing. It is a program (script) - so it must be executable -
+  to customize the construction of the overlay (to a certain extent). It gets
+  two arguments on the command line: the path to the installation being
+  larchified, and the (full) path to the directory in which the overlay is
+  being constructed. It is called just before 'mods.sqf' is squashed, but
+  also before users are added.
+  </li>
+
+</ul>
+
+<h3><a name="users"></a>Adding user accounts</h3>
+
+<p>
+The construction details should be provided in the 'users' file in the
+profile directory. It is an 'ini'-style configuration file, the sections
+being the user names. Here is an example:
+<pre>[DEFAULT]
+pw =
+expert =
+skel =
+maingroup =
+uid =
+xgroups = video,audio,optical,storage,scanner,power,camera
+
+[u1]
+uid = 999
+skel =
+
+[u2]
+pw = p1
+expert =
+skel =
+maingroup =
+uid =
+xgroups = video,audio,optical,storage
+</pre>
+The 'DEFAULT' section is not necessary, but is generated automatically
+by the gui user-table editor. Only entries which differ from the default
+values need be present.
+</p>
+<p>The default primary group is defined by settings in '/etc/login.defs'
+and '/etc/default/useradd' ('USERGROUPS_ENAB yes' in 'etc/login.defs'
+causes this to be a group with the same name as the user). You can
+override this by adding an 'expert' option, or by placing modified versions
+of these files in the profile's 'rootoverlay' directory.
+</p>
+<p>The additional groups should be comma-separated and without spaces.
+</p>
+<p>If no 'skel'-file is specified, the default ('/etc/skel') is used, including
+anything in the overlay. To use a custom 'skel'-file, place the directory
+in the profile, giving it a name starting with 'skel_', and place the rest of
+the name (the part after '_') in the configuration line.
+</p>
+<p>A password can be set for the new user by entering this (plain text -
+I'm guessing this is alright in this situation ...). An empty password
+field will allow passwordless logins (at least on the console).
+</p>
+<p>By default the UID number will be chosen automatically, but a specific
+number may be entered here. In <em>Arch Linux</em> the UIDs normally start
+at 1000.
+</p>
+<p>Users are added by means of 'useradd', so anything placed in the 'expert'
+field should be a valid option to that command. If a user-name already exists
+in the system to be larchified, it will be ignored (it does not count as
+an error).
+</p>
+
+</div>

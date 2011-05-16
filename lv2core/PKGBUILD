@@ -8,23 +8,39 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=lv2core
-pkgver=3.0
+pkgver=4.0
 pkgrel=1
 pkgdesc="LV2: Successor to the LADSPA audio plug-in standard"
 url="http://lv2plug.in/"
 license=('LGPL' 'custom')
-arch=(i686 x86_64)
-makedepends=('python')
-source=(http://lv2plug.in/spec/$pkgname-$pkgver.tar.bz2)
+arch=('i686' 'x86_64')
+makedepends=('python2')
+provides=('lv2')
+install=$pkgname.install
+source=("http://lv2plug.in/spec/$pkgname-$pkgver.tar.bz2")
+md5sums=('5097d964f3559a1ecec2d2fc822ef53a')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+	cd "$srcdir/$pkgname-$pkgver"
 
-  ./waf configure --prefix=/usr
-  ./waf build $MAKEFLAGS || return 1
-  ./waf install --destdir="$pkgdir"
+	python2 waf configure --prefix=/usr
+	python2 waf build $MAKEFLAGS
+}
 
-  install -Dm0644 COPYING \
+package() {
+	cd "$srcdir/$pkgname-$pkgver"
+
+	python waf install --destdir="$pkgdir"
+
+  # do the work of lv2config to own symlinks;
+  #   - generate lv2 headers
+  #   - see FS#23514
+  _ns=$(grep '^<http' manifest.ttl | sed 's|<http://\(.*\)>|\1|')
+  _name=${_ns/*\/}
+  _path="$pkgdir/usr/include/lv2/${_ns%/*}"
+  install -d "$_path"
+  ln -s "/usr/lib/lv2/$_name.lv2" "$_path/$_name"
+
+	install -Dm644 COPYING \
     "$pkgdir/usr/share/licenses/$pkgname/COPYING"
 }
-md5sums=('382f7d96ff0374c0c495336e1c8bb999')

@@ -1,0 +1,95 @@
+<div class="larchdocs">
+
+<h2 id="pagetitle" level="2">GUI Tab: Installation</h2>
+
+<p>This tab mixes profile options and project options. Which packages
+to install is a feature of the profile, as is the basic design of the
+'pacman.conf' file. The exact location of the packages (repository
+and cache paths) are more related to the build environment.
+</p>
+
+<h3>Package selection</h3>
+
+<p>See <a href="archin.html#package_selection">here</a> for details of how
+the list of packages to be installed is built up. The gui offers
+convenient editing of the 'addedpacks' and 'vetopacks' files.
+</p>
+
+<p><em>pacman</em> configuration is handled in separate parts.
+'pacman.conf' is effectively split into two, the options part and the
+repositories part can be edited separately, though the default options
+should be alright for most purposes. This split might ease management
+of updates to the structure of the file 'pacman.conf' with new pacman
+releases. Default versions of both parts (for the options part a complete
+pacman.conf can be used, the repositories will be stripped automatically)
+are supplied in the 'data' directory of the 'larch' package.
+A simplified format is used for the repository file, details can be
+found <a href="archin.html#pacman_conf">here</a>.
+</p>
+
+<p>Note that the <em>larch</em> repository must be available for building
+the <em>live</em> system, i.e. it must be included in the 'pacman.conf'
+used for the installation process. It is not strictly necessary for the
+resulting <em>live</em> system to include this repository. See below for
+further details.
+</p>
+
+<h3>'mirrorlist'</h3>
+
+<p>It is possible to customize the 'mirrorlist' file used for installation.
+This can be very convenient, because when building a <em>live</em> system
+the build environment can be very different from the run-time environment.
+For example, you might use local package repositories for building which
+cannot possibly be available when the <em>live</em> system is used.
+</p>
+
+<p>Customized versions of the 'mirrorlist' file are not regarded as
+belonging to the profile, because they are build environment specific, so
+they are stored in the project directory, which is made current when the
+larch backend scripts are run.
+</p>
+
+<h3>Special installation repositories and cache</h3>
+
+<p>Adjustments to the installation repository file and cache location are
+treated as 'advanced' options, because in many cases the defaults will be
+perfectly adequate.
+</p>
+
+<h4>Using different mirrors/repositories for the installation</h4>
+
+<p>The second part of the 'pacman.conf' file, the repository list, can be
+specified separately for the installation, via the frame
+'Use project repository list'. For certain build environments this can be
+very useful.
+</p>
+
+<p>A further way of getting a distinct 'pacman.conf' in the resulting
+<em>live</em> system is to put it in the profile's 'rootoverlay' directory
+(in the '/etc' subdirectory, as usual).
+</p>
+
+<h4>Package cache</h4>
+
+<p>Normally the host's standard package cache will be used for the
+installation, but it is possible to use a non-standard location. I guess,
+however, that this will not normally be necessary.
+</p>
+
+<h3>Tweak installed packages</h3>
+
+<p>To perform small changes to the base installation, such as updating the
+packages, or adding or removing the odd package, it may be convenient not
+to have to do a complete reinstallation. To this end a set of buttons for
+basic pacman operations are included (in an optional frame). Their use
+should be fairly self-explanatory. During testing it can
+be helpful to be able to make quick changes like this, but it is probably
+not a good idea to use these facilities too freely. The installation will
+differ from the specification in the profile (unless you immediately edit
+the profile too), which may be no problem for one-offs, but if you ever
+want to reuse the profile you may well lose track of what changes you have
+made.
+</p>
+
+</div>
+

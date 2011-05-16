@@ -5,9 +5,9 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
  
 pkgname=gnash
-pkgver=0.8.8
+pkgver=0.8.9
 pkgrel=1
-pkgdesc="GNU flash player and kpath plugin for KDE4"
+pkgdesc="GNU Flash player and kpath plugin for KDE 4."
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/gnash/"
 license=('GPL')
@@ -15,30 +15,40 @@ depends=('agg' 'ffmpeg' 'libjpeg' 'libpng' 'giflib' 'zlib' 'curl' 'giflib' 'boos
          'speex' 'fontconfig' 'libva' 'libxinerama' 'gstreamer0.10-base' 'gstreamer0.10-ffmpeg')
 provides=('gnash' 'gnash-common')
 conflicts=('flashplugin' 'flashplugin-square')
-source=(http://ftp.gnu.org/pub/gnu/gnash/$pkgver/gnash-$pkgver.tar.gz)
-md5sums=('aec414ee3bebb8901054818fae735214')
+source=("http://ftp.gnu.org/pub/gnu/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('01d0420932eede07211e368d405aee9c')
 options=(!libtool !emptydirs)
 backup=(etc/gnashrc etc/gnashpluginrc)
-build () {
- cd $startdir/src/gnash-$pkgver
- ./autogen.sh
- sed -i "s/moc-qt4/moc/g; s/uic-qt4/uic/g" configure
- ./configure --enable-renderer=agg \
-	--enable-media=ffmpeg \
-	--enable-gui=kde4 \
-	--enable-gif \
-	--enable-jpeg \
-	--enable-png \
-	--enable-z \
-	--with-plugins-install=system \
-	--with-npapi-plugindir=/usr/lib/mozilla/plugins \
-	--prefix=/usr \
-	--sysconfdir=/etc
 
- sed -i "s:KDE4_APPSDATADIR =.*:KDE4_APPSDATADIR = /usr/share/apps:" ./plugin/klash4/Makefile
- sed -i "s:KDE4_SERVICESDIR =.*:KDE4_SERVICESDIR = /usr/share/kde4/services:" ./plugin/klash4/Makefile
- sed -i "s:KDE4_PLUGINDIR =.*:KDE4_PLUGINDIR = /usr/lib/kde4:" ./plugin/klash4/Makefile
- make || return 1
- make DESTDIR="$pkgdir" install || return 1
- make DESTDIR="$pkgdir" install-plugins || return 1
+build() {
+	cd "${startdir}/src/${pkgname}-${pkgver}"
+
+	./autogen.sh
+
+	sed -i "s/moc-qt4/moc/g; s/uic-qt4/uic/g" configure
+
+	./configure \
+		--enable-renderer=agg \
+		--enable-media=ffmpeg \
+		--enable-gui=kde4 \
+    --enable-sound=sdl \
+    --enable-hwaccel=vaapi \
+		--with-plugins-install=system \
+		--with-npapi-plugindir=/usr/lib/mozilla/plugins \
+		--prefix=/usr \
+		--sysconfdir=/etc
+
+	sed -i "s:KDE4_APPSDATADIR =.*:KDE4_APPSDATADIR = /usr/share/apps:" ./plugin/klash4/Makefile
+	sed -i "s:KDE4_SERVICESDIR =.*:KDE4_SERVICESDIR = /usr/share/kde4/services:" ./plugin/klash4/Makefile
+	sed -i "s:KDE4_PLUGINDIR =.*:KDE4_PLUGINDIR = /usr/lib/kde4:" ./plugin/klash4/Makefile
+	make || return 1
 }
+
+package() {
+	cd "${startdir}/src/${pkgname}-${pkgver}"
+
+	make DESTDIR="${pkgdir}" install || return 1
+	make DESTDIR="${pkgdir}" install-plugins || return 1
+}
+
+# vim:set ts=2 sw=2 et:

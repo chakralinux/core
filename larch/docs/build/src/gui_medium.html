@@ -1,0 +1,154 @@
+<div class="larchdocs">
+
+<h2 id="pagetitle" level="2">GUI Tab: Preparing the Medium</h2>
+
+<p>This tab presents the various possibilities for installing the
+<em>live</em> system that was built on the 'larchify' tab onto a bootable
+device, which can be in <em>iso9660</em> form (to burn to a CD/DVD), or
+a partition on a hard disk or flash storage device. A suitable bootloader
+can also be installed. In addition the copying of a larch system from one
+medium to another is supported and also the building of a boot-iso for
+a USB device.
+</p>
+
+<h3>Bootloader</h3>
+<p>To keep things simple only the <em>syslinux</em> family of bootloaders is
+supported. This allows booting from CD/DVD (<em>isolinux</em>) and partitions
+formatted with 'ext2/3/4' or 'btrfs' (<em>extlinux</em>) or with 'vfat'
+(<em>syslinux</em>).
+</p>
+
+<h3><a name="bootlines"></a>Boot entries/options</h3>
+
+<p>The bootloader offers a selection of 'boot lines', so that
+different systems, or various kernels in combination with various
+boot options can be started. The file 'cd-root/boot/bootlines' in the profile
+contains this information for the <em>larch live</em> system in a
+form which can be converted automatically into bootloader specific
+formats. This allows the boot menu entries to be supplied in the
+profile in an easily parseable way which is independent of the actual bootloader
+which is used in the end. The format should be pretty clear from
+the default version.
+</p>
+
+<p>The 'bootlines' file covers only the menu entries for the
+<em>larch live</em> system. All other entries must be supplied in
+a bootloader specific 'template' file. A button is supplied to edit
+this, too. Note the '###LARCH' line, which specifies where the
+information from the 'bootlines' file is to be included.
+</p>
+
+<h3>The 'cd-root' directory</h3>
+<p>The handling of this directory is described
+<a href="profiles.html#cd-root">here</a>. It allows customisation of
+files on the medium which are not directly used by <em>larch</em>, but
+can be useful in certain circumstances. You could, for example, include
+a package repository, or just about any data files needed by the
+specific <em>live</em> system. The default settings might well be
+adequate for many purposes.
+There is a button to open a file browser on this directory
+(within the current profile).
+Note that only the '/boot' and '/larch' directories of the medium are
+available for customisation, so in general any application data should
+be placed in the '/larch' directory.
+</p>
+
+
+<h3>Choice of build medium</h3>
+<p>The main choice is between a partition (on a hard-disk, USB-stick, etc.)
+and an <em>iso</em> file (for writing to a CD/DVD). It is also possible to
+build a 'boot-iso' (to burn to a CD) for an already prepared <em>larch</em>
+USB-medium, to enable booting on older systems which don't support booting
+from USB.
+</p>
+
+<p>The destination can be changed by clicking the button - a menu appropriate
+to the type of destination appears (note that for destination partitions
+only unmounted ones will be shown).
+</p>
+
+<h4>Build an <em>iso</em>, for CD or DVD</h4>
+<p>Only limited customisation possibilities are offered here, you can
+set the volume label ('-V' option to <em>mkisofs</em>). The boot CD is
+discovered at boot by searching for '/larch/system.sqf'.
+</p>
+
+<h4>Install to partitition</h4>
+
+<p>Here one must select the partition to install to - which must be
+plugged in and not mounted (good luck to automounters!), and
+also select how the <em>live initramfs</em> is to find the correct
+partition. The available options are:
+
+<ul>
+  <li>Partition: The device will be sought on the basis of its (current)
+  device name  - such as /dev/sdb1. This is only suitable if you can be
+  sure the device will always get the same name (which - especially with
+  pluggable devices - is unlikely).</li>
+  <li>UUID: Each device normally has a unique UUID, so this is a pretty
+  reliable method. It's just that the UUIDs themselves are rather ungainly
+  and unmemorable.</li>
+  <li>LABEL: Booting on the basis of the device label can be quite reliable
+  and quite readable, so it might be a good compromise. This is the
+  recommended choice.</li>
+  <li>Search (for larchboot): The <em>live initramfs</em> tests all
+  visible devices until it finds one containing the file larch/larchboot.
+  </li>
+</ul>
+</p>
+
+<p>The partition will be formatted with 'ext4', and you can choose whether
+to use the journalling feature of this file-system.
+No other file-system types are supported at present (though by formatting
+exernally and using the 'Don't format' option it is possible to use
+another one, so long as it is supported by <em>syslinux/extlinux</em>).
+The option to install without formatting should only be used by people who
+know what they are doing, in general it is <strong>not</strong> recommended.
+Another option for experts is the suppression of the installation of the
+bootloader to the Master Boot Record of the <em>live</em> medium. If you
+don't install to the MBR, you will need to provide some other means of
+booting the device, but in certain circumstances this could be a useful
+option.
+</p>
+
+<p>The option 'Not bootable via search' suppresses the generation of the
+'larch/larchboot' file, so that the method of medium detection which
+searches for this file will not work on the generated medium (this of
+course makes no sense if the 'Search (for larchboot)' medium detection
+method is selected for this medium).
+</p>
+
+<h4>Create boot iso</h4>
+<p>In this case the <em>source</em> medium - a partition containing the
+<em>larch</em> system (presumably on a USB device) must be selected,
+by clicking on the button in the source frame. Only unmounted partitions
+with volume labels will be offered. A small <em>iso</em> file with just
+the kernel and initramfs, plus the necessary bootloader files, will be
+created. This is to cover cases where a machine cannot boot from USB
+devices, but can boot from a CD.
+Note that the USB device for which the CD is to be generated must be
+plugged in, but not mounted.
+</p>
+
+<h3>Volume label</h3>
+<p>The maximum length of the label should be 16 characters, which is ok
+for both 'iso' (CD/DVD) and for 'ext4'.
+</p>
+
+<h3>Write the larch medium</h3>
+<p>When enough information is available, this button will be enabled and
+the generation can be started.
+</p>
+
+<h3>Copying larch media</h3>
+
+<p>By choosing a medium (iso-file or labelled partition) in the source
+frame, it is possible to copy this system to another medium. Certain
+aspects of the destination device can be set just as in the initial
+creation process. When a device or iso-file is selected as source a
+simple validity check will be performed on it, a failure resulting in
+the selection not being accepted.
+</p>
+
+</div>
+

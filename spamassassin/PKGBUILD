@@ -1,15 +1,17 @@
-# $Id: PKGBUILD 75581 2010-04-01 22:07:41Z giovanni $
-# Maintainer: Dale Blount <dale@archlinux.org>
-# Contributor: Manolis Tzanidakis
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=spamassassin
 pkgver=3.3.1
-pkgrel=3
+pkgrel=4
 pkgdesc="A mail filter to identify spam."
 arch=(i686 x86_64)
 license=(APACHE)
 url="http://spamassassin.apache.org"
-depends=('perl>=5.10.0' 'perl-net-dns' 'perl-uri' 'perl-html-parser' \
+depends=('perl>=5.12.2' 'perl-net-dns' 'perl-uri' 'perl-html-parser' \
 		'perl-digest-sha1' 'perl-io-socket-ssl' 'openssl' \
 		'perl-libwww' 'perl-io-zlib' 'perl-mail-spf' \
 		'perl-archive-tar' 'zlib' 're2c')
@@ -24,11 +26,11 @@ backup=(etc/conf.d/spamd etc/mail/spamassassin/local.cf \
 	etc/mail/spamassassin/v320.pre)
 install=${pkgname}.install
 options=(!emptydirs)
-source=(http://apache.rediris.es/${pkgname}/source/Mail-SpamAssassin-${pkgver}.tar.gz \
+source=(http://mirrors.devlib.org/apache/${pkgname}/source/Mail-SpamAssassin-${pkgver}.tar.gz \
 		spamd.conf.d spamd)
 md5sums=('5a93f81fda315411560ff5da099382d2'
          'af501c6b0bb937a2775b747cc4b6d150'
-         'db5c79722722e56678401ae454b28ece')
+         '0534d3071a526a27ddc2b297afa03b04')
 
 build() {
   cd ${srcdir}/Mail-SpamAssassin-${pkgver}
@@ -36,9 +38,12 @@ build() {
   # install module in vendor directories.
   PERL_MM_USE_DEFAULT=1 /usr/bin/perl Makefile.PL INSTALLDIRS=vendor \
       CONTACT_ADDRESS=root@localhost ENABLE_SSL=yes PERL_TAINT=no
-  /usr/bin/make || return 1
-  /usr/bin/make DESTDIR=${pkgdir} install || return 1
+  /usr/bin/make 
+}
 
+package() {
+  cd ${srcdir}/Mail-SpamAssassin-${pkgver}
+  /usr/bin/make DESTDIR=${pkgdir} install
   # remove perllocal.pod and .packlist
   find ${pkgdir} -name perllocal.pod -delete
   find ${pkgdir} -name .packlist -delete

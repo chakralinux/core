@@ -1,18 +1,18 @@
 post_install() {
-		echo " "
-        echo " > Qt 4.7.2"
-        echo "   kde-qt: not patched in this release"
-		echo " "
+	xdg-icon-resource forceupdate --theme hicolor &> /dev/null
+    update-desktop-database -q
+
+                 echo " "
+        echo " > Qt 4.7.3"
+        	echo " "
 		echo "   Prefix: /usr"
 		echo " "
 		echo " > ATTENTION "
-		echo "   Some components are split into separate packages:"
+		echo "   This version of qt is no longer a split package:"
 		echo " "
-		echo "   qt       : Base libraries and tools"
-		echo "   qt-debug : Debugging Symbols"
-		echo "   qt-doc   : Documentation"
-		echo "   qt-demos : Demos & Examples"
-		echo "   qt-tools : Development Tools (Assistant, Designer, Linguist)"
+		echo "   qt-tools is integrated in qt"
+		echo "   qt-doc, qt-demos and qt-examples are one new package"
+                echo "   Please install with sudo pacman -S qt-docs"
 		echo " "
 		echo " > IMPORTANT "
 		echo "   Be sure to install one of the Phonon backends:"
@@ -25,10 +25,9 @@ post_install() {
 }
 
 post_upgrade() {
-  post_install $1
+	post_install
 }
 
-op=$1
-shift
-
-$op $* 
+post_remove() {
+	post_install
+}

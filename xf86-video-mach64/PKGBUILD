@@ -6,20 +6,20 @@
 
 pkgname=xf86-video-mach64
 pkgver=6.8.2
-pkgrel=5
+pkgrel=6
 pkgdesc="X.org mach64 video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc' 'mach64-dri')
-makedepends=('pkgconfig' 'xorg-server=>1.9.5' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
-conflicts=('xorg-server<1.9.5')
+makedepends=('pkgconfig' 'xorg-server=>1.10.1' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
+conflicts=('xorg-server<1.10.1')
 groups=('xorg-video-drivers')
 options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
-       LICENSE)
-md5sums=('6c0522b2b72a0a47c48d718443616651'
-         '901824dae8053c63ef9d313cdaa129a0')
+	mach64-fix-pixmap.patch)
+sha1sums=('b7303689a6a971b956061fd81399dc81adb865af'
+          '9658d16b964c1c0a3f8aa68f6706bd643cef321e')
 
 #source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz"
 #        LICENSE)
@@ -40,13 +40,10 @@ mksource() {
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
-  # enable on git version
-  #cd ${srcdir}/${pkgname}
-  autoreconf -v --install
-  ./configure --prefix=/usr \
-              --enable-dri || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
-  install -D -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
+  patch -Np1 -i ${srcdir}/mach64-fix-pixmap.patch
+  ./configure --prefix=/usr --enable-dri
+  make
+  make DESTDIR="${pkgdir}" install
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }

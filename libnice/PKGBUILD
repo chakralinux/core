@@ -8,26 +8,27 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=libnice
-pkgver=0.0.12
+pkgver=0.1.0
 pkgrel=1
 pkgdesc="An implementation of the IETF's draft ICE (for p2p UDP data streams)"
 arch=('i686' 'x86_64')
 url="http://nice.freedesktop.org"
 license=('LGPL')
 depends=('gstreamer0.10')
-makedepends=('pkgconfig')
 options=('!libtool')
 source=(http://nice.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz)
-md5sums=('fe25005032c441ecfaa0c19ac6b78ee7')
+md5sums=('c077e2aa74c9afb4b4e157efc8a6ad9d')
 
 build() {
 #  export CFLAGS="$CFLAGS -fno-strict-aliasing"
 
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr \
-    --disable-dependency-tracking
-  make || return 1
-  #make sure that all tests pass
-#  make check || return 1
-  make DESTDIR=${pkgdir} install || return 1
+    --disable-static
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR=${pkgdir} install
 }
