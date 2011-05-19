@@ -3,8 +3,7 @@
 # Translators: http://chakra-project.org/bbs/viewtopic.php?pid=29626#p29626
 
 pkgname=appset-qt
-pkgver=0.4.99.1
-_pkgver=0.5.0rc
+pkgver=0.5.0
 pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
@@ -13,13 +12,12 @@ license=('GPL2')
 depends=('qt>=4.7')
 optdepends=('ccr: For Community Repository support')
 install=${pkgname}.install
-source=(#http://sourceforge.net/projects/appset/files/appset-qt/0.4/$pkgver/$pkgname-$pkgver-sources.tar.gz
-        http://sourceforge.net/projects/appset/files/appset-qt/0.5/0.5.0/$pkgname-$_pkgver-sources.tar.gz
+source=(http://sourceforge.net/projects/appset/files/appset-qt/0.5/$pkgver/$pkgname-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
         http://chakra-project.org/sources/$pkgname/$pkgname-0.4.99-chakra.patch
-        http://chakra-project.org/sources/$pkgname/add-chinese-taiwan.patch
+        #http://chakra-project.org/sources/$pkgname/add-chinese-taiwan.patch
         #http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.5.0.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt_de-0.5.0-new.tar.gz
+        #http://chakra-project.org/sources/$pkgname/appset-qt_de-0.5.0-new.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_el-0.4.1.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_es-0.5.0.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.5.0.tar.gz
@@ -27,12 +25,12 @@ source=(#http://sourceforge.net/projects/appset/files/appset-qt/0.4/$pkgver/$pkg
         #http://chakra-project.org/sources/$pkgname/appset-qt_pl-0.4.2.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_zh-tw-0.5.0.tar.gz       
         )
-md5sums=(633c522feb36cb4072754a9ac7a40b4d
+md5sums=(4c7aab8d55fadeb287f52ff00d97d3e1
          87f5f278e3fe67ed2cd6165c2835d81b
          f193b069c8ac4d392d0d1b6c9ca3469f
-         7de9e3d87fb4258174af214b291b5444 # add-chinese-taiwan.patch
+         #7de9e3d87fb4258174af214b291b5444 # add-chinese-taiwan.patch
          #c2fbac4cab7443f60ee00e48a4d537e3 # appset-qt_ca.0.5.0.tar.gz
-         e92f04ce53565ffa396251c4b044ef1c # appset-qt_de-0.5.0-new.tar.gz
+         #e92f04ce53565ffa396251c4b044ef1c # appset-qt_de-0.5.0-new.tar.gz
          #b9ffe714c1c1d76a9df7f0784c9e62d5 # appset-qt_el.0.4.1.tar.gz
          #f04f8aa20631feca91bbde3519bfcf48 # appset-qt_es.0.5.0.tar.gz
          #fa69077be4ac7c409df87ab256c97919 # appset-qt_fr.0.5.0.tar.gz
@@ -42,8 +40,7 @@ md5sums=(633c522feb36cb4072754a9ac7a40b4d
          )
 
 build() {
-  #cd $srcdir/$pkgname-$pkgver-sources
-  cd $srcdir/$pkgname-$_pkgver-sources
+  cd $srcdir/$pkgname-$pkgver-sources
   # copy oxygen icons
   cp -v ../*png Qt/AppSet-Qt
 
@@ -51,9 +48,9 @@ build() {
   patch -Np1 -i ${startdir}/src/$pkgname-0.4.99-chakra.patch
 
   # add chakra translations (check upstream)
-  patch -Np1 -i ${startdir}/src/add-chinese-taiwan.patch
-  cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
-  cp -v ../appset-qt*.ts Qt/AppSet-Qt
+  #patch -Np1 -i ${startdir}/src/add-chinese-taiwan.patch
+  #cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
+  #cp -v ../appset-qt*.ts Qt/AppSet-Qt
 
   # check for updated strings
   cd Qt/AppSet-Qt
@@ -72,14 +69,12 @@ build() {
 }
 
 package() {
-    #cd $srcdir/$pkgname-$pkgver-sources
-    cd $srcdir/$pkgname-$_pkgver-sources
+    cd $srcdir/$pkgname-$pkgver-sources
 
     make INSTALL_ROOT="$pkgdir/" install
 
     #helper daemon
     install -m 755 -d "$pkgdir/etc/rc.d" || return 1
-    #install -m 755 "$srcdir/$pkgname-$pkgver-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
-    install -m 755 "$srcdir/$pkgname-$_pkgver-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
+    install -m 755 "$srcdir/$pkgname-$pkgver-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
 }
 
