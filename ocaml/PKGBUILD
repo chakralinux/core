@@ -1,8 +1,14 @@
-# $Id: PKGBUILD 66794 2010-02-01 14:58:30Z giovanni $
-# Maintainer: Tobias Powalowski <tpowa@archlinux.org>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ocaml	
-pkgver=3.11.2
+pkgver=3.12.0
 pkgrel=1
 pkgdesc="A functional language with OO extensions"
 arch=('i686' 'x86_64')
@@ -11,19 +17,23 @@ url="http://caml.inria.fr/"
 depends=('gdbm')
 makedepends=('tk' 'ncurses>=5.6-7' 'libx11')
 optdepends=('ncurses: advanced ncurses features' 'tk: advanced tk features')
-source=(http://caml.inria.fr/distrib/ocaml-3.11/$pkgname-$pkgver.tar.gz)
+source=(http://caml.inria.fr/distrib/ocaml-3.12/$pkgname-$pkgver.tar.gz
+        fix-ocaml-binutils-2.21.patch)
 options=('!makeflags' '!emptydirs')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
+  patch -Np1 -i "${srcdir}/fix-ocaml-binutils-2.21.patch"
   ./configure -prefix /usr 
   make world.opt || return 1
   make PREFIX=$pkgdir/usr MANDIR=$pkgdir/usr/share/man install || return 1
    
 # Save >10MB with this one, makepkg only strips debug symbols.
- find ${startdir}/pkg/usr/lib -type f -name '*.so.*' -exec strip --strip-unneeded {} \;
+#find ${startdir}/pkg/usr/lib -type f -name '*.so.*' -exec strip --strip-unneeded {} \;
 
-# install license
-install -D -m 644 $startdir/src/$pkgname-$pkgver/LICENSE $startdir/pkg/usr/share/licenses/ocaml/LICENSE
+  # install license
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
-md5sums=('9d0611245122ffbc8263735cae1da7fb')
+md5sums=('3ba7cc65123c3579f14e7c726d3ee782'
+         '8c664a0a346424ea2ec6fc6f713170c6')
