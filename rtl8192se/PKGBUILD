@@ -12,10 +12,10 @@ _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
 pkgname=rtl8192se
 pkgver=2.6.0018.1025.2010
-pkgrel=4
+pkgrel=5
 pkgdesc="Drivers for Realtek 8192SE wireless chipset"
 license="GPL"
-depends=('kernel26-headers' 'kernel26>=2.6.38rc5')
+depends=('kernel26-headers' 'kernel26>=2.6.39' 'kernel26<2.6.40')
 source=("http://www.nd.edu/~pbui/scratch/aur/${pkgname}_linux_${pkgver}.tar.gz")
 arch=('i686' 'x86_64')
 url="http://www.realtek.com.tw/"
@@ -28,7 +28,7 @@ build() {
     #sed -i 's/-DENABLE_LPS//' HAL/rtl8192/*/Makefile || return 1
 
     sed \
-      -e  's/$(shell uname -r)/2.6.38-CHAKRA/g' \
+      -e  's/$(shell uname -r)/2.6.39-CHAKRA/g' \
       -i Makefile
 
     make || return 1
