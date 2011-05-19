@@ -1,7 +1,7 @@
 #!/bin/sh
 #AUFS2VERSION=""
 #KERNELVERSION=2.6.35
-GITSNAPSHOT=20101025
+GITSNAPSHOT=20110519
 # aufs2 (no -xx) for the latest -rc version.
 rm -R aufs2-util.git
 git clone http://git.c3sl.ufpr.br/pub/scm/aufs/aufs2-util.git aufs2-util.git
