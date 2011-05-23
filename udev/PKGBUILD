@@ -17,14 +17,12 @@ options=(!makeflags !libtool)
 makedepends=('glibc' 'coreutils' 'util-linux' 'pciutils' 'libusb-compat' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgbase-$pkgver.tar.bz2
         80-drivers.rules 
-        81-chakra.rules
-        framebuffer_blacklist.conf
+        81-chakra.rules 
         load-modules.sh)
 
 md5sums=('6e132d1a3b4dae24dafd2726c5cdd982'
          '4427855146513a4703ab5c7eb8a0156e'
-         'a2bf84747f44915ec9c5e6e88b077845'
-         'f13b024beca18e5a28503fa9094be5aa'
+         'e7e70ee2953e78001553d0f9c4c3038e'
          'f91fddc67609b45b244a624977c4247b')
 
 build() {
@@ -56,10 +54,9 @@ package_udev() {
 
   # create framebuffer blacklist
   mkdir -p $pkgdir/etc/modprobe.d/
-  install -D -m644 $srcdir/framebuffer_blacklist.conf $pkgdir/etc/modprobe.d/framebuffer_blacklist.conf
-  #for mod in $(find /lib/modules/*/kernel/drivers/video -name '*fb.ko.gz' -exec basename {} .ko.gz \;); do 
-  #	echo "blacklist $mod" 
-  #done | sort -u > $pkgdir/etc/modprobe.d/framebuffer_blacklist.conf
+  for mod in $(find /lib/modules/*/kernel/drivers/video -name '*fb.ko.gz' -exec basename {} .ko.gz \;); do 
+  	echo "blacklist $mod" 
+  done | sort -u > $pkgdir/etc/modprobe.d/framebuffer_blacklist.conf
 
   # create static devices in /lib/udev/devices/
   mkdir ${pkgdir}/lib/udev/devices/pts
