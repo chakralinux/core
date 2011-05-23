@@ -1,0 +1,19 @@
+--- burg-mkconfig.orig	2011-05-23 10:42:25.000000000 +0200
++++ burg-mkconfig	2011-05-23 10:42:25.000000000 +0200
+@@ -305,6 +305,16 @@ for i in ${grub_mkconfig_dir}/* ; do
+   esac
+ done
+ 
++echo "Setup resume hook" >&2
++SWAP=`swapon -a | cat /proc/swaps | grep /dev | cut -d" " -f1`
++if [ -z "${SWAP}" ]; then
++   echo "No swap partition found. Create one to enable hibernation..." >&2
++else
++   echo "Adding swap partition $SWAP" >&2
++   SWAPUUID=`blkid $SWAP -s UUID -o value`
++   sed -i -e "s~root=/dev~resume=/dev/disk/by-uuid/${SWAPUUID} root=/dev~g" ${grub_cfg}.new
++fi
++
+ if test "x${grub_cfg}" != "x" ; then
+   # none of the children aborted with error, install the new grub.cfg
+   mv -f ${grub_cfg}.new ${grub_cfg}
