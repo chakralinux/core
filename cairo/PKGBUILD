@@ -8,7 +8,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=cairo
 pkgver=1.10.2
-pkgrel=2
+pkgrel=3
 pkgdesc="Cairo vector graphics library"
 arch=(i686 x86_64)
 license=('LGPL' 'MPL')
@@ -24,7 +24,7 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   patch -Np1 -i "${srcdir}/cairo-1.10.0-buggy_gradients.patch"
   ./configure --prefix=/usr --sysconfdir=/etc \
-    --localstatedir=/var --disable-static
+    --localstatedir=/var --disable-static --enable-tee
   make
   make DESTDIR="${pkgdir}" install
 }
