@@ -9,8 +9,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 _origname=initscripts
 pkgname=chakra-initscripts
-pkgver=2011.02
-pkgrel=6
+pkgver=2011.04
+pkgrel=1
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
 url="http://www.chakra-project.org"
@@ -28,7 +28,7 @@ install=initscripts.install
 source=("http://chakra-project.org/sources/initscripts/initscripts-${pkgver}.tar.xz"
         'http://chakra-project.org/sources/initscripts/wireless.conf.d'
         "http://chakra-project.org/sources/initscripts/chakra-initscripts-${pkgver}-${pkgrel}.patch")
-sha256sums=('0734166a2fd170a8b144a51d8be5ac3773f8c1381240a744cfd05005464aabda'
+sha256sums=('ae32415b06110e28cdb90263e55013368a9c897626921cc208ea2c0db311440b'
             '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f'
             '768a4c6727370f07d0ccee5a4590fc1eb10a21444f17eaa53863a7a7eba9c579')
 
@@ -39,4 +39,5 @@ package() {
   #cp -vr ${startdir}/etc ${pkgdir}
   cd ${pkgdir}
   patch -Np1 -i ${srcdir}/chakra-initscripts-${pkgver}-${pkgrel}.patch || return 1
+  rm -v $(find . -type f -name '*.orig')
 }
