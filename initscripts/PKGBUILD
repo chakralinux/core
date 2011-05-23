@@ -13,7 +13,7 @@ url="http://www.chakra-project.org"
 license=('GPL2')
 groups=('base')
 backup=(etc/inittab etc/rc.conf etc/rc.local etc/rc.local.shutdown etc/conf.d/wireless)
-depends=('bash' 'awk' 'grep' 'coreutils' 'sed' 'udev'
+depends=('bash' 'grep' 'coreutils' 'udev>=167'
          'net-tools' 'ncurses' 'kbd' 'findutils' 'sysvinit')
 optdepends=('bridge-utils: Network bridging support'
             'dhcpcd: DHCP network configuration'
@@ -21,11 +21,11 @@ optdepends=('bridge-utils: Network bridging support'
 install=initscripts.install
 source=("http://chakra-project.org/sources/initscripts/initscripts-${pkgver}.tar.xz"
         'http://chakra-project.org/sources/initscripts/wireless.conf.d')
-sha256sums=('ae32415b06110e28cdb90263e55013368a9c897626921cc208ea2c0db311440b'
+sha256sums=('95d09e2f68f18e6af5bba1a650352a1b9052eb5a10f1b432f3a78b649d545d9d'
             '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f')
 
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  DESTDIR=${pkgdir} ./install.sh
+  make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
 }

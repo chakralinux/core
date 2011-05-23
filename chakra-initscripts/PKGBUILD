@@ -19,7 +19,7 @@ groups=('livecd')
 provides=("initscripts=${pkgver}")
 conflicts=('initscripts')
 backup=(etc/inittab etc/rc.conf etc/rc.local etc/rc.local.shutdown etc/conf.d/wireless)
-depends=('bash' 'awk' 'grep' 'coreutils' 'sed' 'udev'
+depends=('bash' 'grep' 'coreutils' 'udev>=167'
          'net-tools' 'ncurses' 'kbd' 'findutils' 'sysvinit')
 optdepends=('bridge-utils: Network bridging support'
             'dhcpcd: DHCP network configuration'
@@ -28,15 +28,14 @@ install=initscripts.install
 source=("http://chakra-project.org/sources/initscripts/initscripts-${pkgver}.tar.xz"
         'http://chakra-project.org/sources/initscripts/wireless.conf.d'
         "http://chakra-project.org/sources/initscripts/chakra-initscripts-${pkgver}-${pkgrel}.patch")
-sha256sums=('ae32415b06110e28cdb90263e55013368a9c897626921cc208ea2c0db311440b'
+sha256sums=('95d09e2f68f18e6af5bba1a650352a1b9052eb5a10f1b432f3a78b649d545d9d'
             '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f'
             '768a4c6727370f07d0ccee5a4590fc1eb10a21444f17eaa53863a7a7eba9c579')
 
 package() {
-  cd ${srcdir}/${_origname}-${pkgver}
-  DESTDIR=${pkgdir} ./install.sh
+  cd ${srcdir}/initscripts-${pkgver}
+  make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
-  #cp -vr ${startdir}/etc ${pkgdir}
   cd ${pkgdir}
   patch -Np1 -i ${srcdir}/chakra-initscripts-${pkgver}-${pkgrel}.patch || return 1
   rm -v $(find . -type f -name '*.orig')
