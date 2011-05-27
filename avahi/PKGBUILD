@@ -1,18 +1,18 @@
 # Maintainer: Phil Miller <philm@chakra-project.org>
 
 pkgname=avahi
-pkgver=0.6.25
-pkgrel=4
+pkgver=0.6.30
+pkgrel=1
 pkgdesc="A multicast/unicast DNS-SD framework"
 arch=('i686' 'x86_64')
 url="http://www.avahi.org/"
 license=('LGPL')
 depends=('dbus>=1.1.20-1' 'libcap>=2.16' 'libdaemon>=0.11' 'gdbm' 'glib2' 'expat')
-optdepends=('libglade: avahi-discover-standalone'
+optdepends=('qt: qt bindings'
 	'nss-mdns: NSS support for mDNS'
-	'pygtk: avahi-discover'
-	'dbus-python: avahi-discover')
-makedepends=('pygtk' 'dbus-python' 'libglade' 'intltool')
+	'dbus-python: avahi-discover'
+        'twisted: avahi-bookmarks')
+makedepends=('qt' 'dbus-python' 'gobject-introspection' 'intltool')
 backup=(etc/avahi/avahi-daemon.conf etc/avahi/services/{sftp-,}ssh.service)
 install=avahi.install
 conflicts=('howl' 'mdnsresponder')
@@ -24,18 +24,24 @@ source=(http://www.avahi.org/download/avahi-${pkgver}.tar.gz gnome-nettool.png a
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
 
+  sed -i 's/netdev/network/g' avahi-daemon/avahi-dbus.conf
+  patch -Np0 -i "${srcdir}/avahi-daemon-dbus.patch"
+
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
     --disable-qt3 \
-    --disable-qt4 \
+    --enable-qt4 \
     --disable-mono \
     --disable-monodoc \
     --disable-doxygen-doc \
     --disable-xmltoman \
+    --disable-gtk \
+    --disable-gtk3 \
+    --disable-pygtk \
     --enable-compat-libdns_sd \
     --enable-compat-howl \
-    --with-distro=archlinux \
+    --with-distro=none \
     --with-avahi-priv-access-group=network \
     --enable-autoipd \
     --with-autoipd-user=avahi \
@@ -46,20 +52,16 @@ build() {
 
   rm -rf ${MONO_SHARED_DIR}
   
-  sed -i -e 's/netdev/network/g' ${pkgdir}/etc/dbus-1/system.d/avahi-dbus.conf
-   
+    
   # howl and mdnsresponder compatability
   cd ${pkgdir}/usr/include
   ln -s avahi-compat-libdns_sd/dns_sd.h dns_sd.h
   ln -s avahi-compat-howl howl
   cd ${pkgdir}/usr/lib/pkgconfig
   ln -s avahi-compat-howl.pc howl.pc
-  mkdir -p ${pkgdir}/usr/share/pixmaps
-  install -m 644 ${srcdir}/gnome-nettool.png ${pkgdir}/usr/share/pixmaps/gnome-nettool.png
 
-  cd ${pkgdir}
-  patch -p0 < ${srcdir}/avahi-daemon-dbus.patch || return 1
+  install -D -m 644 "${srcdir}"/gnome-nettool.png "${pkgdir}"/usr/share/pixmaps/gnome-nettool.png || return 1
 }
-md5sums=('a83155a6e29e3988f07e5eea3287b21e'
+md5sums=('e4db89a2a403ff4c47d66ac66fad1f43'
          '42c2905307c7a5dc6ac4b75f4c3d65a3'
-	 '0e1f5900b56fcfa1bffddb4f233f539f')
+	 '9a5053ebfd423dd2909e4b6edfbce169')
