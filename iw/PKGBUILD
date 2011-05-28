@@ -1,8 +1,14 @@
-# $Id: PKGBUILD 89940 2010-09-05 11:20:33Z thomas $
-# Maintainer: Thomas Bächler <thomas@archlinux.org>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=iw
-pkgver=0.9.20
+pkgver=0.9.22
 pkgrel=1
 pkgdesc="nl80211 based CLI configuration utility for wireless devices"
 arch=("i686" "x86_64")
@@ -12,13 +18,13 @@ depends=("libnl")
 makedepends=("kernel-headers")
 source=(http://wireless.kernel.org/download/$pkgname/$pkgname-$pkgver.tar.bz2
         version-sh.patch)
-sha256sums=('2d665fbfbe4fd6a40159fb821518fc5337da37448416405b936a393a14cbc7d3'
-	    '1ffbbca148b3c29446e2116e114d30b866dadbdf54cd276db02bd09e52bedf19')
+sha256sums=('138ce4dc827d8b0af55fe1c444e749b985c1540d791b27922aad880d12908bb1'
+            '92a556cd1a958e45cf891223876c61150b937f1aacf6c8044a4ab53830efe21e')
 
 build() {
   patch -Np0 -i ${srcdir}/version-sh.patch || return 1
 
-  cd ${pkgname}-${pkgver}
+  cd "$srcdir"/$pkgname-$pkgver
 
   make || return 1
   make DESTDIR=$pkgdir install
