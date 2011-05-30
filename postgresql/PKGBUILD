@@ -4,121 +4,116 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgbase=('postgresql')
+pkgbase=postgresql
 pkgname=('postgresql-libs' 'postgresql')
 pkgver=9.0.4
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="http://www.postgresql.org"
-license=('BSD')
-makedepends=('libxml2' 'python2')
-options=('!makeflags')
+license=('custom:PostgreSQL')
+makedepends=('libxml2' 'python2' 'perl')
 source=(ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar.bz2 \
         postgresql postgresql.confd build.patch postgresql.pam postgresql.logrotate)
 install=postgresql.install
 
 build() {
-  cd ${srcdir}/${pkgbase}-${pkgver} || return 1
+  cd "${srcdir}/${pkgbase}-${pkgver}"
 
   # patch to remove regress/test make target (won't build with it present)
-  patch -Np1 -i ../build.patch || return 1
+  patch -Np1 -i ../build.patch
 
   # configure
   ./configure --prefix=/usr --mandir=/usr/share/man --with-libxml \
-  --with-docdir=/usr/share/doc --with-openssl --with-python --with-pam \
-  --datadir=/usr/share/postgresql --enable-thread-safety || return 1
+  --with-openssl --with-perl \
+  --with-python PYTHON=/usr/bin/python2 --with-pam \
+  --with-system-tzdata=/usr/share/zoneinfo --enable-nls \
+  --datadir=/usr/share/postgresql --enable-thread-safety
 
-  sed -i -e '/interfaces/d' src/Makefile || return 1
+  sed -i -e '/interfaces/d' src/Makefile
 
   # build
-  make || return 1
+  make world
 
   # build libs
   for dir in src/interfaces src/bin/pg_config; do
-    pushd ${dir} || return 1
-    make || return 1
+    pushd ${dir}
+    make
     popd
   done
-
-  cd src/include || return 1
-  make || return 1
-
-  # build adminpack
-  cd ../../contrib/adminpack || return 1
-  make || return 1
 }
 
 package_postgresql-libs() {
   pkgdesc="Libraries for use with PostgreSQL"
-  depends=('openssl>=1.0.0' 'readline>=6.0')
+  depends=('openssl>=1.0.0')
 
-  cd ${srcdir}/${pkgbase}-${pkgver} || return 1
+  cd "${srcdir}/${pkgbase}-${pkgver}"
+
+  # install license
+  install -D -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/postgresql-libs/LICENSE"
 
   # install libs
   for dir in src/interfaces src/bin/pg_config; do
-    pushd ${dir} || return 1
-    make DESTDIR=${pkgdir} install || return 1
+    pushd ${dir}
+    make DESTDIR="${pkgdir}" install
     popd
   done
 
-  cd src/include || return 1
+  install -D -m644 doc/src/sgml/man1/pg_config.1 "${pkgdir}/usr/share/man/man1/pg_config.1"
 
-  mkdir -p ${pkgdir}/usr/include/{libpq,postgresql/internal/libpq} || return 1
+  cd src/include
+
+  mkdir -p "${pkgdir}"/usr/include/{libpq,postgresql/internal/libpq}
 
   # these headers are needed by the public headers of the interfaces
-  install -m644 pg_config.h ${pkgdir}/usr/include/ || return 1
-  install -m644 pg_config_os.h ${pkgdir}/usr/include/ || return 1
-  install -m644 postgres_ext.h ${pkgdir}/usr/include/ || return 1
-  install -m644 libpq/libpq-fs.h ${pkgdir}/usr/include/libpq/ || return 1
-  install -m644 pg_config_manual.h ${pkgdir}/usr/include/ || return 1
+  install -m644 pg_config.h "${pkgdir}/usr/include/"
+  install -m644 pg_config_os.h "${pkgdir}/usr/include/"
+  install -m644 postgres_ext.h "${pkgdir}/usr/include/"
+  install -m644 libpq/libpq-fs.h "${pkgdir}/usr/include/libpq/"
+  install -m644 pg_config_manual.h "${pkgdir}/usr/include/"
 
   # these headers are needed by the not-so-public headers of the interfaces
-  install -m644 c.h ${pkgdir}/usr/include/postgresql/internal/ || return 1
-  install -m644 port.h ${pkgdir}/usr/include/postgresql/internal/ || return 1
-  install -m644 postgres_fe.h ${pkgdir}/usr/include/postgresql/internal/ || return 1
-  install -m644 libpq/pqcomm.h ${pkgdir}/usr/include/postgresql/internal/libpq/ || return 1
-
-  install -Dm644 ../../COPYRIGHT ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE || return 1
+  install -m644 c.h "${pkgdir}/usr/include/postgresql/internal/"
+  install -m644 port.h "${pkgdir}/usr/include/postgresql/internal/"
+  install -m644 postgres_fe.h "${pkgdir}/usr/include/postgresql/internal/"
+  install -m644 libpq/pqcomm.h "${pkgdir}/usr/include/postgresql/internal/libpq/"
 }
-
 
 package_postgresql() {
   pkgdesc="A sophisticated object-relational DBMS"
-  backup=('etc/conf.d/postgresql' 'etc/pam.d/postgresql')
-  depends=("postgresql-libs>=${pkgver}" 'libxml2' 'python2')
-  optdepends=('python2: for PL/Python support')
+  backup=('etc/conf.d/postgresql' 'etc/pam.d/postgresql' 'etc/logrotate.d/postgresql')
+  depends=("postgresql-libs>=${pkgver}" 'libxml2' 'readline>=6.0')
+  optdepends=('python2: for PL/Python support'
+              'perl: for PL/Perl support')
   provides=('postgresql-client')
   conflicts=('postgresql-client')
 
-  cd ${srcdir}/${pkgbase}-${pkgver} || return 1
+  cd "${srcdir}/${pkgbase}-${pkgver}"
 
   # install
-  make DESTDIR=${pkgdir} install || return 1
-
-  # install adminpack
-  cd contrib/adminpack || return 1
-  make DESTDIR=${pkgdir} install || return 1;
-
-  # clean up unneeded installed items
-  rm -rf ${pkgdir}/usr/include/postgresql/internal || return 1
-  rm -rf ${pkgdir}/usr/include/libpq || return 1
-  find "${pkgdir}/usr/include" -maxdepth 1 -type f -execdir rm {} +|| return 1
-  
-  # Maintaining the lib below because of qt
-  #rm -f ${pkgdir}/usr/lib/libpgport.a || return 1
-
-  # install launch script
-  install -D -m755 ${srcdir}/postgresql ${pkgdir}/etc/rc.d/postgresql || return 1
+  make DESTDIR="${pkgdir}" install
+  make -C contrib DESTDIR="${pkgdir}" install
+  make -C doc/src/sgml DESTDIR="${pkgdir}" install-man
+  # we don't want this, it is in the -libs package
+  make -C src/bin/pg_config DESTDIR="${pkgdir}" uninstall
+  rm "${pkgdir}/usr/share/man/man1/pg_config.1"
 
   # install license
-  install -D -m644 ../../COPYRIGHT ${pkgdir}/usr/share/licenses/${pkgbase}/LICENSE || return 1
+  install -D -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgbase}/LICENSE"
+
+  # clean up unneeded installed items
+  rm -rf "${pkgdir}/usr/include/postgresql/internal"
+  rm -rf "${pkgdir}/usr/include/libpq"
+  find "${pkgdir}/usr/include" -maxdepth 1 -type f -execdir rm {} +
+
+  # install launch script
+  install -D -m755 "${srcdir}/postgresql" "${pkgdir}/etc/rc.d/postgresql"
 
   # install conf file
   install -D -m644 ${srcdir}/postgresql.confd \
-    ${pkgdir}/etc/conf.d/postgresql || return 1
+    "${pkgdir}/etc/conf.d/postgresql"
 
   install -D -m644 ${srcdir}/postgresql.pam \
-    ${pkgdir}/etc/pam.d/postgresql || return 1
+    "${pkgdir}/etc/pam.d/postgresql"
 
   install -D -m644 ${srcdir}/postgresql.logrotate \
     "${pkgdir}/etc/logrotate.d/postgresql"
