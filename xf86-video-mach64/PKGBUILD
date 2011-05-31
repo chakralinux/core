@@ -5,21 +5,19 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=xf86-video-mach64
-pkgver=6.8.2
-pkgrel=6
+pkgver=6.9.0
+pkgrel=1
 pkgdesc="X.org mach64 video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc' 'mach64-dri')
-makedepends=('pkgconfig' 'xorg-server=>1.10.1' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
+makedepends=('pkgconfig' 'xorg-server>=1.10.1' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
 conflicts=('xorg-server<1.10.1')
 groups=('xorg-video-drivers')
 options=('!libtool')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
-	mach64-fix-pixmap.patch)
-sha1sums=('b7303689a6a971b956061fd81399dc81adb865af'
-          '9658d16b964c1c0a3f8aa68f6706bd643cef321e')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('95a7ec9761fe11dadbcd9078c55148198a91b2f1')
 
 #source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz"
 #        LICENSE)
@@ -40,7 +38,6 @@ mksource() {
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np1 -i ${srcdir}/mach64-fix-pixmap.patch
   ./configure --prefix=/usr --enable-dri
   make
   make DESTDIR="${pkgdir}" install
