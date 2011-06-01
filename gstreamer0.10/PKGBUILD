@@ -8,32 +8,35 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=gstreamer0.10
-pkgver=0.10.32
+pkgver=0.10.34
 pkgrel=1
 pkgdesc="GStreamer Multimedia Framework"
 arch=('i686' 'x86_64')
 license=('LGPL')
 url="http://gstreamer.freedesktop.org/"
-depends=('libxml2>=2.7.7' 'glib2>=2.24.1')
+depends=('libxml2' 'glib2')
 makedepends=('intltool' 'pkgconfig' 'gobject-introspection')
 options=('!libtool')
 source=(${url}/src/gstreamer/gstreamer-${pkgver}.tar.bz2)
-md5sums=('442bc3d37b8511a73379143e7531d726')
+md5sums=('e6938af242cd002be9f0b6441e848d83')
 
 build() {
   cd "${srcdir}/gstreamer-${pkgver}"
+
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libexecdir=/usr/lib \
 	--with-package-name="GStreamer (Chakra GNU/Linux)" \
-	--with-package-origin="http://www.chakra-project.org/" || return 1
+	--with-package-origin="http://www.chakra-project.org/" \
+	--disable-static
+
   make || return 1
 }
 
 package() {
   cd "${srcdir}/gstreamer-${pkgver}"
   make DESTDIR="${pkgdir}" install || return 1
-  cd "${pkgdir}/usr/bin"
 
   #Remove unversioned gst-* binaries to get rid of conflicts
+  cd "${pkgdir}/usr/bin"
   for bins in `ls *-0.10`; do
     rm -f ${bins/-0.10/}
   done

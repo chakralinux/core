@@ -9,18 +9,20 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase=('gstreamer0.10-base')
 pkgname=('gstreamer0.10-base' 'gstreamer0.10-base-plugins')
-pkgver=0.10.32
+pkgver=0.10.34
 pkgrel=1
 arch=('i686' 'x86_64')
 license=('LGPL')
-makedepends=('pkgconfig' 'gstreamer0.10>=0.10.30' 'orc>=0.4.6' 'libsm>=1.1.1' 'libxv>=1.0.5' 'alsa-lib>=1.0.23' 'cdparanoia>=10.2' 'libvisual>=0.4.0' 'libvorbis>=1.3.1' 'libtheora>=1.1.1' 'pango>=1.28.1' 'udev>=151' 'gobject-introspection')
+makedepends=('pkgconfig' 'gstreamer0.10>=0.10.34' 'orc' 'libxv' 'alsa-lib>=1.0.23' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection')
 options=(!libtool !emptydirs)
 url="http://gstreamer.freedesktop.org/"
 source=(${url}/src/gst-plugins-base/gst-plugins-base-${pkgver}.tar.bz2)
-md5sums=('2920af2b3162f3d9fbaa7fabc8ed4d38')
+md5sums=('a8db3791c8b119d9cf109b8e18fb8fe9')
 
 build() {
   cd "${srcdir}/gst-plugins-base-${pkgver}"
+  sed -i '/AC_PATH_XTRA/d' configure.ac
+  autoreconf
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --disable-static --enable-experimental --disable-gnome_vfs \
     --with-package-name="GStreamer Base Plugins (Chakra GNU/Linux)" \
@@ -32,7 +34,7 @@ build() {
 
 package_gstreamer0.10-base() {
   pkgdesc="GStreamer Multimedia Framework Base plugin libraries"
-  depends=('gstreamer0.10>=0.10.30' 'orc>=0.4.6' 'libsm>=1.1.1' 'libxv>=1.0.5' 'udev>=151')
+  depends=('gstreamer0.10>=0.10.34' 'orc' 'libxv>=1.0.5')
 
   cd "${srcdir}/gst-plugins-base-${pkgver}"
   make DESTDIR="${pkgdir}" install || return 1
@@ -40,7 +42,7 @@ package_gstreamer0.10-base() {
 
 package_gstreamer0.10-base-plugins() {
   pkgdesc="GStreamer Multimedia Framework Base Plugins (gst-plugins-base)"
-  depends=("gstreamer0.10-base=${pkgver}" 'alsa-lib>=1.0.23' 'cdparanoia>=10.2' 'libvisual>=0.4.0' 'libvorbis>=1.3.1' 'libtheora>=1.1.1' 'pango>=1.28.1')
+  depends=("gstreamer0.10-base=${pkgver}" 'alsa-lib' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango')
   replaces=('gstreamer0.10-alsa' 'gstreamer0.10-theora' 'gstreamer0.10-libvisual' 'gstreamer0.10-pango' 'gstreamer0.10-cdparanoia' 'gstreamer0.10-vorbis' 'gstreamer0.10-ogg')
   conflicts=('gstreamer0.10-alsa' 'gstreamer0.10-theora' 'gstreamer0.10-libvisual' 'gstreamer0.10-pango' 'gstreamer0.10-cdparanoia' 'gstreamer0.10-vorbis' 'gstreamer0.10-ogg')
   groups=('gstreamer0.10-plugins')

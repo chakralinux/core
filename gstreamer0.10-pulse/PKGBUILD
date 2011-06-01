@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=gstreamer0.10-pulse
-pkgver=0.10.25
+pkgver=0.10.29
 pkgrel=1
 pkgdesc="A GStreamer 0.10 plugin for the PulseAudio sound server"
 arch=('i686' 'x86_64')
@@ -17,9 +17,13 @@ optdepends=('pulseaudio: pulseaudio support')
 options=(!libtool !emptydirs)
 groups=(pulseaudio)
 source=(${url}/src/gst-plugins-good/gst-plugins-good-${pkgver}.tar.bz2)
+md5sums=('5a652416141d9530258b474dc1d384b9')
+
 
 build() {
   cd "${srcdir}/gst-plugins-good-${pkgver}"
+  sed -i '/AC_PATH_XTRA/d' configure.ac
+  autoreconf
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --disable-static --enable-experimental \
     --with-package-name="GStreamer Good Plugins (Chakra GNU/Linux)" \
@@ -33,4 +37,3 @@ package() {
   make DESTDIR="${pkgdir}" install
 }
 
-md5sums=('d734bc866788d1d6fc74c4ff1318926c')
