@@ -162,6 +162,30 @@ package_kdeedu-kalzium()
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
+
+	# Rempve duplicated files in kalzium
+	msg "Fixing duplicated files in Kalzium and Common"
+	rm -rv ${pkgdir}/usr/include/libkdeedu/chemicaldataobject.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/element.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/elementparser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/isotope.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/isotopeparser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/libkdeedu_science_export.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/moleculeparser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/parser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/psetables.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/spectrum.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/spectrumparser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/tempunit.h
+	rm -rv ${pkgdir}/usr/lib/libscience.so
+	rm -rv ${pkgdir}/usr/lib/libscience.so.4
+	rm -rv ${pkgdir}/usr/lib/libscience.so.4.6.0
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/elements.xml
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/isotopes.xml
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/spectra.xml 
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/symbols.csv 
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/symbols2.csv
+
 }
 
 package_kdeedu-kanagram()
