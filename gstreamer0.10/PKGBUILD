@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=gstreamer0.10
 pkgver=0.10.34
-pkgrel=2
+pkgrel=3
 pkgdesc="GStreamer Multimedia Framework"
 arch=('i686' 'x86_64')
 license=('LGPL')
@@ -28,12 +28,12 @@ build() {
 	--with-package-origin="http://www.chakra-project.org/" \
 	--disable-static
 
-  make || return 1
+  make
 }
 
 package() {
   cd "${srcdir}/gstreamer-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
+  make DESTDIR="${pkgdir}" install
 
   #Remove unversioned gst-* binaries to get rid of conflicts
   cd "${pkgdir}/usr/bin"
