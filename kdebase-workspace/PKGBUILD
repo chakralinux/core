@@ -20,7 +20,7 @@ pkgname=('kdebase-workspace'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -90,7 +90,7 @@ source=($_mirror/${pkgbase}-$_kdever.tar.bz2
 
 #	feature_kdm-plymouth.patch
 #	shutdown-fix.patch
-	sensors-fix.patch
+	rev_monotonic_clock.patch
 	)
 
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
@@ -123,7 +123,7 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
 #        'c542f58979cf9cb2299dd42f63e6fd72' #  shutdown-fix.patch
-         'ecf3a9d6af9bdd3db0189e06ddf21034' #  sensors-fix.patch
+         'db8077776b1bc6e796fe227bbc0ef63a' #  rev_monotonic_clock.patch
          )
 
 #
@@ -158,8 +158,8 @@ build()
 # 	patch -Np1 -i ${srcdir}/feature_history-notifications-enable-disable-kde#119207.patch
 # 	patch -Np1 -i ${srcdir}/feature_kdm-plymouth.patch
 
-#	msg "applying upstream patches ..."
-#	patch -Np1 -i ${srcdir}/sensors-fix.patch
+	msg "applying upstream patches ..."
+	patch -Np1 -R < ${srcdir}/rev_monotonic_clock.patch
 
 
 	msg "starting workspace build ..."
