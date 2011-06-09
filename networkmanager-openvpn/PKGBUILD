@@ -8,8 +8,8 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=networkmanager-openvpn
-pkgver=0.8.2
-pkgrel=2
+pkgver=0.8.4
+pkgrel=1
 pkgdesc="NetworkManager VPN plugin for OpenVPN"
 arch=('i686' 'x86_64')
 license=('GPL')
@@ -20,7 +20,7 @@ optdepends=('network-manager-applet: GNOME frontends to NetWorkmanager')
 install=networkmanager-openvpn.install
 options=('!libtool')
 source=(http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-openvpn/0.8/NetworkManager-openvpn-${pkgver}.tar.bz2)
-sha256sums=('21d540b7e7cd88cff3173bb3574a88d4dd76da564fccc58dc436a68476d6d6fe')
+sha256sums=('65736633c15a87dc9de9291746d02684e853fd93bef2ff06969e269bc37791be')
 
 build() {
   cd "${srcdir}/NetworkManager-openvpn-${pkgver}"
@@ -29,5 +29,9 @@ build() {
 	--libexecdir=/usr/lib/networkmanager \
 	--disable-static || return 1
   make || return 1
+}
+
+package() {
+  cd "${srcdir}/NetworkManager-openvpn-${pkgver}"
   make DESTDIR="${pkgdir}" install || return 1
 }

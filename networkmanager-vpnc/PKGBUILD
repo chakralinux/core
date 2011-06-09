@@ -8,8 +8,8 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=networkmanager-vpnc
-pkgver=0.8.2
-pkgrel=2
+pkgver=0.8.4
+pkgrel=1
 pkgdesc="NetworkManager VPN plugin for vpnc"
 arch=('i686' 'x86_64')
 license=('GPL')
@@ -20,7 +20,7 @@ optdepends=('network-manager-applet: GNOME frontends to NetWorkmanager')
 options=('!libtool')
 install=networkmanager-vpnc.install
 source=(http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-vpnc/0.8/NetworkManager-vpnc-${pkgver}.tar.bz2)
-sha256sums=('c37cf921c223f226d16e659321bb372e33278bf642362b7a92cb665d27950011')
+sha256sums=('f475e159ea57c4117ac6ec4bb21576de2c4f806ede65fc75ad05714568db64f9')
 
 build() {
   cd "${srcdir}/NetworkManager-vpnc-${pkgver}"
@@ -29,5 +29,9 @@ build() {
 	--libexecdir=/usr/lib/networkmanager \
 	--disable-static || return 1
   make || return 1
+}
+
+package() {
+  cd "${srcdir}/NetworkManager-vpnc-${pkgver}"
   make DESTDIR="${pkgdir}" install || return 1
 }

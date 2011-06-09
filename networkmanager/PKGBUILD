@@ -8,8 +8,8 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=networkmanager
-pkgver=0.8.2
-pkgrel=4
+pkgver=0.8.4.0
+pkgrel=1
 pkgdesc="Network Management daemon"
 arch=('i686' 'x86_64')
 license=('GPL')
@@ -20,28 +20,38 @@ optdepends=('modemmanager: for modem management service')
 options=('!libtool')
 backup=('etc/NetworkManager/nm-system-settings.conf')
 source=(http://ftp.gnome.org/pub/gnome/sources/NetworkManager/0.8/NetworkManager-${pkgver}.tar.bz2
-        nm-system-settings.conf create_dirs.patch disable_set_hostname.patch)
-sha256sums=('58e49dcd83cb641a9dcaad4fd566a08196c862479ad3086c00f28f03768eb4f1'
+        nm-system-settings.conf disable_set_hostname.patch)
+sha256sums=('e71f2ed5b28b9d46566fbf573e43ee8553e60aa3f557dc61e07b9e198c657588'
             '44b048804c7c0b8b3b0c29b8632b6ad613c397d0a1635ec918e10c0fbcdadf21'
-            '2961ce4cf3079edbf27927a67573ce85dad2268f610fd123dd781eb5ba764c12'
             '1e4586991bc96ef004dc520c794047a336c54433e0bd4edc3879fb6e7ab0e553')
 
 build() {
   cd "${srcdir}/NetworkManager-${pkgver}"
 
-  patch -Np1 -i "${srcdir}/create_dirs.patch"
   patch -Np1 -i "${srcdir}/disable_set_hostname.patch"
-  autoreconf -fi
 
-  ./configure --prefix=/usr --sysconfdir=/etc \
-      --with-distro=arch --localstatedir=/var \
-      --libexecdir=/usr/lib/networkmanager \
-      --disable-static --with-dhcpcd=/sbin/dhcpcd \
-      --with-crypto=nss --with-iptables=/usr/sbin/iptables \
-      --enable-more-warnings=no
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libexecdir=/usr/lib/networkmanager \
+    --with-crypto=nss \
+    --with-distro=arch \
+    --with-dhclient=/usr/sbin/dhclient \
+    --with-dhcpcd=/sbin/dhcpcd \
+    --with-iptables=/usr/sbin/iptables \
+    --disable-static \
+    --enable-more-warnings=no \
+    --disable-wimax
 
   make
+}
+
+package() {
+  cd "${srcdir}/NetworkManager-${pkgver}"
   make DESTDIR="${pkgdir}" install
+
   install -m644 "${srcdir}/nm-system-settings.conf" "${pkgdir}/etc/NetworkManager/"
-  install -m 0755 test/.libs/nm-online "${pkgdir}/usr/bin/"
+
+  rm -rf "${pkgdir}/var/run/"
 }
