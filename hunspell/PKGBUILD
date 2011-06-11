@@ -1,10 +1,12 @@
-# $Id: PKGBUILD 79927 2010-05-09 14:55:31Z andyrtr $
-# Maintainer: Andreas Radke <andyrtr@archlinux.org>
-# Contributor: Hussam Al-Tayeb <ht990332@gmail.com>
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=hunspell
 pkgver=1.2.11
-pkgrel=1
+pkgrel=2
 pkgdesc="Spell checker and morphological analyzer library and program"
 arch=('i686' 'x86_64')
 url="http://hunspell.sourceforge.net/"
@@ -25,4 +27,7 @@ build() {
 package() {
   cd "$srcdir/hunspell-$pkgver"
   make DESTDIR="$pkgdir" install || return 1
+
+  # Add a symlink for backwards compatibility with myspell
+  ln -s /usr/share/myspell "${pkgdir}/usr/share/hunspell"
 }
