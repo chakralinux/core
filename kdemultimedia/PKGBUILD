@@ -7,17 +7,10 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=kdemultimedia
-
-
-
 #
 # package info
 #
-pkgbase=('kdemultimedia')
+pkgbase="kdemultimedia"
 pkgname=('kdemultimedia-common'
          'kdemultimedia-doc'
          'kdemultimedia-dragonplayer'
@@ -37,9 +30,9 @@ license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}"
-             'cdparanoia' 'mplayer' 'libpulse' 'musicbrainz>=3.0.3' 'taglib')
+             'cdparanoia' 'mplayer' 'libpulse' 'musicbrainz>=3.0.3' 'taglib' 'tunepimp')
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2
+source=($_mirror/${pkgbase}-$_kdever.tar.bz2
 	http://kenai.com/projects/kde-odf-thumbnail/downloads/download/1.0.0/kde-odf-thumbnail-1.0.0.tar.gz
 	http://kde-apps.org/CONTENT/content-files/107128-GimpResourcesThumbnailer-2.1.0.tar.gz
 	http://kde-apps.org/CONTENT/content-files/114885-AudioThumbs-0.1.tar.gz
@@ -48,9 +41,9 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 	sprocket-medium.png
 	sprocket-small.png)
 
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
          'edf694939f4b5d5e97c3fe2f91e7cec3' # kde-odf-thumbnail-1.0.0.tar.gz
-         '5e3022ddcf3876e07d4b9870e1806b48' # 107128-GimpResourcesThumbnailer-2.1.0.tar.gz
+         '5e3022ddcf3876e07d4b9870e1806b48' # 107128-GimpResourcesThumbnailer-2.1.1.tar.gz
          '07c3039ddf5e88ba0ab290570f43749d' # 114885-AudioThumbs-0.1.tar.gz
          '00ff1e8a1e4c1e39e3d1146f1d08036c' # mplayerthumbs-horizontal.patch
          '6eeba61989d0e6904fe2c18bb01a3775' # sprocket-large.png
@@ -63,7 +56,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
+	cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "applying patches ..."
 	patch -Np1 -i ${srcdir}/mplayerthumbs-horizontal.patch || return 1
@@ -108,14 +101,13 @@ package_kdemultimedia-common()
 {
 	pkgdesc="KDE multimedia - Common files and libraries"
 	depends=("kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'flac' 'musicbrainz>=3.0.3' 'cdparanoia' 'taglib')
-	conflicts=("kdemod-${_origname}-common")
-	groups=("kde" "kde-complete" "kdemultimedia" "kde-uninstall")
+	groups=("kde" "kdemultimedia" "kde-uninstall")
         optdepends=('pulseaudio: pulseaudio support')
-	install=${_origname}.install
+	install=${pkgbase}.install
 
 	splitdirs="kioslave libkcddb libkcompactdisc strigi-analyzer"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
@@ -123,10 +115,10 @@ package_kdemultimedia-common()
 	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
 	if [ "$?" = "0" ]; then
 		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+		mkdir -p ${pkgdir}/usr/share/chakra/patches/${pkgbase} &>/dev/null
 		for i in ${startdir}/*.patch; do
 			msg "$i"
-			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+			cp $i ${pkgdir}/usr/share/chakra/patches/${pkgbase}/ &>/dev/null
 		done
 	else
 		warning "no patches found, skipping to include them into the package..."
@@ -136,13 +128,11 @@ package_kdemultimedia-common()
 package_kdemultimedia-doc()
 {
 	pkgdesc="KDE multimedia - Documentation"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-doc")
-	groups=("kde-complete" "${_origname}" "kde-doc" "kde-uninstall")
+	groups=("kde" "${pkgbase}" "kde-doc" "kde-uninstall")
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -150,14 +140,13 @@ package_kdemultimedia-doc()
 package_kdemultimedia-dragonplayer()
 {
 	pkgdesc="Simple video player"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-dragonplayer")
-	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="dragonplayer"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -165,14 +154,13 @@ package_kdemultimedia-dragonplayer()
 package_kdemultimedia-juk()
 {
 	pkgdesc="An audio player with music database"
-	depends=("${_origname}-common>=${_kdever}") # Fixme: tunepimp 
-	conflicts=("kdmeod-${_origname}-juk")
-	groups=("kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" "tunepimp")
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="juk"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -180,15 +168,14 @@ package_kdemultimedia-juk()
 package_kdemultimedia-kmix()
 {
 	pkgdesc="Audio mixer"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kmix")
-	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "${pkgbase}" "kde-uninstall")
         optdepends=('pulseaudio: pulseaudio support')
-	install=${_origname}.install
+	install=${pkgbase}.install
 
 	splitdirs="kmix"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -196,14 +183,13 @@ package_kdemultimedia-kmix()
 package_kdemultimedia-kscd()
 {
 	pkgdesc="Audio CD player"
-	depends=("${_origname}-common>=${_kdever}" 'musicbrainz')
-	conflicts=("kdemod-${_origname}-kscd")
-	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'musicbrainz' 'tunepimp')
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kscd"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -211,15 +197,14 @@ package_kdemultimedia-kscd()
 package_kdemultimedia-thumbnailers()
 {
 	pkgdesc='Video Files (MPlayerThumbs)'
-	depends=("${_origname}-common>=${_kdever}" 'mplayer') 
-	provides=("${_origname}-mplayerthumbs=${_kdever}" 'mplayerthumbs')
-	conflicts=("kdemod-${_origname}-thumbnailers")
-	groups=("kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'mplayer') 
+	provides=("${pkgbase}-mplayerthumbs=${_kdever}" 'mplayerthumbs')
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="mplayerthumbs"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 

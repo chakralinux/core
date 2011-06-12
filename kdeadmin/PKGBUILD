@@ -7,25 +7,16 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=kdeadmin
-
-
-
 #
 # package info
 #
-pkgbase=('kdeadmin')
+pkgbase="kdeadmin"
 pkgname=('kdeadmin-common'
          'kdeadmin-doc'
          'kdeadmin-kcron'
          'kdeadmin-kuser'
          'kdeadmin-ksystemlog'
          'kdeadmin-system-config-printer')
-
-         # not in the tarball 'kdeadmin-lilo-config'
       
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
@@ -41,19 +32,15 @@ options=('!splithdr' 'splitdbg' 'log')
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdepimlibs>=${_kdever}"  "kdebase-runtime>=${_kdever}"
 	     "kdebindings-python>=${_kdever}" 'system-config-printer-common') # "kdepim-runtime>=${_kdever}"
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
-
-
-
+source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 #
 # build function
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
+	cd ${srcdir}/${pkgbase}-${pkgver}
 	
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -66,8 +53,6 @@ build()
 	make || return 1
 }
 
-
-
 #
 # split-install functions
 #
@@ -75,12 +60,11 @@ package_kdeadmin-common()
 {
 	pkgdesc="KDE Administrative Tools - Common files and libraries"
 	depends=("kdebase-runtime>=${_kdever}")
-	conflicts=("kdemod-${_origname}" )
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="strigi-analyzer"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
@@ -88,10 +72,10 @@ package_kdeadmin-common()
 #	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
 #	if [ "$?" = "0" ]; then
 #		warning "incuding patches into package"
-#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${pkgbase} &>/dev/null
 #		for i in ${startdir}/*.patch; do
 #			msg "$i"
-#			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+#			cp $i ${pkgdir}/usr/share/chakra/patches/${pkgbase}/ &>/dev/null
 #		done
 #	else
 #		warning "no patches found, skipping to include them into the package..."
@@ -101,12 +85,11 @@ package_kdeadmin-common()
 package_kdeadmin-doc()
 {
 	pkgdesc="KDE Administrative Tools - Documentation"
-	depends=("${_origname}-common>=${_kdever}")
-	groups=("${_origname}" "kde-complete" "kde-uninstall" "doc")
+	groups=("${pkgbase}" "kde" "kde-uninstall" "doc")
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -114,13 +97,13 @@ package_kdeadmin-doc()
 package_kdeadmin-kcron()
 {
 	pkgdesc="Crontab editor"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kcron")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kcron')
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kcron"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -128,13 +111,13 @@ package_kdeadmin-kcron()
 package_kdeadmin-kdat()
 {
 	pkgdesc="Tar-based tape archiver"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kdat")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kdat')
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kdat"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -142,13 +125,13 @@ package_kdeadmin-kdat()
 package_kdeadmin-ksystemlog()
 {
 	pkgdesc="Log viewer"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-ksystemlog")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('ksystemlog')
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="ksystemlog"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -156,27 +139,13 @@ package_kdeadmin-ksystemlog()
 package_kdeadmin-kuser()
 {
 	pkgdesc="Manage users and groups"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("${_origname}-kuser")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kuser')
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kuser"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdeadmin-lilo-config()
-{
-	pkgdesc="Configure the LILO bootloader"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-lilo-config")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
-
-	splitdirs="lilo-config"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -184,13 +153,12 @@ package_kdeadmin-lilo-config()
 package_kdeadmin-system-config-printer()
 {
 	pkgdesc="Printer configuration"
-	depends=("${_origname}-common>=${_kdever}" "system-config-printer" "kdebindings-python")
-	conflicts=("kdemod-${_origname}-system-config-printer-kde")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("${pkgbase}-common>=${_kdever}" "system-config-printer" "kdebindings-python")
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="system-config-printer-kde"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 

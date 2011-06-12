@@ -8,14 +8,14 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.04_r0
+pkgver=2011.04_20110603
 pkgrel=1
 _codename=Aida
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.6.3' 'squashfs-tools' 'partitionmanager>=1216949-4'
+depends=('kdelibs' 'kdeedu-marble>=4.6.3' 'squashfs-tools' 'partitionmanager>=1216949-5'
         'cinstall>=0.4.5' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
 makedepends=('cmake' 'kdelibs' 'kdeedu-marble>=4.6.3' 'kdebase-workspace' 'automoc4')
 provides=('tribe')
@@ -23,10 +23,10 @@ replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_201104R0.html")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_20110603.html")
   
-md5sums=('28f4c2ee7f5a103bb9ab642aa1db87d4'
-         'fb75ac0ce37b6ad838f667b415f5a2e0')
+md5sums=('dfde16097f784d3c6085ab739ca7df1c'
+         'b4bb4472cd8e190a88fbc2e27d1c7bd8')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -60,13 +60,8 @@ build()
 	#patch -Np1 -i ${srcdir}/fake-progress.patch || return 1
 	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
 
-	# remove unsupported pkgs for x64
-	if [ "${CARCH}" = "x86_64" ]; then
-	    rm -v ${srcdir}/$pkgname/data/appIcons/wine.png
-	    rm -v ${srcdir}/$pkgname/data/appIcons/skype.png
-	    sed -i -e '/wine/d' ${srcdir}/$pkgname/data/configPagePkgData
-	    sed -i -e '/skype/d' ${srcdir}/$pkgname/data/configPagePkgData
-	fi
+	# proper bootmnt folder
+	sed -i -e "s/@ARCH@/${CARCH}/g" config-tribe.h.cmake
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver} ($_codename)~g" config-tribe.h.cmake
@@ -85,7 +80,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_201104R0.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_20110603.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +

@@ -7,23 +7,15 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=kdetoys
-
-
-
 #
 # package info
 #
-pkgbase=('kdetoys')
+pkgbase="kdetoys"
 pkgname=('kdetoys-common'
          'kdetoys-doc'
          'kdetoys-amor'
          'kdetoys-kteatime'
          'kdetoys-ktux')
-#         'kdetoys-kweather')
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
@@ -37,8 +29,8 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdebase-workspace>=${_kdever}")
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 #
@@ -46,7 +38,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
+	cd ${srcdir}/${pkgbase}-${pkgver}
 
         # build it
 	msg "starting build ..."
@@ -65,36 +57,17 @@ build()
 #
 package_kdetoys-common()
 {
-	pkgdesc="${_origname} - Common files and libraries"
-	depends=("kdebase-workspace>=${_kdever}")
-	conflicts=("kdemod-${_origname}-common")
-	groups=("kde-complete" "kdetoys" "kde-uninstall")
-	install=${_origname}.install
-
-#	# include our patches into the package
-#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-#	if [ "$?" = "0" ]; then
-#		warning "incuding patches into package"
-#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
-#		for i in ${startdir}/*.patch; do
-#			msg "$i"
-#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
-#		done
-#	else
-#		warning "no patches found, skipping to include them into the package..."
-#	fi
+	pkgdesc="${pkgbase} - Transitional package"
 }
 
 package_kdetoys-doc()
 {
-	pkgdesc="${_origname} - Documentation"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-doc")
-	groups=("kde-complete" "kdetoys" "kde-doc" "kde-uninstall")
+	pkgdesc="${pkgbase} - Documentation"
+	groups=("kde" "kdetoys" "kde-doc" "kde-uninstall")
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -102,14 +75,12 @@ package_kdetoys-doc()
 package_kdetoys-amor()
 {
 	pkgdesc="Amusing Misuse Of Resources puts comic figures above your windows"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-amor")
-	groups=("kde-complete" "kdetoys" "kde-uninstall")
-	install=${_origname}.install
+	groups=("kde" "kdetoys" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="amor"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -117,14 +88,12 @@ package_kdetoys-amor()
 package_kdetoys-eyesapplet()
 {
 	pkgdesc="An applet similar to XEyes"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-eyesapplet")
-	groups=("kde-complete" "kdetoys" "kde-uninstall")
-	install=${_origname}.install
+	groups=("kde" "kdetoys" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="eyesapplet"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -132,14 +101,12 @@ package_kdetoys-eyesapplet()
 package_kdetoys-kteatime()
 {
 	pkgdesc="System tray applet that makes sure your tea doesn't get too strong"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kteatime")
-	groups=("kde-complete" "kdetoys" "kde-uninstall")
-	install=${_origname}.install
+	groups=("kde" "kdetoys" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kteatime"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -147,32 +114,12 @@ package_kdetoys-kteatime()
 package_kdetoys-ktux()
 {
 	pkgdesc="Tux-in-a-Spaceship screen saver"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-ktux")
-	groups=("kde-complete" "kdetoys" "kde-uninstall")
-	install=${_origname}.install
+	groups=("kde" "kdetoys" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="ktux"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
-
-package_kdetoys-kweather()
-{
-	pkgdesc="Kicker applet that will display the current weather outside"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kweather")
-	groups=("kde-complete" "kdetoys" "kde-uninstall")
-	install=${_origname}.install
-
-	splitdirs="kweather"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-
-

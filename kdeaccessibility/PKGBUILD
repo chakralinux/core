@@ -7,17 +7,10 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=kdeaccessibility
-
-
-
 #
 # package info
 #
-pkgbase=('kdeaccessibility')
+pkgbase="kdeaccessibility"
 pkgname=('kdeaccessibility-common'
          'kdeaccessibility-doc'
          'kdeaccessibility-colorschemes'
@@ -27,9 +20,6 @@ pkgname=('kdeaccessibility-common'
          'kdeaccessibility-kmouth'
          'kdeaccessibility-jovie')
 
-# Disabled
-#         'kdeaccessibility-ksayit'
-
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
 pkgrel=1
@@ -38,13 +28,13 @@ pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
-install=${_origname}.install
+install=${pkgbase}.install
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7" 'opentts')
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 
@@ -53,7 +43,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
+	cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -71,35 +61,18 @@ build()
 #
 package_kdeaccessibility-common()
 {
-	pkgdesc="KDE Accessibility Aids - Common files"
-	depends=("kdebase-runtime>=${_kdever}")
-	conflicts=("kdemod-${_origname}-common")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	pkgdesc="KDE Accessibility Aids - Transition package"
 
-#	# include our patches into the package
-#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-#	if [ "$?" = "0" ]; then
-#		warning "incuding patches into package"
-#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
-#		for i in ${startdir}/*.patch; do
-#			msg "$i"
-#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
-#		done
-#	else
-#		warning "no patches found, skipping to include them into the package..."
-#	fi
 }
 
 package_kdeaccessibility-doc()
 {
 	pkgdesc="KDE Accessibility Aids - Documentation"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-doc")
-	groups=("${_origname}" "kde-complete" "kde-uninstall" "kde-doc")
+	groups=("${pkgbase}" "kde" "kde-uninstall" "kde-doc")
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }
@@ -107,13 +80,12 @@ package_kdeaccessibility-doc()
 package_kdeaccessibility-colorschemes()
 {
 	pkgdesc="Accessible Color Schemes for KDE"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-colorschemes")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("kdebase-runtime>=${_kdever}")
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="ColorSchemes"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }
@@ -121,13 +93,12 @@ package_kdeaccessibility-colorschemes()
 package_kdeaccessibility-iconthemes()
 {
 	pkgdesc="Accessibly Icon Themes for KDE"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-iconthemes")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("kdebase-runtime>=${_kdever}")
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="IconThemes"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }
@@ -135,13 +106,12 @@ package_kdeaccessibility-iconthemes()
 package_kdeaccessibility-kmag()
 {
 	pkgdesc="Screen magnifier"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kmag")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kmag"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }
@@ -149,13 +119,12 @@ package_kdeaccessibility-kmag()
 package_kdeaccessibility-kmousetool()
 {
 	pkgdesc="Automatic mouse clicker"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kmousetool")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kmousetool"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }
@@ -163,13 +132,12 @@ package_kdeaccessibility-kmousetool()
 package_kdeaccessibility-kmouth()
 {
 	pkgdesc="Speech synthesizer"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kmouth")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kmouth"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }
@@ -177,14 +145,14 @@ package_kdeaccessibility-kmouth()
 package_kdeaccessibility-jovie()
 {
 	pkgdesc="Text-to-speech system"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7" 'opentts')
-	conflicts=("kdemod-${_origname}-kttsd" "kdemod-${_origname}-ksayit"" ${_origname}-kttsd" "${_origname}-ksayit")
-	replaces=("${_origname}-kttsd" "${_origname}-ksayit")
-	groups=("${_origname}" "kde-complete" "kde-uninstall")
+	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7" 'opentts')
+	conflicts=("${pkgbase}-kttsd" "${pkgbase}-ksayit")
+	replaces=("${pkgbase}-kttsd" "${pkgbase}-ksayit")
+	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="jovie"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }

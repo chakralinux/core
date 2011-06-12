@@ -7,23 +7,15 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=kdeutils
-
-
-
 #
 # package info
 #
-pkgbase=('kdeutils')
+pkgbase="kdeutils"
 pkgname=('kdeutils-common'
          'kdeutils-doc'
          'kdeutils-ark'
          'kdeutils-kcalc'
          'kdeutils-kcharselect'
-#	 'kdeutils-kdelirc'
          'kdeutils-kdf'
          'kdeutils-kfloppy'
          'kdeutils-kgpg'
@@ -49,8 +41,8 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}"
              'system-config-printer-common' 'libarchive' 'qimageblitz'
              'p7zip' 'zip' 'unzip' 'unrar') # "kdepim-runtime>=${_kdever}"
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 #
@@ -58,7 +50,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
+	cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -77,36 +69,18 @@ build()
 #
 package_kdeutils-common()
 {
-	pkgdesc="KDE Utilities - Common files and libraries"
-	provides=("${_origname}=${_kdever}")
-	conflicts=("kdemod-${_origname}-common")
-	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	pkgdesc="KDE Utilities - Transition package"
 
-#	# include our patches into the package
-#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-#	if [ "$?" = "0" ]; then
-#		warning "incuding patches into package"
-#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
-#		for i in ${startdir}/*.patch; do
-#			msg "$i"
-#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
-#		done
-#	else
-#		warning "no patches found, skipping to include them into the package..."
-#	fi
 }
 
 package_kdeutils-doc()
 {
 	pkgdesc="KDE Utilities - Documentation"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-doc")
-	groups=("kde-complete" "kdeutils" "kde-doc" "kde-uninstall")
+	groups=("kde" "kdeutils" "kde-doc" "kde-uninstall")
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -114,16 +88,14 @@ package_kdeutils-doc()
 package_kdeutils-ark()
 {
 	pkgdesc="Archiver for various compression formats"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}" 'libarchive')
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}" 'libarchive')
 	optdepends=('p7zip' 'zip' 'unzip' 'unrar')
-	conflicts=("kdemod-${_origname}-ark")
-	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="ark"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -131,15 +103,13 @@ package_kdeutils-ark()
 package_kdeutils-kcalc()
 {
 	pkgdesc="Scientific calculator"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kcalc")
-	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kcalc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -147,15 +117,13 @@ package_kdeutils-kcalc()
 package_kdeutils-kcharselect()
 {
 	pkgdesc="Character selector"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kcharselect")
-	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kcharselect"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -163,15 +131,13 @@ package_kdeutils-kcharselect()
 package_kdeutils-kdelirc()
 {
 	pkgdesc="KDE Linux infrared remote control server."
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kdelirc")
-	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kdelirc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
@@ -183,15 +149,13 @@ package_kdeutils-kdelirc()
 package_kdeutils-kdessh()
 {
 	pkgdesc="A KDE frontend to SSH"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kdessh")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kdessh"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -199,15 +163,13 @@ package_kdeutils-kdessh()
 package_kdeutils-kdf()
 {
 	pkgdesc="KDE diskfree"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kdf")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kdf"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -215,15 +177,13 @@ package_kdeutils-kdf()
 package_kdeutils-kfloppy()
 {
 	pkgdesc="Floppy formatter"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kfloppy")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kfloppy"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -231,16 +191,13 @@ package_kdeutils-kfloppy()
 package_kdeutils-kgpg()
 {
 	pkgdesc="GPG encryption and key management"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}" 'kde-agent'
-		 ) # "kdepim-runtime>=${_kdever}"
-	conflicts=("kdemod-${_origname}-kgpg")
-	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}" 'kde-agent') # "kdepim-runtime>=${_kdever}"
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kgpg"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -248,15 +205,13 @@ package_kdeutils-kgpg()
 package_kdeutils-ktimer()
 {
 	pkgdesc="Timer application"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-ktimer")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="ktimer"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -264,15 +219,13 @@ package_kdeutils-ktimer()
 package_kdeutils-kwallet()
 {
 	pkgdesc="The KDE wallet system"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kwallet")
-	groups=("kde" "kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kwallet"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -280,15 +233,14 @@ package_kdeutils-kwallet()
 package_kdeutils-printer-applet()
 {
 	pkgdesc="A system tray utility that shows current print jobs, printer warnings and errors"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		 "kdebase>=${_kdever}" "kdebindings-python>=${_kdever}" 'system-config-printer-common')
-	conflicts=("kdemod-${_origname}-printer-applet")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}" 
+		 "kdebindings-python>=${_kdever}" 'system-config-printer-common')
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="printer-applet"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -296,14 +248,13 @@ package_kdeutils-printer-applet()
 package_kdeutils-superkaramba()
 {
 	pkgdesc="Desktop widgets"
-	depends=("${_origname}-common>=${_kdever}" 'qimageblitz')
-	conflicts=("kdemod-${_origname}-superkaramba")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=('qimageblitz')
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="superkaramba"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -311,17 +262,13 @@ package_kdeutils-superkaramba()
 package_kdeutils-sweeper()
 {
 	pkgdesc="Clean unwanted traces the user leaves on the system"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
-		  "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-sweeper")
-	groups=("kde-complete" "kdeutils" "kde-uninstall")
-	install=${_origname}.install
+	depends=("kdebase-runtime>=${_kdever}" "kdebase>=${_kdever}")
+	groups=("kde" "kdeutils" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="sweeper"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
-
-

@@ -7,19 +7,11 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=kdeedu
-
-# FIXME: check if python-bindings build again
-
 #
 # package info
 #
-pkgbase=('kdeedu')
+pkgbase="kdeedu"
 pkgname=('kdeedu-common'
-         'kdeedu-doc'
          'kdeedu-blinken'
 	 'kdeedu-cantor'
          'kdeedu-kalgebra'
@@ -43,20 +35,20 @@ pkgname=('kdeedu-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
-
+pkgrel=1
 pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
-
-options=('docs' '!splithdr' 'splitdbg' 'log')
+options=('!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'ocaml' 'facile' 'eigen' 'cfitsio' "kdelibs>=${_kdever}"
              "kdebase-runtime>=${_kdever}" 'openbabel' 'libqalculate' 'gsl' 'boost' 'indilib' 'r>=2.11.1'
-             'libspectre' 'python' 'xplanet' 'docbook-xml' 'avogadro')
+             'libspectre' 'python' 'xplanet' 'docbook-xsl' 'avogadro')
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2)
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+source=("$_mirror/${pkgbase}-$_kdever.tar.bz2"
+	"$_mirror/${pkgbase}-4.6.3.tar.bz2")
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+         '259ba3e733fecd145c4389f10bee5ad1')
 
 
 #
@@ -64,13 +56,12 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
+	cd ${srcdir}/${pkgbase}-${pkgver}
 
         # parallel build breaks kalzium
 	export MAKEFLAGS="-j1"
 
 	msg "starting build ..."
-	# rpath is needed for cantor to find R
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
                 -DCMAKE_BUILD_TYPE=Release \
@@ -89,59 +80,44 @@ package_kdeedu-common()
 {
 	pkgdesc="KDE Education Programs - Common files and libraries"
 	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
-	conflicts=("kdemod-${_origname}")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	groups=("kde" "kdeedu" "kde-uninstall")
+	conflicts=('kdeedu-doc')
+	install=${pkgbase}.install
 
-	splitdirs="libkdeedu data"
+	splitdirs="libkdeedu"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
 	# WORKAROUND -> install cmake modules
-	install -D -m644 $srcdir/${_origname}-${pkgver}/cmake/modules/FindKDEEdu.cmake \
+	install -D -m644 $srcdir/${pkgbase}-4.6.3/cmake/modules/FindKDEEdu.cmake \
 		$pkgdir/usr/share/apps/cmake/modules/FindKDEEdu.cmake
 
-#	# include our patches into the package
+	# include our patches into the package
 #	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
 #	if [ "$?" = "0" ]; then
 #		warning "incuding patches into package"
-#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
+#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${pkgbase} &>/dev/null
 #		for i in ${startdir}/*.patch; do
 #			msg "$i"
-#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
+#			cp $i ${pkgdir}/usr/share/kdemod/patches/${pkgbase}/ &>/dev/null
 #		done
 #	else
 #		warning "no patches found, skipping to include them into the package..."
 #	fi
 }
 
-package_kdeedu-doc()
-{
-	pkgdesc="KDE Education Programs - Documentation"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-doc")
-	groups=("kde-complete" "kdeedu" "kde-uninstall" "kde-doc")
-
-	splitdirs="doc"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
 package_kdeedu-blinken()
 {
 	pkgdesc="BlinKen is the KDE version of the well-known game Simon Says"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-blinken")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="blinken"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -149,14 +125,13 @@ package_kdeedu-blinken()
 package_kdeedu-cantor()
 {
 	pkgdesc="Cantor is a KDE Application aimed to provide a nice Interface for doing Mathematics and Scientific Computing."
-	depends=("${_origname}-common>=${_kdever}" 'r>=2.11.1')
-	conflicts=("kdemod-${_origname}-cantor")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'r>=2.11.1')
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="cantor"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -164,14 +139,13 @@ package_kdeedu-cantor()
 package_kdeedu-kalgebra()
 {
 	pkgdesc="KAlgebra is a mathematical calculator based on the content markup MathML language"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kalgebra")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kalgebra"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -179,29 +153,51 @@ package_kdeedu-kalgebra()
 package_kdeedu-kalzium()
 {
 	pkgdesc="Kalzium is an application which will show you some information about the periodic system of the elements"
-	depends=("${_origname}-common>=${_kdever}" 'openbabel' 'avogadro')
-	conflicts=("kdemod-${_origname}-kalzium")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'openbabel' 'avogadro')
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kalzium"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
+
+	# Rempve duplicated files in kalzium
+	msg "Fixing duplicated files in Kalzium and Common"
+	rm -rv ${pkgdir}/usr/include/libkdeedu/chemicaldataobject.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/element.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/elementparser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/isotope.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/isotopeparser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/libkdeedu_science_export.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/moleculeparser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/parser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/psetables.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/spectrum.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/spectrumparser.h
+	rm -rv ${pkgdir}/usr/include/libkdeedu/tempunit.h
+	rm -rv ${pkgdir}/usr/lib/libscience.so
+	rm -rv ${pkgdir}/usr/lib/libscience.so.4
+	rm -rv ${pkgdir}/usr/lib/libscience.so.4.6.0
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/elements.xml
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/isotopes.xml
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/spectra.xml 
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/symbols.csv 
+	rm -rv ${pkgdir}/usr/share/apps/libkdeedu/data/symbols2.csv
+
 }
 
 package_kdeedu-kanagram()
 {
 	pkgdesc="Kanagram mixes up the letters of a word (creating an anagram), and you have to guess what the mixed up word is"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kanagram")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kanagram"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -209,14 +205,13 @@ package_kdeedu-kanagram()
 package_kdeedu-kbruch()
 {
 	pkgdesc="KBruch is a small program to practice calculating with fractions"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kbruch")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kbruch"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -224,14 +219,13 @@ package_kdeedu-kbruch()
 package_kdeedu-kgeography()
 {
 	pkgdesc="KGeography is a geography learning program"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}kgeography")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kgeography"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -239,14 +233,13 @@ package_kdeedu-kgeography()
 package_kdeedu-khangman()
 {
 	pkgdesc="KHangman is the classical hangman game"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-khangman")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="khangman"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -254,14 +247,13 @@ package_kdeedu-khangman()
 package_kdeedu-kig()
 {
 	pkgdesc="Kig is a program for exploring geometric constructions"
-	depends=("${_origname}-common>=${_kdever}" 'boost' 'python')
-	conflicts=("kdemod-${_origname}-kig")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'boost' 'python')
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kig"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -269,14 +261,13 @@ package_kdeedu-kig()
 package_kdeedu-kiten()
 {
 	pkgdesc="Kiten is a Japanese reference and learning tool"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kiten")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kiten"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -284,14 +275,13 @@ package_kdeedu-kiten()
 package_kdeedu-klettres()
 {
 	pkgdesc="KLettres aims to help to learn the alphabet and then to read some syllables in different languages"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-klettres")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="klettres"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -299,14 +289,13 @@ package_kdeedu-klettres()
 package_kdeedu-kmplot()
 {
 	pkgdesc="KmPlot is a mathematical function plotter for the KDE-Desktop"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kmplot")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kmplot"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -314,14 +303,13 @@ package_kdeedu-kmplot()
 package_kdeedu-kstars()
 {
 	pkgdesc="A complete Desktop Planetarium application"
-	depends=("${_origname}-common>=${_kdever}" 'indilib' 'xplanet')
-	conflicts=("kdemod-${_origname}-kstars")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'indilib' 'xplanet')
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kstars"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
@@ -332,14 +320,13 @@ package_kdeedu-kstars()
 package_kdeedu-ktouch()
 {
 	pkgdesc="KTouch is a program for learning touch typing"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-ktouch")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="ktouch"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -347,14 +334,13 @@ package_kdeedu-ktouch()
 package_kdeedu-kturtle()
 {
 	pkgdesc="KTurtle is an educational programming environment"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kturtle")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kturtle"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -362,14 +348,13 @@ package_kdeedu-kturtle()
 package_kdeedu-kwordquiz()
 {
 	pkgdesc="KWordQuiz is a general purpose flash card program"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kwordquiz")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kwordquiz"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -377,33 +362,31 @@ package_kdeedu-kwordquiz()
 package_kdeedu-marble()
 {
 	pkgdesc="Marble is a generic geographical map widget that is meant to be used by KDE applications"
-	depends=("${_origname}-common>=${_kdever}" "kdebindings-python>=${_kdever}" 'python')
-	conflicts=("kdemod-${_origname}-marble")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" "kdebindings-python>=${_kdever}" 'python')
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="marble"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
 	# WORKAROUND -> install cmake modules
-	install -D -m644 $srcdir/${_origname}-${pkgver}/cmake/modules/FindMarbleWidget.cmake \
+	install -D -m644 $srcdir/${pkgbase}-4.6.3/cmake/modules/FindMarbleWidget.cmake \
 		$pkgdir/usr/share/apps/cmake/modules/FindMarbleWidget.cmake
 }
 
 package_kdeedu-parley()
 {
 	pkgdesc="Parley is a vocabulary trainer"
-	depends=("${_origname}-common>=${_kdever}" "kdebindings-python>=${_kdever}" 'python')
-	conflicts=("kdemod-${_origname}-parley")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" "kdebindings-python>=${_kdever}" 'python')
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="parley"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -411,14 +394,13 @@ package_kdeedu-parley()
 package_kdeedu-rocs()
 {
 	pkgdesc="Rocs aims to be a full featured Graph Editor and Programming Enviroment"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-rocs")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="rocs"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -426,14 +408,13 @@ package_kdeedu-rocs()
 package_kdeedu-step()
 {
 	pkgdesc="Step is an interactive physics simulator"
-	depends=("${_origname}-common>=${_kdever}" 'gsl' 'libqalculate')
-	conflicts=("kdemod-${_origname}-step")
-	groups=("kde-complete" "kdeedu" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'gsl' 'libqalculate')
+	groups=("kde" "kdeedu" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="step"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 

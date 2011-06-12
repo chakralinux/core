@@ -7,24 +7,16 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=kdesdk
-
-
-
 #
 # package info
 #
-pkgbase=('kdesdk')
+pkgbase="kdesdk"
 pkgname=('kdesdk-common'
          'kdesdk-doc'
          'kdesdk-kate'
          'kdesdk-cervisia'
          'kdesdk-kapptemplate'
          'kdesdk-lokalize'
-#        'kdesdk-kbugbuster'
          'kdesdk-okteta'
          'kdesdk-kdeaccounts-plugin'
          'kdesdk-kcachegrind'
@@ -48,20 +40,19 @@ license=('GPL' 'LGPL' 'FDL')
 
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' "kdebase-runtime>=${_kdever}" 'antlr2'
+makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' "kdebase-runtime>=${_kdever}" 'antlr2' 'openjdk6'
              "kdepimlibs>=${_kdever}" 'subversion' "kdebindings-python>=${_kdever}" "openjdk6") # "kdepim-runtime>=${_kdever}"
 
-source=("$_mirror/${_origname}-$_kdever.tar.bz2"
-	'fix-antlr2-executable.patch')
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-         '2545efa41b5fcb5fec53c453d0f23c25')
+source=("$_mirror/${pkgbase}-$_kdever.tar.bz2")
+	#'fix-antlr2-executable.patch')
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+         #'2545efa41b5fcb5fec53c453d0f23c25')
 #
 # build function
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
-        #patch -Np1 -i ${srcdir}/fix-antlr2-executable.patch
+	cd ${srcdir}/${pkgbase}-${pkgver}
 
 	# FIXME: plugin doesnt build: https://bugs.kde.org/show_bug.cgi?id=217769
 	sed -i -e "/snippets_tng/d" kate/plugins/CMakeLists.txt || return 1
@@ -74,8 +65,6 @@ build()
 	make || return 1
 }
 
-
-
 #
 # split-install functions
 #
@@ -83,13 +72,12 @@ package_kdesdk-common()
 {
 	pkgdesc="KDE Software Development Kit - Common files and libraries"
 	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" 'subversion')
-	conflicts=("kdmeod-${_origname}-common")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="strigi-analyzer kioslave"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
@@ -97,10 +85,10 @@ package_kdesdk-common()
 #	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
 #	if [ "$?" = "0" ]; then
 #		warning "incuding patches into package"
-#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+#		mkdir -p ${pkgdir}/usr/share/chakra/patches/${pkgbase} &>/dev/null
 #		for i in ${startdir}/*.patch; do
 #			msg "$i"
-#			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+#			cp $i ${pkgdir}/usr/share/chakra/patches/${pkgbase}/ &>/dev/null
 #		done
 #	else
 #		warning "no patches found, skipping to include them into the package..."
@@ -110,13 +98,11 @@ package_kdesdk-common()
 package_kdesdk-doc()
 {
 	pkgdesc="KDE Software Development Kit - Documentation"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdmeod-${_origname}-doc")
-	groups=("kde-complete" "kde-devel" "kde-doc" "kde-uninstall" "kdesdk")
+	groups=("kde" "kde-devel" "kde-doc" "kde-uninstall" "kdesdk")
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -124,14 +110,14 @@ package_kdesdk-doc()
 package_kdesdk-kate()
 {
 	pkgdesc="The KDE Advanced Text Editor"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kate")
-	groups=("kde" "kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	provides=('kate')
+	install=${pkgbase}.install
 
 	splitdirs="kate"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -139,14 +125,14 @@ package_kdesdk-kate()
 package_kdesdk-cervisia()
 {
 	pkgdesc="A CVS GUI frontend for KDE"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-cervisia")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	provides=('cervisia')
+	install=${pkgbase}.install
 
 	splitdirs="cervisia"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -154,14 +140,14 @@ package_kdesdk-cervisia()
 package_kdesdk-kapptemplate()
 {
 	pkgdesc="KDE application template generator"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kapptemplate")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	provides=('kapptemplate')
+	install=${pkgbase}.install
 
 	splitdirs="kapptemplate"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -169,30 +155,15 @@ package_kdesdk-kapptemplate()
 package_kdesdk-lokalize()
 {
 	pkgdesc="Computer aided translation system"
-	depends=("${_origname}-common>=${_kdever}" "kdebindings-python>=${_kdever}")
+	depends=("${pkgbase}-common>=${_kdever}" "kdebindings-python>=${_kdever}")
 	optdepends=('translate-toolkit: enable extra python script')
-	conflicts=("kdmeod-${_origname}-lokalize")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	provides=('lokalize')
+	install=${pkgbase}.install
 
 	splitdirs="lokalize"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdesdk-kbugbuster()
-{
-	pkgdesc="Frontend for the KDE bug tracker"
-	depends=("${_origname}-common>=${_kdever}" "kdepimlibs>=${_kdever}") # "kdepim-runtime>=${_kdever}"
-	conflicts=("kdemod-${_origname}-kbugbuster")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
-
-	splitdirs="kbugbuster"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -200,16 +171,15 @@ package_kdesdk-kbugbuster()
 package_kdesdk-okteta()
 {
 	pkgdesc="Okteta is a simple editor for the raw data of files, also known as a hex editor."
-	depends=("${_origname}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
+	depends=("${pkgbase}-common>=${_kdever}" "kdebase-runtime>=${_kdever}"
 		 "kdebase>=${_kdever}")
-	conflicts=("kdemod-${_origname}-okteta" 'kdeutils-okteta')
-	replaces=('kdeutils-okteta')
-	groups=("kde-complete" "kdesdk" "kde-uninstall")
-	install=${_origname}.install
+	provides=('okteta')
+	groups=("kde" "kdesdk" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="okteta"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -217,14 +187,13 @@ package_kdesdk-okteta()
 package_kdesdk-kdeaccounts-plugin()
 {
 	pkgdesc="Addressbook plugin that puts names/email addresses of all KDE SVN accounts into an addressbook"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kdeaccounts-plugin")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="kdeaccounts-plugin"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -232,14 +201,14 @@ package_kdesdk-kdeaccounts-plugin()
 package_kdesdk-kcachegrind()
 {
 	pkgdesc="KDE profiler visualization"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kcachegrind")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kcachegrind')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="kcachegrind"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -247,14 +216,14 @@ package_kdesdk-kcachegrind()
 package_kdesdk-kmtrace()
 {
 	pkgdesc="A KDE memory leak tracer"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kmtrace")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kmtrace')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="kmtrace"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -262,14 +231,14 @@ package_kdesdk-kmtrace()
 package_kdesdk-kompare()
 {
 	pkgdesc="A KDE visual diff viewer"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kompare")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kompare')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="kompare"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -277,14 +246,14 @@ package_kdesdk-kompare()
 package_kdesdk-kpartloader()
 {
 	pkgdesc="KPartloader is a very simple application to test loading of a KPart."
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kpartloader")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kpartloader')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="kpartloader"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -292,14 +261,14 @@ package_kdesdk-kpartloader()
 package_kdesdk-kprofilemethod()
 {
 	pkgdesc="Macros for profiling using QTime"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kprofilemethod")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kprofilemethod')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="kprofilemethod"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -307,14 +276,14 @@ package_kdesdk-kprofilemethod()
 package_kdesdk-kstartperf()
 {
 	pkgdesc="Measures startup time for KDE applications"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kstartperf")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kstartperf')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="kstartperf"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -322,14 +291,14 @@ package_kdesdk-kstartperf()
 package_kdesdk-kuiviewer()
 {
 	pkgdesc="KUIViewer is a utility to display and test .ui-files"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-kuiviewer")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('kuiviewer')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="kuiviewer"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -337,14 +306,13 @@ package_kdesdk-kuiviewer()
 package_kdesdk-poxml()
 {
 	pkgdesc="Tools for using .po-files to translate DocBook XML files"
-	depends=("${_origname}-common>=${_kdever}" 'qt' 'antlr2')
-	conflicts=("kdemod-${_origname}-poxml")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'qt' 'antlr2')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="poxml"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -352,14 +320,13 @@ package_kdesdk-poxml()
 package_kdesdk-scripts()
 {
 	pkgdesc="Extra scripts for the KDE SDK"
-	depends=("${_origname}-common>=${_kdever}" 'python')
-	conflicts=("kdemod-${_origname}-scripts")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'python')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="scripts"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -367,14 +334,14 @@ package_kdesdk-scripts()
 package_kdesdk-umbrello()
 {
 	pkgdesc="An UML modeling tool for KDE"
-	depends=("${_origname}-common>=${_kdever}")
-	conflicts=("kdemod-${_origname}-umbrello")
-	groups=("kde-complete" "kde-devel" "kde-uninstall" "kdesdk")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}")
+	provides=('umbrello')
+	groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+	install=${pkgbase}.install
 
 	splitdirs="umbrello"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }

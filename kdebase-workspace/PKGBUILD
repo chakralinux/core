@@ -7,26 +7,20 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-# original name (used for the source and pkgnames)
-_origname=kdebase-workspace
-
 # default wallpaper to be kept in kdebase-workspace main package
 _default_wp="Horos"
-
-
 
 #
 # package info
 #
-pkgbase=('kdebase-workspace')
+pkgbase="kdebase-workspace"
 pkgname=('kdebase-workspace'
          'kdebase-workspace-doc'
          'kdebase-workspace-wallpapers')
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -41,9 +35,9 @@ depends=('polkit-kde-agent' "kdepimlibs>=${_kdever}" "kdebase-runtime>=${_kdever
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'networkmanager' 'bluez' "kdebindings-python>=${_kdever}"
              "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje' "kdebase-runtime>=${_kdever}" 'gpsd' 'samba' 
-	     'libraw1394' 'libdmtx' 'consolekit' 'docbook-xsl' 'google-gadgets-qt>=0.11.2')
+	     'libraw1394' 'libdmtx' 'consolekit' 'docbook-xsl' 'google-gadgets-qt>=0.11.2' 'boost')
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2
+source=($_mirror/${pkgbase}-$_kdever.tar.bz2
 	mishaaq-kcm_touchpad-00370b5.tar.gz
 	http://www.kde-apps.org/CONTENT/content-files/114856-kcm_tablet-1.1.3.tar.gz
 	http://www.kde-apps.org/CONTENT/content-files/117639-favorites-0.1.tar.bz2
@@ -96,10 +90,10 @@ source=($_mirror/${_origname}-$_kdever.tar.bz2
 
 #	feature_kdm-plymouth.patch
 #	shutdown-fix.patch
-	sensors-fix.patch
+	rev_monotonic_clock.patch
 	)
 
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
         'f355a658d2e9267fdf4e8d8f88038bcf' # mishaaq-kcm_touchpad-00370b5.tar.gz
         'd4570491bcf9986d84aeb77c939090a9' # 114856-kcm_tablet-1.1.3.tar.gz
         'b60baabccbd302d00923e053db0dc0ae' # 117639-favorites-0.1.tar.bz2
@@ -114,19 +108,14 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
         'e2eb9d270fe0e93901b29256bdedd7e2' #  02_sane_env_and_shutdown_path.patch
         '8e623bb5608025417ff9ed061e5a03f1' #  03_plasma_menubutton_branding.patch
         '522a294c09d88d3d722de3f39fd203c3' #  04_plasma_kickoff_url.patch
-#       '0aba9287f038d66afbf545c83a46fd19' #  05_plasma_desktop_defaults.patch
         '0ee6e12bb9830b4248becb0442dc7e0c' #  06_kickoff_default_favourites.patch
         '89d96455c6a446ef59b0620d1b8606af' #  07_always_show_kickoff_subtext.patch
         '5eb9285268916492012151045bdebd26' #  09_enable_start-shutdown-scripts.patch
 
         'db2d8166f5ea80ecd291deb9c0e2bb71' #  fix_kdm-increase-xserver-timeout-bnc#462478.patch
         '814350c52c135d6f7bdada1e29223d38' #  fix_terminate-server.patch
-#        '5d752cf39a28306438bb6d82db6e1696'#  fix_ck-shutdown.patch
 	'97a5eb51e6f9d460f0d61bb322a1db5e' #  fix_kdm_configdef.patch
 	'5f963f80a026f0600edae1b1c70411e5' #  fix_root-only-kcms.patch
-
-#	'c6b58eb228d16c77d692df655046ee9f' #  trunk_powerdevil.patch
-
 
 #        '13c3203589143e9e2fc757c17375227a' #  feature_plasma-transparent-panel-v4-rb#472.patch
 #        '7361012da217f9aeeca61f0e9956e1d0' #  feature_brightness-osd.patch
@@ -134,7 +123,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
 #        'c542f58979cf9cb2299dd42f63e6fd72' #  shutdown-fix.patch
-         'ecf3a9d6af9bdd3db0189e06ddf21034' #  sensors-fix.patch
+         'db8077776b1bc6e796fe227bbc0ef63a' #  rev_monotonic_clock.patch
          )
 
 #
@@ -142,17 +131,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
-
-	# branch update
-	if [ "$_branchupdate" = "yes" ] ; then
-		msg "applying branch update ..."
-		patch -p0 -i $startdir/branch-update-r*.patch
-	else
-		warning "branch updates disabled ..."
-		warning "if you want to make use of it, run branch_updater.sh"
-		warning "and enable branch updates in _/buildsystem/kdemod.conf"
-	fi
+	cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "applying main patchset ..."
 
@@ -160,7 +139,6 @@ build()
 	patch -Np0 -i ${srcdir}/02_sane_env_and_shutdown_path.patch
 	patch -Np1 -i ${srcdir}/03_plasma_menubutton_branding.patch
 	patch -Np1 -i ${srcdir}/04_plasma_kickoff_url.patch
-#	patch -Np1 -i ${srcdir}/05_plasma_desktop_defaults.patch
 	patch -Np1 -i ${srcdir}/06_kickoff_default_favourites.patch
 	patch -Np1 -i ${srcdir}/07_always_show_kickoff_subtext.patch
 	patch -Np1 -i ${srcdir}/09_enable_start-shutdown-scripts.patch
@@ -169,10 +147,8 @@ build()
 	msg "applying fixes ..."
 	patch -Np0 -i ${srcdir}/fix_kdm-increase-xserver-timeout-bnc#462478.patch
 	patch -Np0 -i ${srcdir}/fix_terminate-server.patch
-#	patch -Np1 -i ${srcdir}/fix_ck-shutdown.patch
 	patch -p0 -N -i ${srcdir}/fix_kdm_configdef.patch
         patch -Np1 -i ${srcdir}/fix_root-only-kcms.patch
-#	patch -Np1 -i ${srcdir}/shutdown-fix.patch
 
 # FIXME: update feature patches
 #	msg "applying feature patches ..."
@@ -182,8 +158,8 @@ build()
 # 	patch -Np1 -i ${srcdir}/feature_history-notifications-enable-disable-kde#119207.patch
 # 	patch -Np1 -i ${srcdir}/feature_kdm-plymouth.patch
 
-#	msg "applying upstream patches ..."
-#	patch -Np1 -i ${srcdir}/sensors-fix.patch
+	msg "applying upstream patches ..."
+	patch -Np1 -R < ${srcdir}/rev_monotonic_clock.patch
 
 
 	msg "starting workspace build ..."
@@ -198,6 +174,8 @@ build()
 
 	msg "starting kcm_touchpad build ..."
 	cd ${srcdir}/mishaaq-kcm_touchpad-00370b5
+        # Fix desktop to the new layout
+	sed -i -e "s~keyboard-and-mouse~input-devices~g" touchpad.desktop
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DWITH_Xmms=OFF \
@@ -206,6 +184,8 @@ build()
 
 	msg "starting kcm_tablet build ..."
 	cd ${srcdir}/kcm_tablet-1.1.3
+        # Fix desktop to the new layout
+        sed -i -e "s~keyboard-and-mouse~input-devices~g" ${srcdir}/kcm_tablet-1.1.3/src/kcm_tablet.desktop
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DWITH_Xmms=OFF \
@@ -245,20 +225,20 @@ package_kdebase-workspace()
 		    "gpsd               : Plasma geolocation support"
 		    "(open)ntp          : Time/Date sync support")
 
-	provides=("${_origname}=${_kdever}" "powerdevil" 'powerdevil' 'kcm_tablet=1.1.3')
+	provides=('kde-workspace' 'powerdevil' 'kcm_tablet')
 	replaces=('guidance-power-manager')
 	
-	conflicts=("kdemod-${_origname}" "powerdevil" 'powerdevil' "kde-meta-${_origname}" 'kcm_tablet' 'guidance-power-manager')
-	groups=("kde" "kde-complete" "kde-uninstall" "kde-minimal")
+	conflicts=('powerdevil' 'kcm_tablet' 'guidance-power-manager')
+	groups=("kde" "kde-uninstall" "kde-minimal")
 
 	backup=('usr/share/config/kdm/kdmrc'
                 'etc/pam.d/kde'
                 'etc/pam.d/kde-np'
                 'etc/pam.d/kscreensaver')
 
-	install=${_origname}.install
+	install=${pkgbase}.install
 
-	cd ${srcdir}/${_origname}-${pkgver}
+	cd ${srcdir}/${pkgbase}-${pkgver}
 	make DESTDIR=${pkgdir} install
 
 	cd ${srcdir}/mishaaq-kcm_touchpad-00370b5
@@ -279,13 +259,13 @@ package_kdebase-workspace()
 	install -d -m755 ${pkgdir}/etc/kde/{env,shutdown}
 
 	# install session
-	install -D -m 644 ${srcdir}/${_origname}-${pkgver}/kdm/kfrontend/sessions/kde-plasma.desktop \
+	install -D -m 644 ${srcdir}/${pkgbase}-${pkgver}/kdm/kfrontend/sessions/kde-plasma.desktop \
 	${pkgdir}/etc/X11/sessions/kde-plasma.desktop
-	install -D -m 644 ${srcdir}/${_origname}-${pkgver}/kdm/kfrontend/sessions/kde-plasma-safe.desktop \
+	install -D -m 644 ${srcdir}/${pkgbase}-${pkgver}/kdm/kfrontend/sessions/kde-plasma-safe.desktop \
 	${pkgdir}/etc/X11/sessions/kde-plasma-safe.desktop
 
 	# also install kdm clean default config
-	cd ${srcdir}/${_origname}-${pkgver}/kdm 
+	cd ${srcdir}/${pkgbase}-${pkgver}/kdm 
 	make DESTDIR=${pkgdir} GENKDMCONF_FLAGS="--no-old --no-backup --no-in-notice" install
 
 	# povided in separate package
@@ -330,10 +310,10 @@ package_kdebase-workspace()
 	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
 	if [ "$?" = "0" ]; then
 		warning "incuding patches into package"
-		mkdir -p ${pkgdir}/usr/share/chakra/patches/${_origname} &>/dev/null
+		mkdir -p ${pkgdir}/usr/share/chakra/patches/${pkgbase} &>/dev/null
 		for i in ${startdir}/*.patch; do
 			msg "$i"
-			cp $i ${pkgdir}/usr/share/chakra/patches/${_origname}/ &>/dev/null
+			cp $i ${pkgdir}/usr/share/chakra/patches/${pkgbase}/ &>/dev/null
 		done
 	else
 		warning "no patches found, skipping to include them into the package..."
@@ -348,14 +328,13 @@ package_kdebase-workspace()
 package_kdebase-workspace-doc()
 {
 	pkgdesc="KDE Workspace - Documentation"
-	depends=("${_origname}>=${_kdever}")
-	groups=("kde" "kde-complete" "kde-uninstall" "kde-doc")
+	groups=("kde" "kde-uninstall" "kde-doc")
 	# keep this, the variable must be resetted
 	optdepends=()
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }
@@ -363,13 +342,13 @@ package_kdebase-workspace-doc()
 package_kdebase-workspace-wallpapers()
 {
 	pkgdesc="KDE Workspace - Desktop Wallpapers"
-	groups=("kde" "kde-complete" "kde-uninstall")
+	groups=("kde" "kde-uninstall")
 	# keep this, the variable must be resetted  
 	optdepends=()	
 	
 	splitdirs="wallpapers"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 

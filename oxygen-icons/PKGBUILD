@@ -7,51 +7,31 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=oxygen-icons
-
-
-
 #
 # package info
 #
-pkgbase=('oxygen-icons')
+pkgbase="oxygen-icons"
 pkgname=('oxygen-icons'
 	 'oxygen-icons-svg')
 	 
 arch=('any')
 pkgver=${_kdever}
-pkgrel=2
-
+pkgrel=1
 pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
-
 install=oxygen-icons.install
-options=('log')
-
 makedepends=('pkgconfig' 'cmake' 'automoc4')
 
-# source=($_mirror/${_origname}-$_kdever.tar.bz2
-source=("$_mirror/${_origname}-4.6.2.tar.bz2"
-	"http://chakra-project.org/source/icons/oxygencolors-addon.tar.gz")
-#md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-#         'da971d7e2c862a6f77fb310a289f5529') #  ../_sources/oxygencolors-addon.tar.gz
-
-    
-md5sums=('c46e7e51c5dde641f1e4c6bba0f2852f'
-         'da971d7e2c862a6f77fb310a289f5529')
-
+source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 #
 # build and install
 #
 build()
 {
-        mv -f $srcdir/$_origname-4.6.2 $srcdir/$_origname-$pkgver
-	cd $srcdir/$_origname-$pkgver
+	cd $srcdir/$pkgbase-$pkgver
 	
 	patch -Np0 -i $startdir/install_svg_icons_too.patch || return 1
 	
@@ -64,31 +44,21 @@ build()
 package_oxygen-icons()
 {
 	pkgdesc="Oxygen (Emot)Icons + Addons"
-	groups=("kde" "kde-complete" "kde-uninstall" "kde-minimal")
-	conflicts=("kdmeod-${_origname}")
-	replaces=("kdemod-kdebase-runtime-icons")
+	groups=("kde" "kde-uninstall" "kde-minimal")
 	
-	cd $srcdir/$_origname-$pkgver
+	cd $srcdir/$pkgbase-$pkgver
 	
 	make DESTDIR=$pkgdir install || return 1
 	
 	# move out some svg icons
         mkdir -p $srcdir/svg
         mv $pkgdir/usr/share/icons/oxygen/scalable $srcdir/svg
-
-	# install addons
-	cd ${srcdir}/oxygencolors-addon
-	cp -R * $pkgdir/usr/share/icons/oxygen
-	cd $pkgdir/usr/share/icons/oxygen
-	find . -name "*.png" -print|xargs chmod 644
 }
 
 package_oxygen-icons-svg()
 {
 	pkgdesc="Oxygen (Emot)Icons - SVG Sources"
 	groups=("kde-uninstall")
-	conflicts=("kdemod-${_origname}-svg")
-	depends=("${_origname}")
 	
 	mkdir -p $pkgdir/usr/share/icons/oxygen
 	mv $srcdir/svg/scalable $pkgdir/usr/share/icons/oxygen

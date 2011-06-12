@@ -7,17 +7,10 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-
-# original name (used for the source and pkgnames)
-_origname=kdenetwork
-
-
-
 #
 # package info
 #
-pkgbase=('kdenetwork')
+pkgbase="kdenetwork"
 pkgname=('kdenetwork-common'
          'kdenetwork-doc'
          'kdenetwork-kget'
@@ -42,10 +35,9 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr'
              'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage' 'ilbc' 'msilbc' 
              'libgadu' 'telepathy-qt4' 'meanwhile' 'mediastreamer>=2.7.3' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.5')
 
-source=($_mirror/${_origname}-$_kdever.tar.bz2 \
+source=($_mirror/${pkgbase}-$_kdever.tar.bz2 \
         'lisa.daemon')
-
-md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
          '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
 
 
@@ -54,7 +46,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #
 build()
 {
-	cd ${srcdir}/${_origname}-${pkgver}
+	cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -76,14 +68,13 @@ package_kdenetwork-common()
 {
 	pkgdesc="KDE Network - Common files and libraries"
 	depends=("kdelibs>=${_kdever}" 'smbclient')
-	conflicts=("kdemod-${_origname}-common")
-	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	# FIXME strigi-analyzer
 	splitdirs="filesharing kdnssd" 
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 
 		done
@@ -95,10 +86,10 @@ package_kdenetwork-common()
 #	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
 #	if [ "$?" = "0" ]; then
 #		warning "incuding patches into package"
-#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${_origname} &>/dev/null
+#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${pkgbase} &>/dev/null
 #		for i in ${startdir}/*.patch; do
 #			msg "$i"
-#			cp $i ${pkgdir}/usr/share/kdemod/patches/${_origname}/ &>/dev/null
+#			cp $i ${pkgdir}/usr/share/kdemod/patches/${pkgbase}/ &>/dev/null
 #		done
 #	else
 #		warning "no patches found, skipping to include them into the package..."
@@ -108,12 +99,11 @@ package_kdenetwork-common()
 package_kdenetwork-doc()
 {
 	pkgdesc="KDE Network - Documentation"
-	depends=("${_origname}-common>=${_kdever}")
-	groups=("kde-complete" "${_origname}" "kde-doc" "kde-uninstall")
+	groups=("kde" "${pkgbase}" "kde-doc" "kde-uninstall")
 
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -121,14 +111,14 @@ package_kdenetwork-doc()
 package_kdenetwork-kget()
 {
 	pkgdesc="Download manager"
-	depends=("${_origname}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
-	conflicts=("kdemod-${_origname}-kget")
-	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" "kdebase-workspace>=${_kdever}" 'qca' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.4')
+	provides=('kget')
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kget"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -138,13 +128,13 @@ package_kdenetwork-kopete()
 	pkgdesc="Kopete, the instant messenger"
 	depends=("kdebase-runtime>=${_kdever}" "kdepimlibs>=${_kdever}"
 	         'qca-ossl' 'libotr' 'libmsn' 'libidn' 'qimageblitz' 'libxss' 'v4l-utils' 'libgadu' 'meanwhile' 'mediastreamer' 'msilbc')
-	conflicts=("kdemod-${_origname}-kopete")
-	groups=("kde" "kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	provides=('kopete')
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kopete"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -152,14 +142,14 @@ package_kdenetwork-kopete()
 package_kdenetwork-kppp()
 {
 	pkgdesc="PPP Client"
-	depends=("${_origname}-common>=${_kdever}" 'ppp')
-	conflicts=("kdemod-${_origname}-kppp")
-	groups=("kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'ppp')
+	provides=('kppp')
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="kppp"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -167,14 +157,14 @@ package_kdenetwork-kppp()
 package_kdenetwork-krdc()
 {
 	pkgdesc="Desktop Sharing Client"
-	depends=("${_origname}-common>=${_kdever}" 'libvncserver' 'rdesktop' 'telepathy-qt4')
-	conflicts=("kdemod-${_origname}-krdc")
-	groups=("kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	depends=("${pkgbase}-common>=${_kdever}" 'libvncserver' 'rdesktop' 'telepathy-qt4')
+	provides=('krdc')
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="krdc"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -186,13 +176,13 @@ package_kdenetwork-krfb()
 	#       not detected by namcap because libgl depends on it
 	#       but nvidia providing libgl does not depend on libxdamage
 	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" 'libvncserver' 'libxdamage')
-	conflicts=("kdemod-${_origname}-krfb")
-	groups=("kde-complete" "${_origname}" "kde-uninstall")
-	install=${_origname}.install
+	provides=('krfb')
+	groups=("kde" "${pkgbase}" "kde-uninstall")
+	install=${pkgbase}.install
 
 	splitdirs="krfb"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${_origname}-${pkgver}/${i}
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
