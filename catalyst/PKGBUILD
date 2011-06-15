@@ -23,14 +23,12 @@ install=${pkgname}.install
 source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
         ati_make.sh
         makefile_compat.patch
-	no_bkl.patch
-	2.6.39_bkl.patch)
+	no_bkl.patch)
 
 md5sums=('516ea47b13d367e09a90acb9422df738'
 	 '660396540b0ceaff71d6155c986734de'
 	 '3e1b82bd69774ea808da69c983d6a43b'
-	 '6a6b2133aa6ef3bcd377731b19c0553a'
-	 'eb24250f8e537273bae9dbd79a022d61')
+	 '6a6b2133aa6ef3bcd377731b19c0553a')
 
 
 
@@ -66,15 +64,6 @@ build() {
     if [[ ${_kernver:0:6} < "2.6.39" ]] && [[ `cat /lib/modules/${_kernver}/build/.config | grep -c CONFIG_BKL=y` = 0 ]]; then
 	patch -Np1 -i ../no_bkl.patch || return 1
     fi
-
-    if [[ ${_kernver:0:6} == "2.6.39" ]] || [[ ${_kernver:0:6} > "2.6.39" ]]; then
-	patch -Np1 -i ../no_bkl.patch || return 1
-        patch -Np1 -i ../2.6.39_bkl.patch || return 1
-    fi
-
-#    if [[ ${_kernver:0:6} == "2.6.37" ]] || [[ ${_kernver:0:6} > "2.6.37" ]]; then
-#        patch -Np1 -i ../sema_init.patch || return 1
-#    fi
 
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
     cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a" . || return 1
