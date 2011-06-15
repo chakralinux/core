@@ -20,7 +20,7 @@ pkgname=('kdebase-workspace'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -35,7 +35,7 @@ depends=('polkit-kde-agent' "kdepimlibs>=${_kdever}" "kdebase-runtime>=${_kdever
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'networkmanager' 'bluez' "kdebindings-python>=${_kdever}"
              "kdebindings-ruby>=${_kdever}" 'oxygen-icons' 'qedje' "kdebase-runtime>=${_kdever}" 'gpsd' 'samba' 
-	     'libraw1394' 'libdmtx' 'consolekit' 'docbook-xsl' 'google-gadgets-qt>=0.11.2')
+	     'libraw1394' 'libdmtx' 'consolekit' 'docbook-xsl' 'google-gadgets-qt>=0.11.2' 'boost')
 
 source=($_mirror/${pkgbase}-$_kdever.tar.bz2
 	mishaaq-kcm_touchpad-00370b5.tar.gz
@@ -86,7 +86,6 @@ source=($_mirror/${pkgbase}-$_kdever.tar.bz2
 #	feature_history-notifications-enable-disable-kde#119207.patch
 
 #	feature_kdm-plymouth.patch
-	0001-be-posix-compliant-about-monotonic-clock-detection.patch
 	)
 
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
@@ -118,7 +117,6 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #        '894815a80f99a9a0dee1adbcda49b161' #  feature_battery-tooltip.patch
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
-         '4be7ee4e669ededc3878830bc2f24f46' #  0001-be-posix-compliant-about-monotonic-clock-detection.patch
          )
 
 #
@@ -153,9 +151,7 @@ build()
 # 	patch -Np1 -i ${srcdir}/feature_history-notifications-enable-disable-kde#119207.patch
 # 	patch -Np1 -i ${srcdir}/feature_kdm-plymouth.patch
 
-	msg "applying upstream patches ..."
-	patch -Np1 -i ${srcdir}/0001-be-posix-compliant-about-monotonic-clock-detection.patch
-
+#	msg "applying upstream patches ..."
 
 	msg "starting workspace build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
