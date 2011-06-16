@@ -9,15 +9,15 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase=('gstreamer0.10-base')
 pkgname=('gstreamer0.10-base' 'gstreamer0.10-base-plugins')
-pkgver=0.10.34
-pkgrel=3
+pkgver=0.10.35
+pkgrel=1
 arch=('i686' 'x86_64')
 license=('LGPL')
-makedepends=('pkgconfig' 'gstreamer0.10>=0.10.34' 'orc>=0.4.11-2' 'libxv' 'alsa-lib>=1.0.24.1-2' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection')
+makedepends=('pkgconfig' "gstreamer0.10>=${pkgver}" 'orc>=0.4.11-2' 'libxv' 'alsa-lib>=1.0.24.1-2' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection')
 options=(!libtool !emptydirs)
 url="http://gstreamer.freedesktop.org/"
 source=(${url}/src/gst-plugins-base/gst-plugins-base-${pkgver}.tar.bz2)
-md5sums=('a8db3791c8b119d9cf109b8e18fb8fe9')
+md5sums=('1d300983525f4f09030eb3ba47cb04b0')
 
 build() {
   cd "${srcdir}/gst-plugins-base-${pkgver}"
@@ -34,7 +34,7 @@ build() {
 
 package_gstreamer0.10-base() {
   pkgdesc="GStreamer Multimedia Framework Base plugin libraries"
-  depends=('gstreamer0.10>=0.10.34' 'orc' 'libxv>=1.0.5')
+  depends=("gstreamer0.10>=${pkgver}" 'orc' 'libxv>=1.0.5')
 
   cd "${srcdir}/gst-plugins-base-${pkgver}"
   make DESTDIR="${pkgdir}" install || return 1
