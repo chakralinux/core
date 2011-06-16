@@ -21,7 +21,7 @@ pkgname=('kdemultimedia-common'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -29,8 +29,8 @@ license=('GPL' 'LGPL' 'FDL')
 
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}"
-             'cdparanoia' 'mplayer' 'libpulse' 'musicbrainz>=3.0.3' 'taglib' 'tunepimp')
+makedepends=('doxygen' 'pkgconfig' 'cmake' 'automoc4' 'xine-lib' 'ffmpeg' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}"
+             'cdparanoia' 'mplayer' 'libpulse' 'musicbrainz>=3.0.3' 'taglib' 'docbook-xsl')
 
 source=($_mirror/${pkgbase}-$_kdever.tar.bz2
 	http://kenai.com/projects/kde-odf-thumbnail/downloads/download/1.0.0/kde-odf-thumbnail-1.0.0.tar.gz
@@ -154,7 +154,7 @@ package_kdemultimedia-dragonplayer()
 package_kdemultimedia-juk()
 {
 	pkgdesc="An audio player with music database"
-	depends=("${pkgbase}-common>=${_kdever}" "tunepimp")
+	depends=("${pkgbase}-common>=${_kdever}")
 	groups=("kde" "${pkgbase}" "kde-uninstall")
 	install=${pkgbase}.install
 
