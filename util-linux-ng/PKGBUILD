@@ -4,43 +4,38 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgname=util-linux-ng
-pkgver=2.19
+pkgname=util-linux
+pkgver=2.19.1
 pkgrel=1
 pkgdesc="Miscellaneous system utilities for Linux"
 url="http://userweb.kernel.org/~kzak/util-linux-ng/"
 arch=('i686' 'x86_64')
 groups=('base')
 depends=('bash' 'ncurses>=5.7' 'zlib' 'filesystem')
-replaces=('linux32' 'util-linux')
-conflicts=('linux32' 'util-linux' 'e2fsprogs<1.41.8-2')
-provides=('linux32' 'util-linux')
+replaces=('linux32' 'util-linux-ng')
+conflicts=('linux32' 'util-linux-ng' 'e2fsprogs<1.41.8-2')
+provides=('linux32' "util-linux-ng=${pkgver}")
 license=('GPL2')
 options=('!libtool')
-source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v${pkgver}/util-linux-${pkgver}.tar.bz2)
+source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v2.19/${pkgname}-${pkgver}.tar.bz2
+       mount-segfault-2.19.1.patch)
 optdepends=('perl: for chkdupexe support')
-install=util-linux-ng.install
-md5sums=('590ca71aad0b254e2631d84401f28255')
+md5sums=('3eab06f05163dfa65479c44e5231932c'
+         '3247b52f0e4b8044f23f2f7218e2fdea')
 
 build() {
-  cd "${srcdir}/util-linux-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  # fix https://bugs.archlinux.org/task/24261
+  patch -Np1 -i ../mount-segfault-2.19.1.patch
   # hardware clock
   sed -e 's%etc/adjtime%var/lib/hwclock/adjtime%' -i hwclock/hwclock.c
-
-  autoreconf
-  automake
-  ./configure --enable-arch --enable-write --enable-raw --disable-wall --enable-rdev --enable-partx
-  make HAVE_SLN=yes ADD_RAW=yes
+  ./configure --enable-arch --enable-write --enable-raw --disable-wall --enable-partx
+  make
 }
 
 package() {
-  cd "${srcdir}/util-linux-${pkgver}"
-  mkdir -p "${pkgdir}/var/lib/hwclock"
-  make HAVE_SLN=yes ADD_RAW=yes DESTDIR="${pkgdir}" install
-  # remove files
-  rm -f "${pkgdir}/bin/kill"
-  rm -f "${pkgdir}/usr/share/man/man1/kill.1"
-  rm -f "${pkgdir}/usr/share/man/man5/nfs.5"
-  rm -f "${pkgdir}/usr/share/info/dir"
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  install -dm755 "${pkgdir}/var/lib/hwclock"
+  make DESTDIR="${pkgdir}" install
 }
 
