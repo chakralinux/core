@@ -6,7 +6,7 @@
 
 pkgname=systemd
 pkgver=29
-pkgrel=1
+pkgrel=2
 pkgdesc="Session and Startup manager"
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -26,23 +26,25 @@ backup=(etc/systemd/system.conf
         etc/tmpfiles.d/x11.conf)
 install=systemd.install
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.bz2"
-        "os-release")
+        "os-release" "systemd-add-chakra.patch")
 md5sums=('e91ffd208c5f03e5c11966eee7b684b0'
-         '68cf3e12b0e98a51efde9811e5fc713c')
+         '68cf3e12b0e98a51efde9811e5fc713c'
+         'd7cbae2627bb60360a6b1c03dd0fd90a')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
+  patch -Np1 -i ${srcdir}/systemd-add-chakra.patch
 
   ./configure --prefix=/usr \
               --with-rootdir= \
-              --with-distro=other \
+              --with-distro=chakra \
               --sysconfdir=/etc \
               --libexecdir=/usr/lib \
               --localstatedir=/var \
               --disable-audit \
               --disable-tcpwrap \
               --disable-gtk
-
+echo "test"
   make
 }
 
