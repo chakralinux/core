@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=iasl
-pkgver=20101013
+pkgver=20110527
 pkgrel=1
 pkgdesc="Intel ACPI Source Language compiler"
 arch=('i686' 'x86_64')
@@ -15,13 +15,14 @@ depends=('glibc')
 makedepends=('flex' 'bison')
 options=('!makeflags')
 install=iasl.install
-source=(http://acpica.org/download/acpica-unix-${pkgver}.tar.gz LICENSE)
-md5sums=('9bed41223562c3d8f84b69d28df945ed'
-         '8615526144f69ea4e870d9bc37df9b29')
+source=(http://acpica.org/download/acpica-unix-${pkgver}.tar.gz LICENSE iaslcompileparse.patch)
+md5sums=('82c507fec0dba78dc8562a019aaf6e23'
+         '8615526144f69ea4e870d9bc37df9b29'
+         'e2aa959b3da50ebd2146de9b47d9ecd6')
 
 build() {
   cd "${srcdir}/acpica-unix-${pkgver}/compiler"
-
+  patch -Np1 -i ${srcdir}/iaslcompileparse.patch
   make
   install -D -m755 iasl "${pkgdir}/usr/bin/iasl"
 
