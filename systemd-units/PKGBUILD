@@ -1,0 +1,30 @@
+pkgname=systemd-units
+pkgver=0.20110617
+pkgrel=1
+pkgdesc="Chakra GNU/Linux specific Systemd unit files"
+arch=('any')
+url="https://gitorious.org/chakra/chakra-systemd-units"
+license=('MIT')
+depends=('systemd')
+groups=('systemd')
+install=systemd-units.install
+source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
+sha256sums=('12e595d1427b9e7991a496c311cc78230eb16af6fb5c61c00f2dd605937cc55b')
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf chakra-${pkgname}
+	  git clone git://gitorious.org/chakra/chakra-${pkgname}.git
+	  rm -vRf chakra-${pkgname}/.git
+	  pushd chakra-${pkgname}
+	  popd
+	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz chakra-${pkgname}/*
+	  sha256sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
+}
+
+package() {
+  cd "$srcdir/chakra-${pkgname}"
+
+  make DESTDIR="$pkgdir" install
+}

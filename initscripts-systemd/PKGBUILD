@@ -1,0 +1,30 @@
+pkgname=initscripts-systemd
+pkgver=0.20110617
+pkgrel=1
+pkgdesc="Chakra GNU/Linux specific systemd initialization/bootup scripts for systemd"
+arch=('any')
+url="https://gitorious.org/chakra/chakra-initscripts-systemd"
+license=('GPL')
+groups=('systemd')
+depends=('systemd' 'initscripts')
+install=initscripts-systemd.install
+source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
+sha256sums=('721d2406fa8de78adfba715f6ca125f63d33b5e21469455df9570fd5c27fbf3e')
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf chakra-${pkgname}
+	  git clone git://gitorious.org/chakra/chakra-${pkgname}.git
+	  rm -vRf chakra-${pkgname}/.git
+	  pushd chakra-${pkgname}
+	  popd
+	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz chakra-${pkgname}/*
+	  sha256sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
+}
+
+package() {
+  cd "$srcdir/chakra-${pkgname}"
+
+  make DESTDIR="$pkgdir" install
+}

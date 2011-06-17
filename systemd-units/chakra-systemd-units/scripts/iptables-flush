@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for table in filter nat mangle raw; do
+  iptables -t "$table" -F
+  iptables -t "$table" -X
+done
+
+for chain in INPUT FORWARD OUTPUT; do
+  iptables -P "$chain" ACCEPT
+done
+

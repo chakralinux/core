@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# /lib/systemd/system-generators/chakra-daemons
+#
+
+. /etc/rc.conf
+
+[[ $1 ]] || exit 1
+
+# when called at boot, this is /dev/.systemd/generator-$rand
+dest=$1
+
+# Make service file
+create_unit() {
+  local daemon=${1%.service}
+
+  printf "
+[Unit]
+Description=Legacy unit for $1
+After=$2
+
+[Service]
+ExecStart=/etc/rc.d/$daemon start
+ExecStop=/etc/rc.d/$daemon stop
+RemainAfterExit=yes
+Type=forking
+" > $dest/chakra-daemons.target.wants/$1
+
+}
+
+[[ -d $dest/chakra-daemons.target.wants ]] || /bin/mkdir -p $dest/chakra-daemons.target.wants
+
+for daemon in "${DAEMONS[@]}"; do
+  service="$daemon.service"
+  case ${daemon:0:1} in
+    '!') continue ;;
+    '@') create_unit ${service:1} $dep ;;
+    *) create_unit $service $dep
+       dep=$service ;;
+   esac
+done
+
+# vim: et sw=2:

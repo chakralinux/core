@@ -1,0 +1,14 @@
+[Unit]
+Description=Web Proxy Cache Server
+After=syslog.target
+
+[Service]
+EnvironmentFile=/etc/conf.d/squid
+ExecStartPre=/usr/sbin/squid -z
+ExecStart=/usr/sbin/squid -N $SQUID_ARGS
+ExecStop=/usr/sbin/squid -k shutdown
+ExecReload=/usr/sbin/squid -k reconfigure
+
+[Install]
+WantedBy=multi-user.target
+
