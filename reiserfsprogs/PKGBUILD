@@ -1,10 +1,12 @@
-# $Id: PKGBUILD 48336 2009-08-01 14:36:12Z jgc $
-# Maintainer: Andreas Radke <andyrtr@archlinux.org>
-# Contributor: judd <jvinet@zeroflux.org>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=reiserfsprogs
 pkgver=3.6.21
-pkgrel=2
+pkgrel=3
 pkgdesc="Reiserfs utilities"
 arch=(i686 x86_64)
 url=http://www.kernel.org/pub/linux/utils/fs/reiserfs/README
@@ -16,9 +18,15 @@ md5sums=('0639cefac8f8150536cfa7531c2aa2d2')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --sbindir=/sbin || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr --sbindir=/sbin
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
   ln -s reiserfsck "${pkgdir}/sbin/fsck.reiserfs"
   ln -s mkreiserfs "${pkgdir}/sbin/mkfs.reiserfs"
+  ln -s reiserfsck "${pkgdir}/sbin/fsck.reiser"
+  ln -s mkreiserfs "${pkgdir}/sbin/mkfs.reiser"
 }
