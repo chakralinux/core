@@ -1,11 +1,9 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# $Id: PKGBUILD 90541 2010-09-13 10:46:30Z jgc $
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Contributor: Link Dupont <link@subpop.net>
 #
 pkgname=dbus-core
-pkgver=1.4.10
+pkgver=1.4.0
 pkgrel=1
 pkgdesc="Freedesktop.org message bus system"
 url="http://www.freedesktop.org/Software/dbus"
@@ -17,24 +15,18 @@ options=(!libtool)
 install=dbus.install
 source=(http://dbus.freedesktop.org/releases/dbus/dbus-${pkgver}.tar.gz
         dbus)
-md5sums=('402a2f8102bedbe236e2891b2b0f31c2'
+md5sums=('f59618b18d2fb2bd1fce9e1c5a2a3282'
          '08f93dd19cffd1b45ab05c1fd4efb560')
 
 build() {
   cd "${srcdir}/dbus-${pkgver}"
-  sed -i -e 's/#ifdef DBUS_BUILD_X11/#if 1/' dbus/dbus-sysdeps-unix.c
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
       --libexecdir=/usr/lib/dbus-1.0 --with-dbus-user=81 \
       --with-system-pid-file=/var/run/dbus.pid \
       --enable-inotify --disable-dnotify \
       --disable-verbose-mode --disable-static \
-      --disable-tests --disable-asserts --without-x \
-      --with-systemdsystemunitdir=/lib/systemd/system
+      --disable-tests --disable-asserts --without-x
   make
-}
-
-package() {
-  cd "${srcdir}/dbus-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
   rm -f "${pkgdir}/usr/bin/dbus-launch"
@@ -54,7 +46,7 @@ package() {
   touch "${pkgdir}/etc/dbus-1/session.d/.keep"
   touch "${pkgdir}/etc/dbus-1/system.d/.keep"
 
-  #rmdir "${pkgdir}/usr/lib/dbus-1.0/dbus-1"
+  rmdir "${pkgdir}/usr/lib/dbus-1.0/dbus-1"
 
   install -d -m755 "${pkgdir}/usr/share/licenses/dbus-core"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/dbus-core/"
