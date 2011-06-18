@@ -6,7 +6,7 @@
 
 pkgname=dbus-systemd
 _pkgname=dbus
-pkgver=1.4.10
+pkgver=1.4.0
 pkgrel=1
 pkgdesc="Freedesktop.org message bus system"
 url="http://www.freedesktop.org/Software/dbus"
@@ -18,6 +18,8 @@ provides=('dbus')
 makedepends=('libsm' 'libice')
 source=(http://dbus.freedesktop.org/releases/${_pkgname}/${_pkgname}-${pkgver}.tar.gz
         30-dbus)
+md5sums=('f59618b18d2fb2bd1fce9e1c5a2a3282'
+         'd14e59575f04e55d21a04907b6fd9f3c')
 
 build() {
   cd "${srcdir}/${_pkgname}-${pkgver}"
@@ -43,5 +45,3 @@ packages() {
   install -d -m755 "${pkgdir}/usr/share/licenses/dbus"
   install -m644 ../COPYING "${pkgdir}/usr/share/licenses/dbus/"
 }
-md5sums=('402a2f8102bedbe236e2891b2b0f31c2'
-         'd14e59575f04e55d21a04907b6fd9f3c')
