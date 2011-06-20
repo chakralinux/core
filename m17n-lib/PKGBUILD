@@ -1,23 +1,34 @@
-# $Id: PKGBUILD 57532 2009-10-31 20:25:39Z eric $
-# Contributor: Camille Moncelier <pix@devlife.org>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=m17n-lib
-pkgver=1.5.5
+pkgver=1.6.2
 pkgrel=1
 pkgdesc="A multilingual text processing library (runtimes)"
 arch=('i686' 'x86_64')
 url="http://www.m17n.org/m17n-lib/"
 license=('GPL')
-depends=('libxft' 'libxaw' 'm17n-db>=1.5.4' 'fribidi' 'libxml2' 'gd' 'ispell' 'anthy' 'libotf')
+depends=('libxft' 'm17n-db>=1.5.4' 'fribidi' 'libxml2' 'gd' 'ispell' 'anthy' 'libotf')
 options=('!libtool' '!makeflags')
-source=(http://www.m17n.org/m17n-lib-download/$pkgname-$pkgver.tar.gz)
-md5sums=('924875cfc30ac6620744b67385ecc144')
-sha1sums=('31cc7523f0d70a62ffe1e14f2e6e81bbc2d2d3dd')
+source=(http://www.m17n.org/m17n-lib-download/$pkgname-$pkgver.tar.gz locale.patch)
+sha1sums=('9b9ada79357dd56c90c64cd36845c5537c363d79'
+          '1aa281bf8074518a98817528478fd88dcb85a991')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="$pkgdir" install || return 1
+  patch -p1 -i ../locale.patch # cf. FS#20482
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
 }
 
