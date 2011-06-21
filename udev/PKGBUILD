@@ -7,7 +7,7 @@
 pkgbase="udev"
 pkgname=('udev' 'udev-compat')
 pkgver=171
-pkgrel=2
+pkgrel=3
 arch=(i686 x86_64)
 url="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 license=('GPL')
@@ -16,12 +16,16 @@ groups=('base')
 options=(!makeflags !libtool)
 makedepends=('glibc' 'coreutils' 'util-linux' 'pciutils' 'libusb-compat' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgbase-$pkgver.tar.bz2
-        81-chakra.rules
+        80-drivers.rules 
+        81-chakra.rules 
+        load-modules.sh 
 	static-audio-nodes-group.patch
 	static-nodes-permissions.patch)
 
 md5sums=('bdf4617284be2ecac11767437417e209'
-         'e7e70ee2953e78001553d0f9c4c3038e'
+         '4427855146513a4703ab5c7eb8a0156e'
+         'a2bf84747f44915ec9c5e6e88b077845'
+         'f91fddc67609b45b244a624977c4247b'
          '4f625aea95a5597afd8cdf189421f193'
          'f9e50b8dfcd2215f5423ff9bc04ecf68')
 
@@ -48,8 +52,12 @@ package_udev() {
   
   cd $srcdir/$pkgbase-$pkgver
   make DESTDIR=${pkgdir} install
+  # Replace original 80-drivers.rules with custom one.
+  install -D -m644 $srcdir/80-drivers.rules $pkgdir/lib/udev/rules.d/80-drivers.rules
   # Install our rule for permissions and symlinks
   install -D -m644 $srcdir/81-chakra.rules $pkgdir/lib/udev/rules.d/81-chakra.rules
+  # install our module loading subsystem
+  install -D -m755 $srcdir/load-modules.sh $pkgdir/lib/udev/load-modules.sh
 
   # create framebuffer blacklist
   mkdir -p $pkgdir/etc/modprobe.d/
