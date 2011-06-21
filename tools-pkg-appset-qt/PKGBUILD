@@ -3,8 +3,8 @@
 # Translators: http://chakra-project.org/bbs/viewtopic.php?pid=29626#p29626
 
 pkgname=appset-qt
-pkgver=0.5.80
-pkgrel=2
+pkgver=0.5.90
+pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -12,7 +12,7 @@ license=('GPL2')
 depends=('qt>=4.7')
 optdepends=('ccr: For Community Repository support')
 install=${pkgname}.install
-source=(http://sourceforge.net/projects/appset/files/appset-qt/0.6/0.6.0/appset-qt-0.6.0pre-sources.tar.gz
+source=(http://sourceforge.net/projects/appset/files/appset-qt/0.6/0.6.0/appset-qt-0.6.0rc-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
         http://chakra-project.org/sources/$pkgname/$pkgname-0.6.0-chakra.patch
         #http://chakra-project.org/sources/$pkgname/add-chinese-taiwan.patch
@@ -25,7 +25,7 @@ source=(http://sourceforge.net/projects/appset/files/appset-qt/0.6/0.6.0/appset-
         #http://chakra-project.org/sources/$pkgname/appset-qt_pl-0.4.2.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_zh-tw-0.5.0.tar.gz       
         )
-md5sums=(b75e255351a4497a54179650aab563ff
+md5sums=(68cb4b883c4b7da418589fc31f1d2c0a
          87f5f278e3fe67ed2cd6165c2835d81b
          152d4461282a4d39d12f15041d1c34d3
          #7de9e3d87fb4258174af214b291b5444 # add-chinese-taiwan.patch
@@ -40,7 +40,7 @@ md5sums=(b75e255351a4497a54179650aab563ff
          )
 
 build() {
-  cd $srcdir/$pkgname-0.6.0pre-sources
+  cd $srcdir/$pkgname-0.6.0rc-sources
   # copy oxygen icons
   cp -v ../*png Qt/AppSet-Qt
 
@@ -73,12 +73,12 @@ build() {
 }
 
 package() {
-    cd $srcdir/$pkgname-0.6.0pre-sources
+    cd $srcdir/$pkgname-0.6.0rc-sources
 
     make INSTALL_ROOT="$pkgdir/" install
 
     #helper daemon
     install -m 755 -d "$pkgdir/etc/rc.d" || return 1
-    install -m 755 "$srcdir/$pkgname-0.6.0pre-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
+    install -m 755 "$srcdir/$pkgname-0.6.0rc-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
 }
 
