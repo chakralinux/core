@@ -8,29 +8,36 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=octave
-pkgver=3.2.4
+pkgver=3.4.0
 pkgrel=1
 pkgdesc="A high-level language, primarily intended for numerical computations."
 arch=('i686' 'x86_64')
 url="http://www.octave.org"
 license=('GPL')
-depends=('fftw' 'pcre' 'curl' 'lapack' 'libx11' 'graphicsmagick' 'glpk' 'hdf5' 'gcc-libs')
+depends=('fftw' 'pcre' 'curl' 'lapack' 'libx11' 'graphicsmagick' 'glpk' 'hdf5' 'gcc-libs' 'qhull')
 makedepends=('texinfo' 'graphicsmagick' 'gcc-fortran' 'umfpack')
 optdepends=('texinfo: for help-support in octave'
             'gnuplot: alternative plotting'
             'umfpack: LU decomposition of some large sparse matrices')
-source=("ftp://ftp.octave.org/pub/octave/octave-$pkgver.tar.bz2")
+source=("ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.bz2")
 options=('!emptydirs')
-install=octave.install
-md5sums=('608196657f4fa010420227b77333bb71')
+#install=octave.install
+sha1sums=('936a8fc962abd96e7568fb5909ec2a4d7997a1a8')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
 
+  # http://www.nabble.com/Random-rounding-errors-td16010966.html
+  FFLAGS="-O -ffloat-store" \
+
   ./configure --prefix=/usr --libexecdir=/usr/lib \
-  --enable-shared --disable-static
+  --enable-shared --disable-static --disable-docs
 
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  make
+}
 
+package(){
+  cd ${srcdir}/${pkgname}-${pkgver}
+
+  make DESTDIR="${pkgdir}" install
 }
