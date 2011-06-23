@@ -19,21 +19,16 @@ depends=('sh' 'glibc')
 md5sums=('35937a0f83f0efe7a8c2dee635624784')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
+  cd $srcdir/$pkgname-$pkgver
   ./configure --prefix=/usr
-  make 
-}
-
-package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  make DESTDIR=${pkgdir} install
-  mv ${pkgdir}/usr/libexec ${pkgdir}/usr/lib
-  install -dm755 ${pkgdir}/bin
-  mv ${pkgdir}/usr/bin/gawk* ${pkgdir}/bin/
-  mv ${pkgdir}/usr/bin/awk ${pkgdir}/bin/
-  cd ${pkgdir}/usr/bin/
-  ln -sf /bin/gawk gawk
+  make || return 1
+  make DESTDIR=$pkgdir install
+  mv $pkgdir/usr/libexec $pkgdir/usr/lib
+  install -dm755 $pkgdir/bin
+  mv $pkgdir/usr/bin/gawk* $pkgdir/bin/
+  mv $pkgdir/usr/bin/awk $pkgdir/bin/
+  
+  rm $pkgdir/usr/share/info/dir
+  gzip -9 $pkgdir/usr/share/info/{gawk,gawkinet}.info
 }
 
