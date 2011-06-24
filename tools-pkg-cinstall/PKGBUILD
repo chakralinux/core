@@ -7,7 +7,7 @@
 
 pkgname=cinstall
 pkgver=0.4.6.5
-pkgrel=2
+pkgrel=3
 depends=('rsync' 'cbundle')
 makedepends=('kdelibs' 'qt' 'automoc4' 'libcroco')
 pkgdesc="Chakra's Bundle manager"
@@ -16,8 +16,9 @@ license=('GPL')
 install=$pkgname.install
 url="http://chakra-project.org/"
 
-source=("cinstall-$pkgver.tar.xz")
-md5sums=('1c5119fbb846ffb25aa1517e4a75e89f')
+source=("cinstall-$pkgver.tar.xz" 'refresh.patch')
+md5sums=('1c5119fbb846ffb25aa1517e4a75e89f'
+         'c4e85f9e536fb62f466a535cd5a1dedc')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -31,6 +32,7 @@ mksource() {
 
 build() {
         cd "${srcdir}/fritzvantoms-cinstall-differentui"
+        patch -Np1 -i "${srcdir}/refresh.patch"
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \
           -DCMAKE_BUILD_TYPE=Release
