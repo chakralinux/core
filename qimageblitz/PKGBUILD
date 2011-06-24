@@ -1,8 +1,11 @@
-# $Id: PKGBUILD 17154 2008-10-26 08:49:56Z pierre $
-# Maintainer: Tobias Powalowski <tpowa@archlinux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=qimageblitz
-pkgver=0.0.5
+pkgver=0.0.6
 pkgrel=1
 pkgdesc="An interm image effect library"
 arch=('i686' 'x86_64')
@@ -10,18 +13,21 @@ url="http://sourceforge.net/projects/qimageblitz"
 license=('custom')
 depends=('qt>=4.4.3')
 makedepends=('cmake' 'pkgconfig')
-source=("ftp://ftp.archlinux.org/other/qimageblitz/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('5a6c718a56643ffe1f347410bdcca64d')
+source=("http://download.kde.org/stable/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('0ae2f7d4e0876764a97ca73799f61df4')
 options=(!libtool)
 
 build() {
-	cd ${srcdir}
-	mkdir build
-	cd build
-	cmake ../${pkgname}-${pkgver} \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_INSTALL_PREFIX=/usr 
-	make
-	make DESTDIR=${pkgdir} install
-	install -m644 -D ${srcdir}/${pkgname}-${pkgver}/COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
+  cd ${srcdir}
+  mkdir build
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr 
+  make
+}
+
+package() {
+  cd ${srcdir}/build
+  make DESTDIR=${pkgdir} install
 }
