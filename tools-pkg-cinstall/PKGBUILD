@@ -6,8 +6,8 @@
 # (c) 2010 Drake Justice
 
 pkgname=cinstall
-pkgver=0.4.6.4
-pkgrel=2
+pkgver=0.4.6.5
+pkgrel=1
 depends=('rsync' 'cbundle')
 makedepends=('kdelibs' 'qt' 'automoc4')
 pkgdesc="Chakra's Bundle manager"
@@ -17,20 +17,20 @@ install=$pkgname.install
 url="http://chakra-project.org/"
 
 source=("cinstall-$pkgver.tar.xz")
-md5sums=('0130a79daa5d8225f6a4487bc474377f')
+md5sums=('1c5119fbb846ffb25aa1517e4a75e89f')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-  git clone git://gitorious.org/~fritzvantom/chakra/fritzvantoms-cinstall.git
+  git clone git://gitorious.org/~fritzvantom/chakra/fritzvantoms-cinstall-differentui.git
   pushd fritzvantoms-cinstall
   popd
-  tar -cvJf cinstall-${pkgver}.tar.xz fritzvantoms-cinstall/*
+  tar -cvJf cinstall-${pkgver}.tar.xz fritzvantoms-cinstall-differentui/*
   md5sum cinstall-${pkgver}.tar.xz
 }
 
 build() {
-        cd "${srcdir}/fritzvantoms-cinstall"
+        cd "${srcdir}/fritzvantoms-cinstall-differentui"
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \
           -DCMAKE_BUILD_TYPE=Release
