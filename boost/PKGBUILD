@@ -14,64 +14,74 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # Desktop: kdeedu (kdenetwork, kdepimlibs, kdepim, kdesdk and koffice using boost just as makedep)
  
 pkgname=boost
-pkgver=1.44.0
-_boostver=1_44_0
-pkgrel=2
+pkgver=1.46.1
+_boostver=1_46_1
+pkgrel=1
 pkgdesc="Free peer-reviewed portable C++ source libraries"
 arch=('i686' 'x86_64')
 url="http://www.boost.org/"
-depends=('bzip2' 'zlib')
-makedepends=('python2')
-optdepends=('python: for python bindings')
-source=(http://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgver}/${pkgname}_${_boostver}.tar.gz)
 license=('custom')
-url="http://www.boost.org/"
+depends=('bzip2' 'zlib')
+makedepends=('icu' 'python2' 'bzip2' 'zlib') # Add Python (3) whenever it is added to our repos.
+optdepends=('python: for python bindings')
 options=('!ccache')
-md5sums=('085fce4ff2089375105d72475d730e15')
+source=(http://downloads.sourceforge.net/project/$pkgname/$pkgname/$pkgver/${pkgname}_$_boostver.tar.gz)
+md5sums=('341e5d993b19d099bf1a548495ea91ec')
 
 build() {
-  cd "${srcdir}/${pkgname}_${_boostver}"
 
-  # build bjam
-  cd ${srcdir}/${pkgname}_${_boostver}/tools/jam/src
-  ./build.sh cc || return 1
+  # Set Python path for Bjam.
+  cd $srcdir/${pkgname}_$_boostver/tools
+  echo "using python : 2.7 : /usr/bin/python2 ;" >> build/v2/user-config.jam
+
+  # Build Bjam.
+  cd $srcdir/${pkgname}_$_boostver/tools/build/v2/engine/src
+  ./build.sh cc
 
   _bindir="bin.linuxx86"
   [ "${CARCH}" = "x86_64" ] && _bindir="bin.linuxx86_64"
 
-  install -m755 -d ${pkgdir}/usr/bin
-  install -m755 ${_bindir}/bjam ${pkgdir}/usr/bin/bjam || return 1
+  install -d $pkgdir/usr/bin
+  install $_bindir/bjam $pkgdir/usr/bin/bjam
 
-  # build bcp
-  cd ${srcdir}/${pkgname}_${_boostver}/tools/bcp
-  ../jam/src/${_bindir}/bjam || return 1
-  install -m755 ${srcdir}/${pkgname}_${_boostver}/dist/bin/bcp \
-                ${pkgdir}/usr/bin/bcp || return 1
+  # Build tools.
+  cd $srcdir/${pkgbase}_$_boostver/tools/
+  $pkgdir/usr/bin/bjam --toolset=gcc
 
-  # build libs
-  cd ${srcdir}/${pkgname}_${_boostver}
+  # Copy the tools.
+  cd $srcdir/${pkgbase}_$_boostver/dist/bin
+  for i in *
+  do
+      install -m755 "${i}" "$pkgdir/usr/bin/${i}"
+  done
+
+  # Boostbook needed by quickbook.
+  cd $srcdir/${pkgbase}_$_boostver/dist/
+  cp -r share $pkgdir
+
+  # Build libs.
+  cd $srcdir/${pkgname}_$_boostver
+  
   # default "minimal" install: "release link=shared,static
-  # runtime-link=shared threading=multi"
+  # runtime-link=shared threading=single,multi"
   # --layout=tagged will add the "-mt" suffix for multithreaded libraries
   # and installs includes in /usr/include/boost.
   # --layout=system no longer adds the -mt suffix for multi-threaded libs.
-  ./tools/jam/src/${_bindir}/bjam \
-            release debug-symbols=off threading=single,multi \
-            runtime-link=shared link=shared,static \
-            cflags=-fno-strict-aliasing \
-            --prefix=${pkgdir}/usr \
-            -sPYTHON_ROOT=/usr \
-            -sPYTHON_VERSION=2.7 \
-            -sTOOLS=gcc \
-            --layout=tagged \
-            install || return 1
+  # install to ${_stagedir} in preparation for split packaging
 
-  # build pyste
-  cd ${srcdir}/${pkgname}_${_boostver}/libs/python/pyste/install
-  python setup.py install --root=${pkgdir} || return 1
+  $pkgdir/usr/bin/bjam \
+      release debug-symbols=off threading=multi \
+      runtime-link=shared link=shared,static \
+      cflags=-fno-strict-aliasing \
+      toolset=gcc \
+      --prefix=$pkgdir \
+      -sTOOLS=gcc \
+      --layout=system \
+      $MAKEFLAGS \
+      install
 
-  # license
-  install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m644 ${srcdir}/${pkgname}_${_boostver}/LICENSE_1_0.txt \
-                ${pkgdir}/usr/share/licenses/${pkgname}/ || return 1
+  # License.
+  install -d $pkgdir/usr/share/licenses/$pkgname
+  install -m644 $srcdir/${pkgname}_$_boostver/LICENSE_1_0.txt \
+                $pkgdir/usr/share/licenses/$pkgname/
 }
