@@ -7,7 +7,7 @@
 
 pkgname=repo-clean
 pkgver=0.1.4
-pkgrel=5
+pkgrel=6
 pkgdesc="Clean utility for Pacman repository"
 arch=('i686' 'x86_64')
 url="http://code.google.com/p/repo-clean/"
@@ -15,16 +15,28 @@ license=('GPL')
 depends=('pacman' 'boost') 
 makedepends=('cmake' 'gcc')
 source=(http://chakra-project.org/source/$pkgname-$pkgver.tar.bz2
-            repo_clean_xz.patch)
-
+        repo_clean_xz.patch
+	boost-1.46.1.patch)
 md5sums=('a133d3cc8d740e8a2f78e958e10b117c'
-         'b1ca28279da1bbe35b887b2ef2ad2305')
+         'b1ca28279da1bbe35b887b2ef2ad2305'
+         '7f599b351851dea0eeb1a3b68ae8dd5f')
+
 build() {
-	cd $srcdir/$pkgname-$pkgver
-	patch -Np1 -i $startdir/repo_clean_xz.patch || return 1
-	
-	cmake -DCMAKE_INSTALL_PREFIX=/usr .
-	make
-	make DESTDIR=$pkgdir install
+  cd $srcdir/$pkgname-$pkgver
+
+  # Patches.
+  patch -Np1 -i $srcdir/repo_clean_xz.patch || return 1
+  patch -uN ./src/repo-clean.cpp $srcdir/boost-1.46.1.patch || return 1
+  
+  mkdir build && cd build
+  cmake \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    ..
+  make
 }
 
+package() {
+  cd $srcdir/$pkgname-$pkgver/build
+  make DESTDIR=$pkgdir install
+}
