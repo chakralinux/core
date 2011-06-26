@@ -7,31 +7,22 @@
 pkgbase="udev"
 pkgname=('udev' 'udev-compat')
 pkgver=171
-pkgrel=3
+pkgrel=2
 arch=(i686 x86_64)
 url="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 license=('GPL')
 groups=('base')
 # older initscripts versions required start_udev
 options=(!makeflags !libtool)
+conflicts=('initscripts<2011.09')
 makedepends=('glibc' 'coreutils' 'util-linux' 'pciutils' 'libusb-compat' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgbase-$pkgver.tar.bz2
-        80-drivers.rules 
-        81-chakra.rules 
-        load-modules.sh 
+        81-chakra.rules
 	static-audio-nodes-group.patch
 	static-nodes-permissions.patch)
 
-md5sums=('bdf4617284be2ecac11767437417e209'
-         '4427855146513a4703ab5c7eb8a0156e'
-         '0343412cecef4bb662ac91403c1ed53e'
-         'f91fddc67609b45b244a624977c4247b'
-         '4f625aea95a5597afd8cdf189421f193'
-         'f9e50b8dfcd2215f5423ff9bc04ecf68')
-
 build() {
   cd $srcdir/$pkgbase-$pkgver
-  # fix https://bugs.archlinux.org/task/24362 (will be in udev-172)
   patch -Np1 -i ../static-audio-nodes-group.patch
   patch -Np1 -i ../static-nodes-permissions.patch
   ./configure --sysconfdir=/etc --with-rootlibdir=/lib --libexecdir=/lib/udev\
@@ -52,12 +43,8 @@ package_udev() {
   
   cd $srcdir/$pkgbase-$pkgver
   make DESTDIR=${pkgdir} install
-  # Replace original 80-drivers.rules with custom one.
-  install -D -m644 $srcdir/80-drivers.rules $pkgdir/lib/udev/rules.d/80-drivers.rules
   # Install our rule for permissions and symlinks
   install -D -m644 $srcdir/81-chakra.rules $pkgdir/lib/udev/rules.d/81-chakra.rules
-  # install our module loading subsystem
-  install -D -m755 $srcdir/load-modules.sh $pkgdir/lib/udev/load-modules.sh
 
   # create framebuffer blacklist
   mkdir -p $pkgdir/etc/modprobe.d/
@@ -108,3 +95,7 @@ package_udev-compat() {
   install -d -m755 ${pkgdir}/lib/${pkgbase}/rules.d
   install -D -m644 ${srcdir}/${pkgbase}-${pkgver}/rules/misc/30-kernel-compat.rules ${pkgdir}/lib/udev/rules.d/30-kernel-compat.rules
 }
+md5sums=('bdf4617284be2ecac11767437417e209'
+         '97eec6fa818878bd7e87d374e7cd9fb0'
+         '4f625aea95a5597afd8cdf189421f193'
+         'f9e50b8dfcd2215f5423ff9bc04ecf68')
