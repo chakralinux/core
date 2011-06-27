@@ -7,7 +7,7 @@
 _origname=initscripts
 pkgname=initscripts-live
 pkgver=2011.09
-pkgrel=0.2011.06.17_2
+pkgrel=0.2011.06.27
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
 url="http://www.chakra-project.org"
@@ -22,12 +22,12 @@ optdepends=('bridge-utils: Network bridging support'
             'dhcpcd: DHCP network configuration'
             'net-tools: legacy network support'
             'wireless_tools: Wireless networking')
-source=("http://chakra-project.org/sources/initscripts/initscripts-${pkgver}-0.2011.06.17.tar.xz"
+source=("http://chakra-project.org/sources/initscripts/initscripts-${pkgver}-${pkgrel}.tar.xz"
         'http://chakra-project.org/sources/initscripts/wireless.conf.d'
         "http://chakra-project.org/sources/initscripts/${pkgname}-${pkgver}-${pkgrel}.patch")
-sha256sums=('646152f188948f6637d6c764d02d54125634baa476694e186207c01b1a7e6119'
+sha256sums=('ca7adc72019622de35f90870008d0434dd0ed560358254df4cfd8b3ecf5c2d2b'
             '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f'
-            'ea4dad28e3cc28c8973235bc2a79e51a19652c2693d43f270c2fa594561838e0')
+            '4c25f933cf7b6cc11ce0146dcdc37f6742584ea82241ebf0f75b2d90b3b0a3fb')
 
 package() {
   cd ${srcdir}/chakra-${_origname}
@@ -35,5 +35,5 @@ package() {
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
   cd ${pkgdir}
   patch -Np1 -i ${srcdir}/${pkgname}-${pkgver}-${pkgrel}.patch || return 1
-  rm -v $(find . -type f -name '*.orig')
+  #rm -v $(find . -type f -name '*.orig')
 }
