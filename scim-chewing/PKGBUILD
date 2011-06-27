@@ -1,9 +1,14 @@
-# $Id: PKGBUILD 28130 2009-02-28 00:15:08Z eric $
-# Maintainer: damir <damir@archlinux.org>
-# Contributor: whisky <archlinux.cle(at)gmail.com>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=scim-chewing
-pkgver=0.3.3
+pkgver=0.3.4
 pkgrel=1
 pkgdesc="SCIM Smart Chewing input method engine"
 arch=(i686 x86_64)
@@ -13,13 +18,17 @@ depends=('scim>=1.4.8' 'libchewing>=0.3.2')
 makedepends=('intltool')
 options=('!libtool')
 source=(http://chewing.csie.net/download/scim/$pkgname-$pkgver.tar.bz2)
-md5sums=('3f17ccae3f20f42a33e464aeb06eb1cb')
+sha1sums=('f6c8d16f19f17449ee169f1ca787350353e93b05')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
-  ./configure --prefix=/usr --disable-static || return 1
-  make || return 1
-  make DESTDIR=$pkgdir install || return 1
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	./configure --prefix=/usr --disable-static
+	make
+}
+
+package() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	make DESTDIR="${pkgdir}" install
 }
 
 
