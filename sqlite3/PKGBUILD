@@ -7,19 +7,19 @@
 pkgbase="sqlite3"
 pkgname=('sqlite3' 'sqlite3-tcl' 'sqlite3-doc') 
 _amalgamationver=3070500
-_amalgamationver2=${_amalgamationver/00/}
-pkgver=${_amalgamationver2//0/.}
+_amalgamationver2="${_amalgamationver/00/}"
+pkgver="${_amalgamationver2//0/.}"
 pkgrel=2
-pkgdesc="A C library that implements an SQL database engine"
+pkgdesc="A C library that implements an SQL database engine."
 arch=('i686' 'x86_64')
 license=('custom')
 url="http://www.sqlite.org/"
-makedepends=('tcl' 'readline>=6.0.00')
+makedepends=('tcl' 'readline>=6.0.00' 'icu')
 source=( #http://www.sqlite.org/sqlite-src-${_amalgamationver}.zip - # the no more recommended ZIP archive of the complete source tree for SQLite - Makefile and configure script in this tarball are not supported
-	http://www.sqlite.org/sqlite-autoconf-$_amalgamationver.tar.gz # tarball containing the amalgamation for SQLite 3.7.5 together with an configure script and makefile for building it.
-	http://www.sqlite.org/sqlite-tea-$_amalgamationver.tar.gz # tarball of the amalgamation together with a Tcl Extension Architecture (TEA) compatible configure script and makefile
-	http://www.sqlite.org/sqlite-doc-${_amalgamationver}.zip
-	license.txt)
+  "http://www.sqlite.org/sqlite-autoconf-${_amalgamationver}.tar.gz" # tarball containing the amalgamation for SQLite 3.7.5 together with an configure script and makefile for building it.
+  "http://www.sqlite.org/sqlite-tea-${_amalgamationver}.tar.gz" # tarball of the amalgamation together with a Tcl Extension Architecture (TEA) compatible configure script and makefile
+  "http://www.sqlite.org/sqlite-doc-${_amalgamationver}.zip"
+  license.txt)
 options=('!libtool' '!emptydirs')
 md5sums=('a9604a82613ade2e7f4c303f233e477f'
          '3413e8cfb7990e39260bf45dca017bf0'
@@ -28,26 +28,26 @@ md5sums=('a9604a82613ade2e7f4c303f233e477f'
 
 build() {
 
-  export CFLAGS="$CFLAGS -DSQLITE_ENABLE_FTS3=1 -DSQLITE_ENABLE_COLUMN_METADATA=1 -DSQLITE_ENABLE_UNLOCK_NOTIFY -DSQLITE_SECURE_DELETE"
+  export CFLAGS="${CFLAGS} -DSQLITE_ENABLE_FTS3=1 -DSQLITE_ENABLE_COLUMN_METADATA=1 -DSQLITE_ENABLE_UNLOCK_NOTIFY=1 -DSQLITE_SECURE_DELETE=1 -DSQLITE_ENABLE_ICU=1 $(icu-config --cflags)"
+  export LDFLAGS="${LDFLAGS} $(icu-config --ldflags)"
 
   # build sqlite
-  cd "$srcdir"/sqlite-autoconf-$_amalgamationver
+  cd "${srcdir}/sqlite-autoconf-${_amalgamationver}"
   ./configure --prefix=/usr \
-	--disable-static
+      --disable-static
   make
   
   # build the tcl extension    
-  cd "$srcdir"/sqlite-tea-$_amalgamationver
+  cd "${srcdir}/sqlite-tea-${_amalgamationver}"
   ./configure --prefix=/usr \
-	--with-system-sqlite
+      --with-system-sqlite
   make
-
 }
 
 package_sqlite3() {
  
- pkgdesc="A C library that implements an SQL database engine"
- depends=('readline>=6.0.00')
+ pkgdesc="A C library that implements an SQL database engine."
+ depends=('readline>=6.0.00' 'icu')
  conflicts=('sqlite')
  replaces=('sqlite')
  
@@ -55,27 +55,30 @@ package_sqlite3() {
 #  make DESTDIR=${pkgdir} install
 #  install -Dm0644 sqlite3.1 ${pkgdir}/usr/share/man/man1/sqlite3.1
 
-  cd ${srcdir}/sqlite-autoconf-$_amalgamationver
-  make DESTDIR=${pkgdir} install
+  cd "${srcdir}/sqlite-autoconf-${_amalgamationver}"
+  make DESTDIR="${pkgdir}" install
   
   # license
-  install -D -m644 ${srcdir}/license.txt ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
+  install -D -m644 "${srcdir}/license.txt" "${pkgdir}/usr/share/licenses/${pkgname}/license.txt"
 }
 
 package_sqlite3-tcl() {
  
- pkgdesc="sqlite3 Tcl Extension Architecture (TEA)"
+ pkgdesc="Sqlite Tcl Extension Architecture (TEA)."
  depends=('sqlite3>=3.7.5')
 
-  cd ${srcdir}/sqlite-tea-$_amalgamationver
-  make DESTDIR=${pkgdir} install
+  cd "${srcdir}/sqlite-tea-${_amalgamationver}"
+  make DESTDIR="${pkgdir}" install
 }
 
 package_sqlite3-doc() {
- pkgdesc="most of the static HTML files that comprise this website, including all of the SQL Syntax and the C/C++ interface specs and other miscellaneous documentation"
+
+ pkgdesc="Most of the static HTML files that comprise the Sqlite website, including all of the SQL Syntax and the C/C++ interface specs and other miscellaneous documentation."
  #arch=('any') - not yet supported
 
-  cd ${srcdir}/sqlite-doc-${_amalgamationver}
-  mkdir -p ${pkgdir}/usr/share/doc/${pkgbase}
-  cp -R *  ${pkgdir}/usr/share/doc/${pkgbase}/
+  cd "${srcdir}/sqlite-doc-${_amalgamationver}"
+  mkdir -p "${pkgdir}/usr/share/doc/${pkgbase}"
+  cp -R * "${pkgdir}/usr/share/doc/${pkgbase}"
 }
+
+# vim:set ts=2 sw=2 et:
