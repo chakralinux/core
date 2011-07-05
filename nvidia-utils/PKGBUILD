@@ -6,14 +6,12 @@
 
 pkgname=nvidia-utils
 pkgver=275.09.07
-pkgrel=1
+pkgrel=2
 pkgdesc="NVIDIA drivers utilities and libraries."
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-depends=('xorg-server' 'libxvmc')
+depends=('xorg-server' 'libxvmc' 'libgl')
 optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig')
-conflicts=('libgl')
-provides=('libgl')
 license=('custom')
 install=nvidia.install
 options=('!strip')
@@ -46,7 +44,6 @@ package() {
         install -D -m755 nvidia_drv.so $pkgdir/usr/lib/xorg/modules/drivers/nvidia_drv.so
         # GLX extension module for X
         install -D -m755 libglx.so.$pkgver $pkgdir/usr/lib/xorg/modules/extensions/libglx.so.$pkgver
-        ln -s libglx.so.$pkgver $pkgdir/usr/lib/xorg/modules/extensions/libglx.so       # X doesn't find glx otherwise
         # OpenGL library
         install -D -m755 libGL.so.$pkgver $pkgdir/usr/lib/libGL.so.$pkgver
         # OpenGL core library
@@ -76,6 +73,12 @@ package() {
                 fi
         done
 
+        # remove conflicting so-file links
+        rm -v $pkgdir/usr/lib/libGL.so
+        rm -v $pkgdir/usr/lib/libGL.so.1
+
+        # fix linkage
+        sed -i -e "s/VERSION='.*'/VERSION='$pkgver'/" $startdir/nvidia.install
 
         # nvidia-xconfig
         install -D -m755 nvidia-xconfig $pkgdir/usr/bin/nvidia-xconfig
