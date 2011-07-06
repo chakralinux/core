@@ -45,10 +45,8 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'ocaml' 'facile' 'eigen' 'cfitsio' "
              "kdebase-runtime>=${_kdever}" 'openbabel' 'libqalculate' 'gsl' 'boost' 'indilib' 'r>=2.11.1'
              'libspectre' 'python' 'xplanet' 'docbook-xsl' 'avogadro')
 
-source=("$_mirror/${pkgbase}-$_kdever.tar.bz2"
-	"$_mirror/${pkgbase}-4.6.3.tar.bz2")
-md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-         '259ba3e733fecd145c4389f10bee5ad1')
+source=("$_mirror/${pkgbase}-$_kdever.tar.bz2")
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
 #
@@ -89,10 +87,6 @@ package_kdeedu-common()
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
-
-	# WORKAROUND -> install cmake modules
-	install -D -m644 $srcdir/${pkgbase}-4.6.3/cmake/modules/FindKDEEdu.cmake \
-		$pkgdir/usr/share/apps/cmake/modules/FindKDEEdu.cmake
 
 	# include our patches into the package
 #	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
@@ -372,9 +366,6 @@ package_kdeedu-marble()
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
-	# WORKAROUND -> install cmake modules
-	install -D -m644 $srcdir/${pkgbase}-4.6.3/cmake/modules/FindMarbleWidget.cmake \
-		$pkgdir/usr/share/apps/cmake/modules/FindMarbleWidget.cmake
 }
 
 package_kdeedu-parley()
