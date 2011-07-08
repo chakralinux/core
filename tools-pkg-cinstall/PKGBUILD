@@ -6,10 +6,10 @@
 # (c) 2010 Drake Justice
 
 pkgname=cinstall
-pkgver=0.4.6.4
-pkgrel=2
+pkgver=0.4.6.6
+pkgrel=1
 depends=('rsync' 'cbundle')
-makedepends=('kdelibs' 'qt' 'automoc4')
+makedepends=('kdelibs' 'qt' 'automoc4' 'libcroco')
 pkgdesc="Chakra's Bundle manager"
 arch=("i686" "x86_64")
 license=('GPL')
@@ -17,7 +17,7 @@ install=$pkgname.install
 url="http://chakra-project.org/"
 
 source=("cinstall-$pkgver.tar.xz")
-md5sums=('0130a79daa5d8225f6a4487bc474377f')
+md5sums=('05c19be50c26a1e6ab686621b6dc54c7')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -31,6 +31,7 @@ mksource() {
 
 build() {
         cd "${srcdir}/fritzvantoms-cinstall"
+        
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \
           -DCMAKE_BUILD_TYPE=Release

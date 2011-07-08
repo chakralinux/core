@@ -20,7 +20,7 @@ pkgname=('kdebase-workspace'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=1
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -73,9 +73,6 @@ source=($_mirror/${pkgbase}-$_kdever.tar.bz2
 	# "fix" some sytemsettings modules that need root access
 	fix_root-only-kcms.patch
 
-	# fix powerdevil
-#	trunk_powerdevil.patch
-
 	# experimental, software transparency for plasma panels
 #	feature_plasma-transparent-panel-v4-rb#472.patch
 
@@ -89,8 +86,6 @@ source=($_mirror/${pkgbase}-$_kdever.tar.bz2
 #	feature_history-notifications-enable-disable-kde#119207.patch
 
 #	feature_kdm-plymouth.patch
-#	shutdown-fix.patch
-	rev_monotonic_clock.patch
 	)
 
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
@@ -122,8 +117,6 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
 #        '894815a80f99a9a0dee1adbcda49b161' #  feature_battery-tooltip.patch
 #        '9b97ac1b4deb8d0c8ca7afffb80b4320' #  feature_history-notifications-enable-disable-kde#119207.patch
 #        '42b3b5e09372c57910c3435e63e2dfd6' #  feature_kdm-plymouth.patch
-#        'c542f58979cf9cb2299dd42f63e6fd72' #  shutdown-fix.patch
-         'db8077776b1bc6e796fe227bbc0ef63a' #  rev_monotonic_clock.patch
          )
 
 #
@@ -158,9 +151,7 @@ build()
 # 	patch -Np1 -i ${srcdir}/feature_history-notifications-enable-disable-kde#119207.patch
 # 	patch -Np1 -i ${srcdir}/feature_kdm-plymouth.patch
 
-	msg "applying upstream patches ..."
-	patch -Np1 -R < ${srcdir}/rev_monotonic_clock.patch
-
+#	msg "applying upstream patches ..."
 
 	msg "starting workspace build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
