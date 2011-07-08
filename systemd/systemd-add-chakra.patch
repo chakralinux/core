@@ -1,0 +1,266 @@
+diff -Npur systemd-29.orig/config.h.in systemd-29/config.h.in
+--- systemd-29.orig/config.h.in	2011-06-16 13:19:00.000000000 +0200
++++ systemd-29/config.h.in	2011-06-17 18:33:06.000000000 +0200
+@@ -115,6 +115,9 @@
+ /* Target is ArchLinux */
+ #undef TARGET_ARCH
+ 
++/* Target is Chakra GNU/Linux */
++#undef TARGET_CHAKRA
++
+ /* Target is Debian */
+ #undef TARGET_DEBIAN
+ 
+diff -Npur systemd-29.orig/configure systemd-29/configure
+--- systemd-29.orig/configure	2011-06-16 13:18:08.000000000 +0200
++++ systemd-29/configure	2011-06-17 18:39:15.000000000 +0200
+@@ -703,6 +703,8 @@ TARGET_GENTOO_FALSE
+ TARGET_GENTOO_TRUE
+ TARGET_ARCH_FALSE
+ TARGET_ARCH_TRUE
++TARGET_CHAKRA_FALSE
++TARGET_CHAKRA_TRUE
+ TARGET_DEBIAN_OR_UBUNTU_FALSE
+ TARGET_DEBIAN_OR_UBUNTU_TRUE
+ TARGET_UBUNTU_FALSE
+@@ -1569,7 +1571,7 @@ Optional Packages:
+   --with-sysroot=DIR Search for dependent libraries within DIR
+                         (or the compiler's sysroot if not specified).
+   --with-distro=DISTRO    Specify the distribution to target: One of fedora,
+-                          suse, debian, ubuntu, arch, gentoo, slackware,
++                          suse, debian, ubuntu, arch, chakra, gentoo, slackware,
+                           altlinux or other
+   --with-sysvinit-path=PATH
+                           Specify the path to where the SysV init scripts are
+@@ -14495,6 +14497,14 @@ $as_echo "#define TARGET_ARCH /**/" >>co
+ 
+                 M4_DISTRO_FLAG=-DTARGET_ARCH=1
+                 ;;
++        chakra)
++                SYSTEM_SYSVINIT_PATH=/etc/rc.d
++                SYSTEM_SYSVRCND_PATH=/etc
++
++$as_echo "#define TARGET_CHAKRA /**/" >>confdefs.h
++
++                M4_DISTRO_FLAG=-DTARGET_CHAKRA=1
++                ;;
+         gentoo)
+                 SYSTEM_SYSVINIT_PATH=
+                 SYSTEM_SYSVRCND_PATH=
+@@ -14644,6 +14654,14 @@ else
+   TARGET_ARCH_FALSE=
+ fi
+ 
++ if test x"$with_distro" = xchakra; then
++  TARGET_CHAKRA_TRUE=
++  TARGET_CHAKRA_FALSE='#'
++else
++  TARGET_CHAKRA_TRUE='#'
++  TARGET_CHAKRA_FALSE=
++fi
++
+  if test x"$with_distro" = xgentoo; then
+   TARGET_GENTOO_TRUE=
+   TARGET_GENTOO_FALSE='#'
+@@ -14979,6 +14997,10 @@ if test -z "${TARGET_ARCH_TRUE}" && test
+   as_fn_error $? "conditional \"TARGET_ARCH\" was never defined.
+ Usually this means the macro was only invoked conditionally." "$LINENO" 5
+ fi
++ if test -z "${TARGET_CHAKRA_TRUE}" && test -z "${TARGET_CHAKRA_FALSE}"; then
++  as_fn_error $? "conditional \"TARGET_CHAKRA\" was never defined.
++Usually this means the macro was only invoked conditionally." "$LINENO" 5
++fi
+ if test -z "${TARGET_GENTOO_TRUE}" && test -z "${TARGET_GENTOO_FALSE}"; then
+   as_fn_error $? "conditional \"TARGET_GENTOO\" was never defined.
+ Usually this means the macro was only invoked conditionally." "$LINENO" 5
+diff -Npur systemd-29.orig/configure.ac systemd-29/configure.ac
+--- systemd-29.orig/configure.ac	2011-06-16 13:17:38.000000000 +0200
++++ systemd-29/configure.ac	2011-06-17 18:41:07.000000000 +0200
+@@ -280,7 +280,7 @@ AM_CONDITIONAL(HAVE_XSLTPROC, test x"$XS
+ 
+ AC_PATH_PROG([M4], [m4])
+ 
+-AC_ARG_WITH(distro, AS_HELP_STRING([--with-distro=DISTRO],[Specify the distribution to target: One of fedora, suse, debian, ubuntu, arch, gentoo, slackware, altlinux or other]))
++AC_ARG_WITH(distro, AS_HELP_STRING([--with-distro=DISTRO],[Specify the distribution to target: One of fedora, suse, debian, ubuntu, arch, chakra, gentoo, slackware, altlinux or other]))
+ if test "z$with_distro" = "z"; then
+         if test "$cross_compiling" = yes; then
+                 AC_MSG_WARN([Target distribution cannot be reliably detected when cross-compiling. You should specify it with --with-distro (see $0 --help for recognized distros)])
+@@ -289,6 +289,7 @@ if test "z$with_distro" = "z"; then
+                 test -f "/etc/SuSE-release" && with_distro="suse"
+                 test -f "/etc/debian_version" &&  with_distro="debian"
+                 test -f "/etc/arch-release" && with_distro="arch"
++                test -f "/etc/chakra-release" && with_distro="chakra"
+                 test -f "/etc/gentoo-release" && with_distro="gentoo"
+                 test -f "/etc/slackware-version" && with_distro="slackware"
+                 test -f "/etc/frugalware-release" && with_distro="frugalware"
+@@ -342,6 +343,12 @@ case $with_distro in
+                 AC_DEFINE(TARGET_ARCH, [], [Target is ArchLinux])
+                 M4_DISTRO_FLAG=-DTARGET_ARCH=1
+                 ;;
++        chakra)
++                SYSTEM_SYSVINIT_PATH=/etc/rc.d
++                SYSTEM_SYSVRCND_PATH=/etc
++                AC_DEFINE(TARGET_CHAKRA, [], [Target is Chakra GNU/Linux])
++                M4_DISTRO_FLAG=-DTARGET_CHAKRA=1
++                ;;
+         gentoo)
+                 SYSTEM_SYSVINIT_PATH=
+                 SYSTEM_SYSVRCND_PATH=
+@@ -426,6 +433,7 @@ AM_CONDITIONAL(TARGET_DEBIAN, test x"$wi
+ AM_CONDITIONAL(TARGET_UBUNTU, test x"$with_distro" = xubuntu)
+ AM_CONDITIONAL(TARGET_DEBIAN_OR_UBUNTU, test x"$with_distro" = xdebian -o x"$with_distro" = xubuntu)
+ AM_CONDITIONAL(TARGET_ARCH, test x"$with_distro" = xarch)
++AM_CONDITIONAL(TARGET_CHAKRA, test x"$with_distro" = xchakra)
+ AM_CONDITIONAL(TARGET_GENTOO, test x"$with_distro" = xgentoo)
+ AM_CONDITIONAL(TARGET_SLACKWARE, test x"$with_distro" = xslackware)
+ AM_CONDITIONAL(TARGET_FRUGALWARE, test x"$with_distro" = xfrugalware)
+diff -Npur systemd-29.orig/Makefile.am systemd-29/Makefile.am
+--- systemd-29.orig/Makefile.am	2011-06-16 13:16:25.000000000 +0200
++++ systemd-29/Makefile.am	2011-06-17 18:41:53.000000000 +0200
+@@ -78,6 +78,12 @@ AM_CPPFLAGS += \
+ 	-DKBD_SETFONT=\"/usr/bin/setfont\" \
+ 	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
+ else
++if TARGET_CHAKRA
++AM_CPPFLAGS += \
++	-DKBD_LOADKEYS=\"/usr/bin/loadkeys\" \
++	-DKBD_SETFONT=\"/usr/bin/setfont\" \
++	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
++else
+ if TARGET_FRUGALWARE
+ AM_CPPFLAGS += \
+ 	-DKBD_LOADKEYS=\"/usr/bin/loadkeys\" \
+@@ -118,6 +118,7 @@ endif
+ endif
+ endif
+ endif
++endif
+ 
+ rootbin_PROGRAMS = \
+ 	systemd \
+
+diff -Npur systemd-29.orig/Makefile.in systemd-29/Makefile.in
+--- systemd-29.orig/Makefile.in	2011-06-16 13:18:10.000000000 +0200
++++ systemd-29/Makefile.in	2011-06-17 18:44:49.000000000 +0200
+@@ -64,30 +64,35 @@ host_triplet = @host@
+ @TARGET_ARCH_TRUE@@TARGET_GENTOO_FALSE@	-DKBD_SETFONT=\"/usr/bin/setfont\" \
+ @TARGET_ARCH_TRUE@@TARGET_GENTOO_FALSE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
+ 
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_TRUE@@TARGET_GENTOO_FALSE@am__append_3 = \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_TRUE@@TARGET_GENTOO_FALSE@	-DKBD_LOADKEYS=\"/usr/bin/loadkeys\" \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_TRUE@@TARGET_GENTOO_FALSE@	-DKBD_SETFONT=\"/usr/bin/setfont\" \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_TRUE@@TARGET_GENTOO_FALSE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
+-
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_TRUE@am__append_4 = \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_TRUE@	-DKBD_LOADKEYS=\"/bin/loadkeys\" \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_TRUE@	-DKBD_SETFONT=\"/bin/setfont\" \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_TRUE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
+-
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_TRUE@am__append_5 = \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_TRUE@	-DKBD_LOADKEYS=\"/bin/loadkeys\" \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_TRUE@	-DKBD_SETFONT=\"/bin/setfont\" \
+-@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_TRUE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
+-
+-@TARGET_ANGSTROM_TRUE@@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@am__append_6 = \
+-@TARGET_ANGSTROM_TRUE@@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DKBD_LOADKEYS=\"/usr/bin/loadkeys\" \
+-@TARGET_ANGSTROM_TRUE@@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DKBD_SETFONT=\"/usr/bin/setfont\" \
+-@TARGET_ANGSTROM_TRUE@@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
+-
+-@TARGET_ANGSTROM_FALSE@@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@am__append_7 = \
+-@TARGET_ANGSTROM_FALSE@@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DKBD_LOADKEYS=\"/bin/loadkeys\" \
+-@TARGET_ANGSTROM_FALSE@@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DKBD_SETFONT=\"/bin/setfont\" \
+-@TARGET_ANGSTROM_FALSE@@TARGET_ARCH_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DDEFAULT_FONT=\"latarcyrheb-sun16\"
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_TRUE@@TARGET_GENTOO_FALSE@am__append_3 = \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_TRUE@@TARGET_GENTOO_FALSE@	-DKBD_LOADKEYS=\"/usr/bin/loadkeys\" \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_TRUE@@TARGET_GENTOO_FALSE@	-DKBD_SETFONT=\"/usr/bin/setfont\" \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_TRUE@@TARGET_GENTOO_FALSE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
++
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_TRUE@@TARGET_GENTOO_FALSE@am__append_4 = \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_TRUE@@TARGET_GENTOO_FALSE@	-DKBD_LOADKEYS=\"/usr/bin/loadkeys\" \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_TRUE@@TARGET_GENTOO_FALSE@	-DKBD_SETFONT=\"/usr/bin/setfont\" \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_TRUE@@TARGET_GENTOO_FALSE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
++
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_TRUE@am__append_5 = \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_TRUE@	-DKBD_LOADKEYS=\"/bin/loadkeys\" \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_TRUE@	-DKBD_SETFONT=\"/bin/setfont\" \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_TRUE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
++
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_TRUE@am__append_6 = \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_TRUE@	-DKBD_LOADKEYS=\"/bin/loadkeys\" \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_TRUE@	-DKBD_SETFONT=\"/bin/setfont\" \
++@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_TRUE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
++
++@TARGET_ANGSTROM_TRUE@@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@am__append_7 = \
++@TARGET_ANGSTROM_TRUE@@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DKBD_LOADKEYS=\"/usr/bin/loadkeys\" \
++@TARGET_ANGSTROM_TRUE@@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DKBD_SETFONT=\"/usr/bin/setfont\" \
++@TARGET_ANGSTROM_TRUE@@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DDEFAULT_FONT=\"LatArCyrHeb-16\"
++
++@TARGET_ANGSTROM_FALSE@@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@am__append_8 = \
++@TARGET_ANGSTROM_FALSE@@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DKBD_LOADKEYS=\"/bin/loadkeys\" \
++@TARGET_ANGSTROM_FALSE@@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@	-DKBD_SETFONT=\"/bin/setfont\" \
++@TARGET_ANGSTROM_FALSE@@TARGET_ARCH_FALSE@@TARGET_CHAKRA_FALSE@@TARGET_FRUGALWARE_FALSE@@TARGET_GENTOO_FALSE@@TARGET_MANDRIVA_FALSE@@TARGET_MEEGO_FALSE@
+ 
+ rootbin_PROGRAMS = systemd$(EXEEXT) systemctl$(EXEEXT) \
+ 	systemd-notify$(EXEEXT) systemd-ask-password$(EXEEXT) \
+diff -Npur systemd-29.orig/src/hostname-setup.c systemd-29/src/hostname-setup.c
+--- systemd-29.orig/src/hostname-setup.c	2011-04-20 15:56:33.000000000 +0200
++++ systemd-29/src/hostname-setup.c	2011-06-17 18:25:18.000000000 +0200
+@@ -34,7 +34,7 @@
+ #define FILENAME "/etc/sysconfig/network"
+ #elif defined(TARGET_SUSE) || defined(TARGET_SLACKWARE) || defined(TARGET_FRUGALWARE)
+ #define FILENAME "/etc/HOSTNAME"
+-#elif defined(TARGET_ARCH)
++#elif defined(TARGET_ARCH) || defined(TARGET_CHAKRA)
+ #define FILENAME "/etc/rc.conf"
+ #elif defined(TARGET_GENTOO)
+ #define FILENAME "/etc/conf.d/hostname"
+@@ -64,7 +64,7 @@ static int read_and_strip_hostname(const
+ 
+ static int read_distro_hostname(char **hn) {
+ 
+-#if defined(TARGET_FEDORA) || defined(TARGET_ARCH) || defined(TARGET_GENTOO) || defined(TARGET_ALTLINUX) || defined(TARGET_MANDRIVA) || defined(TARGET_MEEGO)
++#if defined(TARGET_FEDORA) || defined(TARGET_ARCH) || defined(TARGET_CHAKRA) || defined(TARGET_GENTOO) || defined(TARGET_ALTLINUX) || defined(TARGET_MANDRIVA) || defined(TARGET_MEEGO)
+         int r;
+         FILE *f;
+ 
+diff -Npur systemd-29.orig/src/locale-setup.c systemd-29/src/locale-setup.c
+--- systemd-29.orig/src/locale-setup.c	2011-05-09 23:50:16.000000000 +0200
++++ systemd-29/src/locale-setup.c	2011-06-17 18:24:22.000000000 +0200
+@@ -167,6 +167,16 @@ int locale_setup(void) {
+                 if (r != -ENOENT)
+                         log_warning("Failed to read /etc/rc.conf: %s", strerror(-r));
+         }
++        
++#elif defined(TARGET_CHAKRA)
++        if (r <= 0 &&
++            (r = parse_env_file("/etc/rc.conf", NEWLINE,
++                                "LOCALE", &variables[VARIABLE_LANG],
++                                NULL)) < 0) {
++
++                if (r != -ENOENT)
++                        log_warning("Failed to read /etc/rc.conf: %s", strerror(-r));
++        }
+ 
+ #elif defined(TARGET_GENTOO)
+         /* Gentoo's openrc expects locale variables in /etc/env.d/
+diff -Npur systemd-29.orig/src/vconsole-setup.c systemd-29/src/vconsole-setup.c
+--- systemd-29.orig/src/vconsole-setup.c	2011-05-09 22:30:27.000000000 +0200
++++ systemd-29/src/vconsole-setup.c	2011-06-17 18:26:01.000000000 +0200
+@@ -292,6 +292,17 @@ int main(int argc, char **argv) {
+                         if (r != -ENOENT)
+                                 log_warning("Failed to read /etc/rc.conf: %s", strerror(-r));
+                 }
++                
++#elif defined(TARGET_CHAKRA)
++                if ((r = parse_env_file("/etc/rc.conf", NEWLINE,
++                                        "KEYMAP", &vc_keymap,
++                                        "CONSOLEFONT", &vc_font,
++                                        "CONSOLEMAP", &vc_font_map,
++                                        NULL)) < 0) {
++
++                        if (r != -ENOENT)
++                                log_warning("Failed to read /etc/rc.conf: %s", strerror(-r));
++                }
+ 
+ #elif defined(TARGET_FRUGALWARE)
+                 if ((r = parse_env_file("/etc/sysconfig/keymap", NEWLINE,

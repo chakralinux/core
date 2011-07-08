@@ -5,16 +5,16 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=catalyst-utils
-pkgver=11.5
-pkgrel=1
+pkgver=11.6
+pkgrel=2
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
-depends=('xorg-server>=1.7.0' 'xorg-server<1.11.0' 'netkit-bsd-finger' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs')
+depends=('xorg-server>=1.7.0' 'xorg-server<1.11.0' 'netkit-bsd-finger' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs' 'libgl')
 optdepends=('qt: to run ATi Catalyst Control Center (amdcccle)')
-conflicts=('catalyst-test' 'nvidia-utils' 'libgl')
-provides=('libgl' "libatical=${pkgver}")
+conflicts=('catalyst-testing' 'nvidia-utils')
+provides=("libatical=${pkgver}")
 install=${pkgname}.install
 
 source=(
@@ -23,7 +23,7 @@ source=(
     amdcccle.desktop
     atieventsd.sh)
 
-md5sums=('0a407ba5b7302239071a907e36a6934b'
+md5sums=('516ea47b13d367e09a90acb9422df738'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '4efa8414a8fe9eeb50da38b5522ef81d'
          'f729bf913613f49b0b9759c246058a87')
@@ -75,7 +75,7 @@ package() {
       install -m755 linux/*.so "${pkgdir}/usr/lib/xorg/modules/linux/" || return 1
       #install -m755 extensions/libglx.so "${pkgdir}/usr/lib/xorg/modules/extensions/" || return 1 #before 11.4
       install -m755 extensions/fglrx/fglrx-libglx.so "${pkgdir}/usr/lib/xorg/modules/extensions/fglrx/fglrx-libglx.so" || return 1 # since 11.5
-      ln -snf /usr/lib/xorg/modules/extensions/fglrx/fglrx-libglx.so "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so" # since 11.4
+      #ln -snf /usr/lib/xorg/modules/extensions/fglrx/fglrx-libglx.so "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so" # since 11.4
       #install -m755 extensions/libdri.so "${pkgdir}/usr/lib/xorg/modules/extensions/libdri.ati" || return 1
 
     # Controlcenter / libraries
@@ -93,9 +93,9 @@ package() {
       install -m755 X11R6/${_lib}/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/fglrx" || return 1 # since 11.5
       ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/fglrx/libGL.so.1.2" # since 11.4
       ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/fglrx-libGL.so.1.2" # since 11.4
-      ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/libGL.so.1.2" # since 11.4
-      ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/libGL.so.1" # since 11.4
-      ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/libGL.so" # since 11.4
+      #ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/libGL.so.1.2" # since 11.4
+      #ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/libGL.so.1" # since 11.4
+      #ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 "${pkgdir}/usr/lib/libGL.so" # since 11.4
       install -m755 X11R6/${_lib}/libAMDXvBA.so.1.0 "${pkgdir}/usr/lib/" || return 1 # since 11.4
       ln -snf libAMDXvBA.so.1.0 "${pkgdir}/usr/lib/libAMDXvBA.so.1" # since 11.4
       ln -snf libAMDXvBA.so.1.0 "${pkgdir}/usr/lib/libAMDXvBA.so" # since 11.4

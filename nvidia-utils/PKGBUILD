@@ -5,15 +5,13 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=nvidia-utils
-pkgver=270.41.19
-pkgrel=1
+pkgver=275.09.07
+pkgrel=2
 pkgdesc="NVIDIA drivers utilities and libraries."
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-depends=('xorg-server' 'libxvmc')
+depends=('xorg-server' 'libxvmc' 'libgl')
 optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig')
-conflicts=('libgl')
-provides=('libgl')
 license=('custom')
 install=nvidia.install
 options=('!strip')
@@ -23,12 +21,12 @@ if [ "$CARCH" = "i686" ]; then
 	ARCH='x86'
 	_pkg="NVIDIA-Linux-${ARCH}-${pkgver}"
         source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
-        md5sums=('c167e32702f56599bd600add97943312')
+        md5sums=('d779057af3a2f96a05ddda201606618b')
 elif [ "$CARCH" = "x86_64" ]; then
 	ARCH='x86_64'
 	_pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
         source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
-        md5sums=('cb518bdd70f356425b8c4a5a48c0ad9c')
+        md5sums=('f75df248f7bf32199ed88db2f080cbfa')
 fi
 
 source[1]='20-nvidia.conf'
@@ -46,7 +44,6 @@ package() {
         install -D -m755 nvidia_drv.so $pkgdir/usr/lib/xorg/modules/drivers/nvidia_drv.so
         # GLX extension module for X
         install -D -m755 libglx.so.$pkgver $pkgdir/usr/lib/xorg/modules/extensions/libglx.so.$pkgver
-        ln -s libglx.so.$pkgver $pkgdir/usr/lib/xorg/modules/extensions/libglx.so       # X doesn't find glx otherwise
         # OpenGL library
         install -D -m755 libGL.so.$pkgver $pkgdir/usr/lib/libGL.so.$pkgver
         # OpenGL core library
@@ -76,6 +73,12 @@ package() {
                 fi
         done
 
+        # remove conflicting so-file links
+        rm -v $pkgdir/usr/lib/libGL.so
+        rm -v $pkgdir/usr/lib/libGL.so.1
+
+        # fix linkage
+        sed -i -e "s/VERSION='.*'/VERSION='$pkgver'/" $startdir/nvidia.install
 
         # nvidia-xconfig
         install -D -m755 nvidia-xconfig $pkgdir/usr/bin/nvidia-xconfig

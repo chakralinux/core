@@ -76,7 +76,9 @@ hwdetect_graphics()
 					rmmod -f ttm
 					rmmod -f drm_kms_helper
 					rmmod -f drm
-					pacman -Rd --noconfirm libgl &>/dev/null
+					pacman -Rd --noconfirm nouveau-dri &>/dev/null
+					pacman -Rd --noconfirm xf86-video-nv &>/dev/null
+					pacman -Rd --noconfirm xf86-video-nouveau &>/dev/null
 					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-utils-${NVIDIA_DRV_VER}* &>/dev/null
 					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia*${NVIDIA_DRV_VER}* &>/dev/null
 			
@@ -94,7 +96,9 @@ hwdetect_graphics()
 					rmmod -f ttm
 					rmmod -f drm_kms_helper
 					rmmod -f drm
-					pacman -Rd --noconfirm libgl &>/dev/null
+					pacman -Rd --noconfirm nouveau-dri &>/dev/null
+					pacman -Rd --noconfirm xf86-video-nv &>/dev/null
+					pacman -Rd --noconfirm xf86-video-nouveau &>/dev/null
 					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-173xx* &>/dev/null
 				
 					# add a status file in /tmp
@@ -130,7 +134,6 @@ hwdetect_graphics()
 					printhl "ATI hardware detected"
 					printhl "Installing driver: ATI catalyst. This can take some seconds."
 				
-					pacman -Rd --noconfirm libgl &>/dev/null
 					pacman -Rd --noconfirm ati-dri &>/dev/null
 					pacman -Rd --noconfirm xf86-video-ati &>/dev/null
 					pacman -Rd --noconfirm xf86-video-radeonhd &>/dev/null

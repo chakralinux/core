@@ -1,0 +1,57 @@
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+pkgname=rsyslog
+pkgver=5.8.0
+pkgrel=1
+pkgdesc="An enhanced multi-threaded syslogd with a focus on security and reliability"
+url="http://www.rsyslog.com/"
+arch=('i686' 'x86_64')
+license=('GPL3')
+depends=('zlib')
+makedepends=('postgresql-libs>=8.4.1' 'libmysqlclient' 'net-snmp'
+ 'gnutls')
+optdepends=('postgresql-libs: PostgreSQL Database Support'
+    'libmysqlclient: MySQL Database Support'
+    'gnutls'
+    'systemd')
+backup=('etc/rsyslog.conf' \
+'etc/logrotate.d/rsyslog'
+'etc/conf.d/rsyslog')
+options=('strip' 'zipman' '!libtool')
+source=("http://www.rsyslog.com/files/download/rsyslog/rsyslog-$pkgver.tar.gz"
+'rsyslog'
+'rsyslog.logrotate'
+'rsyslog.conf.d')
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  ./configure --prefix=/usr \
+              --enable-mysql \
+              --enable-pgsql \
+              --enable-mail \
+              --enable-imfile \
+              --enable-imtemplate \
+              --enable-snmp \
+              --enable-gnutls \
+              --enable-inet \
+              --with-systemdsystemunitdir=/lib/systemd/system
+  make
+}
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make install DESTDIR=${pkgdir}
+
+  # Install Daemons and Configuration Files
+  install -D -m755 ${srcdir}/${pkgname} ${pkgdir}/etc/rc.d/${pkgname}d
+  install -D -m644 ${pkgname}.conf ${pkgdir}/etc/${pkgname}.conf
+  install -D -m644 $srcdir/${pkgname}.logrotate ${pkgdir}/etc/logrotate.d/${pkgname}
+  install -D -m644 ${srcdir}/${pkgname}.conf.d ${pkgdir}/etc/conf.d/${pkgname}
+}
+md5sums=('37562d0e71a24938a9ed7f242bd32d35'
+         '64e6a66d045cc5546f9bab29b6c5658d'
+         'f4e158a7c7376c543f6060b06af6c382'
+         '39a822977949bb36cc12c74c05b993ba')
