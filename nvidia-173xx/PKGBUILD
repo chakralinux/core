@@ -5,12 +5,10 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
-_kernvers=`pacman -Qf kernel26 | cut -c10-15`
 
 pkgname=nvidia-173xx
-pkgver=${_kernvers}.173.14.30
-_pkgver=173.14.30
-pkgrel=1
+pkgver=173.14.30
+pkgrel=2
 # Find the kernel name inside the chroot
 
 pkgdesc="NVIDIA drivers for kernel26, 173xx branch."
@@ -23,21 +21,21 @@ makedepends=('kernel26-headers')
 conflicts=('nvidia-96xx' 'nvidia' 'nvidia-173xx')
 license=('custom')
 install=nvidia.install
-source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${_pkgver}/NVIDIA-Linux-$ARCH-${_pkgver}-pkg0.run")
+source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run")
 md5sums=('665f9f730c18ab24a997e0e14b863262')
 [ "$CARCH" = "x86_64" ] && md5sums=('8c47463ae14a2f742d0fa00160456745')
 
 build() {
         cd $srcdir
-        sh NVIDIA-Linux-$ARCH-${_pkgver}-pkg0.run --extract-only
-        cd NVIDIA-Linux-$ARCH-${_pkgver}-pkg0
+        sh NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run --extract-only
+        cd NVIDIA-Linux-$ARCH-${pkgver}-pkg0
         cd usr/src/nv/
         ln -s Makefile.kbuild Makefile
         make SYSSRC=/lib/modules/${_kernver}/build module || return 1
 }
 
 package() {
-        cd $srcdir/NVIDIA-Linux-$ARCH-${_pkgver}-pkg0/usr/src/nv/
+        cd $srcdir/NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/
         mkdir -p $pkgdir/lib/modules/${_kernver}/kernel/drivers/video/
         install -m644 nvidia.ko $pkgdir/lib/modules/${_kernver}/kernel/drivers/video/
         mkdir -p $pkgdir/etc/modprobe.d

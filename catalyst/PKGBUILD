@@ -7,12 +7,10 @@
 
 # Find the kernel name inside the chroot
 _kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
-_kernvers=`pacman -Qf kernel26 | cut -c10-15`
 
 pkgname=catalyst
-pkgver=${_kernvers}.11.6
-_pkgver=11.6
-pkgrel=1
+pkgver=11.6
+pkgrel=3
 pkgdesc="AMD/ATI Catalyst drivers for kernel26. fglrx kernel module only"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
@@ -22,7 +20,7 @@ makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'kernel26-headers')
 conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri')
 install=${pkgname}.install
 
-source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${_pkgver/./-}-x86.x86_64.run
+source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
         ati_make.sh
         makefile_compat.patch
 	no_bkl.patch
@@ -45,7 +43,7 @@ build() {
 
 
     msg "Unpacking archive ..."
-    /bin/sh ./ati-driver-installer-${_pkgver/./-}-x86.x86_64.run --extract archive_files
+    /bin/sh ./ati-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
 
 
     if [ "${CARCH}" = "x86_64" ]; then
