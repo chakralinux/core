@@ -23,18 +23,12 @@ install="${pkgname}.install"
 source=("http://sage.math.washington.edu/home/release/sage-${pkgver}/sage-${pkgver}.tar"
         'SAGE-notebook.desktop')
 md5sums=('db4d891feed487e1696b8d01ae3b6469'
-         'bcd01b7863794431f8f208ed96fd108d')
+         'dc391f12b7d17dd37326343ec0e99bbd')
 
 build() {
   cd sage-${pkgver}
 
   # modularization of sage, sort of :)
-  # fixes the following error:
-  # bash: symbol lookup error: bash: undefined symbol: rl_filename_rewrite_hook
-  # remove this hack when sage uses a readline 6.1 or greater, or when sage uses its own internal bash
-  # this is for people who have custom kernels (sage works this around by checking uname -r)
-  mkdir -p spkg/installed
-  touch spkg/installed/ppl-0.11.2
 
   # fix "missing sage.all error" during build
   unset CFLAGS
