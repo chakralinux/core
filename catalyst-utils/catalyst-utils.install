@@ -33,12 +33,20 @@ check_libdri_so(){
 }
 
 link_libgl_so(){
+      #check if libGL is installed
+      LIBGL=`pacman -Qq libgl`
+      MARCH=`uname -m`
+      if [ "$LIBGL" = "libgl" ]; then
+        if [ "$MARCH" = "x86_64" ]; then
+	  ln -snf /usr/lib /usr/lib64
+        fi
+        ln -snf /usr/lib/libGL.so.1.2.mesa /usr/lib/FGL.renamed.libGL.so.1.2
+	ln -snf libglx.xorg /usr/lib/xorg/modules/extensions/FGL.renamed.libglx.so
+      fi
       ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 /usr/lib/libGL.so.1.2
-      ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 /usr/lib/libGL.so.1
-      ln -snf /usr/lib/fglrx/fglrx-libGL.so.1.2 /usr/lib/libGL.so
+      ln -snf /usr/lib/libGL.so.1.2 /usr/lib/libGL.so.1
+      ln -snf /usr/lib/libGL.so.1.2 /usr/lib/libGL.so
       ln -snf /usr/lib/xorg/modules/extensions/fglrx/fglrx-libglx.so /usr/lib/xorg/modules/extensions/libglx.so
-      ln -snf libglx.xorg /usr/lib/xorg/modules/extensions/FGL.renamed.libglx.so
-      ln -snf /usr/lib/libGL.so.1.2.mesa /usr/lib/FGL.renamed.libGL.so.1.2
 }
 
 restore_libgl_so(){
