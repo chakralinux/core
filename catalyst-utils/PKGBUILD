@@ -6,13 +6,15 @@
 
 pkgname=catalyst-utils
 pkgver=11.6
-pkgrel=2
+pkgrel=3
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
-depends=('xorg-server>=1.7.0' 'xorg-server<1.11.0' 'netkit-bsd-finger' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs' 'libgl')
-optdepends=('qt: to run ATi Catalyst Control Center (amdcccle)')
+depends=('xorg-server>=1.7.0' 'xorg-server<1.11.0' 'netkit-bsd-finger' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs')
+optdepends=('qt: to run ATi Catalyst Control Center (amdcccle)'
+            'libgl: support for AMD PowerXpress'
+           )
 conflicts=('catalyst-testing' 'nvidia-utils')
 provides=("libatical=${pkgver}")
 install=${pkgname}.install
@@ -20,13 +22,16 @@ install=${pkgname}.install
 source=(
     http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
     catalyst.sh
+    radeon.conf
     amdcccle.desktop
     atieventsd.sh)
 
-md5sums=('516ea47b13d367e09a90acb9422df738'
+md5sums=('645e3b06f802e3edaa52244ff550c4f7'
          'bdafe749e046bfddee2d1c5e90eabd83'
+         '9ad03a78a863bc0b9f279b330669bd4c'
          '4efa8414a8fe9eeb50da38b5522ef81d'
          'f729bf913613f49b0b9759c246058a87')
+
 build() {
   ## Unpack archive
     /bin/sh ./ati-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
@@ -38,6 +43,7 @@ package() {
       install -m755 -d "${pkgdir}/etc/ati"
       install -m755 -d "${pkgdir}/etc/rc.d"
       install -m755 -d "${pkgdir}/etc/profile.d"
+      install -m755 -d "${pkgdir}/etc/modprobe.d"
       install -m755 -d "${pkgdir}/etc/acpi/events"
       install -m755 -d "${pkgdir}/etc/security/console.apps"
 
@@ -60,6 +66,9 @@ package() {
       install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
       install -m755 -d "${pkgdir}/usr/share/man/man8"
       install -m755 -d "${pkgdir}/usr/share/pixmaps"
+
+    # Blacklist radeon
+      install -m644 "${srcdir}/radeon.conf" "${pkgdir}/etc/profile.d"
 
     # X.org driver
       if [ "${CARCH}" = "i686" ]; then
@@ -108,6 +117,10 @@ package() {
       install -m644 X11R6/${_lib}/*.cap "${pkgdir}/usr/lib/" || return 1
       install -m755 X11R6/${_lib}/modules/dri/*.so "${pkgdir}/usr/lib/xorg/modules/dri/" || return 1
       install -m755 ${_lib}/*.so* "${pkgdir}/usr/lib/" || return 1
+
+     # Install powerXpress scripts
+      install -m755 ${_lib}/fglrx/switchlibGL "${pkgdir}/usr/lib/fglrx"
+      install -m755 ${_lib}/fglrx/switchlibglx "${pkgdir}/usr/lib/fglrx"
 
     ## QT libs (only 2 files) - un-comment 2 lines below if you don't want to install qt package
 #      install -m755 -d "${pkgdir}/usr/share/ati/${_lib}"
