@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=xorg-server
-pkgver=1.10.2
+pkgver=1.10.3
 pkgrel=1
 pkgdesc="X.Org X servers"
 arch=('i686' 'x86_64')
@@ -16,30 +16,33 @@ depends=('xproto' 'randrproto' 'renderproto' 'xextproto' 'inputproto' 'kbproto' 
          'libxext' 'libxdmcp' 'libxau' 'udev' 'xf86-input-evdev' 'xkeyboard-config' 'xorg-xkb-utils' 'xorg-fonts-misc')
 makedepends=('pixman' 'libx11' 'mesa' 'libgl' 'xf86driproto' 'xcmiscproto' 'xtrans' 'bigreqsproto' 'randrproto' 'inputproto' 'fontsproto' 'videoproto' \
              'compositeproto' 'recordproto' 'scrnsaverproto' 'resourceproto' 'xineramaproto' 'libxkbfile' 'libxfont' 'renderproto' 'libpciaccess' \ 
-             'libxv' 'xf86dgaproto' 'libxmu' 'libxrender' 'libxi' 'dmxproto' 'libxaw' 'libdmx' 'libxtst' 'libxres')
+             'libxv' 'xf86dgaproto' 'libxmu' 'libxrender' 'libxi' 'dmxproto' 'libxaw' 'libdmx' 'libxtst' 'libxres' 'links')
 options=('!libtool')
 provides=('x-server')
 groups=('xorg')
-source=(${url}/releases/individual/xserver/xorg-server-${pkgver}.tar.bz2
+backup=('etc/X11/xorg.conf.d/10-evdev.conf' 'etc/X11/xorg.conf.d/10-quirks.conf')
+source=(${url}/releases/individual/xserver/${pkgname}-${pkgver}.tar.bz2
+        #git-fixes.patch
         bg-none-revert.patch
         xserver-1.10-pointer-barriers.patch
         xorg-redhat-die-ugly-pattern-die-die-die.patch
+        autoconfig-nvidia.patch
         xvfb-run
         xvfb-run.1
-        10-evdev.conf
-        10-quirks.conf)
-sha1sums=('fd831b3c6297d1a68830c602d767752d87b9ca54'
+        10-quirks.conf
+        10-evdev.conf)
+sha1sums=('1699be5c0edeca553cfa3ee6caa228483465136b'
+         # '6dd2bcd9d8b17d1a50ed8c15eb1cba480558e695'
           '629c6d8d52126eab81ee1b72a9e4209535f8cb81'
           '1b95e91384a57d966428c7db98ed06f4cc562f91'
           '0efcdf61bde3c0cd813072b94e2b30ab922775b9'
+          'f9328fd7bc931bb02c8909ecfcef35403de33782'
           'c94f742d3f9cabf958ae58e4015d9dd185aabedc'
           '6838fc00ef4618c924a77e0fb03c05346080908a'
-          '56224adfce729782d3a0351abd07928911aa17c5'
           '993798f3d22ad672d769dae5f48d1fa068d5578f')
 
 build() {
-  cd "${srcdir}/${pkgbase}-${pkgver}"
-
+  cd "${srcdir}/${pkgname}-${pkgver}"
   # Get rid of the ugly pattern
   patch -Np3 -i "${srcdir}/xorg-redhat-die-ugly-pattern-die-die-die.patch"
 
@@ -49,6 +52,13 @@ build() {
   # Patches from ~ajax/xserver xserver-next branch
   patch -Np1 -i "${srcdir}/bg-none-revert.patch"
 
+  # Upstream fixes from 1.10 branch
+  #patch -Np1 -i "${srcdir}/git-fixes.patch"
+
+  # Use nouveau/nv/nvidia drivers for nvidia devices
+  patch -Np1 -i "${srcdir}/autoconfig-nvidia.patch"
+
+  autoreconf
   ./configure --prefix=/usr \
       --enable-ipv6 \
       --enable-dri \
@@ -72,7 +82,6 @@ build() {
       --localstatedir=/var \
       --with-xkb-path=/usr/share/X11/xkb \
       --with-xkb-output=/var/lib/xkb \
-      --with-dri-driver-path=/usr/lib/xorg/modules/dri \
       --with-fontrootdir=/usr/share/fonts
   make
 
@@ -85,21 +94,21 @@ build() {
 
 package() {
   # xorg-server-xephyr
-  cd "${srcdir}/${pkgbase}-${pkgver}/hw/kdrive"
+  cd "${srcdir}/${pkgname}-${pkgver}/hw/kdrive"
   make DESTDIR="${pkgdir}" install
 
   # xorg-server-xdmx
-  cd "${srcdir}/${pkgbase}-${pkgver}/hw/dmx"
+  cd "${srcdir}/${pkgname}-${pkgver}/hw/dmx"
   make DESTDIR="${pkgdir}" install
 
   # xorg-server-xvfb
-  cd "${srcdir}/${pkgbase}-${pkgver}/hw/vfb"
+  cd "${srcdir}/${pkgname}-${pkgver}/hw/vfb"
   make DESTDIR="${pkgdir}" install
   install -m755 "${srcdir}/xvfb-run" "${pkgdir}/usr/bin/"
   install -m644 "${srcdir}/xvfb-run.1" "${pkgdir}/usr/share/man/man1/"
 
   # xorg-server-xnest
-  cd "${srcdir}/${pkgbase}-${pkgver}/hw/xnest"
+  cd "${srcdir}/${pkgname}-${pkgver}/hw/xnest"
   make DESTDIR="${pkgdir}" install
 
   # xorg-server
@@ -112,7 +121,8 @@ package() {
 
   # Install sane config files in /etc. I don't see the need for config files in /usr/share here, users will edit them anyways.
   install -m755 -d "${pkgdir}/etc/X11/xorg.conf.d"
-  install -m644 "${srcdir}/10-evdev.conf" "${srcdir}/10-quirks.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
+  install -m644 "${srcdir}/10-quirks.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
+  install -m644 "${srcdir}/10-evdev.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
   rm -rf "${pkgdir}/usr/share/X11"
 
   # Needed for non-mesa drivers, libgl will restore it
