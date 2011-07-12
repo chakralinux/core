@@ -8,12 +8,12 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=gdal
 pkgver=1.8.0
-pkgrel=3
+pkgrel=4
 pkgdesc="A translator library for raster geospatial data formats"
 arch=('i686' 'x86_64')
 url="http://www.gdal.org/"
 license=('custom')
-depends=('curl' 'geos' 'giflib' 'hdf5' 'libgeotiff' 'libjpeg>=8' 'libpng' 'libtiff'
+depends=('curl' 'geos' 'giflib' 'hdf5' 'libgeotiff' 'libjpeg' 'libpng' 'libtiff'
          'netcdf' 'python2' 'python-numpy' 'sqlite3' 'mysql' 'libmysqlclient' 'postgresql-libs' 'cfitsio')
 makedepends=('perl' 'swig')
 options=('!libtool' '!makeflags')
@@ -24,7 +24,8 @@ md5sums=('c762cdab0f7e51a677ba49278a8a263d'
 
 build() {
   export CFLAGS="$CFLAGS -fno-strict-aliasing"
-
+  export LDFLAGS="$LDFLAGS -Wl,--as-needed"
+ 
   cd ${srcdir}/$pkgname-$pkgver
   patch -Np0 -i ${srcdir}/gdal-1.5.1-python-install.patch
 
@@ -35,7 +36,8 @@ build() {
   done
 
   ./configure --prefix=/usr --with-netcdf --with-libtiff --with-sqlite3 \
-              --with-geotiff --with-mysql --with-python --without-libtool --with-curl
+              --with-geotiff --with-mysql --with-python --without-libtool --with-curl \
+              --with-hdf5 --with-perl --with-geos --with-png
 
   # workaround for bug #13646
   sed -i 's/PY_HAVE_SETUPTOOLS=1/PY_HAVE_SETUPTOOLS=/g' ./GDALmake.opt
@@ -43,11 +45,16 @@ build() {
   install -d ${pkgdir}/usr/lib/python2.7/site-packages/
 
   make
+}
+
+package () {
+  cd ${srcdir}/$pkgname-$pkgver
+
   make DESTDIR=${pkgdir} install
 
-  # install license
+# install license
   install -D -m644 LICENSE.TXT ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 
-  #FS#15477 clean up junks
-  rm -f ${pkgdir}/usr/bin/gdal_sieve.dox
+#FS15477 clean up junks
+  rm -f ${pkgdir}/usr/bin/*.dox
 }
