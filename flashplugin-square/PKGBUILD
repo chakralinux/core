@@ -10,24 +10,29 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=flashplugin-square
 _licensefile='PlatformClients_PC_WWEULA_Combined_20100108_1657.pdf'
 pkgver=11.0.1.6
-pkgrel=1
+pkgrel=2
 pkgdesc='Adobe Flash Player Beta'
 url='http://labs.adobe.com/technologies/flashplatformruntimes/flashplayer11/'
 arch=('i686' 'x86_64')
 source=('http://download.macromedia.com/pub/labs/flashplatformruntimes/flashplayer11/flashplayer11_b1_debug_lin_32_071311.tar.gz'
-        "http://www.adobe.com/products/eulas/pdfs/${_licensefile}")
+        "http://www.adobe.com/products/eulas/pdfs/${_licensefile}"
+        'mms.cfg')
 md5sums=('bf137cb0e0e522792d4eaefd9dc35c22'
-         '94ca2aecb409abfe36494d1a7ec7591d') 
+         '94ca2aecb409abfe36494d1a7ec7591d'
+         'df30781e4c9b789e2d7f6cdbd9f47d6b') 
 if [[ $CARCH == x86_64 ]]; then
 source[0]=http://download.macromedia.com/pub/labs/flashplatformruntimes/flashplayer11/flashplayer11_b1_install_lin_64_071311.tar.gz
 md5sums[0]=806b348cfb27054568d9f63d13bee3fd
 fi
 
 depends=('mozilla-common' 'libxt' 'gtk2' 'nss' 'curl')
+optdepends=('libvdpau: GPU acceleration on Nvidia card')
 conflicts=('flashplugin')
 provides=('flashplayer' 'flashplugin')
 license=('custom')
 options=(!strip)
+install=flashplugin.install
+backup=(etc/adobe/mms.cfg)
 
 package() {
   install -D -m755 ${srcdir}/usr/lib/kde4/kcm_adobe_flash_player.so ${pkgdir}/usr/lib/kde4/kcm_adobe_flash_player.so
@@ -42,5 +47,6 @@ package() {
   install -D -m755 ${srcdir}/usr/bin/flash-player-properties ${pkgdir}/usr/bin/flash-player-properties
   install -D -m755 libflashplayer.so ${pkgdir}/usr/lib/mozilla/plugins/libflashplayer.so
   install -D -m644 ${_licensefile} ${pkgdir}/usr/share/licenses/${pkgname}/${_licensefile}
+  install -D -m644 mms.cfg ${pkgdir}/etc/adobe/mms.cfg
 }
 
