@@ -8,28 +8,28 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=aspell
-pkgver=0.60.6
+pkgver=0.60.6.1
 _pkgmajorver=0.60
-pkgrel=4
+pkgrel=1
 pkgdesc="A spell checker designed to eventually replace Ispell"
 url="http://aspell.net/"
 arch=('i686' 'x86_64')
 license=('LGPL')
-depends=('gcc-libs' 'ncurses>=5.6-7')
+depends=('gcc-libs' 'ncurses')
 optdepends=('perl: to import old dictionaries')
 options=(!libtool)
 install=aspell.install
 source=(ftp://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz)
-md5sums=('bc80f0198773d5c05086522be67334eb')
+md5sums=('e66a9c9af6a60dc46134fdacf6ce97d7')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR=${pkgdir} install || return 1
-  ln -s ${pkgname}-${_pkgmajorver} ${pkgdir}/usr/lib/${pkgname} || return 1
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc
+  make
+}
 
-  # cleanup info files
-  rm ${pkgdir}/usr/share/info/dir || return 1
-  gzip ${pkgdir}/usr/share/info/* || return 1
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  ln -s ${pkgname}-${_pkgmajorver} "${pkgdir}/usr/lib/${pkgname}"
 }
