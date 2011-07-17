@@ -6,7 +6,7 @@
 
 pkgname=burg-themes
 pkgver=20100623
-pkgrel=1
+pkgrel=2
 pkgdesc="Themes for Burg Bootloader"
 arch=('any')
 url="https://launchpad.net/burg"
@@ -34,6 +34,9 @@ package() {
 
   msg "add neda theme"
   cp -vR $srcdir/neda $pkgdir/boot/burg/themes
+
+  msg "copy neda background to burg theme"
+  cp -vR $pkgdir/boot/burg/themes/neda/background.png $pkgdir/boot/burg/themes/burg/wallpaper.png
   
   msg "Applying patch..."
   cd $pkgdir/boot/burg
