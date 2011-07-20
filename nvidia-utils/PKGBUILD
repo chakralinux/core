@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgbase=nvidia-utils
-pkgname=('nvidia-utils' 'opencl-nvidia')
+pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl')
 pkgver=275.19
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -108,4 +108,15 @@ package_nvidia-utils() {
     ln -s nvidia $pkgdir/usr/share/doc/nvidia-utils
 
     create_links
+}
+
+package_libcl() {
+    pkgdesc="OpenCL library and ICD loader from NVIDIA"
+    pkgver=1.0
+    depends=('gcc-libs')
+    cd $srcdir/${_pkg}
+    install -D -m755 libOpenCL.so.1.0.0 $pkgdir/usr/lib/libOpenCL.so.1.0.0
+    ln -s /usr/lib/libOpenCL.so.1.0.0 $pkgdir/usr/lib/libOpenCL.so.1
+    ln -s /usr/lib/libOpenCL.so.1 $pkgdir/usr/lib/libOpenCL.so
+    install -D -m644 LICENSE $pkgdir/usr/share/licenses/$pkgname/LICENSE
 }
