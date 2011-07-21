@@ -1,26 +1,26 @@
 pkgname=fpc-qtbindings
-pkgver=2.1
+pkgver=2.4
 pkgrel=1
-_qt4pas=V2.1_Qt4.5.3
+_qt4pas=V"$pkgver"_Qt4.5.3
 pkgdesc='Free Pascal Qt4 Binding'
 url='http://users.telenet.be/Jan.Van.hijfte/qtforfpc/fpcqt4.html'
 license=('GPL')
 depends=('qt')
 conflicts=('gdk-pixbuf')
 arch=('i686' 'x86_64')
-[ "$CARCH" = "i686" ] && source=(http://users.telenet.be/Jan.Van.hijfte/qtforfpc/bin-qt4pas-$_qt4pas.tar.gz
-                                 http://chakra-project.org/sources/fpc-qtbindings/gdk-pixbuf-1.0.tar.gz)
-[ "$CARCH" = "i686" ] && md5sums=('484333fda070dd03da091a5c8af56930'
-                                  'e0cd561f24e8fd71621230c24fed73cc')
-
-[ "$CARCH" = "x86_64" ] && source=(http://users.telenet.be/Jan.Van.hijfte/qtforfpc/bin64-qt4pas-$_qt4pas.tar.gz
-                                   http://chakra-project.org/sources/fpc-qtbindings/gdk-pixbuf-1.0.tar.gz)
-[ "$CARCH" = "x86_64" ] && md5sums=('70f76f945a029bf6403d128c9cb74408'
-                                    'e0cd561f24e8fd71621230c24fed73cc')
+source=(http://users.telenet.be/Jan.Van.hijfte/qtforfpc/V"$pkgver"/qt4pas-$_qt4pas.tar.gz
+        http://chakra-project.org/sources/fpc-qtbindings/gdk-pixbuf-1.0.tar.gz)
+md5sums=('7d8f46b539107438f30c6eea98d716ed'
+         'e0cd561f24e8fd71621230c24fed73cc')
 
 build() {
-  [ "$CARCH" = "i686" ] && cd $srcdir/bin-qt4pas-$_qt4pas
-  [ "$CARCH" = "x86_64" ] && cd $srcdir/bin64-qt4pas-$_qt4pas
+  cd $srcdir/qt4pas-$_qt4pas
+  qmake
+  make
+}
+
+package() {
+  cd $srcdir/qt4pas-$_qt4pas
   mkdir -p $pkgdir/usr/lib
   cp -v libQt4Pas.so.5.$pkgver $pkgdir/usr/lib
   ln -sfv libQt4Pas.so.5.$pkgver $pkgdir/usr/lib/libQt4Pas.so.5.2

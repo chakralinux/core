@@ -1,5 +1,5 @@
 pkgname=fpc
-pkgver=2.4.0
+pkgver=2.4.4
 pkgrel=1
 pkgdesc="The Free Pascal Compiler is a Turbo Pascal 7.0 and Delphi compatible 32bit Pascal Compiler. It comes with fully TP 7.0 compatible run-time library."
 arch=('i686' 'x86_64')
@@ -10,28 +10,28 @@ depends=(ncurses)
 makedepends=(fpc)
 options=(zipman)
 source=(ftp://ftp.freepascal.org/pub/fpc/dist/$pkgver/source/fpcbuild-$pkgver.tar.gz)
-#ftp://ftp.chg.ru/pub/lang/pascal/fpc/dist/source-$pkgver/fpcbuild-$pkgver.tar.gz
-#ftp://ftp.chg.ru/pub/lang/pascal/fpc/snapshot/v22/source/fpcbuild.zip
-md5sums=('af49e9a8bb632f361395add30ece8934')
-
-# NOTE: you might have to restart the build more than once. Don't delete src folder - just start the ../makepkg again
+md5sums=('d069dfd3412bd0d26dcd1b81ac998305')
 
 build() {
   cd ${srcdir}/fpcbuild-$pkgver
-  make NOGDB=1 build || return 1
-  make NOGDB=1 PREFIX=${pkgdir}/usr install || return 1
+  make NOGDB=1 build
+}
+
+package() {
+  cd ${srcdir}/fpcbuild-$pkgver
+  make -j1 NOGDB=1 PREFIX=${pkgdir}/usr install
 
   # install package license
   install -m 755 -d ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m 644 fpcsrc/rtl/COPYING.FPC ${pkgdir}/usr/share/licenses/${pkgname}/ || return 1
+  install -m 644 fpcsrc/rtl/COPYING.FPC ${pkgdir}/usr/share/licenses/${pkgname}/
 
   # create symlink for compiler
   [ "$CARCH" = "i686" ] && ln -s /usr/lib/fpc/${pkgver}/ppc386 ${pkgdir}/usr/bin/
   [ "$CARCH" = "x86_64" ] && ln -s /usr/lib/fpc/${pkgver}/ppcx64 ${pkgdir}/usr/bin/
- 
+
   # install sample config file
   mkdir -p ${pkgdir}/etc
-  ${pkgdir}/usr/lib/fpc/${pkgver}/samplecfg /usr/lib/fpc/${pkgver} ${pkgdir}/etc || return 1
+  ${pkgdir}/usr/lib/fpc/${pkgver}/samplecfg /usr/lib/fpc/${pkgver} ${pkgdir}/etc
 
   mv $pkgdir/usr/man $pkgdir/usr/share/
 }
