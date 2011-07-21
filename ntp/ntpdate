@@ -7,9 +7,10 @@
 case "$1" in
   start)
     stat_busy "Starting NTP Client"
-    /usr/bin/ntpdate $NTP_CLIENT_OPTION -t $NTPCLIENT_TIMEOUT $NTP_CLIENT_SERVER > /dev/null 2>&1
-    if [  $? -gt 0 ]; then
+    /usr/bin/ntpd -q $NTP_CLIENT_OPTION &> /dev/null
+    if [ $? -gt 0 ]; then
       stat_fail
+      exit 1
     else
       add_daemon ntpdate
       stat_done
@@ -22,9 +23,9 @@ case "$1" in
     ;;
   restart)
     $0 stop
-    sleep 1
     $0 start
     ;;
   *)
     echo "usage: $0 {start|stop|restart}"  
 esac
+
