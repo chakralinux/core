@@ -31,7 +31,7 @@ build() {
   # fix man page generation
   patch -Np1 -i ../ntp-4.2.4-html2man.patch
   # configure
-  export LDFLAGS="${LDFLAGS//-Wl,--as-needed}"
+  export LDFLAGS="${LDFLAGS//-Wl,--as-needed -lrt}"
   # 4.2.6p3: aclocal too old, regenerate
   rm -f aclocal.m4
   libtoolize --copy --force
