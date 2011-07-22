@@ -10,11 +10,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 # package info
 #
-pkgbase="kdeaccessibility"
-pkgname=('kdeaccessibility-common'
-         'kdeaccessibility-doc'
-         'kdeaccessibility-colorschemes'
-         'kdeaccessibility-iconthemes'
+pkgbase=('kdeaccessibility')
+pkgname=('kdeaccessibility-kaccessible'
          'kdeaccessibility-kmag'
          'kdeaccessibility-kmousetool'
          'kdeaccessibility-kmouth'
@@ -29,9 +26,9 @@ url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
 install=${pkgbase}.install
-options=('docs' '!splithdr' 'splitdbg' 'log')
+options=('!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7" 'opentts')
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kde-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7" 'opentts')
 
 source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -59,54 +56,31 @@ build()
 #
 # split-install functions
 #
-package_kdeaccessibility-common()
+
+
+package_kdeaccessibility-kaccessible() 
 {
-	pkgdesc="KDE Accessibility Aids - Transition package"
+    	pkgdesc='Provides accessibility services like focus tracking and a screenreader'
+	depends=("kde-runtime>=${_kdever}" 'speech-dispatcher')
+        conflicts=("kdeaccessibility-doc" "kdeaccessibility-colorschemes" "kdeaccessibility-iconthemes")
+	install='kdeaccessibility.install'
+	provides=('kdeaccessibility-common')
+	replaces=('kdeaccessibility-common')
+    	groups=("${pkgbase}" "kde" "kde-uninstall" "kde-doc")
 
-}
-
-package_kdeaccessibility-doc()
-{
-	pkgdesc="KDE Accessibility Aids - Documentation"
-	groups=("${pkgbase}" "kde" "kde-uninstall" "kde-doc")
-
-	splitdirs="doc"
+	splitdirs="kaccessible"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install
 		done
 }
 
-package_kdeaccessibility-colorschemes()
-{
-	pkgdesc="Accessible Color Schemes for KDE"
-	depends=("kdebase-runtime>=${_kdever}")
-	groups=("${pkgbase}" "kde" "kde-uninstall")
-
-	splitdirs="ColorSchemes"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install
-		done
-}
-
-package_kdeaccessibility-iconthemes()
-{
-	pkgdesc="Accessibly Icon Themes for KDE"
-	depends=("kdebase-runtime>=${_kdever}")
-	groups=("${pkgbase}" "kde" "kde-uninstall")
-
-	splitdirs="IconThemes"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install
-		done
-}
 
 package_kdeaccessibility-kmag()
 {
 	pkgdesc="Screen magnifier"
-	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	depends=("kde-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	conflicts=("kdeaccessibility-doc")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kmag"
@@ -119,7 +93,8 @@ package_kdeaccessibility-kmag()
 package_kdeaccessibility-kmousetool()
 {
 	pkgdesc="Automatic mouse clicker"
-	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	depends=("kde-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	conflicts=("kdeaccessibility-doc")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kmousetool"
@@ -132,7 +107,8 @@ package_kdeaccessibility-kmousetool()
 package_kdeaccessibility-kmouth()
 {
 	pkgdesc="Speech synthesizer"
-	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	depends=("kde-runtime>=${_kdever}" "kdelibs>=${_kdever}")
+	conflicts=("kdeaccessibility-doc")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="kmouth"
@@ -145,8 +121,8 @@ package_kdeaccessibility-kmouth()
 package_kdeaccessibility-jovie()
 {
 	pkgdesc="Text-to-speech system"
-	depends=("kdebase-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7" 'opentts')
-	conflicts=("${pkgbase}-kttsd" "${pkgbase}-ksayit")
+	depends=("kde-runtime>=${_kdever}" "kdelibs>=${_kdever}" "speech-dispatcher>=0.6.7" 'opentts')
+	conflicts=("kdeaccessibility-doc")
 	replaces=("${pkgbase}-kttsd" "${pkgbase}-ksayit")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 

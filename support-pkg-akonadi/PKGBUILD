@@ -8,31 +8,34 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=akonadi
-pkgver=1.5.3
+pkgver=1.6.0
 pkgrel=1
 pkgdesc="PIM layer, which provides an asynchronous API to access all kind of PIM data"
 arch=('i686' 'x86_64')
 url='http://www.akonadi-project.org'
 license=('LGPL')
-depends=('shared-mime-info' 'boost-libs' 'mysql>=5.5.11' 'soprano>=2.6.0')
+depends=('shared-mime-info' 'boost-libs' 'mysql>=5.5.14' 'soprano>=2.6.51')
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost')
 install=$pkgname.install
-source=("http://download.akonadi-project.org/${pkgname}-${pkgver}.tar.bz2")
-        
-md5sums=('ad342acca61c2af27be4cce61b2d925a')
+source=("ftp://ftp.gtlib.cc.gatech.edu/pub/kde/stable/akonadi/src//${pkgname}-${pkgver}.tar.bz2")
+md5sums=('16bc40e022d06f287f18c71faaeb2e42')
 
-build() {
-  cd ${srcdir}
-  mkdir -p build
-  cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DINSTALL_QSQLITE_IN_QT_PREFIX=TRUE
-  make || return 1
+build() 
+{
+ 	cd ${srcdir}/${pkgname}-${pkgver}
+	
+	cd ${srcdir}
+	mkdir -p build
+	cd build
+	cmake ../${pkgname}-${pkgver} \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DINSTALL_QSQLITE_IN_QT_PREFIX=TRUE
+	make || return 1
 }
 
-package() {
-  cd ${srcdir}/build
-  make DESTDIR=${pkgdir} install
+package() 
+{
+  	cd ${srcdir}/build
+	make DESTDIR=${pkgdir} install
 }
