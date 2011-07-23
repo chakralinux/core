@@ -4,18 +4,20 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgbase=chakra-live
-pkgname=('chakra-live' 'chakra-live-profiles')
+pkgname=chakra-live
 pkgver=2011.04
-pkgrel=1
+pkgrel=0.20110623.1
+pkgdesc="Chakra GNU/Linux livecd/liveusb generation scripts"
 arch=('any')
 url="https://gitorious.org/chakra/chakra-live"
 license=('GPL')
+depends=('mkinitcpio' 'mkinitcpio-nfs-utils' 'nbd' 'cdrkit' 'squashfs-tools' 'syslinux')
+optdepends=('qemu: quickly test isos')
 makedepends=('git')
 provides=()
 conflicts=()
 source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz)
-md5sums=(e975f5393900d7a46cc42f8d3dcd9200)
+md5sums=(0522ada174268459fbeaec4ddf8466b6)
 
 # create tarball: source PKGBUILD && mksource
 
@@ -29,20 +31,7 @@ mksource() {
 	  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
 }
 
-package_chakra-live() {
-  pkgdesc="Chakra GNU/Linux livecd/liveusb generation scripts"
-  depends=('mkinitcpio' 'mkinitcpio-nfs-utils' 'nbd' 'cdrkit' 'squashfs-tools' 'syslinux')
-  optdepends=('qemu: quickly test isos' 'chakra-live-profiles: Chakra GNU/Linux ISO-Image profiles')
-  cd ${srcdir}/${pkgbase}/chakra-iso
-  sed -ie s'~install -d -m 755 $(DESTDIR)/usr/share/chakraiso/~~'g Makefile
-  sed -ie s'~cp -r ../configs $(DESTDIR)/usr/share/chakraiso/configs~~'g Makefile
+package() {
+  cd ${srcdir}/${pkgname}/chakra-iso
   make DESTDIR="$pkgdir" install
-}
-
-package_chakra-live-profiles() {
-  pkgdesc="Chakra-Live Profiles"
-  depends=('chakra-live')
-  cd ${srcdir}/${pkgbase}/
-  mkdir -p $pkgdir/usr/share/chakraiso/
-  cp -r configs $pkgdir/usr/share/chakraiso/configs
 }
