@@ -1,0 +1,91 @@
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686):   Phil Miller <philm[at]chakra-project[dot]org
+# maintainer (x86_64): Giuseppe Calà <jiveaxe[at]gmail[dot]com>
+
+pkgname=burg-bzr
+pkgver=1844
+pkgrel=5
+pkgdesc="A brand-new boot loader based on GRUB."
+url="https://launchpad.net/burg"
+license="GPL3"
+arch=('i686' 'x86_64')
+depends=('ruby' 'python' 'gettext' 'freetype2' 'sdl' 'ncurses')
+optdepends=('os-prober' 'memtest86+')
+makedepends=('bzr')
+
+changelog=burg.Changelog
+provides=('burg')
+md5sums=('39a0e3f1035342d75a9eda7a65f9793f'
+	 'fa7e08137c8736c0b90375f09beaa101'
+	 '60bdcc9a3f86deb4f1a361f3bea4ae98'
+         'e8735e895ebe33638b3ad3e586fee018'
+         '1dff92d9973ed8eae1a9cb4e7dab842f'
+	 '990eba4f3cb1808c97c2972de6957a3c'
+	 'c91b561ab7d1cf88c216d23bf4a11d76')
+source=('burg.default'
+        'arch-burg-detection-folding.patch'
+        'resume-hook.patch'
+        '00_header'
+        '10_linux'
+        '20_memtest86+'
+        'update-burg')
+install='burg.install'
+
+
+_bzrmod=burg
+_bzrtrunk=lp:${_bzrmod}
+
+build() {
+  cd $srcdir/
+
+  msg "Connecting to the server...."
+  if [ ! -d ./${_bzrmod} ]; then
+    bzr branch ${_bzrtrunk} -r ${pkgver}
+  else
+    cd ${_bzrmod} && bzr pull -r ${pkgver}
+  fi
+  msg "BZR checkout done or server timeout"
+
+
+  cd "${srcdir}/${_bzrmod}"
+  # some random patches to facilitate automatic creation of grub.cfg
+  patch -Np1 -i  ${srcdir}/arch-burg-detection-folding.patch
+  cd "${srcdir}/${_bzrmod}"
+  # Restore to old config: use for example: burg-install /dev/sda --no-floppy
+  # disable floppy probing in grub-mkdevicemap
+  #sed -i 's|int floppy_disks = 1;|int floppy_disks = 0;|' ${srcdir}/${_bzrmod}/util/grub-mkdevicemap.c
+  ## Archlinux changed default /usr/bin/python to 3.1.2, need to use /usr/bin/python2 instead
+  sed -i 's|python|python2|' ${srcdir}/${_bzrmod}/autogen.sh
+  ./autogen.sh || return 1
+
+
+
+  rm -rf $srcdir/$_bzrmod-build
+  msg "Creating build directory..."
+  mkdir $srcdir/$_bzrmod-build
+  msg "Starting make..."
+
+  cd $srcdir/$_bzrmod-build
+  $srcdir/$_bzrmod/configure  --prefix=/usr --bindir=/bin \
+		--sbindir=/sbin --mandir=/usr/share/man \
+		--infodir=/usr/share/info --sysconfdir=/etc || return 1
+
+  make || return 1
+}
+
+package() {
+  cd $srcdir/$_bzrmod-build
+  make install DESTDIR=$pkgdir || return 1
+
+  # install /etc/default/burg(needed config file)
+  install -Dm644 ${srcdir}/burg.default ${pkgdir}/etc/default/burg
+  # install update-burg script 
+  install -Dm755 ${srcdir}/update-burg ${pkgdir}/sbin/update-burg
+  # install memtest config detection
+  install -Dm755 ${srcdir}/20_memtest86+ ${pkgdir}/etc/burg.d/20_memtest86+
+  cd ${pkgdir}/sbin
+  patch -Np0 -i  ${srcdir}/resume-hook.patch
+}
+
