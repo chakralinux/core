@@ -7,7 +7,7 @@
 pkgbase="udev"
 pkgname=('udev' 'udev-compat')
 pkgver=172
-pkgrel=2
+pkgrel=3
 arch=(i686 x86_64)
 url="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 license=('GPL')
@@ -16,10 +16,16 @@ groups=('base')
 options=(!makeflags !libtool)
 makedepends=('glibc' 'coreutils' 'util-linux' 'pciutils' 'libusb-compat' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgbase-$pkgver.tar.bz2
-        81-chakra.rules)
+        81-chakra.rules
+        82-optical-symlinks.rules
+        static-node-permission.patch)
 
 build() {
   cd $srcdir/$pkgbase-$pkgver
+
+  # permissions on static /dev/fuse node (will be in udev-173)
+  patch -Np1 -i ../static-node-permission.patch
+
   ./configure --sysconfdir=/etc --with-rootlibdir=/lib --libexecdir=/lib/udev\
               --sbindir=/sbin --with-systemdsystemunitdir=/lib/systemd/system\
               --disable-rule-generator
@@ -39,6 +45,8 @@ package_udev() {
   make DESTDIR=${pkgdir} install
   # Install our rule for permissions and symlinks
   install -D -m644 $srcdir/81-chakra.rules $pkgdir/lib/udev/rules.d/81-chakra.rules
+  # Install our rule for optical symlinks
+  install -D -m644 $srcdir/82-optical-symlinks.rules $pkgdir/lib/udev/rules.d/82-optical-symlinks.rules
 
   # create framebuffer blacklist
   mkdir -p $pkgdir/lib/modprobe.d/
@@ -90,4 +98,6 @@ package_udev-compat() {
   mknod -m 0600 ${pkgdir}/lib/udev/devices/ppp c 108 0
 }
 sha256sums=('b8959cc951ff69ff13305aad6836eac1ff672d98d5a11435c38c4608f77bbd6a'
-            'b1bc9c86ec3ccdff87ef6926092c13e1bac4144c32879e826d240c79828aaf51')
+            'b1bc9c86ec3ccdff87ef6926092c13e1bac4144c32879e826d240c79828aaf51'
+            '284b665b1fd149bf1e211009d3d630b18147d8b9f8b34f43fa46678f88b97f6d'
+            '36770a26f5d4d84d5b6f9878cf55df3a8ddf4a1d7c6ee623768cc8974bec5955')
