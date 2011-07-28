@@ -8,12 +8,12 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=nvidia-96xx
-pkgver=96.43.19
+pkgver=96.43.20
 
 # Find the kernel name inside the chroot
-_kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
+_kernver=`pacman -Q kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 
-pkgrel=4
+pkgrel=1
 pkgdesc="NVIDIA drivers for kernel26, 96xx branch."
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86
@@ -25,7 +25,7 @@ conflicts=('nvidia' 'nvidia-173xx' 'nvidia-96xx')
 license=('custom')
 install=nvidia.install
 source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run")
-md5sums=('53e98129d885a1b004aabc42a989fa73')
+md5sums=('875cc011385ea26ab5edd54a9b65a003')
 [ "$CARCH" = "x86_64" ] && md5sums=('7ff779e299b938b880baff6cd970ab51')
 
 build() {
