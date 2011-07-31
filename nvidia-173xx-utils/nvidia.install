@@ -1,51 +1,6 @@
-VERSION='173.14.31'
-
-whisperer(){
-	echo 'By using this package you accept the NVIDIA license,'
-	echo 'which has been installed in /usr/share/licenses/nvidia/LICENSE'
-	echo 'If you do not accept this license, you must remove the package immediately.'
-}
-
-check_libdri_so(){
-    if [ ! -e usr/lib/xorg/modules/extensions/libdri.so ]; then
-        ln -sf usr/lib/xorg/modules/extensions/libdri.xorg usr/lib/xorg/modules/extensions/libdri.so
-    fi
-}
-
-link_libgl_so(){
-      ln -snf libGL.so.$VERSION /usr/lib/libGL.so.1.2
-      ln -snf libGL.so.$VERSION /usr/lib/libGL.so.1
-      ln -snf libGL.so.$VERSION /usr/lib/libGL.so
-      ln -snf libglx.so.$VERSION /usr/lib/xorg/modules/extensions/libglx.so
-      ln -snf libglx.xorg /usr/lib/xorg/modules/extensions/NVGL.renamed.libglx.so
-      ln -snf libGL.so.1.2.mesa /usr/lib/NVGL.renamed.libGL.so.1.2
-}
-
-restore_libgl_so(){
-      ln -snf libGL.so.1.2.mesa /usr/lib/libGL.so.1.2
-      ln -snf libGL.so.1.2.mesa /usr/lib/libGL.so.1
-      ln -snf libGL.so.1.2.mesa /usr/lib/libGL.so
-      ln -snf libglx.xorg /usr/lib/xorg/modules/extensions/libglx.so
-      rm -f /usr/lib/xorg/modules/extensions/NVGL.renamed.libglx.so
-      rm -f /usr/lib/NVGL.renamed.libGL.so.1.2
-}
-
-
-post_install(){
-    check_libdri_so
-    link_libgl_so
-    whisperer
-}
-
-post_upgrade(){
-    check_libdri_so
-    link_libgl_so
-    whisperer
-}
-
-post_remove(){
-    # If the symlink is dead, remove it
-    check_libdri_so
-    restore_libgl_so
-    echo "NOTE: Don't forget to recover your original xorg.conf file."
+post_install() {
+	echo By using this package you accept the NVIDIA license,
+	echo which has been installed in /usr/share/licenses/nvidia/LICENSE
+	echo If you do not accept this license, you must remove the package immediately.
+	echo Dont forget to update your /etc/X11/xorg.conf
 }
