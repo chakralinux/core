@@ -7,31 +7,35 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
+# original name (used for the source and pkgnames)
+_origname=oxygen-icons
+
 #
 # package info
 #
-pkgbase="oxygen-icons"
-pkgname=('oxygen-icons'
-	 'oxygen-icons-svg')
-	 
+pkgname=('oxygen-icons' 'oxygen-icons-svg')
 arch=('any')
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
+
 install=oxygen-icons.install
+options=('log')
+
 makedepends=('pkgconfig' 'cmake' 'automoc4')
 
-source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
-md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+source=($_mirror/${_origname}-$_kdever.tar.bz2)
+
+md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 #
 # build and install
 #
-build()
+build() 
 {
-	cd $srcdir/$pkgbase-$pkgver
+	cd $srcdir/$_origname-$pkgver
 	
 	patch -Np0 -i $startdir/install_svg_icons_too.patch || return 1
 	
@@ -43,10 +47,10 @@ build()
 
 package_oxygen-icons()
 {
-	pkgdesc="Oxygen (Emot)Icons + Addons"
-	groups=("kde" "kde-uninstall" "kde-minimal")
+	pkgdesc="Oxygen (Emot)Icons"
+	groups=("kde" "kde-minimal" "kde-uninstall")
 	
-	cd $srcdir/$pkgbase-$pkgver
+	cd $srcdir/$_origname-$pkgver
 	
 	make DESTDIR=$pkgdir install || return 1
 	
@@ -59,10 +63,10 @@ package_oxygen-icons-svg()
 {
 	pkgdesc="Oxygen (Emot)Icons - SVG Sources"
 	groups=("kde-uninstall")
+	depends=("${_origname}")
 	
 	mkdir -p $pkgdir/usr/share/icons/oxygen
 	mv $srcdir/svg/scalable $pkgdir/usr/share/icons/oxygen
-
 	rm -rf $pkgdir/usr/share/icons/oxygen/scalable/apps/clock.svgz
 }
 

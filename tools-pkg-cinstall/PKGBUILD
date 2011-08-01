@@ -6,7 +6,7 @@
 # (c) 2010 Drake Justice
 
 pkgname=cinstall
-pkgver=0.4.6.6
+pkgver=0.4.6.8
 pkgrel=1
 depends=('rsync' 'cbundle')
 makedepends=('kdelibs' 'qt' 'automoc4' 'libcroco')
@@ -16,21 +16,21 @@ license=('GPL')
 install=$pkgname.install
 url="http://chakra-project.org/"
 
-source=("cinstall-$pkgver.tar.xz")
-md5sums=('05c19be50c26a1e6ab686621b6dc54c7')
+source=("http://chakra-project.org/sources/cinstall/cinstall-$pkgver.tar.xz")
+md5sums=('add89294347b296a4c2a39b222b6f7ec')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-  git clone git://gitorious.org/~fritzvantom/chakra/fritzvantoms-cinstall.git
+  git clone git://gitorious.org//chakra/cinstall.git
   pushd fritzvantoms-cinstall
   popd
-  tar -cvJf cinstall-${pkgver}.tar.xz fritzvantoms-cinstall/*
+  tar -cvJf cinstall-${pkgver}.tar.xz cinstall/*
   md5sum cinstall-${pkgver}.tar.xz
 }
 
 build() {
-        cd "${srcdir}/fritzvantoms-cinstall"
+        cd "${srcdir}/cinstall"
         
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \

@@ -63,8 +63,8 @@ license=('GPL' 'LGPL' 'FDL')
 
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kdebase-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted' 'openal' 'qhull' 'pyqt' 
-"kdebindings-python>=${_kdever}")
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kde-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted' 'openal' 'qhull' 'pyqt' 
+"kdebindings-pykde4>=${_kdever}")
 
 source=("$_mirror/${pkgbase}-$_kdever.tar.bz2")
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -109,24 +109,12 @@ package_kdegames-common()
 	for i in $srcdir/${pkgbase}-${pkgver}/cmake/modules/*.cmake; do
 		install -D -m644 $i $pkgdir/usr/share/apps/cmake/modules/$(basename $i)
 	done
-
-#	# include our patches into the package
-#	ls -1 ${startdir}/*.patch &>/dev/null 2>&1
-#	if [ "$?" = "0" ]; then
-#		warning "incuding patches into package"
-#		mkdir -p ${pkgdir}/usr/share/kdemod/patches/${pkgbase} &>/dev/null
-#		for i in ${startdir}/*.patch; do
-#			msg "$i"
-#			cp $i ${pkgdir}/usr/share/kdemod/patches/${pkgbase}/ &>/dev/null
-#		done
-#	else
-#		warning "no patches found, skipping to include them into the package..."
-#	fi
 }
 
 package_kdegames-doc()
 {
 	pkgdesc="KDE games - Documentation"
+	depends=()
 	groups=("kde" "${pkgbase}" "kde-doc" "kde-uninstall")
 
 	splitdirs="doc"
@@ -181,7 +169,7 @@ package_kdegames-granatier()
 package_kdegames-kajongg()
 {
 	pkgdesc="The ancient Chinese board game for 4 players."
-	depends=("${pkgbase}-common>=${_kdever}" 'twisted' 'pyqt' "kdebindings-python>=${_kdever}")
+	depends=("${pkgbase}-common>=${_kdever}" 'twisted' 'pyqt' "kdebindings-pykde4>=${_kdever}")
 	groups=("kde" "${pkgbase}" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -526,6 +514,7 @@ package_kdegames-klickety()
 {
 	pkgdesc="Klickety is an adaptation of the clickomania game"
         depends=("${pkgbase}-common>=${_kdever}")
+        replaces=("kdegames-${pkgbase}-ksame")
 	groups=("kde" "${pkgbase}" "kde-uninstall")
 	install=${pkgbase}.install
 

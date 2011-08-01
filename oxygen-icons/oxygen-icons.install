@@ -1,11 +1,11 @@
 post_install() {
 		# fix default.kde icon link problem
 		pushd /usr/share/icons &>/dev/null
-		rm -rf default.kde4 &>/dev/null
-		ln -s hicolor default.kde4 &>/dev/null
+			rm -rf default.kde4 &>/dev/null
+			ln -s hicolor default.kde4 &>/dev/null
 		popd &>/dev/null
 
-		/usr/bin/chakra-update-icons
+		[[ -f /usr/bin/chakra-update-icons ]] && /usr/bin/chakra-update-icons &>/dev/null
 }
 
 post_upgrade() {

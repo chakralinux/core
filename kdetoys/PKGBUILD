@@ -10,9 +10,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 # package info
 #
-pkgbase="kdetoys"
-pkgname=('kdetoys-common'
-         'kdetoys-doc'
+pkgbase=('kdetoys')
+pkgname=('kdetoys-doc'
          'kdetoys-amor'
          'kdetoys-kteatime'
          'kdetoys-ktux')
@@ -27,7 +26,7 @@ license=('GPL' 'LGPL' 'FDL')
 
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' "kdebase-workspace>=${_kdever}")
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kde-workspace>=${_kdever}")
 
 source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -55,11 +54,6 @@ build()
 #
 # split-install functions
 #
-package_kdetoys-common()
-{
-	pkgdesc="${pkgbase} - Transitional package"
-}
-
 package_kdetoys-doc()
 {
 	pkgdesc="${pkgbase} - Documentation"
@@ -75,6 +69,7 @@ package_kdetoys-doc()
 package_kdetoys-amor()
 {
 	pkgdesc="Amusing Misuse Of Resources puts comic figures above your windows"
+	conflicts=("kdetoys-common")
 	groups=("kde" "kdetoys" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -88,6 +83,7 @@ package_kdetoys-amor()
 package_kdetoys-eyesapplet()
 {
 	pkgdesc="An applet similar to XEyes"
+	conflicts=("kdetoys-common")
 	groups=("kde" "kdetoys" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -101,6 +97,7 @@ package_kdetoys-eyesapplet()
 package_kdetoys-kteatime()
 {
 	pkgdesc="System tray applet that makes sure your tea doesn't get too strong"
+	conflicts=("kdetoys-common")
 	groups=("kde" "kdetoys" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -114,10 +111,25 @@ package_kdetoys-kteatime()
 package_kdetoys-ktux()
 {
 	pkgdesc="Tux-in-a-Spaceship screen saver"
+	conflicts=("kdetoys-common")
 	groups=("kde" "kdetoys" "kde-uninstall")
 	install=${pkgbase}.install
 
 	splitdirs="ktux"
+		for i in ${splitdirs} ; do
+			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
+			make DESTDIR=${pkgdir} install || return 1
+		done
+}
+
+package_kdetoys-kweather()
+{
+	pkgdesc="Kicker applet that will display the current weather outside"
+	conflicts=("kdetoys-common")
+	groups=("kde" "kdetoys" "kde-uninstall")
+	install=${pkgbase}.install
+
+	splitdirs="kweather"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1

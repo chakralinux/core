@@ -7,14 +7,13 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
 #
 # package info
 #
 pkgname=('networkmanagement')
          
 arch=('i686' 'x86_64')
-pkgver=20110522
+pkgver=20110717
 pkgrel=2
 
 pkgdesc="KDE SC networkmanager plasmoid"
@@ -23,14 +22,14 @@ license=('GPL')
 
 options=('force')
 
-depends=("kdelibs" "kdebase-workspace" 'networkmanager>=0.8.2')
+depends=("kdelibs" "kde-workspace" 'networkmanager>=0.8.4')
 makedepends=('subversion' 'cmake' 'python' 'automoc4' 'mobile-broadband-provider-info')
 optdepends=('mobile-broadband-provider-info: allow to add new mobile connection')
 replaces=('networkmanagement-networkmanager-plasmoid' 'networkmanagement-knetworkmanager-kde4')
 
 install=${pkgname}.install
 source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('b836c6a05adf896feb42b40e0185b1f3') # networkmanagement-20110522.tar.xz
+md5sums=('2cdb00adcca86652f2ddc55cdc3fdfed') # networkmanagement-20110717.tar.xz
 
 # create tarball: source PKGBUILD && mksource
 
@@ -51,19 +50,17 @@ mksource() {
 # build function
 #
 build() {
-	mkdir -p $srcdir/build
-	cd $srcdir/build
-	
-	cmake ../${pkgname} -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-			  -DDBUS_SYSTEM_POLICY_DIR=/etc/dbus-1/system.d \
-			  -DCMAKE_BUILD_TYPE=${_build_type} \
-			  -DCMAKE_SKIP_RPATH=ON \
-			  -DINSTALL_KNM_AUTOSTART=OFF \
-			  -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-	make || return 1
+  cd "${srcdir}"
+  mkdir build
+  cd build
+  cmake ../networkmanagement \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DDBUS_SYSTEM_POLICY_DIR=/etc/dbus-1/system.d
+  make
 }
 
 package() {
-	cd $srcdir/build
-	make DESTDIR=${pkgdir} install || return 1
+  cd ${srcdir}/build
+  make DESTDIR=${pkgdir} install
 }
