@@ -6,8 +6,8 @@
 
 pkgbase="udev"
 pkgname=('udev' 'udev-compat')
-pkgver=172
-pkgrel=3
+pkgver=173
+pkgrel=1
 arch=(i686 x86_64)
 url="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 license=('GPL')
@@ -17,14 +17,10 @@ options=(!makeflags !libtool)
 makedepends=('glibc' 'coreutils' 'util-linux' 'pciutils' 'libusb-compat' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection')
 source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgbase-$pkgver.tar.bz2
         81-chakra.rules
-        82-optical-symlinks.rules
-        static-node-permission.patch)
+        82-optical-symlinks.rules)
 
 build() {
   cd $srcdir/$pkgbase-$pkgver
-
-  # permissions on static /dev/fuse node (will be in udev-173)
-  patch -Np1 -i ../static-node-permission.patch
 
   ./configure --sysconfdir=/etc --with-rootlibdir=/lib --libexecdir=/lib/udev\
               --sbindir=/sbin --with-systemdsystemunitdir=/lib/systemd/system\
@@ -97,7 +93,6 @@ package_udev-compat() {
   # /dev/ppp
   mknod -m 0600 ${pkgdir}/lib/udev/devices/ppp c 108 0
 }
-sha256sums=('b8959cc951ff69ff13305aad6836eac1ff672d98d5a11435c38c4608f77bbd6a'
+sha256sums=('70a18315a12f8fc1131f7da5b4dae3606988b69d5c08f96f443b84b8486caaaf'
             'b1bc9c86ec3ccdff87ef6926092c13e1bac4144c32879e826d240c79828aaf51'
-            '284b665b1fd149bf1e211009d3d630b18147d8b9f8b34f43fa46678f88b97f6d'
-            '36770a26f5d4d84d5b6f9878cf55df3a8ddf4a1d7c6ee623768cc8974bec5955')
+            '284b665b1fd149bf1e211009d3d630b18147d8b9f8b34f43fa46678f88b97f6d')
