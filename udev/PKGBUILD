@@ -21,10 +21,13 @@ source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgbase-$pkgver.ta
 
 build() {
   cd $srcdir/$pkgbase-$pkgver
-
-  ./configure --sysconfdir=/etc --with-rootlibdir=/lib --libexecdir=/lib/udev\
-              --sbindir=/sbin --with-systemdsystemunitdir=/lib/systemd/system\
-              --disable-rule-generator
+  ./configure --sysconfdir=/etc\
+              --with-rootlibdir=/lib\
+              --libexecdir=/lib/udev\
+              --sbindir=/sbin\
+              --with-systemdsystemunitdir=/lib/systemd/system\
+              --disable-rule-generator\
+              --enable-udev_acl
   make
 }
   
