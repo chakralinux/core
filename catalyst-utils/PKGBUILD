@@ -5,8 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=catalyst-utils
-pkgver=11.6
-pkgrel=3
+pkgver=11.7
+pkgrel=1
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
@@ -21,12 +21,16 @@ install=${pkgname}.install
 
 source=(
     http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
+    switchlibglx
+    switchlibGL
     catalyst.sh
     radeon.conf
     amdcccle.desktop
     atieventsd.sh)
 
-md5sums=('645e3b06f802e3edaa52244ff550c4f7'
+md5sums=('acebb812d4c057766828df0bf572e8ae'
+         'c937c3e20eb04192d367d46b489bf733'
+         '10a7fdf84d93f73e9ad101fcb66f1f3a'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '9ad03a78a863bc0b9f279b330669bd4c'
          '4efa8414a8fe9eeb50da38b5522ef81d'
@@ -119,8 +123,8 @@ package() {
       install -m755 ${_lib}/*.so* "${pkgdir}/usr/lib/" || return 1
 
      # Install powerXpress scripts
-      install -m755 ${_lib}/fglrx/switchlibGL "${pkgdir}/usr/lib/fglrx"
-      install -m755 ${_lib}/fglrx/switchlibglx "${pkgdir}/usr/lib/fglrx"
+      install -m755 ${srcdir}/switchlibGL "${pkgdir}/usr/lib/fglrx"
+      install -m755 ${srcdir}/switchlibglx "${pkgdir}/usr/lib/fglrx"
 
     ## QT libs (only 2 files) - un-comment 2 lines below if you don't want to install qt package
 #      install -m755 -d "${pkgdir}/usr/share/ati/${_lib}"

@@ -1,0 +1,55 @@
+#!/bin/sh
+# A stupid script to switch GL libs on chakra/archlinux
+USAGE=0
+F_FGLRX="/usr/lib/xorg/modules/extensions/fglrx/fglrx-libglx.so"
+F_MESA="/usr/lib/xorg/modules/extensions/libglx.xorg"
+F_TARGETS="/usr/lib/xorg/modules/extensions/libglx.so"
+F32_FGLRX="/usr/lib32/xorg/modules/extensions/fglrx/fglrx-libglx.so"
+F32_MESA="/usr/lib32/xorg/modules/extensions/libglx.xorg"
+F32_TARGETS="/usr/lib32/xorg/modules/extensions/libglx.so"
+if [ -z $1 ]; then
+  USAGE=1
+fi
+if [ $USAGE -eq 1 ]; then
+  echo "Usage: $0 amd|intel|query"
+  exit 0
+fi
+function switch_ati {
+    ln -sf ${F_FGLRX} ${F_TARGETS}
+    if [ -e $F32_FGLRX ]; then
+      ln -sf ${F_FGLRX} ${F_TARGETS}
+    fi
+}
+
+function switch_intel {
+    ln -sf ${F_MESA} ${F_TARGETS}
+    if [ -e $F32_FGLRX ]; then
+      ln -sf ${F_MESA} ${F_TARGETS}
+    fi
+}
+function print_current {
+  CURRENT_GL=`ls -l ${F_TARGETS}|awk '{print $11}'`
+#  echo $CURRENT_GL
+  if [ -z $CURRENT_GL ]; then
+    echo unknown
+    exit 1
+  fi
+  if [ "$CURRENT_GL" = ${F_FGLRX} ]; then
+    echo "amd"
+  fi
+  if [ "$CURRENT_GL" = ${F_MESA} ]; then
+    echo "intel"
+  fi
+}
+
+if [ "$1" = "amd" ]; then
+  switch_ati
+else
+  if [ "$1" = "intel" ];then
+    switch_intel
+  else
+    if [ "$1" = "query" ]; then
+      print_current
+    fi
+  fi
+fi
