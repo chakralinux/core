@@ -1,20 +1,23 @@
 
 whisperer(){
     echo "----------------------------------------------------------------"
+    echo "PLEASE NOTE:"
+    echo "For these drivers to work, you must install kernel modules."
+    echo "Depending on your kernel, these module packages are named"
+    echo "catalyst-\$kernel and stock kernel module is catalyst"
+    echo ""
+    echo "OR simply use packages that provides auto re-compilation:"
+    echo "catalyst-hook or catalyst-daemon"
+    echo ""
+    echo "OR use catalyst-generator package to generate catalyst-{kernver}"
+    echo "packages"
+    echo "----------------------------------------------------------------"
     echo "You can use the tool 'aticonfig' to generate an xorg.conf file."
     echo "--------------------- ^^^^^^^^^ --------------------------------"
     echo "Add nomodeset to your kernel line in /boot/grub/menu.lst , ie.:"
     echo "kernel /boot/vmlinuz26 root=/dev/sda1 ro nomodeset"
     echo "----------------------------------------------------------------"
-    echo "If experiencing problems with white/gray/black_artifacts you can"
-    echo "[as root] kill Xserver and use this command:"
-    echo "# aticonfig --set-pcs-str=DDX,ForceXAA,TRUE"
-    echo "----------------------------------------------------------------"
-    echo "Now you can swítch between xorg-libgl for intel/radeon or fglrx"
-    echo "[as root] use this command:"
-    echo "# pxp_switch_catalyst <amd|intel|query>"
-    echo "----------------------------------------------------------------"
-    echo "For more info and more troubleshooting visit:"
+    echo "For more info and troubleshooting visit:"
     echo "http://wiki.archlinux.org/index.php/ATI_Catalyst"
     echo "----------------------------------------------------------------"
 }
@@ -25,43 +28,19 @@ check_libdri_so(){
     fi
 }
 
-#pXp = powerXpress, set catalyst libs in default
-pXp_set_to_amd(){
-    CARCH=`uname -m`
-    if [ "${CARCH}" = "i686" ]; then
-      _lib=lib
-    elif [ "${CARCH}" = "x86_64" ]; then
-      _lib=lib64
-    fi
-      
-    usr/${_lib}/fglrx/switchlibGL amd
-    usr/${_lib}/fglrx/switchlibglx amd
-}
 
 post_install(){
     check_libdri_so
-    pXp_set_to_amd
     whisperer
 }
 
 post_upgrade(){
     check_libdri_so
-    pXp_set_to_amd
     whisperer
 }
 
 post_remove(){
     # If the symlink is dead, remove it
-    check_libdri_so
-    #remove /usr/lib/catalystpxp/libGL.so* symlinks and dir
-    rm usr/lib/catalystpxp/libGL.so* &>/dev/null
-    rmdir -p "usr/lib/catalystpxp/" --ignore-fail-on-non-empty &>/dev/null
-    #remove usr/lib/xorg/modules/updates/extensions/libglx.so symlink and dir
-    rm usr/lib/xorg/modules/updates/extensions/libglx.so &>/dev/null
-    rmdir -p "usr/lib/xorg/modules/updates/extensions" --ignore-fail-on-non-empty &>/dev/null
-    rmdir -p "usr/lib/xorg/modules/updates" --ignore-fail-on-non-empty &>/dev/null
-
-    echo "----------------------------------------------------------------"
-    echo " Don't forget to recover your original xorg.conf file."
-    echo "----------------------------------------------------------------"
+     check_libdri_so
+     echo "NOTE: Don't forget to recover your original xorg.conf file."
 }
