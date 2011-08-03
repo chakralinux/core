@@ -46,7 +46,7 @@ post_install() {
 			echo "sudoers file already modded"
 		fi
 
-		chmod -v 0440 /etc/sudoers
+		chmod -v 0440 /etc/sudoers &>/dev/null
 
 		mkdir -p /etc/cb.conf.d &>/dev/null
 		chmod 775 /etc/cb.conf.d &>/dev/null
@@ -104,12 +104,12 @@ post_upgrade() {
 			echo "sudoers file already modded"
 		fi
 
-		chmod -v 0440 /etc/sudoers
+		chmod -v 0440 /etc/sudoers &>/dev/null
 
 		mkdir -p /etc/cb.conf.d &>/dev/null
 		chmod 775 /etc/cb.conf.d &>/dev/null
 		chown -R root:bundle /etc/cb.conf.d &>/dev/null
-		rm /etc/cb.conf.d/* -rv
+		rm /etc/cb.conf.d/* -r &>/dev/null
 
 		echo "update mime-database"      
 		update-mime-database /usr/share/mime &>/dev/null
@@ -135,7 +135,7 @@ post_remove() {
 			echo " "
 		fi
 
-                rm /etc/cb.conf.d -r
+                rm /etc/cb.conf.d -r &>/dev/null
 
 }
 
