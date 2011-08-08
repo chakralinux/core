@@ -1,6 +1,36 @@
 infodir=usr/share/info
 filelist=(grub.info grub-dev.info)
 
+wisperer() {
+  echo -e "\033[0;31m IMPORTANT"
+  echo -e "\033[0;0m  Run \033[0;32m 'grub-install /dev/sda --no-floppy' \033[0;0m as root for installing in MBR"
+  echo -e "\033[0;0m  Run \033[0;32m 'grub-mkconfig -o /boot/grub/grub.cfg' \033[0;0m as root for generating grub.cfg"
+  echo -e "\033[0;0m  Also you can run \033[0;32m 'update-grub' \033[0;0m as root for generating grub.cfg"
+}
+
+delete_symlinks() {
+  if [ `readlink /boot/kernel26.img` ] ;
+  then
+    echo "removing backward-symlink"
+    rm -v /boot/kernel26.img
+  fi
+  if [ `readlink /boot/kernel26-lts.img` ] ;
+  then
+    echo "removing backward-symlink"
+    rm -v /boot/kernel26-lts.img
+  fi
+  if [ `readlink /boot/vmlinuz26` ] ;
+  then
+    echo "removing backward-symlink"
+    rm -v /boot/vmlinuz26
+  fi
+  if [ `readlink /boot/vmlinuz26-lts` ] ;
+  then
+    echo "removing backward-symlink"
+    rm -v /boot/vmlinuz26-lts
+  fi
+}
+
 post_install() {
   if [ -f /boot/grub/grub.cfg.pacsave ]; then
     echo "Copying /boot/grub/grub.cfg.pacsave to /boot/grub/grub.cfg"
@@ -14,12 +44,17 @@ post_install() {
   for file in ${filelist[@]}; do
     install-info $infodir/$file.gz $infodir/dir 2> /dev/null
   done
+  delete_symlinks
+  wisperer
 }
 
 post_upgrade() {
   for file in ${filelist[@]}; do
     install-info $infodir/$file.gz $infodir/dir 2> /dev/null
   done
+  delete_symlinks
+  wisperer
+  update-grub
 }
 
 pre_remove() {

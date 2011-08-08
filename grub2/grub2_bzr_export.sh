@@ -2,10 +2,10 @@
 
 ## For actual repos
 
-bzr branch bzr://bzr.savannah.gnu.org/grub-extras/lua lua
-bzr branch bzr://bzr.savannah.gnu.org/grub-extras/gpxe gpxe
-bzr branch bzr://bzr.savannah.gnu.org/grub-extras/ntldr-img ntldr-img
-bzr branch bzr://bzr.savannah.gnu.org/grub-extras/915resolution 915resolution
+# bzr branch bzr://bzr.savannah.gnu.org/grub-extras/lua lua
+# bzr branch bzr://bzr.savannah.gnu.org/grub-extras/gpxe gpxe
+# bzr branch bzr://bzr.savannah.gnu.org/grub-extras/ntldr-img ntldr-img
+# bzr branch bzr://bzr.savannah.gnu.org/grub-extras/915resolution 915resolution
 
 ## For launchpad mirror
 
@@ -21,8 +21,7 @@ output_dir=${wd}/
 
 grub2_bzr_dir=${wd}/grub2_BZR/
 grub2_bzr_exp_dir=${wd}/grub2_experimental_BZR/
-#grub2_extras_dir=${wd}/grub2_extras_BZR/
-grub2_extras_dir=${wd}/./
+grub2_extras_dir=${wd}/grub2_extras_BZR/
 
 main_snapshot() {
 	

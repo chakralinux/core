@@ -1,7 +1,7 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer:   Phil Miller <philm[at]chakra-project[dot]org
+# Maintainer: Ronald van Haren <ronald.chakra.org>
+# Contributor: Keshav P R <skodabenz at rocketmail dot com>
+
+# The src pkg includes grub2_bzr_export.sh to create newer grub-extras snapshots. Modify the paths in it accordingly.
 
 # _grub2_rev=3238
 
@@ -10,26 +10,29 @@ _grub2_gpxe_ver=12
 _grub2_ntldr_ver=17
 _grub2_915_ver=7
 
-pkgname=('grub2-common' 'grub2-bios' 'grub2-efi-x32')
+pkgname=('grub2-common' 'grub2-bios' 'grub2-efi-i386')
 pkgbase="grub2"
 pkgver='1.99'
-pkgrel=2
+pkgrel=3
 url="http://www.gnu.org/software/grub/"
 arch=('i686' 'x86_64')
 license=('GPL3')
+epoch=1
 makedepends=('bdf-unifont' 'python2' 'xz' 'autogen' 'texinfo' 'help2man' 'gettext' 'device-mapper')
 options=(strip purge docs zipman !emptydirs)
 
 #	"http://alpha.gnu.org/gnu/grub/grub-${pkgver}.tar.xz"
 source=("ftp://ftp.gnu.org/gnu/grub/grub-1.99.tar.xz"
-	"http://chakra-project.org/sources/${pkgbase}/grub2_extras_lua_r${_grub2_lua_ver}.tar.xz"
-	"http://chakra-project.org/sources/${pkgbase}/grub2_extras_gpxe_r${_grub2_gpxe_ver}.tar.xz"
-	"http://chakra-project.org/sources/${pkgbase}/grub2_extras_ntldr-img_r${_grub2_ntldr_ver}.tar.xz"
-	"http://chakra-project.org/sources/${pkgbase}/grub2_extras_915resolution_r${_grub2_915_ver}.tar.xz"
+	"ftp://http://chakra-project.org/sources/grub2/grub2_extras_lua_r${_grub2_lua_ver}.tar.xz"
+	"ftp://http://chakra-project.org/sources/grub2/grub2_extras_gpxe_r${_grub2_gpxe_ver}.tar.xz"
+	"ftp://http://chakra-project.org/sources/grub2/grub2_extras_ntldr-img_r${_grub2_ntldr_ver}.tar.xz"
+	"ftp://http://chakra-project.org/sources/grub2/grub2_extras_915resolution_r${_grub2_915_ver}.tar.xz"
 	'chakra_grub2_mkconfig_fixes.patch'
 	'grub.default'
 	'grub.cfg'
-	'20_memtest86+')
+	'20_memtest86+'
+	'grub2_bzr_export.sh'
+        'update-grub')
 
 noextract=("grub2_extras_lua_r${_grub2_lua_ver}.tar.xz"
 	"grub2_extras_gpxe_r${_grub2_gpxe_ver}.tar.xz"
@@ -41,10 +44,12 @@ sha1sums=('a5ae9558f30ce7757a76aa130088b053a87e2fb6'
           '6c58eee654fa4eb7f057275b330710ffd4a9e989'
           '0e50955141a45918fcf56f3a5e15fb477f0448a7'
           'f2a5f1d5b75bd3286b63aefaf5e6553aa03e772b'
-          '9334c23b9d5525e24c204ab45f9de253809d8fbc'
-          '717bba46ea5c9903ccbb9b1486ff594b66dbe359'
-          '6d4f4a3899a0a343771e258cfb3f86172791e7e9'
-          '82a27eca5277218cf57c6c5767e0b17a72f62229')
+          'b7e5510c7b171e9c4dbddb42bbf54ce5ee86e2de'
+          'e1477db3700b27b5e5ad3d8fa43028555204759b'
+          '8948d89537c12a4202df7c001e65a77030bbe5a3'
+          '82a27eca5277218cf57c6c5767e0b17a72f62229'
+          'beb31419045db70fee7401aa6448c220a491e2a3'
+          '5770fbb559b1f463e1a735a1463d24af489bcc3e')
 
 build() {
 	# set architecture dependent variables
@@ -145,6 +150,8 @@ package_grub2-common() {
 	install -Dm755 ${pkgdir}/sbin/grub-install ${pkgdir}/sbin/grub_bios-install
 	install -Dm755 ${pkgdir}/sbin/grub-install ${pkgdir}/sbin/grub_efi_x86_64-install
 	install -Dm755 ${pkgdir}/sbin/grub-install ${pkgdir}/sbin/grub_efi_i386-install
+	# install update-burg script 
+	install -Dm755 ${srcdir}/update-grub ${pkgdir}/sbin/update-grub
     
 	sed -i "s|^\(target_cpu\)=.*|\1=i386|; \
 		s|^\(platform\)=.*|\1=pc|" \
@@ -173,7 +180,7 @@ package_grub2-common() {
 
 package_grub2-bios() {
 	pkgdesc="The GNU GRand Unified Bootloader version 2 - Built for PC BIOS"
-	depends=(grub2-common=${pkgver})
+	depends=(grub2-common=${epoch}:${pkgver})
 	replaces=('grub2')
 	provides=('grub2')
   
@@ -185,12 +192,11 @@ package_grub2-bios() {
 	rm ${pkgdir}/usr/lib/grub/{grub-mkconfig_lib,update-grub_lib}
 }
 
-package_grub2-efi-x32() {
+package_grub2-efi-i386() {
 
-	pkgdesc="The GNU GRand Unified Bootloader version 2 - 32bit UEFI version"
-	depends=("grub2-common=${pkgver}" 'dosfstools' 'efibootmgr')
+	pkgdesc="The GNU GRand Unified Bootloader version 2 - i386 UEFI version"
+	depends=("grub2-common=${epoch}:${pkgver}" 'dosfstools' 'efibootmgr')
 	optdepends=('mtools')
-	replaces=('grub2-efi-i386')
   
 	cd ${srcdir}/grub2_efi-${pkgver}
 	make DESTDIR=${pkgdir} install 
