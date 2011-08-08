@@ -54,7 +54,10 @@ post_upgrade() {
   done
   delete_symlinks
   wisperer
-  update-grub
+  if [ -f /boot/grub/grub.cfg ]
+  then
+     update-grub
+  fi     
 }
 
 pre_remove() {
