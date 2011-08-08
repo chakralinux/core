@@ -1,0 +1,61 @@
+--- etc/burg.d/10_linux.orig	2010-11-01 14:41:38.000000000 -0600
++++ etc/burg.d/10_linux		2010-11-01 15:54:26.796667850 -0600
+@@ -51,7 +51,7 @@ if [ "x${GRUB_DEVICE_UUID}" = "x" ] || [
+     || ! test -e "/dev/disk/by-uuid/${GRUB_DEVICE_UUID}" ; then
+   LINUX_ROOT_DEVICE=${GRUB_DEVICE}
+ else
+-  LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
++  LINUX_ROOT_DEVICE="/dev/disk/by-uuid/${GRUB_DEVICE_UUID}"
+ fi
+ 
+ linux_entry ()
+@@ -60,14 +60,17 @@ linux_entry ()
+   version="$2"
+   recovery="$3"
+   args="$4"
++  if [ "${version}" = "linux-lts" ] ; then
++    _kernel=LTS
++  else
++    _kernel=Standard
++  fi
+   if ${recovery} ; then
+-    title="$(gettext_quoted "%s, with Linux %s (recovery mode)")"
+-    auth_option=${AUTH_RESCUE}
++    title="$(gettext_quoted "%s, with ${_kernel}-Kernel (recovery mode)")"
+   else
+-    title="$(gettext_quoted "%s, with Linux %s")"
+-    auth_option=${AUTH_NORMAL}
++    title="$(gettext_quoted "%s, with ${_kernel}-Kernel")"
+   fi
+-  printf "menuentry '${title}' ${CLASS} --group group_main ${auth_option}{\n" "${os}" "${version}"
++  printf "menuentry '${title}' ${CLASS} --group group_main ${auth_option}{\n" "${os}"
+   save_default_entry | sed -e "s/^/\t/"
+ 
+   # Use ELILO's generic "efifb" when it's known to be available.
+@@ -115,15 +118,12 @@ while [ "x$list" != "x" ] ; do
+   basename=`basename $linux`
+   dirname=`dirname $linux`
+   rel_dirname=`make_system_path_relative_to_its_root $dirname`
+-  version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
+-  alt_version=`echo $version | sed -e "s,\.old$,,g"`
++  version=`echo $basename | sed -e "s,^[^0-9]*vmlinu[xz]-,,g"`
++  alt_version="$version-fallback"
+   linux_root_device_thisversion="${LINUX_ROOT_DEVICE}"
+ 
+   initrd=
+-  for i in "initrd.img-${version}" "initrd-${version}.img" \
+-	   "initrd-${version}" "initramfs-${version}.img" \
+-	   "initrd.img-${alt_version}" "initrd-${alt_version}.img" \
+-	   "initrd-${alt_version}" "initramfs-${alt_version}.img"; do
++  for i in "initramfs-${version}.img"; do
+     if test -e "${dirname}/${i}" ; then
+       initrd="$i"
+       break
+@@ -139,6 +139,7 @@ while [ "x$list" != "x" ] ; do
+   linux_entry "${OS}" "${version}" false \
+       "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
+   if [ "x${GRUB_DISABLE_LINUX_RECOVERY}" != "xtrue" ]; then
++    initrd="initramfs-${alt_version}.img"
+     linux_entry "${OS}" "${version}" true \
+ 	"single ${GRUB_CMDLINE_LINUX}"
+   fi

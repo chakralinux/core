@@ -16,14 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
 
-prefix=/usr
-exec_prefix=${prefix}
-bindir=/bin
-libdir=${exec_prefix}/lib
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+libdir=@libdir@
 . ${libdir}/burg/burg-mkconfig_lib
 
-export TEXTDOMAIN=burg
-export TEXTDOMAINDIR=${prefix}/share/locale
+export TEXTDOMAIN=@PACKAGE@
+export TEXTDOMAINDIR=@localedir@
 
 CLASS="--class gnu-linux --class gnu --class os"
 
@@ -60,17 +60,12 @@ linux_entry ()
   version="$2"
   recovery="$3"
   args="$4"
-  if [ "${version}" = "linux-lts" ] ; then
-    _kernel=LTS
-  else
-    _kernel=Standard
-  fi
   if ${recovery} ; then
-    title="$(gettext_quoted "%s, with ${_kernel}-Kernel (recovery mode)")"
+    title="$(gettext_quoted "%s, (recovery mode)")"
   else
-    title="$(gettext_quoted "%s, with ${_kernel}-Kernel")"
+    title="$(gettext_quoted "%s")"
   fi
-  printf "menuentry '${title}' ${CLASS} --group group_main ${auth_option}{\n" "${os}"
+  printf "menuentry '${title}' ${CLASS} --group group_main ${auth_option}{\n" "${os}" "${version}"
   save_default_entry | sed -e "s/^/\t/"
 
   # Use ELILO's generic "efifb" when it's known to be available.
@@ -118,7 +113,7 @@ while [ "x$list" != "x" ] ; do
   basename=`basename $linux`
   dirname=`dirname $linux`
   rel_dirname=`make_system_path_relative_to_its_root $dirname`
-  version=`echo $basename | sed -e "s,^[^0-9]*vmlinu[xz]-,,g"`
+  version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
   alt_version="$version-fallback"
   linux_root_device_thisversion="${LINUX_ROOT_DEVICE}"
 
