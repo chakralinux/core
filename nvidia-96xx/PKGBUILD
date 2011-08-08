@@ -11,17 +11,17 @@ pkgname=nvidia-96xx
 pkgver=96.43.20
 
 # Find the kernel name inside the chroot
-_kernver=`pacman -Q kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
+_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
 
-pkgrel=1
+pkgrel=2
 pkgdesc="NVIDIA drivers for kernel26, 96xx branch."
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86
 [ "$CARCH" = "x86_64" ] && ARCH=x86_64
 url="http://www.nvidia.com/"
-depends=('kernel26' 'nvidia-96xx-utils')
-makedepends=('kernel26-headers')
-conflicts=('nvidia' 'nvidia-173xx' 'nvidia-96xx')
+depends=('linux>=3.0' 'linux<3.1' 'nvidia-96xx-utils')
+makedepends=('linux-headers')
+conflicts=('nvidia-96xx' 'nvidia' 'nvidia-173xx')
 license=('custom')
 install=nvidia.install
 source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run")

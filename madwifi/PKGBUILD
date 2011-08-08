@@ -8,23 +8,24 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 # Find the kernel name inside the chroot
-_kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
+_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
 
 pkgname=madwifi
 pkgver=0.9.4.4133
-pkgrel=10
-pkgdesc="Madwifi drivers for Atheros wireless chipsets. For kernel26"
+pkgrel=11
+pkgdesc="Madwifi drivers for Atheros wireless chipsets"
 arch=(i686 x86_64)
 license=('GPL')
 url="http://madwifi-project.org"
-depends=('madwifi-utils' 'kernel26>=2.6.39' 'kernel26<2.6.40')
-makedepends=('kernel26-headers' 'sharutils')
+depends=('madwifi-utils' 'linux>=3.0' 'linux<3.1')
+makedepends=('linux-headers' 'sharutils')
 install=madwifi-ng.install
 # subversion source: svn checkout http:/madwifi-project.org/svn/madwifi/trunk madwifi
 source=(ftp://ftp.archlinux.org/other/madwifi/madwifi-${pkgver}.tar.bz2
 	#http://downloads.sourceforge.net/madwifi/madwifi-${pkgver}.tar.gz
+        kernel-3.0-remove-check.patch
 	)
-groups=("kernel26-modules")
+groups=("linux-modules")
 conflicts=("madwifi")
 replaces=("madwifi")
 
@@ -33,6 +34,7 @@ build() {
 
   #cd $startdir/src/madwifi-$pkgver
   cd $startdir/src/madwifi
+  patch -Np0 -i $srcdir/kernel-3.0-remove-check.patch
     sed \
     -e  's~#include <linux/config.h>~~g' \
     -i */*.c */*/*.c
@@ -48,4 +50,5 @@ build() {
   rm -r $startdir/pkg/lib/modules/$_kernver/net/
 }
 
-md5sums=('ca3c3504d000e7b3d7063af46271c932')
+md5sums=('ca3c3504d000e7b3d7063af46271c932'
+         '413f8af124ae53fd5a20fb6b7c1c64cc')

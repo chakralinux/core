@@ -4,20 +4,21 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-_kernver=`pacman -Q kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=nvidia-173xx
 pkgver=173.14.31
-pkgrel=1
+pkgrel=2
 # Find the kernel name inside the chroot
-
-pkgdesc="NVIDIA drivers for kernel26, 173xx branch."
+_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+pkgdesc="NVIDIA drivers for linux, 173xx branch."
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86
 [ "$CARCH" = "x86_64" ] && ARCH=x86_64
 url="http://www.nvidia.com/"
-depends=('kernel26>=2.6.39' 'kernel26<2.6.40' 'nvidia-173xx-utils')
-makedepends=('kernel26-headers')
+depends=('linux>=3.0' 'linux<3.1' 'nvidia-173xx-utils')
+makedepends=('linux-headers')
 conflicts=('nvidia-96xx' 'nvidia' 'nvidia-173xx')
 license=('custom')
 install=nvidia.install
@@ -29,9 +30,9 @@ build() {
         cd $srcdir
         sh NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run --extract-only
         cd NVIDIA-Linux-$ARCH-${pkgver}-pkg0
-        cd usr/src/nv/
+        cd usr/src/nv
         ln -s Makefile.kbuild Makefile
-        make SYSSRC=/lib/modules/${_kernver}/build module || return 1
+        make module KERNDIR=/lib/modules/${_kernver} SYSSRC=/usr/src/linux-${_kernver}
 }
 
 package() {
