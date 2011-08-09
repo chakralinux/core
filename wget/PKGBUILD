@@ -5,8 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=wget
-pkgver=1.12
-pkgrel=4
+pkgver=1.13
+pkgrel=1
 pkgdesc="A network utility to retrieve files from the Web"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/wget/wget.html"
@@ -16,26 +16,11 @@ depends=('glibc' 'openssl')
 optdepends=('ca-certificates: HTTPS downloads')
 backup=('etc/wgetrc')
 install=wget.install
-source=(ftp://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz
-        wget-1.12-CVE-2010-2252.patch
-        wget-1.12-subjectAltName.patch
-        fix-zh_CN.po.patch)
-md5sums=('141461b9c04e454dc8933c9d1f2abf83'
-         '2c8bc23eff98fd4efc3f96394fc8e61e'
-         'bd589403b7bb4967a6f41b0f43b1c8aa'
-         'bdfafd32d42eb4dd416fb87831a2f5ee')
+source=(ftp://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz)
+md5sums=('d3698837e6a9567ca9be10f115989940')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
-  # Fix arbitrary file overwrite via 3xx redirect (CVE-2010-2252)
-  patch -Np1 -i $srcdir/wget-1.12-CVE-2010-2252.patch
-
-  # https://savannah.gnu.org/bugs/index.php?20421
-  patch -Np0 -i $srcdir/wget-1.12-subjectAltName.patch
-
-  # fix bug related due bad translating
-  patch -Np0 -i $srcdir/fix-zh_CN.po.patch
 
   # Note : We do not build with --enable-nls, because there is a bug in wget causing
   # international domain names to be not properly converted to punycode if
@@ -44,7 +29,6 @@ build() {
 
   ./configure -with-ssl --prefix=/usr --sysconfdir=/etc
   make
-  msgfmt po/zh_CN.po -o po/zh_CN.gmo
 }
 
 package() {
