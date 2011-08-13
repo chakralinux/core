@@ -3,7 +3,7 @@
 # Translators: http://chakra-project.org/bbs/viewtopic.php?pid=29626#p29626
 
 pkgname=appset-qt
-pkgver=0.6.1
+pkgver=0.6.2
 pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
@@ -12,9 +12,9 @@ license=('GPL2')
 depends=('qt>=4.7')
 optdepends=('ccr: For Community Repository support')
 install=${pkgname}.install
-source=(http://sourceforge.net/projects/appset/files/appset-qt/0.6/0.6.1/appset-qt-0.6.1-sources.tar.gz
+source=(http://sourceforge.net/projects/appset/files/appset-qt/0.6/$pkgver/appset-qt-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
-        http://chakra-project.org/sources/$pkgname/$pkgname-0.6.0-chakra.patch
+        http://chakra-project.org/sources/$pkgname/$pkgname-0.6.2-chakra.patch
         #http://chakra-project.org/sources/$pkgname/add-chinese-taiwan.patch
         #http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.5.0.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_de-0.6.0.tar.gz
@@ -25,9 +25,9 @@ source=(http://sourceforge.net/projects/appset/files/appset-qt/0.6/0.6.1/appset-
         #http://chakra-project.org/sources/$pkgname/appset-qt_pl-0.4.2.tar.gz
         #http://chakra-project.org/sources/$pkgname/appset-qt_zh-tw-0.5.0.tar.gz       
         )
-md5sums=(0a3338b2b2ee390cc9143a8287cd122a
+md5sums=(c0d4703e90cbbf453226a03bc6291763
          87f5f278e3fe67ed2cd6165c2835d81b
-         152d4461282a4d39d12f15041d1c34d3
+         b64bccf78bf2640b9c7dee674749e7d7
          #7de9e3d87fb4258174af214b291b5444 # add-chinese-taiwan.patch
          #c2fbac4cab7443f60ee00e48a4d537e3 # appset-qt_ca.0.5.0.tar.gz
          #ee8905fa99ff80485be3d69d2ce7c4f0 # appset-qt_de-0.6.0.tar.gz
@@ -40,12 +40,12 @@ md5sums=(0a3338b2b2ee390cc9143a8287cd122a
          )
 
 build() {
-  cd $srcdir/$pkgname-0.6.1-sources
+  cd $srcdir/$pkgname-$pkgver-sources
   # copy oxygen icons
   cp -v ../*png Qt/AppSet-Qt
 
   # patch it for Chakra GNU/Linux
-  patch -Np1 -i ${startdir}/src/$pkgname-0.6.0-chakra.patch
+  patch -Np1 -i ${startdir}/src/$pkgname-0.6.2-chakra.patch
 
   # add chakra translations (check upstream)
   #patch -Np1 -i ${startdir}/src/add-chinese-taiwan.patch
@@ -73,7 +73,7 @@ build() {
 }
 
 package() {
-    cd $srcdir/$pkgname-0.6.1-sources
+    cd $srcdir/$pkgname-$pkgver-sources
 
     make INSTALL_ROOT="$pkgdir/" install
 
