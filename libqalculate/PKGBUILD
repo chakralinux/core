@@ -1,11 +1,14 @@
-# $Id: PKGBUILD 62401 2010-01-08 06:49:21Z eric $
-# Maintainer: Eric Belanger <eric@archlinux.org>
-# Contributor: Patrick Leslie Polzer <polzer@gnu.org>
-# Contributor: J. Santiago Hirschfeld <jsantiagoh@yahoo.com.ar>
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=libqalculate
 pkgver=0.9.7
-pkgrel=1
+pkgrel=2
 pkgdesc="Multi-purpose desktop calculator"
 arch=('i686' 'x86_64')
 url="http://qalculate.sourceforge.net/"
@@ -16,11 +19,14 @@ optdepends=('gnuplot: for plotting support' 'wget: for retrieval of exchange rat
 options=('!libtool' '!makeflags')
 source=(http://downloads.sourceforge.net/sourceforge/qalculate/${pkgname}-${pkgver}.tar.gz)
 md5sums=('a1507ab862f4ad9852788619aada35cd')
-sha1sums=('c15f7f3a97995decf62cc964956fc1e374ecd78c')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }
