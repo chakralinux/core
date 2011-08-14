@@ -5,13 +5,13 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=nss
-pkgver=3.12.9
+pkgver=3.12.10
 pkgrel=1
 pkgdesc="Mozilla Network Security Services"
 arch=(i686 x86_64)
 url="http://www.mozilla.org/projects/security/pki/nss/"
 license=('MPL' 'GPL')
-_nsprver=4.8.6
+_nsprver=4.8.7
 depends=("nspr>=${_nsprver}" 'sqlite3>=3.6.17' 'zlib')
 makedepends=('perl')
 replaces=('nss-nspr')
@@ -22,7 +22,7 @@ source=(ftp://ftp.mozilla.org/pub/security/nss/releases/NSS_${pkgver//./_}_RTM/s
         add_spi+cacert_ca_certs.patch
         ssl-renegotiate-transitional.patch)
 options=('!strip')
-md5sums=('bd32f183ca28440c1744650be31a9ccc'
+md5sums=('027954e894f02732f4e66cd854261145'
          'e5c97db0c884d5f4cfda21e562dc9bba'
          'c547b030c57fe1ed8b77c73bf52b3ded'
          '46bee81908f1e5b26d6a7a2e14c64d9f'
@@ -37,6 +37,9 @@ build() {
   patch -Np1 -i "${srcdir}/ssl-renegotiate-transitional.patch"
   # Removes rpath
   patch -Np0 -i "${srcdir}/nss-no-rpath.patch"
+
+  # copy linux 2.6 to linux 3.0
+  cp mozilla/security/coreconf/Linux2.6.mk mozilla/security/coreconf/Linux3.0.mk
 
   cd mozilla/security/nss/lib/ckfw/builtins
   make generate
@@ -57,6 +60,10 @@ build() {
   make -j 1 -C mozilla/security/dbm
   make -j 1 -C mozilla/security/nss
 
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
   install -m755 -d "${pkgdir}/usr/lib/pkgconfig"
   install -m755 -d "${pkgdir}/usr/bin"
   install -m755 -d "${pkgdir}/usr/include/nss"
@@ -66,23 +73,23 @@ build() {
   NSS_VPATCH=`grep "#define.*NSS_VPATCH" mozilla/security/nss/lib/nss/nss.h | awk '{print $3}'`
 
   sed "${srcdir}/nss.pc.in" -e "s,%libdir%,/usr/lib,g" \
-                                -e "s,%prefix%,/usr,g" \
-                                -e "s,%exec_prefix%,/usr/bin,g" \
-                                -e "s,%includedir%,/usr/include/nss,g" \
-                                -e "s,%NSPR_VERSION%,${pkgver},g" \
-                                -e "s,%NSS_VERSION%,${pkgver},g" > \
-                        "${pkgdir}/usr/lib/pkgconfig/nss.pc"
+  				-e "s,%prefix%,/usr,g" \
+				-e "s,%exec_prefix%,/usr/bin,g" \
+				-e "s,%includedir%,/usr/include/nss,g" \
+				-e "s,%NSPR_VERSION%,${pkgver},g" \
+				-e "s,%NSS_VERSION%,${pkgver},g" > \
+			"${pkgdir}/usr/lib/pkgconfig/nss.pc"
   ln -sf nss.pc "${pkgdir}/usr/lib/pkgconfig/mozilla-nss.pc"
   chmod 644 ${pkgdir}/usr/lib/pkgconfig/*.pc
 
   sed "${srcdir}/nss-config.in" -e "s,@libdir@,/usr/lib,g" \
-                                    -e "s,@prefix@,/usr/bin,g" \
-                                    -e "s,@exec_prefix@,/usr/bin,g" \
-                                    -e "s,@includedir@,/usr/include/nss,g" \
-                                    -e "s,@MOD_MAJOR_VERSION@,${NSS_VMAJOR},g" \
-                                    -e "s,@MOD_MINOR_VERSION@,${NSS_VMINOR},g" \
-                                    -e "s,@MOD_PATCH_VERSION@,${NSS_VPATCH},g" \
-                            > "${pkgdir}/usr/bin/nss-config"
+  				    -e "s,@prefix@,/usr/bin,g" \
+				    -e "s,@exec_prefix@,/usr/bin,g" \
+				    -e "s,@includedir@,/usr/include/nss,g" \
+				    -e "s,@MOD_MAJOR_VERSION@,${NSS_VMAJOR},g" \
+				    -e "s,@MOD_MINOR_VERSION@,${NSS_VMINOR},g" \
+				    -e "s,@MOD_PATCH_VERSION@,${NSS_VPATCH},g" \
+			    > "${pkgdir}/usr/bin/nss-config"
   chmod 755 "${pkgdir}/usr/bin/nss-config"
 
   for file in libsoftokn3.so libfreebl3.so libnss3.so libnssutil3.so \
