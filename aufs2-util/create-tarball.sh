@@ -7,9 +7,9 @@ rm -R aufs-util.git
 git clone git://aufs.git.sourceforge.net/gitroot/aufs/aufs-util.git
 cd aufs-util
 #git checkout origin/aufs2${AUFS2VERSION}
-git checkout origin/aufs3
+git checkout origin/aufs2.2
 #*** apply "aufs2-base.patch" and "aufs2-standalone.patch" to your kernel source files.
 cd ..
-rm -rf aufs3-util-${GITSNAPSHOT}
-cp -a aufs3-util aufs3-util-${GITSNAPSHOT}
-tar -czf aufs3-util-${GITSNAPSHOT}.tar.gz --exclude=.git aufs3-util-${GITSNAPSHOT}
+rm -rf aufs2-util-${GITSNAPSHOT}
+cp -a aufs-util aufs2-util-${GITSNAPSHOT}
+tar -czf aufs2-util-${GITSNAPSHOT}.tar.gz --exclude=.git aufs2-util-${GITSNAPSHOT}
