@@ -8,26 +8,26 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.04r2
+pkgver=2011.09.ms3
 #pkgver=2011.07.04.KT
-pkgrel=2
-_codename=Aida
+pkgrel=3
+_codename=Edn
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.6.5' 'squashfs-tools' 'partitionmanager>=1216949-5'
-        'cinstall>=0.4.5' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
+depends=('kdelibs' 'kdeedu-marble>=4.7.0' 'squashfs-tools' 'partitionmanager>=1216949-5'
+        'cinstall>=0.4.6.8' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
 makedepends=('cmake' 'kdebase-workspace' 'automoc4')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_2011.04-r2.html")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_20110807.html")
   
-md5sums=('477ab5e2afd7c294663480f115848be9'
-         '7f5f8a6ddfba003f3ce25912810099d8')
+md5sums=('5937264b4d4bddc458812eeceebe7c0e'
+         'e6669ae65a9de5de62dc243270e9c8fb')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -53,7 +53,6 @@ mksource() {
 build()
 {
         cd "${srcdir}/$pkgname"
-       patch -NRp1 -i ${startdir}/marble.patch
 
 	# workaround for bug https://bugzilla.novell.com/show_bug.cgi?id=656144
 	#sed -i -e "s~sudo~kdesu~g" "${srcdir}/$pkgname/tribe.desktop"
@@ -67,7 +66,8 @@ build()
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver} ($_codename)~g" config-tribe.h.cmake
-	sed -i -e "s~git-checkout~${pkgver}-${pkgrel}~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
+	sed -i -e "s~code-name~$_codename~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
+	sed -i -e "s~chakra-version~${pkgver}~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_SKIP_RPATH=ON \
@@ -82,7 +82,7 @@ package()
         cd "${srcdir}/$pkgname"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_2011.04-r2.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_20110807.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
