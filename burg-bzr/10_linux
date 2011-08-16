@@ -31,7 +31,7 @@ if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
   OS=GNU/Linux
   OSLABEL=linux
 else
-  OS="${GRUB_DISTRIBUTOR}"
+  OS="${GRUB_DISTRIBUTOR} GNU/Linux"
   OSLABEL="$(echo ${GRUB_DISTRIBUTOR} | tr '[A-Z]' '[a-z]' | cut -d' ' -f1)"
 fi
 
@@ -60,12 +60,17 @@ linux_entry ()
   version="$2"
   recovery="$3"
   args="$4"
-  if ${recovery} ; then
-    title="$(gettext_quoted "%s" "${GRUB_DISTRIBUTOR}  (recovery mode)")"
+  if [ "${version}" = "linux-lts" ] ; then
+    _kernel=LTS
   else
-    title="$(gettext_quoted "%s" ${GRUB_DISTRIBUTOR})"
+    _kernel=Standard
   fi
-  printf "menuentry '${title}' ${CLASS} --group group_main ${auth_option}{\n" "${os}" "${version}"
+  if ${recovery} ; then
+    title="$(gettext_quoted "%s, with ${_kernel}-Kernel (recovery mode)")"
+  else
+    title="$(gettext_quoted "%s, with ${_kernel}-Kernel")"
+  fi
+  printf "menuentry '${title}' ${CLASS} --group group_main ${auth_option}{\n" "${os}"
   save_default_entry | sed -e "s/^/\t/"
 
   # Use ELILO's generic "efifb" when it's known to be available.
@@ -102,7 +107,7 @@ EOF
 EOF
 }
 
-list=`for i in /boot/vmlinu[xz]* /vmlinu[xz]* ; do
+list=`for i in /boot/vmlinu[xz]-* /vmlinu[xz]-* ; do
         if grub_file_is_not_garbage "$i" ; then echo -n "$i " ; fi
       done`
 prepare_boot_cache=
@@ -113,13 +118,12 @@ while [ "x$list" != "x" ] ; do
   basename=`basename $linux`
   dirname=`dirname $linux`
   rel_dirname=`make_system_path_relative_to_its_root $dirname`
-  version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
-  base_init=`echo $basename | sed -e "s,vmlinuz,kernel,g"`
-  alt_version="${base_init}-fallback"
+  version=`echo $basename | sed -e "s,^[^0-9]*vmlinu[xz]-,,g"`
+  alt_version="$version-fallback"
   linux_root_device_thisversion="${LINUX_ROOT_DEVICE}"
 
   initrd=
- for i in "${base_init}.img"; do
+  for i in "initramfs-${version}.img"; do
     if test -e "${dirname}/${i}" ; then
       initrd="$i"
       break
@@ -134,9 +138,11 @@ while [ "x$list" != "x" ] ; do
 
   linux_entry "${OS}" "${version}" false \
       "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
-  initrd="${alt_version}.img"
-  linux_entry "${OS} (recovery mode)" "${version}" true \
-      "single ${GRUB_CMDLINE_LINUX}"
+  if [ "x${GRUB_DISABLE_LINUX_RECOVERY}" != "xtrue" ]; then
+    initrd="initramfs-${alt_version}.img"
+    linux_entry "${OS}" "${version}" true \
+	"single ${GRUB_CMDLINE_LINUX}"
+  fi
 
   list=`echo $list | tr ' ' '\n' | grep -vx $linux | tr '\n' ' '`
 done

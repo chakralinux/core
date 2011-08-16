@@ -5,7 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=initscripts
-pkgver=2011.02
+pkgver=2011.09.ms3
+_pkgver=2011.04.r3
 pkgrel=1
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
@@ -13,19 +14,31 @@ url="http://www.chakra-project.org"
 license=('GPL2')
 groups=('base')
 backup=(etc/inittab etc/rc.conf etc/rc.local etc/rc.local.shutdown etc/conf.d/wireless)
-depends=('bash' 'awk' 'grep' 'coreutils' 'sed' 'udev'
-         'net-tools' 'ncurses' 'kbd' 'findutils' 'sysvinit')
+depends=('glibc' 'bash' 'grep' 'coreutils' 'udev>=171-2' 'iproute2'
+         'ncurses' 'kbd' 'findutils' 'sysvinit')
 optdepends=('bridge-utils: Network bridging support'
             'dhcpcd: DHCP network configuration'
+            'net-tools: legacy network support'
             'wireless_tools: Wireless networking')
 install=initscripts.install
-source=("http://chakra-project.org/sources/initscripts/initscripts-${pkgver}.tar.xz"
+source=("http://chakra-project.org/sources/initscripts/initscripts-${_pkgver}.tar.xz"
         'http://chakra-project.org/sources/initscripts/wireless.conf.d')
-sha256sums=('0734166a2fd170a8b144a51d8be5ac3773f8c1381240a744cfd05005464aabda'
+sha256sums=('d74e64e3b8a9ebfda9229ec18e2802e90c4780e50532b1bcc40fabd3fe9bac63'
             '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f')
 
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf chakra-${pkgname}
+	  git clone git://gitorious.org/chakra/chakra-${pkgname}.git
+	  rm -vRf chakra-${pkgname}/.git
+	  pushd chakra-${pkgname}
+	  popd
+	  tar -cvJf ${pkgname}-${_pkgver}-${pkgrel}.tar.xz chakra-${pkgname}/*
+	  sha256sum ${pkgname}-${_pkgver}-${pkgrel}.tar.xz
+}
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  DESTDIR=${pkgdir} ./install.sh
+  cd ${srcdir}/initscripts-${_pkgver}
+  make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
 }

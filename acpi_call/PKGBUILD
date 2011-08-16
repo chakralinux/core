@@ -5,20 +5,20 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # Find the kernel name inside the chroot
-_kernver=`pacman -Qf kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
+_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
 
 pkgname=acpi_call
-pkgver=20110323
+pkgver=20110704
 pkgrel=1
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('i686' 'x86_64')
 url=("http://github.com/mkottman/acpi_call")
 license=('GPL')
-depends=('kernel26>=2.6.38' 'kernel26-headers')
+depends=('linux>=3.0' 'linux<3.1' 'linux-headers')
 makedepends=('git')
 install=acpi_call.install
 source=(http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz)
-md5sums=('974c77c6e4b8f0599072c8c05691a2d7')
+md5sums=('a178f28c458be6bc061ad9d281639c54')
 
 
 # create tarball: source PKGBUILD && mksource
@@ -40,7 +40,7 @@ build() {
   cd ${srcdir}/$pkgname-build
 
   sed \
-    -e  's/$(shell uname -r)/2.6.38-CHAKRA/g' \
+    -e  's/$(shell uname -r)/3.0-CHAKRA/g' \
     -i Makefile
   make
 }

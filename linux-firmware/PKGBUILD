@@ -4,19 +4,17 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-#
-# Create a new tarball from the linux-firmware git tree with the following command:
-# git archive --format=tar --prefix linux-firmware-$(date +%Y%m%d)/ master | xz -9 > linux-firmware-$(date +%Y%m%d).tar.xz
-#
-
 pkgname=linux-firmware
-pkgver=20101228
-pkgrel=2
+pkgver=20110722
+_b43=4.178.10.4
+_legacy=3.130.20.0
+_nouveau=20091212
+pkgrel=1
 pkgdesc="Firmware files for Linux"
 arch=('any')
 url="http://git.kernel.org/?p=linux/kernel/git/dwmw2/linux-firmware.git;a=summary"
 license=('GPL2' 'GPL3' 'custom')
-provides=('kernel26-firmware=2.6.35.99')
+provides=('kernel26-firmware=3.0.99' 'linux-firmware=3.0.99')
 conflicts=('linux-firmware-git'
            'kernel26-firmware'
            'ar9170-fw'
@@ -29,7 +27,10 @@ conflicts=('linux-firmware-git'
            'rt2860-firmware'
            'rt2870usb-fw'
            'rt2x00-rt61-fw'
-           'rt2x00-rt71w-fw')
+           'rt2x00-rt71w-fw'
+           'b43-firmware'
+           'b43-firmware-legacy'
+           'nouveau-firmware')
 replaces=('kernel26-firmware'
            'ar9170-fw'
            'iwlwifi-1000-ucode'
@@ -41,12 +42,34 @@ replaces=('kernel26-firmware'
            'rt2860-firmware'
            'rt2870usb-fw'
            'rt2x00-rt61-fw'
-           'rt2x00-rt71w-fw')
+           'rt2x00-rt71w-fw'
+           'b43-firmware'
+           'b43-firmware-legacy'
+           'nouveau-firmware')
+makedepends=("b43-fwcutter=014")
 options=(!strip)
 source=(http://chakra-project.org/sources/linux-firmware/$pkgname-$pkgver.tar.xz
-        http://www.kernel.org/pub/linux/kernel/people/mcgrof/firmware/ar9170/ar9170.fw)
-sha256sums=('489dd4c607826ef9c15fa9befcff7a97b59c3c1d23670e9d330962c8935c8a44'
-            '1b379c5a8d6ab3a43911f7949d6306fe2dae3afb1368be5452a8fc7d9c54e0a0')
+        http://www.kernel.org/pub/linux/kernel/people/mcgrof/firmware/ar9170/ar9170.fw
+        http://mirror2.openwrt.org/sources/broadcom-wl-${_b43}.tar.bz2
+        http://downloads.openwrt.org/sources/wl_apsta-${_legacy}.o
+        http://people.freedesktop.org/~pq/nouveau-drm/nouveau-firmware-$_nouveau.tar.gz)
+sha256sums=('5f71b3679d3ae9ef434770033df50888e1cdfdfdcf98fbc55d8aaa4d86ce8db5'
+            '1b379c5a8d6ab3a43911f7949d6306fe2dae3afb1368be5452a8fc7d9c54e0a0'
+            '32f6ad98facbb9045646fdc8b54bb03086d204153253f9c65d0234a5d90ae53f'
+            '7dba610b1d96dd14e901bcbce14cd6ecd1b1ac6f5c0035b0d6b6dc46a7c3ef90'
+            '4eaeb2044c1da95b50ea4f1facb0effc74d65d8b13dc10893c26e4fe9fe23fb8')
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf linux-firmware
+	  git clone git://git.kernel.org/pub/scm/linux/kernel/git/dwmw2/linux-firmware.git
+	  pushd ${pkgname}
+          git archive --format=tar --prefix linux-firmware-$(date +%Y%m%d)/ master | xz -9 > ../linux-firmware-$(date +%Y%m%d).tar.xz
+	  popd
+	  sha256sum linux-firmware-$(date +%Y%m%d).tar.xz
+}
+
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
@@ -57,10 +80,22 @@ package() {
   mv "${pkgdir}/lib/firmware"/{LICEN*,WHENCE} "${pkgdir}/usr/share/licenses/linux-firmware/"
 
   # Symlinks for Broadcom firmware
-  ln -s bcm43xx-0-610-809-0.fw "${pkgdir}/lib/firmware/brcm/bcm43xx-0.fw"
-  ln -s bcm43xx_hdr-0-610-809-0.fw "${pkgdir}/lib/firmware/brcm/bcm43xx_hdr-0.fw"
+  #ln -s bcm43xx-0-610-809-0.fw "${pkgdir}/lib/firmware/brcm/bcm43xx-0.fw"
+  #ln -s bcm43xx_hdr-0-610-809-0.fw "${pkgdir}/lib/firmware/brcm/bcm43xx_hdr-0.fw"
 
   # https://bugs.archlinux.org/task/20064
   install -m644 "${srcdir}/ar9170.fw" "${pkgdir}/lib/firmware/"
+
+  # install b43-firmware
+  b43-fwcutter -w "${pkgdir}/lib/firmware/" ${srcdir}/broadcom-wl-${_b43}/linux/wl_apsta.o
+
+  # install b43-legacy-firmware
+  b43-fwcutter -w "${pkgdir}/lib/firmware/" ${srcdir}/wl_apsta-${_legacy}.o
+
+  # install nouveau firmwares
+  cd $srcdir/nouveau
+  for i in `ls`; do
+   install -D -m644 $i ${pkgdir}/lib/firmware/nouveau/$i
+  done
 }
 # vim:set ts=2 sw=2 et:
