@@ -1,10 +1,10 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.0.2pre"
+_patch="3.0.3pre"
 _queue="3.0"
 # Aufs
-_aufs="3.0-rcN-20110801"
+_aufs="3.0-20110815"
 # Kernel source file
 SRC="ftp://ftp.kernel.org/pub/linux/kernel/v3.0/linux-3.0.tar.bz2"
 # Original source directory
@@ -17,11 +17,11 @@ SRCNAME="linux-3.0-CHAKRA"
 #   filename%patchlevel (file must be in patches subdirectory)
 PATCHES=(
          # add upstream patch from 3.0 series
-         ftp://ftp.kernel.org/pub/linux/kernel/v3.0/patch-3.0.1.bz2%1
+         ftp://ftp.kernel.org/pub/linux/kernel/v3.0/patch-3.0.2.gz%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-         http://chakra-project.org/sources/linux/patches/3/bugfix/$_patch.patch%1
+         #http://chakra-project.org/sources/linux/patches/3/bugfix/$_patch.patch%1
 
          # fix #19234 i1915 display size
          http://chakra-project.org/sources/linux/patches/3/bugfix/fix-i915.patch%1
@@ -34,15 +34,15 @@ PATCHES=(
          # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
          http://chakra-project.org/sources/linux/patches/3/bugfix/change-default-console-loglevel.patch%1
 
-         # add aufs2 support, in reference to:
+         # add aufs3 support, in reference to:
          # http://aufs.sourceforge.net
-         http://chakra-project.org/sources/linux/patches/3/aufs2.1/aufs2-kbuild-$_aufs.patch%1
-         http://chakra-project.org/sources/linux/patches/3/aufs2.1/aufs2-base-$_aufs.patch%1
-         http://chakra-project.org/sources/linux/patches/3/aufs2.1/aufs2-standalone-$_aufs.patch%1
-         http://chakra-project.org/sources/linux/patches/3/aufs2.1/aufs2.1-standalone.tree-$_aufs.patch.bz2%1
+         http://chakra-project.org/sources/linux/patches/3/aufs3/aufs$_aufs-kbuild.patch%1
+         http://chakra-project.org/sources/linux/patches/3/aufs3/aufs$_aufs-base.patch%1
+         http://chakra-project.org/sources/linux/patches/3/aufs3/aufs$_aufs-standalone.patch%1
+         http://chakra-project.org/sources/linux/patches/3/aufs3/aufs$_aufs.patch.bz2%1
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.0.1-2-CHAKRA"
+PATCHNAME="patch-3.0.2-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {

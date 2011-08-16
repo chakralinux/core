@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # clone the aufs repository to the local disk
-git clone http://git.c3sl.ufpr.br/pub/scm/aufs/aufs2-standalone.git aufs2-standalone.git
-cd aufs2-standalone.git
+git clone git://aufs.git.sourceforge.net/gitroot/aufs/aufs3-standalone.git
+cd aufs3-standalone
 git branch -r
-git checkout origin/aufs2.1
+git checkout origin/aufs3.0
 
 # modify what you want
 
@@ -12,8 +12,8 @@ git checkout origin/aufs2.1
 # create the patch with the directories: fs, include and Documentation
 
 rm -v $(find . -type f -name '*.orig')
-grep -qse 'EXPORT_SYMBOL(' aufs2-standalone.patch && \
-sed -i-old -e 's|EXPORT_SYMBOL(|EXPORT_SYMBOL_GPL(|' aufs2-standalone.patch
+grep -qse 'EXPORT_SYMBOL(' aufs3-standalone.patch && \
+sed -i-old -e 's|EXPORT_SYMBOL(|EXPORT_SYMBOL_GPL(|' aufs3-standalone.patch
 rm -rf /tmp/linux-3.0
 mkdir /tmp/linux-3.0
 cp -a fs /tmp/linux-3.0
