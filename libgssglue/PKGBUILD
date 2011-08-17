@@ -1,10 +1,13 @@
-# $Id: PKGBUILD 62214 2010-01-04 09:19:11Z tpowa $
-# Maintainer: Tobias Powalowski <tpowa@archlinux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=libgssglue
-pkgver=0.1
-pkgrel=3
-pkgdesc="exports a gssapi interface which calls other random gssapi libraries"
+pkgver=0.3
+pkgrel=1
+pkgdesc="Exports a gssapi interface which calls other random gssapi libraries"
 arch=('i686' 'x86_64')
 url="http://www.citi.umich.edu/projects/nfsv4/linux/"
 license=('BSD')
@@ -14,16 +17,21 @@ backup=(etc/gssapi_mech.conf)
 options=('!libtool')
 source=(http://www.citi.umich.edu/projects/nfsv4/linux/$pkgname/$pkgname-$pkgver.tar.gz
         gssapi_mech.conf)
-md5sums=('ce1b4c758e6de01b712d154c5c97e540'
-         '234b9cca75a33af98eda3f1683756879')
+md5sums=('48aaad11b7371ba3270faa322202c038'
+         '080be866717e4e06fa6f7d6f43cb395a')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir"/$pkgname-$pkgver
   ./configure --prefix=/usr 
-  make || return 1
-  make DESTDIR="$pkgdir/" install || return 1
+  make
+}
+
+package() {
+  cd "$srcdir"/$pkgname-$pkgver
+  make DESTDIR="$pkgdir/" install
+
   # Configuration
-  install -D -m 644 ../gssapi_mech.conf "$pkgdir/"etc/gssapi_mech.conf
+  install -Dm644 "$srcdir"/gssapi_mech.conf "$pkgdir/"etc/gssapi_mech.conf
   # install license
-  install -D -m644 COPYING $pkgdir/usr/share/licenses/libgssglue/COPYING
+  install -Dm644 COPYING "$pkgdir"/usr/share/licenses/libgssglue/COPYING
 }
