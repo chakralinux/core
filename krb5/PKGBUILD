@@ -6,7 +6,7 @@
 
 pkgname=krb5
 pkgver=1.9.1
-pkgrel=4
+pkgrel=3
 pkgdesc="The Kerberos network authentication system"
 arch=('i686' 'x86_64')
 url="http://web.mit.edu/kerberos/"
@@ -71,11 +71,6 @@ package() {
    install -dm 755 "${pkgdir}"/etc/rc.d
    install -m 755 ../../krb5-kdc "${pkgdir}"/etc/rc.d
    install -m 755 ../../krb5-kadmind  "${pkgdir}"/etc/rc.d
-
-   # add libgssapi symlinks
-   ln -sf libgssapi_krb5.so "${pkgdir}"/usr/lib/libgssapi.so.2.0.0
-   ln -sf libgssapi_krb5.so "${pkgdir}"/usr/lib/libgssapi.so.2
-   ln -sf libgssapi_krb5.so "${pkgdir}"/usr/lib/libgssapi.so
 
    install -Dm644 "${srcdir}"/${pkgname}-${pkgver}/NOTICE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
 }
