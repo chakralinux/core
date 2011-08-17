@@ -81,7 +81,8 @@ package_linux-lts() {
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
             'gspcav1' 'atl2' 'wlan-ng26' 'rt2500'
             'aufs2' 'nouveau-drm-lts' 'kernel26-lts')
-  provides=('aufs2' 'nouveau-drm-lts' "kernel26-lts=${pkgver}")
+  provides=('aufs2' 'nouveau-drm-lts' "kernel26-lts=${pkgver}" 
+             "linux=${pkgver}" "kernel26=${pkgver}")
   conflicts=('kernel26-lts')
   install=linux-lts.install
   optdepends=('crda: to set the correct wireless channels of your country')
@@ -125,7 +126,8 @@ package_linux-lts() {
 
 package_linux-lts-headers() {
   pkgdesc="Header files and scripts for building modules for linux-lts"
-  provides=("kernel26-lts-headers=${pkgver}")
+  provides=("kernel26-lts-headers=${pkgver}" "kernel26-headers=${pkgver}"
+            "linux-headers=${pkgver}")
   replaces=("kernel26-lts-headers")
   conflicts=("kernel26-lts-headers")
   cd ${srcdir}/linux-${_basekernel}/
