@@ -14,11 +14,11 @@ pkgver=3.5.8
 # to append 'a','b',etc to their subsequent releases, which pamcan
 # misconstrues as alpha, beta, etc.  Bad samba!
 _realver=3.5.8
-pkgrel=2
+pkgrel=3
 arch=(i686 x86_64)
 url="http://www.samba.org"
 license=('GPL3')
-makedepends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' 'libcap>=2.16' 'heimdal>=1.2-1' 'pam' 'fam' 'gnutls>=2.4.1' 'talloc' 'tdb')
+makedepends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' 'libcap>=2.16' 'krb5' 'pam' 'fam' 'gnutls>=2.4.1' 'talloc' 'tdb')
 options=(!makeflags)
 source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${_realver}.tar.gz
         samba samba.logrotate 
@@ -60,7 +60,7 @@ build() {
 
 package_smbclient () {
 pkgdesc="Tools to access a server's filespace and printers via SMB"
-depends=('readline>=6.0.00' 'popt' 'libldap>=2.4.18-1' 'libcap>=2.16' 'heimdal>=1.2-1' 'db>=4.7' 'e2fsprogs' 'tdb' 'talloc')
+depends=('readline>=6.0.00' 'popt' 'libldap>=2.4.18-1' 'libcap>=2.16' 'krb5' 'db>=4.7' 'e2fsprogs' 'tdb' 'talloc')
   cd ${srcdir}/${pkgbase}-${_realver}/source3
   mkdir -p ${pkgdir}/usr/bin ${pkgdir}/sbin ${pkgdir}/usr/lib
   install -m755 bin/{smbclient,rpcclient,smbspool,smbtree,smbcacls,smbcquotas,smbget,net,nmblookup} ${pkgdir}/usr/bin/
@@ -93,7 +93,7 @@ backup=(etc/logrotate.d/samba
         etc/samba/smb.conf
         etc/xinetd.d/swat
         etc/conf.d/samba)
-depends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap>=2.16' 'heimdal>=1.2-1' 'pam' 'fam' 'gnutls>=2.4.1' 'e2fsprogs' 'tdb' 'talloc')
+depends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap>=2.16' 'krb5' 'pam' 'fam' 'gnutls>=2.4.1' 'e2fsprogs' 'tdb' 'talloc')
   cd ${srcdir}/samba-${_realver}/source3
   mkdir -p ${pkgdir}/var/log/samba
   mkdir -p ${pkgdir}/etc/samba/private
