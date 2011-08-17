@@ -1,11 +1,11 @@
 #!/bin/bash
 
-rm -vR aufs2-standalone.git
+rm -vR aufs2-standalone
 # clone the aufs repository to the local disk
-git clone http://git.c3sl.ufpr.br/pub/scm/aufs/aufs2-standalone.git aufs2-standalone.git
-cd aufs2-standalone.git
+git clone git://aufs.git.sourceforge.net/gitroot/aufs/aufs2-standalone.git
+cd aufs2-standalone
 git branch -r
-git checkout origin/aufs2.1-35
+git checkout origin/aufs2.2-35
 
 # modify what you want
 
