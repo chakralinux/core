@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=wget
-pkgver=1.13
+pkgver=1.13.1
 pkgrel=1
 pkgdesc="A network utility to retrieve files from the Web"
 arch=('i686' 'x86_64')
@@ -17,7 +17,7 @@ optdepends=('ca-certificates: HTTPS downloads')
 backup=('etc/wgetrc')
 install=wget.install
 source=(ftp://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz)
-md5sums=('d3698837e6a9567ca9be10f115989940')
+md5sums=('8521e0794dd66af394763ffb4f2594ba')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -27,7 +27,7 @@ build() {
   # the current locale is a UTF-8 one
   # See : http://lists.gnu.org/archive/html/bug-wget/2011-02/msg00026.html
 
-  ./configure -with-ssl --prefix=/usr --sysconfdir=/etc
+  ./configure -with-ssl=openssl --prefix=/usr --sysconfdir=/etc
   make
 }
 
