@@ -6,12 +6,14 @@
 
 pkgname=libtirpc
 pkgver=0.2.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Transport Independent RPC library (SunRPC replacement)"
-arch=(i686 x86_64)
-depends=('libgssglue')
+arch=('i686' 'x86_64')
 url="http://libtirpc.sourceforge.net/"
-license=('GPL2')
+license=('BSD')
+depends=('libgssglue')
+backup=('etc/netconfig')
+options=('!libtool')
 source=(http://downloads.sourceforge.net/sourceforge/libtirpc/${pkgname}-${pkgver}.tar.bz2
        libtirpc-0.2.1-fortify.patch
        libtirpc-0.2.3rc1.patch
@@ -33,4 +35,11 @@ build() {
   autoreconf -fisv
   ./configure --prefix=/usr --enable-gss
   make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  install -D -m644 doc/etc_netconfig "${pkgdir}"/etc/netconfig
+  install -D -m644 COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
 }
