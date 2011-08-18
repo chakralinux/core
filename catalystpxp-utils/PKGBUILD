@@ -15,7 +15,7 @@ depends=('xorg-server>=1.7.0' 'xorg-server<1.11.0' 'netkit-bsd-finger' 'libxrand
 optdepends=('qt: to run ATi Catalyst Control Center (amdcccle)'
             'libxxf86vm: to run ATi Catalyst Control Center (amdcccle)')
 if [ "${CARCH}" = "x86_64" ]; then
-    conflicts=('catalyst-testing' 'nvidia-utils' 'catalyst-utils' 'lib32-catalystpxp-utils')
+    conflicts=('catalyst-testing' 'nvidia-utils' 'catalyst-utils' 'lib32-catalyst-utils' 'lib32-catalystpxp-utils')
     provides=('libgl' "libatical=${pkgver}" "catalyst-utils=${pkgver}" "lib32-catalystpxp-utils=${pkgver}")
 else
     conflicts=('catalyst-testing' 'nvidia-utils' 'catalyst-utils')
@@ -25,6 +25,8 @@ install=catalyst-utils.install
 
 source=(
     http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
+    lib32-catalyst.sh
+    lib32-catalystpxp.sh
     catalyst.sh
     amdcccle.desktop
     atieventsd.sh
@@ -35,14 +37,16 @@ source=(
     pxp_switch_catalyst)
 
 md5sums=('f97a884c3b3c6263091a3035a7046318'
+         'af7fb8ee4fc96fd54c5b483e33dc71c4'
+         'a6f2f8c17484624ab36fc3c820bbcb4f'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '4efa8414a8fe9eeb50da38b5522ef81d'
          'f729bf913613f49b0b9759c246058a87'
-       'b443c0bd92697c490768b9986ab9d5d3'
-       '52e20085e141c1ff48dff4496bdae889'
-       '003d6620ccedde9a3b40e6798e80df24'
-       'aa0bbfca2c4b32aa25bbf8024af68978'
-       'a8cfccaebedcbc733536c6104cbd3b1c')
+         'b443c0bd92697c490768b9986ab9d5d3'
+         '52e20085e141c1ff48dff4496bdae889'
+         '003d6620ccedde9a3b40e6798e80df24'
+         'aa0bbfca2c4b32aa25bbf8024af68978'
+         'a8cfccaebedcbc733536c6104cbd3b1c')
 
 build() {
   ## Unpack archive
