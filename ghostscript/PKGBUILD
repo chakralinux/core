@@ -9,24 +9,28 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ghostscript
-pkgver=9.02
-pkgrel=3
+pkgver=9.04
+pkgrel=1
 pkgdesc="An interpreter for the PostScript language"
 arch=('i686' 'x86_64')
 license=('GPL3' 'custom')
-depends=('libxt' 'libcups' 'fontconfig' 'jasper' 'zlib' 'libpng' 'libjpeg' 'libtiff')
+depends=('libxt' 'libcups' 'fontconfig' 'jasper' 'zlib' 'libpng' 'libjpeg' 'libtiff' 'lcms')
 makedepends=('gnutls')
 optdepends=('texlive-core:      needed for dvipdf')
 url="http://www.ghostscript.com/"
-source=(http://downloads.ghostscript.com/public/ghostscript-${pkgver}.tar.bz2)
+source=(http://downloads.ghostscript.com/public/ghostscript-${pkgver}.tar.bz2
+        ghostscript-cups-rgbw.patch)
 options=('!libtool' '!makeflags')
-md5sums=('f67151444bd56a7904579fc75a083dd6')
+md5sums=('9f6899e821ab6d78ab2c856f10fa3023'
+         'bc56eb8c5fef0ecf964f6b3e9b7e65ae')
 
 build() {
   cd ${srcdir}/ghostscript-${pkgver}
 
+  patch -Np1 -i ${srcdir}/ghostscript-cups-rgbw.patch
+
   # force it to use system-libs
-  rm -rf jpeg libpng zlib jasper expat tiff
+  rm -rf jpeg libpng zlib jasper expat tiff freetype lcms
 
   ./configure --prefix=/usr \
 	--enable-dynamic \
@@ -36,10 +40,14 @@ build() {
 	--with-x \
 	--with-drivers=ALL\
 	--with-fontpath=/usr/share/fonts/Type1:/usr/share/fonts \
+        --with-install-cups \
+	--enable-fontconfig \
+	--enable-freetype \
+	--without-luratech \
 	--disable-compile-inits \
 	--disable-gtk
 
-  make || return 1
+  make
   
   # Build IJS
   cd ${srcdir}/ghostscript-${pkgver}/ijs
