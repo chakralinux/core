@@ -5,8 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=initscripts
-pkgver=2011.09.ms4
-_pkgver=2011.04.r3
+pkgver=2011.09.1
+_pkgver=2011.09
 pkgrel=1
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
@@ -23,22 +23,22 @@ optdepends=('bridge-utils: Network bridging support'
 install=initscripts.install
 source=("http://chakra-project.org/sources/initscripts/initscripts-${_pkgver}.tar.xz"
         'http://chakra-project.org/sources/initscripts/wireless.conf.d')
-sha256sums=('d74e64e3b8a9ebfda9229ec18e2802e90c4780e50532b1bcc40fabd3fe9bac63'
+sha256sums=('569041e2009fc4b9fe3011d459443fd82dbbeee7c79cb796d88abb8e598d9448'
             '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-	  rm -vRf chakra-${pkgname}
-	  git clone git://gitorious.org/chakra/chakra-${pkgname}.git
-	  rm -vRf chakra-${pkgname}/.git
-	  pushd chakra-${pkgname}
+	  rm -vRf ${pkgname}-${_pkgver}
+	  git clone git://gitorious.org/chakra/chakra-${pkgname}.git ${pkgname}-${_pkgver}
+	  rm -vRf ${pkgname}-${_pkgver}/.git
+	  pushd ${pkgname}-${_pkgver}
 	  popd
-	  tar -cvJf ${pkgname}-${_pkgver}-${pkgrel}.tar.xz chakra-${pkgname}/*
-	  sha256sum ${pkgname}-${_pkgver}-${pkgrel}.tar.xz
+	  tar -cvJf ${pkgname}-${_pkgver}.tar.xz ${pkgname}-${_pkgver}/*
+	  sha256sum ${pkgname}-${_pkgver}.tar.xz
 }
 package() {
-  cd ${srcdir}/initscripts-${_pkgver}
+  cd ${srcdir}/${pkgname}-${_pkgver}
   make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
 }

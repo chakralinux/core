@@ -6,8 +6,8 @@
 
 _origname=initscripts
 pkgname=initscripts-live
-pkgver=2011.09.ms4
-_pkgver=2011.04.r3
+pkgver=2011.09.1
+_pkgver=2011.09
 pkgrel=1
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
@@ -25,16 +25,16 @@ optdepends=('bridge-utils: Network bridging support'
             'wireless_tools: Wireless networking')
 source=("http://chakra-project.org/sources/initscripts/initscripts-${_pkgver}.tar.xz"
         'http://chakra-project.org/sources/initscripts/wireless.conf.d'
-        "http://chakra-project.org/sources/initscripts/${pkgname}-${_pkgver}.patch")
-sha256sums=('d74e64e3b8a9ebfda9229ec18e2802e90c4780e50532b1bcc40fabd3fe9bac63'
+        "http://chakra-project.org/sources/initscripts/${pkgname}-2011.04.r3.patch")
+sha256sums=('569041e2009fc4b9fe3011d459443fd82dbbeee7c79cb796d88abb8e598d9448'
             '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f'
             '27369ec8b3efa56527b208e40cff92b703d9a6c436e6614cc73be69eca226ad3')
 
 package() {
-  cd ${srcdir}/initscripts-${_pkgver}
+  cd ${srcdir}/${_origname}-${_pkgver}
   make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
   cd ${pkgdir}
-  patch -Np1 -i ${srcdir}/${pkgname}-${_pkgver}.patch || return 1
+  patch -Np1 -i ${srcdir}/${pkgname}-2011.04.r3.patch || return 1
   rm -v $(find . -type f -name '*.orig')
 }
