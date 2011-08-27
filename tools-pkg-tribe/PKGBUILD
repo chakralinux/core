@@ -8,9 +8,8 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.09.ms3
-#pkgver=2011.07.04.KT
-pkgrel=3
+pkgver=2011.09
+pkgrel=1
 _codename=Edn
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
@@ -23,11 +22,11 @@ provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}-${pkgrel}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_20110807.html")
+source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.xz"
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_20110828.html")
   
-md5sums=('5937264b4d4bddc458812eeceebe7c0e'
-         'e6669ae65a9de5de62dc243270e9c8fb')
+md5sums=('c3d4d239890cc1089d7a639fd7cdf01d'
+         'd8c103e2cfaf97500319387e236afede')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -35,16 +34,13 @@ install=tools-tribe.install
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-	  rm -vRf tribe
-	  git clone git://gitorious.org/chakra/tribe.git
-	  #cd ${pkgname}
-	  #git checkout 2011.03
-	  #cd ..
-	  rm -vRf tribe/.git
-	  pushd ${pkgname}
+	  rm -vRf ${pkgname}-${_pkgver}
+	  git clone git://gitorious.org/chakra/${pkgname}.git ${pkgname}-${pkgver}
+	  rm -vRf ${pkgname}-${pkgver}/.git
+	  pushd ${pkgname}-${pkgver}
 	  popd
-	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz ${pkgname}/*
-	  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
+	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}-${pkgver}/*
+	  md5sum ${pkgname}-${pkgver}.tar.xz
 }
 
 #
@@ -52,7 +48,7 @@ mksource() {
 #
 build()
 {
-        cd "${srcdir}/$pkgname"
+        cd "${srcdir}/${pkgname}-${pkgver}"
 
 	# workaround for bug https://bugzilla.novell.com/show_bug.cgi?id=656144
 	#sed -i -e "s~sudo~kdesu~g" "${srcdir}/$pkgname/tribe.desktop"
@@ -66,8 +62,8 @@ build()
 
 	# add pkgver to tribe
 	sed -i -e "s~source build/from git~Build: ${pkgver} ($_codename)~g" config-tribe.h.cmake
-	sed -i -e "s~code-name~$_codename~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
-	sed -i -e "s~chakra-version~${pkgver}~g" "${srcdir}/$pkgname/scripts/postinstall-functions/job-initialize-target"
+	sed -i -e "s~code-name~$_codename~g" "${srcdir}/${pkgname}-${pkgver}/scripts/postinstall-functions/job-initialize-target"
+	sed -i -e "s~chakra-version~${pkgver}~g" "${srcdir}/${pkgname}-${pkgver}/scripts/postinstall-functions/job-initialize-target"
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_SKIP_RPATH=ON \
@@ -79,10 +75,10 @@ build()
 
 package()
 {
-        cd "${srcdir}/$pkgname"
+        cd "${srcdir}/${pkgname}-${pkgver}"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_20110807.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_20110828.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
