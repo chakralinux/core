@@ -1,8 +1,9 @@
 # $Id: PKGBUILD 75824 2010-04-04 12:03:46Z jgc $
 # Contributor: Jan de Groot <jgc@archlinux.org>
+# Maintainer (x86_64:) Mateusz Krawczuk <willingmagic[at]gmail[dot]com>
 
 pkgname=dbus-python
-pkgver=0.83.2
+pkgver=0.84.0
 pkgrel=1
 pkgdesc="Python bindings for DBUS"
 arch=(i686 x86_64)
@@ -12,11 +13,11 @@ depends=('dbus-glib>=0.82' 'python>=2.7')
 makedepends=('pkgconfig') # 'docutils'
 options=('!libtool')
 source=(http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz)
-md5sums=('4ebcaa905bdcb4132b915196b0a3691b')
+md5sums=('fe69a2613e824463e74f10913708c88a')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  PYTHON=python ./configure --prefix=/usr || return 1
+  PYTHON=python2 ./configure --prefix=/usr || return 1
   make || return 1
   make DESTDIR="${pkgdir}" install || return 1
 }
