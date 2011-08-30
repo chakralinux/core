@@ -1,7 +1,7 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.0.3pre"
+_patch="3.0.5pre"
 _queue="3.0"
 # Aufs
 _aufs="3.0-20110815"
@@ -17,11 +17,11 @@ SRCNAME="linux-3.0-CHAKRA"
 #   filename%patchlevel (file must be in patches subdirectory)
 PATCHES=(
          # add upstream patch from 3.0 series
-         ftp://ftp.kernel.org/pub/linux/kernel/v3.0/patch-3.0.3.gz%1
+         ftp://ftp.kernel.org/pub/linux/kernel/v3.0/patch-3.0.4.gz%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-         #http://chakra-project.org/sources/linux/patches/3/bugfix/$_patch.patch%1
+         http://chakra-project.org/sources/linux/patches/3/bugfix/$_patch.patch%1
 
          # fix #19234 i1915 display size
          http://chakra-project.org/sources/linux/patches/3/bugfix/fix-i915.patch%1
@@ -40,9 +40,26 @@ PATCHES=(
          http://chakra-project.org/sources/linux/patches/3/aufs3/aufs$_aufs-base.patch%1
          http://chakra-project.org/sources/linux/patches/3/aufs3/aufs$_aufs-standalone.patch%1
          http://chakra-project.org/sources/linux/patches/3/aufs3/aufs$_aufs.patch.bz2%1
+
+         # add overlayfs with Jordi Pujol's overlayfs patches
+         # http://git.kernel.org/?p=linux/kernel/git/mszeredi/vfs.git;a=shortlog;h=refs/heads/overlayfs.v11
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/01-vfs_add-i_op-_open.patch.bz2%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/02-vfs_export-do_splice_direct-to-modules.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/03-vfs_introduce-clone_private_mount.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/04-overlay-filesystem.patch.bz2%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/05-overlayfs_add-statfs-support.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/06-overlayfs_implement-show_options.patch%1
+         #http://chakra-project.org/sources/linux/patches/3/overlayfs/08-fs_limit filesystem stacking depth.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/50-copy-up-performance.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/51-improve-ovl_copy_up_xattr.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/52-vfs_getxattr-performance.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/59-read-only.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/60-overlayfs-v10-ovl_permission.patch%1
+         http://chakra-project.org/sources/linux/patches/3/overlayfs/61-overlayfs-v10-ovl_dir_fsync.patch%1
+
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.0.3-1-CHAKRA"
+PATCHNAME="patch-3.0.4-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
