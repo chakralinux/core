@@ -9,18 +9,23 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=quilt
 pkgver=0.48
-pkgrel=1
+pkgrel=2
 pkgdesc="Manage a series of patches by keeping track of the changes each patch makes."
 arch=('i686' 'x86_64')
 url="http://savannah.nongnu.org/projects/quilt"
 license=('GPL')
-depends=('perl' 'diffstat' 'gawk' 'patch' 'diffutils' 'mktemp' 'gettext')
+depends=('perl' 'diffstat' 'gawk' 'patch' 'diffutils' 'gettext')
 source=(http://savannah.nongnu.org/download/quilt/${pkgname}-${pkgver}.tar.gz)
+md5sums=('f77adda60039ffa753f3c584a286f12b')
 
 build() {
   cd ${startdir}/src/${pkgname}-${pkgver}
   ./configure --prefix=/usr --mandir=/usr/share/man || return 1
   make || return 1
+}
+
+package() {
+  cd ${startdir}/src/${pkgname}-${pkgver}
   make prefix=${startdir}/pkg/usr mandir=${startdir}/pkg/usr/share/man install || return 1
 }
-md5sums=('f77adda60039ffa753f3c584a286f12b')
+
