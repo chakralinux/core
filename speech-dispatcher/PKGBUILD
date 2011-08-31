@@ -8,24 +8,25 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=speech-dispatcher
-pkgver=0.6.7
-pkgrel=3
+pkgver=0.7.1
+pkgrel=1
 arch=('i686' 'x86_64')
+url="http://www.freebsoft.org/speechd"
 pkgdesc="High-level device independent layer for speech synthesis interface"
 license=('GPL2' 'FDL')
-depends=('glib2' 'alsa-lib')
-optdepends=('festival-freebsoft-utils: Speech output using Festival.' 'espeak: Speech output using ESpeak.')
-makedepends=('pkgconfig' 'espeak' 'dotconf' 'automake')
+depends=('glib2' 'alsa-lib' 'dotconf' 'texinfo' 'libpulse' )
+optdepends=('festival-freebsoft-utils: Speech output using Festival.' 
+            'espeak: Speech output using ESpeak.'
+            'pulseaudio: PulseAudio support')
+makedepends=('pkgconfig' 'espeak')
 provides=("speechd=$pkgver")
 options=('!libtool') 
-url="http://www.freebsoft.org/speechd"
-source=("http://www.freebsoft.org/pub/projects/speechd/$pkgname-$pkgver.tar.gz" \
-  "spd-respect-DESTDIR.diff" \
-  "speechd"
-  "getline.patch")
-
+replaces=('opentts')
+source=("http://www.freebsoft.org/pub/projects/speechd/$pkgname-$pkgver.tar.gz"
+        'speechd.sh')
 install="speech-dispatcher.install"
-
+md5sums=('ccfc30ac006673d36b4223eb760ed696'
+         '32aed96c53f541284f3ee5af57fee524')
 backup=(etc/speech-dispatcher/clients/gnome-speech.conf
 	etc/speech-dispatcher/clients/emacs.conf
 	etc/speech-dispatcher/modules/ibmtts.conf
@@ -43,25 +44,28 @@ backup=(etc/speech-dispatcher/clients/gnome-speech.conf
 	etc/speech-dispatcher/speechd.conf)
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
+  cd "${srcdir}/${pkgname}-${pkgver}"
   
-  # One part of the build process ignores DESTDIR, so apply a tiny patch.
-  # Patch has been submitted to upstream.
-  patch -p1 < ${startdir}/spd-respect-DESTDIR.diff
-  # fix getline
-  patch -p1 < ${startdir}/getline.patch
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --without-flite
+  make
+}
 
-  # Building speechd
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR=${pkgdir} install
+
+  install -Dm755 ${srcdir}/speechd.sh ${pkgdir}/etc/rc.d/speechd
+  install -d ${pkgdir}/var/log/speech-dispatcher
+
+  # Fix spd-conf to use python 2.7
+  # sed -i -e 's|#!/usr/bin/python|#!/usr/bin/python2|' ${pkgdir}/usr/bin/spd-conf
+  # sed -i -e 's|#!/usr/bin/env python|#!/usr/bin/env python2|' ${pkgdir}/usr/lib/python2.7/site-packages/speechd/_test.py
   
-  ./configure --prefix=/usr --sysconfdir=/etc || return 1
-  make || return 1
-  make DESTDIR=${pkgdir} moduleconfdir=/etc/speech-dispatcher/modules spdconfdir=/etc/speech-dispatcher install || return 1
   rm -f ${pkgdir}/usr/share/info/dir
   gzip -9nf ${pkgdir}/usr/share/info/*
-  install -Dm755 ${srcdir}/speechd ${pkgdir}/etc/rc.d/speechd
-  mkdir -p ${pkgdir}/var/log/speech-dispatcher
+
+  # Remove conflicts with erlang (FS#21674)
+  rm -r ${pkgdir}/usr/bin/run_test
 }
-md5sums=('67432ad655b50fd7c1f1f79e012cfe3f'
-         '4585be4a40ab33f375c31f6ab3a1915f'
-         '53aece3bfea37d40dad62f02f7c5755e'
-         'f70b4b13d2a8fe500f69bf30b0897946')
