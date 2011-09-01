@@ -3,7 +3,7 @@
 # Translators: http://chakra-project.org/bbs/viewtopic.php?pid=29626#p29626
 
 pkgname=appset-qt
-pkgver=0.6.3
+pkgver=0.6.4
 pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
@@ -15,28 +15,10 @@ install=${pkgname}.install
 source=(http://sourceforge.net/projects/appset/files/appset-qt/0.6/$pkgver/appset-qt-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
         http://chakra-project.org/sources/$pkgname/$pkgname-0.6.2-chakra.patch
-        #http://chakra-project.org/sources/$pkgname/add-chinese-taiwan.patch
-        #http://chakra-project.org/sources/$pkgname/appset-qt_ca-0.5.0.tar.gz
-        #http://chakra-project.org/sources/$pkgname/appset-qt_de-0.6.0.tar.gz
-        #http://chakra-project.org/sources/$pkgname/appset-qt_el-0.4.1.tar.gz
-        #http://chakra-project.org/sources/$pkgname/appset-qt_es-0.5.0.tar.gz
-        #http://chakra-project.org/sources/$pkgname/appset-qt_fr-0.5.0.tar.gz
-        #http://chakra-project.org/sources/$pkgname/appset-qt_nl-0.4.1.tar.gz
-        #http://chakra-project.org/sources/$pkgname/appset-qt_pl-0.4.2.tar.gz
-        #http://chakra-project.org/sources/$pkgname/appset-qt_zh-tw-0.5.0.tar.gz       
         )
-md5sums=(ec6d585d1fa8b1b5bd533e29f2c1d2b1
+md5sums=(f2203af08a370ff5b8e60820833cc313
          87f5f278e3fe67ed2cd6165c2835d81b
          b64bccf78bf2640b9c7dee674749e7d7
-         #7de9e3d87fb4258174af214b291b5444 # add-chinese-taiwan.patch
-         #c2fbac4cab7443f60ee00e48a4d537e3 # appset-qt_ca.0.5.0.tar.gz
-         #ee8905fa99ff80485be3d69d2ce7c4f0 # appset-qt_de-0.6.0.tar.gz
-         #b9ffe714c1c1d76a9df7f0784c9e62d5 # appset-qt_el.0.4.1.tar.gz
-         #f04f8aa20631feca91bbde3519bfcf48 # appset-qt_es.0.5.0.tar.gz
-         #fa69077be4ac7c409df87ab256c97919 # appset-qt_fr.0.5.0.tar.gz
-         #2acb9e2ac0e6d75f3d97148a621a5539 # appset-qt_nl-0.4.1.tar.gz
-         #53efb5cc093a97ebeff33e1d25f05a76 # appset-qt_pl-0.4.2.tar.gz
-         #f75199ceb618cb580efcd57b89301f6b # appset-qt_zh-tw-0.5.0.tar.gz
          )
 
 build() {
@@ -46,12 +28,6 @@ build() {
 
   # patch it for Chakra GNU/Linux
   patch -Np1 -i ${startdir}/src/$pkgname-0.6.2-chakra.patch
-
-  # add chakra translations (check upstream)
-  #patch -Np1 -i ${startdir}/src/add-chinese-taiwan.patch
-  #cp -v ../appsetrepoeditor-qt*.ts Qt/AppSetRepoEditor-Qt
-  #cp -v ../appsettray-qt*.ts Qt/AppSetTray-Qt
-  #cp -v ../appset-qt*.ts Qt/AppSet-Qt
 
   # check for updated strings
   cd Qt/AppSet-Qt
