@@ -1,10 +1,12 @@
-# $Id: PKGBUILD 77532 2010-04-15 13:26:42Z andrea $
-# Maintainer: Andrea Scarpino <andrea@archlinux.org>
-# Contributor: dorphell <dorphell@archlinux.org>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=enchant
 pkgver=1.6.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A wrapper library for generic spell checking"
 arch=('i686' 'x86_64')
 url="http://www.abisource.com/enchant/"
@@ -20,11 +22,11 @@ build() {
   ./configure --prefix=/usr \
     --disable-static \
     --disable-ispell \
-    --with-myspell-dir=/usr/share/myspell || return 1
-  make || return 1
+    --with-myspell-dir=/usr/share/myspell 
+  make 
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
+  make DESTDIR="${pkgdir}" install 
 }
