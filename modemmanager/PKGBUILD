@@ -6,7 +6,7 @@
 
 pkgname=modemmanager
 _realname=ModemManager
-pkgver=0.4
+pkgver=0.5
 pkgrel=1
 pkgdesc="Mobile broadband modem management service"
 arch=('i686' 'x86_64')
@@ -15,16 +15,20 @@ license=('GPL2')
 depends=('dbus-glib>=0.82' 'udev>=146' 'ppp>=2.4.5')
 makedepends=('intltool')
 options=('!libtool' 'force')
-source=(http://download.gnome.org/sources/${_realname}/0.4/${_realname}-${pkgver}.tar.bz2)
-sha256sums=('8b5415ae8597726f82e9fd09237c02b5c8af7e9f4fc4cba00f9fe183cc2c6c5f')
+source=(http://download.gnome.org/sources/${_realname}/0.5/${_realname}-${pkgver}.tar.bz2)
+optdepends=('usb_modeswitch: install if your modem shows up as a storage drive')
+md5sums=('cd04109506e88bf4c4cd3e7ce0034c08')
 
 build() {
   cd "$srcdir/${_realname}-${pkgver}"
    ./configure --prefix=/usr \
-	--disable-more-warnings \
    	--sysconfdir=/etc \
 	--localstatedir=/var \
 	--disable-static
-  make || return 1
-  make DESTDIR="$pkgdir" install || return 1
+  make
+}
+
+package() {
+  cd "$srcdir/${_realname}-${pkgver}"
+  make DESTDIR="$pkgdir" install
 }
