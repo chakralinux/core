@@ -8,7 +8,7 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=rtkit
-pkgver=0.8
+pkgver=0.10
 pkgrel=1
 pkgdesc="Realtime Policy and Watchdog Daemon"
 arch=('i686' 'x86_64')
@@ -18,6 +18,7 @@ depends=('dbus' 'polkit')
 makedepends=('pkgconfig')
 install=rtkit.install
 source=(http://0pointer.de/public/$pkgname-$pkgver.tar.gz)
+md5sums=('9ab7f2a25ddf05584ea2216dfe4cefd4')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
@@ -39,4 +40,4 @@ package() {
   sed -ne '4,25p' rtkit.c >"$pkgdir/usr/share/licenses/rtkit/COPYING"
 }
 
-md5sums=('5db8e9c266c695b64b7e5b0d26bd5685')
+

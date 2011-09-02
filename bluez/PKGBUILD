@@ -1,70 +1,84 @@
-# $Id: PKGBUILD 79025 2010-04-30 02:27:22Z andrea $
-# Maintainer: Andrea Scarpino <andrea@archlinux.org>
-# Contributor: Geoffroy Carrier <geoffroy@archlinux.org>
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=bluez
-pkgver=4.85
+pkgver=4.96
 pkgrel=1
 pkgdesc="Libraries and tools for the Bluetooth protocol stack"
 url="http://www.bluez.org/"
 arch=('i686' 'x86_64')
 license=('GPL2')
 depends=('dbus-core')
-makedepends=('gstreamer0.10-base' 'alsa-lib' 'libusb' 'libnl')
-optdepends=('gstreamer0.10-base' 'alsa-lib' 'libusb' 'libnl' 'dbus-python')
+makedepends=('gstreamer0.10-base' 'libusb-compat' 'libnl' 'libsndfile')
+optdepends=("gstreamer0.10-base: bluetooth GStreamer support"
+	"alsa-lib: Audio bluetooth devices support"
+	"dbus-python: to run bluez-simple-agent"
+	"pygobject: to run bluez-simple-agent"
+	"libusb-compat: USB adapters support"
+	"cups: CUPS backend"
+	"libnl: netlink plugin")
 conflicts=('bluez-libs' 'bluez-utils')
 provides=('bluez-libs' 'bluez-utils')
 replaces=('bluez-libs' 'bluez-utils')
-options=('!libtool')
-backup=(etc/bluetooth/{main,rfcomm,audio,network,input}.conf
-        etc/conf.d/bluetooth)
-source=(http://www.kernel.org/pub/linux/bluetooth/${pkgname}-${pkgver}.tar.bz2
-        bluetooth.conf.d
-        rc.bluetooth)
-md5sums=('d2403e791e694048fb70cb5afbabb886'
-         'd12be5b494525bb1ba6eac5c3983dd3e'
-         'b67bd953082befea6ae57c6fe25993e8')
+options=('!libtool' 'emptydirs')
+backup=(etc/bluetooth/{main,rfcomm,audio,network,input,serial}.conf
+        'etc/conf.d/bluetooth' 'etc/dbus-1/system.d/bluetooth.conf')
+source=("http://www.kernel.org/pub/linux/bluetooth/${pkgname}-${pkgver}.tar.bz2"
+        'bluetooth.conf.d'
+        'rc.bluetooth')
+md5sums=('255c3dda8b93210ab0dcf8d04ddaf69f'
+         '8f60a5eb9d84b9c64c478d63e1c24b10'
+         'ca4c39eb4bb201bd2eacad01492cd735')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   ./configure --prefix=/usr \
-        --sysconfdir=/etc \
-        --localstatedir=/var \
-        --libexecdir=/lib \
-        --mandir=/usr/share/man \
-        --enable-gstreamer \
-        --enable-alsa \
-        --enable-usb \
-        --enable-netlink \
-        --enable-tools \
-        --enable-bccmd \
-        --enable-hid2hci \
-        --enable-dfutool \
-        --enable-hidd \
-        --enable-pand \
-        --enable-dund \
-        --enable-cups \
-        --enable-configfiles || return 1
-  make || return 1
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libexecdir=/lib \
+    --enable-gstreamer \
+    --enable-alsa \
+    --enable-usb \
+    --enable-tools \
+    --enable-bccmd \
+    --enable-dfutool \
+    --enable-hid2hci \
+    --enable-hidd \
+    --enable-pand \
+    --enable-dund \
+    --enable-cups \
+    --enable-udevrules \
+    --enable-configfiles \
+    --enable-wiimote
+  make
 }
 
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install || return 1
+  make DESTDIR=${pkgdir} install
 
-  install -Dm755 ${srcdir}/rc.bluetooth ${pkgdir}/etc/rc.d/bluetooth || return 1
+  install -Dm755 ${srcdir}/rc.bluetooth ${pkgdir}/etc/rc.d/bluetooth
   
   install -d ${pkgdir}/etc/bluetooth
-  install -m644 network/network.conf input/input.conf audio/audio.conf \
-    ${pkgdir}/etc/bluetooth/ || return 1
+  install -m644 network/network.conf \
+                input/input.conf \
+                audio/audio.conf \
+                serial/serial.conf \
+    ${pkgdir}/etc/bluetooth/
   
   install -Dm644 ${srcdir}/bluetooth.conf.d \
-    ${pkgdir}/etc/conf.d/bluetooth || return 1
+    ${pkgdir}/etc/conf.d/bluetooth
 
-  install -Dm755 scripts/bluetooth_serial \
-    ${pkgdir}/lib/udev/bluetooth_serial || return 1
+  install -Dm755 test/simple-agent ${pkgdir}/usr/bin/bluez-simple-agent
+  sed -i 's#/usr/bin/python#/usr/bin/python2#' \
+    ${pkgdir}/usr/bin/bluez-simple-agent
 
-  install -Dm755 test/simple-agent \
-    ${pkgdir}/usr/bin/bluez-simple-agent || return 1
+  # http://mailman.archlinux.org/pipermail/arch-general/2011-April/019787.html
+  rm "${pkgdir}"/lib/udev/rules.d/97-bluetooth.rules
 }
