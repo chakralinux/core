@@ -3,7 +3,6 @@
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-# maintainer (x86_64:) Mateusz Krawczuk <willingmagic[at]gmail[dot]com>
 #
 pkgname=dbus
 pkgver=1.4.14
@@ -13,7 +12,6 @@ url="http://www.freedesktop.org/Software/dbus"
 arch=(i686 x86_64)
 license=('GPL' 'custom')
 depends=("dbus-core>=${pkgver}" 'libx11')
-makedepends=('libsm' 'libice')
 source=(http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz
         30-dbus)
 md5sums=('ae6de2562a57516cfabaf56903375ba9'
@@ -21,13 +19,13 @@ md5sums=('ae6de2562a57516cfabaf56903375ba9'
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+  ECHO="echo" ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
       --libexecdir=/usr/lib/dbus-1.0 --with-dbus-user=81 \
       --with-system-pid-file=/var/run/dbus.pid \
       --disable-verbose-mode --disable-static \
       --enable-inotify --disable-dnotify \
       --disable-tests --disable-asserts
-   make -C tools dbus-launch
+  make -C tools dbus-launch
 }
 
 package() {
@@ -43,4 +41,3 @@ package() {
   install -d -m755 "${pkgdir}/usr/share/licenses/dbus"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/dbus/"
 }
-
