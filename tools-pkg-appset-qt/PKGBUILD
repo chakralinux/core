@@ -4,7 +4,7 @@
 
 pkgname=appset-qt
 pkgver=0.6.4
-pkgrel=1
+pkgrel=2
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -14,11 +14,11 @@ optdepends=('ccr: For Community Repository support')
 install=${pkgname}.install
 source=(http://sourceforge.net/projects/appset/files/appset-qt/0.6/$pkgver/appset-qt-$pkgver-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
-        http://chakra-project.org/sources/$pkgname/$pkgname-0.6.2-chakra.patch
+        http://chakra-project.org/sources/$pkgname/$pkgname-0.6.4-chakra.patch
         )
 md5sums=(f2203af08a370ff5b8e60820833cc313
          87f5f278e3fe67ed2cd6165c2835d81b
-         b64bccf78bf2640b9c7dee674749e7d7
+         06a6d41e1c959a7861c8d0a76dd13b4e
          )
 
 build() {
@@ -27,7 +27,7 @@ build() {
   cp -v ../*png Qt/AppSet-Qt
 
   # patch it for Chakra GNU/Linux
-  patch -Np1 -i ${startdir}/src/$pkgname-0.6.2-chakra.patch
+  patch -Np1 -i ${startdir}/src/$pkgname-0.6.4-chakra.patch
 
   # check for updated strings
   cd Qt/AppSet-Qt
