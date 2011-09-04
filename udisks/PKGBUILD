@@ -31,4 +31,6 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
+  #fix ntfs mounts
+  sed -i -e 's|<allow_active>auth_admin_keep</allow_active>|<allow_active>yes</allow_active>|' ${pkgdir}/usr/share/polkit-1/actions/org.freedesktop.udisks.policy
 }
