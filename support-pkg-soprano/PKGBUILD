@@ -8,19 +8,19 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=soprano
-pkgver=2.6.51
+pkgver=2.7.0
 pkgrel=1
 pkgdesc='A library which provides a highly usable object-oriented C++/Qt4 framework for RDF data'
 arch=('i686' 'x86_64')
 url='http://soprano.sourceforge.net/'
 license=('GPL' 'LGPL')
-depends=('qt' 'clucene' 'redland' 'libiodbc' 'virtuoso>=6.1.3')
-makedepends=('cmake' 'openjdk6')
+depends=('qt' 'redland-storage-virtuoso' 'libiodbc' 'virtuoso>=6.1.3')
+makedepends=('cmake' 'openjdk6' 'doxygen')
 source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('574e006a15e61bc2d4d07d2b4a36e2b6')
+md5sums=('52f216c82e731499bb25bf3b4cf0eecb')
 
 build() {
-  cd ${srcdir}
+  cd "${srcdir}"
   mkdir build
   cd build
   . /etc/profile.d/openjdk6.sh
@@ -28,11 +28,12 @@ build() {
   cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_SKIP_RPATH=OFF \
-    -DCMAKE_INSTALL_PREFIX=/usr
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DSOPRANO_DISABLE_CLUCENE_INDEX=ON
   make
 }
 
 package() {
-  cd ${srcdir}/build
+  cd "${srcdir}"/build
   make DESTDIR="${pkgdir}" install
 }

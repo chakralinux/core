@@ -11,8 +11,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgbase=('kdeutils')
-pkgname=('kdeutils-doc'
-         'kdeutils-ark'
+pkgname=('kdeutils-ark'
          'kdeutils-kcalc'
          'kdeutils-kcharselect'
          'kdeutils-kdf'
@@ -38,8 +37,9 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}"
              'system-config-printer-common' 'libarchive' 'qimageblitz'
              'p7zip' 'zip' 'unzip' 'unrar' "kdepim-runtime>=${_kdever}")
 
-source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
+source=("$_mirror/${pkgbase}-$_kdever.tar.bz2")
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+
 
 
 #
@@ -65,25 +65,12 @@ build()
 # split-install functions
 #
 
-package_kdeutils-doc()
-{
-	pkgdesc="KDE Utilities - Documentation"
-	depends=()
-	groups=("kde" "kdeutils" "kde-doc" "kde-uninstall")
-
-	splitdirs="doc"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
 package_kdeutils-ark()
 {
 	pkgdesc="Archiver for various compression formats"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}" 'libarchive')
 	optdepends=('p7zip' 'zip' 'unzip' 'unrar')
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -98,7 +85,7 @@ package_kdeutils-kcalc()
 {
 	pkgdesc="Scientific calculator"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -113,7 +100,7 @@ package_kdeutils-kcharselect()
 {
 	pkgdesc="Character selector"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -128,7 +115,7 @@ package_kdeutils-kdelirc()
 {
 	pkgdesc="KDE Linux infrared remote control server."
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -147,7 +134,7 @@ package_kdeutils-kdessh()
 {
 	pkgdesc="A KDE frontend to SSH"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -162,7 +149,7 @@ package_kdeutils-kdf()
 {
 	pkgdesc="KDE diskfree"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -177,7 +164,7 @@ package_kdeutils-kfloppy()
 {
 	pkgdesc="Floppy formatter"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -192,7 +179,7 @@ package_kdeutils-kgpg()
 {
 	pkgdesc="GPG encryption and key management"
 	depends=("kde-runtime>=${_kdever}" "kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}" 'kde-agent') # "kdepim-runtime>=${_kdever}"
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -207,7 +194,7 @@ package_kdeutils-ktimer()
 {
 	pkgdesc="Timer application"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -222,7 +209,7 @@ package_kdeutils-kwallet()
 {
 	pkgdesc="The KDE wallet system"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -237,7 +224,7 @@ package_kdeutils-printer-applet()
 {
 	pkgdesc="A system tray utility that shows current print jobs, printer warnings and errors"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}" "kdebindings-pykde4>=${_kdever}" 'system-config-printer-common')
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -252,7 +239,7 @@ package_kdeutils-superkaramba()
 {
 	pkgdesc="Desktop widgets"
 	depends=('qimageblitz')
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
@@ -267,7 +254,7 @@ package_kdeutils-sweeper()
 {
 	pkgdesc="Clean unwanted traces the user leaves on the system"
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-	conflicts=("kdeutils-common")
+	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
 	install=${pkgbase}.install
 
