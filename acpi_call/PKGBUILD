@@ -9,7 +9,7 @@ _kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
 
 pkgname=acpi_call
 pkgver=20110704
-pkgrel=1
+pkgrel=2
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('i686' 'x86_64')
 url=("http://github.com/mkottman/acpi_call")
@@ -49,7 +49,7 @@ package() {
   install -d ${pkgdir}/usr/share/$pkgname || return 1
   install -d ${pkgdir}/usr/bin || return 1
   install -d ${pkgdir}/usr/share/$pkgname/doc || return 1
-  cp -a  ${srcdir}/$pkgname-build/test_off.sh \
+  install -Dm755  ${srcdir}/$pkgname-build/test_off.sh \
     ${pkgdir}/usr/share/$pkgname || return 1
   ln -s /usr/share/$pkgname/test_off.sh \
     ${pkgdir}/usr/bin/test_off.sh || return 1
