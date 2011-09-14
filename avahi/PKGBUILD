@@ -2,7 +2,7 @@
 
 pkgname=avahi
 pkgver=0.6.30
-pkgrel=2
+pkgrel=3
 pkgdesc="A multicast/unicast DNS-SD framework"
 arch=('i686' 'x86_64')
 url="http://www.avahi.org/"
@@ -28,7 +28,7 @@ build() {
   cd ${srcdir}/${pkgname}-${pkgver}
 
   sed -i 's/netdev/network/g' avahi-daemon/avahi-dbus.conf
-  patch -Np0 -i "${srcdir}/avahi-daemon-dbus.patch"
+  patch -p1 -i "${srcdir}/avahi-daemon-dbus.patch"
 
   PYTHON=python2 \
   PKG_CONFIG_PATH=/opt/qt/lib/pkgconfig \

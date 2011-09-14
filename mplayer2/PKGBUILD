@@ -6,29 +6,34 @@
  
 pkgname=mplayer2
 pkgver=2.0
-pkgrel=2
-pkgdesc="A media player for Linux, Uoti Urpala's fork"
+pkgrel=3
+pkgdesc="A movie player"
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://www.mplayer2.org/"
-depends=('a52dec' 'aalib' 'alsa-lib' 'libass' 'ffmpeg' 'libcaca' 'cdparanoia' 'glibc' 'libdca' 'directfb' 'libdvdnav'
-         'libdvdread' 'enca' 'faad2' 'fontconfig' 'freetype2' 'gcc-libs' 'giflib' 'libgl' 'jack' 'libjpeg' 'lirc-utils'
-         'libmad' 'libmng' 'mpg123' 'ncurses' 'libogg' 'libpng' 'sdl' 'smbclient' 'libtheora' 'libvdpau' 'libvorbis'
-         'libx11' 'libxext' 'libxinerama' 'libxss' 'xvidcore' 'libxvmc' 'libxv' 'libxxf86dga' 'libxxf86vm' 'zlib')
+depends=('libgl' 'libvdpau' 'ffmpeg' 'libdvdcss' 'libdvdread' 'libdvdnav' 'libxvmc' 'libass' 'fontconfig' 'freetype2'
+         'ttf-dejavu' 'sdl' 'aalib' 'libcaca' 'faad2' 'libpulse' 'jack' 'ncurses' 'libxxf86vm' 'cdparanoia' 'libmad' 
+         'a52dec' 'libdca' 'libxxf86dga' 'libxss' 'mpg123' 'ladspa')
 makedepends=('live-media' 'mesa' 'unzip' 'yasm')
 backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
 provides=('mplayer')
-conflicts=('mplayer' 'mplayer2-git')
-#source=(http://ftp.mplayer2.org/pub/release/${pkgname}-build-${pkgver/_/-}.tar.xz)
-md5sums=('05b93784de995235e2758f182de15f73')
-source=(https://launchpad.net/debian/experimental/+source/mplayer2/2.0-54-gd33877a-1/+files/mplayer2_2.0-54-gd33877a.orig.tar.gz)
-md5sums=('3ccc86e8c340edd37697178a7dba471a')
+conflicts=('mplayer')
+source=(http://ftp.mplayer2.org/pub/release/${pkgname}-${pkgver/_/-}.tar.xz
+        mplayer2-remove-mp3lib.patch)
+sha1sums=('0df8d4e5484128b7b28029273b7704ab5d5419bc'
+          'c55128a99406a5e01ab077555b7b24aa7b54110c')
+options=('!emptydirs')
 
 build() {
+    # Custom CFLAGS break the mplayer build
     unset CFLAGS LDFLAGS
 
-    #cd ${srcdir}/${pkgname}-build-${pkgver/_/-}/${pkgname/2/}
-    cd ${srcdir}/mplayer2-build-2.0-54-gd33877a/mplayer
+    cd "${srcdir}/${pkgname}-${pkgver}"
+
+    # Drop internal mp3lib (FS#24149)
+    # Default decoder for mp3 will be mpg123
+    rm -fr mp3lib
+    patch -Np1 -i ../mplayer2-remove-mp3lib.patch
 
     ./configure --prefix=/usr \
                 --enable-runtime-cpudetection \
@@ -38,25 +43,19 @@ build() {
                 --disable-libdv \
                 --disable-musepack \
                 --disable-esd \
-                --disable-pulse \
                 --disable-mga \
-                --disable-fribidi \
                 --enable-xvmc \
+                --language=all \
                 --enable-translation \
-                --language-doc=all \
-                --language-man=all \
-                --language-msg=all \
                 --confdir=/etc/mplayer
     make
 }
 
 package() {
-    #cd ${srcdir}/${pkgname}-build-${pkgver/_/-}/${pkgname/2/}
-    cd ${srcdir}/mplayer2-build-2.0-54-gd33877a/mplayer
+    cd "${srcdir}/${pkgname}-${pkgver}"
 
     make DESTDIR="${pkgdir}" install
-    install -Dm644 etc/{codecs.conf,input.conf,example.conf} ${pkgdir}/etc/mplayer/
-    install -dm755 ${pkgdir}/usr/share/mplayer/
-    ln -s /usr/share/fonts/TTF/DejaVuSans.ttf ${pkgdir}/usr/share/mplayer/subfont.ttf
-    rm -rf ${pkgdir}/usr/share/mplayer/font
+    install -Dm644 etc/{codecs.conf,input.conf,example.conf} "${pkgdir}"/etc/mplayer/
+    install -dm755 "${pkgdir}"/usr/share/mplayer/
+    ln -s /usr/share/fonts/TTF/DejaVuSans.ttf "${pkgdir}"/usr/share/mplayer/subfont.ttf
 }

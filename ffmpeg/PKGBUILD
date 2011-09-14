@@ -8,16 +8,16 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ffmpeg
-pkgver=0.8
+pkgver=0.8.3
 pkgrel=1
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix."
 arch=('i686' 'x86_64')
 url="http://ffmpeg.org/"
 license=('GPL3')
-depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libva>=1.0.7' 'openjpeg' 'libvpx' 'gsm')
+depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libva' 'openjpeg' 'libvpx' 'rtmpdump')
 makedepends=('yasm')
 options=('force')
-source=('http://www.ffmpeg.org/releases/ffmpeg-0.8.tar.bz2')
+source=('http://www.ffmpeg.org/releases/ffmpeg-0.8.3.tar.bz2')
 md5sums=('7e9b8c8a6952de0c477027e48249f3ed')
 
 build() {
@@ -35,7 +35,6 @@ build() {
     --enable-libtheora \
     --enable-postproc \
     --enable-shared \
-    --enable-pthreads \
     --enable-x11grab \
     --enable-libopencore_amrnb \
     --enable-libopencore_amrwb \
@@ -43,7 +42,7 @@ build() {
     --enable-libopenjpeg \
     --enable-runtime-cpudetect \
     --enable-libvpx \
-    --enable-libgsm \
+    --enable-librtmp \
     --disable-debug
 
   make

@@ -1,23 +1,26 @@
-# $Id: PKGBUILD 61617 2009-12-20 10:45:10Z jgc $
-# Maintainer: Jan de Groot <jgc@archlinux.org>
-# Contributor: onestep_ua <onestep@ukr.net>
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=consolekit
 pkgver=0.4.5
-pkgrel=1
+pkgrel=3
 pkgdesc="A framework for defining and tracking users, login sessions, and seats"
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/ConsoleKit"
 license=('GPL')
-depends=('polkit>=0.95' 'zlib' 'libx11>=1.2.2' 'dbus-glib')
+depends=('polkit' 'zlib' 'libx11' 'dbus-glib')
 makedepends=('pkgconfig' 'xmlto' 'docbook-xsl')
 options=(!libtool)
 source=(http://www.freedesktop.org/software/ConsoleKit/dist/ConsoleKit-${pkgver}.tar.bz2
-        pam-foreground-compat.ck
-        consolekit.logrotate)
+        pam-foreground-compat.ck consolekit.logrotate)
 md5sums=('f2657f93761206922d558471a936fbc3'
          'a8a4de71d9b0549b8143e5f6c2a36fc7'
-         '8e88b48b7dbc62513735c3446b688c7c')
+         '6fefa451d9fe2fc6d6269629d3529793')
 
 build() {
   cd "${srcdir}/ConsoleKit-${pkgver}"

@@ -1,23 +1,29 @@
-# $Id: PKGBUILD 75824 2010-04-04 12:03:46Z jgc $
-# Contributor: Jan de Groot <jgc@archlinux.org>
-# Maintainer (x86_64:) Mateusz Krawczuk <willingmagic[at]gmail[dot]com>
-
+#
+# Chakra Packages, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+#
 pkgname=dbus-python
 pkgver=0.84.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Python bindings for DBUS"
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 license=('GPL' 'LGPL')
 url="http://www.freedesktop.org/wiki/Software/DBusBindings"
-depends=('dbus-glib>=0.82' 'python>=2.7')
-makedepends=('pkgconfig') # 'docutils'
+depends=('dbus-glib' 'python2')
+makedepends=('pkg-config' 'docutils')
 options=('!libtool')
 source=(http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz)
 md5sums=('fe69a2613e824463e74f10913708c88a')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  PYTHON=python2 ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  PYTHON=python2 ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }
