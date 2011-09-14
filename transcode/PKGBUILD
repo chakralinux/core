@@ -10,23 +10,29 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=transcode
 _sripver=0.3-4
 pkgver=1.1.5
-pkgrel=4
+pkgrel=5
 pkgdesc="A video/DVD ripper and encoder for the terminal/console."
 arch=('i686' 'x86_64')
 url="http://tcforge.berlios.de/"
 license=('GPL')
 depends=('imagemagick' 'lzo2' 'libdv' 'libdvdread' 'ffmpeg' 'mjpegtools'
-	'xvidcore' 'libmpeg2' 'libtheora' 'libxaw' 'x264' 'libxml2'
-	'libxv' 'a52dec' 'alsa-lib')
+	 'libmpeg2' 'libxaw' 'libxml2' 'libxv' 'a52dec')
 makedepends=('nasm' 'pkgconfig')
 options=('!libtool' '!makeflags')
 source=(http://download2.berlios.de/tcforge/${pkgname}-${pkgver}.tar.bz2
-	http://downloads.sourceforge.net/sourceforge/subtitleripper/subtitleripper-${_sripver}.tgz)
+	http://downloads.sourceforge.net/sourceforge/subtitleripper/subtitleripper-${_sripver}.tgz
+        transcode-1.1.5-jpeg-7.patch  transcode-1.1.5-mpa.patch)
 md5sums=('41ac6b1c0fe30f3aab286e771fc31b9e'
-	'c0bd49a88f667c68c4430ad25bbed510')
+         'c0bd49a88f667c68c4430ad25bbed510'
+         'af4056b7530a6f147594f676849e7c7b'
+         'c299cfc6c4be6a5512d1a129f04e5450')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -p0 < ../transcode-1.1.5-jpeg-7.patch
+  patch -p1 < ../transcode-1.1.5-mpa.patch
+
+
  # building from here
   ./configure --prefix=/usr \
     --enable-sse=no --enable-sse2=no --enable-altivec=no --enable-mmx \
@@ -46,24 +52,30 @@ build() {
     --with-lzo-libs=/usr/lib \
     --with-libavcodec-prefix=/usr \
     --with-libavcodec-includes=/usr/include \
-    --with-libavcodec-libs=/usr/lib || return 1
+    --with-libavcodec-libs=/usr/lib 
 
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+   make
  ##############################################################################
  # this imports the latest subtitleripper sources and replaces the internal
   mkdir contrib
   mv "${srcdir}/subtitleripper" contrib/subrip
  # removes dependency on libppm, make it dependend on netpbm just failed, argh...
-  cd contrib/subrip || return 1
+  cd contrib/subrip
   sed -e 's|^\(.*lppm.*\)$|#\1|' \
       -e 's|^\(.*D_HAVE_LIB_PPM.*\)$|#\1|' \
       -e 's/DEFINES :=/DEFINES = -DHAVE_GETLINE/' \
-      -i Makefile || return 1
-  make || return 1
-  install -m 755 pgm2txt "${pkgdir}/usr/bin/" || return 1
-  install -m 755 srttool "${pkgdir}/usr/bin/" || return 1
-  install -m 755 subtitle2pgm "${pkgdir}/usr/bin/" || return 1
-  install -m 755 subtitle2vobsub "${pkgdir}/usr/bin/" || return 1
-  install -m 755 vobsub2pgm "${pkgdir}/usr/bin/" || return 1
+      -i Makefile
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  cd contrib/subrip
+  install -m 755 pgm2txt "${pkgdir}/usr/bin/"
+  install -m 755 srttool "${pkgdir}/usr/bin/"
+  install -m 755 subtitle2pgm "${pkgdir}/usr/bin/"
+  install -m 755 subtitle2vobsub "${pkgdir}/usr/bin/"
+  install -m 755 vobsub2pgm "${pkgdir}/usr/bin/"
 }
