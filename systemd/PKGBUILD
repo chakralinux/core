@@ -3,66 +3,75 @@
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-# maintainer (x86_64:) Mateusz Krawczuk <willingmagic[at]gmail[dot]com>
 pkgname=systemd
-pkgver=33
+pkgver=35
 pkgrel=1
 pkgdesc="Session and Startup manager"
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2')
-depends=('dbus-systemd' 'initscripts' 'sysvinit' 'intltool' 'rsyslog' 'util-linux>=2.19.1' 'gperf')
-makedepends=('docbook-xsl' 'libxslt' 'cryptsetup' )
+depends=('dbus-core' 'kbd' 'libcap' 'util-linux>=2.19' 'udev>=172')
+makedepends=('docbook-xsl' 'gperf' 'libxslt' 'cryptsetup' 'intltool' 'libnotify')
 optdepends=('cryptsetup: required for encrypted block devices'
             'dbus-python: systemd-analyze'
+            'initscripts: legacy support for hostname and vconsole setup'
             'initscripts-systemd: native boot and initialization scripts'
             'libnotify: systemadm'
             'python2-cairo: systemd-analyze'
             'systemd-units: collection of native unit files for Chakra daemon/init scripts')
 groups=('systemd')
 options=('!libtool')
-backup=(etc/systemd/system.conf
-        etc/tmpfiles.d/systemd.conf
-        etc/tmpfiles.d/x11.conf)
+backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
+        etc/dbus-1/system.d/org.freedesktop.hostname1.conf
+        etc/dbus-1/system.d/org.freedesktop.login1.conf
+        etc/dbus-1/system.d/org.freedesktop.locale1.conf
+        etc/dbus-1/system.d/org.freedesktop.timedate1.conf
+        etc/systemd/system.conf
+        etc/systemd/user.conf
+        etc/systemd/systemd-logind.conf)
 install=systemd.install
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.bz2"
-        "os-release" "systemd-add-chakra.patch" "v33.diff")
-md5sums=('361cad7c3debbdd81c211527509ba181'
+        "os-release" "systemd-add-chakra.patch" )
+md5sums=('6b37b385d22f28c184a04a4e6c3c69b4'
          '68cf3e12b0e98a51efde9811e5fc713c'
-         'd7cbae2627bb60360a6b1c03dd0fd90a'
-         '74eeb9f936845d9e720b49403c508bc3')
+         'd7cbae2627bb60360a6b1c03dd0fd90a')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
+  
+    # Don't unset locale in getty
+    # https://bugzilla.redhat.com/show_bug.cgi?id=663900
+      sed -i -e '/^Environ.*LANG/s/^/#/' \
+             -e '/^ExecStart/s/agetty/& -8/' units/getty@.service.m4
   patch -Np1 -i ${srcdir}/systemd-add-chakra.patch
-  patch -uN ${srcdir}/$pkgname-$pkgver/src/load-fragment-gperf.gperf.m4 ${srcdir}/v33.diff
+
   ./configure --prefix=/usr \
-              --with-rootdir= \
-              --with-distro=chakra \
               --sysconfdir=/etc \
-              --libexecdir=/usr/lib \
+              --libexecdir=/usr/lib/systemd \
+              --with-distro=chakra \
+              --libdir=/usr/lib \
               --localstatedir=/var \
+              --with-rootdir= \
+              --with-rootlibdir=/lib \
               --disable-audit \
               --disable-tcpwrap \
               --disable-gtk
-echo "test"
   make
+
+  # fix .so links in manpages
+  sed -i 's|\.so halt\.8|.so systemd.halt.8|' man/{halt,poweroff}.8
 }
 
 package() {
-  mkdir -p ${pkgdir}/run
   cd "$srcdir/$pkgname-$pkgver"
+
   make DESTDIR="$pkgdir" install
 
   install -Dm644 "$srcdir/os-release" "$pkgdir/etc/os-release"
-#  install -dm755 "$pkgdir/etc/modules-load.d"
-  printf "d /run/console 755 root root\n" > "$pkgdir/etc/tmpfiles.d/console.conf"
+  printf "d /run/console 755 root root\n" > "$pkgdir/usr/lib/tmpfiles.d/console.conf"
 
   # fix systemd-analyze for python2
   sed -i '1s/python$/python2/' "$pkgdir/usr/bin/systemd-analyze"
-
-  # install target doesn't bring in plymouth units
-  #  install -m644 units/plymouth-* "$pkgdir/lib/systemd/system"
 
   # rename man pages to avoid conflicts with sysvinit
   cd "$pkgdir/usr/share/man/man8"

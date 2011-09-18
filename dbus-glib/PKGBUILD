@@ -3,27 +3,31 @@
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
+#
 pkgname=dbus-glib
-pkgver=0.92
+pkgver=0.94
 pkgrel=1
 pkgdesc="GLib bindings for DBUS"
 arch=(i686 x86_64)
 license=('GPL')
 url="http://www.freedesktop.org/wiki/Software/DBusBindings"
-depends=('dbus-core>=1.3.1' 'glib2>=2.24.1')
+depends=('dbus-core' 'glib2')
 makedepends=('pkgconfig')
 options=('!libtool' '!emptydirs')
-source=(http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz)
-md5sums=('b595b36890c4f9f8f5d5dec131c495f8')
+source=(http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz
+        fix_network_manager.patch)
+md5sums=('e1f1506a6f4941e67bffd614b1ad5af6'
+         '2a3598342dd25722d452e7beaf21b5f3')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i "${srcdir}/fix_network_manager.patch"
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
-      --enable-static=no --enable-bash-completion=no || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+      --enable-static=no --enable-bash-completion=no
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }

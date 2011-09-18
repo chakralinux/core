@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=libva
-pkgver=1.0.11
+pkgver=1.0.14
 pkgrel=1
 pkgdesc="libva with patches to extend VA API with data needed for VDPAU and XvBA backends."
 arch=('i686' 'x86_64')
@@ -16,11 +16,11 @@ makedepends=('mesa')
 optdepends=('vdpau-video: VDPAU backend for VA API')
 options=('!libtool')
 source=(http://cgit.freedesktop.org/libva/snapshot/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('2f3ce750ee2e8d88f6a225bce1a65e9b')
+md5sums=('9a7eba239bffa3b40d7a49e3bb4fb6fb')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  autoreconf -fi
+  ./autogen.sh
   ./configure --prefix=/usr  \
     --enable-i965-driver \
     --enable-glx
