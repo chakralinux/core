@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm -Rf aufs3-standalone
 # clone the aufs repository to the local disk
 git clone git://aufs.git.sourceforge.net/gitroot/aufs/aufs3-standalone.git
 cd aufs3-standalone
