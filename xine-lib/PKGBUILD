@@ -9,17 +9,26 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xine-lib
 pkgver=1.1.19
-pkgrel=5
+pkgrel=6
 pkgdesc="A multimedia playback engine"
 arch=('i686' 'x86_64')
 url="http://www.xine-project.org"
 license=('LGPL' 'GPL')
-depends=('libgl' 'libxvmc' 'esound' 'flac' 'libvorbis' 'sdl' 'libmng' 'libtheora'
-         'libxcb' 'wavpack' 'ffmpeg' 'krb5' 'faad2' 'libpulse')
-makedepends=('pkgconfig' 'libtool' 'imagemagick' 'smbclient' 'mesa' 'alsa-lib' 
-             'vcdimager' 'jack')
-optdepends=('imagemagick: for using the imagemagick plugin' 'smbclient: for using the smb plugin' \
-            'jack: for using the jack plugin' 'vcdimager: for using the vcd plugin')
+depends=('libgl' 'libxvmc' 'flac' 'ffmpeg' 'libxinerama' 'libmodplug')
+makedepends=('wavpack' 'faad2' 'libmng' 'imagemagick' 'smbclient' 'mesa'
+             'v4l-utils' 'vcdimager' 'jack' 'libpulse' 'speex' 'aalib')
+optdepends=('imagemagick: for using the imagemagick plugin' \
+            'smbclient: for using the smb plugin' \
+            'jack: for using the jack plugin' \
+            'vcdimager: for using the vcd plugin' \
+            'mesa: for using the opengl plugin' \
+            'libpulse: for using the pulseaudio plugin' \
+            'speex: for using the speex plugin' \
+            'v4l-utils: for using the v4l plugin' \
+            'wavpack: for using the wavpack plugin' \
+            'faad2: for using the faad plugin' \
+            'libmng: for using the mng plugin' \
+            'aalib: for using the aalib plugin')
 options=('!libtool')
 source=(http://downloads.sourceforge.net/sourceforge/xine/${pkgname}-${pkgver}.tar.bz2
         xine-lib-1.1.1-configure-no-mcpu-march.patch xine-lib-1.1.19-xvmc.patch)
@@ -30,20 +39,23 @@ sha1sums=('5afcc28c5cf2bdaab99d951960f6587797e1e5a0' '121a8358d7919b2e5106741237
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -p0 < ../xine-lib-1.1.1-configure-no-mcpu-march.patch || return 1
+  patch -p0 < ../xine-lib-1.1.1-configure-no-mcpu-march.patch
   patch -p0 < ../xine-lib-1.1.19-xvmc.patch
+  sed -i 's|linux/videodev.h|libv4l1-videodev.h|' \
+    configure.ac src/input/input_v4l.c src/video_out/video_out_syncfb.h
 
-  libtoolize --force --copy || return 1
-  aclocal -I m4 || return 1
-  autoconf || return 1
-  automake --add-missing || return 1
+  libtoolize --force --copy
+  aclocal -I m4
+  autoconf
+  automake --add-missing
 
-  ./configure --prefix=/usr --with-w32-path=/usr/lib/codecs \
-    --with-xv-path=/usr/lib --with-xxmc-path=/usr/lib --with-xvmc-path=/usr/lib \
-    --with-libflac --with-wavpack --with-xcb \
-    --without-arts --with-jack --without-speex \
-    --disable-gnomevfs --with-pulseaudio --disable-aalib \
-    --disable-modplug --with-external-ffmpeg || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr --with-wavpack --with-external-ffmpeg --with-external-libfaad --disable-gnomevfs
+    
+  make
 }
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
+

@@ -7,21 +7,25 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=atk
-pkgver=1.32.0
+pkgver=2.0.1
 pkgrel=1
 pkgdesc="A library providing a set of interfaces for accessibility"
 arch=(i686 x86_64)
 license=('LGPL')
-depends=('glib2>=2.26')
+depends=('glib2')
 makedepends=('pkgconfig' 'gobject-introspection')
 options=('!libtool')
-source=(http://ftp.gnome.org/pub/gnome/sources/${pkgname}/1.32/${pkgname}-${pkgver}.tar.bz2)
+source=(http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz)
 url='http://www.gtk.org/'
-sha256sums=('e9a3e598f75c4db1af914f8b052dd9f7e89e920a96cc187c18eb06b8339cb16e')
+sha256sums=('4588867bb9eb788b2cf3399d3a2d5e4898193a9027436f6cffc9c18a627452a1')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }

@@ -5,40 +5,51 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=postfix
-pkgver=2.8.3
+pkgver=2.8.5
 pkgrel=1
-pkgdesc="Secure, fast, easy to administer drop in replacement for Sendmail (MTA)"
+pkgdesc='Secure, fast, easy to administer alternative to Sendmail'
+url='http://www.postfix.org/'
 arch=('i686' 'x86_64')
 license=('custom')
-depends=('pcre' 'libsasl' 'libmysqlclient' 'postgresql-libs>=8.4' 'libldap>=2.4' 'db>=4.8')
-backup=(etc/postfix/aliases etc/postfix/virtual etc/postfix/relocated \
-	etc/postfix/access etc/postfix/header_checks etc/postfix/transport \
-	etc/postfix/generic etc/postfix/canonical \
-	etc/postfix/main.cf etc/postfix/master.cf)
-install="${pkgname}.install"
+depends=('pcre' 'libsasl' 'libmysqlclient' 'postgresql-libs' 'sqlite3' 'libldap' 'db')
+backup=('etc/postfix/'{access,aliases,canonical,generic,header_checks,main.cf,master.cf,relocated,transport,virtual})
+source=("ftp://ftp.porcupine.org/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz" \
+        'aliases.patch' \
+        'rc.d')
+sha1sums=('49ef711c80b5a3434258ab24ae00940932503e80'
+          '5fc3de6c7df1e5851a0a379e825148868808318b'
+          '40c6be2eb55e6437a402f43775cdb3d22ea87a66')
+
 provides=('smtp-server' 'smtp-forwarder')
 replaces=('postfix-mysql' 'postfix-pgsql')
 conflicts=('postfix-mysql' 'postfix-pgsql' 'smtp-server' 'smtp-forwarder')
-url="http://www.postfix.org/"
-source=(ftp://ftp.porcupine.org/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz \
-        ${pkgname}.patch.bz2 \
-	${pkgname})
-md5sums=('b3922ededd3fd6051f759e58a4ada3ae'
-         'a3c45ff23ef036143711793fcf2478c3'
-         'c847b96f08925f08b0f610468a8e21f6')
+
+install=postfix.install
 
 build() {
-	cd ${srcdir}/${pkgname}-${pkgver}
-	
-	make makefiles \
-	        CCARGS="-DUSE_SASL_AUTH -I/usr/include/sasl \
-			-DUSE_CYRUS_SASL \
-			-DHAS_LDAP \
-			-DUSE_TLS \
-			-DHAS_MYSQL -I/usr/include/mysql \
-			-DHAS_PGSQL -I/usr/include/postgresql" \
-	        AUXLIBS="-lsasl2 -lssl -lcrypto -lldap -llber -lmysqlclient -lz -lm -lpq"
-	make OPT="${CFLAGS}" || return 1
+	cd "${srcdir}/${pkgname}-${pkgver}"
+
+	make makefiles DEBUG='' CCARGS=' \
+		-DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl \
+		-DHAS_LDAP \
+		-DUSE_TLS \
+		-DHAS_MYSQL -I/usr/include/mysql \
+		-DHAS_PGSQL -I/usr/include/postgresql \
+		-DHAS_SQLITE \
+	' AUXLIBS=' \
+		-lsasl2 \
+		-lldap -llber \
+		-lssl -lcrypto \
+		-lmysqlclient -lz -lm \
+		-lpq \
+		-lsqlite3 -lpthread \
+	' OPT="${CFLAGS} ${LDFLAGS}"
+
+	make
+}
+
+package() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
 
 	sh postfix-install -non-interactive \
 		install_root="${pkgdir}" \
@@ -46,13 +57,9 @@ build() {
 		sample_directory="/etc/${pkgname}/sample" \
 		manpage_directory="/usr/share/man"
 
-	cd ${pkgdir}
-	cat ${srcdir}/${pkgname}.patch |patch -Np0 || return 1
-	rm -f etc/${pkgname}/main.cf~
+	install -D -m755 ../rc.d "${pkgdir}/etc/rc.d/${pkgname}"
+	install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
-	cd ${pkgdir}
-	mkdir etc/rc.d
-	install -m 0755 ${srcdir}/${pkgname} etc/rc.d/${pkgname}
-
-	install -Dm644 ${srcdir}/${pkgname}-${pkgver}/LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+	cd "${pkgdir}"
+	patch -p0 < "${srcdir}"/aliases.patch
 }

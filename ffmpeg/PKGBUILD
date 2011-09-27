@@ -8,54 +8,47 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ffmpeg
-pkgver=0.8
+pkgver=20110910
 pkgrel=1
-pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix."
+pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('i686' 'x86_64')
 url="http://ffmpeg.org/"
-license=('GPL3')
-depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libva>=1.0.7' 'openjpeg' 'libvpx' 'gsm')
-makedepends=('yasm')
-options=('force')
-source=('http://www.ffmpeg.org/releases/ffmpeg-0.8.tar.bz2')
-md5sums=('7e9b8c8a6952de0c477027e48249f3ed')
+license=('GPL')
+depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx' 'libva' 'openjpeg' 'rtmpdump')
+makedepends=('yasm' 'git')
+#git clone git://git.videolan.org/ffmpeg.git
+source=(http://chakra-project.org/sources/ffmpeg/${pkgname}-${pkgver}.tar.xz)
+md5sums=('f726ae21f9c12551603d8a9cf301280a')
 
 build() {
-
-  cd $srcdir/$pkgbase-$pkgver
+  cd "$srcdir/$pkgname"
 
   ./configure \
     --prefix=/usr \
-    --enable-gpl \
-    --enable-version3 \
     --enable-libmp3lame \
     --enable-libvorbis \
     --enable-libxvid \
     --enable-libx264 \
+    --enable-libvpx \
     --enable-libtheora \
     --enable-postproc \
     --enable-shared \
-    --enable-pthreads \
     --enable-x11grab \
     --enable-libopencore_amrnb \
     --enable-libopencore_amrwb \
     --enable-libschroedinger \
     --enable-libopenjpeg \
+    --enable-librtmp \
+    --enable-gpl \
+    --enable-version3 \
     --enable-runtime-cpudetect \
-    --enable-libvpx \
-    --enable-libgsm \
     --disable-debug
 
   make
   make tools/qt-faststart
   make doc/ff{mpeg,play,server}.1
+
+  make DESTDIR="$pkgdir" install install-man
+  install -D -m755 tools/qt-faststart "$pkgdir/usr/bin/qt-faststart"
 }
 
-package() {
-  cd $srcdir/$pkgbase-$pkgver
-
-  make DESTDIR="${pkgdir}" install install-man
-  install -D -m755 tools/qt-faststart "${pkgdir}/usr/bin/qt-faststart"
-}
-
-# vim:set ts=2 sw=2 et:

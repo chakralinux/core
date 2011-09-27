@@ -1,50 +1,56 @@
-#
+
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
 pkgbase=poppler
 pkgname=('poppler' 'poppler-glib' 'poppler-qt')
-pkgver=0.14.4
+pkgver=0.16.7
 pkgrel=1
 arch=(i686 x86_64)
 license=('GPL')
-makedepends=('libjpeg>=8.0.2' 'gcc-libs>=4.5.0' 'cairo>=1.10.0' 'libxml2>=2.7.7' 'fontconfig>=2.8.0' 'openjpeg>=1.3-3' 'gtk2>=2.22.0' 'qt>=4.7.0' 'pkgconfig' 'lcms>=1.19')
+makedepends=('libjpeg-turbo' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'qt' 'pkgconfig' 'lcms')
 options=('!libtool')
 url="http://poppler.freedesktop.org/"
 source=(http://poppler.freedesktop.org/${pkgname}-${pkgver}.tar.gz)
-md5sums=('a40fe96e1115f648ce4689e667743530')
+md5sums=('3afa28e3c8c4f06b0fbca3c91e06394e')
+
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgbase}-${pkgver}"
+  sed -i -e '/AC_PATH_XTRA/d' configure.ac
+  autoreconf
   ./configure --prefix=/usr --sysconfdir=/etc \
       --localstatedir=/var --disable-static \
       --enable-cairo-output \
       --enable-xpdf-headers \
       --enable-libjpeg --enable-zlib \
       --enable-poppler-qt4 \
-      --enable-poppler-glib
+      --enable-poppler-glib \
+      --disable-gtk
   make
 }
 
 package_poppler() {
   pkgdesc="PDF rendering library based on xpdf 3.0"
-  depends=('libjpeg>=8.0.2' 'gcc-libs>=4.5.0' 'cairo>=1.10.0' 'libxml2>=2.7.7' 'fontconfig>=2.8.0' 'openjpeg>=1.3-3' 'lcms>=1.19' 'poppler-data>=0.4.3')
+  depends=('libjpeg' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'lcms' 'poppler-data')
   conflicts=("poppler-qt3<${pkgver}")
 
   cd "${srcdir}/${pkgbase}-${pkgver}"
+  sed -e 's/^glib_subdir =.*/glib_subdir =/' \
+      -e 's/^qt4_subdir =.*/qt4_subdir =/' -i Makefile
   make DESTDIR="${pkgdir}" install
 
-  rm -rf "${pkgdir}"/usr/include/poppler/{glib,qt4}
-  rm -f "${pkgdir}"/usr/lib/libpoppler-{glib,qt4}.so*
   rm -f "${pkgdir}"/usr/lib/pkgconfig/poppler-{glib,qt4}.pc
-  rm -rf "${pkgdir}/usr/share/gtk-doc"
 }
 
 package_poppler-glib() {
   pkgdesc="Poppler glib bindings"
-  depends=("poppler=${pkgver}" 'gtk2>=2.22.0')
+  depends=("poppler=${pkgver}")
 
   cd "${srcdir}/${pkgbase}-${pkgver}/poppler"
   make DESTDIR="${pkgdir}" install-libLTLIBRARIES
