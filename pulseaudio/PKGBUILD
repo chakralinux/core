@@ -8,23 +8,25 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase=pulseaudio
-pkgname=(pulseaudio libpulse)
-pkgver=0.9.22
-pkgrel=3
+pkgname=('pulseaudio' 'libpulse')
+pkgver=1.0
+pkgrel=1
 arch=(i686 x86_64)
 url="http://pulseaudio.org/"
-license=(GPL LGPL)
-makedepends=(libasyncns libcap attr libxtst libsm tcp_wrappers libsndfile
-             libtool rtkit speex libsamplerate tdb udev dbus-core xcb-util
-             avahi bluez intltool jack lirc-utils pkgconfig openssl)
+license=('GPL' 'LGPL')
+makedepends=('libasyncns' 'libcap' 'attr' 'libxtst' 'libsm' 'tcp_wrappers' 'libsndfile'
+             'libtool' 'rtkit' 'speex' 'libsamplerate' 'tdb' 'udev' 'dbus-core' 'xcb-util'
+             'avahi' 'bluez' 'intltool' 'jack' 'lirc-utils' 'pkgconfig' 'openssl' 'json-c')
 options=(!emptydirs !libtool !makeflags)
-source=("http://0pointer.de/lennart/projects/$pkgbase/$pkgbase-$pkgver.tar.gz"
-        $pkgbase.xinit)
-md5sums=('ca85ab470669b05e100861654cf5eb3c'
+source=("http://freedesktop.org/software/${pkgbase}/releases/${pkgbase}-${pkgver}.tar.xz"
+        "${pkgbase}.xinit")
+md5sums=('538e0b55ab9ba2987a88047ae332f5f4'
          'eb1cfae28eb2e4d3fdbe45a90e4318ab')
+sha1sums=('24a408e762b2df4334e9ae4f644ac1b893c7ef86'
+          'e33cce91a688104ccf718953711cb85b83e74a8f')
 
 build() {
-  cd "$srcdir/$pkgbase-$pkgver"
+  cd "${srcdir}/${pkgbase}-${pkgver}"
 
   # Don't break circular dependency between libpulse and libpulsecommon
   LDFLAGS="${LDFLAGS//-Wl,--as-needed}"
@@ -43,9 +45,9 @@ build() {
 }
 
 package_pulseaudio() {
-  pkgdesc="A featureful, general-purpose sound server"
-  depends=("libpulse=$pkgver-$pkgrel" rtkit libtool speex libsamplerate tdb
-           udev)
+  pkgdesc="A featureful, general-purpose sound server."
+  depends=("libpulse=${pkgver}-${pkgrel}" 'rtkit' 'libtool' 'speex' 'libsamplerate' 'tdb'
+           'udev' 'json-c')
   optdepends=('avahi: zeroconf support'
               'bluez: bluetooth support'
 #             'gconf: configuration through gconf'
@@ -54,42 +56,44 @@ package_pulseaudio() {
               'openssl: RAOP support')
   backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
   install=pulseaudio.install
-  cd "$srcdir/$pkgbase-$pkgver"
-  make DESTDIR="$pkgdir" install
+  cd "${srcdir}/${pkgbase}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 
   # Lower resample quality
   sed -e '/resample-method/iresample-method=speex-float-0' \
-      -i "$pkgdir/etc/pulse/daemon.conf"
+      -i "${pkgdir}/etc/pulse/daemon.conf"
 
   sed -e 's|/usr/bin/pactl load-module module-x11-cork-request|#&|' \
-      -i "$pkgdir/usr/bin/start-$pkgbase-x11"
+      -i "${pkgdir}/usr/bin/start-${pkgbase}-x11"
 
-  install -Dm755 "$srcdir/$pkgbase.xinit" "$pkgdir/etc/X11/xinit/xinitrc.d/$pkgbase"
+  install -Dm755 "${srcdir}/${pkgbase}.xinit" "${pkgdir}/etc/X11/xinit/xinitrc.d/${pkgbase}"
 
-  rm "$pkgdir/etc/dbus-1/system.d/$pkgbase-system.conf"
+  rm "${pkgdir}/etc/dbus-1/system.d/${pkgbase}-system.conf"
 
 ### Split libpulse
 
-  mkdir -p "$srcdir"/libpulse/{etc/pulse,usr/{lib,share/{man/man5,vala/vapi}}}
+  mkdir -p "${srcdir}"/libpulse/{etc/pulse,usr/{lib,share/{man/man5,vala/vapi}}}
 
-  mv {"$pkgdir","$srcdir/libpulse"}/etc/pulse/client.conf
+  mv {"${pkgdir}","${srcdir}/libpulse"}/etc/pulse/client.conf
 
-  mv "$pkgdir"/usr/lib/libpulse{,dsp,-simple,-browse,-mainloop-glib}.so* \
-     "$pkgdir"/usr/lib/libpulsecommon-*.so \
-     "$srcdir/libpulse/usr/lib"
+  mv "${pkgdir}"/usr/lib/libpulse{,dsp,-simple,-mainloop-glib}.so* \
+     "${pkgdir}"/usr/lib/libpulsecommon-*.so \
+     "${srcdir}/libpulse/usr/lib"
 
-  mv {"$pkgdir","$srcdir/libpulse"}/usr/lib/pkgconfig
-  mv {"$pkgdir","$srcdir/libpulse"}/usr/include
+  mv {"${pkgdir}","${srcdir}/libpulse"}/usr/lib/pkgconfig
+  mv {"${pkgdir}","${srcdir}/libpulse"}/usr/include
 
-  mv {"$pkgdir","$srcdir/libpulse"}/usr/share/man/man5/pulse-client.conf.5
-  mv {"$pkgdir","$srcdir/libpulse"}/usr/share/vala/vapi/libpulse.vapi
+  mv {"${pkgdir}","${srcdir}/libpulse"}/usr/share/man/man5/pulse-client.conf.5
+  mv {"${pkgdir}","${srcdir}/libpulse"}/usr/share/vala/vapi/libpulse.vapi
 }
 
 package_libpulse() {
   pkgdesc="A featureful, general-purpose sound server (client library)"
-  depends=(tcp_wrappers dbus-core xcb-util libasyncns libcap libxtst libsm libsndfile)
+  depends=('tcp_wrappers' 'dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm' 'libsndfile' 'json-c')
   optdepends=('alsa-plugins: ALSA support'
               'avahi: zeroconf support')
   backup=(etc/pulse/client.conf)
-  mv "$srcdir"/libpulse/* "$pkgdir"
+  mv "${srcdir}"/libpulse/* "${pkgdir}"
 }
+
+# vim:set ts=2 sw=2 et:
