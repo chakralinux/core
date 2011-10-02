@@ -1,22 +1,24 @@
-# $Id: PKGBUILD 79062 2010-04-30 05:56:42Z tpowa $
-# Maintainer: damir <damir@archlinux.org>
-# Contributor: Damir Perisa <damir.perisa@bluewin.ch>
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=libksba
-pkgver=1.0.7
+pkgver=1.2.0
 pkgrel=1
-pkgdesc="Libksba is a CMS and X.509 access library"
+pkgdesc="A CMS and X.509 access library"
 arch=(i686 x86_64)
 license=('GPL')
 url="ftp://ftp.gnupg.org/gcrypt/alpha/libksba"
 depends=('bash' 'libgpg-error' 'glibc')
 source=(ftp://ftp.gnupg.org/gcrypt/$pkgname/$pkgname-$pkgver.tar.bz2)
 options=(!libtool)
+install=libksba.install
 
 build() {
   cd $startdir/src/$pkgname-$pkgver
   ./configure --prefix=/usr
-  make || return 1
+  make
   make DESTDIR=$startdir/pkg install
 }
-md5sums=('eebce521a90600369c33c5fa6b9bbbd8')
+md5sums=('e797f370b69b4dc776499d6a071ae137')
