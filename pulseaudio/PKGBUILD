@@ -10,7 +10,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgbase=pulseaudio
 pkgname=('pulseaudio' 'libpulse')
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
@@ -19,14 +19,19 @@ makedepends=('libasyncns' 'libcap' 'attr' 'libxtst' 'libsm' 'tcp_wrappers' 'libs
              'avahi' 'bluez' 'intltool' 'jack' 'lirc-utils' 'pkgconfig' 'openssl' 'json-c')
 options=(!emptydirs !libtool !makeflags)
 source=("http://freedesktop.org/software/${pkgbase}/releases/${pkgbase}-${pkgver}.tar.xz"
-        "${pkgbase}.xinit")
+        "${pkgbase}.xinit"
+        version-number.patch)
 md5sums=('538e0b55ab9ba2987a88047ae332f5f4'
-         'eb1cfae28eb2e4d3fdbe45a90e4318ab')
+         'eb1cfae28eb2e4d3fdbe45a90e4318ab'
+         '2c15058a61d6952353c1555ff90bb279')
 sha1sums=('24a408e762b2df4334e9ae4f644ac1b893c7ef86'
-          'e33cce91a688104ccf718953711cb85b83e74a8f')
+          'e33cce91a688104ccf718953711cb85b83e74a8f'
+          '7a8e7d07837ecfc448cebca9a13d60b0e83fd9d5')
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
+
+  patch -Np1 -i "$srcdir/version-number.patch"
 
   # Don't break circular dependency between libpulse and libpulsecommon
   LDFLAGS="${LDFLAGS//-Wl,--as-needed}"
