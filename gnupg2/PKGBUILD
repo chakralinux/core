@@ -1,9 +1,10 @@
-# $Id: PKGBUILD 78419 2010-04-23 17:41:17Z andrea $
-# Maintainer: Tobias Powalowski <tpowa@archlinux.org>
-# Contributor: Andreas Radke <andyrtr@archlinux.org>
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=gnupg2
-pkgver=2.0.15
+pkgver=2.0.18
 pkgrel=1
 pkgdesc="GNU Privacy Guard 2 - a PGP replacement tool"
 arch=('i686' 'x86_64')
@@ -13,18 +14,19 @@ license=('GPL')
 url="http://www.gnupg.org/"
 install=${pkgname}.install
 source=(ftp://ftp.gnupg.org/gcrypt/gnupg/gnupg-$pkgver.tar.bz2)
-md5sums=('c1286e85b66349879dc4b760dd83e2f1')
+md5sums=('2f37e0722666a0fedbe4d9f9227ac4d7')
 
 build() {
   cd ${srcdir}/gnupg-$pkgver
   ./configure --prefix=/usr --libexecdir=/usr/lib/gnupg2 #$EXTRAOPTS
-  make || return 1
+  make
 }
 
 package() {
   cd ${srcdir}/gnupg-$pkgver
-  make DESTDIR=${pkgdir} install || return 1
+  make DESTDIR=${pkgdir} install
   # move conflicting files
   mv ${pkgdir}/usr/share/gnupg{,2}
   rm -f ${pkgdir}/usr/share/info/dir
 }
+
