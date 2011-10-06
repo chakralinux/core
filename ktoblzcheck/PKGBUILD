@@ -8,7 +8,7 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ktoblzcheck
-pkgver=1.28
+pkgver=1.33
 pkgrel=1
 pkgdesc="tool for verification of account numbers and bank codes"
 arch=('i686' 'x86_64')
@@ -16,11 +16,15 @@ license=('LGPL')
 url="http://ktoblzcheck.sourceforge.net/"
 depends=('python2' 'gcc-libs')
 source=("http://downloads.sourceforge.net/project/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('c0d4eea78f30e9bef4c5770c4773cde0')
+md5sums=('e9f62a9a64ee51ab43751eadcade0433')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
   ./configure --prefix=/usr --enable-python
   make
-  make prefix=$pkgdir/usr install
+}
+
+package() {
+  cd "$srcdir/ktoblzcheck-$pkgver"
+   make DESTDIR="$pkgdir" install
 }
