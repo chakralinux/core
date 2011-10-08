@@ -8,25 +8,25 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.09
-pkgrel=1
+pkgver=2011.09.21
+pkgrel=2
 _codename=Edn
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.7.0' 'squashfs-tools' 'partitionmanager>=1216949-5'
-        'cinstall>=0.4.6.8' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
+depends=('kdelibs' 'kdeedu-marble>=4.7.1' 'squashfs-tools' 'tribe-partitionmanager'
+        'cinstall>=0.4.6.10' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
 makedepends=('cmake' 'kdebase-workspace' 'automoc4')
 provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_20110828.html")
+        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_20110921.html")
   
-md5sums=('c3d4d239890cc1089d7a639fd7cdf01d'
-         'd8c103e2cfaf97500319387e236afede')
+md5sums=('e23020aca7aede941f48c105125a8d88'
+         'ecf28c848d8bb62761f305a6ab63ce13')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -34,7 +34,7 @@ install=tools-tribe.install
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-	  rm -vRf ${pkgname}-${_pkgver}
+	  rm -vRf ${pkgname}-${pkgver}
 	  git clone git://gitorious.org/chakra/${pkgname}.git ${pkgname}-${pkgver}
 	  rm -vRf ${pkgname}-${pkgver}/.git
 	  pushd ${pkgname}-${pkgver}
@@ -50,12 +50,9 @@ build()
 {
         cd "${srcdir}/${pkgname}-${pkgver}"
 
-	# workaround for bug https://bugzilla.novell.com/show_bug.cgi?id=656144
-	#sed -i -e "s~sudo~kdesu~g" "${srcdir}/$pkgname/tribe.desktop"
-
-	# patches
-	#patch -Np1 -i ${srcdir}/fake-progress.patch || return 1
-	#patch -Np1 -i ${startdir}/2011.03-1.patch || return 1
+	# replace rekonq screenshot with konqueror
+	rm -v ui/images/screenshot04.png
+	mv -v ui/images/screenshot04-konqueror.png ui/images/screenshot04.png
 
 	# proper bootmnt folder
 	sed -i -e "s/@ARCH@/${CARCH}/g" config-tribe.h.cmake
@@ -78,7 +75,7 @@ package()
         cd "${srcdir}/${pkgname}-${pkgver}"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_20110828.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_20110921.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +

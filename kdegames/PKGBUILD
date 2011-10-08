@@ -55,7 +55,7 @@ pkgname=('kdegames-common'
         
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="split package"
 url="http://www.kde.org"
@@ -64,7 +64,7 @@ license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}" "kde-runtime>=${_kdever}" 'qca' 'ggz-client-libs' 'gnugo' 'twisted' 'openal' 'qhull' 'pyqt' 
-"kdebindings-pykde4>=${_kdever}")
+"kdebindings-pykde4>=${_kdever}" 'docbook-xsl')
 
 source=("$_mirror/${pkgbase}-$_kdever.tar.bz2")
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -140,7 +140,7 @@ package_kdegames-bomber()
 
 package_kdegames-bovo()
 {
-	pkgdesc="Client for playing Monopoly-like games on the monopd network"
+	pkgdesc="Five-in-a-row Board Game"
 	depends=("${pkgbase}-common>=${_kdever}")
 	groups=("kde" "${pkgbase}" "kde-uninstall")
 	install=${pkgbase}.install
@@ -313,7 +313,7 @@ package_kdegames-kfourinline()
 package_kdegames-kgoldrunner()
 {
 	pkgdesc="Action game, akin to the C64s LodeRunner"
-	depends=("${pkgbase}-common>=${_kdever}" "${pkgbase}-doc>=${_kdever}")
+	depends=("${pkgbase}-common>=${_kdever}" "${pkgbase}-doc>=${_kdever}" 'openal')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
 	install=${pkgbase}.install
 
