@@ -10,7 +10,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgbase=pulseaudio
 pkgname=('pulseaudio' 'libpulse')
 pkgver=1.0
-pkgrel=3
+pkgrel=4
 arch=('i686' 'x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
@@ -51,8 +51,8 @@ build() {
 
 package_pulseaudio() {
   pkgdesc="A featureful, general-purpose sound server."
-  depends=("libpulse=${pkgver}-${pkgrel}" 'rtkit' 'libtool' 'speex' 'libsamplerate' 'tdb'
-           'udev')
+  depends=("libpulse=${pkgver}-${pkgrel}" 'rtkit' 'libtool' 'speex' 'tdb'
+           'udev' 'fftw' 'orc')
   optdepends=('avahi: zeroconf support'
               'bluez: bluetooth support'
 #             'gconf: configuration through gconf'
@@ -94,7 +94,7 @@ package_pulseaudio() {
 
 package_libpulse() {
   pkgdesc="A featureful, general-purpose sound server (client library)."
-  depends=('tcp_wrappers' 'dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm' 'libsndfile' 'json-c')
+  depends=('tcp_wrappers' 'dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm' 'libsndfile' 'libsamplerate' 'json-c')
   optdepends=('alsa-plugins: ALSA support'
               'avahi: zeroconf support')
   backup=(etc/pulse/client.conf)
