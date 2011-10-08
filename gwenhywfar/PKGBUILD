@@ -8,20 +8,20 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=gwenhywfar
-pkgver=4.0.9
+pkgver=4.3.0
 pkgrel=1
 pkgdesc="OS abstraction functions for various projects"
 arch=(i686 x86_64)
 url="http://www.aquamaniac.de"
 options=('!libtool')
 license=("LGPL")
-depends=('openssl' 'qt' 'gnutls')
+depends=('openssl' 'qt' 'gnutls' 'libgcrypt')
 source=("gwenhywfar-$pkgver.tar.gz::http://www2.aquamaniac.de/sites/download/download.php?package=01&release=60&file=01&dummy=gwenhywfar-$pkgver.tar.gz")
 md5sums=('03c22b95eb493c8c98284d3d2e4d9795')
 
 build() {
   pacman -Q gwenhywfar && return 1
-  cd $srcdir/gwenhywfar-$pkgver
+  cd $srcdir/gwenhywfar-4.0.9
   ./configure --prefix=/usr --sysconfdir=/etc --enable-ssl --with-guis=qt4 --disable-gtk2
   make
   make DESTDIR=$pkgdir install

@@ -7,20 +7,20 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers')
 pkgver=4.7.4
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
 makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
     'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
     'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
-    'mysql' 'unixodbc' 'cups' 'libxinerama')
+    'mysql' 'unixodbc' 'cups' 'libxinerama' 'libxcursor')
 options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
         'qtconfig.desktop' 'appmenu.patch')
-md5sums=('ddf7d83f912cf1283aa066368464fa22'
+md5sums=('9831cf1dfa8d0689a06c2c54c5c65aaf'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
@@ -111,7 +111,8 @@ build() {
 		-no-gtkstyle \
 		-opengl \
 		-no-openvg \
-		-glib
+		-glib \
+                -xcursor 
 	make
 }
 
@@ -119,12 +120,11 @@ package_qt() {
     pkgdesc='A cross-platform application and UI framework'
     depends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
       'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
-      'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'libxinerama')
+      'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'libxinerama' 'libxcursor')
     optdepends=('postgresql-libs: PostgreSQL driver'
 	  'libmysqlclient: MySQL driver'
 	  'unixodbc: ODBC driver'
 	  'libxinerama: Xinerama support'
-	  'libxcursor: Xcursor support'
 	  'libxfixes: Xfixes support')
     conflicts=('qt-doc' 'qt-debug' 'qt-demos' 'qt-tools')
     provides=('qt-tools')
