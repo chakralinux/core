@@ -7,31 +7,47 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=strigi
-pkgver=0.7.5
+pkgver=0.7.6
 pkgrel=1
 pkgdesc="Fast crawling desktop search engine with Qt4 GUI"
 arch=('i686' 'x86_64')
 url="http://www.vandenoever.info/software/strigi/"
 license=('GPL2')
-depends=('qt' 'clucene' 'bzip2' 'exiv2' 'libxml2')
-makedepends=('cmake' 'pkgconfig')
-source=("http://www.vandenoever.info/software/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('0559e2ab65d187d30916e9ffe36e0fb6')
+depends=('bzip2' 'exiv2' 'libxml2' 'boost-libs')
+makedepends=('qt' 'cmake' 'pkgconfig' 'boost')
+provides=('strigi-git')
+replaces=('strigi-git')
+conflicts=('strigi-git')
+source=("http://rdieter.fedorapeople.org/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('41cddd39e4ae3f590d82c859a14e9261')
 options=('!libtool')
-install=$pkgname.install
 
 build() {
-  cd $srcdir
+  cd "${srcdir}"
   mkdir build
   cd build
   cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DENABLE_INOTIFY=ON
-  make || return 1
+    -DENABLE_INOTIFY=ON \
+    -DENABLE_LOG4CXX=OFF \
+    -DENABLE_FAM=OFF \
+    -DENABLE_CLUCENE=OFF \
+    -DENABLE_CLUCENE_NG=OFF \
+    -DENABLE_FFMPEG=OFF
+  make
 }
 
 package() {
-  cd ${srcdir}/build
-  make DESTDIR=$pkgdir install || return 1
+  cd "${srcdir}/build/libstreams"
+  make DESTDIR="${pkgdir}" install
+
+  cd "${srcdir}/build/libstreamanalyzer"
+  make DESTDIR="${pkgdir}" install
+
+  cd "${srcdir}/build/strigiclient/lib/searchclient/qtdbus"
+  make DESTDIR="${pkgdir}" install
+  
+  cd "${srcdir}/build/strigiutils"
+  make DESTDIR="${pkgdir}" install
 }
