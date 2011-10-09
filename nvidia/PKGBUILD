@@ -5,11 +5,11 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # Find the kernel name inside the chroot
-_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_kernver=$(pacman -Q linux | cut -c7-9 | sed 's/linux //g')-CHAKRA
 
 pkgname=nvidia
-pkgver=280.13
-pkgrel=2
+pkgver=285.05.09
+pkgrel=1
 pkgdesc="NVIDIA drivers for linux."
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -23,15 +23,16 @@ if [ "$CARCH" = "i686" ]; then
     ARCH='x86'
     _pkg="NVIDIA-Linux-${ARCH}-${pkgver}"
     source=("http://us.download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
-    md5sums=('c3992c8cef02b7773a398640d8830e77')
+    md5sums=('2d469a90abef50320f548cfa8085e3a0')
 elif [ "$CARCH" = "x86_64" ]; then
     ARCH='x86_64'
     _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
     source=("http://us.download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
-    md5sums=('05e62b61feb34bf412f83ca1074e1917')
+    md5sums=('2f4a0e78f5560c07220b7ed6fc1e27aa')
 fi
 
 build() {
+	echo "==> Building for kernel version ${_kernver}"
         cd $srcdir
         sh ${_pkg}.run --extract-only
         cd ${_pkg}/kernel
@@ -45,5 +46,3 @@ package() {
         echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf
         sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/nvidia.install
 }
-
-
