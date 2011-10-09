@@ -1,0 +1,31 @@
+#
+# QT Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+pkgname=qtwebkit
+pkgver=2.2.0
+pkgrel=2
+pkgdesc="Standalone qtwebkit version"
+arch=('i686' 'x86_64')
+url="http://www.qtsoftware.com"
+license=('GPL3' 'LGPL')
+depends=('qt' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ugly-plugins' )
+makedepends=('gperf' 'sqlite3' 'fontconfig' 'phonon' 'perl' 'python' 'mesa')
+source=("http://get.qt.nokia.com/qtwebkit/QtWebKit-${pkgver}.tar.gz")
+
+md5sums=('f8c4becff276fcb86d83731f9a09fa96')
+
+build() {
+          cd $srcdir/QtWebKit-$pkgver
+
+          export QT4DIR=$srcdir/$pkgname
+          export PATH=${QT4DIR}/bin:${PATH}
+          Tools/Scripts/build-webkit --qt --video                
+}
+
+package() {
+          cd $srcdir/QtWebKit-$pkgver/WebKitBuild/Release
+          make INSTALL_ROOT=$pkgdir install
+}
