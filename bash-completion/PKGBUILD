@@ -1,34 +1,29 @@
-# $Id: PKGBUILD 67318 2010-02-06 09:38:55Z eric $
-# Maintainer: Aaron Griffin <aaron@archlinux.org>
-# Contributor: Aurelien Foret <orelien@chez.com>
-# Contributor: Evangelos Foutras <foutrelis@gmail.com>
+# Platform packages for Chakra Linux
 
 pkgname=bash-completion
-pkgver=1.1
-pkgrel=3
+pkgver=1.3
+pkgrel=1
 pkgdesc="Programmable completion for the bash shell"
-arch=(any)
+arch=('any')
 url="http://bash-completion.alioth.debian.org/"
 license=('GPL')
 depends=('bash')
-source=(http://bash-completion.alioth.debian.org/files/$pkgname-$pkgver.tar.gz cowsay.bashcomp)
-md5sums=('593d3edcf287b9e9d735049bd4d3f229' 'e9766bdc391caf825cb24e704422987e')
-sha1sums=('0e666ebda3d577571ab62bcecc16e1024922cd18' 'a8620aa1029d46bae92be8a6ea0eb62d737545ef')
+source=(http://bash-completion.alioth.debian.org/files/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('a1262659b4bbf44dc9e59d034de505ec')
+sha1sums=('6a46b93f44c56cc336632ab28d90c0595fbcc98f')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
-
-  # fixes for archlinux
-  sed -i 's#/sbin/lsmod#/bin/lsmod#' bash_completion || return 1
-
+  cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr --sysconfdir=/etc
-  make || return 1
-  make DESTDIR="$pkgdir" install
-  install -D -m644 "$srcdir/cowsay.bashcomp" "$pkgdir/etc/bash_completion.d/cowsay"
-
-  # apache2ctl doesn't work, even when renamed to apachectl (and sed'd)
-  rm "$pkgdir/etc/bash_completion.d/apache2ctl"
-  # munin-node doesn't work, even i've updated munin to 1.4.0
-  rm "$pkgdir/etc/bash_completion.d/munin-node"
+  make
 }
-# vim:set ts=2 sw=2 et:
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  # Does not work on Chakra Linux 
+  rm -r "${pkgdir}/etc/profile.d"
+  rm "${pkgdir}/etc/bash_completion.d/service"
+}
+
