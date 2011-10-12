@@ -8,8 +8,7 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=hwinfo
-pkgver=18.1
-_minorver=3.5
+pkgver=19.0
 pkgrel=1
 pkgdesc="A simple program that lists results from the hardware detection library."
 arch=('i686' 'x86_64')
@@ -18,26 +17,29 @@ license=('GPL2')
 depends=('perl' 'libx86emu')
 makedepends=('sysfsutils' 'rpmextract' 'flex')
 options=('!emptydirs')
-source=("http://download.opensuse.org/source/factory/repo/oss/suse/src/${pkgname}-${pkgver}-${_minorver}.src.rpm"
+source=("http://download.opensuse.org/source/factory/repo/oss/suse/src/${pkgname}-${pkgver}-1.1.src.rpm"
         "kbd.patch")
+
 build() {
+  cd "${srcdir}"
 
-  cd ${srcdir}
-  rpmextract.sh ${pkgname}-${pkgver}-${_minorver}.src.rpm || return 1
-  tar -xjf ${pkgname}-${pkgver}.tar.bz2
-
-  cd ${srcdir}/${pkgname}-${pkgver}
-
-# Apply patch for custom ioctl
-  patch -p 0 < ../kbd.patch
-
-# Fix Makefile using /usr/lib64 instead of /usr/lib - it broke x86_64, possibly i686 too. 
-# Comment if this fix breaks it.
-  sed -i 's_usr/lib64_usr/lib_' src/hd/Makefile 
-
-  make -j1 || return 1
-  make DESTDIR=${pkgdir} install || return 1
-
+  msg2 "Extracting source rpm..."
+  rpmextract.sh "${pkgname}-${pkgver}-1.1.src.rpm"
+  tar jxf ${pkgname}-${pkgver}.tar.bz2
+  cd "${pkgname}-${pkgver}"
+  msg2 "Patching..."
+  patch -p0 < ../kbd.patch
+  msg2 "Compiling..."
+  make -j1 CFLAGS+="-fPIC -I${srcdir}/${pkgname}-${pkgver}/src/hd" LIBDIR=/usr/lib
 }
-md5sums=('17c2a703643d1f007859c5e743589bb8'
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  msg2 "Packaging files..."
+  make LIBDIR=/usr/lib DESTDIR=${pkgdir} install
+  msg2 "Cleaning up..."
+  rmdir "${pkgdir}/sbin"
+}
+md5sums=('751238feaa13449324593ee5e145cd56'
          '1500ecfa26f6aaf4d7967eea74e86e5d')
