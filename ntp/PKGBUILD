@@ -10,14 +10,14 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=ntp
 pkgver=4.2.6.p4
 _realver=4.2.6p4
-pkgrel=1
+pkgrel=2
 pkgdesc="NTP (Network Time Protocol) tries to keep servers in sync"
 arch=('i686' 'x86_64')
 license=('custom')
 url="http://www.ntp.org/"
 depends=('openssl' 'readline' 'libcap')
 makedepends=('perl-html-parser')
-backup=('etc/ntp.conf' 'etc/conf.d/ntp-client.conf')
+backup=('etc/ntp.conf' 'etc/conf.d/ntpd.conf')
 install=install
 source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-${_realver}.tar.gz"
         ntp.conf
@@ -28,7 +28,7 @@ md5sums=('1447121a07b49361677ffda4f6e29527'
          '302c19233dc599328f0faefcce45f109'
          '58997d6cf4846d80e35a01b855376a33'
          '1a487594387e87039169e200f74a8346'
-         '997d91431ebfd8b75a68de6f7ada2a95')
+         'ab55ac8d8d7d0eefa3c3bec2ec98a1f4')
 
 build() {
   cd "${srcdir}/${pkgname}-${_realver}"
