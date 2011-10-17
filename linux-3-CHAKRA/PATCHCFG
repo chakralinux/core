@@ -1,7 +1,7 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.0.5pre"
+_patch="3.0.7-rc1"
 _queue="3.0"
 # Aufs
 _aufs="3.0-20110919"
@@ -23,6 +23,8 @@ PATCHES=(
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
+         http://chakra-project.org/sources/linux/patches/3/upstream/3.0.4-5.patch%1
+         http://chakra-project.org/sources/linux/patches/3/upstream/3.0.5-6.patch%1
          http://chakra-project.org/sources/linux/patches/3/upstream/$_patch.patch%1
 
          # fix #19234 i1915 display size
@@ -37,165 +39,7 @@ PATCHES=(
          http://chakra-project.org/sources/linux/patches/3/bugfix/change-default-console-loglevel.patch%1
 
          # stable candidate patches
-         http://chakra-project.org/sources/linux/patches/3/candidate/0001-md-linear-avoid-corrupting-structure-while-waiting-f.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0002-drm-radeon-kms-set-a-default-max_pixel_clock.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0003-drm-radeon-kms-make-sure-pci-max-read-request-size-i.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0004-mm-page-allocator-reconsider-zones-for-allocation-af.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0005-mm-page-allocator-initialise-ZLC-for-first-zone-elig.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0006-igb-fix-WOL-on-second-port-of-i350-device.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0007-MXC-iomux-v3-correct-NO_PAD_CTRL-definition.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0008-x86-perf-Check-that-current-mm-is-alive-before-getti.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0009-sched-Separate-the-scheduler-entry-for-preemption.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0010-sched-Move-blk_schedule_flush_plug-out-of-__schedule.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0011-sched-Fix-a-memory-leak-in-__sdt_free.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0012-rtc-Fix-RTC-PIE-frequency-limit.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0013-mmc-sdhci-s3c-Fix-mmc-card-I-O-problem.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0014-mmc-rename-mmc_host_clk_-ungate-gate-to-mmc_host_clk.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0015-mmc-core-use-non-reentrant-workqueue-for-clock-gatin.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0016-mmc-core-prevent-aggressive-clock-gating-racing-with.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0017-alarmtimers-Memset-itimerspec-passed-into-alarm_time.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0018-alarmtimers-Avoid-possible-null-pointer-traversal.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0019-alarmtimers-Avoid-possible-denial-of-service-with-hi.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0020-xen-smp-Warn-user-why-they-keel-over-nosmp-or-noapic.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0021-md-Fix-handling-for-devices-from-2TB-to-4TB-in-0.90-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0022-vp7045-fix-buffer-setup.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0023-nuvoton-cir-simplify-raw-IR-sample-handling.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0024-hwmon-max16065-Fix-current-calculation.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0025-drm-nouveau-properly-handle-allocation-failure-in-no.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0026-Avoid-dereferencing-a-request_queue-after-last-close.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0027-ARM-davinci-fix-cache-flush-build-error.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0028-ARM-davinci-da850-EVM-read-mac-address-from-SPI-flas.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0029-ARM-7081-1-mach-integrator-fix-the-clocksource.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0030-net-9p-Fix-the-msize-calculation.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0031-VirtIO-can-transfer-VIRTQUEUE_NUM-of-pages.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0032-net-9p-fix-client-code-to-fail-more-gracefully-on-pr.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0033-irda-fix-smsc-ircc2-section-mismatch-warning.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0034-iommu-amd-Make-sure-iommu-need_sync-contains-correct.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0035-iommu-amd-Don-t-take-domain-lock-recursivly.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0036-fs-9p-When-doing-inode-lookup-compare-qid-details-an.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0037-fs-9p-Fix-invalid-mount-options-args.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0038-fs-9p-Fid-is-not-valid-after-a-failed-clunk.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0039-fs-9p-Always-ask-new-inode-in-create.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0040-Fix-the-size-of-receive-buffer-packing-onto-VirtIO-r.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0041-9p-close-ACL-leaks.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0042-ACPICA-Do-not-repair-_TSS-return-package-if-_PSS-is-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0043-net-9p-Fix-kernel-crash-with-msize-512K.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0044-fs-9p-Use-protocol-defined-value-for-lock-getlock-ty.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0045-fs-9p-Don-t-update-file-type-when-updating-file-attr.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0046-fs-9p-Always-ask-new-inode-in-lookup-for-cache-mode-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0047-fs-9p-Add-fid-before-dentry-instantiation.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0048-PCI-Set-PCI-E-Max-Payload-Size-on-fabric.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0049-PCI-Remove-MRRS-modification-from-MPS-setting-code.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0050-PCI-export-pcie_bus_configure_settings-symbol.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0051-fs-9p-Add-OS-dependent-open-flags-in-9p-protocol.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0052-isci-fix-sata-response-handling.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0053-x86-iommu-Mark-DMAR-IRQ-as-non-threaded.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0054-rtlwifi-rtl8192su-Fix-problem-connecting-to-HT-enabl.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0055-rtlwifi-Fix-problem-when-switching-connections.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0056-mfd-Make-omap-usb-host-TLL-mode-work-again.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0057-mfd-Fix-value-of-WM8994_CONFIGURE_GPIO.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0058-mfd-Fix-initialisation-of-tps65910-interrupts.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0059-mac80211-fix-missing-sta_lock-in-__sta_info_destroy.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0060-iwlegacy-fix-BUG_ON-info-control.rates-0-.idx-0.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0061-isci-fix-32-bit-operation-when-CONFIG_HIGHMEM64G-n.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0062-hpsa-fix-problem-that-OBDR-devices-are-not-detected.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0063-hpsa-fix-physical-device-lun-and-target-numbering-pr.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0064-genirq-Make-irq_shutdown-symmetric-vs.-irq_startup-a.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0065-e1000-Fix-driver-to-be-used-on-PA-RISC-C8000-worksta.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0066-ath9k_hw-fix-calibration-on-5-ghz.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0067-ASoC-MPC5200-replace-of_device-with-platform_device.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0068-ASoC-Fix-reporting-of-partial-jack-updates.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0069-ASoC-Blackfin-bf5xx-ad193x-Fix-codec-device-name.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0070-acpica-ACPI_MAX_SLEEP-should-be-2-sec-not-20.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0071-vfs-automount-should-ignore-LOOKUP_FOLLOW.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0072-workqueue-lock-cwq-access-in-drain_workqueue.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0073-USB-xhci-Set-change-bit-when-warm-reset-change-is-se.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0074-restore-pinning-the-victim-dentry-in-vfs_rmdir-vfs_r.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0075-mm-sync-vmalloc-address-space-page-tables-in-alloc_v.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0076-ibmveth-Fix-issue-with-DMA-mapping-failure.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0077-ibmveth-Fix-DMA-unmap-error.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0078-ibmveth-Checksum-offload-is-always-disabled.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0079-firewire-ohci-add-no-MSI-quirk-for-O2Micro-controlle.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0080-drm-radeon-kms-Make-GPU-CPU-page-size-handling-consi.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0081-drm-radeon-Don-t-read-from-CP-ring-write-pointer-reg.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0082-drm-radeon-kms-fix-typo-in-r100_blit_copy.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0083-drivers-leds-ledtrig-timer.c-fix-broken-sysfs-delay-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0084-drivers-cpufreq-pcc-cpufreq.c-avoid-NULL-pointer-der.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0085-ALSA-pcm-fix-race-condition-in-wait_for_avail.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0086-ALSA-HDA-Cirrus-fix-Surround-Speaker-volume-control-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0087-iwlagn-fix-command-queue-timeout.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0088-cifs-fix-possible-memory-corruption-in-CIFSFindNext.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0089-Fix-the-conflict-between-rwpidforward-and-rw-mount-o.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0090-ALSA-hda-realtek-Fix-auto-mute-with-HP-LO-configurat.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0091-ARM-Dove-fix-second-SPI-initialization-call.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0092-XZ-Fix-incorrect-XZ_BUF_ERROR.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0093-xen-use-maximum-reservation-to-limit-amount-of-usabl.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0094-xen-e820-if-there-is-no-dom0_mem-don-t-tweak-extra_p.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0095-wireless-Reset-beacon_found-while-updating-regulator.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0096-rtl2800usb-Fix-incorrect-storage-of-MAC-address-on-b.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0097-rt2800pci-Fix-compiler-error-on-PowerPC.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0098-make-proc-pid-numa_maps-gather_stats-take-variable-p.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0099-ixgbe-fix-possible-null-buffer-error.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0100-iwlagn-workaround-bug-crashing-some-APs.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0101-floppy-use-del_timer_sync-in-init-cleanup.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0102-break-out-numa_maps-gather_pte_stats-checks.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0103-blk-cgroup-be-able-to-remove-the-record-of-unplugged.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0104-b43-Fix-beacon-problem-in-ad-hoc-mode.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0105-writeback-update-dirtied_when-for-synced-inode-to-pr.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0106-writeback-introduce-.tagged_writepages-for-the-WB_SY.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0107-tg3-Fix-io-failures-after-chip-reset.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0108-tg3-Fix-int-selftest-for-recent-devices.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0109-tg3-Add-5719-and-5720-to-EEE_CAP-list.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0110-USB-PL2303-correctly-handle-baudrates-above-115200.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0111-perf-x86-Add-model-45-SandyBridge-support.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0112-mpt2sas-Adding-support-for-customer-specific-brandin.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0113-qdio-clear-shared-DSCI-before-scheduling-the-queue-h.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0114-ipc-mqueue.c-refactor-failure-handling.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0115-libfc-Enhancement-to-RPORT-state-machine-applicable-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0116-iscsi_tcp-fix-locking-around-iscsi-sk-user-data.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0117-ipc-mqueue.c-fix-mq_open-return-value.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0118-ehci-refactor-pci-quirk-to-use-standard-dmi_check_sy.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0119-ehci-add-pci-quirk-for-Ordissimo-and-RM-Slate-100-to.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0120-fcoe-Unable-to-select-the-exchangeID-from-offload-po.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0121-cdc_ncm-fix-endianness-problem.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0122-ASIX-Add-AX88772B-USB-ID.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0123-teach-proc-pid-numa_maps-about-transparent-hugepages.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0124-xfrm-Perform-a-replay-check-after-return-from-async-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0125-vlan-reset-headers-on-accel-emulation-path.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0126-tcp-initialize-variable-ecn_ok-in-syncookies-path.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0127-tcp-fix-validation-of-D-SACK.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0128-scm-Capture-the-full-credentials-of-the-scm-sender.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0129-net_sched-prio-use-qdisc_dequeue_peeked.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0130-Revert-sfc-Use-write-combining-to-reduce-TX-latency-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0131-netfilter-TCP-and-raw-fix-for-ip_route_me_harder.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0132-mcast-Fix-source-address-selection-for-multicast-lis.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0133-ipv6-Fix-ipv6_getsockopt-for-IPV6_2292PKTOPTIONS.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0134-ipv4-some-rt_iif-rt_route_iif-conversions.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0135-fib-fix-BUG_ON-in-fib_nl_newrule-when-add-new-fib-ru.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0136-bridge-fix-a-possible-use-after-free.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0137-bridge-fix-a-possible-net_device-leak.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0138-bridge-Pseudo-header-required-for-the-checksum-of-IC.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0139-arp-fix-rcu-lockdep-splat-in-arp_process.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0140-zorro-Defer-device_register-until-all-devices-have-b.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0141-TPM-Zero-buffer-after-copying-to-userspace.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0142-TPM-Call-tpm_transmit-with-correct-size.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0143-lpfc-8.3.25-T10-DIF-Fixes.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0144-lpfc-8.3.25-PCI-and-SR-IOV-Fixes.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0145-lpfc-8.3.25-Miscellaneous-Bug-fixes-and-code-cleanup.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0146-lpfc-8.3.25-Fabric-and-Target-Discovery-Fixes.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0147-lpfc-8.3.25-Adapter-Interface-fixes-and-changes.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0148-libiscsi_tcp-fix-LLD-data-allocation.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0149-isci-fix-event-get-pointer-increment.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0150-isci-change-sas-phy-timeouts-from-54us-to-59us.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0151-isci-Leave-requests-alone-if-already-terminating.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0152-ahci-RAID-mode-SATA-patch-for-Intel-Panther-Point-De.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0153-Bluetooth-Fix-timeout-on-scanning-for-the-second-tim.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0154-usb-host-pci-quirks.c-correct-annotation-of-ehci_dmi.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0155-perf-symbols-Fix-ppc64-SEGV-in-dso__load_sym-with-de.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0156-drm-radeon-kms-fix-DDIA-enable-on-some-rs690-systems.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0157-ALSA-usb-audio-clear-chip-probing-on-error-exit.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0158-ALSA-fm801-Fix-double-free-in-case-of-error-in-tuner.patch%1
-         http://chakra-project.org/sources/linux/patches/3/candidate/0159-ALSA-fm801-Gracefully-handle-failure-of-tuner-auto-d.patch%1
+         # none this time
 
          # add aufs3 support, in reference to:
          # http://aufs.sourceforge.net
@@ -260,6 +104,7 @@ PATCHES=(
          http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0007-Revert-rt2x00-fix-crash-in-rt2800usb_get_txwi.patch%1
          http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0008-Revert-rt2800pci-Fix-compiler-error-on-PowerPC.patch%1
          http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0009-Revert-rtl2800usb-Fix-incorrect-storage-of-MAC-addre.patch%1
+         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0010-Revert-rt2x00-Serialize-TX-operations-on-a-queue.patch%1
 
          # add rt2x00 drivers from 3.1 tree (31-rc7)
          http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0001-rt2x00-Enable-PA_PE-bits-in-TX_PIN_CFG-according-to-.patch%1
@@ -290,9 +135,12 @@ PATCHES=(
          http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0028-rt2800pci-Fix-compiler-error-on-PowerPC.patch%1
          http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0029-rtl2800usb-Fix-incorrect-storage-of-MAC-address-on-b.patch%1
 
+         # other features
+         http://chakra-project.org/sources/linux/patches/3/features/rtl8192cu_add-USB-ID-for-Belkin-n300-Micro-USB-wireless-adapter.patch%1
+
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.0.4-4-CHAKRA"
+PATCHNAME="patch-3.0.6-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
