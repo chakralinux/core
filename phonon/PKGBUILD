@@ -8,32 +8,34 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=phonon
-pkgver=4.5.0
+pkgver=4.5.55
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://phonon.kde.org"
 license=('LGPL')
-pkgdesc="The multimedia API for KDE4"
+pkgdesc="The multimedia framework for KDE4"
 depends=('qt' 'libpulse' 'libqzeitgeist')
 optdepends=('pulseaudio: PulseAudio support')
-makedepends=('cmake' 'automoc4' 'libpulse')
-groups=("kde" "kde-complete" "kde-minimal" "kde-uninstall")
-source=("http://download.kde.org/stable/${pkgname}/${pkgver}/src/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('32f8d388c18fde2e23dea7bb103f9713')
+makedepends=('cmake' 'automoc4' 'pulseaudio')
+source=("${pkgname}-${pkgver}.tar.bz2"::"http://quickgit.kde.org/?p=phonon.git&a=snapshot&h=37ec84753af68c4f30041d080b37f1a49a89197c&fmt=tbz2"
+        pulsestream.diff)
+#source=("http://download.kde.org/stable/${pkgname}/${pkgver}/src/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('7324a7d4e61104632cafd1c524961c14'
+         'f0cd7bc5dfae7aa86823ae30502016bc')
 
 build() {
-  cd ${srcdir}
+  cd "${srcdir}"
+  patch -Np1 -i "$srcdir/pulsestream.diff"
   mkdir build
   cd build
-	cmake ../${pkgname}-${pkgver} -DCMAKE_BUILD_TYPE=Release \
-		 -DCMAKE_INSTALL_PREFIX=/usr \
-		 -DCMAKE_SKIP_RPATH=ON \
-		 -DWITH_PulseAudio=ON \
-		 -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+  cmake ../${pkgname} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_SKIP_RPATH=ON
   make
 }
 
 package(){
-  cd ${srcdir}/build
-  make DESTDIR=${pkgdir} install
+  cd "${srcdir}"/build
+  make DESTDIR="${pkgdir}" install
 }
