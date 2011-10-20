@@ -7,55 +7,45 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xulrunner
-pkgver=2.0
-_ffoxver=4.0
-pkgrel=2
+pkgver=7.0.1
+_ffoxver=7.0.1
+pkgrel=1
 pkgdesc="Mozilla Runtime Environment"
 arch=('i686' 'x86_64')
 license=('MPL' 'GPL' 'LGPL')
 depends=('gcc-libs' 'libidl2' 'mozilla-common' 'nss' 'qt' 'libxt' 'libxrender' 'hunspell' 'startup-notification' 'mime-types' 'dbus-glib' 'alsa-lib' 'libevent' 'sqlite3>=3.7.4')
-makedepends=('zip' 'pkg-config' 'diffutils' 'python2' 'wireless_tools' 'yasm' 'mesa')
+makedepends=('zip' 'pkg-config' 'diffutils' 'python2' 'wireless_tools' 'yasm' 'mesa' 'pango')
 url="http://wiki.mozilla.org/XUL:Xul_Runner"
 source=(http://releases.mozilla.org/pub/mozilla.org/firefox/releases/${_ffoxver}/source/firefox-${_ffoxver}.source.tar.bz2
         mozconfig
-        mozilla-pkgconfig.patch
-        xulrunner-version.patch
-        xulrunner-omnijar.patch)
-options=('!emptydirs')
-md5sums=('3468a2c463b4fc2788ba621e4b511c30'
-         'e3be9cef491ef86f18252cc6ed8bffb4'
-         '639ea80e823543dd415b90c0ee804186'
-         'a0236f6c3e55f60b7888d8cf137ff209'
-         'dea8c2a57a588bf5f6198ce7b4155655')
+        mozilla-pkgconfig.patch)
+options=('!emptydirs' '!buildflags')
+replaces=('xulrunner-oss')
+md5sums=('5b212db48630ba93bb30ec63cca17f4d'
+         '52bbbb0117566b19c5a65e072725d47e'
+         '639ea80e823543dd415b90c0ee804186')
+
 build() {
-  cd "${srcdir}/mozilla-2.0"
+  cd "${srcdir}/mozilla-release"
   cp "${srcdir}/mozconfig" .mozconfig
 
   #fix libdir/sdkdir - fedora
   patch -Np1 -i "${srcdir}/mozilla-pkgconfig.patch"
 
-  #Force installation to the same path for every version
-  patch -Np1 -i "${srcdir}/xulrunner-version.patch"
-
-  #https://bugzilla.mozilla.org/show_bug.cgi?id=620931
-  patch -Np1 -i "${srcdir}/xulrunner-omnijar.patch"
-
-  unset CFLAGS
-  unset CXXFLAGS
+  export LDFLAGS="-Wl,-rpath,/usr/lib/xulrunner-${pkgver} -Wl,-O1,--sort-common,--hash-style=gnu,--as-needed"
 
   make -j1 -f client.mk build MOZ_MAKE_FLAGS="$MAKEFLAGS"
 }
 
 package() {
-  cd "${srcdir}/mozilla-2.0"
+  cd "${srcdir}/mozilla-release"
   make -j1 -f client.mk DESTDIR="${pkgdir}" install
-
-  #Remove included dictionaries, add symlink to system myspell path.
-  #Note: this will cause file conflicts when users have installed dictionaries in the old location
-  rm -rf "${pkgdir}/usr/lib/xulrunner-2.0/dictionaries"
-  ln -sf /usr/share/myspell/dicts "${pkgdir}/usr/lib/xulrunner-2.0/dictionaries"
 
   # add xulrunner library path to ld.so.conf
   install -d ${pkgdir}/etc/ld.so.conf.d
-  echo "/usr/lib/xulrunner-2.0" > ${pkgdir}/etc/ld.so.conf.d/xulrunner.conf
+  echo "/usr/lib/xulrunner-${pkgver}" > ${pkgdir}/etc/ld.so.conf.d/xulrunner.conf
+
+  #wtf mozilla!
+  chmod +x "${pkgdir}/usr/lib/xulrunner-devel-$pkgver/sdk/bin/xpt.py"
+  sed -i 's|!/usr/bin/env python|!/usr/bin/env python2|' "${pkgdir}/usr/lib/xulrunner-devel-$pkgver/sdk/bin/xpt.py"
 }
