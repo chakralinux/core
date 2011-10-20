@@ -26,15 +26,15 @@ package() {
   cd "pypy/tool/release"
 
   # Make PyPy release package first
-  pypy package.py ../../.. pypy
+  pypy package.py ../../.. "${pkgname}"
 
   # Then, install it under "${pkgdir}/opt"
   install -d "${pkgdir}/opt"
-  tar -jxvf "/tmp/usession-unknown-${USER}/build/pypy.tar.bz2" -C "${pkgdir}/opt"
+  tar -jxvf "/tmp/usession-unknown-${USER}/build/${pkgname}.tar.bz2" -C "${pkgdir}/opt"
 
   # Install binary symlink
   install -d "${pkgdir}/usr/bin"
-  ln -sf "/opt/${pkgname}-${pkgver}/bin/pypy" "${pkgdir}/usr/bin/pypy"
+  ln -sf "/opt/${pkgname}/bin/pypy" "${pkgdir}/usr/bin/pypy"
 
   # Install license file
   cd "${srcdir}/${pkgname}-${pkgname}-release-${pkgver}"
