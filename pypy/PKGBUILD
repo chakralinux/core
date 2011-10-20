@@ -1,0 +1,44 @@
+# Maintainer: Daniele Cocca <jmc@chakra-project.org>
+
+pkgname=pypy
+pkgver=1.6
+pkgrel=1
+pkgdesc="PyPy is a fast, compliant alternative implementation of the Python language (2.7.1)."
+arch=('i686' 'x86_64')
+url="http://www.pypy.org/"
+license=('MIT')
+depends=('expat' 'zlib' 'bzip2' 'openssl' 'python-greenlet')
+makedepends=('pypy')
+source=("https://bitbucket.org/${pkgname}/${pkgname}/get/release-${pkgver}.tar.bz2")
+md5sums=('1189352effc5df7df84e6916b3b3eae3')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgname}-release-${pkgver}"
+  cd "pypy/translator/goal"
+
+  # This will probably make the translation possible - otherwise it will easily saturate
+  # your system's memory.
+  PYPY_GC_MAX_DELTA=200MB pypy --jit loop_longevity=300 ./translate.py -Ojit
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgname}-release-${pkgver}"
+  cd "pypy/tool/release"
+
+  # Make PyPy release package first
+  pypy package.py ../../.. pypy
+
+  # Then, install it under "${pkgdir}/opt"
+  install -d "${pkgdir}/opt"
+  tar -jxvf "/tmp/usession-unknown-${USER}/build/pypy.tar.bz2" -C "${pkgdir}/opt"
+
+  # Install binary symlink
+  install -d "${pkgdir}/usr/bin"
+  ln -sf "/opt/${pkgname}-${pkgver}/bin/pypy" "${pkgdir}/usr/bin/pypy"
+
+  # Install license file
+  cd "${srcdir}/${pkgname}-${pkgname}-release-${pkgver}"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licences/${pkgname}/LICENSE"
+}
+
+# vim:set ts=2 sw=2 et:
