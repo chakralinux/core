@@ -1,7 +1,7 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.0.7-rc1"
+_patch="3.0.7"
 _queue="3.0"
 # Aufs
 _aufs="3.0-20110919"
@@ -19,128 +19,146 @@ SRCNAME="linux-3.0-CHAKRA"
 PATCHES=(
          # add upstream patch from 3.0 series
          #ftp://ftp.kernel.org/pub/linux/kernel/v3.0/patch-3.0.4.gz%1
-         http://ftp.uni-erlangen.de/pub/mirrors/kernel.org/v3.0/patch-3.0.4.gz%1
+         #http://ftp.uni-erlangen.de/pub/mirrors/kernel.org/v3.0/patch-3.0.4.gz%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/$_patch.patch%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-         http://chakra-project.org/sources/linux/patches/3/upstream/3.0.4-5.patch%1
-         http://chakra-project.org/sources/linux/patches/3/upstream/3.0.5-6.patch%1
-         http://chakra-project.org/sources/linux/patches/3/upstream/$_patch.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/arm-7113-1-mm-align-bank-start-to-max_order_nr_pages.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/arm-7117-1-perf-fix-hw_cache_-events-on-cortex-a9.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/hid-usbhid-add-support-for-sigma-micro-chip.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/hwmon-w83627ehf-properly-report-thermal-diode-sensors.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/avoid-using-variable-length-arrays-in-kernel-sys.c.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/drm-radeon-kms-atom-fix-handling-of-fb-scratch-indices.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/cputimer-cure-lock-inversion.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/fuse-fix-memory-leak.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/platform-fix-samsung-laptop-dmi-identification-for-n150-n210-220-n230.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/hid-magicmouse-ignore-ivalid-report-id-while-switching-modes-v2.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/uvcvideo-fix-crash-when-linking-entities.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/hfsplus-ensure-bio-requests-are-not-smaller-than-the-hardware-sectors.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/drm-ttm-ensure-ttm-for-new-node-is-bound-before-calling-move_notify.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/drm-ttm-unbind-ttm-before-destroying-node-in-accel-move-cleanup.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/cifs-fix-err_ptr-dereference-in-cifs_get_root.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-start-periodic-workers-later.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-use-a-cursor-for-bulk-ail-insertion.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-do-not-update-xa_last_pushed_lsn-for-locked-items.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-force-the-log-if-we-encounter-pinned-buffers-in-.iop_pushbuf.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-revert-to-using-a-kthread-for-ail-pushing.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/firewire-sbp2-fix-panic-after-rmmod-with-slow-targets.patch%1
 
          # fix #19234 i1915 display size
-         http://chakra-project.org/sources/linux/patches/3/bugfix/fix-i915.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/bugfix/fix-i915.patch%1
 
          # fix several webcams (https://bugzilla.kernel.org/show_bug.cgi?id=35922)
-         http://chakra-project.org/sources/linux/patches/3/bugfix/webcam-usb_quirk_reset_resume.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/bugfix/webcam-usb_quirk_reset_resume.patch%1
 
          # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
          # remove this when a Kconfig knob is made available by upstream
          # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
-         http://chakra-project.org/sources/linux/patches/3/bugfix/change-default-console-loglevel.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/bugfix/change-default-console-loglevel.patch%1
 
          # stable candidate patches
          # none this time
 
          # add aufs3 support, in reference to:
          # http://aufs.sourceforge.net
-         http://chakra-project.org/sources/linux/patches/3/features/aufs3/aufs$_aufs-kbuild.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/aufs3/aufs$_aufs-base.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/aufs3/aufs$_aufs-standalone.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/aufs3/aufs$_aufs.patch.bz2%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/aufs3/aufs$_aufs-kbuild.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/aufs3/aufs$_aufs-base.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/aufs3/aufs$_aufs-standalone.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/aufs3/aufs$_aufs.patch.bz2%1
 
          # add overlayfs v11 from git
          # http://git.kernel.org/?p=linux/kernel/git/mszeredi/vfs.git;a=shortlog;h=refs/heads/overlayfs.v11
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/01-vfs_add-i_op-_open.patch.bz2%1
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/02-vfs_export-do_splice_direct-to-modules.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/03-vfs_introduce-clone_private_mount.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/04-overlay-filesystem.patch.bz2%1
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/05-overlayfs_add-statfs-support.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/06-overlayfs_implement-show_options.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/01-vfs_add-i_op-_open.patch.bz2%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/02-vfs_export-do_splice_direct-to-modules.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/03-vfs_introduce-clone_private_mount.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/04-overlay-filesystem.patch.bz2%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/05-overlayfs_add-statfs-support.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/06-overlayfs_implement-show_options.patch%1
          # don't wanted feature
-         #http://chakra-project.org/sources/linux/patches/3/features/overlayfs/08-fs_limit filesystem stacking depth.patch%1
+         #http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/08-fs_limit filesystem stacking depth.patch%1
 
          # with Jordi Pujol's overlayfs patches following:
          # for performance and improvement
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/50-copy-up-performance.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/51-improve-ovl_copy_up_xattr.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/52-vfs_getxattr-performance.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/50-copy-up-performance.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/51-improve-ovl_copy_up_xattr.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/52-vfs_getxattr-performance.patch%1
          # suppress unreliable code, it confuses /proc/mounts
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/59-read-only.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/59-read-only.patch%1
          # revert Linux 3.1 functions to 3.0
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/60-overlayfs-v10-ovl_permission.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/overlayfs/61-overlayfs-v10-ovl_dir_fsync.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/60-overlayfs-v10-ovl_permission.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/overlayfs/61-overlayfs-v10-ovl_dir_fsync.patch%1
 
          # add fedora patches
-         http://chakra-project.org/sources/linux/patches/3/features/fedora/die-floppy-die.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/fedora/drm-intel-make-lvds-work.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/fedora/drm-nouveau-updates.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/fedora/drm-ttm-nouveau-oops-fix.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/fedora/efi-dont-map-boot-services-on-32bit.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/fedora/hda_intel-prealloc-4mb-dmabuffer.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/fedora/linux-2.6-input-kill-stupid-messages.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/fedora/linux-2.6-intel-iommu-igfx.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/fedora/die-floppy-die.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/fedora/drm-intel-make-lvds-work.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/fedora/drm-nouveau-updates.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/fedora/efi-dont-map-boot-services-on-32bit.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/fedora/hda_intel-prealloc-4mb-dmabuffer.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/fedora/linux-2.6-input-kill-stupid-messages.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/fedora/linux-2.6-intel-iommu-igfx.patch%1
 
          # add acerhk
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/01_acerhk-0.5.35.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/02_64bits_support_for_aspire5100.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/03_Add_Medion_MD97600_support.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/04_3rd-acerhk-proc_dir_entry-owner.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/05_kbuild.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/06_lindent.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/07_remove-ifdefs-for-ancient-kernels.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/08_remove-ifdefs-for-ACERDEBUG.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/09_kcompat-2.6.36.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/10_kcompat-2.6.38.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/11_bg-flag.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/acerhk/12_Get-rid-off-bios-error.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/01_acerhk-0.5.35.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/02_64bits_support_for_aspire5100.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/03_Add_Medion_MD97600_support.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/04_3rd-acerhk-proc_dir_entry-owner.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/05_kbuild.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/06_lindent.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/07_remove-ifdefs-for-ancient-kernels.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/08_remove-ifdefs-for-ACERDEBUG.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/09_kcompat-2.6.36.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/10_kcompat-2.6.38.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/11_bg-flag.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/acerhk/12_Get-rid-off-bios-error.patch%1
 
          # revert rt2x00 changes to apply new drivers
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0001-Revert-rt2x00-Add-device-ID-for-RT539F-device.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0002-Revert-rt2x00-rt2800-fix-zeroing-skb-structure.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0003-Revert-rt2x00-fix-usage-of-NULL-queue.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0004-Revert-rt2x00-fix-order-of-entry-flags-modification.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0005-Revert-rt2x00-do-not-drop-usb-dev-reference-counter-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0006-Revert-rt2x00-fix-crash-in-rt2800usb_write_tx_desc.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0007-Revert-rt2x00-fix-crash-in-rt2800usb_get_txwi.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0008-Revert-rt2800pci-Fix-compiler-error-on-PowerPC.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0009-Revert-rtl2800usb-Fix-incorrect-storage-of-MAC-addre.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00-reverts/0010-Revert-rt2x00-Serialize-TX-operations-on-a-queue.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0001-Revert-rt2x00-Add-device-ID-for-RT539F-device.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0002-Revert-rt2x00-rt2800-fix-zeroing-skb-structure.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0003-Revert-rt2x00-fix-usage-of-NULL-queue.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0004-Revert-rt2x00-fix-order-of-entry-flags-modification.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0005-Revert-rt2x00-do-not-drop-usb-dev-reference-counter-.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0006-Revert-rt2x00-fix-crash-in-rt2800usb_write_tx_desc.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0007-Revert-rt2x00-fix-crash-in-rt2800usb_get_txwi.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0008-Revert-rt2800pci-Fix-compiler-error-on-PowerPC.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0009-Revert-rtl2800usb-Fix-incorrect-storage-of-MAC-addre.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00-reverts/0010-Revert-rt2x00-Serialize-TX-operations-on-a-queue.patch%1
 
          # add rt2x00 drivers from 3.1 tree (31-rc7)
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0001-rt2x00-Enable-PA_PE-bits-in-TX_PIN_CFG-according-to-.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0002-rt2x00-Don-t-disable-G0-PA_PE-bit-in-case-of-BT-coex.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0003-rt2x00-Add-support-for-RT3572-RT3592-RT3592-Bluetoot.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0004-rt2x00-Interface-sequence-lock-doesn-t-have-to-disab.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0005-rt2x00-Move-rt2800_txdone-and-rt2800_txdone_entry_ch.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0006-rt2x00-Enabled-rt35xx-device-support-by-default.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0009-rt2x00-fix-possible-memory-corruption-in-case-of-inv.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0010-rt2x00-reset-usb-devices-at-probe.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0011-rt2x00-Fix-unspeficied-typo.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0012-rt2x00-Serialize-TX-operations-on-a-queue.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0013-rt2x00-Don-t-use-queue-entry-as-parameter-when-creat.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0014-rt2x00-Reduce-window-of-a-queue-s-tx-lock.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0015-rt2x00-Add-device-ID-for-RT539F-device.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0016-rt2x00-Properly-identify-rt2800usb-devices.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0017-rt2x00-Implement-tx_frames_pending-mac80211-callback.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0018-rt2800usb-Add-new-device-ID-for-Belkin.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0019-rt2x00-rt2800-fix-zeroing-skb-structure.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0020-rt2x00-Fix-compilation-without-CONFIG_RT2X00_LIB_CRY.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0021-rt2x00-fix-usage-of-NULL-queue.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0022-rt2x00-Add-new-rt73-buffalo-USB-id.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0023-rt2x00-Add-rt2870-device-id-for-Dvico-usb-key.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0024-rt2x00-fix-crash-in-rt2800usb_write_tx_desc.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0025-rt2x00-fix-order-of-entry-flags-modification.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0026-rt2x00-fix-crash-in-rt2800usb_get_txwi.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0027-rt2x00-do-not-drop-usb-dev-reference-counter-on-susp.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0028-rt2800pci-Fix-compiler-error-on-PowerPC.patch%1
-         http://chakra-project.org/sources/linux/patches/3/features/rt2x00/0029-rtl2800usb-Fix-incorrect-storage-of-MAC-address-on-b.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0001-rt2x00-Enable-PA_PE-bits-in-TX_PIN_CFG-according-to-.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0002-rt2x00-Don-t-disable-G0-PA_PE-bit-in-case-of-BT-coex.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0003-rt2x00-Add-support-for-RT3572-RT3592-RT3592-Bluetoot.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0004-rt2x00-Interface-sequence-lock-doesn-t-have-to-disab.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0005-rt2x00-Move-rt2800_txdone-and-rt2800_txdone_entry_ch.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0006-rt2x00-Enabled-rt35xx-device-support-by-default.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0009-rt2x00-fix-possible-memory-corruption-in-case-of-inv.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0010-rt2x00-reset-usb-devices-at-probe.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0011-rt2x00-Fix-unspeficied-typo.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0012-rt2x00-Serialize-TX-operations-on-a-queue.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0013-rt2x00-Don-t-use-queue-entry-as-parameter-when-creat.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0014-rt2x00-Reduce-window-of-a-queue-s-tx-lock.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0015-rt2x00-Add-device-ID-for-RT539F-device.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0016-rt2x00-Properly-identify-rt2800usb-devices.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0017-rt2x00-Implement-tx_frames_pending-mac80211-callback.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0018-rt2800usb-Add-new-device-ID-for-Belkin.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0019-rt2x00-rt2800-fix-zeroing-skb-structure.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0020-rt2x00-Fix-compilation-without-CONFIG_RT2X00_LIB_CRY.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0021-rt2x00-fix-usage-of-NULL-queue.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0022-rt2x00-Add-new-rt73-buffalo-USB-id.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0023-rt2x00-Add-rt2870-device-id-for-Dvico-usb-key.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0024-rt2x00-fix-crash-in-rt2800usb_write_tx_desc.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0025-rt2x00-fix-order-of-entry-flags-modification.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0026-rt2x00-fix-crash-in-rt2800usb_get_txwi.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0027-rt2x00-do-not-drop-usb-dev-reference-counter-on-susp.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0028-rt2800pci-Fix-compiler-error-on-PowerPC.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rt2x00/0029-rtl2800usb-Fix-incorrect-storage-of-MAC-address-on-b.patch%1
 
          # other features
-         http://chakra-project.org/sources/linux/patches/3/features/rtl8192cu_add-USB-ID-for-Belkin-n300-Micro-USB-wireless-adapter.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3/features/rtl8192cu_add-USB-ID-for-Belkin-n300-Micro-USB-wireless-adapter.patch%1
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.0.6-1-CHAKRA"
+PATCHNAME="patch-3.0.7-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
