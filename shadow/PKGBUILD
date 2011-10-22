@@ -1,9 +1,12 @@
-# $Id: PKGBUILD 70658 2010-02-28 04:30:43Z allan $
-# Maintainer: Aaron Griffin <aaron@archlinux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=shadow
-pkgver=4.1.4.2
-pkgrel=2
+pkgver=4.1.4.3
+pkgrel=1
 pkgdesc="Shadow password file utilities"
 arch=('i686' 'x86_64')
 url='http://pkg-shadow.alioth.debian.org/'
@@ -16,13 +19,16 @@ backup=(etc/login.defs
         etc/pam.d/{chfn,chgpasswd,groupmems,chsh}
         etc/default/useradd)
 depends=('pam')
-source=(ftp://pkg-shadow.alioth.debian.org/pub/pkg-shadow/shadow-$pkgver.tar.bz2
-        useradd.defaults login passwd chgpasswd defaults.pam login.defs adduser
-        shadow.cron.daily xstrdup.patch)
+source=("http://pkg-shadow.alioth.debian.org/releases/${pkgname}-${pkgver}.tar.bz2"
+        'useradd.defaults' 'login' 'passwd' 'chgpasswd' 'defaults.pam' 'login.defs' 'adduser' 'shadow.cron.daily'
+        'xstrdup.patch'
+        'shadow-add-missing-include.patch'
+        'shadow-strncpy-usage.patch'
+        'fs#343-cannot-determine-your-user-name.patch')
 options=(!libtool)
 install='shadow.install'
-md5sums=('d593a9cab93c48ee0a6ba056db8c1997'
-         'beb64d09256ea46a4d96a783f096447f'
+md5sums=('b8608d8294ac88974f27b20f991c0e79'
+         'ccf2ef156798dc07c92300682f3c7f9d'
          '0aa429de6773ebcdf89db80165379cc6'
          'b84204ab731bd02dca49d0637d44ebec'
          '65e9ebce249a5b9ed021e2790452b9e1'
@@ -30,18 +36,24 @@ md5sums=('d593a9cab93c48ee0a6ba056db8c1997'
          'fad9a7116366f7775b1099290be840da'
          '6ce67e423ee19c87ae64f661310b2408'
          '1d64b4113e1d402746d9dd65f28a2c6f'
-         '0eebe9d13065bec4b5d7ccf3bf46c509')
+         '0eebe9d13065bec4b5d7ccf3bf46c509'
+         '2b524cc4b749490117017ae24c2bb71e'
+         'be1c0a3faa5e44777783c154ebd0f6d0'
+         '21869fc00183947baae4ddf4eb07e4ac')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
-  #Ugh, force this to build shared libraries, for god's sake
+  # Ugh, force this to build shared libraries, for god's sake
   sed -i "s/noinst_LTLIBRARIES/lib_LTLIBRARIES/g" lib/Makefile.am
   libtoolize
   autoreconf
-  export LDFLAGS="$LDFLAGS -lcrypt"
+  export LDFLAGS="${LDFLAGS} -lcrypt"
 
-  patch -Np1 -i $srcdir/xstrdup.patch || return 1
+  patch -p1 -i "${srcdir}/xstrdup.patch"
+  patch -p1 -i "${srcdir}/shadow-strncpy-usage.patch"
+  patch -p1 -i "${srcdir}/shadow-add-missing-include.patch"
+  patch -p0 -i "${srcdir}/fs#343-cannot-determine-your-user-name.patch"
 
   # supress etc/pam.d/*, we provide our own
   sed -i '/^SUBDIRS/s/pam.d//' etc/Makefile.in
@@ -51,38 +63,45 @@ build() {
     --mandir=/usr/share/man --sysconfdir=/etc \
     --enable-shared --disable-static \
     --with-libpam --without-selinux
-  make || return 1
-  make DESTDIR=$pkgdir install
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
 
   # license
-  install -Dm644 COPYING $pkgdir/usr/share/licenses/shadow/COPYING
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/shadow/COPYING"
 
   # interactive useradd
-  install -Dm755 $srcdir/adduser $pkgdir/usr/sbin/adduser
+  install -Dm755 "${srcdir}/adduser" "${pkgdir}/usr/sbin/adduser"
 
   # useradd defaults
-  install -Dm644 $srcdir/useradd.defaults $pkgdir/etc/default/useradd
+  install -Dm644 "${srcdir}/useradd.defaults" "${pkgdir}/etc/default/useradd"
 
   # cron job
-  install -Dm744 $srcdir/shadow.cron.daily $pkgdir/etc/cron.daily/shadow
+  install -Dm744 "${srcdir}/shadow.cron.daily" "${pkgdir}/etc/cron.daily/shadow"
 
   # login.defs
-  install -Dm644 $srcdir/login.defs $pkgdir/etc/login.defs
+  install -Dm644 "${srcdir}/login.defs" "${pkgdir}/etc/login.defs"
 
-  # PAM config - cutsom
-  install -Dm644 $srcdir/login $pkgdir/etc/pam.d/login
-  install -Dm644 $srcdir/passwd $pkgdir/etc/pam.d/passwd
-  install -Dm644 $srcdir/chgpasswd $pkgdir/etc/pam.d/chgpasswd
+  # PAM config - custom
+  install -Dm644 "${srcdir}/login" "${pkgdir}/etc/pam.d/login"
+  install -Dm644 "${srcdir}/passwd" "${pkgdir}/etc/pam.d/passwd"
+  install -Dm644 "${srcdir}/chgpasswd" "${pkgdir}/etc/pam.d/chgpasswd"
   # PAM config - from tarball
-  install -Dm644 etc/pam.d/groupmems $pkgdir/etc/pam.d/groupmems
+  install -Dm644 etc/pam.d/groupmems "${pkgdir}/etc/pam.d/groupmems"
 
   # we use the 'useradd' PAM file for other similar utilities
   for file in chage chpasswd chfn chsh groupadd groupdel groupmod \
       newusers shadow useradd usermod userdel; do
-    install -Dm644 $srcdir/defaults.pam $pkgdir/etc/pam.d/$file
+    install -Dm644 "${srcdir}/defaults.pam" "${pkgdir}/etc/pam.d/$file"
   done
 
   # Remove su - using su from coreutils instead
-  rm -v $pkgdir/bin/su
-  find $pkgdir/usr/share/man -name 'su.1' -exec rm -v {} \;
+  rm -v "${pkgdir}/bin/su"
+  find "${pkgdir}/usr/share/man" -name 'su.1' -exec rm -v {} \;
 }
+
+# vim:set ts=2 sw=2 et:
