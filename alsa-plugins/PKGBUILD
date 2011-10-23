@@ -3,7 +3,7 @@
 # Contributor: Daniel Ehlers <danielehlers@mindeye.net>
 
 pkgname=alsa-plugins
-pkgver=1.0.24
+pkgver=1.0.24.901
 pkgrel=1
 pkgdesc="Extra alsa plugins"
 arch=('i686' 'x86_64')
@@ -14,11 +14,29 @@ makedepends=('pulseaudio' 'jack' 'ffmpeg')
 optdepends=('pulseaudio' 'jack' 'ffmpeg')
 options=('!libtool')
 install=$pkgname.install
-source=(ftp://ftp.alsa-project.org/pub/plugins/alsa-plugins-$pkgver.tar.bz2)
-md5sums=('e4d4c90e11ab9d1a117afbbc1edd2b16')
+#source=(ftp://ftp.alsa-project.org/pub/plugins/alsa-plugins-$pkgver.tar.bz2)
+#md5sums=('e4d4c90e11ab9d1a117afbbc1edd2b16')
+
+source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('01d00251cbe4f510e131eeee69c8361a')
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf ${pkgname}-${pkgver}
+	  git clone git://git.alsa-project.org/${pkgname}.git ${pkgname}-${pkgver}
+	  rm -vRf ${pkgname}-${pkgver}/.git
+	  pushd ${pkgname}-${pkgver}
+	  popd
+	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}-${pkgver}/*
+	  md5sum ${pkgname}-${pkgver}.tar.xz
+}
 
 build() {
   cd $startdir/src/alsa-plugins-$pkgver
+  # only on git tarballs
+  autoreconf -v --force --install
+
   ./configure --prefix=/usr
   make || return 1
   make DESTDIR=$startdir/pkg install || return 1
