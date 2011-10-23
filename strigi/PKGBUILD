@@ -8,7 +8,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=strigi
 pkgver=0.7.6
-pkgrel=1
+pkgrel=2
 pkgdesc="Fast crawling desktop search engine with Qt4 GUI"
 arch=('i686' 'x86_64')
 url="http://www.vandenoever.info/software/strigi/"
@@ -18,11 +18,16 @@ makedepends=('qt' 'cmake' 'pkgconfig' 'boost')
 provides=('strigi-git')
 replaces=('strigi-git')
 conflicts=('strigi-git')
-source=("http://rdieter.fedorapeople.org/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('41cddd39e4ae3f590d82c859a14e9261')
+source=("http://rdieter.fedorapeople.org/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
+       'libstreamanalyzer_pdf.patch')
+md5sums=('41cddd39e4ae3f590d82c859a14e9261'
+        '3e722a93cf5c6238e625ca58463afac2')
 options=('!libtool')
 
 build() {
+  cd "${srcdir}"/${pkgname}-${pkgver}/libstreamanalyzer
+  patch -p1 -i "${srcdir}"/libstreamanalyzer_pdf.patch
+
   cd "${srcdir}"
   mkdir build
   cd build
