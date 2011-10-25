@@ -25,7 +25,7 @@ pkgname=('kdeutils-ark'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
@@ -37,9 +37,10 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}"
              'system-config-printer-common' 'libarchive' 'qimageblitz'
              'p7zip' 'zip' 'unzip' 'unrar' "kdepim-runtime>=${_kdever}" 'docbook-xsl')
 
-source=("$_mirror/${pkgbase}-$_kdever.tar.bz2")
-md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
-
+source=("$_mirror/${pkgbase}-$_kdever.tar.bz2"
+        "fix-ark-security.diff")
+md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
+         '01f4244af8af3a09c955ed13daba75cc')
 
 
 #
@@ -47,7 +48,12 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 #
 build()
 {
-	cd ${srcdir}/${pkgbase}-${pkgver}
+	# fixes
+	msg "applying fixes ..."
+        cd "${srcdir}"/${pkgbase}-${pkgver}/ark
+	patch -p1 -i ${srcdir}/fix-ark-security.diff || return 1
+
+        cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
