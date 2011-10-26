@@ -4,7 +4,7 @@
 
 pkgname=appset-qt
 pkgver=0.7.0
-pkgrel=0pre1
+pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
 url="http://appset.sourceforge.net/"
@@ -12,17 +12,17 @@ license=('GPL2')
 depends=('qt>=4.7' 'kde-baseapps-konsole')
 optdepends=('ccr: For Community Repository support')
 install=${pkgname}.install
-source=(http://sourceforge.net/projects/appset/files/appset-qt/0.7/0.7.0/appset-qt-0.7.0pre-sources.tar.gz
+source=(http://sourceforge.net/projects/appset/files/appset-qt/0.7/0.7.0/appset-qt-0.7.0-sources.tar.gz
         http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
         http://chakra-project.org/sources/$pkgname/$pkgname-0.7.0-chakra.patch
         )
-md5sums=(81abf5d52532e2a7f98e374fe3b3140e
+md5sums=(6c76c96a30972419bc64c64c71b7a35f
          87f5f278e3fe67ed2cd6165c2835d81b
-         9b6b473d2a2ff31457f0f6e9fe3d345f
+         d236f4d2391acace22df0c8fa532ba52
          )
 
 build() {
-  cd $srcdir/$pkgname-0.7.0pre-sources
+  cd $srcdir/$pkgname-0.7.0-sources
   # copy oxygen icons
   cp -v ../*png Qt/AppSet-Qt
 
@@ -49,12 +49,12 @@ build() {
 }
 
 package() {
-    cd $srcdir/$pkgname-0.7.0pre-sources
+    cd $srcdir/$pkgname-0.7.0-sources
 
     make INSTALL_ROOT="$pkgdir/" install
 
     #helper daemon
     install -m 755 -d "$pkgdir/etc/rc.d" || return 1
-    install -m 755 "$srcdir/$pkgname-0.7.0pre-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
+    install -m 755 "$srcdir/$pkgname-0.7.0-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
 }
 
