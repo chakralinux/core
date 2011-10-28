@@ -1,0 +1,29 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# contributor made by: Gris Ge <cnfourt@gmail.com>
+
+pkgname="perl-list-moreutils"
+pkgver="0.33"
+pkgrel="1"
+pkgdesc="Provide the stuff missing in List::Util"
+arch=('i686' 'x86_64')
+makedepends=( 'perl' )
+url="http://search.cpan.org/~adamk/List-MoreUtils-$pkgver"
+license=('PerlArtistic')
+depends=('')
+source=("http://search.cpan.org/CPAN/authors/id/A/AD/ADAMK/List-MoreUtils-$pkgver.tar.gz")
+md5sums=('8a33c84028cc2ff3e92c92434b326c0f')
+
+build() {
+    cd $srcdir/List-MoreUtils-${pkgver} $?
+    perl Makefile.PL 
+    make 
+}
+
+package() {
+    cd $srcdir/List-MoreUtils-${pkgver} $?
+    make install DESTDIR=${pkgdir} 
+}
