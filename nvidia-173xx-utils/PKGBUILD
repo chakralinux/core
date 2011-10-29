@@ -9,14 +9,15 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=nvidia-173xx-utils
 pkgver=173.14.31
-pkgrel=2
+pkgrel=3
 pkgdesc="NVIDIA drivers utilities and libraries, 173xx branch."
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86 	 
 [ "$CARCH" = "x86_64" ] && ARCH=x86_64
 url="http://www.nvidia.com/"
-depends=('xorg-server' 'libgl')
-conflicts=('nvidia-utils')
+depends=('xorg-server')
+conflicts=('nvidia-utils' 'libgl')
+provides=('libgl')
 optdepends=('gtk2: nvidia-settings' 'pkgconfig: nvidia-xconfig')
 license=('custom')
 install=nvidia.install
