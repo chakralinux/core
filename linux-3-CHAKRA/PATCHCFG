@@ -1,10 +1,11 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.0.7"
+_patch="3.0.8"
+_prepatch=""
 _queue="3.0"
 # Aufs
-_aufs="3.0-20110919"
+_aufs="3.0-20111024"
 # Kernel source file
 #SRC="ftp://ftp.kernel.org/pub/linux/kernel/v3.0/linux-3.0.tar.bz2"
 SRC="http://ftp.uni-erlangen.de/pub/mirrors/kernel.org/v3.0/linux-3.0.tar.bz2"
@@ -18,33 +19,12 @@ SRCNAME="linux-3.0-CHAKRA"
 #   filename%patchlevel (file must be in patches subdirectory)
 PATCHES=(
          # add upstream patch from 3.0 series
-         #ftp://ftp.kernel.org/pub/linux/kernel/v3.0/patch-3.0.4.gz%1
-         #http://ftp.uni-erlangen.de/pub/mirrors/kernel.org/v3.0/patch-3.0.4.gz%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/$_patch.patch%1
+         #ftp://ftp.kernel.org/pub/linux/kernel/v3.0/patch-$_patch.gz%1
+         http://ftp.uni-erlangen.de/pub/mirrors/kernel.org/v3.0/patch-$_patch.gz%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/arm-7113-1-mm-align-bank-start-to-max_order_nr_pages.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/arm-7117-1-perf-fix-hw_cache_-events-on-cortex-a9.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/hid-usbhid-add-support-for-sigma-micro-chip.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/hwmon-w83627ehf-properly-report-thermal-diode-sensors.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/avoid-using-variable-length-arrays-in-kernel-sys.c.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/drm-radeon-kms-atom-fix-handling-of-fb-scratch-indices.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/cputimer-cure-lock-inversion.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/fuse-fix-memory-leak.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/platform-fix-samsung-laptop-dmi-identification-for-n150-n210-220-n230.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/hid-magicmouse-ignore-ivalid-report-id-while-switching-modes-v2.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/uvcvideo-fix-crash-when-linking-entities.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/hfsplus-ensure-bio-requests-are-not-smaller-than-the-hardware-sectors.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/drm-ttm-ensure-ttm-for-new-node-is-bound-before-calling-move_notify.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/drm-ttm-unbind-ttm-before-destroying-node-in-accel-move-cleanup.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/cifs-fix-err_ptr-dereference-in-cifs_get_root.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-start-periodic-workers-later.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-use-a-cursor-for-bulk-ail-insertion.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-do-not-update-xa_last_pushed_lsn-for-locked-items.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-force-the-log-if-we-encounter-pinned-buffers-in-.iop_pushbuf.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/xfs-revert-to-using-a-kthread-for-ail-pushing.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3/upstream/firewire-sbp2-fix-panic-after-rmmod-with-slow-targets.patch%1
+         #http://chakra.sourceforge.net/sources/linux/patches/3/upstream/$_prepatch.patch%1
 
          # fix #19234 i1915 display size
          http://chakra.sourceforge.net/sources/linux/patches/3/bugfix/fix-i915.patch%1
@@ -56,9 +36,6 @@ PATCHES=(
          # remove this when a Kconfig knob is made available by upstream
          # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
          http://chakra.sourceforge.net/sources/linux/patches/3/bugfix/change-default-console-loglevel.patch%1
-
-         # stable candidate patches
-         # none this time
 
          # add aufs3 support, in reference to:
          # http://aufs.sourceforge.net
@@ -158,7 +135,7 @@ PATCHES=(
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.0.7-1-CHAKRA"
+PATCHNAME="patch-3.0.8-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
