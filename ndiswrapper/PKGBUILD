@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ndiswrapper
 pkgver=1.56
-pkgrel=16
+pkgrel=17
 
 # Find the kernel name inside the chroot
 _kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
@@ -19,30 +19,46 @@ license=('GPL')
 arch=(i686 x86_64)
 url="http://ndiswrapper.sourceforge.net"
 install="ndiswrapper.install"
-depends=("ndiswrapper-utils=$pkgver" 'linux>=3.0' 'linux<3.1')
+depends=("ndiswrapper-utils=$pkgver" 'linux>=3.1' 'linux<3.2')
 makedepends=('linux-headers')
 source=(http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz
         kernel-2.6.35.patch
         kernel-2.6.36.patch
-        kernel-2.6.38.patch)
+        kernel-2.6.38.patch
+        kernel-3.1.patch)
 build()
 {
-  cd $srcdir/ndiswrapper-$pkgver/driver
-  patch -Np2 -i $startdir/kernel-2.6.35.patch
-  patch -Np2 -i $startdir/kernel-2.6.36.patch
-  patch -Np2 -i $startdir/kernel-2.6.38.patch
-  make KVERS=$_kernver
-  make DESTDIR=$pkgdir KVERS=$_kernver install
-  rm $pkgdir/lib/modules/$_kernver/modules.* #wtf?
+  cd "$srcdir/$pkgname-$pkgver"
 
-  sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/*.install
-  # move it to correct kernel directory
-  mkdir -p $pkgdir/lib/modules/$_kernver/kernel/drivers/net/wireless/ndiswrapper
-  mv $pkgdir/lib/modules/$_kernver/misc/* $pkgdir/lib/modules/$_kernver/kernel/drivers/net/wireless/ndiswrapper/
-  rm -r $pkgdir/lib/modules/$_kernver/misc/
+  # kernel patches
+  patch -Np1 -i "$srcdir/kernel-2.6.35.patch"
+  patch -Np1 -i "$srcdir/kernel-2.6.36.patch"
+  patch -Np1 -i "$srcdir/kernel-2.6.38.patch"
+  patch -Np1 -i "$srcdir/kernel-3.1.patch"
+
+  # fix regex to accept kernel version 3.x
+  sed -i "/uname/s/\/.*\//\/(\\\d+)\\\.(\\\d+)\//" utils/$pkgname
+
+  # fix module dir
+  sed -i "s|misc|kernel/drivers/net/wireless/$pkgname|" driver/Makefile
+
+  make KVERS=$_kernver
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  make DESTDIR="$pkgdir/" KVERS=$_kernver install
+
+  # remove useless files (they already exist)
+  rm "$pkgdir"/lib/modules/$_kernver/modules.*
+
+  # gzip -9 modules
+  find "$pkgdir" -name '*.ko' -exec gzip -9 {} \;
 }
 
 md5sums=('1431f7ed5f8e92e752d330bbb3aed333'
          '0a03d613b1fd545a75c5dd1a7c2aaec4'
          'cc16ed13449f17e90865df688b180b2c'
-         '2499a87276ae0c8ce39bea6ef942d926')
+         '2499a87276ae0c8ce39bea6ef942d926'
+         '993e83a5348740b81d8f9d6e819de8b8')
