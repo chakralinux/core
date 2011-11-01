@@ -4,30 +4,36 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=parted
-pkgver=2.3
+pkgver=3.0
 pkgrel=1
 pkgdesc="A program for creating, destroying, resizing, checking and copying partitions"
 arch=('i686' 'x86_64')
 license=('GPL3')
 url="http://www.gnu.org/software/parted/parted.html"
 depends=('device-mapper' 'e2fsprogs')
+makedepends=('pkgconfig')
 options=('!libtool')
-install=parted.install
-source=(ftp://ftp.gnu.org/pub/gnu/parted/parted-${pkgver}.tar.gz)
-md5sums=('30ceb6df7e8681891e865e2fe5a7903d')
+install=${pkgname}.install
+source=("http://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz"
+        linux.c.patch)
+md5sums=('c415e5c97f86b5ff65a2d925e5a3feb7'
+         '08c942e212424e238271217f52c59706')
 
 build() {
-  cd "${srcdir}/parted-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  # FS#25307
+  patch -Np1 -i ${srcdir}/linux.c.patch
 
   ./configure --prefix=/usr \
               --disable-debug \
-              --disable-rpath \
-              --disable-Werror || return 1
+              --disable-rpath
+  make
+}
 
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
 }
