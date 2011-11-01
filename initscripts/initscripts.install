@@ -1,4 +1,15 @@
 post_upgrade() {
+
+  rcdata=$(cat /etc/rc.conf | grep "LOCALE=" | grep -v "DAEMON" | cut -d '"' -f2) 
+  if [ Â"$rcdata" != "" ] ; then
+        rm /etc/locale.conf
+	echo "Found old language configuration in /etc/rc.conf"
+	echo "the file /etc/locale.conf will be configured automatically"
+        echo "LANG=${rcdata}" >> /etc/locale.conf
+        echo "LC_MESSAGES=C" >> /etc/locale.conf
+        echo " "
+  fi
+
   if [ "$(vercmp $2 2011.06.1)" -lt 0 ]; then
     echo "Blacklisting of modules is no longer supported in rc.conf,"
     echo "please add blacklist entries to /etc/modprobe.d/ instead."
