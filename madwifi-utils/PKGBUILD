@@ -9,7 +9,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 
 pkgname=madwifi-utils
-pkgver=0.9.4.4133
+pkgver=0.9.4.4173
+_ver=0.9.4-r4173-20111008
 # Find the kernel name inside the chroot
 _kernver=`pacman -Q kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 pkgrel=1
@@ -23,7 +24,7 @@ provides=("madwifi-ng-utils")
 conflicts=("madwifi-ng-utils")
 replaces=("madwifi-ng-utils")
 # subversion source: svn checkout http://madwifi-project.org/svn/madwifi/trunk madwifi
-source=(ftp://ftp.archlinux.org/other/madwifi/madwifi-${pkgver}.tar.bz2
+source=(http://chakra.sourceforge.net/sources/madwifi/madwifi-${pkgver}.tar.gz
 	#http://downloads.sourceforge.net/sourceforge/madwifi/madwifi-$pkgver.tar.gz
 	)
 
@@ -32,11 +33,11 @@ build() {
 
   export KERNELPATH=/lib/modules/${_kernver}/build
   #cd $startdir/src/madwifi-$pkgver
-  cd $startdir/src/madwifi
+  cd $startdir/src/madwifi-$_ver
   make tools|| return 1
   make DESTDIR=$startdir/pkg \
        BINDIR=/usr/bin \
        MANDIR=/usr/share/man \
        install-tools
 }
-md5sums=('ca3c3504d000e7b3d7063af46271c932')
+md5sums=('18cd1c574e0fa66eb4396f92f0700a7e')
