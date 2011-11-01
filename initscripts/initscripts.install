@@ -1,7 +1,7 @@
 post_upgrade() {
 
   rcdata=$(cat /etc/rc.conf | grep "LOCALE=" | grep -v "DAEMON" | cut -d '"' -f2) 
-  if [ Â"$rcdata" != "" ] ; then
+  if [ "$rcdata" != "" ] ; then
         rm /etc/locale.conf
 	echo "Found old language configuration in /etc/rc.conf"
 	echo "the file /etc/locale.conf will be configured automatically"
