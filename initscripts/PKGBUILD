@@ -5,40 +5,43 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=initscripts
-pkgver=2011.09.1
-_pkgver=2011.09
+pkgver=2011.11.0
 pkgrel=1
+_codename=Edn
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
 url="http://www.chakra-project.org"
 license=('GPL2')
 groups=('base')
 backup=(etc/inittab etc/rc.conf etc/rc.local etc/rc.local.shutdown etc/conf.d/wireless)
-depends=('glibc' 'bash' 'grep' 'coreutils' 'udev>=171-2' 'iproute2'
+depends=('glibc' 'bash' 'grep' 'coreutils' 'udev>=174' 'iproute2'
          'ncurses' 'kbd' 'findutils' 'sysvinit')
 optdepends=('bridge-utils: Network bridging support'
             'dhcpcd: DHCP network configuration'
             'net-tools: legacy network support'
             'wireless_tools: Wireless networking')
+makedepends=(asciidoc)
 install=initscripts.install
-source=("http://chakra-project.org/sources/initscripts/initscripts-${_pkgver}.tar.xz"
-        'http://chakra-project.org/sources/initscripts/wireless.conf.d')
-sha256sums=('569041e2009fc4b9fe3011d459443fd82dbbeee7c79cb796d88abb8e598d9448'
-            '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f')
+source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz"
+        'wireless.conf.d')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-	  rm -vRf ${pkgname}-${_pkgver}
-	  git clone git://gitorious.org/chakra/chakra-${pkgname}.git ${pkgname}-${_pkgver}
-	  rm -vRf ${pkgname}-${_pkgver}/.git
-	  pushd ${pkgname}-${_pkgver}
-	  popd
-	  tar -cvJf ${pkgname}-${_pkgver}.tar.xz ${pkgname}-${_pkgver}/*
-	  sha256sum ${pkgname}-${_pkgver}.tar.xz
+  rm -vRf chakra-${pkgname}
+  git clone git://gitorious.org/chakra/chakra-${pkgname}.git
+  rm -vRf chakra-${pkgname}/.git
+  pushd chakra-${pkgname}
+  popd
+  tar -cvJf ${pkgname}-${pkgver}.tar.xz chakra-${pkgname}/*
+  md5sum ${pkgname}-${pkgver}.tar.xz
 }
+
 package() {
-  cd ${srcdir}/${pkgname}-${_pkgver}
+  cd ${srcdir}/chakra-${pkgname}
   make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
 }
+
+md5sums=('e0e4758bc7e5bc6feb01d3f686329582'
+         '027576534885b8d5dded9be546057b12')

@@ -5,30 +5,32 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=mkinitcpio-busybox
-pkgver=1.18.4
-pkgrel=2
+pkgver=1.19.2
+pkgrel=1
 pkgdesc="base initramfs tools"
 arch=('i686' 'x86_64')
 url="http://www.busybox.net/"
 license=('GPL')
 depends=('glibc')
-source=(http://busybox.net/downloads/busybox-${pkgver}.tar.bz2
-        config)
-sha256sums=('4d24d37bd6f1bd153e8cf9a984ec2f32f18464f73ca535e2cc2e8be9694097fa'
-            'dd6dca08fbc335f1394e0f1b619df6895349c759d0c6e43456aed411e16d4194')
+options=()
+source=("http://busybox.net/downloads/busybox-$pkgver.tar.bz2"
+        'config')
+sha256sums=('ea7ec9b6df70b8c528f4a2b6300e9913431c7223308fb08dfafa7508d75a0cb9'
+            '21ae2cd21e33ba1ef9500a9b14273579fc554bf995cfd7907fb3fe94fc162cf8')
 
 build() {
-  cd "${srcdir}/busybox-${pkgver}"
+  cd "$srcdir/busybox-$pkgver"
 
-  unset CFLAGS CXXFLAGS
-  if [ ${CARCH} = "x86_64" ]; then
-    sed 's|^CONFIG_EXTRA_CFLAGS=.*|CONFIG_EXTRA_CFLAGS="-march=x86-64 -mtune=generic -Os -pipe -fno-strict-aliasing"|' "${srcdir}/config" > .config
-  else
-    sed 's|^CONFIG_EXTRA_CFLAGS=.*|CONFIG_EXTRA_CFLAGS="-march=i686 -mtune=generic -Os -pipe -fno-strict-aliasing"|' "${srcdir}/config" > .config
-  fi
+  local safeflags="${CARCH/_/-} -mtune=generic -Os -pipe -fno-strict-aliasing"
+
+  sed 's|^\(CONFIG_EXTRA_CFLAGS\)=.*|\1="-march='"$safeflags"'"|' \
+    "$srcdir/config" > .config
+
   make
 }
 
 package() {
-  install -D -m755 "${srcdir}/busybox-${pkgver}"/busybox "${pkgdir}/lib/initcpio/busybox"
+  install -Dm755 "$srcdir/busybox-$pkgver/busybox" "$pkgdir/lib/initcpio/busybox"
 }
+
+# vim:set ts=2 sw=2 et:

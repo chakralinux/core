@@ -6,21 +6,22 @@
 
 pkgbase="udev"
 pkgname=('udev' 'udev-compat')
-pkgver=173
+pkgver=174
 pkgrel=1
 arch=(i686 x86_64)
 url="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
 license=('GPL')
 groups=('base')
-# older initscripts versions required start_udev
 options=(!makeflags !libtool)
-makedepends=('glibc' 'coreutils' 'util-linux' 'pciutils' 'libusb-compat' 'glib2' 'kernel26' 'gperf' 'libxslt' 'gobject-introspection')
-source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgbase-$pkgver.tar.bz2
+makedepends=('gobject-introspection' 'gperf')
+#source=(http://www.kernel.org/pub/linux/utils/kernel/hotplug/$pkgbase-$pkgver.tar.bz2
+source=(http://people.freedesktop.org/~kay/$pkgbase-$pkgver.tar.bz2
         81-chakra.rules
         82-optical-symlinks.rules)
 
 build() {
   cd $srcdir/$pkgbase-$pkgver
+
   ./configure --sysconfdir=/etc\
               --with-rootlibdir=/lib\
               --libexecdir=/lib/udev\
@@ -28,13 +29,13 @@ build() {
               --with-systemdsystemunitdir=/lib/systemd/system\
               --disable-rule-generator\
               --enable-udev_acl
+
   make
 }
   
 package_udev() {
   pkgdesc="The userspace dev tools (udev)"
-  depends=('glibc' 'coreutils' 'util-linux' 'libusb-compat' 'glib2'
-           'module-init-tools>=3.11' 'pciutils')
+  depends=('util-linux' 'libusb-compat' 'glib2' 'module-init-tools' 'pciutils')
   install=udev.install
   backup=(etc/udev/udev.conf)
   conflicts=('pcmcia-cs' 'hotplug' 'initscripts<2009.07')
@@ -53,10 +54,13 @@ package_udev() {
   	echo "blacklist $mod" 
   done | sort -u > $pkgdir/lib/modprobe.d/framebuffer_blacklist.conf
 
-  # these static devices are created for convenience, to autoload the modules if necessary
-  # /dev/loop0
+  # /dev/loop0 is created for convenience, to autoload the module if necessary
+  # may be obsoleted by https://lkml.org/lkml/2011/7/30/111
   mknod -m 0660 ${pkgdir}/lib/udev/devices/loop0 b 7 0
   chgrp disk ${pkgdir}/lib/udev/devices/loop0
+
+  # udevd moved, symlink to make life easy for restarting udevd manually
+  ln -s /lib/udev/udevd ${pkgdir}/sbin/udevd
 
   # Replace dialout/tape/cdrom group in rules with uucp/storage/optical group
   for i in $pkgdir/lib/udev/rules.d/*.rules; do
@@ -96,6 +100,7 @@ package_udev-compat() {
   # /dev/ppp
   mknod -m 0600 ${pkgdir}/lib/udev/devices/ppp c 108 0
 }
-sha256sums=('70a18315a12f8fc1131f7da5b4dae3606988b69d5c08f96f443b84b8486caaaf'
-            'b1bc9c86ec3ccdff87ef6926092c13e1bac4144c32879e826d240c79828aaf51'
+
+sha256sums=('832662179a5ff9782769b0feadd51aaaea6e603f91f6ef0ec8bb6aab0fb3ad1a'
+            '68f2d480d8e163ec3f6ecb13f37faccfc4f0c1093fa3788439d55be08da5e93b'
             '284b665b1fd149bf1e211009d3d630b18147d8b9f8b34f43fa46678f88b97f6d')

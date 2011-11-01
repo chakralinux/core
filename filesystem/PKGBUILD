@@ -5,8 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=filesystem
-pkgver=2011.09
-pkgrel=2
+pkgver=2011.11.0
+pkgrel=1
 _codename=Edn
 pkgdesc="Base filesystem"
 arch=('any')
@@ -19,8 +19,8 @@ backup=(etc/fstab etc/crypttab etc/group etc/hosts etc/ld.so.conf etc/passwd
         etc/shadow etc/gshadow etc/resolv.conf etc/motd etc/nsswitch.conf
         etc/shells etc/host.conf etc/securetty etc/profile etc/issue
         etc/chakra-release)
-source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-0.2011.06.17.tar.xz")
-md5sums=('3d9022e13bb10fbf131d27a6584a58f7')
+source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
+md5sums=('646e0ae42faae3c67e79cfa82ee377e3')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -62,7 +62,7 @@ package() {
 		install -m600 ${srcdir}/chakra-${pkgname}/${f} ${pkgdir}/etc/
 	done
 
-	install -D -m644 ${srcdir}/chakra-${pkgname}/modprobe.d.usb-load-ehci-first ${pkgdir}/etc/modprobe.d/usb-load-ehci-first.conf
+	install -D -m644 ${srcdir}/chakra-${pkgname}/modprobe.d.usb-load-ehci-first ${pkgdir}/lib/modprobe.d/usb-load-ehci-first.conf
 
 	#
 	# setup /var
