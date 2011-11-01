@@ -1,8 +1,21 @@
 add_daemon() {
-  checkdmn=$(grep '^DAEMONS' /etc/rc.conf | grep cups)
+  local checkdmn=$(grep '^DAEMONS' /etc/rc.conf | grep cups)
+
   if [ -z "${checkdmn}" ]; then
     sed -i '/^DAEMONS/{s/)$/ cups)/}' /etc/rc.conf
   fi
+}
+
+add_group() {
+  # Create the "lpadmin" group, if needed
+  if ! getent group lpadmin 2> /dev/null; then
+    groupadd --system lpadmin
+  fi
+
+  # Add all the users in the "lp" group to "lpadmin" (expect for "daemon")
+  for user in $(getent group lp | cut -d ':' -f 4 | tr ',' ' '); do
+    [ "${user}" != "daemon" ] && gpasswd -a "${user}" lpadmin > /dev/null
+  done
 }
 
 post_install() {
@@ -11,6 +24,7 @@ post_install() {
   echo ">> the interface it may take a very long time before the site comes up."
   echo ">> This is because the first request triggers the generation of the CUPS"
   echo ">> SSL certificates which can be a very time-consuming job."
+  add_group
   add_daemon
   /etc/rc.d/cups restart
 }
@@ -28,9 +42,10 @@ post_upgrade() {
 
   if ( getent group lp && grep '^SystemGroup sys root$' "${cupsd}") &>/dev/null; then
     echo "[NOTICE] The CUPS configuration is being automatically tweaked to allow all users belonging to the \"lp\" group to administrate the server."
-    sed -i 's/^SystemGroup sys root$/SystemGroup sys root lp/g' "${cupsd}"
+    sed -i 's/^SystemGroup sys root$/SystemGroup sys root lpadmin/g' "${cupsd}"
   fi
 
+  add_group
   add_daemon
   /etc/rc.d/cups restart
 }
