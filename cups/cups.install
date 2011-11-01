@@ -1,24 +1,22 @@
-post_install() {
-  if [ -x usr/bin/xdg-icon-resource ]; then
-    xdg-icon-resource forceupdate --theme hicolor 2> /dev/null
+add_daemon() {
+  checkdmn=$(grep '^DAEMONS' /etc/rc.conf | grep cups)
+  if [ -z "${checkdmn}" ]; then
+    sed -i '/^DAEMONS/{s/)$/ cups)/}' /etc/rc.conf
   fi
+}
 
+post_install() {
+  xdg-icon-resource forceupdate --theme hicolor 2> /dev/null
   echo ">> If you use an HTTPS connection to CUPS, the first time you access"
   echo ">> the interface it may take a very long time before the site comes up."
   echo ">> This is because the first request triggers the generation of the CUPS"
   echo ">> SSL certificates which can be a very time-consuming job."
+  add_daemon
+  /etc/rc.d/cups restart
 }
 
 post_upgrade() {
-  if [ -x usr/bin/xdg-icon-resource ]; then
-    xdg-icon-resource forceupdate --theme hicolor 2> /dev/null
-  fi
-
-  if [ "$(vercmp "${2}" 1.4.7-2)" -lt 0 ]; then
-    # important upgrade notice
-    echo "The CUPS daemon script has been renamed to /etc/rc.d/cupsd"
-    echo "Change your entry in /etc/rc.conf"
-  fi
+  xdg-icon-resource forceupdate --theme hicolor 2> /dev/null
 
   # If the "lp" user group is still present, and the user has not changed the cupsd.conf
   # from the old default "SystemGroup sys root" setting, let's replace that line, so that
@@ -29,13 +27,19 @@ post_upgrade() {
   local cupsd=etc/cups/cupsd.conf
 
   if ( getent group lp && grep '^SystemGroup sys root$' "${cupsd}") &>/dev/null; then
-    echo "[NOTICE] the CUPS configuration is being automatically tweaked to allow all users belonging to the \"lp\" group to administrate the server."
+    echo "[NOTICE] The CUPS configuration is being automatically tweaked to allow all users belonging to the \"lp\" group to administrate the server."
     sed -i 's/^SystemGroup sys root$/SystemGroup sys root lp/g' "${cupsd}"
   fi
+
+  add_daemon
+  /etc/rc.d/cups restart
+}
+
+pre_remove() {
+  /etc/rc.d/cups stop
 }
 
 post_remove() {
-    if [ -x usr/bin/xdg-icon-resource ]; then
-	xdg-icon-resource forceupdate --theme hicolor 2> /dev/null
-    fi
+  xdg-icon-resource forceupdate --theme hicolor 2> /dev/null
+  sed -i '/^DAEMONS/{s/ cups)$/)/}' /etc/rc.conf
 }
