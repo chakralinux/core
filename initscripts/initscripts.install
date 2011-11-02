@@ -13,16 +13,17 @@ post_upgrade() {
   if [ "$(vercmp $2 2011.10.1)" -lt 0 ]; then
     echo "If using non-bash-compatible shell, please set LANG in /etc/locale.conf,"
     echo "as LOCALE in /etc/rc.conf no longer works."
-    rcdata=$(cat /etc/rc.conf | grep "LOCALE=" | grep -v "DAEMON" | cut -d '"' -f2)
   fi
 
-  if [ "$rcdata" != "" ] ; then
-    rm /etc/locale.conf
-    echo "Found old language configuration in /etc/rc.conf"
-    echo "the file /etc/locale.conf will be configured automatically"
-    echo "LANG=${rcdata}" >> /etc/locale.conf
-    echo "LC_MESSAGES=${rcdata}" >> /etc/locale.conf
-    echo " "
+  if [ ! -f /etc/locale.conf ] ; then
+    rcdata=$(cat /etc/rc.conf | grep "LOCALE=" | grep -v "DAEMON" | cut -d '"' -f2)
+    if [ "$rcdata" != "" ] ; then
+      echo "Found old language configuration in /etc/rc.conf"
+      echo "the file /etc/locale.conf will be configured automatically"
+      echo "LANG=${rcdata}" > /etc/locale.conf
+      echo "LC_MESSAGES=C" >> /etc/locale.conf
+      echo " "
+    fi
   fi
 
   if [ -f /etc/profile.d/locale,sh ] ; then
