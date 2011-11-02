@@ -14,17 +14,19 @@ post_upgrade() {
     echo "If using non-bash-compatible shell, please set LANG in /etc/locale.conf,"
     echo "as LOCALE in /etc/rc.conf no longer works."
     rcdata=$(cat /etc/rc.conf | grep "LOCALE=" | grep -v "DAEMON" | cut -d '"' -f2)
-    if [ "$rcdata" != "" ] ; then
-        rm /etc/locale.conf
-        echo "Found old language configuration in /etc/rc.conf"
-        echo "the file /etc/locale.conf will be configured automatically"
-        echo "LANG=${rcdata}" >> /etc/locale.conf
-        echo "LC_MESSAGES=${rcdata}" >> /etc/locale.conf
-        echo " "
-    fi
-    if [ -f /etc/profile.d/locale,sh ] ; then
-   	 rm /etc/profile.d/locale.sh
-    fi
-    mv /etc/profile.d/locale.sh.new /etc/profile.d/locale.sh
   fi
+
+  if [ "$rcdata" != "" ] ; then
+    rm /etc/locale.conf
+    echo "Found old language configuration in /etc/rc.conf"
+    echo "the file /etc/locale.conf will be configured automatically"
+    echo "LANG=${rcdata}" >> /etc/locale.conf
+    echo "LC_MESSAGES=${rcdata}" >> /etc/locale.conf
+    echo " "
+  fi
+
+  if [ -f /etc/profile.d/locale,sh ] ; then
+    rm /etc/profile.d/locale.sh
+  fi
+  mv /etc/profile.d/locale.sh.new /etc/profile.d/locale.sh
 }
