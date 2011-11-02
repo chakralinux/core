@@ -7,12 +7,12 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
+# Find the kernel name inside the chroot
+_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
 
 pkgname=madwifi-utils
 pkgver=0.9.4.4173
 _ver=0.9.4-r4173-20111008
-# Find the kernel name inside the chroot
-_kernver=`pacman -Q kernel26 | cut -c10-15 | sed 's/kernel26 //g'`-CHAKRA
 pkgrel=1
 pkgdesc="Userspace tools of madwifi drivers for Atheros wireless chipsets."
 arch=(i686 x86_64)
