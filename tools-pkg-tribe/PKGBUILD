@@ -8,7 +8,7 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.11.02
+pkgver=2011.11.05
 pkgrel=1
 _codename=Edn
 pkgdesc="Tribe - Chakra LiveCD Installer"
@@ -23,10 +23,10 @@ replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra.sourceforge.net/sources/tribe/tribe-${pkgver}.tar.xz"
-        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20111102.html")
+        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20111105.html")
   
-md5sums=('ffeae01a17f543e3ac4cb4e6a05e008a'
-         '76d0412a0240b4169c3a7673ab288e8b')
+md5sums=('a0cd5c3bdb1ef494462f1ba58662261b'
+         '0a307aa4eac761cd41e9c052923d3b49')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -75,7 +75,7 @@ package()
         cd "${srcdir}/${pkgname}-${pkgver}"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_20111102.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_20111105.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
