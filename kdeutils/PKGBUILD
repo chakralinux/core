@@ -41,13 +41,15 @@ source=("$_mirror/${pkgbase}-$_kdever.tar.bz2")
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 
-
 #
 # build function
 #
 build()
 {
-	cd ${srcdir}/${pkgbase}-${pkgver}
+	# fixes
+	# msg "applying fixes ..."
+
+        cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -72,6 +74,7 @@ package_kdeutils-ark()
 	optdepends=('p7zip' 'zip' 'unzip' 'unrar')
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('ark')
 	install=${pkgbase}.install
 
 	splitdirs="ark"
@@ -87,6 +90,7 @@ package_kdeutils-kcalc()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('kcalc')
 	install=${pkgbase}.install
 
 	splitdirs="kcalc"
@@ -102,6 +106,7 @@ package_kdeutils-kcharselect()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('kcharselect')
 	install=${pkgbase}.install
 
 	splitdirs="kcharselect"
@@ -117,6 +122,7 @@ package_kdeutils-kdelirc()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('kdelirc')
 	install=${pkgbase}.install
 
 	splitdirs="kdelirc"
@@ -136,6 +142,7 @@ package_kdeutils-kdessh()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('kdessh')
 	install=${pkgbase}.install
 
 	splitdirs="kdessh"
@@ -151,6 +158,7 @@ package_kdeutils-kdf()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('kdf')
 	install=${pkgbase}.install
 
 	splitdirs="kdf"
@@ -166,6 +174,7 @@ package_kdeutils-kfloppy()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('kfloppy')
 	install=${pkgbase}.install
 
 	splitdirs="kfloppy"
@@ -181,6 +190,7 @@ package_kdeutils-kgpg()
 	depends=("kde-runtime>=${_kdever}" "kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}" 'kde-agent') # "kdepim-runtime>=${_kdever}"
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('kgpg')
 	install=${pkgbase}.install
 
 	splitdirs="kgpg"
@@ -196,6 +206,7 @@ package_kdeutils-ktimer()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('ktimer')
 	install=${pkgbase}.install
 
 	splitdirs="ktimer"
@@ -211,6 +222,7 @@ package_kdeutils-kwallet()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('kwallet')
 	install=${pkgbase}.install
 
 	splitdirs="kwallet"
@@ -241,6 +253,7 @@ package_kdeutils-superkaramba()
 	depends=('qimageblitz')
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('superkaramba')
 	install=${pkgbase}.install
 
 	splitdirs="superkaramba"
@@ -256,6 +269,7 @@ package_kdeutils-sweeper()
 	depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 	conflicts=("kdeutils-common" "kdeutils-doc")
 	groups=("kde" "kdeutils" "kde-uninstall")
+        provides=('sweeper')
 	install=${pkgbase}.install
 
 	splitdirs="sweeper"

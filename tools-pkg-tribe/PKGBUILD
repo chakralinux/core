@@ -8,7 +8,7 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.09.21
+pkgver=2011.11.05
 pkgrel=2
 _codename=Edn
 pkgdesc="Tribe - Chakra LiveCD Installer"
@@ -22,11 +22,13 @@ provides=('tribe')
 replaces=('kdemod-tribe-svn' 'kdemod-tribe')
 conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
 options=('!splithdr' '!splitdbg' 'sign')
-source=("http://chakra-project.org/sources/tribe/tribe-${pkgver}.tar.xz"
-        "http://chakra-project.org/sources/tribe/RELEASE_NOTES_20110921.html")
+source=("http://chakra.sourceforge.net/sources/tribe/tribe-${pkgver}.tar.xz"
+        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20111105.html"
+        'launch-tribe.sh')
   
-md5sums=('e23020aca7aede941f48c105125a8d88'
-         'ecf28c848d8bb62761f305a6ab63ce13')
+md5sums=('a0cd5c3bdb1ef494462f1ba58662261b'
+         '0a307aa4eac761cd41e9c052923d3b49'
+         'e31855da237a2c8029774831b3c04685')
          
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -51,8 +53,8 @@ build()
         cd "${srcdir}/${pkgname}-${pkgver}"
 
 	# replace rekonq screenshot with konqueror
-	rm -v ui/images/screenshot04.png
-	mv -v ui/images/screenshot04-konqueror.png ui/images/screenshot04.png
+	#rm -v ui/images/screenshot04.png
+	#mv -v ui/images/screenshot04-konqueror.png ui/images/screenshot04.png
 
 	# proper bootmnt folder
 	sed -i -e "s/@ARCH@/${CARCH}/g" config-tribe.h.cmake
@@ -64,18 +66,20 @@ build()
 	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_SKIP_RPATH=ON \
-		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' || return 1
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' 
 
 	msg "Starting make..."
-	make || return 1
+	make 
 }
 
 package()
 {
         cd "${srcdir}/${pkgname}-${pkgver}"
 	msg "Make successful, installing..."
-	make DESTDIR=$startdir/pkg install || return 1
-	cp -vf ${srcdir}/RELEASE_NOTES_20110921.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	make DESTDIR=$startdir/pkg install 
+        install -Dm755 ${srcdir}/launch-tribe.sh \
+		${pkgdir}/usr/bin/launch-tribe.sh
+	cp -vf ${srcdir}/RELEASE_NOTES_20111105.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
