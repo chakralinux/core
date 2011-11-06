@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=celt
 pkgver=0.11.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Low-latency audio communication codec"
 arch=('i686' 'x86_64')
 url="http://www.celt-codec.org"
@@ -20,12 +20,20 @@ source=(http://downloads.xiph.org/releases/celt/celt-$pkgver.tar.gz)
 md5sums=('94fe4acd241da8702c295bcd13a555e6')
 
 build() {
-  cd "$srcdir/celt-$pkgver"
+  cd ${pkgname}-${pkgver}
 
-  ./configure --prefix=/usr
-  make || return 1
-  make DESTDIR="$pkgdir" install
+  ./configure \
+    --prefix=/usr
 
-  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/BSD"
+  make
+}
+
+package() {
+  cd ${pkgname}-${pkgver}
+
+  make DESTDIR=${pkgdir} install
+
+  install -D -m644 COPYING \
+    ${pkgdir}/usr/share/licenses/${pkgname}/BSD
 }
 
