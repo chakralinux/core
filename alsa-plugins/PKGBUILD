@@ -1,10 +1,12 @@
-# $Id: PKGBUILD 16443 2010-04-30 08:42:50Z spupykin $
-# Maintainer: Sergej Pupykin <pupykin.s+arch@gmail.com>
-# Contributor: Daniel Ehlers <danielehlers@mindeye.net>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=alsa-plugins
-pkgver=1.0.24.901
-pkgrel=1
+pkgver=1.0.24
+pkgrel=2
 pkgdesc="Extra alsa plugins"
 arch=('i686' 'x86_64')
 url="http://www.alsa-project.org"
@@ -14,11 +16,11 @@ makedepends=('pulseaudio' 'jack' 'ffmpeg')
 optdepends=('pulseaudio' 'jack' 'ffmpeg')
 options=('!libtool')
 install=$pkgname.install
-#source=(ftp://ftp.alsa-project.org/pub/plugins/alsa-plugins-$pkgver.tar.bz2)
-#md5sums=('e4d4c90e11ab9d1a117afbbc1edd2b16')
+source=(ftp://ftp.alsa-project.org/pub/plugins/alsa-plugins-$pkgver.tar.bz2)
+md5sums=('e4d4c90e11ab9d1a117afbbc1edd2b16')
 
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('01d00251cbe4f510e131eeee69c8361a')
+#source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
+#md5sums=('01d00251cbe4f510e131eeee69c8361a')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -34,16 +36,14 @@ mksource() {
 
 build() {
   cd $startdir/src/alsa-plugins-$pkgver
-  # only on git tarballs
-  autoreconf -v --force --install
-
   ./configure --prefix=/usr
-  make || return 1
-  make DESTDIR=$startdir/pkg install || return 1
-  mkdir -p $startdir/pkg/etc/profile.d && \
-  cat >$startdir/pkg/etc/profile.d/alsa.sh <<EOF && \
-#!/bin/bash
-export ALSA_PLUGINS_DIR=/usr/lib/alsa-lib
-EOF
-  chmod 0755 $startdir/pkg/etc/profile.d/alsa.sh
+  make 
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+
+  mkdir -p "$pkgdir/usr/share/doc/$pkgname"
+  install -m644 doc/README* doc/*.txt "$pkgdir/usr/share/doc/$pkgname/"
 }
