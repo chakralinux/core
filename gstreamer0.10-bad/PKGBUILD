@@ -24,10 +24,10 @@ build() {
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --disable-static --enable-experimental \
     --with-package-name="GStreamer Bad Plugins (Chakra GNU/Linux)" \
-    --with-package-origin="http://www.chakra-project.org/" || return 1
+    --with-package-origin="http://www.chakra-project.org/" 
 
-  make || return 1
-  sed -e 's/gst sys ext/gst/' -i Makefile || return 1
+  make 
+  sed -e 's/gst sys ext/gst/' -i Makefile 
 }
 
 package_gstreamer0.10-bad() {
@@ -36,7 +36,7 @@ package_gstreamer0.10-bad() {
   groups=('gstreamer0.10-plugins')
 
   cd "${srcdir}/gst-plugins-bad-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
+  make DESTDIR="${pkgdir}" install 
 }
 
 package_gstreamer0.10-bad-plugins() {
