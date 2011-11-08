@@ -8,28 +8,30 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=rdesktop
-pkgver=1.6.0
-pkgrel=6
+pkgver=1.7.0
+pkgrel=1
 depends=('libx11' 'openssl' 'libao' 'libsamplerate')
 pkgdesc="Is used to connect to windows terminal servers"
 url="http://www.rdesktop.org/"
 license=('GPL')
 arch=('i686' 'x86_64')
 source=(http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.gz
-	'rdesktop-send_physical_buttons.diff')
-md5sums=('c6fcbed7f0ad7e60ac5fcb2d324d8b16'
-         '880d3aeac67b901e6bf44d1323374768')
+	'rdesktop-send_physical_buttons.diff' 'rdesktop-libao.patch')
+md5sums=('77fa93b21aa38837a85e81c00e757228'
+         '880d3aeac67b901e6bf44d1323374768'
+         'bd2c9bc68bddcc2652c668753d787df7')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
 
-  patch -i ${srcdir}/rdesktop-send_physical_buttons.diff || return 1
+  patch -i ${srcdir}/rdesktop-send_physical_buttons.diff
+  patch -i ${srcdir}/rdesktop-libao.patch
 
   ./configure --prefix=/usr
-  make || return 1
+  make
 }
 
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install || return 1
+  make DESTDIR=${pkgdir} install
 }
