@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=vorbis-tools
 pkgver=1.4.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Extra tools for Ogg-Vorbis"
 arch=('i686' 'x86_64')
 url='http://www.xiph.org/vorbis/'
@@ -22,11 +22,11 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr \
     --without-speex \
-    --enable-vcut || return 1
-  make || return 1
+    --enable-vcut 
+  make 
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
+  make DESTDIR="${pkgdir}" install 
 }
