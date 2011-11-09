@@ -8,20 +8,20 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ffmpeg
-pkgver=20110910
+pkgver=0.8.6
 pkgrel=1
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('i686' 'x86_64')
 url="http://ffmpeg.org/"
 license=('GPL')
-depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx' 'libva' 'openjpeg' 'rtmpdump')
-makedepends=('yasm' 'git')
+depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx' 'libva' 'openjpeg' 'rtmpdump' 'speex')
+makedepends=('yasm')
 #git clone git://git.videolan.org/ffmpeg.git
-source=(http://chakra-project.org/sources/ffmpeg/${pkgname}-${pkgver}.tar.xz)
-md5sums=('f726ae21f9c12551603d8a9cf301280a')
+source=(http://$pkgname.org/releases/$pkgname-$pkgver.tar.bz2)
+md5sums=('b4ef1fa6506750569fdb64a0f0a646a8')
 
 build() {
-  cd "$srcdir/$pkgname"
+  cd "$srcdir/$pkgname-$pkgver"
 
   ./configure \
     --prefix=/usr \
@@ -42,12 +42,17 @@ build() {
     --enable-gpl \
     --enable-version3 \
     --enable-runtime-cpudetect \
-    --disable-debug
+    --enable-libspeex \
+    --disable-debug \
+    --disable-static
 
   make
   make tools/qt-faststart
   make doc/ff{mpeg,play,server}.1
+}
 
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
   make DESTDIR="$pkgdir" install install-man
   install -D -m755 tools/qt-faststart "$pkgdir/usr/bin/qt-faststart"
 }

@@ -31,13 +31,11 @@ build() {
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --with-dyn-default \
-    --with-distro="Arch Linux" || return 1
-  make || return 1
+    --with-distro="Chakra-Linux" 
+  make 
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
-  ln -sf play "${pkgdir}/usr/bin/rec" || return 1
-  ln -sf ../man1/sox.1.gz "${pkgdir}/usr/share/man/man7/soxeffect.7"
+  make DESTDIR="${pkgdir}" install
 }

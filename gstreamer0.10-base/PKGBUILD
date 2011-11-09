@@ -10,10 +10,10 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgbase=('gstreamer0.10-base')
 pkgname=('gstreamer0.10-base' 'gstreamer0.10-base-plugins')
 pkgver=0.10.35
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 license=('LGPL')
-makedepends=('pkgconfig' "gstreamer0.10>=${pkgver}" 'orc>=0.4.11-2' 'libxv' 'alsa-lib>=1.0.24.1-2' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection')
+makedepends=('pkgconfig' "gstreamer0.10>=${pkgver}" 'orc' 'libxv' 'alsa-lib' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection')
 options=(!libtool !emptydirs)
 url="http://gstreamer.freedesktop.org/"
 source=(${url}/src/gst-plugins-base/gst-plugins-base-${pkgver}.tar.bz2)
@@ -24,20 +24,20 @@ build() {
   sed -i '/AC_PATH_XTRA/d' configure.ac
   autoreconf
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
-    --disable-static --enable-experimental --disable-gnome_vfs \
+    --disable-static --enable-experimental --disable-gnome_vfs --enable-subparse\
     --with-package-name="GStreamer Base Plugins (Chakra GNU/Linux)" \
-    --with-package-origin="http://www.chakra-project.org/" || return 1
+    --with-package-origin="http://www.chakra-project.org/"
 
   make || return 1
-  sed -e 's/^SUBDIRS_EXT =.*/SUBDIRS_EXT =/' -i Makefile || return 1
+  sed -e 's/^SUBDIRS_EXT =.*/SUBDIRS_EXT =/' -i Makefile
 }
 
 package_gstreamer0.10-base() {
   pkgdesc="GStreamer Multimedia Framework Base plugin libraries"
-  depends=("gstreamer0.10>=${pkgver}" 'orc' 'libxv>=1.0.5')
+  depends=('gstreamer0.10>=0.10.35' 'orc' 'libxv')
 
   cd "${srcdir}/gst-plugins-base-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
+  make DESTDIR="${pkgdir}" install
 }
 
 package_gstreamer0.10-base-plugins() {
@@ -48,7 +48,7 @@ package_gstreamer0.10-base-plugins() {
   groups=('gstreamer0.10-plugins')
 
   cd "${srcdir}/gst-plugins-base-${pkgver}"
-  make -C gst-libs DESTDIR="${pkgdir}" install || return 1
-  make -C ext DESTDIR="${pkgdir}" install || return 1
-  make -C gst-libs DESTDIR="${pkgdir}" uninstall || return 1
+  make -C gst-libs DESTDIR="${pkgdir}" install
+  make -C ext DESTDIR="${pkgdir}" install
+  make -C gst-libs DESTDIR="${pkgdir}" uninstall
 }
