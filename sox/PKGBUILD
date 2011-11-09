@@ -23,11 +23,15 @@ optdepends=('libao: for ao plugin'
             'libid3tag: for mp3 plugin'
             'wavpack: for wavpack plugin')
 options=('!libtool')
-source=(http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz)
-md5sums=('e9d35cf3b0f8878596e0b7c49f9e8302')
+source=(http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz
+        sox-14.3.2-ffmpeg.patch)
+md5sums=('e9d35cf3b0f8878596e0b7c49f9e8302'
+         '217df87e92a3698ba1d7a78779ed72f2')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -p1 -i "${srcdir}/sox-14.3.2-ffmpeg.patch"
+  sed -i 's|man1/sox.1 soxeffect.7|man1/sox.1.gz soxeffect.7.gz|' Makefile.am
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --with-dyn-default \
