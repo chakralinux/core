@@ -8,8 +8,8 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=perl-sdl
-pkgver=2.532
-pkgrel=2
+pkgver=2.534
+pkgrel=1
 pkgdesc="Simple DirectMedia Layer for Perl."
 arch=(i686 x86_64)
 license=(LGPL)
@@ -21,13 +21,21 @@ replaces=(sdl_perl)
 conflicts=(sdl_perl)
 provides=("sdl_perl=$pkgver")
 source=(http://search.cpan.org/CPAN/authors/id/K/KT/KTHAKORE/SDL-$pkgver.tar.gz)
-md5sums=('8d389b10aa9c054788a8e37077d8eb4d')
+md5sums=('1dd0b888c1ef7f40e9b24aed6bba1bdf')
+
+build() {
+  cd $srcdir/SDL-$pkgver
+  #unset CFLAGS
+  perl Build.PL installdirs=vendor destdir=$pkgdir
+  perl Build
+}
+
+check() {
+  cd "$srcdir/SDL-$pkgver"
+  perl Build test || true
+}
 
 package() {
-  cd $srcdir/SDL-$pkgver
-
-  perl Build.PL installdirs=vendor destdir=$pkgdir
-
-  perl Build
-  perl Build install
+  cd "$srcdir/SDL-$pkgver"
+  perl Build install destdir="$pkgdir"
 }
