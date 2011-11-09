@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=normalize
 pkgver=0.7.7
-pkgrel=2
+pkgrel=3
 pkgdesc="A tool for adjusting the volume of WAV files to a standard level"
 arch=('i686' 'x86_64')
 license=('GPL')
@@ -25,6 +25,10 @@ build() {
               --mandir=/usr/share/man \
               --with-audiofile \
               --with-mad
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  make 
+}
+
+package(){
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }
