@@ -38,7 +38,7 @@ case "$1" in
     ;;
   stop)
     stat_busy "Stopping cdemud"
-    cdemud -k &>/dev/null
+    kill -9 `pidof cdemud` &>/dev/null && sleep 1 && rmmod vhba
     if [ $? -ne 0 ]; then
       stat_fail
     else
