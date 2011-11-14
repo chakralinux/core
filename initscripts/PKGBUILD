@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=initscripts
-pkgver=2011.11.1
+pkgver=2011.11.2
 pkgrel=1
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
@@ -15,9 +15,9 @@ groups=('base')
 backup=(etc/inittab etc/rc.conf etc/rc.local etc/rc.local.shutdown etc/conf.d/wireless etc/locale.conf)
 depends=('glibc' 'bash' 'grep' 'coreutils' 'udev>=174' 'iproute2'
          'ncurses' 'kbd' 'findutils' 'sysvinit')
-optdepends=('bridge-utils: Network bridging support'
+optdepends=('net-tools: legacy networking support'
+            'bridge-utils: Network bridging support'
             'dhcpcd: DHCP network configuration'
-            'net-tools: legacy network support'
             'wireless_tools: Wireless networking')
 makedepends=(asciidoc)
 install=initscripts.install
@@ -33,7 +33,7 @@ mksource() {
   pushd chakra-${pkgname}
   popd
   tar -cvJf ${pkgname}-${pkgver}.tar.xz chakra-${pkgname}/*
-  md5sum ${pkgname}-${pkgver}.tar.xz
+  sha256sum ${pkgname}-${pkgver}.tar.xz
 }
 
 package() {
@@ -45,5 +45,5 @@ package() {
   mv ${pkgdir}/etc/profile.d/locale.sh ${pkgdir}/etc/profile.d/locale.sh.new
 }
 
-sha256sums=('186ebf437ec51f524fd2e341d68d1f15b724b988e61eef9d641bafed5375b859'
+sha256sums=('1a69b69cfd09b2f5295340a136b45fc20dde303785f4793cefa748f3f36e9f3a'
             '0eba4250b07e0a727ef64772f5ee9027b123cbd4bb0894ba2842f545035c827f')
