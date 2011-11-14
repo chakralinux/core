@@ -5,7 +5,7 @@ _patch="3.1.1"
 _prepatch="3.1.2pre"
 _queue="3.1"
 # Aufs
-_aufs="3.1-20111107"
+_aufs="3.1-20111114"
 # Kernel source file
 #SRC="ftp://ftp.kernel.org/pub/linux/kernel/v3.x/linux-3.1.tar.bz2"
 SRC="http://ftp.uni-erlangen.de/pub/mirrors/kernel.org/v3.x/linux-3.1.tar.bz2"
@@ -26,8 +26,17 @@ PATCHES=(
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
          #http://chakra.sourceforge.net/sources/linux/patches/3.1/candidate/$_prepatch.patch%1
 
-         # fix #19234 i1915 display size
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/fix-i915.patch%1
+         #wireless: allow to retrieve the channel set on monitor interface
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/channel-negative-one-maxim.patch%1
+
+         # Some chips detect a ghost TV output
+         # mailing list discussion: http://lists.freedesktop.org/archives/intel-gfx/2011-April/010371.html
+         # Arch Linux bug report: FS#19234
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/i915-fix-ghost-tv-output.patch%1
+
+         # In 3.1.1, a DRM_DEBUG message is falsely declared as DRM_ERROR. This
+         # worries users, as this message is displayed even at loglevel 4. Fix this.
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/i915-fix-incorrect-error-message.patch%1
 
          # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
          # remove this when a Kconfig knob is made available by upstream
@@ -128,6 +137,9 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/brcm80211.patch%1
          #### Remove overlap between bcma/b43 and brcmsmac and reenable bcm4331
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/bcma-brcmsmac-compat.patch%1
+
+         # add quirk for other webcams
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/usb-add-quirk-for-other-webcams.patch%1
 
          # add acerhk
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/01_acerhk-0.5.35.patch%1
