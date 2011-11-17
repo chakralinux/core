@@ -6,35 +6,37 @@
  
 pkgname=gnash
 pkgver=0.8.9
-pkgrel=3
+pkgrel=4
 pkgdesc="GNU Flash player and kpath plugin for KDE 4."
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/gnash/"
 license=('GPL')
 depends=('agg' 'ffmpeg' 'libjpeg' 'libpng' 'giflib' 'zlib' 'curl' 'giflib' 'boost-libs' 'libldap' 'sdl'
          'speex' 'fontconfig' 'libva' 'libxinerama' 'gstreamer0.10-base' 'gstreamer0.10-ffmpeg'
-         'libdca' 'kdebase' 'xulrunner' 'hicolor-icon-theme' 'desktop-file-utils' 'pkgconfig')
+         'libdca' 'kdebase' 'xulrunner' 'hicolor-icon-theme' 'desktop-file-utils' 'pkgconfig' 'libtool')
 makedepend=('boost')
 provides=('gnash' 'gnash-common')
 conflicts=('flashplugin' 'flashplugin-square')
-source=("http://ftp.gnu.org/pub/gnu/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('01d0420932eede07211e368d405aee9c')
 options=(!libtool !emptydirs)
-backup=(etc/gnashrc etc/gnashpluginrc)
+backup=(etc/gnashrc)
+source=("${pkgname}.zip")
+        # gentoo-ffmpeg-0.8.patch)
+md5sums=('d0347a9d31c9c80759c6d4f384212f69')
+         #'a88de6b2de6d2b100ab7932e901a4b92')
 
 build() {
-	cd "${startdir}/src/${pkgname}-${pkgver}"
-
+  cd "$srcdir/gnash"
+       # patch -Np1 -i "$srcdir/gentoo-ffmpeg-0.8.patch"
 	./autogen.sh
 
 	sed -i "s/moc-qt4/moc/g; s/uic-qt4/uic/g" configure
 
 	./configure \
 		--enable-renderer=agg \
-		--enable-media=ffmpeg \
+		--enable-media=gst,ffmpeg \
 		--enable-gui=kde4 \
-    --enable-sound=sdl \
-    --enable-hwaccel=vaapi \
+                --enable-sound=sdl \
+                --enable-hwaccel=vaapi \
 		--with-plugins-install=system \
 		--with-npapi-plugindir=/usr/lib/mozilla/plugins \
 		--prefix=/usr \
@@ -43,14 +45,14 @@ build() {
 	sed -i "s:KDE4_APPSDATADIR =.*:KDE4_APPSDATADIR = /usr/share/apps:" ./plugin/klash4/Makefile
 	sed -i "s:KDE4_SERVICESDIR =.*:KDE4_SERVICESDIR = /usr/share/kde4/services:" ./plugin/klash4/Makefile
 	sed -i "s:KDE4_PLUGINDIR =.*:KDE4_PLUGINDIR = /usr/lib/kde4:" ./plugin/klash4/Makefile
-	make || return 1
+	make 
 }
 
 package() {
-	cd "${startdir}/src/${pkgname}-${pkgver}"
+	cd "$srcdir/gnash"
 
-	make DESTDIR="${pkgdir}" install || return 1
-	make DESTDIR="${pkgdir}" install-plugins || return 1
+	make DESTDIR="${pkgdir}" install 
+	make DESTDIR="${pkgdir}" install-plugins 
 }
 
 # vim:set ts=2 sw=2 et:
