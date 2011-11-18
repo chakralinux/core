@@ -8,34 +8,38 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase=mesa
-pkgname=('mesa' 'libgl' 'libglapi' 'libgles' 'libegl' 'ati-dri' 'intel-dri' 'unichrome-dri' 'mach64-dri' 'mga-dri' 'r128-dri' 'savage-dri' 'sis-dri' 'tdfx-dri' 'nouveau-dri') # 'llvm-dri')
+pkgname=('mesa' 'libgl' 'libglapi' 'libgles' 'libegl' 'khrplatform-devel' 'ati-dri' 'intel-dri' 'unichrome-dri' 'mach64-dri' 'mga-dri' 'r128-dri' 'savage-dri' 'sis-dri' 'tdfx-dri' 'nouveau-dri') # 'llvm-dri')
+# prepare 7.12/8.0
+#pkgname=('mesa' 'libgl' 'libglapi' 'libgles' 'libegl' 'ati-dri' 'intel-dri' 'nouveau-dri') # 'llvm-dri')
 
 #_git=true
+_gitdate=20111031
 _git=false
 
 if [ "${_git}" = "true" ]; then
     #pkgver=7.10.99.git20110709
     pkgver=7.11
   else
-    pkgver=7.11
+    pkgver=7.11.1
 fi
 pkgrel=1
 arch=('i686' 'x86_64')
 makedepends=('glproto>=1.4.14' 'libdrm>=2.4.26' 'libxxf86vm>=1.1.1' 'libxdamage>=1.1.3' 'expat>=2.0.1' 'libx11>=1.4.3' 'libxt>=1.1.1' 
-             'gcc-libs' 'dri2proto>=2.6' 'python2' 'libxml2' 'imake' 'llvm' 'udev')
+             'gcc-libs>=4.6.1' 'dri2proto>=2.6' 'python2' 'libxml2' 'imake' 'llvm' 'udev')
 url="http://mesa3d.sourceforge.net"
 license=('custom')
 source=(LICENSE)
 if [ "${_git}" = "true" ]; then
 	# mesa git shot from 7.11 branch - see for state: http://cgit.freedesktop.org/mesa/mesa/commit/?h=7.11&id=1ae00c5960af83bea9545a18a1754bad83d5cbd0
 	#source=(${source[@]} 'ftp://ftp.archlinux.org/other/mesa/mesa-1ae00c5960af83bea9545a18a1754bad83d5cbd0.tar.bz2')
-	source=(${source[@]} "MesaLib-${pkgver}.zip"::"http://cgit.freedesktop.org/mesa/mesa/snapshot/mesa-ef9f16f6322a89fb699fbe3da868b10f9acaef98.tar.bz2")
+	source=(${source[@]} "MesaLib-git${_gitdate}.zip"::"http://cgit.freedesktop.org/mesa/mesa/snapshot/mesa-ef9f16f6322a89fb699fbe3da868b10f9acaef98.tar.bz2")
   else
 	source=(${source[@]} "ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/MesaLib-${pkgver}.tar.bz2"
+	#source=(${source[@]} "MesaLib-git${_gitdate}.zip"::"http://cgit.freedesktop.org/mesa/mesa/snapshot/mesa-4464ee1a9aa3745109cee23531e3fb2323234d07.tar.bz2"
 )
 fi
 md5sums=('5c65a0fe315dd347e09b1f2826a1df5a'
-         'ff03aca82d0560009a076a87c888cf13')
+         'a77307102cee844ff6544ffa8fafeac1')
 
 build() {
     cd ${srcdir}/?esa-*
@@ -93,12 +97,8 @@ package_libgl() {
   bin/minstall lib/libglsl.so* "${pkgdir}/usr/lib/"
 
   cd src/mesa/drivers/dri
-  #make -C swrast DESTDIR="${pkgdir}" install
-if [ "${_git}" = "true" ]; then
-    make -C ${srcdir}/mesa-*/src/gallium/targets/dri-swrast DESTDIR="${pkgdir}" install
-  else
-    make -C ${srcdir}/Mesa-${pkgver/rc/-rc}/src/gallium/targets/dri-swrast DESTDIR="${pkgdir}" install
-fi
+  make -C ${srcdir}/?esa-*/src/gallium/targets/dri-swrast DESTDIR="${pkgdir}" install
+
   ln -s swrastg_dri.so "${pkgdir}/usr/lib/xorg/modules/dri/swrast_dri.so"
   ln -s libglx.xorg "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so"
 
@@ -119,7 +119,7 @@ package_libglapi() {
 }
 
 package_libgles() {
-  depends=('libglapi')
+  depends=('libglapi' 'khrplatform-devel')
   pkgdesc="Mesa GLES libraries and headers"
 
   cd ${srcdir}/?esa-*   
@@ -140,7 +140,7 @@ package_libgles() {
 }
 
 package_libegl() {
-  depends=('libglapi' 'libdrm' 'libxext' 'libxfixes' 'udev')
+  depends=('libglapi' 'libdrm' 'libxext' 'libxfixes' 'udev' 'khrplatform-devel')
   pkgdesc="Mesa EGL libraries and headers"
 
   cd ${srcdir}/?esa-*   
@@ -150,7 +150,6 @@ package_libegl() {
   install -m755 -d "${pkgdir}/usr/include"
   install -m755 -d "${pkgdir}/usr/include/"
   install -m755 -d "${pkgdir}/usr/include/EGL"
-  install -m755 -d "${pkgdir}/usr/include/KHR"
   install -m755 -d "${pkgdir}/usr/share"
   install -m755 -d "${pkgdir}/usr/share/doc"
   install -m755 -d "${pkgdir}/usr/share/doc/libegl"
@@ -159,15 +158,26 @@ package_libegl() {
   bin/minstall lib/egl/* "${pkgdir}/usr/lib/egl/"
   bin/minstall src/egl/main/egl.pc "${pkgdir}/usr/lib/pkgconfig/"
   bin/minstall include/EGL/* "${pkgdir}/usr/include/EGL/"
-  bin/minstall include/KHR/khrplatform.h "${pkgdir}/usr/include/KHR/"
   bin/minstall docs/egl.html "${pkgdir}/usr/share/doc/libegl/"
 
   install -m755 -d "${pkgdir}/usr/share/licenses/libegl"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/libegl/"
 }
 
+package_khrplatform-devel() {
+  depends=()
+  pkgdesc="Khronos platform development package"
+
+  cd ${srcdir}/?esa-*
+  install -m755 -d "${pkgdir}/usr/include/KHR"
+  bin/minstall include/KHR/khrplatform.h "${pkgdir}/usr/include/KHR/"
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/khrplatform-devel"
+  install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/khrplatform-devel/"
+}
+
 package_mesa() {
-  depends=('libgl' 'libx11>=1.4.3' 'libxt>=1.1.1' 'gcc-libs' 'dri2proto>=2.6' 'glproto>=1.4.14')
+  depends=('libgl' 'libx11>=1.4.3' 'libxt>=1.1.1' 'gcc-libs>=4.6' 'dri2proto>=2.6' 'glproto>=1.4.14') #dri2proto + glproto needed for gl.pc
   optdepends=('opengl-man-pages: for the OpenGL API man pages')
   pkgdesc="Mesa 3-D graphics libraries and include files"
 
@@ -208,7 +218,7 @@ package_intel-dri() {
   depends=("libgl=${pkgver}")
   pkgdesc="Mesa DRI drivers for Intel"
 
-  make -C ${srcdir}/?esa-*/src/mesa/drivers/dri/i810 DESTDIR="${pkgdir}" install
+  make -C ${srcdir}/?esa-*/src/mesa/drivers/dri/i810 DESTDIR="${pkgdir}" install # dead in 7.12
   make -C ${srcdir}/?esa-*/src/mesa/drivers/dri/i915 DESTDIR="${pkgdir}" install
   make -C ${srcdir}/?esa-*/src/mesa/drivers/dri/i965 DESTDIR="${pkgdir}" install
 }
