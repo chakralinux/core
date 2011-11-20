@@ -3,7 +3,7 @@
 # Translators: http://chakra-project.org/bbs/viewtopic.php?pid=29626#p29626
 
 pkgname=appset-qt
-pkgver=0.7.0
+pkgver=0.7.1
 pkgrel=1
 pkgdesc="An advanced and feature rich Package Manager Frontend"
 arch=('i686' 'x86_64')
@@ -12,17 +12,16 @@ license=('GPL2')
 depends=('qt>=4.7' 'kde-baseapps-konsole')
 optdepends=('ccr: For Community Repository support')
 install=${pkgname}.install
-source=(http://sourceforge.net/projects/appset/files/appset-qt/0.7/0.7.0/appset-qt-0.7.0-sources.tar.gz
-        http://chakra-project.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz
-        http://chakra-project.org/sources/$pkgname/$pkgname-0.7.0-chakra.patch
+source=("http://sourceforge.net/projects/appset/files/appset-qt/0.7/$pkgver/appset-qt-$pkgver-sources.tar.gz"
+        "http://chakra-linux.org/sources/$pkgname/appset-qt-oxygen-icons.tar.xz"
+        "http://chakra-linux.org/sources/$pkgname/$pkgname-0.7.0-chakra.patch"
         )
-md5sums=(6c76c96a30972419bc64c64c71b7a35f
-         87f5f278e3fe67ed2cd6165c2835d81b
-         d236f4d2391acace22df0c8fa532ba52
-         )
+md5sums=('83100d84a8735abd3a1cca4f6f1d3197'
+         '87f5f278e3fe67ed2cd6165c2835d81b'
+         '9b6b473d2a2ff31457f0f6e9fe3d345f')
 
 build() {
-  cd $srcdir/$pkgname-0.7.0-sources
+  cd $srcdir/$pkgname-$pkgver-sources
   # copy oxygen icons
   cp -v ../*png Qt/AppSet-Qt
 
@@ -49,12 +48,12 @@ build() {
 }
 
 package() {
-    cd $srcdir/$pkgname-0.7.0-sources
+    cd $srcdir/$pkgname-$pkgver-sources
 
     make INSTALL_ROOT="$pkgdir/" install
 
     #helper daemon
     install -m 755 -d "$pkgdir/etc/rc.d" || return 1
-    install -m 755 "$srcdir/$pkgname-0.7.0-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
+    install -m 755 "$srcdir/$pkgname-$pkgver-sources/AppSetHelper/appset-helper.sh" "$pkgdir/etc/rc.d/appset-helper"
 }
 
