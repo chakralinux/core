@@ -1,8 +1,8 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.1.1"
-_prepatch="3.1.2pre"
+_patch="3.1.2"
+_prepatch="3.1.3pre"
 _queue="3.1"
 # Aufs
 _aufs="3.1-20111114"
@@ -19,8 +19,8 @@ SRCNAME="linux-3.1-CHAKRA"
 #   filename%patchlevel (file must be in patches subdirectory)
 PATCHES=(
          # add upstream patch from 3.1 series
-         #ftp://ftp.kernel.org/pub/linux/kernel/v3.x/patch-$_patch.gz%1
-         http://ftp.uni-erlangen.de/pub/mirrors/kernel.org/v3.x/patch-$_patch.gz%1
+         ftp://ftp.kernel.org/pub/linux/kernel/v3.x/patch-$_patch.gz%1
+         #http://ftp.uni-erlangen.de/pub/mirrors/kernel.org/v3.x/patch-$_patch.gz%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -99,8 +99,10 @@ PATCHES=(
          ## Quiet boot fixes
          ### silence the ACPI blacklist code
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-silence-acpi-blacklist.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/quite-apm.patch%1
          ## Platform fixes not sent for -stable
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/samsung-laptop-brightness-fixes-3.2.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/asus-laptop-3.2-backport.patch%1
          ## patches headed upstream
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/rcutree-avoid-false-quiescent-states.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/disable-i8042-check-on-apple-mac.patch%1
@@ -110,6 +112,7 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/rcu-avoid-just-onlined-cpu-resched.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/block-stray-block-put-after-teardown.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/usb-add-quirk-for-logitech-webcams.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/HID-wacom-Set-input-bits-before-registration.patch%1
 
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/revert-efi-rtclock.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/efi-dont-map-boot-services-on-32bit.patch%1
@@ -119,9 +122,12 @@ PATCHES=(
          ## fixes
          ###rhbz#605888
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/dmar-disable-when-ricoh-multifunction.patch%1
+         ###rhbz 751165
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/ip6_tunnel-copy-parms.name-after-register_netdevice.patch%1
          ###rhbz #735946
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/0001-mm-vmscan-Limit-direct-reclaim-for-higher-order-allo.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/0002-mm-Abort-reclaim-compaction-if-compaction-can-procee.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/mm-do-not-stall-in-synchronous-compaction-for-THP-allocations.patch%1
          ###rhbz 748691
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/be2net-non-member-vlan-pkts-not-received-in-promisco.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/benet-remove-bogus-unlikely-on-vlan-check.patch%1
@@ -131,6 +137,12 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/elantech.patch%1
          ###rhbz 748210
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/ideapad-Check-if-acpi-already-handle-backlight.patch%1
+         ## ext4
+         ###rhbz 753346
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/jbd-jbd2-validate-sb-s_first-in-journal_get_superblo.patch%1
+         ## NFSv4
+         ###rhbz 753236
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/nfsv4-include-bitmap-in-nfsv4_get_acl_data.patch%1
          ###rhbz752176
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/sysfs-msi-irq-per-device.patch%1
          ###backport brcm80211 from 3.2-rc1
@@ -159,11 +171,13 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/linux-next/multitouch/0002-HID-hid-multitouch-add-support-for-the-IDEACOM-6650-.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/ath_override-eeprom-countrycode.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/defaults-fat-utf8.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/dm-table-propagate-non-rotational-flag.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/module-bug-Add-TAINT_OOT_MODULE-flag-for-modules-not.patch%1
 
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.1.1-1-CHAKRA"
+PATCHNAME="patch-3.1.2-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
