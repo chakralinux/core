@@ -5,13 +5,13 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=git
-pkgver=1.7.5.3
-pkgrel=2
+pkgver=1.7.7.4
+pkgrel=1
 pkgdesc="the fast distributed version control system"
 arch=(i686 x86_64)
 url="http://git-scm.com/"
 license=('GPL2')
-depends=('curl' 'expat>=2.0' 'perl-error' 'perl>=5.10.1')
+depends=('curl' 'expat>=2.0' 'perl-error' 'perl')
 makedepends=('python2')
 optdepends=('tk: gitk and git gui'
             'perl-libwww: git svn'
@@ -23,19 +23,15 @@ optdepends=('tk: gitk and git gui'
 replaces=('git-core')
 provides=('git-core')
 backup=('etc/conf.d/git-daemon.conf')
-source=("http://kernel.org/pub/software/scm/git/${pkgname}-${pkgver}.tar.bz2" \
-        "http://kernel.org/pub/software/scm/git/git-manpages-${pkgver}.tar.bz2"
+source=("http://git-core.googlecode.com/files/git-$pkgver.tar.gz"
+        "http://git-core.googlecode.com/files/git-manpages-$pkgver.tar.gz"
         git-daemon
         git-daemon.conf)
 
-md5sums=('5b5a5e6c1c5c05db6b8dd33e6f3acea4'
-         '6733ecbb5a46d9879463f963ae2a2dbb'
-         '8e2648910fd5dd4f1c41d3c7fa9e9156'
-         '2e42bf97779a1c6411d89043334c9e78')
-sha256sums=('8017b0c624fea88bf5488d35f3839778fac3c0e089a02fe0017aea6913af3292'
-            '018f5c16b9a3c4e4942ae318d1faea0b6092287228069a718efd267b9f98b8c8'
-            '2e0a50bdaf8f387a499895e1c204bff78244eaa72b78187c8a84ef40c0b82598'
-            'e8bfe29d8393d2b87517c4dd56ea834b213aa00bf3d7fcde4ead3457cadbbc68')
+sha1sums=('5b6920989480a37ec65977e756b24961578795dd'
+          'cb21e55ae793865453c165a0e666348f2db8c740'
+          'f2b41828bd912b72e2cb3e14677739c4f370de66'
+          '149e2da1ecb48872ddb31c0945afeaad1f9653d7')
 
 build() {
   export PYTHON_PATH='/usr/bin/python2'
