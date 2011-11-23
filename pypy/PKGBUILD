@@ -1,7 +1,7 @@
 # Maintainer: Daniele Cocca <jmc@chakra-project.org>
 
 pkgname=pypy
-pkgver=1.6
+pkgver=1.7
 pkgrel=1
 pkgdesc="PyPy is a fast, compliant alternative implementation of the Python language (2.7.1)."
 arch=('i686' 'x86_64')
@@ -10,15 +10,16 @@ license=('MIT')
 depends=('expat' 'zlib' 'bzip2' 'openssl' 'python-greenlet')
 makedepends=('pypy')
 source=("https://bitbucket.org/${pkgname}/${pkgname}/get/release-${pkgver}.tar.bz2")
-md5sums=('1189352effc5df7df84e6916b3b3eae3')
+md5sums=('fc22184c931ead98bdae9ec3e79595c2')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgname}-release-${pkgver}"
   cd "pypy/translator/goal"
 
-  # This will probably make the translation possible - otherwise it will easily saturate
-  # your system's memory.
-  PYPY_GC_MAX_DELTA=200MB pypy --jit loop_longevity=300 ./translate.py -Ojit
+  pypy translate.py -Ojit
+
+  # Switch to this one instead, if the default one saturates your memory:
+  # PYPY_GC_MAX_DELTA=200MB pypy --jit loop_longevity=300 ./translate.py -Ojit
 }
 
 package() {
