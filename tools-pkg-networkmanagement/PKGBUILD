@@ -3,6 +3,7 @@
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# contributor : Radu Andries <admiral0[at]tuxfamily[dot]org>
 
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
@@ -13,8 +14,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=('networkmanagement')
          
 arch=('i686' 'x86_64')
-pkgver=20110717
-pkgrel=2
+pkgver=0.8.95
+pkgrel=1
 
 pkgdesc="KDE SC networkmanager plasmoid"
 url="http://plasma.kde.org"
@@ -22,14 +23,15 @@ license=('GPL')
 
 options=('force')
 
-depends=("kdelibs" "kde-workspace" 'networkmanager>=0.8.4')
+depends=("kdelibs" "kde-workspace" 'networkmanager>=0.9')
 makedepends=('subversion' 'cmake' 'python' 'automoc4' 'mobile-broadband-provider-info')
-optdepends=('mobile-broadband-provider-info: allow to add new mobile connection')
+optdepends=('mobile-broadband-provider-info: allow to add new mobile connection'
+	    'openconnect: allow connection to openconnect VPN')
 replaces=('networkmanagement-networkmanager-plasmoid' 'networkmanagement-knetworkmanager-kde4')
 
 install=${pkgname}.install
-source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('2cdb00adcca86652f2ddc55cdc3fdfed') # networkmanagement-20110717.tar.xz
+source=("ftp://ftp.kde.org/pub/kde/unstable/networkmanagement/${pkgver}/src/networkmanagement-${pkgver}.tar.bz2")
+md5sums=('14f4051446a33be9bd46b34763acd760')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -53,7 +55,7 @@ build() {
   cd "${srcdir}"
   mkdir build
   cd build
-  cmake ../networkmanagement \
+  cmake ../networkmanagement-${pkgver} \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_BUILD_TYPE=Release \
     -DDBUS_SYSTEM_POLICY_DIR=/etc/dbus-1/system.d
