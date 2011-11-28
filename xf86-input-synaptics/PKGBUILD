@@ -7,35 +7,32 @@
 pkgname=xf86-input-synaptics
 pkgver=1.5.0
 pkgrel=1
-pkgdesc="synaptics driver for notebook touchpads"
-arch=(i686 x86_64)
+pkgdesc="Synaptics driver for notebook touchpads"
+arch=('i686' 'x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('libxtst')
-makedepends=('xorg-server' 'libxi' 'libx11')
-optdepends=('synaptics-led: support fot ON/OFF swich led')
-conflicts=('xorg-server<1.9.0')
-provides=('xf86-input-synaptics')
-conflicts=('xf86-input-synaptics')
-groups=('xorg-input-drivers')
+makedepends=('xorg-server>=1.10.4' 'libxi' 'libx11')
+conflicts=('xorg-server<1.10.4')
+replaces=('synaptics')
+provides=('synaptics')
+conflicts=('synaptics')
+groups=('xorg-drivers' 'xorg')
 options=(!libtool)
 backup=('etc/X11/xorg.conf.d/10-synaptics.conf')
 source=(http://xorg.freedesktop.org/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
-        10-synaptics.conf
-        synaptics-clickpad-support.patch)
+        10-synaptics.conf)
+sha1sums=('7373c1e3f02bf7e18f71b65762a982d907b4a053'
+          '68e1f4ef5e1038231d210eb422fa4d18c5922f0f')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
- 
-  patch -p1 -i ../synaptics-clickpad-support.patch
-
   ./configure --prefix=/usr
   make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/etc/X11/xorg.conf.d"
   install -m644 "${srcdir}/10-synaptics.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
@@ -44,8 +41,3 @@ package() {
 
   rm -rf "${pkgdir}/usr/share/X11"
 }
-
-
-md5sums=('2dac10f93918ed5bf7d1039d56880cf4'
-         '69f24fc2b8230313c30053b621502051'
-         '7fea317a43c6a17d487e2776d76ce1fd')
