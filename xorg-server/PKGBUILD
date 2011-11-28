@@ -6,7 +6,7 @@
 
 pkgname=xorg-server
 pkgver=1.10.4
-pkgrel=1
+pkgrel=2
 pkgdesc="X.Org X servers"
 arch=('i686' 'x86_64')
 license=('custom')
@@ -48,6 +48,9 @@ build() {
 
   # Use nouveau/nv/nvidia drivers for nvidia devices
   patch -Np1 -i "${srcdir}/autoconfig-nvidia.patch"
+
+  # fix libtools error msgs
+  libtoolize --copy --force --ltdl
 
   autoreconf
   ./configure --prefix=/usr \
