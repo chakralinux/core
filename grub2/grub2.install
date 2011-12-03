@@ -1,7 +1,7 @@
 infodir=usr/share/info
 filelist=(grub.info grub-dev.info)
 
-wisperer() {
+show_important_message() {
   echo -e "\033[0;31m IMPORTANT"
   echo -e "\033[0;0m  Run \033[0;32m 'grub-install /dev/sda --no-floppy' \033[0;0m as root for installing in MBR"
   echo -e "\033[0;0m  Run \033[0;32m 'grub-mkconfig -o /boot/grub/grub.cfg' \033[0;0m as root for generating grub.cfg"
@@ -45,7 +45,7 @@ post_install() {
     install-info $infodir/$file.gz $infodir/dir 2> /dev/null
   done
   delete_symlinks
-  wisperer
+  show_important_message
 }
 
 post_upgrade() {
@@ -53,7 +53,7 @@ post_upgrade() {
     install-info $infodir/$file.gz $infodir/dir 2> /dev/null
   done
   delete_symlinks
-  wisperer
+  show_important_message
   if [ -f /boot/grub/grub.cfg ]
   then
      update-grub
