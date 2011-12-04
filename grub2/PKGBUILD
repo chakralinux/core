@@ -13,7 +13,7 @@ _grub2_915_ver=7
 pkgname=('grub2-common' 'grub2-bios' 'grub2-efi-x32')
 pkgbase="grub2"
 pkgver='1.99'
-pkgrel=5
+pkgrel=6
 url="http://www.gnu.org/software/grub/"
 arch=('i686' 'x86_64')
 license=('GPL3')
@@ -85,12 +85,12 @@ build_grub2-common_and_bios() {
 
   ## Need to use python2
   sed -i 's|python|python2|' autogen.sh
-  
-  ## fix unifont.bdf location so grub-mkfont can create *.pf2 files
-  sed -i 's|/usr/share/fonts/unifont|/usr/share/fonts/misc|' configure
 
   # start the actual build process
   ./autogen.sh
+  
+  ## fix unifont.bdf location so grub-mkfont can create *.pf2 files
+  sed -i 's|/usr/share/fonts/unifont|/usr/share/fonts/misc|' configure
   
 # mkdir ${srcdir}/grub2_bios-${pkgver}/BUILD_BIOS
 # cd ${srcdir}/grub2_bios-${pkgver}/BUILD_BIOS
