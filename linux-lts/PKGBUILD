@@ -12,21 +12,21 @@ pkgname=('linux-lts' 'linux-lts-headers') # Build stock -CHAKRA-LTS kernel
 _kernelname=${pkgname#linux}
 _basekernel=2.6.35
 pkgver=${_basekernel}.14
-pkgrel=2
-_patchname="patch-${pkgver}-2-CHAKRA-LTS"
+pkgrel=3
+_patchname="patch-${pkgver}-3-CHAKRA-LTS"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
 source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
-        http://chakra-project.org/sources/linux/${_patchname}.bz2
+        http://chakra.sourceforge.net/sources/linux/${_patchname}.bz2
         # the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
         ${pkgname}.preset)
 md5sums=('091abeb4684ce03d1d936851618687b6'
-         '5ba067ccfa42ca8aaa84eaa847c7c9dc'
-         '960176c1988f2bdc98ef4c407edcad1c'
-         '382cdfe6a3b8af870a626a2c3bc256d2'
+         'c329fd8a587d9897619c985951963843'
+         '22882396c6a950d5f25ef1a1eb46c5e2'
+         '925ddf37962a4942fae3fbb6d1ab2e70'
          '56cdd0978dd4a539a25813fd4273c834')
 
 build() {
@@ -82,8 +82,8 @@ package_linux-lts() {
             'gspcav1' 'atl2' 'wlan-ng26' 'rt2500'
             'aufs2' 'nouveau-drm-lts' 'kernel26-lts')
   provides=('aufs2' 'nouveau-drm-lts' "kernel26-lts=${pkgver}" 
-             "linux=${pkgver}")
-  conflicts=('kernel26-lts')
+             "linux=${pkgver}" 'acerhk=0.5.35')
+  conflicts=('kernel26-lts' 'acerhk')
   install=linux-lts.install
   optdepends=('crda: to set the correct wireless channels of your country')
 
@@ -116,8 +116,6 @@ package_linux-lts() {
 
   # remove build and source links
   rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
-  # add compat symlink for the kernel image
-  ln -sf vmlinuz-${pkgname} "${pkgdir}/boot/vmlinuz26${_kernelname}"
   # remove the firmware
   rm -rf "${pkgdir}/lib/firmware"
   # gzip -9 all modules to safe 100MB of space

@@ -15,6 +15,8 @@ post_install () {
   ln -sf initramfs-linux${KERNEL_NAME}.img boot/kernel26${KERNEL_NAME}.img
   ln -sf initramfs-linux${KERNEL_NAME}-fallback.img \
     boot/kernel26${KERNEL_NAME}-fallback.img
+  # add compat symlink for the kernel image
+  ln -sf vmlinuz-linux${KERNEL_NAME} /boot/vmlinuz26${KERNEL_NAME}
 }
 
 post_upgrade() {
@@ -54,6 +56,7 @@ post_upgrade() {
   ln -sf initramfs-linux${KERNEL_NAME}.img boot/kernel26${KERNEL_NAME}.img
   ln -sf initramfs-linux${KERNEL_NAME}-fallback.img \
     boot/kernel26${KERNEL_NAME}-fallback.img
+  ln -sf vmlinuz-linux${KERNEL_NAME} /boot/vmlinuz26${KERNEL_NAME}
 }
 
 post_remove() {
