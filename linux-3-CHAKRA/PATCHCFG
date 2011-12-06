@@ -2,7 +2,7 @@
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
 _patch="3.1.4"
-_prepatch="3.1.5-pre1"
+_prepatch="3.1.5-pre2"
 _queue="3.1"
 # Aufs
 _aufs="3.1-20111114"
@@ -151,8 +151,8 @@ PATCHES=(
          ### rhbz 754907
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/cciss-fix-irqf-shared.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/hpsa-add-irqf-shared.patch%1
-         ###rhbz 755154
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/rtlwifi-fix-lps_lock-deadlock.patch%1
+         ###rhbz 731365
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/mac80211_offchannel_rework_revert.patch%1
 
          # add quirk for other webcams
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/usb-add-quirk-for-other-webcams.patch%1
@@ -171,8 +171,15 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/11_bg-flag.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/12_Get-rid-off-bios-error.patch%1
 
+         # tomoyo 2.5
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/tomoyo-2.5-backport-from-3.2-rc4-for-3.1.4.patch%1
+
          # other features
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/linux-next/multitouch/0002-HID-hid-multitouch-add-support-for-the-IDEACOM-6650-.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0001-media-dvb-usb-prepare-for-multi-frontend-support-MFE.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0002-media-dvb-usb-multi-frontend-support-MFE.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0003-media-anysee-use-multi-frontend-MFE.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0004-media-ttusb2-add-support-for-the-dvb-t-part-of-CT-36.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0005-media-dvb-usb-refactor-MFE-code-for-individual-strea.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/ath_override-eeprom-countrycode.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/defaults-fat-utf8.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/dm-table-propagate-non-rotational-flag.patch%1
@@ -181,7 +188,7 @@ PATCHES=(
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.1.4-1-CHAKRA"
+PATCHNAME="patch-3.1.4-2-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
