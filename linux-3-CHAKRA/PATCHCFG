@@ -1,8 +1,8 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.1.4"
-_prepatch="3.1.5-pre2"
+_patch="3.1.5"
+_prepatch="3.1.6-pre1"
 _queue="3.1"
 # Aufs
 _aufs="3.1-20111114"
@@ -92,6 +92,7 @@ PATCHES=(
          ## DRM
          ### nouveau + drm fixes
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-nouveau-updates.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-nouveau-gf108.patch%1
          ### hush the i915 fbc noise
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-i915-fbc-stfu.patch%1
          ### rhbz#729882, https://bugs.freedesktop.org/attachment.cgi?id=49069
@@ -153,6 +154,8 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/hpsa-add-irqf-shared.patch%1
          ###rhbz 731365
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/mac80211_offchannel_rework_revert.patch%1
+         ###rhbz #757839
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/net-sky2-88e8059-fix-link-speed.patch%1
 
          # add quirk for other webcams
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/usb-add-quirk-for-other-webcams.patch%1
@@ -171,9 +174,6 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/11_bg-flag.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/12_Get-rid-off-bios-error.patch%1
 
-         # tomoyo 2.5
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/tomoyo-2.5-backport-from-3.2-rc4-for-3.1.4.patch%1
-
          # other features
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0001-media-dvb-usb-prepare-for-multi-frontend-support-MFE.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0002-media-dvb-usb-multi-frontend-support-MFE.patch%1
@@ -185,10 +185,15 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/dm-table-propagate-non-rotational-flag.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/module-bug-Add-TAINT_OOT_MODULE-flag-for-modules-not.patch%1
 
+         # tomoyo 2.5
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/revert-tomoyo-fix-pathname-handling-of-disconnected-paths.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/revert-partly-fix-apparmor-dereferencing-potentially-freed-dentry-sanitize-__d_path-api.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/tomoyo-2.5-backport-from-3.2-rc5-for-3.1.5.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/tomoyo-2.5-backport-for-3.1.5.patch%1
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.1.4-2-CHAKRA"
+PATCHNAME="patch-3.1.5-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
