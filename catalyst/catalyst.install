@@ -1,24 +1,6 @@
 
-KERNEL_VERSION=3.1-CHAKRA
+KERNEL_VERSION="3.1-CHAKRA"
 
-
-whisperer(){
-    echo "----------------------------------------------------------------"
-    echo "For more info and more troubleshooting visit:"
-    echo "http://wiki.archlinux.org/index.php/ATI_Catalyst"
-    echo "----------------------------------------------------------------"
-    echo ""
-    echo "--------------------------- == * == ----------------------------"
-    echo "catalyst package has been splited between:"
-    echo "- catalyst (module for stock kernel)"
-    echo "- catalyst-utils (libs and stuff)"
-    echo ""
-    echo "and optional:"
-    echo "- catalyst-hook (auto rebuilding script and source files)"
-    echo "- catalyst-daemon (auto rebuilding script and source files)"
-    echo "- catalyst-generator (generator of catalyst-{kernver} packages)"
-    echo "----------------------------------------------------------------"
-}
 
 remove_hook(){
    ##removing hook's entries
@@ -29,19 +11,18 @@ remove_hook(){
 }
 
 post_install() {
-    depmod $KERNEL_VERSION
-    whisperer
+    depmod "${KERNEL_VERSION}"
 }
 
 post_upgrade() {
     remove_hook
-    depmod $KERNEL_VERSION
-    whisperer
+    depmod "${KERNEL_VERSION}"
 }
 
 post_remove() {
-    depmod $KERNEL_VERSION
+    depmod "${KERNEL_VERSION}"
     echo "----------------------------------------------------------------"
     echo "Don't forget to remove fglrx from MODULES array of /etc/rc.conf"
     echo "----------------------------------------------------------------"
 }
+
