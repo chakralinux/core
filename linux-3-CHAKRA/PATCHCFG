@@ -2,7 +2,7 @@
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
 _patch="3.1.5"
-_prepatch="3.1.6-pre1"
+_prepatch="3.1.6-pre2"
 _queue="3.1"
 # Aufs
 _aufs="3.1-20111114"
@@ -156,6 +156,15 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/mac80211_offchannel_rework_revert.patch%1
          ###rhbz #757839
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/net-sky2-88e8059-fix-link-speed.patch%1
+         ### Backport ALPS touchpad patches from input/next branch (rhbz #590880)
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/alps.patch%1
+         ### patch to do a better job of dealing with busted EDID headers (rhbz#751589)
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-edid-try-harder-to-fix-up-broken-headers.patch%1
+         ### patch to fix Intel wifi regression in 3.1.5 (rhbz 767173)
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/iwlwifi-allow-to-switch-to-HT40-if-not-associated.patch%1
+         ### patch from Jeff Layton to fix suspend with NFS (rhbz #717735)
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/nfs-client-freezer.patch%1
+
 
          # add quirk for other webcams
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/usb-add-quirk-for-other-webcams.patch%1
@@ -193,7 +202,7 @@ PATCHES=(
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.1.5-1-CHAKRA"
+PATCHNAME="patch-3.1.5-2-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
