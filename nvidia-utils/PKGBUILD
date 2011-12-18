@@ -5,9 +5,9 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgbase=nvidia-utils
-pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl')
+pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl' 'nvidia-settings')
 pkgver=290.10
-pkgrel=3
+pkgrel=4
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
@@ -53,7 +53,6 @@ package_libcl() {
   install -D -m755 libOpenCL.so.1.0.0 "${pkgdir}/usr/lib/libOpenCL.so.1.0.0"
   ln -s /usr/lib/libOpenCL.so.1.0.0 "${pkgdir}/usr/lib/libOpenCL.so.1"
   ln -s /usr/lib/libOpenCL.so.1 "${pkgdir}/usr/lib/libOpenCL.so"
-  install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
 
 package_opencl-nvidia() {
@@ -77,7 +76,8 @@ package_nvidia-utils() {
   pkgdesc="NVIDIA drivers utilities and libraries."
   depends=('xorg-server' 'libxvmc')
   optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig'
-              'opencl-nvidia: OpenCL support')
+              'opencl-nvidia: OpenCL support'
+	      'nvidia-settings: Gtk GUI')
   conflicts=('libgl')
   provides=('libgl')
 
@@ -106,12 +106,6 @@ package_nvidia-utils() {
   # nvidia-xconfig
   install -D -m755 nvidia-xconfig "${pkgdir}/usr/bin/nvidia-xconfig"
   install -D -m644 nvidia-xconfig.1.gz "${pkgdir}/usr/share/man/man1/nvidia-xconfig.1.gz"
-  # nvidia-settings
-  install -D -m755 nvidia-settings "${pkgdir}/usr/bin/nvidia-settings"
-  install -D -m644 nvidia-settings.1.gz "${pkgdir}/usr/share/man/man1/nvidia-settings.1.gz"
-  install -D -m644 nvidia-settings.desktop "${pkgdir}/usr/share/applications/nvidia-settings.desktop"
-  install -D -m644 nvidia-settings.png "${pkgdir}/usr/share/pixmaps/nvidia-settings.png"
-  sed -e 's:__UTILS_PATH__:/usr/bin:' -e 's:__PIXMAP_PATH__:/usr/share/pixmaps:' -i "${pkgdir}/usr/share/applications/nvidia-settings.desktop"
   # nvidia-bug-report
   install -D -m755 nvidia-bug-report.sh "${pkgdir}/usr/bin/nvidia-bug-report.sh"
   # nvidia-smi
@@ -124,11 +118,25 @@ package_nvidia-utils() {
   install -D -m644 NVIDIA_Changelog "${pkgdir}/usr/share/doc/nvidia/NVIDIA_Changelog"
   ln -s nvidia "${pkgdir}/usr/share/doc/nvidia-utils"
 
+  create_links
+}
+
+package_nvidia-settings() {
+  pkgdesc="Gtk Graphical User Interface for nVidia"
+  depends=('nvidia-utils' 'gtk2')
+
+  cd "${srcdir}/${_pkg}"
+
+
+  install -D -m755 nvidia-settings "${pkgdir}/usr/bin/nvidia-settings"
+  install -D -m644 nvidia-settings.1.gz "${pkgdir}/usr/share/man/man1/nvidia-settings.1.gz"
+  install -D -m644 nvidia-settings.desktop "${pkgdir}/usr/share/applications/nvidia-settings.desktop"
+  install -D -m644 nvidia-settings.png "${pkgdir}/usr/share/pixmaps/nvidia-settings.png"
+  sed -e 's:__UTILS_PATH__:/usr/bin:' -e 's:__PIXMAP_PATH__:/usr/share/pixmaps:' -i "${pkgdir}/usr/share/applications/nvidia-settings.desktop"
+
   # Install the autostart .desktop file, so that parameters saved through nvidia-settings
   # are automatically reloaded at each login
   install -D -m644 "${srcdir}/nvidia-restore-settings.desktop" "${pkgdir}/usr/share/autostart/nvidia-restore-settings.desktop"
-
-  create_links
 }
 
 # vim:set ts=2 sw=2 et:
