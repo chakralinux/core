@@ -1,0 +1,34 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=zeitgeist
+pkgver=0.8.2
+pkgrel=1
+pkgdesc="A service which logs the users's activities and events and makes relevant information available to other applications"
+arch=('any')
+url="http://zeitgeist-project.com/"
+license=('GPL')
+depends=('dbus-python' 'pygobject' 'pyxdg')
+makedepends=('intltool' 'raptor' 'python2-rdflib')
+source=("http://launchpad.net/$pkgname/0.8/$pkgver/+download/$pkgname-$pkgver.tar.gz")
+md5sums=('589e7de784d21177491780bffd11097d')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  PYTHON=/usr/bin/python2 ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+}
