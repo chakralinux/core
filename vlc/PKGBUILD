@@ -7,31 +7,48 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgbase=vlc
-pkgname=('vlc'
-         'vlc-plugin')
-pkgver=1.1.12
-pkgrel=3
+pkgname=('vlc')
+pkgver=1.1.13
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.videolan.org/vlc/"
 license=('GPL')
-makedepends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'lirc-utils'
-             'libdca' 'qt' 'libproxy' 'sdl_image' 'libdvdnav' 'mesa'
-             'lua' 'libv4l' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
-             'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2'
-             'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug'
-             'avahi' 'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'libxpm'
-             'xulrunner' 'pkgconfig' 'live-media' 'libnotify' 'libcdio'
-             'flac' 'libtheora' 'alsa-lib' 'jack' 'udev'
-             'libraw1394' 'libdc1394' 'libavc1394' 'libva')
+depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libxpm' 'libcdio'
+         'libdca' 'qt' 'libproxy' 'sdl_image' 'libdvdnav' 'mesa'
+         'lua' 'v4l-utils' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
+         'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp'
+         'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug' 
+         'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'desktop-file-utils')
+makedepends=('avahi' 'pkgconfig' 'live-media' 'libnotify'
+             'flac' 'libtheora' 'alsa-lib' 'jack' 'kdelibs' 'udev'
+             'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'libpulse'
+             'lirc-utils' 'gnutls' 'libcaca')
+optdepends=('avahi: for service discovery using bonjour protocol'
+            'libnotify: for notification plugin'
+            'ncurses: for ncurses interface support'
+            'libdvdcss: for decoding encrypted DVDs'
+            'lirc-utils: for lirc plugin'
+            'libavc1394: for devices using the 1394ta AV/C'
+            'libdc1394: for IEEE 1394 plugin'
+            'libpulse: PulseAudio support'
+            'vdpau-video: vdpau back-end for nvidia'
+            'libva-driver-intel: back-end for intel cards')
+conflicts=('vlc-plugin')
+replaces=('vlc-plugin')
+backup=('usr/share/vlc/http/.hosts'
+        'usr/share/vlc/http/dialogs/.hosts'
+        'usr/share/vlc/lua/http/.hosts'
+        'usr/share/vlc/lua/http/dialogs/.hosts')
 options=('!libtool')
-source=("http://download.videolan.org/pub/videolan/${pkgbase}/${pkgver}/${pkgbase}-${pkgver}.tar.xz")
-md5sums=('56cb9975725a12da8c84882bc00fdce0')
+install=vlc.install
+source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('9678fb7a04808b6e0de63746d35e4bb1')
 
 build() {
-  cd "${srcdir}/${pkgbase}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   sed -i -e 's:truetype/freefont:TTF:g' modules/misc/freetype.c
+
   ./configure --prefix=/usr \
               --disable-rpath \
               --enable-faad \
@@ -42,53 +59,18 @@ build() {
               --enable-lirc \
               --enable-pvr \
               --enable-ncurses \
-              --enable-mozilla \
               --with-live555-tree=/usr/lib/live \
+              --enable-upnp \
               --enable-realrtsp
-  CFLAGS="-fPIC"
   make
 }
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
-package_vlc() {
-  pkgdesc="A multi-platform MPEG, VCD/DVD, and DivX player"
-  depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libcdio'
-           'libdca' 'qt' 'libproxy' 'sdl_image' 'libdvdnav' 'mesa'
-           'lua' 'libv4l' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
-           'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg=0.8.6' 'faad2'
-           'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug'
-           'ttf-freefont' 'libxv' 'libass' 'xdg-utils')
-  optdepends=('avahi: for service discovery using bonjour protocol'
-              'libnotify: for notification plugin'
-              'ncurses: for ncurses interface support'
-              'libdvdcss: for decoding encrypted DVDs'
-              'lirc-utils: for lirc plugin'
-              'libavc1394: for devices using the 1394ta AV/C'
-              'libdc1394: for IEEE 1394 plugin'
-              'vdpau-video: VDPAU backend for VA API (for GPU acceleration on Nvidia cards)')
-  options=('!libtool')
-  install=vlc.install
-  cd "${srcdir}/${pkgbase}-${pkgver}"
-
-  make DESTDIR=${pkgdir}/ install
+  make DESTDIR="${pkgdir}/" install
 
   for res in 16 32 48 128; do
-    install -D -m644 ${srcdir}/vlc-${pkgver}/share/icons/${res}x${res}/vlc.png \
-        ${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png
+    install -D -m644 "${srcdir}/vlc-${pkgver}/share/icons/${res}x${res}/vlc.png" \
+        "${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png"
   done
-
-  rm -rf ${pkgdir}/usr/lib/mozilla
-}
-
-package_vlc-plugin() {
-  pkgdesc="VLC mozilla browser plugin"
-  depends=("${pkgbase}=${pkgver}" 'nspr' 'xulrunner' 'libxpm')
-  cd "${srcdir}/${pkgbase}-${pkgver}"
-
-  #for linking against libvlc
-  make -C src DESTDIR="${pkgdir}" install-libLTLIBRARIES
-
-  make -C projects/mozilla DESTDIR=${pkgdir}/ install
-
-  #clean up libvlc
-  make -C src DESTDIR="${pkgdir}" uninstall-libLTLIBRARIES
 }
