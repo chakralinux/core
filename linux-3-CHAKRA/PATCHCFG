@@ -2,7 +2,7 @@
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
 _patch="3.1.5"
-_prepatch="3.1.6-pre2"
+_prepatch="3.1.6-pre3"
 _queue="3.1"
 # Aufs
 _aufs="3.1-20111114"
@@ -131,6 +131,8 @@ PATCHES=(
          ###rhbz 748691
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/be2net-non-member-vlan-pkts-not-received-in-promisco.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/benet-remove-bogus-unlikely-on-vlan-check.patch%1
+         ###rhbz 736815
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/x86-code-dump-fix-truncation.patch%1
          ###rhbz 749166
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/oom-fix-integer-overflow-of-points.patch%1
          ###rhbz 728607
@@ -145,10 +147,6 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/nfsv4-include-bitmap-in-nfsv4_get_acl_data.patch%1
          ###rhbz752176
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/sysfs-msi-irq-per-device.patch%1
-         ###backport brcm80211 from 3.2-rc1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/brcm80211.patch%1
-         #### Remove overlap between bcma/b43 and brcmsmac and reenable bcm4331
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/bcma-brcmsmac-compat.patch%1
          ### rhbz 754907
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/cciss-fix-irqf-shared.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/hpsa-add-irqf-shared.patch%1
@@ -160,11 +158,21 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/alps.patch%1
          ### patch to do a better job of dealing with busted EDID headers (rhbz#751589)
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-edid-try-harder-to-fix-up-broken-headers.patch%1
-         ### patch to fix Intel wifi regression in 3.1.5 (rhbz 767173)
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/iwlwifi-allow-to-switch-to-HT40-if-not-associated.patch%1
          ### patch from Jeff Layton to fix suspend with NFS (rhbz #717735)
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/nfs-client-freezer.patch%1
+         ###rhbz 741117
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/b44-Use-dev_kfree_skb_irq-in-b44_tx.patch%1
+         ###rhbz 746097
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/tpm_tis-delay-after-aborting-cmd.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/route-cache-garbage-collector.patch%1
 
+         ###backport brcm80211 from 3.2-rc1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/brcm80211.patch%1
+         ### Remove overlap between bcma/b43 and brcmsmac and reenable bcm4331
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/bcma-brcmsmac-compat.patch%1
+         ### Apply some iwlwifi regression fixes
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/iwlwifi-tx_sync-only-on-PAN-context.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/iwlwifi-allow-to-switch-to-HT40-if-not-associated.patch%1
 
          # add quirk for other webcams
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/usb-add-quirk-for-other-webcams.patch%1
@@ -202,7 +210,7 @@ PATCHES=(
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.1.5-2-CHAKRA"
+PATCHNAME="patch-3.1.5-3-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
