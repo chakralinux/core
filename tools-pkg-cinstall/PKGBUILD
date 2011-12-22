@@ -6,9 +6,9 @@
 # (c) 2010 Drake Justice
 
 pkgname=cinstall
-pkgver=0.4.6.12
+pkgver=0.4.7
 pkgrel=1
-depends=('rsync' 'cbundle' 'kdelibs')
+depends=('rsync' 'cbundle' 'kdelibs' 'qjson')
 makedepends=('qt' 'automoc4' 'libcroco')
 pkgdesc="Chakra's Bundle manager"
 arch=("i686" "x86_64")
@@ -17,13 +17,13 @@ install=$pkgname.install
 url="http://chakra-project.org/"
 
 source=("http://chakra-project.org/sources/cinstall/cinstall-$pkgver.tar.xz")
-md5sums=('c9b5ec59a68ae403b8cf04b7cdaa8458')
+md5sums=('a5abf8eca2c458861380c8494eb0fad2')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
   git clone git://gitorious.org//chakra/cinstall.git
-  pushd fritzvantoms-cinstall
+  pushd cinstall
   popd
   tar -cvJf cinstall-${pkgver}.tar.xz cinstall/*
   md5sum cinstall-${pkgver}.tar.xz
@@ -35,6 +35,9 @@ build() {
         cmake  \
           -DCMAKE_INSTALL_PREFIX=/usr \
           -DCMAKE_BUILD_TYPE=Release
-        make || return 1
-        make DESTDIR=${pkgdir} install || return 1
+        make 
+}
+package() {
+        cd "${srcdir}/cinstall"
+        make DESTDIR=${pkgdir} install 
 }
