@@ -5,19 +5,17 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=os-prober
-pkgver=1.42
+pkgver=1.49
 pkgrel=1
 pkgdesc="Utility to detect other OSes on a set of drives"
 url="http://joey.kitenet.net/code/os-prober/"
 arch=('i686' 'x86_64')
 license=('GPL')
 depends=()
-optdepends=()
 makedepends=('gcc' 'sed')
-install=
 source=(ftp://ftp.us.debian.org/debian/pool/main/o/${pkgname}/${pkgname}_${pkgver}.tar.gz)
+md5sums=('5a981493a7c16174e6454fcf6b39b1b5')
 
-md5sums=('8c208654327df559884a54b69d840219')
 build() {
   cd $srcdir/${pkgname}
 
@@ -41,6 +39,7 @@ build() {
   for f in os-probes/mounted/x86/* ; do 
     install -Dm755 $f $pkgdir/usr/lib/os-probes/mounted/`basename $f`
   done
+  install -Dm755 os-probes/mounted/powerpc/20macosx $pkgdir/usr/lib/os-probes/mounted/20macosx
   install -Dm755 os-probes/mounted/common/40lsb $pkgdir/usr/lib/os-probes/mounted/40lsb
   install -Dm755 os-probes/mounted/common/90linux-distro $pkgdir/usr/lib/os-probes/mounted/90linux-distro
 
