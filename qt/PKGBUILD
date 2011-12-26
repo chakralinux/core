@@ -7,7 +7,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers')
 pkgver=4.8.0
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -18,9 +18,21 @@ makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'db
 options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
+        "http://chakra.sourceforge.net/sources/${pkgbase}/qt-everywhere-opensource-src-4.8.0-QTBUG-22037.patch"
+        "http://chakra.sourceforge.net/sources/${pkgbase}/qt-everywhere-opensource-src-4.8.0-QTBUG-14724.patch"
+        "http://chakra.sourceforge.net/sources/${pkgbase}/qt-everywhere-opensource-src-4.8.0-QTBUG-21900.patch"
+        "http://chakra.sourceforge.net/sources/${pkgbase}/qt-everywhere-opensource-src-4.8.0-QUrl_toLocalFile.patch"
+        "http://chakra.sourceforge.net/sources/${pkgbase}/qt-everywhere-opensource-src-4.7.4-tds_no_strict_aliasing.patch"
+        "http://chakra.sourceforge.net/sources/${pkgbase}/qt-everywhere-opensource-src-4.8.0-icu_no_spam.patch"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
         'qtconfig.desktop')
 md5sums=('e8a5fdbeba2927c948d9f477a6abe904'
+         '7f9592bcd5d47421455125537845b5fe'
+         'f9b63a5dc2ec17d9e386959b4174477d'
+         '64e3c15a0f51dc11957b2a62c79b69c9'
+         '7bc255a36733d0fbc80c1902ade4beca'
+         '64a910e50f98b7dcd3f03b427d6cebe3'
+         'd45a908a6e1333fc4f361c8e3ab00d5a'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
@@ -52,6 +64,26 @@ build() {
 #	  # editing qt.install
 #	  sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
 #	fi
+
+	# revert qlist.h commit that seems to induce crashes in qDeleteAll<QList (QTBUG-22037)
+	patch -Np1 -i ${srcdir}/qt-everywhere-opensource-src-4.8.0-QTBUG-22037.patch
+
+	# Qt doesn't close orphaned file descriptors after printing (#746601, QTBUG-14724)
+	patch -Np1 -i ${srcdir}/qt-everywhere-opensource-src-4.8.0-QTBUG-14724.patch 
+
+	# Buttons in Qt applications not clickable when run under gnome-shell (#742658, QTBUG-21900)
+	patch -Np1 -i ${srcdir}/qt-everywhere-opensource-src-4.8.0-QTBUG-21900.patch
+
+	# restore Qt-4.7 behavior (which kde needs) to QUrl.toLocalfile
+	# https://bugzilla.redhat.com/show_bug.cgi?id=749213
+	patch -Np1 -i ${srcdir}/qt-everywhere-opensource-src-4.8.0-QUrl_toLocalFile.patch
+
+	# workaround
+	# sql/drivers/tds/qsql_tds.cpp:341:49: warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]
+	patch -Np1 -i ${srcdir}/qt-everywhere-opensource-src-4.7.4-tds_no_strict_aliasing.patch
+
+	# don't spam if libicu is not present at runtime
+	patch -Np1 -i ${srcdir}/qt-everywhere-opensource-src-4.8.0-icu_no_spam.patch
 
         export QT4DIR="${srcdir}"/${_pkgfqn}
         export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
