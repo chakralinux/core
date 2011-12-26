@@ -5,14 +5,14 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=linux-firmware
-pkgver=20111101
+pkgver=20111226
 _b43=4.178.10.4
 _legacy=3.130.20.0
 _nouveau=20091212
 pkgrel=1
 pkgdesc="Firmware files for Linux"
 arch=('any')
-url="http://git.kernel.org/?p=linux/kernel/git/dwmw2/linux-firmware.git;a=summary"
+url="http://git.kernel.org/?p=linux/kernel/git/firmware/linux-firmware.git;a=summary"
 license=('GPL2' 'GPL3' 'custom')
 provides=('kernel26-firmware=3.1.99' 'linux-firmware=3.1.99')
 conflicts=('linux-firmware-git'
@@ -53,7 +53,7 @@ source=(http://chakra.sourceforge.net/sources/linux-firmware/$pkgname-$pkgver.ta
         http://mirror2.openwrt.org/sources/broadcom-wl-${_b43}.tar.bz2
         http://downloads.openwrt.org/sources/wl_apsta-${_legacy}.o
         http://people.freedesktop.org/~pq/nouveau-drm/nouveau-firmware-$_nouveau.tar.gz)
-sha256sums=('df6cc48f6437a65ba63f10da82101329e36931263761a9a823da84d99384d6b4'
+sha256sums=('c59ad00d557882607590726205ddd923f2a14f6e45021ccb34c2aa1d73ccadc7'
             '1b379c5a8d6ab3a43911f7949d6306fe2dae3afb1368be5452a8fc7d9c54e0a0'
             '32f6ad98facbb9045646fdc8b54bb03086d204153253f9c65d0234a5d90ae53f'
             '7dba610b1d96dd14e901bcbce14cd6ecd1b1ac6f5c0035b0d6b6dc46a7c3ef90'
@@ -62,8 +62,8 @@ sha256sums=('df6cc48f6437a65ba63f10da82101329e36931263761a9a823da84d99384d6b4'
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-	  rm -vRf linux-firmware
-	  git clone git://git.kernel.org/pub/scm/linux/kernel/git/dwmw2/linux-firmware.git
+	  rm -vRf linux-firmware*
+	  git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
 	  pushd ${pkgname}
           git archive --format=tar --prefix linux-firmware-$(date +%Y%m%d)/ master | xz -9 > ../linux-firmware-$(date +%Y%m%d).tar.xz
 	  popd
