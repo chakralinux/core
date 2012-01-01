@@ -1,7 +1,11 @@
-# $Id: PKGBUILD 19227 2008-11-17 22:22:42Z thayer $
-# Contributor: Christian Storm <Christian.Storm@gmx.DE>
-# Contributor: James Rayner <james@archlinux.org>
-# Maintainer: Thayer Williams <thayer@archlinux.org>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=vbetool
 pkgver=1.1
@@ -16,13 +20,17 @@ source=(http://www.codon.org.uk/~mjg59/vbetool/download/vbetool-${pkgver}.tar.gz
 md5sums=('ffb03b118867a02296d7449019ad8846')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
+  cd "${srcdir}"/$pkgname-$pkgver
   if [ "${CARCH}" = "x86_64" ]; then
-    ./configure --prefix=/usr --without-x86emu || return 1
+    ./configure --prefix=/usr --without-x86emu
   else
-    ./configure --prefix=/usr || return 1
+    ./configure --prefix=/usr
   fi
-  make LIBS=-lpci || return 1
-  make DESTDIR=$pkgdir install || return 1
+  make LIBS=-lpci
+}
+
+package() {
+  cd "${srcdir}"/$pkgname-$pkgver
+  make DESTDIR="${pkgdir}" install
 }
 
