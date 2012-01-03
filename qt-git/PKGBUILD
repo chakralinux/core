@@ -3,16 +3,16 @@
 # This package provides the master-stable branch of Qt
 
 pkgname=qt-git
-pkgver=20101206
+pkgver=20120103
 pkgrel=1
 pkgdesc="The C++ Qt GUI framework - current development snapshot (master-stable branch)"
 arch=('i686' 'x86_64')
 url="http://www.qtsoftware.com"
 license=('GPL3' 'LGPL')
 
-depends=('libpng' 'mesa' 'fontconfig' 'libtiff' 'libmng' 'sqlite3' 'libxrandr' 'glib2' 'libxi' 'dbus' 'libxcursor' 'libxinerama' 'libxrender' 'ca-certificates')
+depends=('libpng' 'mesa' 'fontconfig' 'libtiff' 'libmng' 'sqlite3' 'libxrandr' 'glib2' 'libxi' 'dbus' 'libxcursor' 'libxinerama' 'libxrender' 'ca-certificates' 'xcb-util' 'python2')
 optdepends=('postgresql-libs' 'libmysqlclient' 'unixodbc')
-makedepends=('inputproto' 'postgresql-libs' 'mysql' 'unixodbc' 'cups' 'libxfixes' 'gtk2')
+makedepends=('inputproto' 'postgresql-libs' 'mysql' 'unixodbc' 'cups' 'libxfixes')
 provides=('qt' 'qt4' 'qt-doc' 'qt=4.7.0' 'qt4=4.7.0')
 replaces=('qt' 'qt4' 'qt-doc' 'qt4-git' 'qt4-doc')
 conflicts=('qt' 'qt4' 'qt-doc' 'qt4-git' 'qt4-doc')
@@ -26,8 +26,8 @@ md5sums=('83d1fd8da6a350dc1f1459d0c8cd226b'
          '038d7083823c2600c97239fe088b2f4b'
          '8618e4b1875143fab8ad244688b2aae7')
 
-_gitroot="git://gitorious.org/qt/qt.git"
-_gitname="qt"
+_gitroot="git://gitorious.org/qt/qt5.git"
+_gitname="qt5"
 
 build() {
           msg "Connecting to git server...."
@@ -45,15 +45,16 @@ build() {
 
                     cd $srcdir/$_gitname
 
-                    sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
-                    sed -i "/^QMAKE_RPATH/s| -Wl,-rpath,||g" mkspecs/common/g++.conf
-                    sed -i "/^QMAKE_LFLAGS\s/s|+=|+= $LDFLAGS|g" mkspecs/common/g++.conf
+                    #sed -i "s|-O2|$CXXFLAGS|" mkspecs/common/g++.conf
+                    #sed -i "/^QMAKE_RPATH/s| -Wl,-rpath,||g" mkspecs/common/g++.conf
+                    #sed -i "/^QMAKE_LFLAGS\s/s|+=|+= $LDFLAGS|g" mkspecs/common/g++.conf
           fi
-
-          unset QMAKESPEC
-          export QT4DIR=$srcdir/$_gitname
-          export PATH=${QT4DIR}/bin:${PATH}
-          export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
+    
+          #perl init-repository
+          #unset QMAKESPEC
+          #export QT5DIR=$srcdir/$_gitname
+          export PATH=$PWD/qtbase/bin:$PATH
+          #export LD_LIBRARY_PATH=${QT5DIR}/lib:${LD_LIBRARY_PATH}
 
           ./configure -confirm-license -opensource  -v \
                     -prefix /usr \
@@ -63,42 +64,31 @@ build() {
                     -datadir /usr/share/qt \
                     -docdir /usr/share/doc/qt \
                     -examplesdir /usr/share/doc/qt/examples \
-                    -demosdir /usr/share/doc/qt/demos \
                     -largefile \
                     -plugin-sql-{psql,mysql,sqlite,odbc} \
                     -system-sqlite \
                     -xmlpatterns \
                     -no-phonon \
                     -no-phonon-backend \
-                    -svg \
-                    -webkit \
-                    -scripttools \
-                    -system-zlib \
-                    -system-libtiff \
-                    -system-libpng \
-                    -system-libmng \
-                    -system-libjpeg \
-                    -openssl-linked \
+                    -no-webkit \
                     -dbus-linked \
                     -no-rpath \
                     -silent \
                     -optimized-qmake \
-                    -dbus \
+                    -dbus-linked \
                     -no-separate-debug-info \
+                    -nomake demos \
+                    -nomake examples \
+                    -nomake docs \
+                    -nomake tests \
+                    -no-gtkstyle \
+                    -no-wayland \
                     -reduce-relocations \
-                    -gtkstyle \
-                    -opengl \
-                    -glib \
-                    -cups \
-                    -iconv \
-                    -xinerama \
                     -xcursor \
-                    -xfixes \
-                    -qdbus
+                    -developer-build 
 
           # build qt master
-          make || return 1
-          make docs
+          make module-qtscript module-qtquick3d module-qt3d
 }
 
 package() {
@@ -129,6 +119,6 @@ package() {
                   -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
 
           # install doc
-          install -d ${pkgdir}/usr/share/doc/qt
-          cp -r doc/* ${pkgdir}/usr/share/doc/qt
+          #install -d ${pkgdir}/usr/share/doc/qt
+          #cp -r doc/* ${pkgdir}/usr/share/doc/qt
 }
