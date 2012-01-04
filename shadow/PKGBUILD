@@ -6,19 +6,18 @@
 
 pkgname=shadow
 pkgver=4.1.4.3
-pkgrel=1
-pkgdesc="Shadow password file utilities"
+pkgrel=2
+pkgdesc="Shadow password file utilities."
 arch=('i686' 'x86_64')
 url='http://pkg-shadow.alioth.debian.org/'
 license=('custom')
 groups=('base')
-depends=('bash')
+depends=('bash' 'pam')
 backup=(etc/login.defs
         etc/pam.d/{chage,login,passwd,shadow,useradd,usermod,userdel}
         etc/pam.d/{chpasswd,newusers,groupadd,groupdel,groupmod}
         etc/pam.d/{chfn,chgpasswd,groupmems,chsh}
         etc/default/useradd)
-depends=('pam')
 source=("http://pkg-shadow.alioth.debian.org/releases/${pkgname}-${pkgver}.tar.bz2"
         'useradd.defaults' 'login' 'passwd' 'chgpasswd' 'defaults.pam' 'login.defs' 'adduser' 'shadow.cron.daily'
         'xstrdup.patch'
@@ -33,7 +32,7 @@ md5sums=('b8608d8294ac88974f27b20f991c0e79'
          'b84204ab731bd02dca49d0637d44ebec'
          '65e9ebce249a5b9ed021e2790452b9e1'
          'a31374fef2cba0ca34dfc7078e2969e4'
-         'fad9a7116366f7775b1099290be840da'
+         'e93f663f4edc35aa18fb7ebb04e0400b'
          '6ce67e423ee19c87ae64f661310b2408'
          '1d64b4113e1d402746d9dd65f28a2c6f'
          '0eebe9d13065bec4b5d7ccf3bf46c509'
@@ -50,19 +49,23 @@ build() {
   autoreconf
   export LDFLAGS="${LDFLAGS} -lcrypt"
 
-  patch -p1 -i "${srcdir}/xstrdup.patch"
-  patch -p1 -i "${srcdir}/shadow-strncpy-usage.patch"
-  patch -p1 -i "${srcdir}/shadow-add-missing-include.patch"
-  patch -p0 -i "${srcdir}/fs#343-cannot-determine-your-user-name.patch"
+  patch -Np1 -i "${srcdir}/xstrdup.patch"
+  patch -Np1 -i "${srcdir}/shadow-strncpy-usage.patch"
+  patch -Np1 -i "${srcdir}/shadow-add-missing-include.patch"
+  patch -Np0 -i "${srcdir}/fs#343-cannot-determine-your-user-name.patch"
 
   # supress etc/pam.d/*, we provide our own
   sed -i '/^SUBDIRS/s/pam.d//' etc/Makefile.in
 
-  ./configure \
-    --prefix=/usr --libdir=/lib \
-    --mandir=/usr/share/man --sysconfdir=/etc \
-    --enable-shared --disable-static \
-    --with-libpam --without-selinux
+  ./configure --prefix=/usr \
+              --libdir=/lib \
+              --mandir=/usr/share/man \
+              --sysconfdir=/etc \
+              --enable-shared \
+              --disable-static \
+              --with-libpam \
+              --without-selinux
+
   make
 }
 
@@ -101,7 +104,7 @@ package() {
 
   # Remove su - using su from coreutils instead
   rm -v "${pkgdir}/bin/su"
-  find "${pkgdir}/usr/share/man" -name 'su.1' -exec rm -v {} \;
+  find "${pkgdir}/usr/share/man" -name 'su.1' -exec rm -v \{\} \;
 }
 
 # vim:set ts=2 sw=2 et:
