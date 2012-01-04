@@ -1,8 +1,8 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.1.6"
-_prepatch="3.1.7-pre1"
+_patch="3.1.7"
+_prepatch="3.1.8-pre1"
 _queue="3.1"
 # Aufs
 _aufs="3.1-20111114"
@@ -162,12 +162,12 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/b44-Use-dev_kfree_skb_irq-in-b44_tx.patch%1
          ###rhbz 746097
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/tpm_tis-delay-after-aborting-cmd.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/route-cache-garbage-collector.patch%1
-
-         ###backport brcm80211 from 3.2-rc1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/brcm80211.patch%1
-         ### Remove overlap between bcma/b43 and brcmsmac and reenable bcm4331
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/bcma-brcmsmac-compat.patch%1
+         ###rhbz 771006
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/thp-reduce-khugepaged-freezing-latency.patch%1
+         ###rhbz 771387
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/KVM-x86-Prevent-starting-PIT-timers-in-the-absence-of.patch%1
+         ###rhbz 770233
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/Bluetooth-Add-support-for-BCM20702A0.patch%1
 
          # add quirk for other webcams
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/usb-add-quirk-for-other-webcams.patch%1
@@ -205,7 +205,7 @@ PATCHES=(
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.1.6-1-CHAKRA"
+PATCHNAME="patch-3.1.7-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
