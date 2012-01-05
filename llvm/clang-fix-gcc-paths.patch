@@ -1,0 +1,22 @@
+diff -Naur a/lib/Driver/ToolChains.cpp b/lib/Driver/ToolChains.cpp
+--- a/lib/Driver/ToolChains.cpp	2012-01-05 14:18:02.089531142 +0000
++++ b/lib/Driver/ToolChains.cpp	2012-01-05 14:22:20.591459223 +0000
+@@ -1645,7 +1645,7 @@
+     LibDirs.append(ARMLibDirs, ARMLibDirs + llvm::array_lengthof(ARMLibDirs));
+     Triples.append(ARMTriples, ARMTriples + llvm::array_lengthof(ARMTriples));
+   } else if (HostArch == llvm::Triple::x86_64) {
+-    static const char *const X86_64LibDirs[] = { "/lib64", "/lib" };
++    static const char *const X86_64LibDirs[] = { "/usr/lib/gcc", "/lib64", "/lib" };
+     static const char *const X86_64Triples[] = {
+       "x86_64-linux-gnu",
+       "x86_64-unknown-linux-gnu",
+@@ -1780,7 +1780,8 @@
+       return "x86_64-linux-gnu";
+     if (llvm::sys::fs::exists(SysRoot + "/lib/x86_64-pc-linux-gnu"))
+       return "x86_64-pc-linux-gnu";
+-    if (llvm::sys::fs::exists(SysRoot + "/lib/x86_64-unknown-linux-gnu"))
++    if (llvm::sys::fs::exists(SysRoot + "/lib/x86_64-unknown-linux-gnu") ||
++	llvm::sys::fs::exists(SysRoot + "/usr/lib/gcc/x86_64-unknown-linux-gnu"))
+       return "x86_64-unknown-linux-gnu";
+     return TargetTriple.str();
+   }

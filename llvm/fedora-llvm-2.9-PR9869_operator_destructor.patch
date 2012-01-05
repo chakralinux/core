@@ -1,6 +1,20 @@
---- llvm/trunk/include/llvm/Operator.h	2011/02/07 16:40:21	125006
-+++ llvm/trunk/include/llvm/Operator.h	2011/05/08 01:59:22	131062
-@@ -186,28 +186,46 @@
+From 6a61834d1c41971f80669a0484f1a0d2d8a1c286 Mon Sep 17 00:00:00 2001
+From: Eli Friedman <eli.friedman@gmail.com>
+Date: Sun, 8 May 2011 01:59:22 +0000
+Subject: [PATCH] PR9869: Add explicit destructor declarations to Operator
+ subclasses, to allow compiling Operator.h with gcc 4.6 in
+ C++0x mode.
+
+git-svn-id: https://llvm.org/svn/llvm-project/llvm/trunk@131062 91177308-0d34-0410-b5e6-96231b3b80d8
+---
+ include/llvm/Operator.h |   34 ++++++++++++++++++++++++++--------
+ 1 files changed, 26 insertions(+), 8 deletions(-)
+
+diff --git a/include/llvm/Operator.h b/include/llvm/Operator.h
+index ff2a0ad..e9aa499 100644
+--- a/include/llvm/Operator.h
++++ b/include/llvm/Operator.h
+@@ -186,28 +186,46 @@ public:
  };
  
  class AddOperator
@@ -55,3 +69,6 @@
    enum {
      IsInBounds = (1 << 0)
    };
+-- 
+1.7.6.4
+
