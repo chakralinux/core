@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=vala
-pkgver=0.12.1
+pkgver=0.15.0
 pkgrel=1
 pkgdesc="Compiler for the GObject type system"
 arch=('i686' 'x86_64')
@@ -14,16 +14,18 @@ license=('LGPL')
 depends=('glib2')
 makedepends=('libxslt')
 options=('!libtool')
-source=(http://ftp.gnome.org/pub/gnome/sources/${pkgname}/0.12/${pkgname}-${pkgver}.tar.xz)
-sha256sums=('f102bb64549ebe88955bb9fa0f502d974413aec71fec88e3544c65adfeb0afb4')
+source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('828f7341a3c4fc14b6d0f5a14ce3bdf4c40f5eae3e7ccf11c2b49061df9d2e23')
 
 build() {
-    cd "${srcdir}/${pkgname}-${pkgver}"
-    ./configure --prefix=/usr --enable-vapigen
-    make
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --enable-vapigen
+  make
 }
 
 package() {
-    cd "${srcdir}/${pkgname}-${pkgver}"
-    make DESTDIR="${pkgdir}" install
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }
+
+# vim:set ts=2 sw=2 et:
