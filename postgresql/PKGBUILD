@@ -7,20 +7,26 @@
 pkgbase=postgresql
 pkgname=('postgresql-libs' 'postgresql')
 pkgver=9.0.4
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 url="http://www.postgresql.org"
 license=('custom:PostgreSQL')
 makedepends=('libxml2' 'python2' 'perl')
-source=(ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar.bz2 \
+source=("ftp://ftp.postgresql.org/pub/source/v${pkgver}/${pkgbase}-${pkgver}.tar.bz2"
         postgresql postgresql.confd build.patch postgresql.pam postgresql.logrotate)
-install=postgresql.install
+md5sums=('80390514d568a7af5ab61db1cda27e29'
+         'eacf91f987d230f2dc2d040618ea1817'
+         'd63a05943cf0a2726aa2070f3033c569'
+         '4d74f4227dc5e12bf95b3490758d86c9'
+         '96f82c38f3f540b53f3e5144900acf17'
+         'd28e443f9f65a5712c52018b84e27137')
+install="postgresql.install"
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
 
   # patch to remove regress/test make target (won't build with it present)
-  patch -Np1 -i ../build.patch
+  patch -Np1 -i "${srcdir}/build.patch"
 
   # configure
   ./configure --prefix=/usr --mandir=/usr/share/man --with-libxml \
@@ -36,7 +42,7 @@ build() {
 
   # build libs
   for dir in src/interfaces src/bin/pg_config; do
-    pushd ${dir}
+    pushd "${dir}"
     make
     popd
   done
@@ -53,7 +59,7 @@ package_postgresql-libs() {
 
   # install libs
   for dir in src/interfaces src/bin/pg_config; do
-    pushd ${dir}
+    pushd "${dir}"
     make DESTDIR="${pkgdir}" install
     popd
   done
@@ -103,25 +109,20 @@ package_postgresql() {
   # clean up unneeded installed items
   rm -rf "${pkgdir}/usr/include/postgresql/internal"
   rm -rf "${pkgdir}/usr/include/libpq"
-  find "${pkgdir}/usr/include" -maxdepth 1 -type f -execdir rm {} +
+  find "${pkgdir}/usr/include" -maxdepth 1 -type f -execdir rm \{\} +
 
   # install launch script
   install -D -m755 "${srcdir}/postgresql" "${pkgdir}/etc/rc.d/postgresql"
 
   # install conf file
-  install -D -m644 ${srcdir}/postgresql.confd \
+  install -D -m644 "${srcdir}/postgresql.confd" \
     "${pkgdir}/etc/conf.d/postgresql"
 
-  install -D -m644 ${srcdir}/postgresql.pam \
+  install -D -m644 "${srcdir}/postgresql.pam" \
     "${pkgdir}/etc/pam.d/postgresql"
 
-  install -D -m644 ${srcdir}/postgresql.logrotate \
+  install -D -m644 "${srcdir}/postgresql.logrotate" \
     "${pkgdir}/etc/logrotate.d/postgresql"
 }
 
-md5sums=('80390514d568a7af5ab61db1cda27e29'
-         'eacf91f987d230f2dc2d040618ea1817'
-         'd63a05943cf0a2726aa2070f3033c569'
-         '4d74f4227dc5e12bf95b3490758d86c9'
-         '96f82c38f3f540b53f3e5144900acf17'
-         'd28e443f9f65a5712c52018b84e27137')
+# vim:set ts=2 sw=2 et:
