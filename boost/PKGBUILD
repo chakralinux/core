@@ -15,21 +15,24 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
  
 pkgbase=boost
 pkgname=('boost-libs' 'boost')
-pkgver=1.46.1
+pkgver=1.48.0
 _boostver=${pkgver//./_}
-pkgrel=3
+pkgrel=1
 pkgdesc="Free peer-reviewed portable C++ source libraries"
 arch=('i686' 'x86_64')
 url="http://www.boost.org/"
 license=('custom')
 depends=('bzip2' 'zlib')
-makedepends=('icu' 'python2' 'bzip2' 'zlib') # Add Python (3) whenever it is added to our repos.
+makedepends=('icu' 'python2' 'bzip2' 'zlib' 'openmpi') # Add Python (3) whenever it is added to our repos.
 optdepends=('python: for python bindings')
 options=('!ccache')
-source=(http://downloads.sourceforge.net/sourceforge/${pkgbase}/${pkgbase}_${_boostver}.tar.gz
-       boost-1.46.0-spirit.patch)
-md5sums=('341e5d993b19d099bf1a548495ea91ec'
-         '9d6e2f13fef23bf27d7bdddc104e182a')
+source=(http://downloads.sourceforge.net/${pkgbase}/${pkgbase}_${_boostver}.tar.gz
+        exceptions.patch
+        BOOST_FOREACH.patch)
+license=('custom')
+md5sums=('313a11e97eb56eb7efd18325354631be'
+         'e12a237436bd9c18c4f7c1f55a7d0996'
+         'af2c30a290d2429b3e09788bcfa2210e')
 
 _stagedir="${srcdir}/stagedir"
 
@@ -37,11 +40,18 @@ build() {
   # set python path for bjam
   cd "${srcdir}/${pkgbase}_${_boostver}/tools"
   echo "using python : 2.7 : /usr/bin/python2 ;" >> build/v2/user-config.jam
-  #echo "using python : 3.2 : /usr/bin/python : /usr/include/python3.2mu : /usr/lib ;" >> build/v2/user-config.jam
-  #echo "using mpi ;" >> build/v2/user-config.jam
+  echo "using python : 3.2 : /usr/bin/python : /usr/include/python3.2mu : /usr/lib ;" >> build/v2/user-config.jam
+  echo "using mpi ;" >> build/v2/user-config.jam
+
+  cd "${srcdir}"/${pkgbase}_${_boostver}
+  # https://svn.boost.org/trac/boost/ticket/5731
+  patch -p0 -i "${srcdir}/exceptions.patch"
+  # https://svn.boost.org/trac/boost/ticket/6131
+  patch -p2 -i "${srcdir}/BOOST_FOREACH.patch"
+
 
   # build bjam
-  cd "${srcdir}/${pkgbase}_${_boostver}/tools/build/v2/engine/src"
+  cd "${srcdir}/${pkgbase}_${_boostver}/tools/build/v2/engine"
   ./build.sh cc
 
   _bindir="bin.linuxx86"
@@ -66,9 +76,6 @@ build() {
 
   # build libs
   cd "${srcdir}/${pkgbase}_${_boostver}"
-  
-  #https://svn.boost.org/trac/boost/ticket/4994
-  patch -Np0 -i "${srcdir}/boost-1.46.0-spirit.patch"
 
   # default "minimal" install: "release link=shared,static
   # runtime-link=shared threading=single,multi"
@@ -84,15 +91,9 @@ build() {
       toolset=gcc \
       --prefix="${_stagedir}" \
       -sTOOLS=gcc \
-      --without-mpi \
       --layout=system \
       ${MAKEFLAGS} \
       install
-
-  # pyste is unmaintained: http://www.boost.org/doc/libs/1_46_0/libs/python/doc/index.html
-  # build pyste
-  #cd "${srcdir}/${pkgbase}_${_boostver}/libs/python/pyste/install"
-  #python2 setup.py install --root=${_stagedir} --optimize=1
 }
 
 package_boost() {
@@ -132,3 +133,4 @@ package_boost-libs() {
     install -D -m644 "${srcdir}/${pkgbase}_${_boostver}/LICENSE_1_0.txt" \
         "${pkgdir}"/usr/share/licenses/boost-libs/LICENSE_1_0.txt
 }
+
