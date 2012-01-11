@@ -11,7 +11,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 _kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
 
 pkgname=rtl8192
-pkgver=0004.0816.2011
+pkgver=0005.1230.2011
 pkgrel=1
 pkgdesc="Driver for Realtek 8192CE/DE/SE PCI wireless chipsets."
 license=("GPL")
@@ -23,11 +23,11 @@ url="http://www.realtek.com.tw/"
 install="${pkgname}.install"
 
 build() {
-	cd ${srcdir}/rtl_92ce_92se_92de_linux_mac80211_${pkgver}
+	cd ${srcdir}/rtl_92ce_92se_92de_linux_mac80211_0005.1230.2011
 
     patch < ../../wifi.h.patch
 
-	make || return 1
+	make 
 
 	mkdir -p ${pkgdir}/lib/firmware
 	cp -rf firmware/rtlwifi ${pkgdir}/lib/firmware/rtlwifi
@@ -40,4 +40,4 @@ build() {
     find ${pkgdir}/lib/modules/$_kernver/kernel/drivers/net/wireless/rtlwifi -name '*.ko' -exec gzip {} \;
 }
 
-md5sums=('42b1583c3aa3383995299e58bb787e9c')
+md5sums=('f7d166274151276a7f7035813a5d5336')
