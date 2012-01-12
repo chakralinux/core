@@ -5,10 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=cloog
-pkgver=0.16.2
+pkgver=0.16.3
 pkgrel=1
-# dash the next line if you want to skip the tests
-_test=1
 pkgdesc="Library that generates loops for scanning polyhedra"
 arch=('i686' 'x86_64')
 url="http://www.bastoul.net/cloog/"
@@ -16,22 +14,22 @@ license=('GPL')
 depends=('isl' 'gmp')
 conflicts=('cloog-ppl<0.15.11')
 options=('!libtool' 'log')
-source=(http://www.bastoul.net/cloog/pages/download/$pkgname-$pkgver.tar.gz)
-md5sums=('83877caaa879c7160063138bb18348e7')
+source=(http://www.bastoul.net/cloog/pages/download/${pkgname}-${pkgver}.tar.gz)
+md5sums=('a0f8a241cd1c4f103f8d2c91642b3498')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr --with-isl=system --with-gmp=system
   make
+}
 
-  if [ -n "${_test}" ]; then
-     echo "<<< STARTING TESTS >>>"
-     make check
-     echo "<<< ENDING TESTS >>>"
-  fi
+check() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make check
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
-  make DESTDIR="$pkgdir/" install
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}/" install
 }
+
