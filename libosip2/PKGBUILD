@@ -7,7 +7,7 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=libosip2
-pkgver=3.3.0
+pkgver=3.6.0
 pkgrel=1
 pkgdesc="oSIP is an implementation of SIP"
 arch=('i686' 'x86_64')
@@ -16,7 +16,7 @@ license=('LGPL')
 depends=(glibc)
 options=(!emptydirs !libtool)
 source=(http://ftp.gnu.org/gnu/osip/libosip2-${pkgver/_/-}.tar.gz)
-md5sums=('81493bb4d4ae6d55b71a0d4369339125')
+md5sums=('92fd1c1698235a798497887db159c9b3')
 
 build() {
   cd $srcdir/libosip2-${pkgver/_/-}/
@@ -43,6 +43,6 @@ diff -wbBur libosip2-3.1.0/src/osip2/port_sema.c libosip2-3.1.0.my/src/osip2/por
 EOF
 
   ./configure --prefix=/usr --disable-semaphore --enable-sysv
-  make || return 1
+  make 
   make DESTDIR=$pkgdir install
 }
