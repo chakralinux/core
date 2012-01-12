@@ -11,7 +11,7 @@ pkgdesc="Utility libraries for XC Binding"
 arch=('i686' 'x86_64')
 url="http://xcb.freedesktop.org"
 license=('custom')
-depends=('libxcb>=1.7')
+depends=('libxcb')
 makedepends=('gperf')
 options=('!libtool')
 source=(http://xcb.freedesktop.org/dist/${pkgname}-${pkgver}.tar.bz2
@@ -21,8 +21,14 @@ md5sums=('8ce019c4bbf20dce246b98f177cfccff'
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --disable-static || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
-  install -D -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
+  ./configure --prefix=/usr --disable-static
+  make
+}
+
+package() { 
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -D -m644 "${srcdir}/LICENSE" \
+    "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
