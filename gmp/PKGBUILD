@@ -5,10 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=gmp
-pkgver=5.0.1
-pkgrel=3
-# dash the next line if you want to skip the tests
-_test=1
+pkgver=5.0.2
+pkgrel=1
 pkgdesc="A free library for arbitrary precision arithmetic"
 arch=('i686' 'x86_64')
 url="http://gmplib.org/"
@@ -17,7 +15,7 @@ license=('LGPL3')
 options=('!libtool' 'log')
 install=gmp.install
 source=(ftp://ftp.gnu.org/gnu/gmp/gmp-${pkgver}.tar.bz2)
-md5sums=('6bac6df75c192a13419dfd71d19240a7')
+md5sums=('0bbaedc82fb30315b06b1588b9077cd3')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -26,15 +24,10 @@ build() {
     --prefix=/usr --infodir=/usr/share/info \
     --enable-cxx
   make
-
-  if [ -n "${_test}" ]; then
-     echo "<<< STARTING TESTS >>>"
-     make check
-     echo "<<< ENDING TESTS >>>"
-  fi
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 }
+
