@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=fontconfig
 pkgver=2.8.0
-pkgrel=2
+pkgrel=3
 pkgdesc="A library for configuring and customizing font access"
 arch=('i686' 'x86_64')
 url="http://www.fontconfig.org/release/"
@@ -35,7 +35,9 @@ build() {
   # enable Position Independent Code for prelinking
   export CFLAGS="${CFLAGS} -fPIC"
 
-  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --localstatedir=/var
 
   make
 }
@@ -48,9 +50,13 @@ package() {
   install -m644 "${srcdir}/29-replace-bitmap-fonts.conf" \
       "${pkgdir}/etc/fonts/conf.avail"
 
+  # Removing the configuration files, we will symlink those in the .install hook
   rm -f "${pkgdir}/etc/fonts/conf.d"/*.conf
 
-  #Install license
+  # Remove this configuration file, which looks like it's deprecated
+  rm -f "${pkgdir}/etc/fonts/local.conf"
+
+  # Install license
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}"
 }
