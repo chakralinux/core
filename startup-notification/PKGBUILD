@@ -5,20 +5,26 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=startup-notification
-pkgver=0.10
-pkgrel=2
-pkgdesc="Monitor and display application startup"
-arch=(i686 x86_64)
+pkgver=0.12
+pkgrel=1
+pkgdesc="Monitor and display application startup."
+arch=('i686' 'x86_64')
 license=('LGPL')
 depends=('libx11' 'libsm' 'xcb-util>=0.3.4')
 options=('!libtool')
 url="http://www.freedesktop.org"
-source=(http://www.freedesktop.org/software/startup-notification/releases/${pkgname}-${pkgver}.tar.gz)
-md5sums=('bca0ed1c74bc4e483ea2ed12a5717354')
+source=("http://www.freedesktop.org/software/startup-notification/releases/${pkgname}-${pkgver}.tar.gz")
+md5sums=('2cd77326d4dcaed9a5a23a1232fb38e9')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc
+  make
 }
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
+
+# vim:set ts=2 sw=2 et:
