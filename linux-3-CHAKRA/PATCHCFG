@@ -1,8 +1,8 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.1.8"
-_prepatch="3.1.9-pre1"
+_patch="3.1.9"
+_prepatch="3.1.10-pre1"
 _queue="3.1"
 # Aufs
 _aufs="3.1-20111114"
@@ -27,152 +27,60 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/candidate/$_prepatch.patch%1
          #ftp://ftp.kernel.org/pub/linux/kernel/v3.x/stable-review/patch-$_prepatch.gz%1
 
-         #wireless: allow to retrieve the channel set on monitor interface
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/channel-negative-one-maxim.patch%1
+         # Archlinux patches
 
-         # Some chips detect a ghost TV output
-         # mailing list discussion: http://lists.freedesktop.org/archives/intel-gfx/2011-April/010371.html
-         # Arch Linux bug report: FS#19234
+         ### fix FS#27883
+         ### drm/i915: Only clear the GPU domains upon a successful finish
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/i915-gpu-finish.patch%1
+
+         ### Some chips detect a ghost TV output
+         ### mailing list discussion: http://lists.freedesktop.org/archives/intel-gfx/2011-April/010371.html
+         ### Arch Linux bug report: FS#19234
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/i915-fix-ghost-tv-output.patch%1
 
-         # In 3.1.1, a DRM_DEBUG message is falsely declared as DRM_ERROR. This
-         # worries users, as this message is displayed even at loglevel 4. Fix this.
+         ### In 3.1.1, a DRM_DEBUG message is falsely declared as DRM_ERROR. This
+         #### worries users, as this message is displayed even at loglevel 4. Fix this.
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/i915-fix-incorrect-error-message.patch%1
 
-         # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
-         # remove this when a Kconfig knob is made available by upstream
-         # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
+         ### set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
+         ### remove this when a Kconfig knob is made available by upstream
+         ### (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/change-default-console-loglevel.patch%1
 
-         # Power-Fix for 3.1 (https://lkml.org/lkml/2011/11/10/467)
+         # Custom Chakra Patches
+
+         ### Power-Fix for 3.1 (https://lkml.org/lkml/2011/11/10/467)
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/rework-aspm-disable-code-3.1.patch%1
 
-         # add aufs3 support, in reference to:
-         # http://aufs.sourceforge.net
+         ### add aufs3 support, in reference to:
+         ### http://aufs.sourceforge.net
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/aufs3.1/aufs$_aufs-kbuild.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/aufs3.1/aufs$_aufs-base.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/aufs3.1/aufs$_aufs-standalone.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/aufs3.1/aufs$_aufs.patch.bz2%1
 
-         # add overlayfs v11 from git
-         # http://git.kernel.org/?p=linux/kernel/git/mszeredi/vfs.git;a=shortlog;h=refs/heads/overlayfs.v11
+         ### add overlayfs v11 from git
+         ### http://git.kernel.org/?p=linux/kernel/git/mszeredi/vfs.git;a=shortlog;h=refs/heads/overlayfs.v11
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/01-vfs_add-i_op-_open.patch.bz2%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/02-vfs_export-do_splice_direct-to-modules.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/03-vfs_introduce-clone_private_mount.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/04-overlay-filesystem.patch.bz2%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/05-overlayfs_add-statfs-support.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/06-overlayfs_implement-show_options.patch%1
-         # don't wanted feature
+         ### don't wanted feature
          #http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/08-fs_limit filesystem stacking depth.patch%1
-
-         # with Jordi Pujol's overlayfs patches following:
-         # for performance and improvement
+         ### with Jordi Pujol's overlayfs patches following:
+         ### for performance and improvement
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/50-copy-up-performance.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/51-improve-ovl_copy_up_xattr.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/52-vfs_getxattr-performance.patch%1
-         # suppress unreliable code, it confuses /proc/mounts
+         ### suppress unreliable code, it confuses /proc/mounts
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/overlayfs/59-read-only.patch%1
 
-         # add fedora patches
-         ## Standalone patches
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/taint-vbox.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-defaults-acpi-video.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-acpi-video-dos.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-acpi-debug-infinite-loop.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/acpi-ensure-thermal-limits-match-cpu-freq.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/acpi-sony-nonvs-blacklist.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-input-kill-stupid-messages.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6.30-no-pcspkr-modalias.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/die-floppy-die.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/floppy-drop-disable_hlt-warning.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-e1000-ich9-montevina.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-crash-driver.patch%1
-         ## virt + ksm patches
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/fix_xen_guest_on_old_EC2.patch%1
-         ## DRM
-         ### nouveau + drm fixes
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-nouveau-updates.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-nouveau-gf108.patch%1
-         ### hush the i915 fbc noise
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-i915-fbc-stfu.patch%1
-         ### rhbz#729882, https://bugs.freedesktop.org/attachment.cgi?id=49069
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-i915-sdvo-lvds-is-digital.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-lower-severity-radeon-lockup.diff%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-intel-iommu-igfx.patch%1
-         ## Quiet boot fixes
-         ### silence the ACPI blacklist code
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/linux-2.6-silence-acpi-blacklist.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/quite-apm.patch%1
-         ## Platform fixes not sent for -stable
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/samsung-laptop-brightness-fixes-3.2.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/asus-laptop-3.2-backport.patch%1
-         ## patches headed upstream
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/rcutree-avoid-false-quiescent-states.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/disable-i8042-check-on-apple-mac.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/add-appleir-usb-driver.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/udlfb-bind-framebuffer-to-interface.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/epoll-limit-paths.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/rcu-avoid-just-onlined-cpu-resched.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/block-stray-block-put-after-teardown.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/HID-wacom-Set-input-bits-before-registration.patch%1
-
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/revert-efi-rtclock.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/efi-dont-map-boot-services-on-32bit.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/hvcs_pi_buf_alloc.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/media-dib0700-correct-error-message.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/utrace.patch%1
-         ## fixes
-         ###rhbz#605888
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/dmar-disable-when-ricoh-multifunction.patch%1
-         ###rhbz #735946
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/0001-mm-vmscan-Limit-direct-reclaim-for-higher-order-allo.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/0002-mm-Abort-reclaim-compaction-if-compaction-can-procee.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/mm-do-not-stall-in-synchronous-compaction-for-THP-allocations.patch%1
-         ###rhbz 748691
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/be2net-non-member-vlan-pkts-not-received-in-promisco.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/benet-remove-bogus-unlikely-on-vlan-check.patch%1
-         ###rhbz 736815
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/x86-code-dump-fix-truncation.patch%1
-         ###rhbz 728607
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/elantech.patch%1
-         ###rhbz 748210
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/ideapad-Check-if-acpi-already-handle-backlight.patch%1
-         ## ext4
-         ###rhbz 753346
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/jbd-jbd2-validate-sb-s_first-in-journal_get_superblo.patch%1
-         ## NFSv4
-         ###rhbz 753236
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/nfsv4-include-bitmap-in-nfsv4_get_acl_data.patch%1
-         ###rhbz752176
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/sysfs-msi-irq-per-device.patch%1
-         ### rhbz 754907
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/cciss-fix-irqf-shared.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/hpsa-add-irqf-shared.patch%1
-         ###rhbz 731365
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/mac80211_offchannel_rework_revert.patch%1
-         ###rhbz #757839
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/net-sky2-88e8059-fix-link-speed.patch%1
-         ### Backport ALPS touchpad patches from input/next branch (rhbz #590880)
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/alps.patch%1
-         ### patch to do a better job of dealing with busted EDID headers (rhbz#751589)
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/drm-edid-try-harder-to-fix-up-broken-headers.patch%1
-         ### patch from Jeff Layton to fix suspend with NFS (rhbz #717735)
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/nfs-client-freezer.patch%1
-         ###rhbz 741117
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/b44-Use-dev_kfree_skb_irq-in-b44_tx.patch%1
-         ###rhbz 746097
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/tpm_tis-delay-after-aborting-cmd.patch%1
-         ###rhbz 771006
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/thp-reduce-khugepaged-freezing-latency.patch%1
-         ###rhbz 771387
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/KVM-x86-Prevent-starting-PIT-timers-in-the-absence-of.patch%1
-         ###rhbz 770233
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/fedora/Bluetooth-Add-support-for-BCM20702A0.patch%1
-
-         # add quirk for other webcams
+         ### add quirk for other webcams
          http://chakra.sourceforge.net/sources/linux/patches/3.1/bugfix/usb-add-quirk-for-other-webcams.patch%1
 
-         # add acerhk
+         ### add acerhk
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/01_acerhk-0.5.35.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/02_64bits_support_for_aspire5100.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/03_Add_Medion_MD97600_support.patch%1
@@ -186,7 +94,13 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/11_bg-flag.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/acerhk/12_Get-rid-off-bios-error.patch%1
 
-         # other features
+         ### tomoyo 2.5
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/revert-tomoyo-fix-pathname-handling-of-disconnected-paths.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/revert-partly-fix-apparmor-dereferencing-potentially-freed-dentry-sanitize-__d_path-api.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/tomoyo-2.5-backport-from-3.2-rc5-for-3.1.5.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/tomoyo-2.5-backport-for-3.1.5.patch%1
+
+         ### other features
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0001-media-dvb-usb-prepare-for-multi-frontend-support-MFE.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0002-media-dvb-usb-multi-frontend-support-MFE.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/v4l/0003-media-anysee-use-multi-frontend-MFE.patch%1
@@ -198,15 +112,9 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/module-bug-Add-TAINT_OOT_MODULE-flag-for-modules-not.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.1/features/mv_sas-OCZ-RevoDrive3-zDrive-R4-support.patch%1
 
-         # tomoyo 2.5
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/revert-tomoyo-fix-pathname-handling-of-disconnected-paths.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/revert-partly-fix-apparmor-dereferencing-potentially-freed-dentry-sanitize-__d_path-api.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/tomoyo-2.5-backport-from-3.2-rc5-for-3.1.5.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.1/features/tomoyo/tomoyo-2.5-backport-for-3.1.5.patch%1
-
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.1.8-4-CHAKRA"
+PATCHNAME="patch-3.1.9-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
