@@ -9,12 +9,12 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=maxima
 pkgver=5.25.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Maxima - a sophisticated Computer Algebra System."
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://maxima.sourceforge.net"
-depends=('clisp' 'texinfo' 'sh')
+depends=('sbcl' 'texinfo' 'sh')
 optdepends=('gnuplot: plotting capabilities' \
             'rlwrap: readline support via /usr/bin/rmaxima' \
             'tk: graphical xmaxima interface')
@@ -34,8 +34,8 @@ build() {
               --mandir=/usr/share/man \
               --infodir=/usr/share/info \
               --libexecdir=/usr/lib \
-              --enable-clisp \
-              --with-default-lisp=clisp
+              --enable-sbcl \
+              --with-default-lisp=sbcl
 
   make
 }
