@@ -9,27 +9,32 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=lsb-release
 pkgver=1.4
-pkgrel=2
-pkgdesc="LSB version query program"
+pkgrel=4
+pkgdesc="LSB version query program."
 arch=('i686' 'x86_64')
 url="http://www.linuxbase.org/"
+makedepends=('perl') # to generate the man page
 license=('GPL2')
-source=(http://downloads.sourceforge.net/lsb/$pkgname-$pkgver.tar.gz)
+source=("http://downloads.sourceforge.net/lsb/${pkgname}-${pkgver}.tar.gz")
 md5sums=('30537ef5a01e0ca94b7b8eb6a36bb1e4')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
-  install -dm755 "$pkgdir/etc"
-  echo "DISTRIB_ID=\"Chakra\"" > "$pkgdir/etc/lsb-release"
-  echo "DISTRIB_RELEASE=\"2011.04\"" >> "$pkgdir/etc/lsb-release"
-  echo "DISTRIB_CODENAME=\"Aida\"" >> "$pkgdir/etc/lsb-release"
-  echo "DISTRIB_DESCRIPTION=\"Chakra Linux\"" >> "$pkgdir/etc/lsb-release"
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make prefix="${pkgdir}/usr" mandir="${pkgdir}/usr/share/man" install
 
-  install -Dm 644 lsb_release.1.gz "$pkgdir/usr/share/man/man1/lsb_release.1.gz"
-  install -Dm 755 lsb_release "$pkgdir/usr/bin/lsb_release"
+  # Create an /etc/lsb-release file suitable for Chakra
+  install -d -m755 "${pkgdir}/etc"
+  cat > "${pkgdir}/etc/lsb-release" <<-EOF
+DISTRIB_ID="Chakra"
+DISTRIB_RELEASE="2011.12"
+DISTRIB_CODENAME="Edn"
+DISTRIB_DESCRIPTION="Chakra Linux"
+EOF
 }
+
+# vim:set ts=2 sw=2 et:
