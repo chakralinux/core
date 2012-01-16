@@ -19,21 +19,22 @@ provides=('gnash' 'gnash-common')
 conflicts=('flashplugin' 'flashplugin-square')
 options=(!libtool !emptydirs)
 backup=(etc/gnashrc)
-source=("${pkgname}.zip")
-        # gentoo-ffmpeg-0.8.patch)
-md5sums=('d0347a9d31c9c80759c6d4f384212f69')
-         #'a88de6b2de6d2b100ab7932e901a4b92')
+source=("http://ftp.gnu.org/gnu/gnash/${pkgver}/gnash-${pkgver}.tar.bz2"
+        "http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/www-plugins/gnash/files/gnash-0.8.9-ffmpeg-detection.patch")
+md5sums=('5b2be6b04a1bcc5fb404cc377034499e'
+         'def95689fea9a8558f78ea8c18ef5281')
 
 build() {
-  cd "$srcdir/gnash"
-       # patch -Np1 -i "$srcdir/gentoo-ffmpeg-0.8.patch"
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  patch -Np1 -i "$srcdir/gnash-0.8.9-ffmpeg-detection.patch"
 	./autogen.sh
 
 	sed -i "s/moc-qt4/moc/g; s/uic-qt4/uic/g" configure
 
 	./configure \
 		--enable-renderer=agg \
-		--enable-media=gst,ffmpeg \
+		--enable-media=gst \
 		--enable-gui=kde4 \
                 --enable-sound=sdl \
                 --enable-hwaccel=vaapi \
@@ -49,7 +50,7 @@ build() {
 }
 
 package() {
-	cd "$srcdir/gnash"
+	cd "${srcdir}/${pkgname}-${pkgver}"
 
 	make DESTDIR="${pkgdir}" install 
 	make DESTDIR="${pkgdir}" install-plugins 

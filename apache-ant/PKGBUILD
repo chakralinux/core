@@ -4,12 +4,10 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=apache-ant
 pkgver=1.8.2
-pkgrel=2
+pkgrel=4
 pkgdesc="A java-based build tool."
 arch=('i686' 'x86_64')
 license=('APACHE')
@@ -41,10 +39,6 @@ package() {
 
   # symlink to junit so it's on the javac build path for ant
   ln -sf /usr/share/java/junit.jar "${pkgdir}"/usr/share/java/apache-ant/lib/
-
-  # symlink the binary into PATH
-  mkdir -p "${pkgdir}"/usr/bin
-  ln -sf "${pkgdir}"/usr/share/java/apache-ant/bin/ant "${pkgdir}"/usr/bin/ant
 
   # fix python2 path
   sed -i 's|/usr/bin/python|/usr/bin/python2|' "${pkgdir}"/usr/share/java/apache-ant/bin/runant.py
