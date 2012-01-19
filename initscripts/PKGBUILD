@@ -6,7 +6,7 @@
 
 pkgname=initscripts
 pkgver=2011.12.1.1
-pkgrel=1
+pkgrel=2
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
 url="http://www.chakra-project.org"
@@ -38,6 +38,10 @@ mksource() {
 
 package() {
   cd ${srcdir}/chakra-${pkgname}
+
+  # Update copyright year
+  sed -i 's/2006-2011/2006-2012/g' rc.sysinit
+
   make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
  
