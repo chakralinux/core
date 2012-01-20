@@ -7,7 +7,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers')
 pkgver=4.8.0
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -19,12 +19,14 @@ options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
-        'qtconfig.desktop')
+        'qtconfig.desktop'
+        "http://chakra-linux.org/sources/qt/qt-everywhere-opensource-src-4.8.0-QUrl_toLocalFile.patch")
 md5sums=('e8a5fdbeba2927c948d9f477a6abe904'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
-         '6b771c8a81dd90b45e8a79afa0e5bbfd')
+         '6b771c8a81dd90b45e8a79afa0e5bbfd'
+         '7bc255a36733d0fbc80c1902ade4beca')
 
 # source PKGBUILD && _create-kdeqt-patch
 _create-kdeqt-patch() {
@@ -52,6 +54,9 @@ build() {
 #	  # editing qt.install
 #	  sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
 #	fi
+
+        #KDE sound-notification work-around
+        patch -Np1 -i ${srcdir}/qt-everywhere-opensource-src-4.8.0-QUrl_toLocalFile.patch
 
         export QT4DIR="${srcdir}"/${_pkgfqn}
         export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
