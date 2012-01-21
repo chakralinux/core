@@ -1,5 +1,8 @@
-# Maintainer: Ronald van Haren <ronald.chakra.org>
-# Contributor: Keshav P R <skodabenz at rocketmail dot com>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686):   Phil Miller <philm[at]chakra-project[dot]org
+# maintainer (x86_64): Daniele Cocca <jmc[at]chakra-project[dot]org>
 
 # The src pkg includes grub2_bzr_export.sh to create newer grub-extras snapshots. Modify the paths in it accordingly.
 
@@ -13,7 +16,7 @@ _grub2_915_ver=7
 pkgname=('grub2-common' 'grub2-bios' 'grub2-efi-x32')
 pkgbase="grub2"
 pkgver='1.99'
-pkgrel=6
+pkgrel=7
 url="http://www.gnu.org/software/grub/"
 arch=('i686' 'x86_64')
 license=('GPL3')
@@ -28,8 +31,8 @@ source=("ftp://ftp.gnu.org/gnu/grub/grub-1.99.tar.xz"
         "http://chakra-linux.org/sources/grub2/grub2_extras_ntldr-img_r${_grub2_ntldr_ver}.tar.xz"
         "http://chakra-linux.org/sources/grub2/grub2_extras_915resolution_r${_grub2_915_ver}.tar.xz"
         'chakra_grub2_mkconfig_fixes.patch'
+        'resume-hook.patch'
         'grub.default'
-        'grub.cfg'
         '20_memtest86+'
         'grub2_bzr_export.sh'
         'update-grub')
@@ -45,8 +48,8 @@ sha1sums=('a5ae9558f30ce7757a76aa130088b053a87e2fb6'
           '0e50955141a45918fcf56f3a5e15fb477f0448a7'
           'f2a5f1d5b75bd3286b63aefaf5e6553aa03e772b'
           'd44bb9c9b95a6999560d3b7300e05e14e85fcfc6'
-          'b517e8ce88e2edfdf97129a03a747258d4a2b44d'
-          '8948d89537c12a4202df7c001e65a77030bbe5a3'
+          '16424e596f4f1e976b626e0d43e9772fb80f8acb' 
+          'c6192dbda83d11871eb81024fef7679685310005'
           '82a27eca5277218cf57c6c5767e0b17a72f62229'
           'beb31419045db70fee7401aa6448c220a491e2a3'
           '5770fbb559b1f463e1a735a1463d24af489bcc3e')
@@ -174,11 +177,16 @@ package_grub2-common() {
   ## install /etc/default/grub (used by grub-mkconfig)
   install -Dm644 "${srcdir}/grub.default" "${pkgdir}/etc/default/grub"
 
-  ## install grub.cfg (needed so it doesn't get removed on upgrading because it was previously here)
-  install -Dm644 "${srcdir}/grub.cfg" "${pkgdir}/boot/grub/grub.cfg"
+  ## create blank grub.cfg so it won't get removed on upgrade
+  mkdir -p "${pkgdir}/boot/grub"
+  touch "${pkgdir}/boot/grub/grub.cfg"
 
   # remove platform specific files
   rm -rf "${pkgdir}/usr/lib/grub/i386-pc"
+
+  # add resume-hook support
+  cd ${pkgdir}/sbin
+  patch -Np0 -i  ${srcdir}/resume-hook.patch
 }
 
 package_grub2-bios() {
