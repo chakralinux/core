@@ -1,6 +1,18 @@
-diff -Nur a/util/grub.d/00_header.in b/util/grub.d/00_header.in
---- a/util/grub.d/00_header.in	2011-04-06 13:14:27.000000000 +0200
-+++ b/util/grub.d/00_header.in	2011-08-01 15:19:57.919100452 +0200
+diff -Naur a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+--- a/util/grub-mkconfig.in	2011-12-03 21:37:37.148786544 +0000
++++ b/util/grub-mkconfig.in	2011-12-03 21:37:48.445392013 +0000
+@@ -252,6 +252,8 @@
+   GRUB_THEME \
+   GRUB_GFXPAYLOAD_LINUX \
+   GRUB_DISABLE_OS_PROBER \
++  GRUB_COLOR_NORMAL \
++  GRUB_COLOR_HIGHLIGHT \
+   GRUB_INIT_TUNE \
+   GRUB_SAVEDEFAULT \
+   GRUB_BADRAM
+diff -Naur a/util/grub.d/00_header.in b/util/grub.d/00_header.in
+--- a/util/grub.d/00_header.in	2011-12-03 21:37:37.148786544 +0000
++++ b/util/grub.d/00_header.in	2011-12-03 21:37:48.445392013 +0000
 @@ -100,6 +100,14 @@
  
  EOF
@@ -16,9 +28,9 @@ diff -Nur a/util/grub.d/00_header.in b/util/grub.d/00_header.in
  serial=0;
  gfxterm=0;
  for x in ${GRUB_TERMINAL_INPUT} ${GRUB_TERMINAL_OUTPUT}; do
-diff -Nur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
---- a/util/grub.d/10_linux.in	2011-05-14 22:36:49.000000000 +0200
-+++ b/util/grub.d/10_linux.in	2011-08-01 15:56:53.324779083 +0200
+diff -Naur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+--- a/util/grub.d/10_linux.in	2011-12-03 21:37:37.148786544 +0000
++++ b/util/grub.d/10_linux.in	2011-12-03 21:40:36.621147593 +0000
 @@ -31,8 +31,8 @@
  if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
    OS=GNU/Linux
@@ -50,9 +62,12 @@ diff -Nur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
                    if grub_file_is_not_garbage "$i" ; then echo -n "$i " ; fi
                done` ;;
      *) 
-@@ -160,7 +162,8 @@
+@@ -159,8 +161,11 @@
+ 	   "initrd-${version}" "initramfs-${version}.img" \
  	   "initrd.img-${alt_version}" "initrd-${alt_version}.img" \
  	   "initrd-${alt_version}" "initramfs-${alt_version}.img" \
++	   "initramfs-linux-${version}" "initramfs-linux-${version}.img" \
++	   "initramfs-linux-${alt_version}" "initramfs-linux-${alt_version}.img" \
  	   "initramfs-genkernel-${version}" \
 -	   "initramfs-genkernel-${alt_version}"; do
 +	   "initramfs-genkernel-${alt_version}" \
@@ -60,7 +75,7 @@ diff -Nur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
      if test -e "${dirname}/${i}" ; then
        initrd="$i"
        break
-@@ -190,6 +193,15 @@
+@@ -190,6 +195,15 @@
  
    linux_entry "${OS}" "${version}" false \
        "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
@@ -76,15 +91,3 @@ diff -Nur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
    if [ "x${GRUB_DISABLE_RECOVERY}" != "xtrue" ]; then
      linux_entry "${OS}" "${version}" true \
  	"single ${GRUB_CMDLINE_LINUX}"
-diff -Nur a/util/grub-mkconfig.in b/util/grub-mkconfig.in
---- a/util/grub-mkconfig.in	2011-04-06 17:45:53.000000000 +0200
-+++ b/util/grub-mkconfig.in	2011-08-01 15:20:49.256867648 +0200
-@@ -252,6 +252,8 @@
-   GRUB_THEME \
-   GRUB_GFXPAYLOAD_LINUX \
-   GRUB_DISABLE_OS_PROBER \
-+  GRUB_COLOR_NORMAL \
-+  GRUB_COLOR_HIGHLIGHT \
-   GRUB_INIT_TUNE \
-   GRUB_SAVEDEFAULT \
-   GRUB_BADRAM
