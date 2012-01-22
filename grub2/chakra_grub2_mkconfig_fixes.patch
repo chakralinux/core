@@ -42,7 +42,7 @@ diff -Naur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
  fi
  
  # loop-AES arranges things so that /dev/loop/X can be our root device, but
-@@ -65,10 +65,17 @@ linux_entry ()
+@@ -65,12 +65,19 @@ linux_entry ()
    version="$2"
    recovery="$3"
    args="$4"
@@ -53,16 +53,19 @@ diff -Naur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
    else
 -    title="$(gettext_quoted "%s, with Linux %s")"
 +    _kernel=Standard
-+  fi
+   fi
+-  printf "menuentry '${title}' ${CLASS} {\n" "${os}" "${version}"
 +  if [ -n "$5" ] ; then
 +    title="$(gettext_quoted "%s, with ${_kernel}-Kernel") $5"
 +  elif ${recovery} ; then
 +    title="$(gettext_quoted "%s, with ${_kernel}-Kernel (recovery mode)")"
 +  else
 +    title="$(gettext_quoted "%s, with ${_kernel}-Kernel")"
-   fi
-   printf "menuentry '${title}' ${CLASS} {\n" "${os}" "${version}"
++  fi
++  printf "menuentry '${title}' ${CLASS} {\n" "${os}"
    if ! ${recovery} ; then
+       save_default_entry | sed -e "s/^/\t/"
+   fi
 @@ -132,7 +139,7 @@ EOF
  
  case x`uname -m` in
