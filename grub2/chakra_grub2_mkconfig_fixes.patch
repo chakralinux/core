@@ -42,6 +42,15 @@ diff -Naur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
  fi
  
  # loop-AES arranges things so that /dev/loop/X can be our root device, but
+@@ -49,7 +49,7 @@ if [ "x${GRUB_DEVICE_UUID}" = "x" ] || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue"
+     || uses_abstraction "${GRUB_DEVICE}" lvm; then
+   LINUX_ROOT_DEVICE=${GRUB_DEVICE}
+ else
+-  LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
++  LINUX_ROOT_DEVICE="/dev/disk/by-uuid/${GRUB_DEVICE_UUID}"
+ fi
+
+ if [ "x`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2>/dev/null || true`" = xbtrfs ]; then
 @@ -65,12 +65,19 @@ linux_entry ()
    version="$2"
    recovery="$3"

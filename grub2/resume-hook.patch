@@ -38,7 +38,7 @@
 +    else
 +       echo "Adding swap partition $SWAP" >&2
 +       SWAPUUID=`blkid $SWAP -s UUID -o value`
-+       sed -i -e "s~root=~resume=UUID=${SWAPUUID} root=~g" ${grub_cfg}.new
++       sed -i -e "s~root=~resume=/dev/disk/by-uuid/${SWAPUUID} root=~g" ${grub_cfg}.new
 +    fi
 +fi
 +
