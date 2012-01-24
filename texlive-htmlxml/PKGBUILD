@@ -3,11 +3,10 @@
 #
 # contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=texlive-htmlxml
-pkgver=2010.19804
+pkgver=2011.24013
+_revnr=${pkgver#2011.}
 pkgrel=1
 pkgdesc="TeX Live - Packages to convert LaTeX to XML/HTML, and typeset XML/SGML"
 license=('GPL')
@@ -15,11 +14,10 @@ arch=(any)
 depends=('texlive-core')
 groups=('texlive-most')
 url='http://tug.org/texlive/'
-source=("http://chakra-project.org/sources/texlive/$pkgname-$pkgver-src.zip")
+source=("http://mirror.ancl.hawaii.edu/linux/archlinux/other/texlive/${pkgname}-${pkgver}-src.zip")
 options=('!emptydirs')
-options=(!strip)
 install=texlive.install
-md5sums=('ef08cc67e0d8c702dc7ecfde6a9c0894')
+md5sums=('1fd5dbf7fd8ae85708643486548da0ce')
 
 build() {
    for p in *.tar.xz; do
@@ -27,10 +25,10 @@ build() {
    done
    rm -rf {tlpkg,doc,source} || true
 }
+
 package() {
    install -m755 -d $pkgdir/var/lib/texmf/arch/installedpkgs
    sed -i '/^#/d' CONTENTS
-   _revnr=`echo $pkgver | sed 's/2010\.//'`
    install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_${_revnr}.pkgs
    install -m755 -d $pkgdir/usr/share
    wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
