@@ -6,7 +6,7 @@
 
 pkgname=shadow
 pkgver=4.1.4.3
-pkgrel=2
+pkgrel=3
 pkgdesc="Shadow password file utilities."
 arch=('i686' 'x86_64')
 url='http://pkg-shadow.alioth.debian.org/'
@@ -64,7 +64,8 @@ build() {
               --enable-shared \
               --disable-static \
               --with-libpam \
-              --without-selinux
+              --without-selinux \
+              --with-pic
 
   make
 }
@@ -105,6 +106,9 @@ package() {
   # Remove su - using su from coreutils instead
   rm -v "${pkgdir}/bin/su"
   find "${pkgdir}/usr/share/man" -name 'su.1' -exec rm -v \{\} \;
+
+  # Fix permissions of SUID binaries
+  find "${pkgdir}" -perm -4000 -exec chmod -rw \{\} \+
 }
 
 # vim:set ts=2 sw=2 et:
