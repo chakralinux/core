@@ -8,34 +8,40 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=fakeroot
-pkgver=1.15.1
-pkgrel=2
-pkgdesc="Gives a fake root environment, useful for building packages as a non-privileged user"
+pkgver=1.18.2
+pkgrel=1
+pkgdesc="Gives a fake root environment, useful for building packages as a non-privileged user."
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://packages.debian.org/fakeroot"
 groups=('base-devel')
-install=fakeroot.install
+install="fakeroot.install"
 depends=('glibc' 'filesystem' 'util-linux' 'sed' 'sh')
 options=('!libtool')
-source=(http://ftp.debian.org/debian/pool/main/f/$pkgname/${pkgname}_${pkgver}.orig.tar.bz2)
-md5sums=('248c408b1e06e776c5739871b49bd968')
+source=("http://ftp.debian.org/debian/pool/main/f/${pkgname}/${pkgname}_${pkgver}.orig.tar.bz2")
+md5sums=('79f32331358ad58499704ea5e19fd0ae')
 
 build() {
-  cd ${srcdir}/$pkgname-$pkgver
-  ./configure --prefix=/usr --libdir=/usr/lib/libfakeroot \
-	 --disable-static --with-ipc=sysv
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr \
+              --libdir=/usr/lib/libfakeroot \
+	            --disable-static \
+              --with-ipc=sysv
 	# --with-ipc=tcp is currently broken and no option on smp systems
-  make || return 1
+
+  make
 }
 
 package() {
-  cd ${srcdir}/$pkgname-$pkgver
-  make DESTDIR=${pkgdir} install || return 1
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
   
-  install -dm755 ${pkgdir}/etc/ld.so.conf.d/
-  echo '/usr/lib/libfakeroot' > ${pkgdir}/etc/ld.so.conf.d/fakeroot.conf
+  install -d -m755 "${pkgdir}/etc/ld.so.conf.d"
+  echo '/usr/lib/libfakeroot' > "${pkgdir}/etc/ld.so.conf.d/fakeroot.conf"
   
   # install README for sysv/tcp usage
-  install -Dm644 $srcdir/$pkgname-$pkgver/README $pkgdir/usr/share/doc/$pkgname/README
+  install -D -m644 "${srcdir}/${pkgname}-${pkgver}/README" "${pkgdir}/usr/share/doc/${pkgname}/README"
 }
+
+# vim:set ts=2 sw=2 et:
