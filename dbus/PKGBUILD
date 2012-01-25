@@ -6,25 +6,35 @@
 #
 pkgname=dbus
 pkgver=1.4.14
-pkgrel=1
+pkgrel=2
 pkgdesc="Freedesktop.org message bus system"
 url="http://www.freedesktop.org/Software/dbus"
 arch=(i686 x86_64)
 license=('GPL' 'custom')
 depends=("dbus-core>=${pkgver}" 'libx11')
-source=(http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz
-        30-dbus)
+source=("http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+        '30-dbus')
 md5sums=('ae6de2562a57516cfabaf56903375ba9'
-         'd14e59575f04e55d21a04907b6fd9f3c')
+         'd1c8e6ed22a59762773dd81363ffacd8')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ECHO="echo" ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
-      --libexecdir=/usr/lib/dbus-1.0 --with-dbus-user=81 \
-      --with-system-pid-file=/var/run/dbus.pid \
-      --disable-verbose-mode --disable-static \
-      --enable-inotify --disable-dnotify \
-      --disable-tests --disable-asserts
+
+  ECHO="echo" ./configure --prefix=/usr \
+			                    --sysconfdir=/etc \
+                          --localstatedir=/var \
+                          --libexecdir=/usr/lib/dbus-1.0 \
+                          --with-dbus-user=81 \
+                          --with-system-pid-file=/var/run/dbus.pid \
+                          --disable-verbose-mode \
+                          --disable-static \
+                          --enable-inotify \
+                          --disable-dnotify \
+                          --disable-tests \
+                          --disable-asserts \
+                          --with-x \
+                          --enable-x11-autolaunch
+
   make -C tools dbus-launch
 }
 
@@ -41,3 +51,5 @@ package() {
   install -d -m755 "${pkgdir}/usr/share/licenses/dbus"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/dbus/"
 }
+
+# vim:set ts=2 sw=2 et:

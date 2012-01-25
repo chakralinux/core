@@ -2,37 +2,37 @@
 # Platform Packages for Chakra, part of chakra-project.org
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer (x86_64): Drake Justice <djustice[at]chakra-linux[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=texlive-fontsextra
-pkgver=2010.19878
-pkgrel=2
+pkgver=2011.24706
+_revnr=${pkgver#2011.}
+pkgrel=1
 pkgdesc="TeX Live - all sorts of extra fonts"
 license=('GPL')
 arch=(any)
 depends=('texlive-core')
 groups=('texlive-most')
 url='http://tug.org/texlive/'
-source=("http://chakra-project.org/sources/texlive/$pkgname-$pkgver-src.zip" "$pkgname.maps")
+source=("http://mirror.ancl.hawaii.edu/linux/archlinux/other/texlive/${pkgname}-${pkgver}-src.zip" "$pkgname.maps")
 options=('!emptydirs')
 options=(!strip)
 install=texlive.install
-md5sums=('3e2a1ea758bf9b4b5a64d43d57a38e94'
-         '038007ecc64393e68248ba43ba67d673')
+md5sums=('cae6076c03573799db348923a4582d97'
+         '6e84e4a8ee6a25adec39cd6310d9bef2')
 
 build() {
+   cd $srcdir
    for p in *.tar.xz; do
 	   bsdtar -xf $p
    done
    rm -rf {tlpkg,doc,source} || true
 }
+
 package() {
    install -m755 -d $pkgdir/var/lib/texmf/arch/installedpkgs
    sed -i '/^#/d' CONTENTS
-   _revnr=`echo $pkgver | sed 's/2010\.//'`
    install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_${_revnr}.pkgs
    install -m644 $pkgname.maps $pkgdir/var/lib/texmf/arch/installedpkgs/
    install -m755 -d $pkgdir/usr/share
