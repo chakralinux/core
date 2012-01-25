@@ -6,20 +6,20 @@
 
 pkgname=util-linux
 pkgver=2.20.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Miscellaneous system utilities for Linux"
 url="http://userweb.kernel.org/~kzak/util-linux-ng/"
 arch=('i686' 'x86_64')
 groups=('base')
 depends=('filesystem')
+optdepends=('perl: for chkdupexe support')
 replaces=('linux32' 'util-linux-ng')
 conflicts=('linux32' 'util-linux-ng' 'e2fsprogs<1.41.8-2')
 provides=('linux32' "util-linux-ng=${pkgver}")
 license=('GPL2')
 options=('!libtool')
-#source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v${pkgver}/${pkgname}-${pkgver}.tar.bz2)
-source=(ftp://ftp.infradead.org/pub/${pkgname}/v2.20/${pkgname}-${pkgver}.tar.bz2)
-optdepends=('perl: for chkdupexe support')
+source=("ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('dd87a15e8d410b447e493a6f407f38c8')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -27,11 +27,11 @@ build() {
   # hardware clock
   sed -e 's%etc/adjtime%var/lib/hwclock/adjtime%' -i include/pathnames.h
 
-  ./configure --enable-arch\
-              --enable-write\
-              --enable-raw\
-              --disable-wall\
-              --enable-partx\
+  ./configure --enable-arch \
+              --enable-write \
+              --enable-raw \
+              --disable-wall \
+              --enable-partx \
               --enable-libmount-mount
 
   make
@@ -44,4 +44,5 @@ package() {
 
   make DESTDIR="${pkgdir}" install
 }
-md5sums=('079b37517fd4e002a2e6e992e8b4e361')
+
+# vim:set ts=2 sw=2 et:
