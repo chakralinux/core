@@ -7,9 +7,9 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgname=('vlc')
+pkgname='vlc'
 pkgver=1.1.13
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 url="http://www.videolan.org/vlc/"
 license=('GPL')
@@ -40,7 +40,7 @@ backup=('usr/share/vlc/http/.hosts'
         'usr/share/vlc/lua/http/.hosts'
         'usr/share/vlc/lua/http/dialogs/.hosts')
 options=('!libtool')
-install=vlc.install
+install="vlc.install"
 source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
 md5sums=('9678fb7a04808b6e0de63746d35e4bb1')
 
@@ -64,13 +64,16 @@ build() {
               --enable-realrtsp
   make
 }
+
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make DESTDIR="${pkgdir}/" install
+  make DESTDIR="${pkgdir}" install
 
   for res in 16 32 48 128; do
     install -D -m644 "${srcdir}/vlc-${pkgver}/share/icons/${res}x${res}/vlc.png" \
         "${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png"
   done
 }
+
+# vim:set ts=2 sw=2 et:
