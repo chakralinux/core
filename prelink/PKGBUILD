@@ -6,8 +6,8 @@
 
 
 pkgname=prelink
-pkgver=20100106
-pkgrel=2
+pkgver=20111012
+pkgrel=1
 pkgdesc="ELF prelinking utility to speed up dynamic linking"
 arch=('i686' 'x86_64')
 url="http://people.redhat.com/jakub/prelink/"
@@ -16,7 +16,7 @@ depends=('elfutils')
 backup=('etc/prelink.conf')
 source=("http://people.redhat.com/jakub/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
         'prelink.conf')
-md5sums=('56e2a1b5a478795352bf6e4d2bc6e0ab'
+md5sums=('f5aaf347432d677c293e5e3399ba4fdf'
          '0793ed49e9b31c125cba4d936c333cf6')
 
 build() {
@@ -32,3 +32,4 @@ package() {
   make DESTDIR=$pkgdir install
   install -Dm644 ${srcdir}/prelink.conf "${pkgdir}/etc/prelink.conf"
 }
+
