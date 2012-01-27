@@ -1,6 +1,8 @@
 pre_install() {
-  mv /usr/lib/pkgconfig/mozilla-js.pc.bak \
-    /usr/lib/pkgconfig/mozilla-js.pc
+  local __file="/usr/lib/pkgconfig/mozilla-js.pc"
+  if [ -f "${__file}.bak" ]; then
+    mv "${__file}.bak" "${__file}"
+  fi
 }
 
 post_install() {
