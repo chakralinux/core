@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=telepathy-glib
-pkgver=0.16.2
+pkgver=0.17.4
 pkgrel=1
 pkgdesc="GLib bindings for the Telepathy D-Bus protocol"
 arch=('i686' 'x86_64')
@@ -16,13 +16,12 @@ options=('!libtool' '!emptydirs')
 depends=('dbus-glib')
 makedepends=('libxslt' 'vala' 'gobject-introspection')
 source=("http://telepathy.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('c05e48da72f013cec86ca8a05da71ffd')
+md5sums=('2e1d583af92e7e88bd5478eab1755696')
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
     PYTHON=/usr/bin/python2 ./configure --prefix=/usr \
         --libexecdir=/usr/lib/telepathy \
-        --enable-vala-bindings \
         --enable-static=no
     make
 }
