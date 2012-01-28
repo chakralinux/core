@@ -35,7 +35,7 @@ post_upgrade() {
 	if [ -n "`grep /tmp /etc/fstab`" ]; then
 	  echo "Your system might have a damaged /etc/fstab file."
 	  echo "We try to fix your /etc/fstab file."
-	  echo "Your original /etc/fstab file will get saved as '/etc/fstab.backup'"
+	  echo "Your original /etc/fstab file will be saved as '/etc/fstab.backup'"
 	  cat /etc/fstab > /etc/fstab.backup
 	  cat /etc/fstab | grep -v -e "/tmp" > /etc/fstab.new
 	  mv /etc/fstab.new /etc/fstab
