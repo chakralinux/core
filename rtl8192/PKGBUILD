@@ -4,18 +4,16 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 # Find the kernel name inside the chroot
-_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=rtl8192
 pkgver=0005.1230.2011
-pkgrel=1
+pkgrel=3
 pkgdesc="Driver for Realtek 8192CE/DE/SE PCI wireless chipsets."
 license=("GPL")
-depends=('linux-headers')
+depends=('linux>=3.2' 'linux<3.3' 'linux-headers')
 replaces=(rtl8192se)
 source=("http://chakra.sourceforge.net/sources/$pkgname/92ce_se_de_linux_mac80211_${pkgver}.tar.gz")
 arch=('i686' 'x86_64')
@@ -23,21 +21,22 @@ url="http://www.realtek.com.tw/"
 install="${pkgname}.install"
 
 build() {
-	cd ${srcdir}/rtl_92ce_92se_92de_linux_mac80211_0005.1230.2011
+   cd ${srcdir}/rtl_92ce_92se_92de_linux_mac80211_${pkgver}
 
-    patch < ../../wifi.h.patch
+   make KVER=$_kver
+}
 
-	make 
+package() {
+   cd ${srcdir}/rtl_92ce_92se_92de_linux_mac80211_${pkgver}
+   mkdir -p ${pkgdir}/lib/firmware
+   cp -rf firmware/rtlwifi ${pkgdir}/lib/firmware/rtlwifi-realtek
 
-	mkdir -p ${pkgdir}/lib/firmware
-	cp -rf firmware/rtlwifi ${pkgdir}/lib/firmware/rtlwifi
-	
-	mkdir -p ${pkgdir}/lib/modules/$_kernver/kernel/drivers/net/wireless/rtlwifi/rtl8192{c,d,s}e
-	cp -f rtl8192ce/rtl8192ce.ko ${pkgdir}/lib/modules/$_kernver/kernel/drivers/net/wireless/rtlwifi/rtl8192ce
-	cp -f rtl8192de/rtl8192de.ko ${pkgdir}/lib/modules/$_kernver/kernel/drivers/net/wireless/rtlwifi/rtl8192de
-	cp -f rtl8192se/rtl8192se.ko ${pkgdir}/lib/modules/$_kernver/kernel/drivers/net/wireless/rtlwifi/rtl8192se
-	cp -f rtlwifi.ko ${pkgdir}/lib/modules/$_kernver/kernel/drivers/net/wireless/rtlwifi
-    find ${pkgdir}/lib/modules/$_kernver/kernel/drivers/net/wireless/rtlwifi -name '*.ko' -exec gzip {} \;
+   mkdir -p ${pkgdir}/lib/modules/${_extramodules}
+   cp -f rtl8192ce/rtl8192ce.ko ${pkgdir}/lib/modules/${_extramodules}
+   cp -f rtl8192de/rtl8192de.ko ${pkgdir}/lib/modules/${_extramodules}
+   cp -f rtl8192se/rtl8192se.ko ${pkgdir}/lib/modules/${_extramodules}
+   cp -f rtlwifi.ko ${pkgdir}/lib/modules/${_extramodules}
+   find ${pkgdir}/lib/modules/${_extramodules} -name '*.ko' -exec gzip {} \;
 }
 
 md5sums=('f7d166274151276a7f7035813a5d5336')

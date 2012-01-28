@@ -5,15 +5,16 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # Find the kernel name inside the chroot
-_kernver=$(pacman -Q linux | cut -c7-9 | sed 's/linux //g')-CHAKRA
+_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=nvidia
 pkgver=295.09
-pkgrel=2
+pkgrel=4
 pkgdesc="NVIDIA drivers for linux."
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-depends=('linux>=3.1' 'linux<3.2' "nvidia-utils=${pkgver}")
+depends=('linux>=3.2' 'linux<3.3' "nvidia-utils=${pkgver}")
 makedepends=('linux-headers')
 conflicts=('nvidia-96xx' 'nvidia-173xx')
 license=('custom')
@@ -32,17 +33,21 @@ elif [ "$CARCH" = "x86_64" ]; then
 fi
 
 build() {
-	echo "==> Building for kernel version ${_kernver}"
-        cd $srcdir
-        sh ${_pkg}.run --extract-only
-        cd ${_pkg}/kernel
-        make SYSSRC=/lib/modules/${_kernver}/build module
+    cd "${srcdir}"
+    sh "${_pkg}.run" --extract-only
+    cd "${_pkg}/kernel"
+    make SYSSRC=/lib/modules/"${_kver}/build" module
 }
 
 package() {
-        install -D -m644 $srcdir/${_pkg}/kernel/nvidia.ko \
-                $pkgdir/lib/modules/${_kernver}/kernel/drivers/video/nvidia.ko
-        install -d -m755 $pkgdir/etc/modprobe.d
-        echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf
-        sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/nvidia.install
+    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
+        "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
+    install -d -m755 "${pkgdir}/etc/modprobe.d"
+    echo "blacklist nouveau" >> "${pkgdir}/etc/modprobe.d/nouveau_blacklist.conf"
+
+    # create /etc/nvidia-drv.conf for chakra-hardware-detection and tribe
+    echo "NVIDIA_DRV_VER=\"${pkgver}\"" > $pkgdir/etc/nvidia-drv.conf
+
+    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
+    gzip "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
 }

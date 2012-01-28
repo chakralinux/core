@@ -7,20 +7,23 @@ remove_hook(){
     # remove hook fglrx
      sed '/^HOOKS/s/ *fglrx//' -i etc/mkinitcpio.conf
     # remove heads
-     sed '/^SyncFirst/s/ *kernel26-headers//' -i etc/pacman.conf
+     sed '/^SyncFirst/s/ *linux-headers//' -i etc/pacman.conf
 }
 
 post_install() {
-    depmod "${KERNEL_VERSION}"
+    EXTRAMODULES='extramodules-3.2-CHAKRA'
+    depmod $(cat /lib/modules/$EXTRAMODULES/version)
 }
 
 post_upgrade() {
     remove_hook
-    depmod "${KERNEL_VERSION}"
+    EXTRAMODULES='extramodules-3.2-CHAKRA'
+    depmod $(cat /lib/modules/$EXTRAMODULES/version)
 }
 
 post_remove() {
-    depmod "${KERNEL_VERSION}"
+    EXTRAMODULES='extramodules-3.2-CHAKRA'
+    depmod $(cat /lib/modules/$EXTRAMODULES/version)
     echo "----------------------------------------------------------------"
     echo "Don't forget to remove fglrx from MODULES array of /etc/rc.conf"
     echo "----------------------------------------------------------------"

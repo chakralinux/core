@@ -1,14 +1,15 @@
-post_install() {
-  KERNEL_VERSION='3.1-CHAKRA'
-  depmod -ae $KERNEL_VERSION > /dev/null 2>&1
+post_install()
+{
+  post_upgrade
 }
 
-post_upgrade() {
-  KERNEL_VERSION='3.1-CHAKRA'
-  depmod -ae $KERNEL_VERSION > /dev/null 2>&1
+post_upgrade()
+{
+  EXTRAMODULES='extramodules-3.2-CHAKRA'
+  depmod $(cat /lib/modules/$EXTRAMODULES/version)
 }
 
-post_remove() {
-  KERNEL_VERSION='3.1-CHAKRA'
-  depmod -ae $KERNEL_VERSION > /dev/null 2>&1
+post_remove()
+{
+  post_upgrade
 }

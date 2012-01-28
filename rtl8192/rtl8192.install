@@ -1,12 +1,15 @@
 refresh_depmod()
 {
     echo "updating kernel modules..."
-    depmod -a
+    EXTRAMODULES='extramodules-3.2-CHAKRA'
+    depmod $(cat /lib/modules/$EXTRAMODULES/version)
 }
 
 # arg 1:  the new package version
 post_install()
 {
+    mv /lib/firmware/rtlwifi /lib/firmware/rtlwifi-linux
+    mv /lib/firmware/rtlwifi-realtek /lib/firmware/rtlwifi
     refresh_depmod
 }
 
@@ -14,12 +17,16 @@ post_install()
 # arg 2:  the old package version
 post_upgrade()
 {
+    rm /lib/firmware/rtlwifi/*
+    mv /lib/firmware/rtlwifi-realtek /lib/firmware/rtlwifi
     refresh_depmod
 }
 
 # arg 1:  the old package version
 post_remove()
 {
+    rm /lib/firmware/rtlwifi/*
+    mv /lib/firmware/rtlwifi-linux /lib/firmware/rtlwifi
     refresh_depmod
 }
 

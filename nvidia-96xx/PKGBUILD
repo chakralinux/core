@@ -4,22 +4,19 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# Find the kernel name inside the chroot
+_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=nvidia-96xx
 pkgver=96.43.20
-
-# Find the kernel name inside the chroot
-_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
-
-pkgrel=4
+pkgrel=6
 pkgdesc="NVIDIA drivers for kernel26, 96xx branch."
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86
 [ "$CARCH" = "x86_64" ] && ARCH=x86_64
 url="http://www.nvidia.com/"
-depends=('linux>=3.1' 'linux<3.2' 'nvidia-96xx-utils')
+depends=('linux>=3.2' 'linux<3.3' 'nvidia-96xx-utils')
 makedepends=('linux-headers')
 conflicts=('nvidia-96xx' 'nvidia' 'nvidia-173xx')
 license=('custom')
@@ -29,15 +26,18 @@ md5sums=('875cc011385ea26ab5edd54a9b65a003')
 [ "$CARCH" = "x86_64" ] && md5sums=('df3c87005487bdf54a6c5b783ff373db')
 
 build() {
-	cd $srcdir
-	sh NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run --extract-only
-	cd NVIDIA-Linux-$ARCH-${pkgver}-pkg0
-	cd usr/src/nv/
-	ln -s Makefile.kbuild Makefile
-	make SYSSRC=/lib/modules/${_kernver}/build module || return 1
+    sh "NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run" --extract-only
+    cd "NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/"
+    ln -s Makefile.kbuild Makefile
+    make SYSSRC=/lib/modules/${_kver}/build module || return 1
+}
 
-	mkdir -p $pkgdir/lib/modules/${_kernver}/kernel/drivers/video/
-	install -m644 nvidia.ko $pkgdir/lib/modules/${_kernver}/kernel/drivers/video/
-
-	sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/nvidia.install
+package() {
+    cd "NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/"
+    mkdir -p $pkgdir//lib/modules/${_extramodules}
+    install -m644 nvidia.ko $pkgdir/lib/modules/${_extramodules}
+    install -d -m755 "${pkgdir}/etc/modprobe.d"
+    echo "blacklist nouveau" >> "${pkgdir}/etc/modprobe.d/nouveau_blacklist.conf"
+    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
+    gzip "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
 }
