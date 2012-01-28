@@ -32,12 +32,13 @@ _adduser() {
 post_upgrade() {
 	post_install
 
-	if [ "$(vercmp $2 2012.02)" -lt 0 ]; then
-	  echo "Your system might have a damaged /etc/fstab"
-	  echo "please remove any /tmp (tmpfs /tmp tmpfs nodev,nosuid 0 0) line "
-	  echo "and add followed instead:"
-	  echo "devpts                 /dev/pts      devpts    defaults            0      0"
-	  echo "shm                    /dev/shm      tmpfs     nodev,nosuid        0      0"
+	if [ -n "`grep /tmp /etc/fstab`" ]; then
+	  echo "Your system might have a damaged /etc/fstab file."
+	  echo "We try to fix your /etc/fstab file."
+	  echo "Your original /etc/fstab file will get saved as '/etc/fstab.backup'"
+	  cat /etc/fstab > /etc/fstab.backup
+	  cat /etc/fstab | grep -v -e "/tmp" > /etc/fstab.new
+	  mv /etc/fstab.new /etc/fstab
 	fi
 
 	_addgroup cdemu   -g 103
