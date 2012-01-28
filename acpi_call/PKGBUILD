@@ -5,20 +5,21 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # Find the kernel name inside the chroot
-_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=acpi_call
-pkgver=20111101
+pkgver=20120115
 pkgrel=2
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('i686' 'x86_64')
 url=("http://github.com/mkottman/acpi_call")
 license=('GPL')
-depends=('linux>=3.1' 'linux<3.2' 'linux-headers')
+depends=('linux>=3.2' 'linux<3.3' 'linux-headers')
 makedepends=('git')
 install=acpi_call.install
 source=(http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz)
-md5sums=('dc6c7af743a0f0a643195bdc21860af0')
+md5sums=('129841dd806887492609214462792413')
 
 
 # create tarball: source PKGBUILD && mksource
@@ -40,7 +41,7 @@ build() {
   cd ${srcdir}/$pkgname-build
 
   sed \
-    -e  's/$(shell uname -r)/3.1-CHAKRA/g' \
+    -e  's/$(shell uname -r)/3.2-CHAKRA/g' \
     -i Makefile
   make
 }
@@ -56,11 +57,11 @@ package() {
   install -Dm644 README \
     ${pkgdir}/usr/share/$pkgname/README
 
-  msg2 "Building module for $_kernver..."
+  msg2 "Building module for $_kver..."
 
   # KDIR is necessary even when cleaning
-  make KDIR=/usr/src/linux-${_kernver} clean
-  make KDIR=/usr/src/linux-${_kernver}
+  make KDIR=/usr/src/linux-${_kver} clean
+  make KDIR=/usr/src/linux-${_kver}
 
-  install -D -m644 acpi_call.ko ${pkgdir}/lib/modules/${_kernver}/kernel/drivers/acpi/acpi_call.ko
+  install -D -m644 acpi_call.ko $pkgdir/lib/modules/$_extramodules/acpi_call.ko
 }
