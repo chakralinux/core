@@ -8,25 +8,24 @@
 # package info
 #
 pkgname=tribe
-pkgver=2012.01.08
+pkgver=2012.02.01
 pkgrel=1
-_codename=Edn
+_codename=Archimedes
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.7.1' 'squashfs-tools' 'tribe-partitionmanager'
-        'cinstall>=0.4.6.10' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
-makedepends=('cmake' 'kdebase-workspace' 'automoc4')
-provides=('tribe')
-replaces=('kdemod-tribe-svn' 'kdemod-tribe')
-conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
+depends=('kdelibs' 'kdeedu-marble>=4.8.0' 'squashfs-tools' 'tribe-partitionmanager'
+        'cinstall>=0.4.6.10' 'rsync' 'mkinitcpio-nfs-utils' 'ntfs-3g')
+makedepends=('cmake' 'kde-workspace' 'automoc4')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra.sourceforge.net/sources/tribe/tribe-${pkgver}.tar.xz"
-        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20120108.html")
+        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20111218.html"
+        'launch-tribe.sh')
   
-md5sums=('b610d0737ba81c018ca413e0a24bf1f2'
-         'd5fb7b7236b7de4b52a06f6ac2ab0958')
+md5sums=('bb7cdb84e9264748a94000fefd4ddb1b'
+         'baa374fb249001bf38bc5b2cea575170'
+         'e31855da237a2c8029774831b3c04685')
  
 groups=('kde-uninstall')
 install=tools-tribe.install
@@ -75,7 +74,9 @@ package()
         cd "${srcdir}/${pkgname}-${pkgver}"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install 
-	cp -vf ${srcdir}/RELEASE_NOTES_20120108.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+        install -Dm755 ${srcdir}/launch-tribe.sh \
+        ${pkgdir}/usr/bin/launch-tribe.sh
+	cp -vf ${srcdir}/RELEASE_NOTES_20111218.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
