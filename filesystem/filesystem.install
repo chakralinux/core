@@ -5,14 +5,12 @@ post_install() {
 	chown root:20 var/run/utmp
 	chmod 664 var/run/utmp
 	[ -f var/log/btmp ]    || (: >var/log/btmp && bin/chmod 600 var/log/btmp)
-	# link conflicting folders
-	ln -sf /proc/self/mounts etc/mtab
-	ln -sf /run var/run
-	ln -sf /run/lock var/lock
 	# workaround for bug #7194
 	# readded due to bug #9465
 	# please do not remove!
 	bin/chmod 1777 var/spool/mail tmp var/tmp var/lock
+	# link conflicting folders
+	ln -sf /proc/self/mounts etc/mtab
 }
 
 # args: <group> [options]

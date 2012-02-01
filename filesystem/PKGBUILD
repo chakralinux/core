@@ -5,9 +5,9 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=filesystem
-pkgver=2012.01
-pkgrel=2
-_codename=Edn
+pkgver=2012.02
+pkgrel=1
+_codename=Archimedes
 pkgdesc="Base filesystem"
 arch=('any')
 license=('GPL')
@@ -19,8 +19,8 @@ backup=(etc/fstab etc/crypttab etc/group etc/hosts etc/ld.so.conf etc/passwd
         etc/shadow etc/gshadow etc/resolv.conf etc/motd etc/nsswitch.conf
         etc/shells etc/host.conf etc/securetty etc/profile etc/issue
         etc/chakra-release)
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}-1.tar.xz")
-md5sums=("035e9d7dc803909fe2a7a16b8fad48bc")
+source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
+md5sums=('e201fff56c0de549e227af66d0486aa4')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -67,17 +67,17 @@ package() {
 	#
 	# setup /var
 	#
-	for d in cache/man local opt log/old lib/misc empty; do
+	for d in cache/man local opt run log/old lib/misc empty; do
 		install -d -m755 ${pkgdir}/var/${d}
 	done
 
-	install -d -m1777 ${pkgdir}/var/{tmp,spool/mail}
+	install -d -m1777 ${pkgdir}/var/{lock,tmp,spool/mail}
 
 	#
 	# allow setgid games to write scores
 	#
 	install -d -m775 -g games ${pkgdir}/var/games
-	ln -s /var/spool/mail ${pkgdir}/var/mail
+	ln -s spool/mail ${pkgdir}/var/mail
 
 	#
 	# prevent pacman from removing directory (FS#16886)
