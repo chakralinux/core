@@ -44,6 +44,9 @@ build() {
   #rm -fr mp3lib
   #patch -Np1 -i "${srcdir}/mplayer2-remove-mp3lib.patch"
 
+  # lower prostproc
+  sed -i -e s'/libpostproc >= 52.0.0/libpostproc >= 51.0.0/'g configure*
+
   ./configure --prefix=/usr \
               --enable-runtime-cpudetection \
               --disable-arts \
