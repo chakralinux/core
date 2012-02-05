@@ -1,0 +1,203 @@
+Index: gui/mdwslider.h
+===================================================================
+--- kdemultimedia-4.7.95/kmix/gui/mdwslider.h	(Revision 1270925)
++++ kdemultimedia-4.7.95/kmix/gui/mdwslider.h	(Revision 1270926)
+@@ -56,7 +56,7 @@
+ 	       bool includePlayback, bool includeCapture,
+ 	       bool small, Qt::Orientation,
+ 	       QWidget* parent, ViewBase* view, ProfControl *pctl);
+-    ~MDWSlider() { }
++    virtual ~MDWSlider();
+ 
+     enum LabelType { LT_ALL, LT_FIRST_CAPTURE, LT_NONE };
+     void addActionToPopup( KAction *action );
+Index: gui/viewbase.cpp
+===================================================================
+--- kdemultimedia-4.7.95/kmix/gui/viewbase.cpp	(Revision 1270925)
++++ kdemultimedia-4.7.95/kmix/gui/viewbase.cpp	(Revision 1270926)
+@@ -128,13 +128,14 @@
+     // allow view to "polish" itself
+     constructionFinished();
+ 
+-   kDebug() << "CONNECT ViewBase count " << _mixers.size();
+-  foreach ( Mixer* mixer, _mixers )
+-  {
+-    kDebug(67100) << "CONNECT ViewBase controlschanged" << mixer->id(); 
+-   connect ( mixer, SIGNAL(controlChanged()), this, SLOT(refreshVolumeLevels()) );
+-   connect ( mixer, SIGNAL(controlsReconfigured(QString)), this, SLOT(controlsReconfigured(QString)) );
+-  }
++// Moved the following up one Level to KMixerWidget
++//   kDebug() << "CONNECT ViewBase count " << _mixers.size();
++//  foreach ( Mixer* mixer, _mixers )
++//  {
++//    kDebug(67100) << "CONNECT ViewBase controlschanged" << mixer->id();
++//   connect ( mixer, SIGNAL(controlChanged()), this, SLOT(refreshVolumeLevels()) );
++//   connect ( mixer, SIGNAL(controlsReconfigured(QString)), this, SLOT(controlsReconfigured(QString)) );
++//  }
+ 
+     
+ }
+@@ -217,10 +218,6 @@
+ 		setMixSet();
+ 		kDebug(67100) << "ViewBase::controlsReconfigured() " << mixer_ID << ": Recreating widgets (mixset contains: " << _mixSet->count() << ")";
+ 		createDeviceWidgets();
+-
+-		// We've done the low level stuff our selves but let elements
+-		// above know what has happened so they can reload config etc.
+-		emit redrawMixer(mixer_ID);
+ 	}
+ }
+ 
+Index: gui/kmixerwidget.h
+===================================================================
+--- kdemultimedia-4.7.95/kmix/gui/kmixerwidget.h	(Revision 1270925)
++++ kdemultimedia-4.7.95/kmix/gui/kmixerwidget.h	(Revision 1270926)
+@@ -75,6 +75,10 @@
+    void saveConfig( KConfig *config );
+    void loadConfig( KConfig *config );
+ 
++  private slots:
++    void controlsReconfiguredToplevel(QString mixerId);
++    void refreshVolumeLevelsToplevel();
++
+   private:
+    Mixer *_mixer;
+    QVBoxLayout *m_topLayout; // contains TabWidget
+@@ -82,6 +86,7 @@
+    ProfTab* _tab;
+    std::vector<ViewBase*> _views;
+    KActionCollection* _actionCollection;  // -<- applciations wide action collection
++   QWidget* _mainWindow;
+ 
+    
+    void createLayout(ViewBase::ViewFlags vflags);
+Index: gui/mixdevicewidget.h
+===================================================================
+--- kdemultimedia-4.7.95/kmix/gui/mixdevicewidget.h	(Revision 1270925)
++++ kdemultimedia-4.7.95/kmix/gui/mixdevicewidget.h	(Revision 1270926)
+@@ -47,7 +47,7 @@
+     MixDeviceWidget( MixDevice* md,
+                      bool small, Qt::Orientation orientation,
+                      QWidget* parent, ViewBase*, ProfControl * );
+-    ~MixDeviceWidget();
++    virtual ~MixDeviceWidget();
+ 
+     void addActionToPopup( KAction *action );
+ 
+Index: gui/mdwslider.cpp
+===================================================================
+--- kdemultimedia-4.7.95/kmix/gui/mdwslider.cpp	(Revision 1270925)
++++ kdemultimedia-4.7.95/kmix/gui/mdwslider.cpp	(Revision 1270926)
+@@ -81,7 +81,25 @@
+     update();
+ }
+ 
++MDWSlider::~MDWSlider()
++{
++	foreach( QAbstractSlider* slider, m_slidersPlayback)
++	{
++		delete slider;
++	}
++	foreach( QAbstractSlider* slider, m_slidersCapture)
++	{
++		delete slider;
++	}
+ 
++	/*
++	static int destructorCalls = 1;
++	kDebug() << "Destroying id=" << this->mixDevice()->id() << "desctructorCalls=" << destructorCalls;
++	++destructorCalls;
++	*/
++
++}
++
+ void MDWSlider::createActions()
+ {
+     // create actions (on _mdwActions, see MixDeviceWidget)
+Index: gui/kmixerwidget.cpp
+===================================================================
+--- kdemultimedia-4.7.95/kmix/gui/kmixerwidget.cpp	(Revision 1270925)
++++ kdemultimedia-4.7.95/kmix/gui/kmixerwidget.cpp	(Revision 1270926)
+@@ -37,6 +37,7 @@
+ #include <ktabwidget.h>
+ 
+ // KMix
++#include "apps/kmix.h"
+ #include "gui/guiprofile.h"
+ #include "gui/kmixerwidget.h"
+ #include "gui/kmixtoolbox.h"
+@@ -58,6 +59,8 @@
+      m_topLayout(0), _guiprof(guiprof),
+      _actionCollection(actionCollection)
+ {
++	_mainWindow = parent;
++	//kDebug() << "kmixWindow created: parent=" << parent << ", parentWidget()=" << parentWidget();
+    if ( _mixer )
+    {
+       createLayout(vflags);
+@@ -126,13 +129,42 @@
+       connect( vbase, SIGNAL(toggleMenuBar()), parentWidget(), SLOT(toggleMenuBar()) );
+       // *this will be deleted on rebuildGUI(), so lets queue the signal
+       connect( vbase, SIGNAL(rebuildGUI())   , parentWidget(), SLOT(recreateGUIwithSavingView()), Qt::QueuedConnection );
+-      connect( vbase, SIGNAL(redrawMixer(QString)), parentWidget(), SLOT(redrawMixer(QString)), Qt::QueuedConnection );
++      //connect( vbase, SIGNAL(redrawMixer(QString)), parentWidget(), SLOT(redrawMixer(QString)), Qt::QueuedConnection );
++
++      kDebug() << "CONNECT ViewBase count " << vbase->getMixers().size();
++	  foreach ( Mixer* mixer, vbase->getMixers() )
++	  {
++	    kDebug(67100) << "CONNECT ViewBase controlschanged" << mixer->id();
++	   connect ( mixer, SIGNAL(controlChanged()), this, SLOT(refreshVolumeLevelsToplevel()) );
++	   connect ( mixer, SIGNAL(controlsReconfigured(QString)), this, SLOT(controlsReconfiguredToplevel(QString)) );
++	  }
+       return true;
+    }
+ }
+ 
++void KMixerWidget::controlsReconfiguredToplevel(QString mixerId)
++{
++	foreach ( ViewBase* vbase, _views)
++	{
++		vbase->controlsReconfigured(mixerId);
++	}
++	KMixWindow* kmixWindow = qobject_cast<KMixWindow*>(_mainWindow);
++	kDebug() << "kmixWindow to redraw: " << kmixWindow << ", not-casted=" << _mainWindow;
++	if (kmixWindow != 0)
++	{
++		kmixWindow->redrawMixer(mixerId);
++	}
++}
+ 
++void KMixerWidget::refreshVolumeLevelsToplevel()
++{
++	foreach ( ViewBase* vbase, _views)
++	{
++		vbase->refreshVolumeLevels();
++	}
++}
+ 
++
+ /**
+  * Returns the current View. Normally we have only one View, so we always return the first view.
+  * This method is only here for one reason: We can plug in an action in the main menu, so that
+Index: gui/viewbase.h
+===================================================================
+--- kdemultimedia-4.7.95/kmix/gui/viewbase.h	(Revision 1270925)
++++ kdemultimedia-4.7.95/kmix/gui/viewbase.h	(Revision 1270926)
+@@ -113,6 +113,8 @@
+    GUIProfile* guiProfile() { return _guiprof; };
+    KActionCollection* actionCollection() { return _actions; };
+ 
++   QSet<Mixer*>& getMixers() { return _mixers; };
++
+     /**
+      * Contains the widgets for the _mixSet. There is a 1:1 relationship, which means:
+      * _mdws[i] is the Widget for the MixDevice _mixSet[i] - please see ViewBase::createDeviceWidgets().
+@@ -123,7 +125,7 @@
+ 
+ signals:
+     void rebuildGUI();
+-    void redrawMixer( const QString& mixer_ID );
++    //void redrawMixer( const QString& mixer_ID );
+ 
+ 
+ protected:

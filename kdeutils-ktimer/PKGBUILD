@@ -10,35 +10,37 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 # package info
 #
-pkgname=kdeedu-kturtle
-_pkgname=kturtle
+pkgname="kdeutils-ktimer"
+_pkgname="ktimer"
+arch=('i686' 'x86_64')
 pkgver=${_kdever}
 pkgrel=1
-pkgdesc="Educational Programming Environment"
-url="http://kde.org/applications/education/kturtle/"
-arch=('i686' 'x86_64')
-url='http://www.kde.org'
+pkgdesc="Timer application"
+url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
-depends=("kde-runtime>=${_kdever}")
-makedepends=('cmake' 'automoc4')
-provides=('kturtle')
-groups=("kde" "kdeedu" "kde-uninstall")
 options=('docs' '!splithdr' 'splitdbg' 'log')
-install=${pkgname}.install
+depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
+conflicts=("kdeutils-common")
+groups=("kde" "kdeutils" "kde-uninstall")
+install=kdeutils.install
+makedepends=('pkgconfig' 'cmake' 'automoc4' "kdelibs>=${_kdever}")
 
-source=("$_mirror/${_pkgname}-$_kdever.tar.bz2")
+source=($_mirror/${_pkgname}-$_kdever.tar.bz2)
 md5sums=(`grep ${_pkgname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
 build() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-                -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-                -DCMAKE_SKIP_RPATH=ON \
-                -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
+	msg "starting build ..."
+	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+
+	make || return 1
 }
 
 package() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install || return 1
+	make DESTDIR=${pkgdir} install 
 }

@@ -5,42 +5,52 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+#source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 #
 # package info
 #
 pkgname=kdeedu-marble
 _pkgname=marble
-pkgver=${_kdever}
-pkgrel=1
+pkgver=4.8.0
+pkgrel=2
 pkgdesc="Desktop Globe"
 url="http://kde.org/applications/education/marble/"
 arch=('i686' 'x86_64')
 url='http://www.kde.org'
 license=('GPL' 'LGPL' 'FDL')
-depends=("kde-runtime>=${_kdever}" "gpsd")
+depends=("kde-runtime>=${_kdever}" "gpsd" "qt-mobility")
 makedepends=('cmake' 'automoc4')
 provides=('marble')
 groups=("kde" "kdeedu" "kde-uninstall")
-options=('!splithdr' 'splitdbg' 'log')
+options=('docs' '!splithdr' 'splitdbg' 'log')
 install=${pkgname}.install
 
-source=("$_mirror/${_pkgname}-$_kdever.tar.bz2")
-md5sums=(`grep ${_pkgname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+source=("marble-4.8.0.tar.xz")
+md5sums=('e783a56ff6c1ff46f009a2b7fd521a30')
 
-build()
-{
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf ${_pkgname}-${pkgver}
+	  git clone git://anongit.kde.org/marble ${_pkgname}-${pkgver}
+	  rm -vRf ${_pkgname}-${pkgver}/.git
+	  pushd ${_pkgname}-${pkgver}
+	  popd
+	  tar -cvJf ${_pkgname}-${pkgver}.tar.xz ${_pkgname}-${pkgver}/*
+	  md5sum ${_pkgname}-${pkgver}.tar.xz
+}
+
+build() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-                -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_SKIP_RPATH=ON \
                 -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
 }
 
-package()
-{
+package() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install || return 1
+	make DESTDIR=${pkgdir} install 
 }

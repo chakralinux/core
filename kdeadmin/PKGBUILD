@@ -12,7 +12,6 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 pkgbase=('kdeadmin')
 pkgname=('kdeadmin-strigi-analyzer'
-         'kdeadmin-doc'
          'kdeadmin-kcron'
          'kdeadmin-kuser'
          'kdeadmin-ksystemlog'
@@ -25,10 +24,10 @@ pkgdesc="split package"
 url="http://www.kde.org/"
 license=('GPL' 'LGPL' 'FDL')
 install=kdeadmin.install
-options=('!splithdr' 'splitdbg' 'log')
+options=('docs' '!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdepimlibs>=${_kdever}"  "kde-runtime>=${_kdever}"
-	     "kdebindings-pykde4>=${_kdever}" 'system-config-printer-common' "kdepim-runtime>=${_kdever}" 'docbook-xsl')
+	     "kdebindings-pykde4>=${_kdever}" 'system-config-printer-common' "kdepim-runtime>=${_kdever}")
 
 source=($_mirror/${pkgbase}-$_kdever.tar.bz2)
 md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
@@ -36,26 +35,22 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 #
 # build function
 #
-build()
-{
+build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
 	
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DBUILD_kpackage=OFF \
-                -DBUILD_knetworkconf=OFF \
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
-	make || return 1
+	make
 }
 
 #
 # split-install functions
 #
-package_kdeadmin-strigi-analyzer()
-{
+package_kdeadmin-strigi-analyzer() {
 	pkgdesc="KDE Administrative Tools - Common files and libraries"
 	depends=("kde-runtime>=${_kdever}")
         provides=('kdeadmin-common')
@@ -70,34 +65,20 @@ package_kdeadmin-strigi-analyzer()
 
 }
 
-package_kdeadmin-doc()
-{
-	pkgdesc="KDE Administrative Tools - Documentation"
-	depends=()
-	groups=("${pkgbase}" "kde" "kde-uninstall" "doc")
-
-	splitdirs="doc"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdeadmin-kcron()
-{
+package_kdeadmin-kcron() {
 	pkgdesc="Crontab editor"
 	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
+	conflicts=("kdeadmin-doc")
 
-	splitdirs="kcron"
+	splitdirs="kcron doc/kcron"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdeadmin-kdat()
-{
+package_kdeadmin-kdat() {
 	pkgdesc="Tar-based tape archiver"
 	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
@@ -109,36 +90,35 @@ package_kdeadmin-kdat()
 		done
 }
 
-package_kdeadmin-ksystemlog()
-{
+package_kdeadmin-ksystemlog() {
 	pkgdesc="Log viewer"
 	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
+	conflicts=("kdeadmin-doc")
 
-	splitdirs="ksystemlog"
+	splitdirs="ksystemlog doc/ksystemlog"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdeadmin-kuser()
-{
+package_kdeadmin-kuser() {
 	pkgdesc="Manage users and groups"
 	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-minimal" "kde-uninstall")
+	conflicts=("kdeadmin-doc")
 
-	splitdirs="kuser"
+	splitdirs="kuser doc/kuser"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdeadmin-system-config-printer()
-{
+package_kdeadmin-system-config-printer() {
 	pkgdesc="Printer configuration"
-	depends=("kdeadmin-strigi-analyzer>=${_kdever}" "system-config-printer" "kdebindings-pykde4>=${_kdever}" 'pygobject')
+	depends=("kdeadmin-strigi-analyzer>=${_kdever}" "system-config-printer" "kdebindings-pykde4>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 
 	splitdirs="system-config-printer-kde"

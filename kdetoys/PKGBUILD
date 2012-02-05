@@ -11,15 +11,13 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # package info
 #
 pkgbase=('kdetoys')
-pkgname=('kdetoys-doc'
-         'kdetoys-amor'
+pkgname=('kdetoys-amor'
          'kdetoys-kteatime'
          'kdetoys-ktux')
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
 pkgrel=1
-
 pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
@@ -35,8 +33,7 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 #
 # build function
 #
-build()
-{
+build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
 
         # build it
@@ -49,39 +46,23 @@ build()
 	make || return 1
 }
 
-
-
 #
 # split-install functions
 #
-package_kdetoys-doc()
-{
-	pkgdesc="${pkgbase} - Documentation"
-	groups=("kde" "kdetoys" "kde-doc" "kde-uninstall")
-
-	splitdirs="doc"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdetoys-amor()
-{
+package_kdetoys-amor() {
 	pkgdesc="Amusing Misuse Of Resources puts comic figures above your windows"
-	conflicts=("kdetoys-common")
+	conflicts=("kdetoys-common" "kdetoys-doc")
 	groups=("kde" "kdetoys" "kde-uninstall")
 	install=${pkgbase}.install
 
-	splitdirs="amor"
+	splitdirs="amor doc/amor"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdetoys-eyesapplet()
-{
+package_kdetoys-eyesapplet() {
 	pkgdesc="An applet similar to XEyes"
 	conflicts=("kdetoys-common")
 	groups=("kde" "kdetoys" "kde-uninstall")
@@ -94,22 +75,20 @@ package_kdetoys-eyesapplet()
 		done
 }
 
-package_kdetoys-kteatime()
-{
+package_kdetoys-kteatime() {
 	pkgdesc="System tray applet that makes sure your tea doesn't get too strong"
-	conflicts=("kdetoys-common")
+	conflicts=("kdetoys-common" "kdetoys-doc")
 	groups=("kde" "kdetoys" "kde-uninstall")
 	install=${pkgbase}.install
 
-	splitdirs="kteatime"
+	splitdirs="kteatime doc/kteatime"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdetoys-ktux()
-{
+package_kdetoys-ktux() {
 	pkgdesc="Tux-in-a-Spaceship screen saver"
 	conflicts=("kdetoys-common")
 	groups=("kde" "kdetoys" "kde-uninstall")
@@ -122,8 +101,7 @@ package_kdetoys-ktux()
 		done
 }
 
-package_kdetoys-kweather()
-{
+package_kdetoys-kweather() {
 	pkgdesc="Kicker applet that will display the current weather outside"
 	conflicts=("kdetoys-common")
 	groups=("kde" "kdetoys" "kde-uninstall")
