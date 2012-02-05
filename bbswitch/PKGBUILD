@@ -1,0 +1,40 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# Find the kernel name inside the chroot
+_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_kver="$(cat /lib/modules/${_extramodules}/version)"
+ 
+pkgname=bbswitch
+pkgver=0.4.1
+pkgrel=1
+pkgdesc="kernel module allowing to switch dedicated graphics card on Optimus laptops"
+arch=('i686' 'x86_64')
+url=("http://github.com/Bumblebee-Project/bbswitch")
+license=('GPL')
+provides=('bbswitch')
+install=bbswitch.install
+depends=('linux>=3.2' 'linux<3.3')
+source=("https://github.com/downloads/Bumblebee-Project/bbswitch/${pkgname}-${pkgver}.tar.gz")
+md5sums=('9b2ab87770987af6264812ef99759c95')
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make
+}
+
+package() {
+    cd ${srcdir}/${pkgname}-${pkgver}
+    msg2 "Building module for $_kver..."
+
+    # KDIR is necessary even when cleaning
+    make KDIR=/usr/src/linux-${_kver} clean
+    make KDIR=/usr/src/linux-${_kver}
+    mkdir -p $pkgdir//lib/modules/${_extramodules}
+    install -D -m644 bbswitch.ko $pkgdir/lib/modules/${_extramodules}
+    gzip "${pkgdir}/lib/modules/${_extramodules}/bbswitch.ko"
+    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/bbswitch.install"
+}
