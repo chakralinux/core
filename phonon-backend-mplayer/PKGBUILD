@@ -1,0 +1,54 @@
+#
+# Phonon Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=('phonon-backend-mplayer')
+_pkgname=('phonon-mplayer')
+pkgver=20111223
+pkgrel=1
+pkgdesc='Phonon MPlayer backend'
+arch=('i686' 'x86_64')
+url='http://phonon.kde.org'
+license=('LGPL')
+depends=('phonon' 'mplayer')
+makedepends=('qt' 'pkgconfig' 'cmake' 'automoc4' 'git' 'mesa')
+groups=("kde-complete" "kde-uninstall")
+conflicts=("phonon-mplayer-svn" 'phonon-mplayer')
+replaces=("phonon-mplayer-svn" 'phonon-mplayer')
+
+	_gitroot="git://anongit.kde.org/${_pkgname}.git"
+	_gitname="${_pkgname}"
+
+build() {
+	cd "$srcdir"
+
+	msg "Connecting to GIT server...."
+	if [ -d ${_gitname} ] ; then
+		cd ${_gitname} && git pull origin
+		msg "The local files are updated."
+	else
+		git clone ${_gitroot} ${_gitname}
+	fi
+	msg "GIT checkout done or server timeout"
+	msg "Starting make..."
+
+	rm -rf "${srcdir}/${_gitname}-build"
+	git clone -l "${srcdir}/${_gitname}" "${srcdir}/${_gitname}-build"
+	cd "${srcdir}/${_gitname}-build"
+
+	# Config
+	[ ${CARCH} = 'x86_64' ] && CXXFLAGS="$CXXFLAGS -fPIC"
+
+	# Build
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release \
+		-DPLUGIN_INSTALL_DIR=/usr/lib/kde4 -DSERVICES_INSTALL_DIR=/usr/share/kde4/services . || return 1
+	make || return 1
+	make DESTDIR=${pkgdir} install || return 1
+	rm -rf "${srcdir}/${_gitname}-build"
+}
+
