@@ -4,13 +4,13 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 pkgname=systemd
-pkgver=37
+pkgver=40
 pkgrel=1
 pkgdesc="Session and Startup manager"
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2')
-depends=('dbus-core' 'kbd' 'libcap' 'util-linux>=2.19' 'udev>=172')
+depends=('dbus-core' 'kbd' 'libcap' 'util-linux>=2.19' 'udev>=172' 'acl')
 makedepends=('docbook-xsl' 'gperf' 'libxslt' 'cryptsetup' 'intltool' 'libnotify')
 optdepends=('cryptsetup: required for encrypted block devices'
             'dbus-python: systemd-analyze'
@@ -30,11 +30,11 @@ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/systemd/user.conf
         etc/systemd/systemd-logind.conf)
 install=systemd.install
-source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.bz2"
+source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         "os-release" "systemd-add-chakra.patch" )
-md5sums=('1435f23be79c8c38d1121c6b150510f3'
+md5sums=('8880180f54dac8618ef70c46492fd8d9'
          '68cf3e12b0e98a51efde9811e5fc713c'
-         'd7cbae2627bb60360a6b1c03dd0fd90a')
+         '7f4415f93512049d1b797f81ae0363d5')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
@@ -79,6 +79,4 @@ package() {
     mv {,systemd.}"$manpage.8"
   done
 }
-
-
 
