@@ -8,8 +8,8 @@
 # package info
 #
 pkgname=tribe
-pkgver=2012.02.02
-pkgrel=2
+pkgver=2012.02.08
+pkgrel=1
 _codename=Archimedes
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
@@ -20,11 +20,11 @@ depends=('kdelibs' 'kdeedu-marble>=4.8.0' 'squashfs-tools' 'tribe-partitionmanag
 makedepends=('cmake' 'kde-workspace' 'automoc4')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra.sourceforge.net/sources/tribe/tribe-${pkgver}.tar.xz"
-        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20120210.html"
+        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20120211.html"
         'launch-tribe.sh')
   
-md5sums=('816558ee6bc9df5265685706eebd2ee2'
-         'bab4ecd09019f52c2bbf10fa3dde3fad'
+md5sums=('848d7632e06cdd2447b729d0d640c4b9'
+         '91565121dc251f283dc99d781c2dc671'
          'e31855da237a2c8029774831b3c04685')
  
 groups=('kde-uninstall')
@@ -76,7 +76,7 @@ package()
 	make DESTDIR=$startdir/pkg install 
         install -Dm755 ${srcdir}/launch-tribe.sh \
         ${pkgdir}/usr/bin/launch-tribe.sh
-	cp -vf ${srcdir}/RELEASE_NOTES_20120210.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+	cp -vf ${srcdir}/RELEASE_NOTES_20120211.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +
