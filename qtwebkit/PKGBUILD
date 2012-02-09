@@ -5,27 +5,37 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=qtwebkit
-pkgver=2.2.0
-pkgrel=5
+pkgver=2.2.1
+pkgrel=1
 pkgdesc="Standalone qtwebkit version"
 arch=('i686' 'x86_64')
 url="http://www.qtsoftware.com"
 license=('GPL3' 'LGPL')
 depends=('qt' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins' )
 makedepends=('gperf' 'sqlite3' 'fontconfig' 'phonon' 'perl' 'python' 'mesa')
-source=("http://get.qt.nokia.com/qtwebkit/QtWebKit-${pkgver}.tar.gz")
+#source=("http://get.qt.nokia.com/qtwebkit/QtWebKit-${pkgver}.tar.gz")
+source=("http://chakra-linux.org/sources/$pkgname/QtWebKit-$pkgver.tar.gz"
+        "http://chakra-linux.org/sources/$pkgname/qwebview-4.8.0.tar.bz2")
 
-md5sums=('f8c4becff276fcb86d83731f9a09fa96')
+md5sums=('1a77037379369ba151bb8a2d6bc6122a'
+         '13a4ac75d98452c2bf7ef710353e91d8')
 
 build() {
           cd $srcdir/QtWebKit-$pkgver
 
           export QT4DIR=$srcdir/$pkgname
           export PATH=${QT4DIR}/bin:${PATH}
-          Tools/Scripts/build-webkit --qt --3d-canvas --3d-rendering --accelerated-2d-canvas --geolocation          
+          Tools/Scripts/build-webkit --qt --3d-canvas          
+         
+          cd "${srcdir}"/QtWebKit-${pkgver}/qwebview-4.8.0/plugins/qwebview
+          qmake
+          make
 }
 
 package() {
           cd $srcdir/QtWebKit-$pkgver/WebKitBuild/Release
           make INSTALL_ROOT=$pkgdir install
+
+          cd "${srcdir}"/QtWebKit-${pkgver}/qwebview-4.8.0/plugins/qwebview
+          make INSTALL_ROOT="${pkgdir}" install
 }

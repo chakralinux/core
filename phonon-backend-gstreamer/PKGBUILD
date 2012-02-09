@@ -1,0 +1,47 @@
+#
+# Phonon Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+pkgname=('phonon-backend-gstreamer')
+_pkgname=('phonon-gstreamer')
+pkgver=4.5.9
+pkgrel=1
+pkgdesc="Phonon GStreamer backend"
+arch=('i686' 'x86_64')
+url='http://phonon.kde.org'
+license=('LGPL')
+depends=('gstreamer0.10-base-plugins' 'phonon')
+makedepends=('qt' 'pkgconfig' 'cmake' 'automoc4' 'git' 'mesa')
+groups=("kde-complete" "kde-uninstall")
+conflicts=('phonon-gstreamer')
+replaces=('phonon-gstreamer')
+source=("http://www.chakra-linux.org/sources/${pkgname}/${_pkgname}-${pkgver}.tar.xz")
+md5sums=('4434b053e58dcb93225a039199dff1bc')
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+        git clone git://anongit.kde.org/${_pkgname}
+        pushd ${_pkgname}
+        popd
+        tar -cvJf ${_pkgname}-${pkgver}.tar.xz ${_pkgname}/*
+        md5sum ${_pkgname}-${pkgver}.tar.xz
+}
+
+build() {
+	cd ${srcdir}
+	mkdir -p build
+	cd build
+	cmake ../${_pkgname} \
+		 -DCMAKE_BUILD_TYPE=Release \
+		 -DCMAKE_INSTALL_PREFIX=/usr
+	make
+}
+
+package() {
+	cd ${srcdir}/build
+	make DESTDIR=${pkgdir} install
+}
+
