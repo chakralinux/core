@@ -1,21 +1,24 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Chakra Package
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Phil Miller <philm[at]chakra-project[dog]org>
+# Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Drake Justice <djustice[at]chakra-project[dot]org>
+#
+
 
 pkgname=libnotify
-pkgver=0.5.2
+pkgver=0.7.4
 pkgrel=1
 pkgdesc="Desktop notification library"
 arch=('i686' 'x86_64')
 url="http://library.gnome.org/devel/notification-spec/"
 license=('LGPL')
 depends=('gdk-pixbuf2')
-makedepends=('gtk2' 'gobject-introspection')
+makedepends=('gtk3' 'gobject-introspection')
 options=('!libtool')
-source=(http://ftp.gnome.org/pub/GNOME/sources/${pkgname}/0.5/${pkgname}-${pkgver}.tar.gz)
-sha256sums=('ab6833e98c816ae96800de07c43c3a44015be64eb3f7f8117cdd0a0889e1f41d')
+source=(http://ftp.gnome.org/pub/GNOME/sources/${pkgname}/0.7/${pkgname}-${pkgver}.tar.xz)
+sha256sums=('e3c58345112672c2cbb05a67512ff6c7028892df7a34746e2162fe76d9877019')
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
@@ -27,3 +30,4 @@ package() {
     cd "${srcdir}/${pkgname}-${pkgver}"
     make DESTDIR="${pkgdir}" install
 }
+
