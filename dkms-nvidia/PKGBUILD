@@ -9,8 +9,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=dkms-nvidia
 _pkgname=nvidia
-pkgver=295.17
-pkgrel=2
+pkgver=295.20
+pkgrel=1
 pkgdesc="NVIDIA dynamic kernel module (DKMS) drivers for kernel26."
 arch=(i686 x86_64)
 url="http://www.nvidia.com/"
@@ -24,29 +24,28 @@ options=(!strip)
 
 if [ "$CARCH" = "i686" ]; then
 	_pkg="NVIDIA-Linux-x86-${pkgver}"
-  source=("ftp://download.nvidia.com/XFree86/Linux-x86/${pkgver}/${_pkg}.run")
+  source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/${_pkg}.run")
   md5sums=('453d7585254cb2abb486135828278e43')
 elif [ "$CARCH" = "x86_64" ]; then
 	_arch='x86_64'
 	_pkg="NVIDIA-Linux-${_arch}-${pkgver}-no-compat32"
-  source=("ftp://download.nvidia.com/XFree86/Linux-${_arch}/${pkgver}/${_pkg}.run")
-  md5sums=('784480587bb000df46065a853e370ef0')
+  source=("http://us.download.nvidia.com/XFree86/Linux-${_arch}/${pkgver}/${_pkg}.run")
+  md5sums=('79b05cffa482234833ae1c4bb40664c3')
 fi
 
 source[1]="dkms.conf"
 md5sums[1]='d263c0a91f7aea7b59cc08ba53262b62'
 
 build() {
-	cd $srcdir
-	sh ${_pkg}.run --extract-only
+   cd $srcdir
+   sh ${_pkg}.run --extract-only
 }
 
-package() 
-{
- 	mkdir -p                                ${pkgdir}/usr/src/${_pkgname}-${pkgver}
- 	cp -a       ${srcdir}/${_pkg}/kernel/*  ${pkgdir}/usr/src/${_pkgname}-${pkgver}
-	cp          ${srcdir}/dkms.conf         ${pkgdir}/usr/src/${_pkgname}-${pkgver}
-
-  install -d -m755 $pkgdir/etc/modprobe.d
-  echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf
+package() {
+   mkdir -p                                ${pkgdir}/usr/src/${_pkgname}-${pkgver}
+   cp -a       ${srcdir}/${_pkg}/kernel/*  ${pkgdir}/usr/src/${_pkgname}-${pkgver}
+   cp          ${srcdir}/dkms.conf         ${pkgdir}/usr/src/${_pkgname}-${pkgver}
+   install -d -m755 $pkgdir/etc/modprobe.d
+   echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf
+   sed -i -e "s/^.*nvidia -v 2.*/nvidia -v '${pkgver}'/" "${startdir}/nvidia.install" 
 }
