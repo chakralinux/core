@@ -6,7 +6,7 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl' 'nvidia-settings')
-pkgver=295.17
+pkgver=295.20
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -22,10 +22,10 @@ options=('!strip')
 [ "$CARCH" = "x86_64" ] && {
   ARCH='x86_64'
   _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-  md5sums=('784480587bb000df46065a853e370ef0')
+  md5sums=('79b05cffa482234833ae1c4bb40664c3')
 }
 
-source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
+source=("http://us.download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
         'nvidia-restore-settings.desktop')
 md5sums=("${md5sums[@]}"
          '9237516792da7b6df32f8c7e8a98f475')
@@ -46,7 +46,7 @@ build() {
 
 package_libcl() {
   pkgdesc="OpenCL library and ICD loader from NVIDIA"
-  pkgver=1.1.6
+  pkgver=1.1.7
 
   cd "${srcdir}/${_pkg}"
 
