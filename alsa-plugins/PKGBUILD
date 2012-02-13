@@ -5,19 +5,22 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=alsa-plugins
-pkgver=1.0.24
-pkgrel=2
+pkgver=1.0.25
+pkgrel=1
 pkgdesc="Extra alsa plugins"
-arch=('i686' 'x86_64')
+arch=(i686 x86_64)
 url="http://www.alsa-project.org"
-license=('GPL')
-depends=('alsa-lib>1.0.24')
-makedepends=('pulseaudio' 'jack' 'ffmpeg')
-optdepends=('pulseaudio' 'jack' 'ffmpeg')
+license=(GPL)
+depends=(alsa-lib)
+makedepends=(libpulse jack ffmpeg)
+optdepends=('libpulse: PulseAudio plugin'
+            'jack: Jack plugin'
+            'ffmpeg: libavcodec resampling plugin'
+            'libsamplerate: libsamplerate resampling plugin'
+            'speex: libspeexdsp resampling plugin')
 options=('!libtool')
-install=$pkgname.install
-source=(ftp://ftp.alsa-project.org/pub/plugins/alsa-plugins-$pkgver.tar.bz2)
-md5sums=('e4d4c90e11ab9d1a117afbbc1edd2b16')
+source=("ftp://ftp.alsa-project.org/pub/plugins/$pkgname-$pkgver.tar.bz2")
+md5sums=('038c023eaa51171f018fbf7141255185')
 
 #source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
 #md5sums=('01d00251cbe4f510e131eeee69c8361a')
@@ -35,9 +38,9 @@ mksource() {
 }
 
 build() {
-  cd $startdir/src/alsa-plugins-$pkgver
+  cd "$srcdir/$pkgname-$pkgver"
   ./configure --prefix=/usr
-  make 
+  make
 }
 
 package() {

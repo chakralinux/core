@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=('phonon-backend-mplayer')
 _pkgname=('phonon-mplayer')
-pkgver=20111223
+pkgver=20120212
 pkgrel=1
 pkgdesc='Phonon MPlayer backend'
 arch=('i686' 'x86_64')
@@ -20,26 +20,25 @@ makedepends=('qt' 'pkgconfig' 'cmake' 'automoc4' 'git' 'mesa')
 groups=("kde-complete" "kde-uninstall")
 conflicts=("phonon-mplayer-svn" 'phonon-mplayer')
 replaces=("phonon-mplayer-svn" 'phonon-mplayer')
+source=(http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz)
+md5sums=(3e4334033ff7930a9b2a55a8b46fc9db)
 
-	_gitroot="git://anongit.kde.org/${_pkgname}.git"
-	_gitname="${_pkgname}"
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf ${pkgname}-${pkgver}
+	  git clone git://anongit.kde.org/${_pkgname}.git ${pkgname}-${pkgver}
+	  rm -vRf ${pkgname}-${pkgver}/.git
+	  pushd ${pkgname}-${pkgver}
+	  popd
+	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}-${pkgver}/*
+	  md5sum ${pkgname}-${pkgver}.tar.xz
+}
 
 build() {
-	cd "$srcdir"
+	cd "$srcdir/${pkgname}-${pkgver}"
 
-	msg "Connecting to GIT server...."
-	if [ -d ${_gitname} ] ; then
-		cd ${_gitname} && git pull origin
-		msg "The local files are updated."
-	else
-		git clone ${_gitroot} ${_gitname}
-	fi
-	msg "GIT checkout done or server timeout"
 	msg "Starting make..."
-
-	rm -rf "${srcdir}/${_gitname}-build"
-	git clone -l "${srcdir}/${_gitname}" "${srcdir}/${_gitname}-build"
-	cd "${srcdir}/${_gitname}-build"
 
 	# Config
 	[ ${CARCH} = 'x86_64' ] && CXXFLAGS="$CXXFLAGS -fPIC"
