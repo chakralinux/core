@@ -10,7 +10,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=dkms-nvidia
 _pkgname=nvidia
 pkgver=295.20
-pkgrel=1
+pkgrel=2
 pkgdesc="NVIDIA dynamic kernel module (DKMS) drivers for kernel26."
 arch=(i686 x86_64)
 url="http://www.nvidia.com/"
@@ -47,5 +47,5 @@ package() {
    cp          ${srcdir}/dkms.conf         ${pkgdir}/usr/src/${_pkgname}-${pkgver}
    install -d -m755 $pkgdir/etc/modprobe.d
    echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf
-   sed -i -e "s/^.*nvidia -v 2.*/nvidia -v '${pkgver}'/" "${startdir}/nvidia.install" 
+   sed -i -e "s:^\(.*nvidia -v\) \(2.*\)\$:\1 '${pkgver}':g" "${startdir}/nvidia.install"
 }
