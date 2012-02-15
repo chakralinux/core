@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=openssh
-pkgver=5.8p2
+pkgver=5.9p1
 pkgrel=1
 pkgdesc='Free version of the SSH connectivity tools'
 arch=('i686' 'x86_64')
@@ -14,20 +14,16 @@ url='http://www.openssh.org/portable.html'
 backup=('etc/ssh/ssh_config' 'etc/ssh/sshd_config' 'etc/pam.d/sshd' 'etc/conf.d/sshd')
 depends=('krb5' 'openssl' 'libedit')
 source=("ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${pkgname}-${pkgver}.tar.gz"
-        'authfile.c.patch'
         'sshd.confd'
         'sshd.pam'
         'sshd')
-sha1sums=('64798328d310e4f06c9f01228107520adbc8b3e5'
-          '3669cb5ca6149f69015df5ce8e60b82c540eb0a4'
+sha1sums=('ac4e0055421e9543f0af5da607a72cf5922dcc56'
           'ec102deb69cad7d14f406289d2fc11fee6eddbdd'
           '07fecd5880b1c4fdd8c94ddb2e89ddce88effdc1'
           '6b7f8ebf0c1cc37137a7d9a53447ac8a0ee6a2b5')
 
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
-
-	patch -p1 -i ../authfile.c.patch # fix FS#24693 using http://anoncvs.mindrot.org/index.cgi/openssh/authfile.c?revision=1.95
 
 	./configure \
 		--prefix=/usr \
