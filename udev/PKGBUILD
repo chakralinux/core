@@ -6,7 +6,7 @@
 
 pkgname=udev
 pkgver=181
-pkgrel=4
+pkgrel=5
 pkgdesc="The userspace dev tools (udev)"
 depends=('util-linux' 'libusb-compat' 'glib2' 'kmod' 'pciutils' 'usbutils' 'pciutils')
 install=udev.install
@@ -14,10 +14,12 @@ arch=(i686 x86_64)
 license=('GPL')
 makedepends=('gobject-introspection' 'gperf' 'libxslt' 'usbutils' 'kmod')
 source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/hotplug/$pkgname-$pkgver.tar.xz"
+        '82-optical-symlinks.rules'
         'initcpio-hooks-udev'
         'initcpio-install-udev'
         'modprobe.nouveau.conf')
 md5sums=('0d7af750702620a871b9f9b98d8ad859'
+         '4538d729fa292fbb8f9dca6265dc9c14'
          'a4dd853050bf2e0ae6b2e3d2c75499c2'
          'ee0bfe91a20fff12cc25ab1d1e024853'
          '633dabda1fbfa4b6fe4dab5452b40fed')
@@ -59,6 +61,10 @@ package() {
     sed -i -e 's#GROUP="dialout"#GROUP="uucp"#g;
                s#GROUP="tape"#GROUP="storage"#g;
                s#GROUP="cdrom"#GROUP="optical"#g' $i
+  done
+
+  for rule in "${srcdir}"/*.rules; do
+    install -m644 "${rule}" "${pkgdir}/lib/udev/rules.d"
   done
 
   # nouveau still conflicts with some other standard kernel modules, should go away soon
