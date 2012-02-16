@@ -29,10 +29,6 @@ source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${_realver}.tar.gz
 ### UNINSTALL dmapi package before building!!!
 
 build() {
-  cd ${srcdir}/${pkgbase}-${_realver}/
-  # fix https://bugzilla.samba.org/show_bug.cgi?id=7205
-  #patch -Np0 -i ${srcdir}/fix-ipv6-mount.patch || return 1
-
   cd ${srcdir}/${pkgbase}-${_realver}/source3
   ./configure --prefix=/usr \
               --libdir=/usr/lib/ \
@@ -44,27 +40,27 @@ build() {
               --with-pam \
               --with-pam_smbpass \
               --with-pammodulesdir=/lib/security \
+              --with-dnsupdate \
+              --with-automount \
+              --with-quotas \
               --with-ads \
               --with-acl-support \
-              --with-cifsmount \
               --with-libsmbclient \
               --with-syslog \
               --enable-external-libtalloc \
               --disable-dnssd \
               --disable-avahi \
-              --with-cifsumount \
-              --with-shared-modules=idmap_ad,idmap_adex,idmap_rid,idmap_hash \
+              --with-shared-modules=idmap_ad,idmap_adex,idmap_rid,idmap_hash,idmap_tdb2 \
               --enable-external-libtdb
-  make || return 1
+  make
 }
 
 package_smbclient () {
 pkgdesc="Tools to access a server's filespace and printers via SMB"
-depends=('readline>=6.0.00' 'popt' 'libldap>=2.4.18-1' 'libcap>=2.16' 'krb5' 'db>=4.7' 'e2fsprogs' 'tdb' 'talloc')
+depends=('readline' 'popt' 'libldap' 'cifs-utils' 'libcap' 'krb5' 'db' 'e2fsprogs' 'tdb' 'talloc')
   cd ${srcdir}/${pkgbase}-${_realver}/source3
-  mkdir -p ${pkgdir}/usr/bin ${pkgdir}/sbin ${pkgdir}/usr/lib
+  mkdir -p ${pkgdir}/usr/bin ${pkgdir}/usr/lib
   install -m755 bin/{smbclient,rpcclient,smbspool,smbtree,smbcacls,smbcquotas,smbget,net,nmblookup} ${pkgdir}/usr/bin/
-  install -m755 bin/{mount.cifs,umount.cifs} ${pkgdir}/sbin/
   for i in libnetapi* libwbclient* libsmbclient*;do
       cp  -a bin/${i}*.so* ${pkgdir}/usr/lib/
   done
@@ -74,11 +70,7 @@ depends=('readline>=6.0.00' 'popt' 'libldap>=2.4.18-1' 'libcap>=2.16' 'krb5' 'db
   mkdir -p ${pkgdir}/usr/include
   install -m644 include/libsmbclient.h ${pkgdir}/usr/include/
   install -m644 lib/netapi/netapi.h ${pkgdir}/usr/include/
-  mkdir -p ${pkgdir}/usr/share/man/man{1,7,8}
-  for man in smbspool \
-      umount.cifs mount.cifs net; do
-      install -m644 ../docs/manpages/${man}.8 ${pkgdir}/usr/share/man/man8/
-  done
+  mkdir -p ${pkgdir}/usr/share/man/man{1,7}
   for man in rpcclient smbcacls smbclient smbcquotas smbget \
       smbtree smbtar nmblookup; do
       install -m644 ../docs/manpages/${man}.1 ${pkgdir}/usr/share/man/man1/
@@ -88,19 +80,19 @@ depends=('readline>=6.0.00' 'popt' 'libldap>=2.4.18-1' 'libcap>=2.16' 'krb5' 'db
 
 package_samba () {
 pkgdesc="Tools to access a server's filespace and printers via SMB"
-backup=(etc/logrotate.d/samba 
-        etc/pam.d/samba 
+backup=(etc/logrotate.d/samba
+        etc/pam.d/samba
         etc/samba/smb.conf
         etc/xinetd.d/swat
         etc/conf.d/samba)
-depends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap>=2.16' 'krb5' 'pam' 'fam' 'gnutls>=2.4.1' 'e2fsprogs' 'tdb' 'talloc')
+depends=('db' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap' 'krb5' 'pam' 'gamin' 'gnutls' 'e2fsprogs' 'tdb' 'talloc')
   cd ${srcdir}/samba-${_realver}/source3
-  mkdir -p ${pkgdir}/var/log/samba
   mkdir -p ${pkgdir}/etc/samba/private
   chmod 700 ${pkgdir}/etc/samba/private
-  make DESTDIR=${pkgdir} install || return 1
+  make DESTDIR=${pkgdir} install
   chmod 644 ${pkgdir}/usr/include/*.h
   rm -rf ${pkgdir}/usr/var
+  rm -rf ${pkgdir}/var/run/samba
   (cd script; cp installbin.sh i; cat i | sed 's/\/sbin\///' > installbin.sh)
   install -D -m755 ../../samba ${pkgdir}/etc/rc.d/samba
   install -D -m644 ../../samba.conf.d ${pkgdir}/etc/conf.d/samba
@@ -119,12 +111,17 @@ depends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap
   install -D -m755 ${srcdir}/samba-${_realver}/nsswitch/libnss_wins.so ${pkgdir}/lib/libnss_wins.so
   ln -s libnss_wins.so ${pkgdir}/lib/libnss_wins.so.2
   install -D -m755 ${srcdir}/samba-${_realver}/nsswitch/libnss_winbind.so ${pkgdir}/lib/libnss_winbind.so
+  ln -s libnss_winbind.so ${pkgdir}/lib/libnss_winbind.so.2
+  # winbind krb5 locator
+  mkdir -p ${pkgdir}/usr/lib/krb5/plugins/libkrb5
+  install -d -m 0755 ${pkgdir}/usr/lib/krb5/plugins/libkrb5
+  install -m 755 bin/winbind_krb5_locator.so ${pkgdir}/usr/lib/krb5/plugins/libkrb5/winbind_krb5_locator.so
   # remove conflict files of smbclient
   for man in libsmbclient smbspool \
-      umount.cifs mount.cifs net; do
+      mount.cifs net cifs.upcall; do
       rm -f ${pkgdir}/usr/share/man/man8/${man}.8
   done
-  for i in libnetapi* libwbclient* libsmbclient*;do
+  for i in libnetapi* libwbclient* libsmbclient* winbind_krb5*;do
       rm -f ${pkgdir}/usr/lib/$i
   done
   for bin in net \
@@ -132,6 +129,7 @@ depends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap
       smbcquotas smbget smbspool smbtar smbtree; do
       rm -f ${pkgdir}/usr/bin/$bin
   done
+  rm -f ${pkgdir}/usr/sbin/cifs.upcall
   rm -f ${pkgdir}/usr/include/netapi.h
   for man in rpcclient smbcacls smbclient smbcquotas \
       smbtree smbtar nmblookup smbget; do
@@ -145,8 +143,8 @@ depends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap
   # copy ldap example
   install -D -m644 ${srcdir}/samba-${_realver}/examples/LDAP/samba.schema ${pkgdir}/usr/share/doc/samba/examples/LDAP/samba.schema
 }
-md5sums=('355b4530c20997e94aebc74cd6ea5307'
-         '891b9be03e7adf65c9a00319c76d33e5'
+md5sums=('98ac9db9f4b6ebfc3f013aa193ffb0d1'
+         'a3da19515a234c703876cf850c44e996'
          '5697da77590ec092cc8a883bae06093c'
          'a4bbfa39fee95bba2e7ad6b535fae7e6'
          '96f82c38f3f540b53f3e5144900acf17'

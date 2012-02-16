@@ -9,7 +9,7 @@
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=ghostscript
-pkgver=9.04
+pkgver=9.05
 pkgrel=1
 pkgdesc="An interpreter for the PostScript language"
 arch=('i686' 'x86_64')
@@ -18,16 +18,12 @@ depends=('libxt' 'libcups' 'fontconfig' 'jasper' 'zlib' 'libpng' 'libjpeg' 'libt
 makedepends=('gnutls')
 optdepends=('texlive-core:      needed for dvipdf')
 url="http://www.ghostscript.com/"
-source=(http://downloads.ghostscript.com/public/ghostscript-${pkgver}.tar.bz2
-        ghostscript-cups-rgbw.patch)
+source=(http://downloads.ghostscript.com/public/ghostscript-${pkgver}.tar.bz2)
 options=('!libtool' '!makeflags')
-md5sums=('9f6899e821ab6d78ab2c856f10fa3023'
-         'bc56eb8c5fef0ecf964f6b3e9b7e65ae')
+md5sums=('8bcef1f33ddf8a4d12b2cf8da385c191')
 
 build() {
   cd ${srcdir}/ghostscript-${pkgver}
-
-  patch -Np1 -i ${srcdir}/ghostscript-cups-rgbw.patch
 
   # force it to use system-libs
   rm -rf jpeg libpng zlib jasper expat tiff freetype lcms

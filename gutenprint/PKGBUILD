@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=gutenprint
 pkgver=5.2.7
-pkgrel=2
+pkgrel=3
 pkgdesc="Top quality printer drivers for POSIX systems."
 arch=('i686' 'x86_64')
 license=('GPL')
@@ -19,14 +19,17 @@ makedepends=('cups>=1.4.2' 'foomatic-db-engine' 'ghostscript>=8.71')
 optdepends=('cups:		to use cups printer spooler(recommended)'
             'foomatic-db-engine:	to use foomatic spooler'
             'ghostscript:	adds postscript support for ijsgutenprint')
-source=(http://downloads.sourceforge.net/gimp-print/$pkgname-$pkgver.tar.bz2)
+source=(http://downloads.sourceforge.net/gimp-print/$pkgname-$pkgver.tar.bz2
+        buildfix.patch)
 url="http://gimp-print.sourceforge.net/"
 replaces=('gimp-print' 'gutenprint')
 options=('!libtool' '!emptydirs')
-md5sums=('b19029972bf28f6efd693270daf8f5de')
+md5sums=('b19029972bf28f6efd693270daf8f5de'
+         '3d5e93734b403dbc5b067856be1cbd65')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
+  patch -Np1 -i ${srcdir}/buildfix.patch
   ./configure --prefix=/usr --disable-samples --with-cups \
 	--disable-translated-cups-ppds \
 	--disable-libgutenprintui  --disable-libgutenprintui2 --disable-gtktest \
