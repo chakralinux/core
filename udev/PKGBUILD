@@ -4,104 +4,67 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgbase="udev"
-pkgname=('udev' 'udev-compat')
-pkgver=175
-pkgrel=3
-arch=('i686' 'x86_64')
-url="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
+pkgname=udev
+pkgver=181
+pkgrel=4
+pkgdesc="The userspace dev tools (udev)"
+depends=('util-linux' 'libusb-compat' 'glib2' 'kmod' 'pciutils' 'usbutils' 'pciutils')
+install=udev.install
+arch=(i686 x86_64)
 license=('GPL')
+makedepends=('gobject-introspection' 'gperf' 'libxslt' 'usbutils' 'kmod')
+source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/hotplug/$pkgname-$pkgver.tar.xz"
+        'initcpio-hooks-udev'
+        'initcpio-install-udev'
+        'modprobe.nouveau.conf')
+md5sums=('0d7af750702620a871b9f9b98d8ad859'
+         'a4dd853050bf2e0ae6b2e3d2c75499c2'
+         'ee0bfe91a20fff12cc25ab1d1e024853'
+         '633dabda1fbfa4b6fe4dab5452b40fed')
+url="http://git.kernel.org/?p=linux/hotplug/udev.git;a=summary"
+backup=(etc/udev/udev.conf)
 groups=('base')
 options=(!makeflags !libtool)
-makedepends=('gobject-introspection' 'gperf')
-source=("http://people.freedesktop.org/~kay/udev/${pkgbase}-${pkgver}.tar.bz2"
-        '81-chakra.rules'
-        '82-optical-symlinks.rules')
-md5sums=('2fc9c1efcbde98e3d73ffee7a77aea47'
-         '8455185f071187579a252dd0505b72cf'
-         '4538d729fa292fbb8f9dca6265dc9c14')
 
 build() {
-  cd "${srcdir}/${pkgbase}-${pkgver}"
+  cd $srcdir/$pkgname-$pkgver
 
-  ./configure --sysconfdir=/etc \
-              --with-rootlibdir=/lib \
-              --libexecdir=/lib/udev \
-              --sbindir=/sbin \
+  ./configure --prefix=/usr \
+              --with-rootprefix= \
+              --sysconfdir=/etc \
+              --libdir=/usr/lib \
+              --libexecdir=/lib \
               --with-systemdsystemunitdir=/lib/systemd/system \
-              --disable-rule-generator \
               --enable-udev_acl
+
   make
 }
   
-package_udev() {
-  pkgdesc="The userspace dev tools (udev)"
-  depends=('util-linux' 'libusb-compat' 'glib2' 'module-init-tools' 'pciutils')
-  install='udev.install'
-  backup=(etc/udev/udev.conf)
-  conflicts=('pcmcia-cs' 'hotplug' 'initscripts<2009.07')
-  replaces=('devfsd')
-  
-  cd "${srcdir}/${pkgbase}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-
-  # Setup the udev rules directory
-  install -d -m755 "${pkgdir}/lib/udev/rules.d"
-  for rule in "${srcdir}"/*.rules; do
-    install -m644 "${rule}" "${pkgdir}/lib/udev/rules.d"
-  done
-
-  # create framebuffer blacklist
-  install -d -m755 "${pkgdir}/lib/modprobe.d"
-  for mod in $(find /lib/modules/*/kernel/drivers/video -name '*fb.ko.gz' -exec basename \{\} .ko.gz \;); do 
-    echo "blacklist ${mod}" 
-  done | sort -u > "${pkgdir}/lib/modprobe.d/framebuffer_blacklist.conf"
+package() {
+  cd $srcdir/$pkgname-$pkgver
+  make DESTDIR=${pkgdir} install
 
   # /dev/loop0 is created for convenience, to autoload the module if necessary
-  # may be obsoleted by https://lkml.org/lkml/2011/7/30/111
-  mknod -m 0660 "${pkgdir}/lib/udev/devices/loop0" b 7 0
-  chgrp disk "${pkgdir}/lib/udev/devices/loop0"
+  # this is no longer needed when util-linux-2.21 is released as /dev/loop-control
+  # will be used instead. Support for this will go away in a future version of udev
+  install -d -m755 ${pkgdir}/lib/udev/devices/
+  mknod ${pkgdir}/lib/udev/devices/loop0 b 7 0
+  chgrp disk ${pkgdir}/lib/udev/devices/loop0
 
   # udevd moved, symlink to make life easy for restarting udevd manually
-  ln -s /lib/udev/udevd "${pkgdir}/sbin/udevd"
+  ln -s /lib/udev/udevd ${pkgdir}/usr/bin/udevd
 
   # Replace dialout/tape/cdrom group in rules with uucp/storage/optical group
-  for i in "${pkgdir}/lib/udev/rules.d"/*.rules; do
+  for i in $pkgdir/lib/udev/rules.d/*.rules; do
     sed -i -e 's#GROUP="dialout"#GROUP="uucp"#g;
                s#GROUP="tape"#GROUP="storage"#g;
-               s#GROUP="cdrom"#GROUP="optical"#g' "${i}"
+               s#GROUP="cdrom"#GROUP="optical"#g' $i
   done
+
+  # nouveau still conflicts with some other standard kernel modules, should go away soon
+  install -D -m644 ../modprobe.nouveau.conf ${pkgdir}/lib/modprobe.d/nouveau.conf
+
+  # install the mkinitpcio hook
+  install -D -m644 ../initcpio-hooks-udev ${pkgdir}/lib/initcpio/hooks/udev
+  install -D -m644 ../initcpio-install-udev ${pkgdir}/lib/initcpio/install/udev
 }
-
-package_udev-compat() {
-  pkgdesc="The userspace dev tools (udev) - additional rules for older kernels"
-  depends=('udev')
-
-  cd "${srcdir}/${pkgbase}-${pkgver}"
-  install -d -m755 "${pkgdir}/lib/${pkgbase}/rules.d"
-  install -m644 "${srcdir}/${pkgbase}-${pkgver}/rules/misc/30-kernel-compat.rules" "${pkgdir}/lib/udev/rules.d"
-  # create static devices in /lib/udev/devices/
-  mkdir -p "${pkgdir}/lib/udev/devices"/{pts,shm}
-
-  mknod -m0600 "${pkgdir}/lib/udev/devices/console" c 5 1
-  mknod -m0666 "${pkgdir}/lib/udev/devices/null" c 1 3
-  mknod -m0660 "${pkgdir}/lib/udev/devices/zero" c 1 5
-  mknod -m0666 "${pkgdir}/lib/udev/devices/kmsg" c 1 11
-
-  ln -snf /proc/self/fd "${pkgdir}/lib/udev/devices/fd"
-  ln -snf /proc/self/fd/0 "${pkgdir}/lib/udev/devices/stdin"
-  ln -snf /proc/self/fd/1 "${pkgdir}/lib/udev/devices/stdout"
-  ln -snf /proc/self/fd/2 "${pkgdir}/lib/udev/devices/stderr"
-  ln -snf /proc/kcore "${pkgdir}/lib/udev/devices/core"
-
-  # these static devices are created for convenience, to autoload the modules if necessary
-  install -d -m755 "${pkgdir}/lib/udev/devices/net"
-  # /dev/net/tun
-  mknod -m0666 "${pkgdir}/lib/udev/devices/net/tun" c 10 200
-  # /dev/fuse
-  mknod -m0666 "${pkgdir}/lib/udev/devices/fuse" c 10 229 
-  # /dev/ppp
-  mknod -m0600 "${pkgdir}/lib/udev/devices/ppp" c 108 0
-}
-
-# vim:set ts=2 sw=2 et:
