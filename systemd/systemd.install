@@ -1,30 +1,51 @@
-#!/bin/bash
+#!/bin/sh
 
 checkgroups() {
-  getent group lock >/dev/null || groupadd -g 54 lock
+  if ! getent group lock >/dev/null; then
+    groupadd -g 54 lock
+  fi
+}
+
+sd_booted() {
+  [ -e sys/fs/cgroups/systemd ]
 }
 
 post_install() {
   checkgroups
 
-  [ -f /etc/machine-id ] || /bin/systemd-machine-id-setup
+  if [ ! -f etc/machine-id ]; then
+    systemd-machine-id-setup
+  fi
 
   echo "systemd has been installed to /bin/systemd. Please ensure you append"
   echo "init=/bin/systemd to your kernel command line in your bootloader."
-  echo "Please disable and blacklist syslog-ng. Use rsyslog, which work correct with systemd."
 }
 
 post_upgrade() {
   checkgroups
 
-  [ -f /etc/machine-id ] || /bin/systemd-machine-id-setup
-  /bin/systemctl daemon-reexec >/dev/null || :
-}
+  if [ ! -f etc/machine-id ]; then
+    systemd-machine-id-setup
+  fi
 
-pre_remove() {
-  /bin/rm -f /etc/systemd/system/default.target
+  if sd_booted; then
+    systemctl daemon-reexec >/dev/null
+  fi
+
+  newpkgver=${1%-*}
+  oldpkgver=${2%-*}
+
+  # catch v31 need for restarting systemd-logind.service
+  if [ "$newpkgver" -ge 31 ] && [ "$oldpkgver" -lt 31 ]; then
+    # but only if systemd is running
+    if sd_booted; then
+      systemctl try-restart systemd-logind.service
+    fi
+  fi
 }
 
 post_remove() {
-  getent group lock >/dev/null && groupdel lock
+  if getent group lock >/dev/null; then
+    groupdel lock
+  fi
 }
