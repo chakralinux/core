@@ -5,9 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=('phonon-backend-gstreamer')
-_pkgname=('phonon-gstreamer')
-pkgver=4.5.9
-pkgrel=2
+pkgver=4.6.0
+pkgrel=1
 pkgdesc="Phonon GStreamer backend"
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
@@ -17,8 +16,8 @@ makedepends=('qt' 'pkgconfig' 'cmake' 'automoc4' 'git' 'mesa')
 groups=("kde-complete" "kde-uninstall")
 conflicts=('phonon-gstreamer')
 replaces=('phonon-gstreamer')
-source=("http://www.chakra-linux.org/sources/${pkgname}/${_pkgname}-${pkgver}.tar.xz")
-md5sums=('4434b053e58dcb93225a039199dff1bc')
+source=(""http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.xz"")
+md5sums=('cc380c7612aaaa87294185ded702f88a')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -34,7 +33,7 @@ build() {
 	cd ${srcdir}
 	mkdir -p build
 	cd build
-	cmake ../${_pkgname} \
+	cmake ../${pkgname}-${pkgver} \
 		 -DCMAKE_BUILD_TYPE=Release \
 		 -DCMAKE_INSTALL_PREFIX=/usr
 	make
