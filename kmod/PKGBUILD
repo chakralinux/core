@@ -6,7 +6,7 @@
 
 pkgname=kmod
 pkgver=5
-pkgrel=3
+pkgrel=4
 pkgdesc="Linux kernel module handling"
 arch=('i686' 'x86_64')
 url="http://git.profusion.mobi/cgit.cgi/kmod.git"
@@ -51,6 +51,13 @@ package() {
   # add symlinks to kmod
   ln -s ../usr/bin/kmod "$pkgdir/sbin/modprobe"
   ln -s ../usr/bin/kmod "$pkgdir/sbin/depmod"
+
+  # add compatible symlinks
+  ln -s ../usr/bin/insmod "$pkgdir/sbin/insmod"
+  ln -s ../usr/bin/lsmod "$pkgdir/sbin/lsmod"
+  ln -s ../usr/bin/modinfo "$pkgdir/sbin/modinfo"
+  ln -s ../usr/bin/rmmod "$pkgdir/sbin/rmmod"
+
 
   for tool in {ins,ls,rm}mod modinfo; do
     ln -s kmod "$pkgdir/usr/bin/$tool"
