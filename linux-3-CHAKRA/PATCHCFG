@@ -2,7 +2,7 @@
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
 _patch="3.2.6"
-_prepatch="3.2.7-pre1"
+_prepatch="3.2.7-rc1"
 _queue="3.2"
 # Aufs
 _aufs="3.2-20120109"
@@ -24,8 +24,8 @@ PATCHES=(
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/candidate/$_prepatch.patch%1
-         #ftp://ftp.kernel.org/pub/linux/kernel/v3.x/stable-review/patch-$_prepatch.gz%1
+         #http://chakra.sourceforge.net/sources/linux/patches/3.2/candidate/$_prepatch.patch%1
+         ftp://ftp.kernel.org/pub/linux/kernel/v3.x/stable-review/patch-$_prepatch.gz%1
 
          # Archlinux patches
 
@@ -59,7 +59,6 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/drm-i915-fbc-stfu.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/intel-iommu-igfx.patch%1
 
-
          ### add aufs3 support, in reference to:
          ### http://aufs.sourceforge.net
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/aufs3.2/aufs$_aufs.patch.bz2%1
@@ -70,24 +69,31 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/aufs3.2/aufs$_aufs-standalone.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/aufs3.2/aufs$_aufs-fix-export-__devcgroup_inode_permission.patch%1
 
-         ###  add overlayfs v11
-         ###  http://git.kernel.org/?p=linux/kernel/git/mszeredi/vfs.git;a=shortlog;h=refs/heads/overlayfs.v11
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/01-vfs_add-i_op-_open.patch.xz%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/02-vfs_export-do_splice_direct-to-modules.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/03-vfs_introduce-clone_private_mount.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/04-overlay-filesystem.patch.xz%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/05-overlayfs_add-statfs-support.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/06-overlayfs_implement-show_options.patch%1
-         ###  unwanted feature
-         ###  http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/08-fs_limit filesystem stacking depth.patch%1
-         ###  Jordi Pujol's overlayfs patches
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/50-copy-up-performance.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/51-improve-ovl_copy_up_xattr.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/52-vfs_getxattr-performance.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs/59-read-only.patch%1
+         ###  add overlayfs v12
+         ###  http://git.kernel.org/?p=linux/kernel/git/mszeredi/vfs.git;a=shortlog;h=refs/heads/overlayfs.v12
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/02-vfs_pass-struct-path-to__dentry_open.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/03-vfs_add-i_op-_open.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/04-vfs_export-do_splice_direct-to-modules.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/05-vfs_introduce-clone_private_mount.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/06-overlay-filesystem.patch.xz%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/07-overlayfs_add-statfs-support.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/08-overlayfs_implement-show_options.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/09-overlay_overlay-filesystem-documentation.diff%1
+         # unwanted feature
+         #http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/10-fs_limit-filesystem-stacking-depth.diff%1
+         # ubuntu
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/41-overlayfs-apply-device-cgroup-and-security-permissio.patch%1
+         # Jordi Pujol's overlayfs patches
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/50-copy-up-performance.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/51-improve-ovl_copy_up_xattr.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/52-vfs_getxattr-performance.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/59-read-only.patch%1
+         # ubuntu
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/81-ovl_show_options-vfsmount.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/overlayfs-v12/82-fs-namespace.patch%1
 
-         ### add tuxonice (disabled due some hardware issues with old netbook CPU's)
-         # http://chakra.sourceforge.net/sources/linux/patches/3.2/features/tuxonice/tuxonice-head-2012Jan01-for_Linux_3_2_1.patch.xz%1
+         ### add tuxonice
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/tuxonice/tuxonice-2012Feb05-for_Linux_3_2_5.patch.xz%1
 
          ### add acerhk
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/acerhk/01_acerhk-0.5.35.patch.xz%1
@@ -105,15 +111,34 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/acerhk/13_bg-flag.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/acerhk/14_Get-rid-off-bios-error.patch%1
 
+         ### add wacom
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0001-Input-wacom-cleanup-feature-report-for-bamboos.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0002-Input-wacom-remove-unused-bamboo-HID-parsing.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0003-Input-wacom-add-some-comments-to-wacom_parse_hid.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0004-Input-wacom-relax-Bamboo-stylus-ID-check.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0005-Input-wacom-read-3rd-gen-Bamboo-Touch-HID-data.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0006-Input-wacom-3rd-gen-Bamboo-P-Touch-packet-support.patch.xz%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0007-Input-wacom-ignore-unwanted-bamboo-packets.patch%1
+
+         ### add lirc
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0001-media-staging-lirc_serial-Fix-init-exit-order.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0002-media-staging-lirc_serial-Free-resources-on-failure-.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0003-media-staging-lirc_serial-Fix-deadlock-on-resume-fai.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0004-media-staging-lirc_serial-Fix-bogus-error-codes.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0005-media-staging-lirc_serial-Do-not-assume-error-codes-.patch%1
+
          ### bugfixes
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/0001-media-staging-lirc_serial-Fix-init-exit-order.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/0002-media-staging-lirc_serial-Free-resources-on-failure-.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/0003-media-staging-lirc_serial-Fix-deadlock-on-resume-fai.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/0004-media-staging-lirc_serial-Fix-bogus-error-codes.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/0005-media-staging-lirc_serial-Do-not-assume-error-codes-.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/cpu-Do-not-return-errors-from-cpu_dev_init-which-wil.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/cpu-Register-a-generic-CPU-device-on-architectures-t.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/dm-Deal-with-merge_bvec_fn-in-component-devices-bett.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/rt2800-disable-powersaving-as-default.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/snapshot-Implement-compat_ioctl.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/x86/KVM-nVMX-Add-KVM_REQ_IMMEDIATE_EXIT.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/x86/KVM-nVMX-Fix-warning-causing-idt-vectoring-info-beha.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/x86/KVM-x86-extend-struct-x86_emulate_ops-with-get_cpuid.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/x86/KVM-x86-fix-missing-checks-in-syscall-emulation.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/x86/Skip-looking-for-ioapic-overrides-when-ioapics-are-not-present.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/neuter-drm_i915_fix-ILK+-infoframe-support.patch%1%1
          ### chakra specific patches.
          http://chakra.sourceforge.net/sources/linux/patches/3.2/chakra/af_802154-Disable-auto-loading-as-mitigation-against.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/chakra/cgroups-Document-the-Chakra-memory-resource-controll.patch%1
@@ -124,7 +149,7 @@ PATCHES=(
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.2.6-1-CHAKRA"
+PATCHNAME="patch-3.2.6-2-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
