@@ -19,7 +19,7 @@ depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libxpm' 'libcdio'
          'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp'
          'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug' 
          'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'desktop-file-utils')
-makedepends=('avahi' 'pkgconfig' 'live-media' 'libnotify'
+makedepends=('avahi' 'pkgconfig' 'live-media' 'libnotify' 'libbluray'
              'flac' 'libtheora' 'alsa-lib' 'jack' 'kdelibs' 'udev'
              'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'libpulse'
              'lirc-utils' 'gnutls' 'libcaca')
@@ -32,7 +32,8 @@ optdepends=('avahi: for service discovery using bonjour protocol'
             'libdc1394: for IEEE 1394 plugin'
             'libpulse: PulseAudio support'
             'vdpau-video: vdpau back-end for nvidia'
-            'libva-driver-intel: back-end for intel cards')
+            'libva-driver-intel: back-end for intel cards'
+            'libbluray: for Blu-Ray disks')
 conflicts=('vlc-plugin')
 replaces=('vlc-plugin')
 backup=('usr/share/vlc/http/.hosts'
@@ -47,7 +48,7 @@ md5sums=('8806bff2ea9c76791123d444a92f708c')
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-#  sed -i -e 's:truetype/freefont:TTF:g' modules/misc/freetype.c
+  sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
 
   ./configure --prefix=/usr \
               --disable-rpath \
@@ -61,7 +62,8 @@ build() {
               --enable-ncurses \
               --with-live555-tree=/usr/lib/live \
               --enable-upnp \
-              --enable-realrtsp
+              --enable-realrtsp \
+              --enable-bluray
   make
 }
 
