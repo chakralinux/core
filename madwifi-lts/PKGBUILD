@@ -4,41 +4,56 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# use ../makepkg
-_kernver="2.6.35-CHAKRA-LTS"
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+# Find the kernel name inside the chroot
+_extramodules=extramodules-`pacman -Q linux-lts | cut -c11-13 | sed 's/linux-lts //g'`-CHAKRA-LTS
+_kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=madwifi-lts
 pkgver=0.9.4.4173
 _ver=0.9.4-r4173-20111008
-pkgrel=1
-pkgdesc="Madwifi drivers for Atheros wireless chipsets. For kernel26"
+pkgrel=2
+pkgdesc="Madwifi drivers for Atheros wireless chipsets"
 arch=(i686 x86_64)
 license=('GPL')
 url="http://madwifi-project.org"
-depends=('madwifi-utils' 'kernel26-lts>=2.6.35' 'kernel26-lts<2.6.36')
-makedepends=('kernel26-lts-headers>=2.6.35' 'kernel26-lts-headers<2.6.36' 'sharutils')
+depends=('madwifi-utils' 'linux-lts>=3.0' 'linux-lts<3.1')
+makedepends=('linux-lts-headers' 'sharutils')
 install=madwifi-ng.install
 # subversion source: svn checkout http:/madwifi-project.org/svn/madwifi/trunk madwifi
 source=(http://chakra.sourceforge.net/sources/madwifi/madwifi-${pkgver}.tar.gz
 	#http://downloads.sourceforge.net/madwifi/madwifi-${pkgver}.tar.gz
 	)
-groups=("kernel26-lts-modules")
+groups=("linux-lts-modules")
+conflicts=("madwifi")
+replaces=("madwifi")
 
-build() {
-  [ "${CARCH}" = "i686" ] && export ARCH=i386
+build()
+{
+  cd madwifi-$_ver
 
-  #cd $startdir/src/madwifi-$pkgver
-  cd $startdir/src/madwifi-$_ver
-  sed -i -e 's/-Werror//g' Makefile.inc
-  make KERNELPATH=/lib/modules/$_kernver/build KERNELRELEASE=$_kernver modules|| return 1
-  make KERNELPATH=/lib/modules/$_kernver/build KERNELRELEASE=$_kernver modules \
-       DESTDIR=$startdir/pkg KERNELRELEASE=$_kernver install-modules
-  sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/*.install
+  # kernel 3.2 abi change
+  sed -i -e "s/.ndo_set_multicast_list/.ndo_set_rx_mode/" ath/if_ath.c
+  sed -i -e "s/ieee80211_set_multicast_list/ieee80211_set_rx_mode/" net80211/ieee80211.c
+  sed -i -e "s/ndo_set_multicast_list/ndo_set_rx_mode/" net80211/ieee80211.c
 
-  # install to wireless kernel directory
-  mkdir -p $startdir/pkg/lib/modules/$_kernver/kernel/drivers/net/wireless/madwifi
-  mv $startdir/pkg/lib/modules/$_kernver/net/* $startdir/pkg/lib/modules/$_kernver/kernel/drivers/net/wireless/madwifi
-  rm -r $startdir/pkg/lib/modules/$_kernver/net/
+  sed -i 's/-Werror//' Makefile.inc
+  sed -i 's/\[4-9\]\\\./[0-9]-/' Makefile
+  make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules
+}
+
+package()
+{
+  cd madwifi-$_ver
+  make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules \
+       DESTDIR="${pkgdir}" KERNELRELEASE=${_kver} install-modules
+  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" ${startdir}/*.install
+  mkdir -p "${pkgdir}/lib/modules/$_extramodules"
+  mv "${pkgdir}"/lib/modules/${_kver}/net/* "${pkgdir}/lib/modules/$_extramodules"
+  rm -r "${pkgdir}"/lib/modules/${_kver}
+  find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
 }
 
 md5sums=('18cd1c574e0fa66eb4396f92f0700a7e')
