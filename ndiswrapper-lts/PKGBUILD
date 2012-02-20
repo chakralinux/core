@@ -19,10 +19,7 @@ license=('GPL')
 arch=(i686 x86_64)
 url="http://ndiswrapper.sourceforge.net"
 install="ndiswrapper.install"
-depends=('linux-lts>=3.0' 'linux-lts<3.1')
-provides=("ndiswrapper-utils=$pkgver")
-replaces=('ndiswrapper-utils')
-conflicts=('ndiswrapper-utils')
+depends=('linux-lts>=3.0' 'linux-lts<3.1' 'ndiswrapper')
 makedepends=('linux-lts-headers')
 source=(http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz)
 md5sums=('7a401dc540938bf07893c67f418b6152')
@@ -38,6 +35,9 @@ package() {
 
   make INST_DIR="lib/modules/$_extramodules" \
     KVERS=$_kver DESTDIR="$pkgdir/" install
+
+  # rm ndiswrapper
+  rm -R "$pkgdir/usr" "$pkgdir/sbin"
 
   gzip "$pkgdir/lib/modules/$_extramodules/ndiswrapper.ko"
   sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" ${startdir}/*.install
