@@ -37,7 +37,6 @@ package() {
     mkdir -p $pkgdir//lib/modules/${_extramodules}
     install -m644 nvidia.ko $pkgdir/lib/modules/${_extramodules}
     install -d -m755 "${pkgdir}/etc/modprobe.d"
-    echo "blacklist nouveau" >> "${pkgdir}/etc/modprobe.d/nouveau_blacklist.conf"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
     gzip "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
 }
