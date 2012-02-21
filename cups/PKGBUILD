@@ -15,20 +15,20 @@ license=('GPL')
 url="http://www.cups.org/"
 makedepends=('libtiff>=3.9.2-2' 'libpng>=1.4.0'  'acl' 'openslp' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'poppler>=0.12.3' 'xinetd' 'gzip' 'autoconf' 'php' 'libusb-compat' 'dbus-core' 'avahi'  'hicolor-icon-theme')
 source=("ftp://ftp.easysw.com/pub/cups/${pkgver}/${pkgbase}-${pkgver}-source.tar.bz2"
-        cups-avahi-1-config.patch
-        cups-avahi-2-backend.patch
-        cups-avahi-3-timeouts.patch
-        cups-avahi-4-poll.patch
-        cups-avahi-5-services.patch
+        #cups-avahi-1-config.patch
+        #cups-avahi-2-backend.patch
+        #cups-avahi-3-timeouts.patch
+        #cups-avahi-4-poll.patch
+        #cups-avahi-5-services.patch
         cups-no-export-ssllibs.patch
         cups-no-gcrypt.patch
         cups cups.logrotate cups.pam)
 md5sums=('9471d2a7c920cfbb17133c32d2e6866f'
-         'fe3906f7733f8f63e05daf025d05abf3'
-         '80e2d7d6ffcf125f917dca795e161efd'
-         'eef9b879d9bdfb04c2042f57d07969b4'
-         '9f82b56a2119bfc2ee46a345f6229a2c'
-         'ca64df54a3a2dc53c28e6291e8d53d8f'
+         #'fe3906f7733f8f63e05daf025d05abf3'
+         #'80e2d7d6ffcf125f917dca795e161efd'
+         #'eef9b879d9bdfb04c2042f57d07969b4'
+         #'9f82b56a2119bfc2ee46a345f6229a2c'
+         #'ca64df54a3a2dc53c28e6291e8d53d8f'
          '9b8467a1e51d360096b70e2c3c081e6c'
          '3733c23e77eb503bd94cc368e02830dc'
          '9657daa21760bb0b5fa3d8b51d5e01a1'
@@ -40,10 +40,10 @@ build() {
 
   # Avahi support in the dnssd backend. patches from upstream/FC RawHide
   patch -Np1 -i ${srcdir}/cups-avahi-1-config.patch
-  patch -Np1 -i ${srcdir}/cups-avahi-2-backend.patch
-  patch -Np1 -i ${srcdir}/cups-avahi-3-timeouts.patch
-  patch -Np1 -i ${srcdir}/cups-avahi-4-poll.patch
-  patch -Np1 -i ${srcdir}/cups-avahi-5-services.patch
+  #patch -Np1 -i ${srcdir}/cups-avahi-2-backend.patch
+  #patch -Np1 -i ${srcdir}/cups-avahi-3-timeouts.patch
+  #patch -Np1 -i ${srcdir}/cups-avahi-4-poll.patch
+  #patch -Np1 -i ${srcdir}/cups-avahi-5-services.patch
 
   # Do not export SSL libs in cups-config
   patch -Np1 -i "${srcdir}/cups-no-export-ssllibs.patch"
@@ -69,7 +69,7 @@ build() {
               --enable-ssl=yes \
               --enable-gnutls \
               --enable-threads \
-              --enable-avahi \
+              --disable-avahi \
               --with-php=/usr/bin/php-cgi \
               --with-pdftops=pdftops \
               --with-optim="${CFLAGS}"
