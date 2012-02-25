@@ -5,21 +5,22 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=util-linux
-pkgver=2.20.1
-pkgrel=3
+pkgver=2.21
+pkgrel=1
 pkgdesc="Miscellaneous system utilities for Linux"
-url="http://userweb.kernel.org/~kzak/util-linux-ng/"
+url="http://www.kernel.org/pub/linux/utils/util-linux/"
 arch=('i686' 'x86_64')
 groups=('base')
-depends=('filesystem')
-replaces=('linux32' 'util-linux-ng')
-conflicts=('linux32' 'util-linux-ng' 'e2fsprogs<1.41.8-2')
-provides=('linux32' "util-linux-ng=${pkgver}")
+depends=('udev')
+conflicts=('util-linux-ng')
+provides=("util-linux-ng=${pkgver}")
 license=('GPL2')
 options=('!libtool')
-#source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v${pkgver}/${pkgname}-${pkgver}.tar.bz2)
-source=(ftp://ftp.infradead.org/pub/${pkgname}/v2.20/${pkgname}-${pkgver}.tar.bz2
-	0001-findmnt-support-alternative-location-of-fstab.patch)
+source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v${pkgver}/${pkgname}-${pkgver}.tar.xz
+	libmount-canonicalize-all-paths-from-fs-tab.patch
+	lib-canonicalize-always-remove-tailing-slash.patch
+	libmount-canonicalize-targets-from-fstab-on-mount-a.patch
+	mount-new-cleanup-mount-a-return-codes.patch)
 optdepends=('perl: for chkdupexe support')
 
 build() {
@@ -28,15 +29,17 @@ build() {
   # hardware clock
   sed -e 's%etc/adjtime%var/lib/hwclock/adjtime%' -i include/pathnames.h
 
-  # backport patch needed for usr support in initramfs
-  patch -p1 -i ../0001-findmnt-support-alternative-location-of-fstab.patch
+  patch -p1 -i ../libmount-canonicalize-all-paths-from-fs-tab.patch
+  patch -p1 -i ../lib-canonicalize-always-remove-tailing-slash.patch
+  patch -p1 -i ../libmount-canonicalize-targets-from-fstab-on-mount-a.patch
+  patch -p1 -i ../mount-new-cleanup-mount-a-return-codes.patch 
 
-  ./configure --enable-arch\
-              --enable-write\
-              --enable-raw\
-              --disable-wall\
-              --enable-partx\
-              --enable-libmount-mount
+  ./configure --prefix=/usr \
+              --libdir=/usr/lib \
+              --enable-write \
+              --enable-raw \
+              --disable-wall \
+              --enable-new-mount
 
   make
 }
@@ -44,9 +47,17 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  install -dm755 "${pkgdir}/var/lib/hwclock"
-
   make DESTDIR="${pkgdir}" install
+
+  cd "${pkgdir}"
+
+  install -dm755 var/lib/hwclock
+
+  # delete stray empty dir, fixed upstream
+  rm -r usr/share/man/ru
 }
-md5sums=('079b37517fd4e002a2e6e992e8b4e361'
-         '3e311c3e4e9f767a183b17ff929c8d16')
+md5sums=('208aa058f4117759d2939d1be7d662fc'
+         'c4011222a19b020d9b8465c3c7e443f6'
+         '8c1bf7b10e22e2b835441e6ae2d804d6'
+         '7b92423c588ed35229a9a166349c29a9'
+         'c483ab2d52609b5857d096b256a5075c')
