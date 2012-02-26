@@ -5,8 +5,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
  
 pkgname=gnash
-pkgver=0.8.9
-pkgrel=5
+pkgver=0.8.10
+pkgrel=1
 pkgdesc="GNU Flash player and kpath plugin for KDE 4."
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/gnash/"
@@ -14,20 +14,20 @@ license=('GPL')
 depends=('agg' 'ffmpeg' 'libjpeg' 'libpng' 'giflib' 'zlib' 'curl' 'giflib' 'boost-libs' 'libldap' 'sdl'
          'speex' 'fontconfig' 'libva' 'libxinerama' 'gstreamer0.10-base' 'gstreamer0.10-ffmpeg'
          'libdca' 'kdebase' 'xulrunner' 'hicolor-icon-theme' 'desktop-file-utils' 'pkgconfig' 'libtool')
-makedepend=('boost')
+makedepends=('boost')
 provides=('gnash' 'gnash-common')
 conflicts=('flashplugin' 'flashplugin-square')
 options=(!libtool !emptydirs)
-backup=(etc/gnashrc)
+backup=(etc/gnashrc etc/gnashthumbnailrc)
 source=("http://ftp.gnu.org/gnu/gnash/${pkgver}/gnash-${pkgver}.tar.bz2"
-        "http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/www-plugins/gnash/files/gnash-0.8.9-ffmpeg-detection.patch")
-md5sums=('5b2be6b04a1bcc5fb404cc377034499e'
-         'def95689fea9a8558f78ea8c18ef5281')
+        "nodebug.patch")
+md5sums=('63e9f79c41d93d48c5a2fa94856548c4'
+         '371a91b3eb90df268607b731e7ec03c2')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   
-  patch -Np1 -i "$srcdir/gnash-0.8.9-ffmpeg-detection.patch"
+  patch -Np1 -i "$srcdir/nodebug.patch"
 	./autogen.sh
 
 	sed -i "s/moc-qt4/moc/g; s/uic-qt4/uic/g" configure
@@ -36,8 +36,9 @@ build() {
 		--enable-renderer=agg \
 		--enable-media=gst \
 		--enable-gui=kde4 \
-                --enable-sound=sdl \
-                --enable-hwaccel=vaapi \
+		--enable-sound=sdl \
+		--enable-hwaccel=vaapi \
+		--without-gconf \
 		--with-plugins-install=system \
 		--with-npapi-plugindir=/usr/lib/mozilla/plugins \
 		--prefix=/usr \
