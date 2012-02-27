@@ -10,18 +10,19 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=sox
 pkgver=14.3.2
-pkgrel=3
+pkgrel=4
 pkgdesc="The Swiss Army knife of sound processing tools"
 arch=('i686' 'x86_64')
 url="http://sox.sourceforge.net/"
 license=('GPL' 'LGPL')
-depends=('libtool' 'file' 'libsndfile' 'libpng' 'lame' 'opencore-amr')
-makedepends=('ffmpeg' 'libao' 'libmad' 'libid3tag' 'wavpack')
+depends=('libltdl' 'file' 'libsndfile' 'libpng' 'lame' 'opencore-amr' 'gsm')
+makedepends=('ffmpeg' 'libao' 'libmad' 'libid3tag' 'wavpack' 'libpulse')
 optdepends=('libao: for ao plugin'
             'ffmpeg: for ffmpeg plugin'
             'libmad: for mp3 plugin'
             'libid3tag: for mp3 plugin'
-            'wavpack: for wavpack plugin')
+            'wavpack: for wavpack plugin'
+            'libpulse: for pulse plugin')
 options=('!libtool')
 source=(http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz
         sox-14.3.2-ffmpeg.patch)
