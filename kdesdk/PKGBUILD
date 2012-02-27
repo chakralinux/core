@@ -69,9 +69,13 @@ build() {
 package_kdesdk-dolphin-plugins() {
 	pkgdesc='Extra Dolphin plugins'
 	depends=("kde-baseapps-dolphin>=${_kdever}" 'subversion' 'git' "kdesdk-kompare>=${_kdever}")
+        optdepends=('bzr: bazaar support'
+                    'git: git support'
+                    'mercurial: hg support'
+                    'subversion: svn support')
 	install=${pkgbase}.install
 
-	splitdirs="git svn"
+	splitdirs="git svn bazaar hg"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/dolphin-plugins/${i}
 			make DESTDIR=${pkgdir} install || return 1
