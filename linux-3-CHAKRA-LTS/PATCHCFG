@@ -1,8 +1,8 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.0.21"
-_prepatch="3.0.22-rc1"
+_patch="3.0.22"
+_prepatch="3.0.23-rc1"
 _queue="3.0"
 # Aufs
 _aufs="3.0-20120109"
@@ -38,6 +38,10 @@ PATCHES=(
          ### remove this when a Kconfig knob is made available by upstream
          ### (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
          http://chakra.sourceforge.net/sources/linux/patches/3.0/arch/change-default-console-loglevel.patch%1
+
+         ### fix ext4 module to mount ext3/2 correct
+         ### https://bugs.archlinux.org/task/28653
+         http://chakra.sourceforge.net/sources/linux/patches/3.0/arch/ext4-options.patch%1
 
          # Custom Chakra Patches
 
@@ -112,7 +116,7 @@ PATCHES=(
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.0.21-1-CHAKRA-LTS"
+PATCHNAME="patch-3.0.22-1-CHAKRA-LTS"
 
 # Run this before applying patches
 pre_apply() {
