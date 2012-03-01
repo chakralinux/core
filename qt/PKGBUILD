@@ -7,7 +7,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers')
 pkgver=4.8.0
-pkgrel=3
+pkgrel=4
 arch=('i686' 'x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -20,12 +20,16 @@ _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("ftp://ftp.qt.nokia.com/qt/source/${_pkgfqn}.tar.gz"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
         'qtconfig.desktop'
+        'fix-qgraphicsscene-regression.patch'
+        'improved-filter-event.patch'
         "http://chakra-linux.org/sources/qt/qt-everywhere-opensource-src-4.8.0-QUrl_toLocalFile.patch")
 md5sums=('e8a5fdbeba2927c948d9f477a6abe904'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
          '6b771c8a81dd90b45e8a79afa0e5bbfd'
+         '57f0e3ca3b5acd264a07c3ea3fd3f3a9'
+         '2ace80d6392f0ddfa2a7640597811a2c'
          '7bc255a36733d0fbc80c1902ade4beca')
 
 # source PKGBUILD && _create-kdeqt-patch
@@ -57,7 +61,9 @@ build() {
 
         #KDE sound-notification work-around
         patch -Np1 -i ${srcdir}/qt-everywhere-opensource-src-4.8.0-QUrl_toLocalFile.patch
-
+        # (QTBUG-22663) (KDEBUG#275469)
+        patch -p1 -i "${srcdir}"/improved-filter-event.patch
+        patch -p1 -i "${srcdir}"/fix-qgraphicsscene-regression.patch
         export QT4DIR="${srcdir}"/${_pkgfqn}
         export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
 
