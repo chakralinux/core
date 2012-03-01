@@ -9,7 +9,7 @@ pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs') # Build stock -CHAKRA
 # pkgname=linux-custom       # Build kernel with a different name
 _kernelname=${pkgname#linux-lts}
 _basekernel=3.0
-pkgver=${_basekernel}.21
+pkgver=${_basekernel}.22
 pkgrel=1
 _aufs="3.0-20120109"
 makedepends=('xmlto' 'docbook-xsl')
@@ -25,9 +25,9 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v3.0/linux-$_basekernel.tar.bz2
         # standard config files for mkinitcpio ramdisk
         linux-lts.preset)
 md5sums=('398e95866794def22b12dfbc15ce89c0'
-         'a178943c5f58449acf965290f4b08b31'
-         '4dc4ffb13e001900b332a30ccadabc04'
-         'b637601a44649fc905b02bf475ac8bd1'
+         '673f3af8fa3d6da539473c64b879b895'
+         '4641adbc91eb89d98870d8984abd10c1'
+         '46aa71d1918a8a167aa6a6ab503375c4'
          '56cdd0978dd4a539a25813fd4273c834')
 
 build() {
@@ -72,7 +72,7 @@ build() {
 
 package_linux-lts() {
   pkgdesc="The Linux LTS-Kernel and modules"
-  groups=('base')
+  groups=('lts')
   depends=('coreutils' 'linux-firmware' 'module-init-tools>=3.16' 'mkinitcpio>=0.7.5')
   optdepends=('crda: to set the correct wireless channels of your country')
   replaces=('kernel24' 'kernel24-scsi' 'kernel26-lts' 'linux-scsi'
