@@ -11,7 +11,7 @@ pkgbase=pulseaudio
 pkgname=('pulseaudio' 'libpulse')
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=1.1
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
@@ -38,6 +38,17 @@ build() {
               --disable-default-build-tests
 
   make
+}
+
+package_libpulse() {
+pkgdesc="${pkgdesc} (client library)"
+depends=('dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm'
+         'libsamplerate' 'json-c')
+optdepends=('alsa-plugins: ALSA support'
+            'avahi: zeroconf support')
+backup=(etc/pulse/client.conf)
+
+  mv "${srcdir}/libpulse"/* "${pkgdir}"
 }
 
 package_pulseaudio() {
@@ -91,17 +102,6 @@ install="pulseaudio.install"
 
   mv {"${pkgdir}","${srcdir}/libpulse"}/usr/share/man/man5/pulse-client.conf.5
   mv {"${pkgdir}","${srcdir}/libpulse"}/usr/share/vala
-}
-
-package_libpulse() {
-pkgdesc="${pkgdesc} (client library)"
-depends=('dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm'
-         'libsamplerate' 'json-c')
-optdepends=('alsa-plugins: ALSA support'
-            'avahi: zeroconf support')
-backup=(etc/pulse/client.conf)
-
-  mv "${srcdir}/libpulse"/* "${pkgdir}"
 }
 
 # vim:set ts=2 sw=2 et:

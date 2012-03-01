@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname='vlc'
 pkgver=2.0.0
-pkgrel=2
+pkgrel=4
 arch=('i686' 'x86_64')
 url="http://www.videolan.org/vlc/"
 license=('GPL')
@@ -18,7 +18,7 @@ depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libxpm' 'libcdio'
          'lua' 'v4l-utils' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
          'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp'
          'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug' 
-         'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'desktop-file-utils')
+         'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'desktop-file-utils' 'xcb-util-keysyms')
 makedepends=('avahi' 'pkgconfig' 'live-media' 'libnotify' 'libbluray'
              'flac' 'libtheora' 'alsa-lib' 'jack' 'kdelibs' 'udev'
              'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'libpulse'
@@ -53,14 +53,11 @@ build() {
   ./configure --prefix=/usr \
               --disable-rpath \
               --enable-faad \
-              --enable-v4l \
-              --enable-snapshot \
               --enable-dbus-control \
               --enable-nls \
               --enable-lirc \
               --enable-pvr \
               --enable-ncurses \
-              --with-live555-tree=/usr/lib/live \
               --enable-upnp \
               --enable-realrtsp \
               --enable-bluray
