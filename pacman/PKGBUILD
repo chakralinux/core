@@ -6,7 +6,7 @@
 
 pkgname=pacman
 pkgver=3.5.3
-pkgrel=2
+pkgrel=3
 pkgdesc="A library-based package manager with dependency support"
 arch=('i686' 'x86_64')
 url="http://www.archlinux.org/pacman/"
@@ -21,17 +21,23 @@ options=(!libtool)
 source=(ftp://ftp.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz
         pacman.conf.x86_64
         pacman.conf
-        makepkg.conf)
+        makepkg.conf
+        add_categories.patch)
 md5sums=('c36c18ed4d8ec69c0ecb4f9684266901'
          '7cc09e46386579933ef50cea30b8389a'
          '6c79bb013b5b6a14126ebcdaef12fdcd'
-         '5beebe36bfc1e1f677d5ae12fcff8083')
+         '5beebe36bfc1e1f677d5ae12fcff8083'
+         'fe69ac2da03a87e0ff6ffa323fec7f71')
 
 # keep an upgrade path for older installations
 PKGEXT='.pkg.tar.gz'
 
 build() {
   cd $srcdir/$pkgname-$pkgver
+  
+  # add categories array support
+  patch -Np1 -i ../add_categories.patch
+  
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-doc
   make
 }
