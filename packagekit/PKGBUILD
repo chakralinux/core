@@ -6,7 +6,7 @@
 pkgbase='packagekit'
 pkgname=('packagekit' 'packagekit-qt2')
 pkgver=0.7.1
-pkgrel=3
+pkgrel=4
 pkgdesc="A system designed to make installation and updates of packages easier."
 arch=('i686' 'x86_64')
 url="http://www.packagekit.org"
@@ -16,16 +16,24 @@ makedepends=('dbus-glib' 'gobject-introspection' 'intltool'
 	     'shared-mime-info' 'sqlite3' 'udev' 'automoc4')
 options=('!libtool')
 source=("http://www.packagekit.org/releases/PackageKit-$pkgver.tar.xz"
-        'alpm.patch' 'Makefile.diff')
+        'alpm.patch'
+        'Makefile.diff'
+        'use-categories.patch'
+        'groups.patch')
 sha256sums=('fc20a864cfbf53e83f7f95ccafab08ac1a7cd76a9413839f4539c7c6d4a99210'
             '397b0007c4c689c5c2ef48dd807ad3c60d97061ccf4ba49046b00ae5e91fbd9e'
-            '0e6dbba9a6fa3adc004baaf24605bae9c5de1b408e24768e4aabbe12fda55dce')
+            '0e6dbba9a6fa3adc004baaf24605bae9c5de1b408e24768e4aabbe12fda55dce'
+            '645731060d23d1890b56018a16bb4a574c82bf9d2066f4f93d6aa27461e77dc3'
+            '7158d8033d8216d2000fc115e832d77591b102647a869f862ea8c016665f0a0d')
  
 build() {
   cd "$srcdir/PackageKit-$pkgver"
  
   patch -Np1 -i "$srcdir/alpm.patch"
   patch -Np1 -i "$srcdir/Makefile.diff"
+  patch -Np1 -i "$srcdir/use-categories.patch"
+  patch -Np1 -i "$srcdir/groups.patch"
+  
  
   sed -i 's@SUBDIRS = test@SUBDIRS =@' 'backends/Makefile.in'
   sed -i 's@python @python2 @' 'lib/python/packagekit/Makefile.in'
