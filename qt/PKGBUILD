@@ -53,6 +53,12 @@ _create-kdeqt-patch() {
 }
 
 build() {
+        # check if qtwebkit is installed
+        if [ -d /usr/include/QtWebKit/ ]; then
+           echo "before you can build qt you need to remove 'qtwebkit'"
+           exit
+        fi
+
 	cd $srcdir/$_pkgfqn
 #       if [ -n "${kdeqtver}" ]; then
 #	  msg "applying kde-qt patches"
