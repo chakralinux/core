@@ -19,11 +19,12 @@ url="http://kde.org/applications/education/cantor/"
 arch=('i686' 'x86_64')
 url='http://www.kde.org'
 license=('GPL' 'LGPL' 'FDL')
-depends=("kde-runtime>=${_kdever}" 'r' 'libspectre')
-makedepends=('cmake' 'automoc4' 'docbook-xsl' 'icu' 'kdeedu-kalgebra')
+depends=("kde-runtime>=${_kdever}" 'r' 'libspectre' "kdeedu-analitza>=${_kdever}")
+makedepends=('cmake' 'automoc4' 'docbook-xsl' 'icu')
 provides=('cantor')
 groups=("kde" "kdeedu" "kde-uninstall")
-options=('!splithdr' 'splitdbg' 'log')
+categories=('education')
+options=('docs' '!splithdr' 'splitdbg' 'log')
 install=${pkgname}.install
 
 source=("$_mirror/${_pkgname}-$_kdever.tar.bz2")
@@ -35,7 +36,6 @@ build()
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
                 -DCMAKE_INSTALL_PREFIX=${_installprefix} \
                 -DCMAKE_SKIP_RPATH=OFF
-#                -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
 }
 

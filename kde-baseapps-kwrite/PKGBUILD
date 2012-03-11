@@ -27,31 +27,29 @@ install='kde-baseapps-kwrite.install'
 source=("$_mirror/${_pkgname}-$_kdever.tar.bz2"
         'pkgbuild-syntax-highlight.patch')
 md5sums=(`grep ${_pkgname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-         'dc4315d8f0c0f97ea63cfa645a1013be')
-options=('!splithdr' 'splitdbg' 'log')
+         'bb189857e6d917ee8f9ecebab38c1b70')
+options=('docs' '!splithdr' 'splitdbg' 'log')
 
-build()
-{
+build() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
 
 	patch -p1 -i "${srcdir}"/pkgbuild-syntax-highlight.patch
 
-	# FIXME: Snippet tags plugin does not compile
-	sed -i -e "s~add_subdirectory( snippets_tng )~~g" ${srcdir}/${_pkgname}-${pkgver}/kate/plugins/CMakeLists.txt
+        rm -rf build
+        mkdir build && cd build      
 
 	msg "starting build ..."
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DBUILD_KTEXTEDITOR=OFF \
-		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' 
+	cmake .. -DCMAKE_BUILD_TYPE=${_build_type} \
+	         -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+		 -DBUILD_KTEXTEDITOR=OFF \
+		 -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' 
 	make
 }
 
-package()
-{
-	cd ${srcdir}/${_pkgname}-${pkgver}/kwrite
+package() {
+	cd ${srcdir}/${_pkgname}-${pkgver}/build/kwrite
 	make DESTDIR="${pkgdir}" install
 
-	cd ${srcdir}/${_pkgname}-${pkgver}/doc/kwrite
+	cd ${srcdir}/${_pkgname}-${pkgver}/build/doc/kwrite
 	make DESTDIR="${pkgdir}" install
 }

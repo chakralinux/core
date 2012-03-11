@@ -12,7 +12,6 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 pkgbase="kdegames"
 pkgname=('kdegames-common'
-         'kdegames-doc'
          'kdegames-bomber'
          'kdegames-bovo'
          'kdegames-granatier'
@@ -74,8 +73,7 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 #
 # build function
 #
-build()
-{
+build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "starting build ..."
@@ -92,8 +90,7 @@ build()
 #
 # split-install functions
 #
-package_kdegames-common()
-{
+package_kdegames-common() {
 	pkgdesc="KDE games - Common files and libraries"
 	depends=("kdelibs>=${_kdever}")
 	groups=("kde" "${pkgbase}" "kde-uninstall")
@@ -111,111 +108,105 @@ package_kdegames-common()
 	done
 }
 
-package_kdegames-doc()
-{
-	pkgdesc="KDE games - Documentation"
-	depends=()
-	groups=("kde" "${pkgbase}" "kde-doc" "kde-uninstall")
-
-	splitdirs="doc"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdegames-bomber()
-{
+package_kdegames-bomber() {
 	pkgdesc="Destroy the buildings below, before you crash into them"
 	depends=("${pkgbase}-common>=${_kdever}")
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
+	conflicts=('kdegames-doc')
 	install=${pkgbase}.install
 
-	splitdirs="bomber"
+	splitdirs="bomber doc/bomber"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-bovo()
-{
+package_kdegames-bovo() {
 	pkgdesc="Five-in-a-row Board Game"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="bovo"
+	splitdirs="bovo doc/bovo"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-granatier()
-{
+package_kdegames-granatier() {
 	pkgdesc="Granatier is a clone of the classic Bomberman game, inspired by the work of the Clanbomber clone."
 	depends=("${pkgbase}-common>=${_kdever}" 'openal')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
+        conflicts=('kdegames-doc')
 	install=${pkgbase}.install
 
-	splitdirs="granatier"
+	splitdirs="granatier doc/granatier"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kajongg()
-{
+package_kdegames-kajongg() {
 	pkgdesc="The ancient Chinese board game for 4 players."
 	depends=("${pkgbase}-common>=${_kdever}" 'twisted' 'pyqt' "kdebindings-pykde4>=${_kdever}")
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
+        conflicts=('kdegames-doc')
 	install=${pkgbase}.install
 
-	splitdirs="kajongg"
+	splitdirs="kajongg doc/kajongg"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kapman()
-{
+package_kdegames-kapman() {
 	pkgdesc="A clone of the classic Pacman game"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kapman"
+	splitdirs="kapman doc/kapman"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-katomic()
-{
+package_kdegames-katomic() {
 	pkgdesc="Thinking game where you have to form chemical molecules out of atoms"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="katomic"
+	splitdirs="katomic doc/katomic"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kbattleship()
-{
+package_kdegames-kbattleship() {
 	pkgdesc="Implentation of the popular game Battleship where you have to try to sink the opponents ships"
 	depends=("${pkgbase}-common>=${_kdever}" 'ggz-client-libs')
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}-kbattleship.install
 
-	splitdirs="kbattleship"
+	splitdirs="kbattleship doc/kbattleship"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
@@ -226,280 +217,300 @@ package_kdegames-kbattleship()
 	install -D -m644 ${srcdir}/${pkgbase}-${pkgver}/kbattleship/src/module.dsc ${pkgdir}/usr/share/ggz/kbattleship.dsc
 }
 
-package_kdegames-kblackbox()
-{
+package_kdegames-kblackbox() {
 	pkgdesc="Graphical logical game, inspired by emacs blackbox"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kblackbox"
+	splitdirs="kblackbox doc/kblackbox"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kblocks()
-{
+package_kdegames-kblocks() {
 	pkgdesc="KBlocks is a single player falling blocks puzzle game, a Tetris-like replacement for KSirtet"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kblocks"
+	splitdirs="kblocks doc/kblocks"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kbounce()
-{
+package_kdegames-kbounce() {
 	pkgdesc="Catch several moving balls in a rectangular game field by building walls"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kbounce"
+	splitdirs="kbounce doc/kbounce"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kbreakout()
-{
+package_kdegames-kbreakout() {
 	pkgdesc="A clone of the classic breakout game"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kbreakout"
+	splitdirs="kbreakout doc/kbreakout"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kdiamond()
-{
+package_kdegames-kdiamond() {
 	pkgdesc="KDiamond is a three-in-a-row game (much like Bejeweled)"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kdiamond"
+	splitdirs="kdiamond doc/kdiamond"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kfourinline()
-{
+package_kdegames-kfourinline() {
 	pkgdesc="A board game for two players based on the Connect-Four game"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kfourinline"
+	splitdirs="kfourinline doc/kfourinline"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kgoldrunner()
-{
+package_kdegames-kgoldrunner() {
 	pkgdesc="Action game, akin to the C64s LodeRunner"
-	depends=("${pkgbase}-common>=${_kdever}" "${pkgbase}-doc>=${_kdever}" 'openal')
+	depends=("${pkgbase}-common>=${_kdever}" 'openal')
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kgoldrunner"
+	splitdirs="kgoldrunner doc/kgoldrunner"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kigo()
-{
+package_kdegames-kigo() {
 	pkgdesc="A go board game for KDE"
 	depends=("${pkgbase}-common>=${_kdever}" 'gnugo')
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kigo"
+	splitdirs="kigo doc/kigo"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-killbots()
-{
+package_kdegames-killbots() {
 	pkgdesc="A classic turn-based game in which the player tries to avoid being killed by attacking robots"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="killbots"
+	splitdirs="killbots doc/killbots"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kiriki()
-{
+package_kdegames-kiriki() {
 	pkgdesc="Kiriki is a clone of Yahtzee"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kiriki"
+	splitdirs="kiriki doc/kiriki"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kjumpingcube()
-{
+package_kdegames-kjumpingcube() {
 	pkgdesc="Tactical one or two-player game. The playing field consists of squares that contains points which can be increased"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kjumpingcube"
+	splitdirs="kjumpingcube doc/kjumpingcube"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-klines()
-{
+package_kdegames-klines() {
 	pkgdesc="A version of the russian game Lines"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="klines"
+	splitdirs="klines doc/klines"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kmahjongg()
-{
+package_kdegames-kmahjongg() {
 	pkgdesc="Clone of the well known tile based patience game of the same name"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kmahjongg"
+	splitdirs="kmahjongg doc/kmahjongg"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kmines()
-{
+package_kdegames-kmines() {
 	pkgdesc="Classical Minesweeper game where you have to find mines by logical deduction"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kmines"
+	splitdirs="kmines doc/kmines"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-knetwalk()
-{
+package_kdegames-knetwalk() {
 	pkgdesc="Connect all computers to a messed up network"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="knetwalk"
+	splitdirs="knetwalk doc/knetwalk"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kolf()
-{
+package_kdegames-kolf() {
 	pkgdesc="Miniature golf simulator"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kolf"
+	splitdirs="kolf doc/kolf"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kollision()
-{
+package_kdegames-kollision() {
 	pkgdesc="A simple ball dodging game"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kollision"
+	splitdirs="kollision doc/kollision"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-konquest()
-{
+package_kdegames-konquest() {
 	pkgdesc="Version of Gnu-Lactic Konquest, a multi-player strategy game"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="konquest"
+	splitdirs="konquest doc/konquest"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kpat()
-{
+package_kdegames-kpat() {
 	pkgdesc="Collection of various patience games known all over the world"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kpat"
+	splitdirs="kpat doc/kpat"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kreversi()
-{
+package_kdegames-kreversi() {
 	pkgdesc="Board game game where two players have to gain the majority of pieces on the board"
 	depends=("${pkgbase}-common>=${_kdever}" 'ggz-client-libs')
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}-kreversi.install
 
-	splitdirs="kreversi"
+	splitdirs="kreversi doc/kreversi"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
@@ -510,71 +521,76 @@ package_kdegames-kreversi()
 	install -D -m644 ${srcdir}/${pkgbase}-${pkgver}/kreversi/module.dsc ${pkgdir}/usr/share/ggz/kreversi.dsc
 }
 
-package_kdegames-klickety()
-{
+package_kdegames-klickety() {
 	pkgdesc="Klickety is an adaptation of the clickomania game"
         depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
         replaces=("kdegames-${pkgbase}-ksame")
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="klickety"
+	splitdirs="klickety doc/klickety"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kshisen()
-{
+package_kdegames-kshisen() {
 	pkgdesc="A game similiar to Mahjongg"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kshisen"
+	splitdirs="kshisen doc/kshisen"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-ksirk()
-{
+package_kdegames-ksirk() {
 	pkgdesc="A game similiar to Risk"
 	depends=("${pkgbase}-common>=${_kdever}" 'qca')
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="ksirk"
+	splitdirs="ksirk doc/ksirk"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kspaceduel()
-{
+package_kdegames-kspaceduel() {
 	pkgdesc="Space arcade game for two players"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kspaceduel"
+	splitdirs="kspaceduel doc/kspaceduel"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-ksquares()
-{
+package_kdegames-ksquares() {
 	pkgdesc="A game modeled after the well known pen and paper based game of Dots and Boxes"
 	depends=("${pkgbase}-common>=${_kdever}" 'ggz-client-libs')
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}-ksquares.install
 
-	splitdirs="ksquares"
+	splitdirs="ksquares doc/ksquares"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
@@ -585,83 +601,89 @@ package_kdegames-ksquares()
 	install -D -m644 ${srcdir}/${pkgbase}-${pkgver}/ksquares/src/module.dsc ${pkgdir}/usr/share/ggz/ksquares.dsc
 }
 
-package_kdegames-ksudoku()
-{
+package_kdegames-ksudoku() {
 	pkgdesc="Sudoku game"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="ksudoku"
+	splitdirs="ksudoku doc/ksudoku"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-ktron()
-{
+package_kdegames-ktron() {
 	pkgdesc="Well known from the famous movie, KTron is a popular computer game for two players."
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="ktron"
+	splitdirs="ktron doc/ktron"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-ktuberling()
-{
+package_kdegames-ktuberling() {
 	pkgdesc="Nice potato editor for kids"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="ktuberling"
+	splitdirs="ktuberling doc/ktuberling"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-kubrick()
-{
+package_kdegames-kubrick() {
 	pkgdesc="Kubrick is a game based on Rubik's Cube (TM)"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="kubrick"
+	splitdirs="kubrick doc/kubrick"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-lskat()
-{
+package_kdegames-lskat() {
 	pkgdesc="Two player card game which follows the rules for the German game Offiziers-Skat"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="lskat"
+	splitdirs="lskat doc/lskat"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
 
-package_kdegames-palapeli()
-{
+package_kdegames-palapeli() {
 	pkgdesc="Palapeli is a jigsaw puzzle game."
 	depends=("${pkgbase}-common>=${_kdever}" "qhull")
+        conflicts=('kdegames-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
+	categories=('games')
 
-	splitdirs="palapeli"
+	splitdirs="palapeli doc/palapeli"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1

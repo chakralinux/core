@@ -12,7 +12,6 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 #
 pkgbase=('kdemultimedia')
 pkgname=('kdemultimedia-common'
-         'kdemultimedia-doc'
          'kdemultimedia-dragonplayer'
          'kdemultimedia-juk'
          'kdemultimedia-kmix'
@@ -48,19 +47,17 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
          '00ff1e8a1e4c1e39e3d1146f1d08036c'  # mplayerthumbs-horizontal.patch
          '6eeba61989d0e6904fe2c18bb01a3775'  # sprocket-large.png
          'ebb3b4c68ee69e128faf5ef0b37aaeae'  # sprocket-medium.png
-         '450cf7bf2ac02b1efe75156d9bb887f6') # sprocket-small.png
-
+         '450cf7bf2ac02b1efe75156d9bb887f6')  # sprocket-small.png
 
 #
 # build function
 #
-build()
-{
+build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
 
 	msg "applying patches ..."
-	patch -Np1 -i ${srcdir}/mplayerthumbs-horizontal.patch || return 1
-
+	patch -Np1 -i ${srcdir}/mplayerthumbs-horizontal.patch 
+        
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
@@ -92,23 +89,21 @@ build()
 	popd
 }
 
-
-
 #
 # split-install functions
 #
-package_kdemultimedia-common()
-{
+package_kdemultimedia-common() {
 	pkgdesc="KDE multimedia - Common files and libraries"
 	depends=("kdelibs>=${_kdever}" "kde-runtime>=${_kdever}" 'flac' 'musicbrainz>=3.0.3' 'cdparanoia' 'taglib')
+        conflicts=('kdemultimedia-doc')
 	groups=("kde" "kdemultimedia" "kde-uninstall")
         optdepends=('pulseaudio: pulseaudio support')
 	install=${pkgbase}.install
 
-	splitdirs="kioslave libkcddb libkcompactdisc strigi-analyzer"
+	splitdirs="kioslave libkcddb libkcompactdisc strigi-analyzer doc/kioslave doc/kcontrol"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install 
 		done
 
 	# include our patches into the package
@@ -125,81 +120,71 @@ package_kdemultimedia-common()
 	fi
 }
 
-package_kdemultimedia-doc()
-{
-	pkgdesc="KDE multimedia - Documentation"
-        groups=("kde" "${pkgbase}" "kde-doc" "kde-uninstall")
-
-	splitdirs="doc"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdemultimedia-dragonplayer()
-{
+package_kdemultimedia-dragonplayer() {
 	pkgdesc="Simple video player"
 	depends=("${pkgbase}-common>=${_kdever}" "xine-lib")
+	conflicts=('kdemultimedia-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
         provides=('dragonplayer')
+        categories=('multimedia')
 	install=${pkgbase}.install
 
-	splitdirs="dragonplayer"
+	splitdirs="dragonplayer doc/dragonplayer"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
-package_kdemultimedia-juk()
-{
+package_kdemultimedia-juk() {
 	pkgdesc="An audio player with music database"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdemultimedia-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
         provides=('juk')
+        categories=('multimedia')
 	install=${pkgbase}.install
 
-	splitdirs="juk"
+	splitdirs="juk doc/juk"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install 
 		done
 }
 
-package_kdemultimedia-kmix()
-{
+package_kdemultimedia-kmix() {
 	pkgdesc="Audio mixer"
 	depends=("${pkgbase}-common>=${_kdever}")
+        conflicts=('kdemultimedia-doc')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
         optdepends=('pulseaudio: pulseaudio support')
         provides=('kmix')
+        categories=('multimedia')
 	install=${pkgbase}.install
 
-	splitdirs="kmix"
+	splitdirs="kmix doc/kmix"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install 
 		done
 }
 
-package_kdemultimedia-kscd()
-{
+package_kdemultimedia-kscd() {
 	pkgdesc="Audio CD player"
 	depends=("${pkgbase}-common>=${_kdever}" 'musicbrainz')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
         provides=('kscd')
+        categories=('multimedia')
 	install=${pkgbase}.install
 
 	splitdirs="kscd"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install 
 		done
 }
 
-package_kdemultimedia-thumbnailers()
-{
+package_kdemultimedia-thumbnailers() {
 	pkgdesc='KDE Thumbnailers for several formats'
 	depends=("${pkgbase}-common>=${_kdever}" 'mplayer') 
 	provides=("${pkgbase}-mplayerthumbs=${_kdever}" 'mplayerthumbs')
@@ -209,7 +194,7 @@ package_kdemultimedia-thumbnailers()
 	splitdirs="mplayerthumbs ffmpegthumbs"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 
 	install -D -m644 ${srcdir}/sprocket-large.png ${pkgdir}/usr/share/apps/videothumbnail/sprocket-large.png
@@ -217,11 +202,11 @@ package_kdemultimedia-thumbnailers()
 	install -D -m644 ${srcdir}/sprocket-small.png ${pkgdir}/usr/share/apps/videothumbnail/sprocket-small.png
 
 	cd $srcdir/kde-odf-thumbnail-1.0.0
-	make DESTDIR=${pkgdir} install || return 1
+	make DESTDIR=${pkgdir} install 
 
 	cd $srcdir/GimpResourcesThumbnailer-2.1.0
-	make DESTDIR=${pkgdir} install || return 1
+	make DESTDIR=${pkgdir} install 
 
 	cd $srcdir/AudioThumbs-0.1
-	make DESTDIR=${pkgdir} install || return 1
+	make DESTDIR=${pkgdir} install 
 }

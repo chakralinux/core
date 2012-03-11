@@ -8,27 +8,27 @@
 # package info
 #
 pkgname=tribe
-pkgver=2011.12.12
-pkgrel=1
-_codename=Edn
+pkgver=2012.02.08
+pkgrel=4
+_codename=Archimedes
 pkgdesc="Tribe - Chakra LiveCD Installer"
 url="http://git.chakra-project.org/chakra/"
 license="GPL"
 arch=('i686' 'x86_64')
-depends=('kdelibs' 'kdeedu-marble>=4.7.1' 'squashfs-tools' 'tribe-partitionmanager'
-        'cinstall>=0.4.6.10' 'rsync' 'mkinitcpio-nfs-utils' 'ntfsprogs')
-makedepends=('cmake' 'kdebase-workspace' 'automoc4')
-provides=('tribe')
-replaces=('kdemod-tribe-svn' 'kdemod-tribe')
-conflicts=('chakra-tribe' 'tribe-svn' 'kdemod-partitionmanager' 'kdemod-tribe' 'kdemod-tribe-debug' 'kdemod-tribe-partitionmanager')
+depends=('kdelibs' 'kdeedu-marble>=4.8.0' 'squashfs-tools' 'tribe-partitionmanager'
+        'cinstall>=0.4.6.10' 'rsync' 'mkinitcpio-nfs-utils' 'ntfs-3g')
+makedepends=('cmake' 'kde-workspace' 'automoc4')
 options=('!splithdr' '!splitdbg' 'sign')
 source=("http://chakra.sourceforge.net/sources/tribe/tribe-${pkgver}.tar.xz"
-        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20111218.html")
+        "http://chakra.sourceforge.net/sources/tribe/RELEASE_NOTES_20120212.html"
+        'launch-tribe.sh')
   
-md5sums=('843820cff52acf4dae2d05d1d1efcf0c'
-         '6f325d8647381d5d54f7f3b74aa492eb')
-         
+md5sums=('27e7d7039e945013a25d11550a623420'
+         'b51a10a8c7bce515a2d3e3c81a7fa0a4'
+         'e31855da237a2c8029774831b3c04685')
+ 
 groups=('kde-uninstall')
+categories=('system')
 install=tools-tribe.install
 
 # create tarball: source PKGBUILD && mksource
@@ -75,7 +75,9 @@ package()
         cd "${srcdir}/${pkgname}-${pkgver}"
 	msg "Make successful, installing..."
 	make DESTDIR=$startdir/pkg install 
-	cp -vf ${srcdir}/RELEASE_NOTES_20111218.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
+        install -Dm755 ${srcdir}/launch-tribe.sh \
+        ${pkgdir}/usr/bin/launch-tribe.sh
+	cp -vf ${srcdir}/RELEASE_NOTES_20120212.html $pkgdir/usr/share/tribe/config/RELEASE_NOTES.html
 
 	# remove nasty files
 	find $startdir/pkg/ -name ".git" -type d -exec rm -fr {} +

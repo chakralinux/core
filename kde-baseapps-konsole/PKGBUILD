@@ -14,7 +14,7 @@ pkgname=kde-baseapps-konsole
 _pkgname=konsole
 pkgver=${_kdever}
 pkgrel=1
-pkgdesc="Terminal"
+pkgdesc="KDE Terminal"
 url='http://kde.org/applications/system/konsole/'
 arch=('i686' 'x86_64')
 license=('GPL' 'LGPL' 'FDL')
@@ -24,15 +24,15 @@ groups=('kde' 'kde-baseapps' 'kde-uninstall')
 provides=('kdebase-konsole' 'konsole')
 conflicts=('kdebase-konsole')
 replaces=('kdebase-konsole')
-options=('!splithdr' 'splitdbg' 'log')
+categories=('system')
+options=('docs' '!splithdr' 'splitdbg' 'log')
 
 source=("$_mirror/${_pkgname}-$_kdever.tar.bz2"
 	"konsole_defaults.patch")
 md5sums=(`grep ${_pkgname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`
-	 '8ab6f508a4e04517dd51ac3ab2eb01ef')
+	 'c2709d856ec8aa16329c65a759611ba0')
 
-build()
-{
+build() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
 
 	patch -Np3 -i ${srcdir}/konsole_defaults.patch || return 1
@@ -40,13 +40,11 @@ build()
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DBUILD_KTEXTEDITOR=OFF \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' 
 	make
 }
 
-package()
-{
+package() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
 	make DESTDIR="${pkgdir}" install
 

@@ -19,28 +19,39 @@ url="http://kde.org/applications/education/marble/"
 arch=('i686' 'x86_64')
 url='http://www.kde.org'
 license=('GPL' 'LGPL' 'FDL')
-depends=("kde-runtime>=${_kdever}" "gpsd")
+depends=("kde-runtime>=${_kdever}" "gpsd" "qt-mobility")
 makedepends=('cmake' 'automoc4')
 provides=('marble')
 groups=("kde" "kdeedu" "kde-uninstall")
-options=('!splithdr' 'splitdbg' 'log')
+categories=('education')
+options=('docs' '!splithdr' 'splitdbg' 'log')
 install=${pkgname}.install
 
 source=("$_mirror/${_pkgname}-$_kdever.tar.bz2")
 md5sums=(`grep ${_pkgname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
 
-build()
-{
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf ${_pkgname}-${pkgver}
+	  git clone git://anongit.kde.org/marble ${_pkgname}-${pkgver}
+	  rm -vRf ${_pkgname}-${pkgver}/.git
+	  pushd ${_pkgname}-${pkgver}
+	  popd
+	  tar -cvJf ${_pkgname}-${pkgver}.tar.xz ${_pkgname}-${pkgver}/*
+	  md5sum ${_pkgname}-${pkgver}.tar.xz
+}
+
+build() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-                -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+	cmake . -DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_SKIP_RPATH=ON \
                 -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
 }
 
-package()
-{
+package() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install || return 1
+	make DESTDIR=${pkgdir} install 
 }

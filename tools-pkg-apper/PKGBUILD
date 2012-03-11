@@ -1,0 +1,48 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Giuseppe Calà <jiveaxe@gmail.com>
+ 
+pkgname=apper
+pkgver=0.7.1
+pkgrel=3
+pkgdesc="KDE tools for PackageKit"
+arch=('i686' 'x86_64')
+url="http://kde-apps.org/content/show.php/Apper?content=84745"
+license=('GPL')
+depends=('kde-workspace' 'packagekit-qt2>=0.6.11')
+makedepends=('cmake' 'automoc4' 'docbook-xml' 'docbook-xsl')
+provides=('kpackagekit')
+conflicts=('kpackagekit')
+replaces=('kpackagekit')
+categories=('system')
+source=("https://launchpad.net/${pkgname}/0.7/${pkgver}/+download/${pkgname}-${pkgver}.tar.bz2"
+        "remove-unavailable-groups.patch"
+        "hide-showOriginCB.patch")
+sha256sums=('d604e766c788ed26d5e352b7e97477ba58d6fe9e41db0c2649a2a39460bcab98'
+            '414013e596e6bac17d1d08afb56f473c9a8a8b714efbf644d0dd70575e9c3a1f'
+            'eb77e20e5ca52d03aef83889def774e370a192b20e82b0d6497dfcba1b61b00e')
+screenshot=('http://kde-apps.org/CONTENT/content-pre1/84745-1.png')
+ 
+build() {
+    cd ${pkgname}-${pkgver}
+ 
+    # Remove unavailable groups
+    patch -Np1 -i ../remove-unavailable-groups.patch
+    
+    # Hide showOriginCB
+    patch -Np1 -i ../hide-showOriginCB.patch
+ 
+    [ -d "build" ] && rm -rf build
+    mkdir build
+    cd build
+ 
+    cmake ../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+    make
+}
+ 
+package() {
+    cd ${pkgname}-${pkgver}
+    cd build
+    make DESTDIR=${pkgdir} install
+}

@@ -1,0 +1,41 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname="kactivities"
+pkgver=${_kdever}
+pkgrel=1
+arch=('i686' 'x86_64')
+pkgdesc='API for using and interacting with Activities'
+url='http://kde.org/'
+license=('GPL' 'FDL')
+depends=('kdelibs')
+makedepends=('cmake')
+options=('docs' '!splithdr' 'splitdbg' 'log')
+
+source=($_mirror/${pkgname}-$_kdever.tar.bz2)
+md5sums=(`grep ${pkgname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+
+
+build() {
+	cd "${srcdir}"
+ 
+        rm -rf build
+	mkdir build && cd build
+	cmake ../${pkgname}-${pkgver} \
+    		-DCMAKE_BUILD_TYPE=Release \
+    		-DCMAKE_INSTALL_PREFIX=/usr
+	make
+}
+
+package() {
+  	cd $srcdir/build
+	make DESTDIR=$pkgdir install
+
+}
+
