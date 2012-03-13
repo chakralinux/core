@@ -1,8 +1,8 @@
 # Source env-settings
 source ../_buildscripts/`pwd | cut -d/ -f3`-${_arch}-makepkg.conf
 # Pre-Patch settings
-_patch="3.2.9"
-_prepatch="3.2.10-pre1"
+_patch="3.2.10"
+_prepatch="3.2.11-pre1"
 _queue="3.2"
 # Aufs
 _aufs="3.2-20120109"
@@ -24,7 +24,7 @@ PATCHES=(
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/candidate/$_prepatch.patch%1
+         #http://chakra.sourceforge.net/sources/linux/patches/3.2/candidate/$_prepatch.patch%1
          #ftp://ftp.kernel.org/pub/linux/kernel/v3.x/stable-review/patch-$_prepatch.gz%1
 
          # Archlinux patches
@@ -124,13 +124,6 @@ PATCHES=(
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0006-Input-wacom-3rd-gen-Bamboo-P-Touch-packet-support.patch.xz%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/features/wacom/0007-Input-wacom-ignore-unwanted-bamboo-packets.patch%1
 
-         ### add lirc
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0001-media-staging-lirc_serial-Fix-init-exit-order.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0002-media-staging-lirc_serial-Free-resources-on-failure-.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0003-media-staging-lirc_serial-Fix-deadlock-on-resume-fai.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0004-media-staging-lirc_serial-Fix-bogus-error-codes.patch%1
-         http://chakra.sourceforge.net/sources/linux/patches/3.2/features/lirc/0005-media-staging-lirc_serial-Do-not-assume-error-codes-.patch%1
-
          ### bugfixes
          http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/cpu-Do-not-return-errors-from-cpu_dev_init-which-wil.patch%1
          http://chakra.sourceforge.net/sources/linux/patches/3.2/bugfix/all/cpu-Register-a-generic-CPU-device-on-architectures-t.patch%1
@@ -153,7 +146,7 @@ PATCHES=(
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-3.2.9-1-CHAKRA"
+PATCHNAME="patch-3.2.10-1-CHAKRA"
 
 # Run this before applying patches
 pre_apply() {
