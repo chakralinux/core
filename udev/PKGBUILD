@@ -8,21 +8,17 @@ pkgname=udev
 pkgver=181
 pkgrel=6
 pkgdesc="The userspace dev tools (udev)"
-depends=('util-linux' 'libusb-compat' 'glib2' 'kmod' 'pciutils' 'usbutils' 'pciutils')
+depends=('util-linux' 'libusb-compat' 'glib2' 'kmod' 'pciutils' 'usbutils' 'pciutils' 'acl')
 install=udev.install
 arch=(i686 x86_64)
 license=('GPL')
 makedepends=('gobject-introspection' 'gperf' 'libxslt' 'usbutils' 'kmod')
-source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/hotplug/$pkgname-$pkgver.tar.xz"
-        '82-optical-symlinks.rules'
-        'initcpio-hooks-udev'
-        'initcpio-install-udev'
-        'modprobe.nouveau.conf')
+source=(ftp://ftp.kernel.org/pub/linux/utils/kernel/hotplug/$pkgname-$pkgver.tar.xz
+	initcpio-hooks-udev
+	initcpio-install-udev)
 md5sums=('0d7af750702620a871b9f9b98d8ad859'
-         '4538d729fa292fbb8f9dca6265dc9c14'
          'a4dd853050bf2e0ae6b2e3d2c75499c2'
-         'ee0bfe91a20fff12cc25ab1d1e024853'
-         '633dabda1fbfa4b6fe4dab5452b40fed')
+         'ee0bfe91a20fff12cc25ab1d1e024853')
 url="http://git.kernel.org/?p=linux/hotplug/udev.git;a=summary"
 backup=(etc/udev/udev.conf)
 groups=('base')
@@ -47,7 +43,11 @@ package() {
   make DESTDIR=${pkgdir} install
 
   # udevd moved, symlink to make life easy for restarting udevd manually
-  ln -s /lib/udev/udevd ${pkgdir}/usr/bin/udevd
+  ln -s ../../lib/udev/udevd ${pkgdir}/usr/bin/udevd
+
+  # the path to udevadm is hardcoded in some places
+  install -d ${pkgdir}/sbin
+  ln -s ../usr/bin/udevadm ${pkgdir}/sbin/udevadm
 
   # Replace dialout/tape/cdrom group in rules with uucp/storage/optical group
   for i in $pkgdir/lib/udev/rules.d/*.rules; do
@@ -56,14 +56,8 @@ package() {
                s#GROUP="cdrom"#GROUP="optical"#g' $i
   done
 
-  for rule in "${srcdir}"/*.rules; do
-    install -m644 "${rule}" "${pkgdir}/lib/udev/rules.d"
-  done
-
-  # nouveau still conflicts with some other standard kernel modules, should go away soon
-  install -D -m644 ../modprobe.nouveau.conf ${pkgdir}/lib/modprobe.d/nouveau.conf
-
   # install the mkinitpcio hook
   install -D -m644 ../initcpio-hooks-udev ${pkgdir}/lib/initcpio/hooks/udev
   install -D -m644 ../initcpio-install-udev ${pkgdir}/lib/initcpio/install/udev
 }
+
