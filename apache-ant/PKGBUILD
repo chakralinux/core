@@ -1,28 +1,28 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 
 pkgname=apache-ant
-pkgver=1.8.2
-pkgrel=4
+pkgver=1.8.3
+pkgrel=1
 pkgdesc="A java-based build tool."
 arch=('i686' 'x86_64')
 license=('APACHE')
 url="http://ant.apache.org/"
 depends=('java-runtime')
-optdepends=('junit: to jave junit on the classpath in javac tasks')
+optdepends=('junit: to have junit on the classpath in javac tasks')
 source=(http://archive.apache.org/dist/ant/binaries/${pkgname}-${pkgver}-bin.tar.bz2
-        ${pkgname}.sh)
-md5sums=('9e9ae9fc7352960191489a1286fb0928'
-         '593ee6ebd9b8ec321534a028e686880f')
+        ${pkgname}.sh ${pkgname}.csh)
+md5sums=('f5959aff4ab061cac37ff1f84f3b874a'
+         '593ee6ebd9b8ec321534a028e686880f'
+         '475b684eb8202c09cbb51496cd8ee1e0')
 
 package() {
   # install profile.d script
   install -dm755 "${pkgdir}"/etc/profile.d
-  install -m755 "${srcdir}"/${pkgname}.sh "${pkgdir}"/etc/profile.d/
+  install -m755 "${srcdir}"/${pkgname}.{csh,sh} "${pkgdir}"/etc/profile.d/
 
   # Get the ANT_HOME env var
   source "${srcdir}"/${pkgname}.sh
