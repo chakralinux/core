@@ -5,16 +5,17 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=pacman
-pkgver=3.5.3
-pkgrel=4
+pkgver=4.0.2
+pkgrel=1
 pkgdesc="A library-based package manager with dependency support"
 arch=('i686' 'x86_64')
 url="http://www.archlinux.org/pacman/"
 license=('GPL')
 groups=('base')
-depends=('bash' 'libarchive>=2.8.4' 'libfetch>=2.28' 'pacman-mirrorlist')
-optdepends=('fakeroot: for makepkg usage as normal user'
-            'curl: for rankmirrors usage')
+depends=('bash' 'glibc' 'libarchive>=3.0.2' 'curl>=7.19.4'
+         'gpgme' 'pacman-mirrorlist')
+makedepends=('asciidoc')
+optdepends=('fakeroot: for makepkg usage as normal user')
 backup=(etc/pacman.conf etc/makepkg.conf)
 install=pacman.install
 options=(!libtool)
@@ -23,30 +24,32 @@ source=(ftp://ftp.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz
         pacman.conf
         makepkg.conf
         add_categories.patch)
-md5sums=('c36c18ed4d8ec69c0ecb4f9684266901'
+md5sums=('289ba4a19a16393096e065cec1cb9b0a'
          '7cc09e46386579933ef50cea30b8389a'
          '6c79bb013b5b6a14126ebcdaef12fdcd'
          '5beebe36bfc1e1f677d5ae12fcff8083'
          'fe69ac2da03a87e0ff6ffa323fec7f71')
-
-# keep an upgrade path for older installations
-PKGEXT='.pkg.tar.gz'
 
 build() {
   cd $srcdir/$pkgname-$pkgver
   
   # add categories array support
   patch -Np1 -i ../add_categories.patch
-  
-  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-doc
+
+  ./configure --prefix=/usr --sysconfdir=/etc \
+    --localstatedir=/var --enable-doc
   make
+}
+
+check() {
+  make -C "$pkgname-$pkgver" check
 }
 
 package() {
   cd $srcdir/$pkgname-$pkgver
   make DESTDIR=$pkgdir install
 
-  # install Chakra specific stuff
+  # install Arch specific stuff
   mkdir -p $pkgdir/etc
   case "$CARCH" in
     i686)
@@ -75,5 +78,3 @@ package() {
   mkdir -p $pkgdir/usr/share/zsh/site-functions/
   install -m644 contrib/zsh_completion $pkgdir/usr/share/zsh/site-functions/_pacman
 }
-
-# vim: set ts=2 sw=2 et:
