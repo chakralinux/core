@@ -5,13 +5,13 @@
 
 pkgbase='packagekit'
 pkgname=('packagekit' 'packagekit-qt2')
-pkgver=0.7.1
-pkgrel=5
+pkgver=0.7.3
+pkgrel=1
 pkgdesc="A system designed to make installation and updates of packages easier."
 arch=('i686' 'x86_64')
 url="http://www.packagekit.org"
 license=('GPL')
-makedepends=('dbus-glib' 'gobject-introspection' 'intltool'
+makedepends=('dbus-glib' 'gobject-introspection' 'intltool' 'consolekit' 'docbook-xsl'
              'networkmanager' 'pacman'  'pm-utils' 'polkit' 'python2' 'qt'
 	     'shared-mime-info' 'sqlite3' 'udev' 'automoc4')
 options=('!libtool')
@@ -20,7 +20,7 @@ source=("http://www.packagekit.org/releases/PackageKit-$pkgver.tar.xz"
         'Makefile.diff'
         'use-categories.patch'
         'groups.patch')
-sha256sums=('fc20a864cfbf53e83f7f95ccafab08ac1a7cd76a9413839f4539c7c6d4a99210'
+sha256sums=('a3f350dbc4c327b526f1a7cb9290768091215987d9bfa94a96058285fcd31370'
             '397b0007c4c689c5c2ef48dd807ad3c60d97061ccf4ba49046b00ae5e91fbd9e'
             '0e6dbba9a6fa3adc004baaf24605bae9c5de1b408e24768e4aabbe12fda55dce'
             '645731060d23d1890b56018a16bb4a574c82bf9d2066f4f93d6aa27461e77dc3'
@@ -40,25 +40,27 @@ build() {
   sed -i 's@bin/python@bin/python2@' 'lib/python/packagekit/'*.py
  
   export PYTHON=/usr/bin/python2
+  autoreconf
   ./configure --prefix=/usr \
 	      --sysconfdir=/etc \
 	      --localstatedir=/var \
 	      --libexecdir=/usr/lib/PackageKit \
+	      --enable-strict \
 	      --disable-static \
 	      --disable-gtk-doc \
 	      --disable-tests \
 	      --disable-local \
+	      --enable-pm-utils \
 	      --disable-browser-plugin \
 	      --disable-gstreamer-plugin \
 	      --disable-gtk-module \
 	      --disable-command-not-found \
 	      --disable-cron \
 	      --disable-debuginfo-install \
-	      --enable-pm-utils \
 	      --disable-dummy \
 	      --enable-alpm \
 	      --with-default-backend=alpm
-  make -s
+  make
 }
  
 package_packagekit() {

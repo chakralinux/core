@@ -9,22 +9,22 @@ _extramodules=extramodules-`pacman -Q linux-lts | cut -c11-13 | sed 's/linux-lts
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=catalyst-lts
-pkgver=11.11
-pkgrel=3
+pkgver=12.2
+pkgrel=1
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
 depends=('linux-lts>=3.0' 'linux-lts<3.1' 'catalyst-utils')
-makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers')
+makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-lts-headers')
 conflicts=('catalyst-test' 'nvidia-lts' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri')
 install=catalyst.install
 
-source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
+source=(http://www2.ati.com/drivers/linux/amd-driver-installer-${pkgver/./-}-x86.x86_64.run
         ati_make.sh
         makefile_compat.patch)
 
-md5sums=('7196077aacfbaf7234a705f5352a1111'
+md5sums=('7764bd0343ed542a8e0ebed05e347865'
 	 '660396540b0ceaff71d6155c986734de'
 	 '3e1b82bd69774ea808da69c983d6a43b')
 
@@ -39,7 +39,7 @@ build() {
 
 
     msg "Unpacking archive ..."
-    /bin/sh ./ati-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
+    /bin/sh ./amd-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
 
 
     if [ "${CARCH}" = "x86_64" ]; then
