@@ -4,9 +4,6 @@
 # Contributor: Samsagax <samsagax@gmail.com>
 # Contributor: borman <borisov.mikhail@gmail.com>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=nvidia-utils-bumblebee
 
 _pacman_get_key()
@@ -14,7 +11,7 @@ _pacman_get_key()
   pacman --print --print-format $1 -S nvidia-utils | grep nvidia-utils
 }
 
-pkgver=295.20
+pkgver=295.33
 pkgrel=1
 pkgdesc="NVIDIA drivers utilities and libraries. Repacked and installed in different folder to be used simultaneously with libgl."
 arch=('i686' 'x86_64')
@@ -28,7 +25,7 @@ install=nvidia.install
 if [ "$CARCH" = "i686" ]; then
      md5sums=('7055d8c7635930fe0c7d774d7bab0dca')
 elif [ "$CARCH" = "x86_64" ]; then
-     md5sums=('11a0f421e7c7c1144410985d70b8c952')
+     md5sums=('d9ae4a1bddf57b4e01a574450c708785')
      optdepends[${#optdepends[@]}]='lib32-nvidia-utils-bumblebee'
 fi
 source=$(_pacman_get_key %l)
