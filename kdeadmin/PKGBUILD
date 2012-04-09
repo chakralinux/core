@@ -19,7 +19,7 @@ pkgname=('kdeadmin-strigi-analyzer'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 pkgdesc="split package"
 url="http://www.kde.org/"
 license=('GPL' 'LGPL' 'FDL')
@@ -29,14 +29,20 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdepimlibs>=${_kdever}"  "kde-runtime>=${_kdever}"
 	     "kdebindings-pykde4>=${_kdever}" 'system-config-printer-common' "kdepim-runtime>=${_kdever}" "docbook-xsl")
 
-source=($_mirror/${pkgbase}-$_kdever.tar.xz)
-md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
+source=("$_mirror/${pkgbase}-$_kdever.tar.xz" 
+        "syslog-path.patch")
+
+md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
+         '4b0c3e0a7b7561185e20014fcbc1118e')
 
 #
 # build function
 #
 build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
+
+	msg "fixing syslog path"
+	patch -p1 -i ${srcdir}/syslog-path.patch
 	
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -95,6 +101,7 @@ package_kdeadmin-kdat() {
 
 package_kdeadmin-ksystemlog() {
 	pkgdesc="Log viewer"
+	screenshot="http://www.kde.org/images/screenshots/ksystemlog.png"
 	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 	conflicts=("kdeadmin-doc")
@@ -109,6 +116,7 @@ package_kdeadmin-ksystemlog() {
 
 package_kdeadmin-kuser() {
 	pkgdesc="Manage users and groups"
+	screenshot="http://www.kde.org/images/screenshots/kuser.png"
 	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-minimal" "kde-uninstall")
 	conflicts=("kdeadmin-doc")
