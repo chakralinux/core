@@ -38,9 +38,27 @@ kdialog --dontagain minibackup:helloworld --msgbox "Welcome! \n\nThis is a simpl
 # SELECT BACKUP SOURCES
 ###########################################################################
 
-echo "backup selection"
-backup_selection=$(kdialog --separate-output --checklist "Select the data you want to backup" emails "Personal Data: EMails and account(s) data" 0 addressbook "Personal Data: Addressbook(s)" 0 wallet "Personal Data: Wallet password database(s)" 0 ssh "Personal Data: SSH keys and configs" 0 subversion "Personal Data: Subversion configs" 0 places "Personal Data: Places (in Dolphin & the file dialog)" 0 remoteview "Personal Data: Network folders" 0  truecrypt "Personal Data: TrueCrypt configs" 0 akregator "Application Settings: Akregator" 0 amarok "Application Settings: Amarok" 0 kaddressbook "Application Settings: Kaddressbook" 0 kate "Application Settings: Kate" 0 kdesvn "Application Settings: KDESVN" 0 kgpg "Application Settings: KGPG" 0 kjots "Application Settings: KJots" 0 kmail "Application Settings: KMail" 0 knotes "Application Settings: KNotes" 0 konsole "Application Settings: Konsole" 0 kontact "Application Settings: Kontact" 0 kopete "Application Settings: Kopete" 0 korganizer "Application Settings: KOrganizer" 0 kwallet "Application Settings: KWallet" 0 kwrite "Application Settings: KWrite" 0 powerdevil "Application Settings: PowerDevil" 0 systemsettings "Application Settings: Systemsettings" 0 museek "Application Settings: Museek" 0 skype "Application Settings: Skype" 0 opera "Application Settings: Opera" 0 --title "miniBackup")
+while true ; do
+  echo "backup selection"
+  backup_selection=$(kdialog --separate-output --checklist "Select the data you want to backup" personalSettings "Personal Data:" off addressbook "     Addressbook" off emails "     Emails and all account data" off places "     Places (in Dolphin & the file dialog)" off remoteview "     Network folders" off ssh "     SSH keys and configurations" off subversion "     Subversion configurations" off truecrypt "     TrueCrypt configurations" off wallet "     KWallet passwords" off blank "" off applicationSettings "Application Settings:" off akregator "     Akregator" off amarok "     Amarok" off kaddressbook "     KAddressBook" off kate "     Kate" off kdesrc "     kdesrc-build" off kgpg "     KGpg" off kjots "     KJots" off kmail "     KMail" off knotes "     KNotes" off konsole "     Konsole" off kontact "     Kontact" off kopete "     Kopete" off korganizer "     KOrganizer" off kwallet "     KWallet" off kwrite "     KWrite" off museek "     Museek" off opera "     Opera" off powerdevil "     PowerDevil" off skype "     Skype" off systemsettings "     System Settings" off --title "miniBackup" --geometry 300x300)
 
+	  case $? in
+		  1) exit ;;
+		  0)
+		    if [ -n "$backup_selection" ] ; then
+		      for selec in $backup_selection; do
+			if [[ "$selec" != "personalSettings" ]] && [[ "$selec" != "applicationSettings" ]] && [[ "$selec" != "blank" ]] ; then
+			  found=true
+			  break
+			fi
+		      done
+
+		      if [ $found ] ; then
+			break
+		      fi
+		    fi ;;
+	  esac
+done
 
 
 ###########################################################################
@@ -50,7 +68,7 @@ backup_selection=$(kdialog --separate-output --checklist "Select the data you wa
 echo "select target dir"
 StoreFLDR=$(kdialog --getexistingdirectory ~/ --title "Where should i store the backup?")
 
-	case $? in 
+	case $? in
 		1) exit ;;
 		0) mkdir -p $StoreFLDR ; echo "" ;;
 	esac
@@ -76,7 +94,6 @@ mkdir -p $TempFLDR/.gnupg
 mkdir -p $TempFLDR/.config
 mkdir -p $TempFLDR/.local/share
 
-
 for selection in $backup_selection; do
 
 	if [ "$selection" = "emails" ] ; then
@@ -99,7 +116,7 @@ for selection in $backup_selection; do
 		qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 5
 		qdbus $DBUSREF setLabelText "Copying addressbook ..."
 		cp -r $HOME/$KDEdir/share/apps/kabc $TempFLDR/$KDEdir/share/apps/
-		
+
 	elif [ "$selection" = "wallet" ] ; then
 		echo $selection;
 		qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 6
@@ -156,14 +173,11 @@ for selection in $backup_selection; do
 		cp $HOME/$KDEdir/share/config/katesyntaxhighlightingrc $TempFLDR/$KDEdir/share/config/
 		cp -r $HOME/$KDEdir/share/apps/kate $TempFLDR/$KDEdir/share/apps/
 
-	elif [ "$selection" = "kdesvn" ] ; then
+	elif [ "$selection" = "kdesrc" ] ; then
 		echo $selection;
 		qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 13
-		qdbus $DBUSREF setLabelText "Copying KDESVN Data ..."
-		cp $HOME/$KDEdir/share/config/kdesvnrc $TempFLDR/$KDEdir/share/config/
-		cp $HOME/$KDEdir/share/config/kdesvn.notifyrc $TempFLDR/$KDEdir/share/config/
-		cp $HOME/$KDEdir/share/config/kdesvnpartrc $TempFLDR/$KDEdir/share/config/
-		cp -r $HOME/$KDEdir/share/apps/kdesvn $TempFLDR/$KDEdir/share/apps/
+		qdbus $DBUSREF setLabelText "Copying kdesrc-build Data ..."
+		cp $HOME/.kdesrc-build $TempFLDR/
 
 	elif [ "$selection" = "kjots" ] ; then
 		echo $selection;
@@ -274,14 +288,12 @@ for selection in $backup_selection; do
 		cp $HOME/$KDEdir/share/config/amarok-appletsrc $TempFLDR/$KDEdir/share/config/
 		cp $HOME/$KDEdir/share/config/amarok_homerc $TempFLDR/$KDEdir/share/config/
 		cp -r $HOME/$KDEdir/share/apps/amarok $TempFLDR/$KDEdir/share/apps/
-	fi
 
 	elif [ "$selection" = "remoteview" ] ; then
 		echo $selection;
 		qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 26
 		qdbus $DBUSREF setLabelText "Copying remoteview Data ..."
 		cp -r $HOME/$KDEdir/share/apps/remoteview $TempFLDR/$KDEdir/share/apps/
-	fi
 
 	elif [ "$selection" = "museek" ] ; then
 		echo $selection;
@@ -289,28 +301,24 @@ for selection in $backup_selection; do
 		qdbus $DBUSREF setLabelText "Copying museek Data ..."
 		cp -r $HOME/.museekd $TempFLDR/
 		cp -r $HOME/.museeq $TempFLDR/
-	fi
 
 	elif [ "$selection" = "subversion" ] ; then
 		echo $selection;
 		qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 26
 		qdbus $DBUSREF setLabelText "Copying museek Data ..."
 		cp -r $HOME/.subversion $TempFLDR/
-	fi
 
 	elif [ "$selection" = "skype" ] ; then
 		echo $selection;
 		qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 26
 		qdbus $DBUSREF setLabelText "Copying Skype Data ..."
 		cp -r $HOME/.Skype $TempFLDR/
-	fi
 
 	elif [ "$selection" = "truecrypt" ] ; then
 		echo $selection;
 		qdbus $DBUSREF Set org.kde.kdialog.ProgressDialog value 26
 		qdbus $DBUSREF setLabelText "Copying TrueCrypt Data ..."
 		cp -r $HOME/.TrueCrypt $TempFLDR/
-	fi
 
 	elif [ "$selection" = "opera" ] ; then
 		echo $selection;
