@@ -1,11 +1,11 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->binutils->glibc
 # NOTE: libtool requires rebuilt with each new gcc version
+# after compile ppl, libgcc is broken -> ln -s /usr/lib/libppl.so.11 /usr/lib/libppl.so.9
 
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada' 'gcc-go')
 pkgver=4.7.0
@@ -27,7 +27,7 @@ source=(#ftp://gcc.gnu.org/pub/gcc/releases/gcc-${pkgver}/gcc-${pkgver}.tar.bz2
 md5sums=('9f9d082b64753d5908690500251fc52e'
          '489d2f5311535800a120efd8d18db719'
          'ced48436c1b3c981d721a829f1094de1'
-         '575f7d17b022e609447a590e481b18b5')
+         '488f11cf9822d110dde4a12add1d6e03')
 
 if [ -n "${_snapshot}" ]; then
   _basedir="${srcdir}/gcc-${_snapshot}"
@@ -45,12 +45,11 @@ build() {
   sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   if [ "${CARCH}" = "x86_64" ]; then
-    patch -Np1 -i ${srcdir}/gcc_pure64.patch
+    patch -p1 -i ${srcdir}/gcc_pure64.patch
   fi
-  patch -Np0 -i ${srcdir}/gcc-hash-style-both.patch
 
   # compatibility with latest cloog
-  patch -Np1 -i ${srcdir}/gcc-4.6.2-cloog-0.17.patch
+  patch -p1 -i ${srcdir}/gcc-4.7.0-cloog-0.17.patch
 
   echo ${pkgver} > gcc/BASE-VER
 
@@ -91,7 +90,7 @@ package_gcc-libs()
 {
   pkgdesc="Runtime libraries shipped by GCC"
   groups=('base')
-  depends=('glibc>=2.14')
+  depends=('glibc>=2.15')
   install=gcc-libs.install
 
   cd gcc-build
