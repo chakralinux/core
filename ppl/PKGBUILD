@@ -1,33 +1,32 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# after compile cloog, ppl is broken -> ln -s /usr/lib/libcloog-isl.so.3 /usr/lib/libcloog-isl.so.1
 
 pkgname=ppl
-pkgver=0.11.2
+pkgver=0.12.1
 pkgrel=1
-# dash the next line if you want to skip the tests
-_test=1
 pkgdesc="A modern library for convex polyhedra and other numerical abstractions."
 arch=('i686' 'x86_64')
-url="http://www.cs.unipr.it/ppl"
+url="http://bugseng.com/products/ppl"
 license=('GPL3')
 depends=('gmp>=5.0')
-options=('!docs' '!libtool' 'log')
-source=(http://www.cs.unipr.it/ppl/Download/ftp/releases/$pkgver/ppl-$pkgver.tar.gz)
-md5sums=('ce014f153a28006009db207ca953a984')
+options=('!docs' '!libtool')
+source=(http://bugseng.com/products/ppl/download/ftp/releases/$pkgver/ppl-$pkgver.tar.gz{,.sign})
+md5sums=('cec8144f2072ac45a850214cca97d075'
+         '43eeeb147f9d8b3608aead63486c9545')
 
 build() {
   cd $srcdir/ppl-$pkgver
   ./configure --prefix=/usr --enable-interfaces="c,cxx"
   make
+}
 
-  if [ -n "${_test}" ]; then
-     echo "<<< STARTING TESTS >>>"
-     make check
-     echo "<<< ENDING TESTS >>>"
-  fi
+check() {
+  cd $srcdir/ppl-$pkgver
+  make check
 }
 
 package() {
