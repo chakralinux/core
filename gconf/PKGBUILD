@@ -1,12 +1,11 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 pkgname=gconf
-pkgver=2.32.0
-pkgrel=3
+pkgver=2.32.4
+pkgrel=1
 pkgdesc="A configuration database system"
 arch=(i686 x86_64)
 license=('LGPL')
@@ -20,7 +19,7 @@ source=(http://ftp.gnome.org/pub/gnome/sources/GConf/2.32/GConf-${pkgver}.tar.bz
         gconfpkg
         gconf-reload.patch
         01_xml-gettext-domain.patch)
-md5sums=('b161da6a1ab090b649aed3111003b0bb'
+md5sums=('b4475bb58c51ca59c7781cd95b302c13'
          '240b473fa17b748fc9020caf372d936c'
          'b745f04b4121d8724c002b14a4c110b6'
          'cfcc8e15be7b8a48de4aa34336ff6090'
@@ -38,8 +37,7 @@ build() {
 
   ./configure --prefix=/usr --sysconfdir=/etc \
       --localstatedir=/var --libexecdir=/usr/lib/GConf \
-      --disable-static --enable-defaults-service --with-gtk=3.0 \
-      --disable-orbit
+      --disable-static --enable-defaults-service 
 
   make pkglibdir=/usr/lib/GConf
 }
