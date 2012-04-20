@@ -59,7 +59,7 @@ build() {
   ${_basedir}/configure --prefix=/usr \
       --libdir=/usr/lib --libexecdir=/usr/lib \
       --mandir=/usr/share/man --infodir=/usr/share/info \
-      --with-bugurl=http://chakra-project.org/bugs/ \
+      --with-bugurl=https://bugs.archlinux.org/ \
       --enable-languages=c,c++,ada,fortran,go,lto,objc,obj-c++ \
       --enable-shared --enable-threads=posix \
       --with-system-zlib --enable-__cxa_atexit \
@@ -69,7 +69,9 @@ build() {
       --with-ppl --enable-cloog-backend=isl \
       --enable-lto --enable-gold --enable-ld=default \
       --enable-plugin --with-plugin-ld=ld.gold \
+      --with-linker-hash-style=gnu \
       --disable-multilib --disable-libssp \
+      --disable-build-with-cxx --disable-build-poststage1-with-cxx \
       --enable-checking=release
   make
 }
@@ -86,8 +88,7 @@ check() {
   ${_basedir}/contrib/test_summary
 }
 
-package_gcc-libs()
-{
+package_gcc-libs() {
   pkgdesc="Runtime libraries shipped by GCC"
   groups=('base')
   depends=('glibc>=2.15')
@@ -116,8 +117,7 @@ package_gcc-libs()
     ${pkgdir}/usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION
 }
 
-package_gcc()
-{
+package_gcc() {
   pkgdesc="The GNU Compiler Collection - C and C++ frontends"
   depends=("gcc-libs=$pkgver-$pkgrel" 'binutils>=2.22' 'libmpc' 'cloog' 'ppl')
   groups=('base-devel')
@@ -186,7 +186,7 @@ EOF
 
   # install the libstdc++ man pages
   install -dm755 ${pkgdir}/usr/share/man/man3
-  install -m644 ${srcdir}/man3/* ${pkgdir}/usr/share/man/man3/
+  install -m644 ${srcdir}/man/man3/* ${pkgdir}/usr/share/man/man3/
 
   # Install Runtime Library Exception
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
@@ -233,8 +233,7 @@ package_gcc-objc()
     ${pkgdir}/usr/share/licenses/gcc-objc/RUNTIME.LIBRARY.EXCEPTION
 }
 
-package_gcc-ada()
-{
+package_gcc-ada() {
   pkgdesc="Ada front-end for GCC (GNAT)"
   depends=("gcc=$pkgver-$pkgrel")
   install=gcc-ada.install
@@ -245,11 +244,10 @@ package_gcc-ada()
   
   # Install Runtime Library Exception
   install -Dm644 ${_basedir}/COPYING.RUNTIME \
-    ${pkgdir}/usr/share/licenses/gcc-ada/RUNTIME.LIBRARY.EXCEPTION
+  ${pkgdir}/usr/share/licenses/gcc-ada/RUNTIME.LIBRARY.EXCEPTION
 }
 
-package_gcc-go()
-{
+package_gcc-go() {
   pkgdesc="Go front-end for GCC"
   depends=("gcc=$pkgver-$pkgrel")
   install=gcc-go.install
