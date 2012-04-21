@@ -89,74 +89,79 @@ check() {
 }
 
 package_gcc-libs() {
-  pkgdesc="Runtime libraries shipped by GCC"
-  groups=('base')
-  depends=('glibc>=2.15')
-  install=gcc-libs.install
+   pkgdesc="Runtime libraries shipped by GCC"
+   groups=('base')
+   depends=('glibc>=2.15')
+   install=gcc-libs.install
 
-  cd gcc-build
-  make -j1 -C $CHOST/libgcc DESTDIR=${pkgdir} install-shared
-  for lib in libmudflap libgomp libstdc++-v3/src; do
-    make -j1 -C $CHOST/$lib DESTDIR=${pkgdir} install-toolexeclibLTLIBRARIES
-  done
-  make -j1 -C $CHOST/libstdc++-v3/po DESTDIR=${pkgdir} install
-  make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
+   cd gcc-build
+   make -j1 -C $CHOST/libgcc DESTDIR=${pkgdir} install-shared
+   for lib in libmudflap libgomp libstdc++-v3/src; do
+     make -j1 -C $CHOST/$lib DESTDIR=${pkgdir} install-toolexeclibLTLIBRARIES
+   done
+   make -j1 -C $CHOST/libstdc++-v3/po DESTDIR=${pkgdir} install
+   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
 
-  make -j1 DESTDIR=${pkgdir} install-target-libquadmath  
-  make -j1 DESTDIR=${pkgdir} install-target-libgfortran
-  make -j1 DESTDIR=${pkgdir} install-target-libobjc
+   make -j1 DESTDIR=${pkgdir} install-target-libquadmath  
+   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
+   make -j1 DESTDIR=${pkgdir} install-target-libobjc
 
-  # remove unnecessary files installed by install-target-{libquadmath,libgfortran,libobjc}
-  rm -rf ${pkgdir}/usr/lib/{gcc/,libgfortran.spec}
+   # remove unnecessary files installed by install-target-{libquadmath,libgfortran,libobjc}
+   rm -rf ${pkgdir}/usr/lib/{gcc/,libgfortran.spec}
 
-  # remove static libraries
-  find ${pkgdir} -name *.a -delete
+   # remove static libraries
+   find ${pkgdir} -name *.a -delete
   
-  # Install Runtime Library Exception
-  install -Dm644 ${_basedir}/COPYING.RUNTIME \
+   # Install Runtime Library Exception
+   install -Dm644 ${_basedir}/COPYING.RUNTIME \
     ${pkgdir}/usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc() {
-  pkgdesc="The GNU Compiler Collection - C and C++ frontends"
-  depends=("gcc-libs=$pkgver-$pkgrel" 'binutils>=2.22' 'libmpc' 'cloog' 'ppl')
-  groups=('base-devel')
-  install=gcc.install
+   pkgdesc="The GNU Compiler Collection - C and C++ frontends"
+   depends=("gcc-libs=$pkgver-$pkgrel" 'binutils>=2.22' 'libmpc' 'cloog' 'ppl')
+   groups=('base-devel')
+   install=gcc.install
 
-  cd gcc-build
+   cd gcc-build
   
-  # unfortunately it is much, much easier to install the lot and clean-up the mess...
-  make -j1 DESTDIR=${pkgdir} install
-  rm $pkgdir/usr/bin/{{$CHOST-,}gfortran,{$CHOST-,}gccgo,gnat*}
-  rm $pkgdir/usr/lib/*.so*
-  rm $pkgdir/usr/lib/lib{ffi,gfortran,go{,begin},objc,quadmath}.a
-  rm $pkgdir/usr/lib/libgfortran.spec
-  rm -r $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{ada{include,lib},finclude,include/objc}
-  rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/include/{ffi{,target}.h,quadmath{,_weak}.h}
-  rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{cc1obj{,plus},f951,gnat1,go1,libgfortranbegin.a}
-  rm -r $pkgdir/usr/lib/go
-  rm $pkgdir/usr/share/info/{gccgo,gfortran,gnat*,libgomp,libquadmath}.info
-  rm $pkgdir/usr/share/locale/{de,fr}/LC_MESSAGES/libstdc++.mo
-  rm $pkgdir/usr/share/man/man1/{gccgo,gfortran}.1
-  rm $pkgdir/usr/share/man/man3/ffi*
+   make -j1 DESTDIR=${pkgdir} install
 
-  # many packages require these symlinks
-  install -dm755 ${pkgdir}/lib
-  ln -sf /usr/bin/cpp ${pkgdir}/lib/cpp
-  ln -sf gcc ${pkgdir}/usr/bin/cc
-  ln -sf g++ ${pkgdir}/usr/bin/c++
+   install -d $pkgdir/usr/share/gdb/auto-load
+   mv $pkgdir/usr/{lib/libstdc++.so.6.0.17-gdb.py,share/gdb/auto-load}
 
-  # install gengtype for plugin support
-  install -m755 gcc/build/gengtype $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/
-  install -m644 gcc/gtype.state $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/
+   # unfortunately it is much, much easier to install the lot and clean-up the mess...
+   rm $pkgdir/usr/bin/{{$CHOST-,}gfortran,{$CHOST-,}gccgo,gnat*}
+   rm $pkgdir/usr/lib/*.so*
+   rm $pkgdir/usr/lib/lib{ffi,gfortran,go{,begin},objc,quadmath}.a
+   rm $pkgdir/usr/lib/libgfortran.spec
+   rm -r $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{ada{include,lib},finclude,include/objc}
+   rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/include/{ffi{,target}.h,quadmath{,_weak}.h}
+   rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{cc1obj{,plus},f951,gnat1,go1}
+   rm $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/{libcaf_single,libgfortranbegin}.a
+   rm -r $pkgdir/usr/lib/go
+   rm $pkgdir/usr/share/info/{gccgo,gfortran,gnat*,libgomp,libquadmath,libitm}.info
+   rm $pkgdir/usr/share/locale/{de,fr}/LC_MESSAGES/libstdc++.mo
+   rm $pkgdir/usr/share/man/man1/{gccgo,gfortran}.1
+   rm $pkgdir/usr/share/man/man3/ffi*
 
-  # plugin headers are all over the place at the moment...
-  for i in common objc pragma pretty-print; do
-    ln -sf ../c-$i.h $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/plugin/include/c-family/c-$i.h
-  done
+   # many packages require these symlinks
+   install -dm755 ${pkgdir}/lib
+   ln -sf /usr/bin/cpp ${pkgdir}/lib/cpp
+   ln -sf gcc ${pkgdir}/usr/bin/cc
+   ln -sf g++ ${pkgdir}/usr/bin/c++
 
-  # POSIX conformance launcher scripts for c89 and c99
-  cat > $pkgdir/usr/bin/c89 <<"EOF"
+   # install gengtype for plugin support
+   install -m755 gcc/build/gengtype $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/
+   install -m644 gcc/gtype.state $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/
+
+   # plugin headers are all over the place at the moment...
+   for i in common objc pragma pretty-print; do
+     ln -sf ../c-$i.h $pkgdir/usr/lib/gcc/$CHOST/${pkgver}/plugin/include/c-family/c-$i.h
+   done
+
+   # POSIX conformance launcher scripts for c89 and c99
+   cat > $pkgdir/usr/bin/c89 <<"EOF"
 #!/bin/sh
 fl="-std=c89"
 for opt; do
@@ -182,82 +187,80 @@ done
 exec gcc $fl ${1+"$@"}
 EOF
 
-  chmod 755 $pkgdir/usr/bin/c{8,9}9
+   chmod 755 $pkgdir/usr/bin/c{8,9}9
 
-  # install the libstdc++ man pages
-  install -dm755 ${pkgdir}/usr/share/man/man3
-  install -m644 ${srcdir}/man/man3/* ${pkgdir}/usr/share/man/man3/
+   # install the libstdc++ man pages
+   install -dm755 ${pkgdir}/usr/share/man/man3
+   install -m644 ${srcdir}/man/man3/* ${pkgdir}/usr/share/man/man3/
 
-  # Install Runtime Library Exception
-  install -Dm644 ${_basedir}/COPYING.RUNTIME \
+   # Install Runtime Library Exception
+   install -Dm644 ${_basedir}/COPYING.RUNTIME \
     ${pkgdir}/usr/share/licenses/gcc/RUNTIME.LIBRARY.EXCEPTION
 }
 
-package_gcc-fortran()
-{
-  pkgdesc="Fortran front-end for GCC"
-  depends=("gcc=$pkgver-$pkgrel")
-  install=gcc-fortran.install
+package_gcc-fortran() {
+   pkgdesc="Fortran front-end for GCC"
+   depends=("gcc=$pkgver-$pkgrel")
+   install=gcc-fortran.install
 
-  cd gcc-build
-  make -j1 DESTDIR=${pkgdir} install-target-libquadmath
-  make -j1 DESTDIR=$pkgdir install-target-libgfortran
-  make -j1 -C $CHOST/libgomp DESTDIR=$pkgdir install-nodist_fincludeHEADERS
-  make -j1 -C gcc DESTDIR=$pkgdir fortran.install-{common,man,info}
-  install -Dm755 gcc/f951 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/f951
+   cd gcc-build
+   make -j1 DESTDIR=${pkgdir} install-target-libquadmath
+   make -j1 DESTDIR=$pkgdir install-target-libgfortran
+   make -j1 -C $CHOST/libgomp DESTDIR=$pkgdir install-nodist_fincludeHEADERS
+   make -j1 -C gcc DESTDIR=$pkgdir fortran.install-{common,man,info}
+   install -Dm755 gcc/f951 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/f951
   
-  # remove libraries included in gcc-libs
-  rm ${pkgdir}/usr/lib/lib{gfortran,quadmath}.so*
-  rm ${pkgdir}/usr/share/info/libquadmath.info
+   # remove libraries included in gcc-libs
+   rm ${pkgdir}/usr/lib/lib{gfortran,quadmath}.so*
+   rm ${pkgdir}/usr/share/info/libquadmath.info
   
-  # Install Runtime Library Exception
-  install -Dm644 ${_basedir}/COPYING.RUNTIME \
+   # Install Runtime Library Exception
+   install -Dm644 ${_basedir}/COPYING.RUNTIME \
     ${pkgdir}/usr/share/licenses/gcc-fortran/RUNTIME.LIBRARY.EXCEPTION
 }
 
-package_gcc-objc()
-{
-  pkgdesc="Objective-C front-end for GCC"
-  depends=("gcc=$pkgver-$pkgrel")
+package_gcc-objc() {
+   pkgdesc="Objective-C front-end for GCC"
+   depends=("gcc=$pkgver-$pkgrel")
 
-  cd gcc-build
-  make -j1 DESTDIR=$pkgdir install-target-libobjc
-  install -dm755 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/
-  install -m755 gcc/cc1obj{,plus} $pkgdir/usr/lib/gcc/$CHOST/$pkgver/
+   cd gcc-build
+   make -j1 DESTDIR=$pkgdir install-target-libobjc
+   install -dm755 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/
+   install -m755 gcc/cc1obj{,plus} $pkgdir/usr/lib/gcc/$CHOST/$pkgver/
 
-  # remove libraries included in gcc-libs
-  rm ${pkgdir}/usr/lib/libobjc.so*
+   # remove libraries included in gcc-libs
+   rm ${pkgdir}/usr/lib/libobjc.so*
 
-  # Install Runtime Library Exception
-  install -Dm644 ${_basedir}/COPYING.RUNTIME \
+   # Install Runtime Library Exception
+   install -Dm644 ${_basedir}/COPYING.RUNTIME \
     ${pkgdir}/usr/share/licenses/gcc-objc/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc-ada() {
-  pkgdesc="Ada front-end for GCC (GNAT)"
-  depends=("gcc=$pkgver-$pkgrel")
-  install=gcc-ada.install
+   pkgdesc="Ada front-end for GCC (GNAT)"
+   depends=("gcc=$pkgver-$pkgrel")
+   install=gcc-ada.install
 
-  cd gcc-build/gcc
-  make -j1 DESTDIR=$pkgdir ada.install-{common,info}
-  install -m755 gnat1 $pkgdir/usr/lib/gcc/$CHOST/$pkgver
+   cd gcc-build/gcc
+   make -j1 DESTDIR=$pkgdir ada.install-{common,info}
+   install -m755 gnat1 $pkgdir/usr/lib/gcc/$CHOST/$pkgver
   
-  # Install Runtime Library Exception
-  install -Dm644 ${_basedir}/COPYING.RUNTIME \
-  ${pkgdir}/usr/share/licenses/gcc-ada/RUNTIME.LIBRARY.EXCEPTION
+   # Install Runtime Library Exception
+   install -Dm644 ${_basedir}/COPYING.RUNTIME \
+    ${pkgdir}/usr/share/licenses/gcc-ada/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc-go() {
-  pkgdesc="Go front-end for GCC"
-  depends=("gcc=$pkgver-$pkgrel")
-  install=gcc-go.install
+   pkgdesc="Go front-end for GCC"
+   depends=("gcc=$pkgver-$pkgrel")
+   install=gcc-go.install
 
-  cd gcc-build
-  make -j1 DESTDIR=$pkgdir install-target-libgo
-  make -j1 -C gcc DESTDIR=$pkgdir go.install-{common,man,info}
-  install -Dm755 gcc/go1 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/go1
+   cd gcc-build
+   make -j1 DESTDIR=$pkgdir install-target-libgo
+   make -j1 -C gcc DESTDIR=$pkgdir go.install-{common,man,info}
+   install -Dm755 gcc/go1 $pkgdir/usr/lib/gcc/$CHOST/$pkgver/go1
 
-  # Install Runtime Library Exception
-  install -Dm644 ${_basedir}/COPYING.RUNTIME \
+   # Install Runtime Library Exception
+   install -Dm644 ${_basedir}/COPYING.RUNTIME \
     ${pkgdir}/usr/share/licenses/gcc-go/RUNTIME.LIBRARY.EXCEPTION
 }
