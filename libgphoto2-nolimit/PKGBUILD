@@ -1,15 +1,11 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=libgphoto2-nolimit
 oldpkgname=libgphoto2
-pkgver=2.4.11
+pkgver=2.4.14
 pkgrel=1
 pkgdesc="The core library of gphoto2.  This variation is only to increase the limit of files !"
 arch=(i686 x86_64)
@@ -21,8 +17,8 @@ provides=(libgphoto2=${pkgver})
 depends=('libexif>=0.6.19' 'libjpeg>=8' 'gd' 'libtool>=2.4' 'libusb')
 install=libgphoto2.install
 options=('libtool')
-source=(http://downloads.sourceforge.net/gphoto/${oldpkgname}-${pkgver}.tar.gz)
-md5sums=('a2230c31e320acb7ececd90bc02fe515')
+source=(http://downloads.sourceforge.net/gphoto/${oldpkgname}-${pkgver}.tar.bz2)
+md5sums=('c7fc6cafa6343f2457976dbe9f2d9d68')
 
 build() {
   cd "${srcdir}/${oldpkgname}-${pkgver}"
@@ -30,7 +26,7 @@ build() {
   #Change the limit which cause "Fixed limit exceeded"
   sed -i "s#MAX_ENTRIES 1024#MAX_ENTRIES 8192#" libgphoto2/gphoto2-list.c
 
-  udevscriptdir=/lib/udev ./configure --prefix=/usr --with-drivers=all --disable-static --disable-rpath
+  ./configure --prefix=/usr --with-drivers=all --disable-rpath
   LD_PRELOAD="" make
   make DESTDIR="${pkgdir}" install
 
@@ -45,7 +41,7 @@ build() {
 
   LD_LIBRARY_PATH="${pkgdir}/usr/lib${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH" \
   CAMLIBS="${pkgdir}/usr/lib/libgphoto2/${pkgver}" \
-      "${pkgdir}/usr/lib/libgphoto2/print-camera-list" udev-rules version 136 group camera mode 0660 > \
+      "${pkgdir}/usr/lib/libgphoto2/print-camera-list" udev-rules version 175 > \
       "${pkgdir}/lib/udev/rules.d/54-gphoto.rules"
 
   # Remove recursive symlink
