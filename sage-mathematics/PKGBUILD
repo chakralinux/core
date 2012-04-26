@@ -1,96 +1,115 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=sage-mathematics
-pkgver=4.7
+pkgver=4.8
 pkgrel=1
-pkgdesc='SAGE: Open Source Mathematics Software, a viable free alternative to Magma, Maple, Mathematica, and Matlab.'
+pkgdesc='Open Source Mathematics Software, a viable free alternative to Magma, Maple, Mathematica, and Matlab.'
 url='http://www.sagemath.org'
 arch=('i686' 'x86_64')
 license=('GPL')
-depends=('ppl')
-makedepends=('gcc-fortran' 'gcc-libs' 'desktop-file-utils' 'imagemagick' 'texlive-core')
-optdepends=('imagemagick: some plotting functionality benefits from it'
-            'texlive-core: some plotting functionality benefits from it')
-options=('!makeflags')
-install="${pkgname}.install"
-source=("http://sage.math.washington.edu/home/release/sage-${pkgver}/sage-${pkgver}.tar"
-        'SAGE-notebook.desktop')
-md5sums=('db4d891feed487e1696b8d01ae3b6469'
-         'dc391f12b7d17dd37326343ec0e99bbd')
+depends=('atlas-lapack')
+makedepends=('gcc-fortran' 'desktop-file-utils' 'texlive-core')
+optdepends=('ffmpeg: to show animations' 'imagemagick: to show animations and some LaTeX output in the notebook'
+            'texlive-core: to view LaTeX output in the notebook and to use SageTeX'
+            'jsmath-fonts: native TeX fonts for the notebook'
+            'openssh: to use the notebook in secure mode')
+install="$pkgname.install"
+source=("http://boxen.math.washington.edu/home/release/sage-$pkgver/sage-$pkgver.tar"
+  "http://boxen.math.washington.edu/home/leif/Sage/spkgs/gfan-0.4plus.p3.spkg"
+  "http://boxen.math.washington.edu/home/leif/Sage/spkgs/givaro-3.2.13.rc1.p4.spkg"
+  'SAGE-notebook.desktop' 'polybori_gcc47.patch')
+noextract=("gfan-0.4plus.p3.spkg" "givaro-3.2.13.rc1.p4.spkg")
+md5sums=('3e9725846a20f624a9a6811107fc5cb0'
+         '2e35abd57788571faf6b638802bff470'
+         'a84996518e39a1197eaf63562d8fe734'
+         'cc47a29bc32fbdea48f8a19e2ad70441'
+         '21462df65ca8bc72988022ba572a0753')
+
 
 build() {
-  cd sage-${pkgver}
+  cd sage-$pkgver
 
-  # modularization of sage, sort of :)
-  #mkdir -p spkg/installed
-  #touch spkg/installed/readline-6.1
-  mkdir -p spkg/installed
-  touch spkg/installed/ppl-0.11.2
+  # fix gfan build with GCC 4.7 http://trac.sagemath.org/sage_trac/ticket/12760
+  mv ../gfan-0.4plus.p3.spkg spkg/standard
+  rm spkg/standard/gfan-0.4plus.p1.spkg 
 
-  # fix "missing sage.all error" during build
+  # fix sage library build with GCC 4.7 http://trac.sagemath.org/sage_trac/ticket/12760
+  mv ../givaro-3.2.13.rc1.p4.spkg spkg/standard
+  rm spkg/standard/givaro-3.2.13.rc1.p3.spkg
+
+  # fix polybori build with GCC 4.7 http://trac.sagemath.org/sage_trac/ticket/12750
+  cd spkg/standard
+  tar xjf polybori-0.7.1.p6.spkg
+  patch -p0 -i $srcdir/polybori_gcc47.patch
+  tar cjf polybori-0.7.1.p6.spkg polybori-0.7.1.p6
+  rm -r polybori-0.7.1.p6
+  cd ../..
+    
+  # fix missing symbol _ZN23Parma_Polyhedra_Library13have_sse_unitE on i686 http://trac.sagemath.org/sage_trac/ticket/11391
+  if [[ "$CARCH" == "i686" ]]; then
+   cd spkg/standard
+   tar xjf ppl-0.11.2.p0.spkg
+   sed -i 's/--enable-interfaces=c++/--enable-interfaces="c++ c"/' ppl-0.11.2.p0/spkg-install
+   tar cjf ppl-0.11.2.p0.spkg ppl-0.11.2.p0
+   rm -r ppl-0.11.2.p0
+   cd ../..
+  fi
+
   unset CFLAGS
   unset CXXFLAGS
-
-  # fix build errors
   unset LDFLAGS
 
-  # enable multiple threads while building, is this really needed? check if uses MAKEFLAGS
-  export SAGE_BUILD_THREADS=$(lscpu | awk '/^CPU\(s\):/ { print $2 }')
-  export MAKE="make -j${SAGE_BUILD_THREADS}"
+  # fix polybori, linbox and sage library build with GCC 4.7 http://trac.sagemath.org/sage_trac/ticket/12751
+  export CXX="g++ -fpermissive"
 
-  # use Chakra's fortran rather then the one that ships with sage to compile sage's fortran
+  # parallel build
+  export MAKE="make -j2"
+
+  # use archlinux's fortran
   export SAGE_FORTRAN='/usr/bin/gfortran'
   export SAGE_FORTRAN_LIB='/usr/lib/libgfortran.so'
+
+  # use external ATLAS
+  [[ $USE_EXTERNAL_ATLAS ]] && export SAGE_ATLAS_LIB='/usr/lib'
 
   # disable building with debugging support
   export SAGE_DEBUG='no'
 
   # enable fat binaries (disables processor specific optimizations)
   # comment out if you're only building it for yourself
-  export SAGE_FAT_BINARY='yes'
-
-  # can't write to root in a clean chroot
-  export DOT_SAGE='/build/src/'
-
-  # only build sage, no documents
-  #make build
+  # export SAGE_FAT_BINARY='yes'
+  
   make
+}
 
-  # uncomment if we want to run all the tests (warning: very long)
-  #make ptestlong
+check() {
+  cd sage-$pkgver
+
+  make ptest || /bin/true
+
+  # uncomment if you want to run all the tests (warning: very long)
+  # make ptestlong || /bin/true
 }
 
 package() {
-  cd sage-${pkgver}
+  cd sage-$pkgver
 
   # cp because make install is experimental and will corrupt the install
-  install -d ${pkgdir}/opt/sage
-  cp -r * ${pkgdir}/opt/sage
+  install -d $pkgdir/opt/sage
+  cp -r * $pkgdir/opt/sage
 
-  # move SageTeX files to more appropriate directory
-  install -d ${pkgdir}/usr/share
-  mv ${pkgdir}/opt/sage/local/share/texmf \
-    ${pkgdir}/usr/share
-
-  desktop-file-install ${srcdir}/SAGE-notebook.desktop \
-    --dir ${pkgdir}/usr/share/applications 
+  desktop-file-install $srcdir/SAGE-notebook.desktop --dir $pkgdir/usr/share/applications 
 
   # create link to main binary
-  install -d ${pkgdir}/usr/bin
-  ln -s /opt/sage/sage ${pkgdir}/usr/bin/sage
+  install -d $pkgdir/usr/bin
+  ln -s /opt/sage/sage $pkgdir/usr/bin/sage
 
   # remove build logs
-  rm -f ${pkgdir}/opt/sage/install.log
-  rm -rf ${pkgdir}/opt/sage/spkg/logs
+  rm -f $pkgdir/opt/sage/install.log
 
-  # remove source packages, since they are rarely needed, they are 300mb in size (compressed), and no need to compile them, put them into aur/sage-mathematics-spkgs
-  rm -f ${pkgdir}/opt/sage/spkg/base/*spkg
-  rm -f ${pkgdir}/opt/sage/spkg/standard/*spkg
+  # remove source packages
+  rm -rf $pkgdir/opt/sage/spkg/{base,standard,logs}
 }
