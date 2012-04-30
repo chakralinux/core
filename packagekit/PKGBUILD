@@ -4,8 +4,8 @@
 # maintainer: Giuseppe Calà <jiveaxe@gmail.com>
 
 pkgbase='packagekit'
-pkgname=('packagekit' 'packagekit-qt2')
-pkgver=0.7.3
+pkgname=('packagekit' 'packagekit-qt2' 'packagekit-python')
+pkgver=0.6.22
 pkgrel=1
 pkgdesc="A system designed to make installation and updates of packages easier."
 arch=('i686' 'x86_64')
@@ -16,21 +16,15 @@ makedepends=('dbus-glib' 'gobject-introspection' 'intltool' 'consolekit' 'docboo
 	     'shared-mime-info' 'sqlite3' 'udev' 'automoc4')
 options=('!libtool')
 source=("http://www.packagekit.org/releases/PackageKit-$pkgver.tar.xz"
-        'alpm.patch'
-        'Makefile.diff'
         'use-categories.patch'
         'groups.patch')
-sha256sums=('a3f350dbc4c327b526f1a7cb9290768091215987d9bfa94a96058285fcd31370'
-            '397b0007c4c689c5c2ef48dd807ad3c60d97061ccf4ba49046b00ae5e91fbd9e'
-            '0e6dbba9a6fa3adc004baaf24605bae9c5de1b408e24768e4aabbe12fda55dce'
+sha256sums=('b9f71721b0b16e106c0a1ce28c97b2277a34b0c15d1a171f4898f34117ebaa2d'
             '645731060d23d1890b56018a16bb4a574c82bf9d2066f4f93d6aa27461e77dc3'
             '5ea517ad96557a6c2c6d9b91aa331aff0b3db7ddfdd9b20b698a819b014fe45a')
  
 build() {
   cd "$srcdir/PackageKit-$pkgver"
  
-  patch -Np1 -i "$srcdir/alpm.patch"
-  patch -Np1 -i "$srcdir/Makefile.diff"
   patch -Np1 -i "$srcdir/use-categories.patch"
   patch -Np1 -i "$srcdir/groups.patch"
   
@@ -60,40 +54,51 @@ build() {
 	      --disable-dummy \
 	      --enable-alpm \
 	      --with-default-backend=alpm
-  make
+  make -s CFLAGS='-D_FILE_OFFSET_BITS=64'
 }
  
 package_packagekit() {
   backup=('var/lib/PackageKit/transactions.db'
           'etc/PackageKit/alpm.d/pacman.conf'
           'etc/PackageKit/alpm.d/repos.list')
-  depends=('dbus-glib' 'pacman>=3.5.0' 'pacman<3.6.0' 'polkit'
-           'shared-mime-info' 'sqlite3' 'udev' 'consolekit')
+  depends=('dbus-glib' 'pacman>=4.0.0' 'pacman<4.1.0' 'polkit'
+           'shared-mime-info' 'sqlite3' 'udev')
   optdepends=('networkmanager')
   install='packagekit.install'
+
   cd "$srcdir/PackageKit-$pkgver"
- 
+
   make DESTDIR="$pkgdir" install
- 
-  rm -rf "$pkgdir/usr/include/PackageKit/packagekit-qt2"*
-  rm -rf "$pkgdir/usr/lib/libpackagekit-qt2"*
-  rm -rf "$pkgdir/usr/lib/pkgconfig/packagekit-qt2"*
-  rm -rf "$pkgdir/usr/lib/cmake"
- 
+
+  rm -rf "$pkgdir/usr/include/PackageKit/packagekit-qt"*
+  rm -rf "$pkgdir/usr/lib/libpackagekit-qt"*
+  rm -rf "$pkgdir/usr/lib/pkgconfig/packagekit-qt"*
+  rm -rf "$pkgdir/usr/share/cmake"
+
   rm -rf "$pkgdir/usr/lib/python"*
   rm -rf "$pkgdir/usr/share/PackageKit/website"
- 
+
+  mkdir -p "$pkgdir/usr/share/bash-completion/completions"
   mv "$pkgdir/etc/bash_completion.d/pk-completion.bash" \
-     "$pkgdir/etc/bash_completion.d/pkcon"
+     "$pkgdir/usr/share/bash-completion/completions/pkcon"
   touch "$pkgdir/var/log/PackageKit"
 }
 
 package_packagekit-qt2() {
   depends=('packagekit' 'qt')
   pkgdesc=('Qt bindings for PackageKit')
- 
+
   cd "$srcdir/PackageKit-$pkgver/lib/packagekit-qt2"
- 
+
+  make DESTDIR="$pkgdir" install
+}
+
+package_packagekit-python() {
+  depends=('packagekit' 'python2')
+  pkgdesc=('Python bindings for PackageKit')
+
+  cd "$srcdir/PackageKit-$pkgver/lib/python"
+
   make DESTDIR="$pkgdir" install
 }
 
