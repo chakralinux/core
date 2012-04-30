@@ -4,33 +4,39 @@
 # Contributor: Raymano <re1212122000@yahoo.com>
 
 pkgname=soundtouch
-pkgver=1.5.0
+pkgver=1.6.0
 pkgrel=1
-pkgdesc="An audio processing library"
+pkgdesc="SoundTouch is an open-source audio processing library for changing the Tempo, Pitch and Playback Rates of audio streams or audio files."
 arch=('i686' 'x86_64')
 url="http://www.surina.net/soundtouch/"
 license=('LGPL')
 depends=('gcc-libs')
 options=('!libtool')
-source=(http://www.surina.net/soundtouch/${pkgname}-${pkgver}.tar.gz
-        soundtouch-1.4.0-mmx-sse-compile-fix.patch
-        soundtouch-1.4.0-x86_64-asm-broken.patch)
-md5sums=('5456481d8707d2a2c27466ea64a099cb' 'f0204136c90ce4f6d4761073151eb4dc'\
-         '0d856bb5b519b18c6ba3a2e1770bdfd2')
-sha1sums=('c3e73419acec242a49a408b78c55883def937fc0' '39815091c4cb1817f8a56b8fb29fa684984514d1'\
-         '95282cca856b3b8645fadb530ce5eb892074f193')
+source=("http://www.surina.net/soundtouch/${pkgname}-${pkgver}.tar.gz")
+md5sums=('aa1c63d4d67b033f044a6a48d2be5bdd')
 
 build() {
+  local _extra_opts=""
+
   cd "${srcdir}/${pkgname}"
-  patch -Np1 -i "${srcdir}/soundtouch-1.4.0-mmx-sse-compile-fix.patch" || return 1
-  patch -Np1 -i "${srcdir}/soundtouch-1.4.0-x86_64-asm-broken.patch" || return 1
-  if [ "${CARCH}" = "x86_64" ]; then
-    ./configure --prefix=/usr --enable-shared --with-pic || return 1
-  else
-    ./configure --prefix=/usr --enable-shared || return 1
+
+  if [ ! -x ./configure ]; then
+    ./bootstrap
   fi
-  make || return 1
-  make DESTDIR="${pkgdir}" pkgdocdir=/usr/share/doc/soundtouch install || return 1
-  # Upstream changed pkgconfig filename
-  ln -sf soundtouch-1.4.pc "${pkgdir}/usr/lib/pkgconfig/soundtouch-1.0.pc" || return 1
+
+  if [ "${CARCH}" = "x86_64" ]; then
+    _extra_opts="--with-pic"
+  fi
+
+  ./configure --prefix=/usr --enable-shared "${_extra_opts}" || return 1
+
+  make
 }
+
+package() {
+  cd "${srcdir}/${pkgname}"
+
+  make DESTDIR="${pkgdir}" pkgdocdir=/usr/share/doc/soundtouch install
+}
+
+# vim:set ts=2 sw=2 et:
