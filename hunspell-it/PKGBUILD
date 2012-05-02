@@ -1,24 +1,46 @@
-# Maintainer: SpepS <dreamspepser at yahoo dot it>
+# Platform packages for Chakra
 
-pkgname=(hunspell-it)
+pkgname=hunspell-it
 pkgver=2.4
-pkgrel=2
-pkgdesc="An italian dictionary for Hunspell"
-arch=('i686' 'x86_64')
-url="http://linguistico.sourceforge.net/pages/dizionario_italiano.html"
-license=('GPL')
-depends=("hunspell")
-source=(http://prdownloads.sf.net/linguistico/italiano_2_4_2007_09_01.zip?download)
+_pkgver=2_4
+_date=2007_09_01
+pkgrel=3
+pkgdesc="Italian dictionary for Hunspell"
+arch=('any')
+url="http://sourceforge.net/projects/linguistico/"
+license=('GPL3')
+makedepends=('hunspell')
+optdepends=('hunspell: the spell checking libraries and apps')
+source=("http://downloads.sourceforge.net/linguistico/italiano_${_pkgver}_${_date}.zip")
 md5sums=('e7fbd9e2dfb25ea3288cdb918e1e1260')
 
 build() {
-  cd $srcdir
+  cd "${srcdir}"
 
-  mkdir -p $pkgdir/usr/share/myspell || return 1
-
-  # Fix dic file empty lines
-  sed '/^\/$/d' -i it_IT.dic || return 1
-
-  install -Dm644 it_IT.* $pkgdir/usr/share/myspell || return 1
+  # Fix dic file empty lines (FS#22275)
+  sed '/^\/$/d' -i it_IT.dic
 }
 
+package() {
+  cd "${srcdir}"
+  install -dm755 ${pkgdir}/usr/share/hunspell
+
+  install -D -m644 it_IT.dic "${pkgdir}/usr/share/hunspell/it_IT.dic"
+  install -D -m644 it_IT.aff "${pkgdir}/usr/share/hunspell/it_IT.aff"
+
+  pushd $pkgdir/usr/share/hunspell/
+  it_IT_aliases="it_CH"
+  for lang in $it_IT_aliases; do
+       ln -s it_IT.aff $lang.aff
+       ln -s it_IT.dic $lang.dic
+  done
+  popd
+
+  # the symlinks
+  install -dm755 ${pkgdir}/usr/share/myspell/dicts
+  pushd $pkgdir/usr/share/myspell/dicts
+    for file in $pkgdir/usr/share/hunspell/*; do
+      ln -sv /usr/share/hunspell/$(basename $file) .
+    done
+  popd
+}
