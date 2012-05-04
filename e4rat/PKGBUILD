@@ -3,8 +3,8 @@
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=e4rat
-pkgver=0.2.2
-pkgrel=2
+pkgver=0.2.3
+pkgrel=1
 pkgdesc="Toolset to accelerate the boot process and application startups for systems with ext4 root partitions."
 arch=('i686' 'x86_64')
 url="http://e4rat.sourceforge.net/"
@@ -13,17 +13,13 @@ depends=('e2fsprogs' 'util-linux')
 makedepends=('audit' 'boost' 'cmake')
 options=(!strip)
 backup=(etc/e4rat.conf)
-source=(http://downloads.sourceforge.net/project/$pkgname/$pkgver/e4rat_${pkgver}_src.tar.gz e4rat-static_core.patch)
-md5sums=('dada998e857794dc7f76ffc887e04c19'
-         '731c5a8a33c323d0cf71616483c37705')
+source=(http://downloads.sourceforge.net/project/$pkgname/$pkgver/e4rat_${pkgver}_src.tar.gz)
+md5sums=('e8e7db69018036f11d509b65c32d3ea4')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
-  patch -p0 -i "$srcdir/e4rat-static_core.patch"
 
-  unset LDFLAGS
-  sed -i '/stdlib.h/a #include <unistd.h>' src/fiemap.cc
-  cmake -DCMAKE_BUILD_TYPE=Release .
+  cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_CORE_LIBRARY_STATIC=true .
   make
 }
 
