@@ -1,12 +1,11 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl' 'nvidia-settings')
-pkgver=295.33
+pkgver=295.49
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -16,13 +15,13 @@ options=('!strip')
 [ "$CARCH" = 'i686' ] && {
   ARCH='x86'
   _pkg="NVIDIA-Linux-${ARCH}-${pkgver}"
-  md5sums=('1634fb3115526caeae5eb8227282bf17')
+  md5sums=('fd998f870d20b30b8d636ffce79d9e6c')
 }
 
 [ "$CARCH" = "x86_64" ] && {
   ARCH='x86_64'
   _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-  md5sums=('04e814843bcaf23efa0b4b3df4ea2700')
+  md5sums=('84b92aa6eec13a38e8748264138acc56')
 }
 
 source=("http://us.download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
@@ -46,7 +45,7 @@ build() {
 
 package_libcl() {
   pkgdesc="OpenCL library and ICD loader from NVIDIA"
-  pkgver=1.1.8
+  pkgver=1.1.9
 
   cd "${srcdir}/${_pkg}"
 

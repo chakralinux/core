@@ -1,15 +1,14 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 # Find the kernel name inside the chroot
 _extramodules=extramodules-`pacman -Q linux-lts | cut -c11-13 | sed 's/linux-lts //g'`-CHAKRA-LTS
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=nvidia-lts
-pkgver=295.33
+pkgver=295.49
 pkgrel=1
 pkgdesc="NVIDIA drivers for linux."
 arch=('i686' 'x86_64')
@@ -24,12 +23,12 @@ if [ "$CARCH" = "i686" ]; then
     _ARCH='x86'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}"
     source=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-    md5sums=('1634fb3115526caeae5eb8227282bf17')
+    md5sums=('fd998f870d20b30b8d636ffce79d9e6c')
 elif [ "$CARCH" = "x86_64" ]; then
     _ARCH='x86_64'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
     source=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-    md5sums=('04e814843bcaf23efa0b4b3df4ea2700')
+    md5sums=('84b92aa6eec13a38e8748264138acc56')
 fi
 
 build() {
