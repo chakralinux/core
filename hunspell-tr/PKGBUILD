@@ -1,10 +1,12 @@
-# Contributor: unlucu <unlucu at gmail dot com>
+# Platform packages for Chakra
+#
+# Maintainer: Manuel Tortosa <manutortosa@chakra-project.org>
 
 pkgname=hunspell-tr
 pkgver=0.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Turkish dictionary for Hunspell"
-arch=('i686' 'x86_64')
+arch=('any')
 url="http://tr-spell.googlecode.com/"
 license=('LGPL' 'BSD')
 depends=('hunspell')
@@ -13,8 +15,15 @@ md5sums=('774eae07421f2823898a2a423245b472')
 
 build() {
   cd $srcdir
-  install -D -m644 tr.dic $pkgdir/usr/share/myspell/tr.dic
-  install -D -m644 tr.aff $pkgdir/usr/share/myspell/tr.aff
-  install -D -m644 dictionary.lst $pkgdir/usr/share/myspell/dictionary.lst
-  install -D -m644 README $pkgdir/usr/share/myspell/README
+  install -D -m644 tr.dic $pkgdir/usr/share/hunspell/tr.dic
+  install -D -m644 tr.aff $pkgdir/usr/share/hunspell/tr.aff
+
+  #myspell symlinks
+  install -dm755 "${pkgdir}"/usr/share/myspell/dicts
+  pushd "${pkgdir}"/usr/share/myspell/dicts
+  for file in "${pkgdir}"/usr/share/hunspell/*; do
+      ln -sv /usr/share/hunspell/"$(basename "${file}")" .
+  done
+  popd
+
 }
