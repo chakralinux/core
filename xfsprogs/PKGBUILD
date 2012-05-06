@@ -1,7 +1,11 @@
-# $Id: PKGBUILD 66428 2010-01-31 08:42:59Z tpowa $
-# Maintainer: Paul Mattal <paul@archlinux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
 pkgname=xfsprogs
-pkgver=3.1.1
+pkgver=3.1.7
 pkgrel=1
 pkgdesc="XFS filesystem utilities"
 arch=(i686 x86_64)
@@ -10,14 +14,20 @@ url="http://oss.sgi.com/projects/xfs/"
 groups=('base')
 depends=('util-linux-ng>=2.16')
 options=('!makeflags' '!libtool')
-source=(ftp://oss.sgi.com/projects/xfs/cmd_tars/${pkgname}-${pkgver}.tar.gz)
-md5sums=('c2308b46ee707597ac50aae418d321b8')
+source=("ftp://ftp.archlinux.org/other/xfsprogs/${pkgname}-${pkgver}.tar.gz")
+md5sums=('049cf9873794ea49d0bb3f12d45748a4')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   export OPTIMIZER="-march=${CARCH/_/-} -O1"
   export DEBUG=-DNDEBUG
-  make || return 1
-  make DIST_ROOT="${pkgdir}" install install-dev || return 1
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DIST_ROOT="${pkgdir}" install install-dev
+  chown -R root $pkgdir
+  chgrp -R root $pkgdir
 }
 

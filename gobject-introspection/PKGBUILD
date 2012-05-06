@@ -1,25 +1,34 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abferitas@cahkra-project.org
+
 
 pkgname=gobject-introspection
-pkgver=0.10.0
+pkgver=1.32.1
 pkgrel=1
 pkgdesc="Introspection system for GObject-based libraries"
 url="http://live.gnome.org/GObjectInstrospection"
 arch=('x86_64' 'i686')
 license=('LGPL' 'GPL')
-depends=('libffi>=3.0.8' 'glib2>=2.23.5' 'python')
+depends=('libffi' 'glib2' 'python2')
+makedepends=('cairo')
 options=('!libtool')
-source=(http://ftp.gnome.org/pub/gnome/sources/${pkgname}/0.10/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('8af5a4ff16df4b7f08db2eabc09396e15a19dde85a7d288fa26b9cdca280b9fa')
+source=(http://ftp.gnome.org/pub/gnome/sources/${pkgname}/1.32/${pkgname}-${pkgver}.tar.xz)
+sha256sums=('44f3fb933f76e4728818cc360cb5f9e2edcbdf9bc8a8f9aded99b3e3ef5cb858')
+
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --disable-static --disable-tests || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  PYTHON=/usr/bin/python2 ./configure --prefix=/usr --disable-static
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  sed -i '1s|#!/usr/bin/env python$|&2|' \
+    "${pkgdir}"/usr/lib/gobject-introspection/giscanner/*.py
 }
 

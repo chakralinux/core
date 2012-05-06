@@ -1,18 +1,21 @@
-# $Id: PKGBUILD 78429 2010-04-23 18:51:55Z andyrtr $
-# Maintainer: AndyRTR <andyrtr@archlinux.org>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# Contributor: Judd Vinet <jvinet@zeroflux.org>
-# Contributor: Tom Newsom <Jeepster@gmx.co.uk>
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=unixodbc
 pkgver=2.3.0
-pkgrel=1
+pkgrel=3
 pkgdesc="ODBC is an open specification for providing application developers with a predictable API with which to access Data Sources"
 arch=(i686 x86_64)
 license=('GPL2' 'LGPL2.1')
 url="http://www.unixodbc.org/"
 backup=('etc/odbc.ini' 'etc/odbcinst.ini')
-depends=('readline>=6.0' 'libtool')
+depends=('readline>=6.0' 'libltdl')
 options=('!libtool')
 source=(http://www.unixodbc.org/unixODBC-$pkgver.tar.gz)
 md5sums=('f2ad22cbdffe836c58987ed2332c2e99')
@@ -20,10 +23,10 @@ md5sums=('f2ad22cbdffe836c58987ed2332c2e99')
 build() {
     cd ${srcdir}/unixODBC-${pkgver}
     ./configure --prefix=/usr --sysconfdir=/etc
-    make || return 1
+    make 
 }
 
 package() {
     cd ${srcdir}/unixODBC-${pkgver}
-    make DESTDIR=${pkgdir} install || return 1
+    make DESTDIR=${pkgdir} install 
 }

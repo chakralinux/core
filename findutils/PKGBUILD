@@ -1,9 +1,12 @@
-# $Id: PKGBUILD 77807 2010-04-18 04:29:16Z allan $
-# Maintainer: 
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org> 
 
 pkgname=findutils
 pkgver=4.4.2
-pkgrel=2
+pkgrel=4
 pkgdesc="GNU utilities to locate files"
 arch=('i686' 'x86_64')
 license=('GPL3')
@@ -12,21 +15,20 @@ depends=('glibc' 'sh')
 url="http://www.gnu.org/software/findutils"
 source=(ftp://ftp.gnu.org/pub/gnu/findutils/findutils-$pkgver.tar.gz)
 install=findutils.install
-md5sums=('351cc4adb07d54877fa15f75fb77d39f')
+sha1sums=('e8dd88fa2cc58abffd0bfc1eddab9020231bb024')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  # Don't build or install locate because we use mlocate,
+  # which is a secure version of locate.
+  sed -i '/^SUBDIRS/s/locate//' Makefile.in
+
   ./configure --prefix=/usr
-  make || return 1
+  make
 }
 
 package() {
-  cd $srcdir/$pkgname-$pkgver
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR=$pkgdir install
-  rm -rf $pkgdir/usr/{libexec,var}
-
-  # remove locate utils (we use mlocate instead)
-  rm -f $pkgdir/usr/bin/{locate,updatedb}
-  rm -f $pkgdir/usr/share/man/man1/{updatedb.1,locate.1}
-  rm -f $pkgdir/usr/share/man/man5/locatedb.5
 }

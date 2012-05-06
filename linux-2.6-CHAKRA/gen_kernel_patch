@@ -28,7 +28,6 @@ get_file() {
   cd ${OPWD}
 }
 
-source ../_buildscripts/core-${_arch}-makepkg.conf
 source PATCHCFG
 
 export SRCNAME
@@ -58,4 +57,5 @@ rm -v $(find . -type f -name '*.orig')
 cd ${startdir}/src
 diff -Nur ${SRCORIG} ${SRCNAME} > $startdir/${PATCHNAME}
 bzip2 --best $startdir/${PATCHNAME}
+md5sum $startdir/${PATCHNAME}.bz2
 

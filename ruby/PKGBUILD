@@ -1,14 +1,14 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer : abveritas@chakra-project.org
+# maintainer : Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # NOTE If fails to compile restart build without clearing src
 
 pkgname=('ruby' 'ruby-docs')
-pkgver=1.9.2_p180
-_pkgver=1.9.2-p180
+pkgver=1.9.3_p194
+_pkgver=1.9.3-p194
 pkgrel=1
 pkgdesc="An object-oriented language for quick and easy programming"
 arch=('i686' 'x86_64')
@@ -18,12 +18,12 @@ makedepends=('gdbm' 'db' 'openssl' 'zlib' 'readline' 'tk' 'libffi'
              'doxygen' 'graphviz')
 options=('!emptydirs')
 source=("ftp://ftp.ruby-lang.org/pub/ruby/1.9/${pkgname}-${_pkgver}.tar.bz2")
-md5sums=('68510eeb7511c403b91fe5476f250538')
-sha256sums=('06520c4d4b4512d08000f7dfff11d1fabc1d458c3c289c76a2f1ddb7f5a03f4d')
+md5sums=('2278eff4cfed3cbc0653bc73085caa34')
 
 build() {
   cd "${srcdir}/${pkgname}-${_pkgver}"
   ./configure --prefix=/usr \
+      --sysconfdir=/etc \
       --enable-shared \
       --enable-pthread \
       --disable-rpath

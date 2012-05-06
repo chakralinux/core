@@ -1,9 +1,12 @@
-# $Id: PKGBUILD 77149 2010-04-11 11:02:48Z thomas $
-# Maintainer: Thomas Bächler <thomas@archlinux.org>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=libpcap
 pkgver=1.1.1
-pkgrel=1
+pkgrel=2
 pkgdesc="A system-independent interface for user-level packet capture"
 arch=('i686' 'x86_64')
 url="http://www.tcpdump.org/"
@@ -16,13 +19,16 @@ sha256sums=('508cca15547e55d1318498b838456a21770c450beb2dc7d7d4a96d90816e5a85')
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
   ./configure --prefix=/usr --enable-ipv6
-  make || return 1
-  make shared || return 1
-  
+  make
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
   install -d -m755 ${pkgdir}/usr/bin
-  make DESTDIR=${pkgdir} install install-shared || return 1
-  ln -s libpcap.so.1.0.0 ${pkgdir}/usr/lib/libpcap.so.1
-  ln -s libpcap.so.1.0.0 ${pkgdir}/usr/lib/libpcap.so
+  make DESTDIR=${pkgdir} install
+  # remove static library
+  rm -rf ${pkgdir}/usr/lib/libpcap.a
+  
   # backwards compatibility, programs often look for net/bpf.h
   mkdir -p ${pkgdir}/usr/include/net
   cd ${pkgdir}/usr/include/net
@@ -31,3 +37,4 @@ build() {
   #install the license
   install -D -m644 ${srcdir}/$pkgname-$pkgver/LICENSE ${pkgdir}/usr/share/licenses/$pkgname/LICENSE
 }
+

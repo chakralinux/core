@@ -1,23 +1,15 @@
-# arg 1:  the new package version
 post_install()
 {
-  ndiswrapper -m
-  KERNEL_VERSION='2.6.35-CHAKRA-LTS'
-  depmod -ae $KERNEL_VERSION > /dev/null 2>&1 
+  post_upgrade
 }
 
-# arg 1:  the new package version
-# arg 2:  the old package version
 post_upgrade()
 {
-  ndiswrapper -m
-  KERNEL_VERSION='2.6.35-CHAKRA-LTS'
-  depmod -ae $KERNEL_VERSION > /dev/null 2>&1 
+  EXTRAMODULES='extramodules-3.0-CHAKRA-LTS'
+  depmod $(cat /lib/modules/$EXTRAMODULES/version)
 }
 
-# arg 1:  the old package version
 post_remove()
 {
-  KERNEL_VERSION='2.6.35-CHAKRA-LTS'
-  depmod -ae $KERNEL_VERSION > /dev/null 2>&1
+  post_upgrade
 }

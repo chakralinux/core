@@ -4,28 +4,30 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgname=vhba-module
-pkgver=20100822
 # Find the kernel name inside the chroot
-_kernver=`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
-pkgrel=6
+_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_kver="$(cat /lib/modules/${_extramodules}/version)"
+
+pkgname=vhba-module
+pkgver=20110915
+pkgrel=4
 pkgdesc="Kernel module that emulates SCSI devices"
 arch=('i686' 'x86_64')
 url="http://cdemu.sourceforge.net/"
 license=('GPL2')
-groups=('linux-modules')
-depends=('linux>=3.0' 'linux<3.1')
+depends=('linux>=3.2' 'linux<3.3')
 makedepends=('linux-headers')
 install=vhba-module.install
-source=(http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.gz
-        Make-vhba-compatible-with-kernel-2.6.37-SCSI-host-AP.patch)
-md5sums=('1d2f06ae33c5d15b7c29e467e4658aa2'
-         'f0499fc54f6ef9b8d6ca0b9e940c5906')
+source=(http://sourceforge.net/projects/cdemu/files/vhba-module/vhba-module-$pkgver.tar.bz2)
+md5sums=('8bb99b427ca67bad448f4dd211bdd1a2')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
-  patch -Np2 -i ${srcdir}/Make-vhba-compatible-with-kernel-2.6.37-SCSI-host-AP.patch || return 1
-  make -j1 KDIR=/usr/src/linux-${_kernver} || return 1
-  install -D vhba.ko "$pkgdir/lib/modules/${_kernver}/extra/vhba.ko" || return 1
-  sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" "$startdir/vhba-module.install"
+  make -j1 KDIR=/usr/src/linux-${_kver}
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  install -D vhba.ko "$pkgdir/lib/modules/${_extramodules}/vhba.ko"
+  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/vhba-module.install"
 }

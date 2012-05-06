@@ -5,30 +5,36 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=cloog-ppl
-pkgver=0.15.9
-pkgrel=2
+pkgver=0.15.11
+pkgrel=1
+# dash the next line if you want to skip the tests
+_test=1
 pkgdesc="Library that generates loops for scanning polyhedra"
 arch=('i686' 'x86_64')
 url="http://www.cloog.org/"
 license=('GPL')
 depends=('ppl>=0.11')
-options=('!libtool')
+options=('!libtool' 'log')
 source=(ftp://gcc.gnu.org/pub/gcc/infrastructure/${pkgname}-${pkgver}.tar.gz)
-md5sums=('806e001d1b1a6b130069ff6274900af5')
+md5sums=('060ae4df6fb8176e021b4d033a6c0b9e')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
 
-  # "Add" ppl-0.11 compatibility
-  sed -i "/ppl_minor_version=/s#10#11#" configure
-
-  ./configure --prefix=/usr --infodir=/usr/share/info \
+  ./autogen.sh
+  ./configure --prefix=/usr --includedir=/usr/include/cloog-ppl \
     --with-bits=gmp --with-ppl=/usr 
   make
-  make check
+
+  if [ -n "${_test}" ]; then
+     echo "<<< STARTING TESTS >>>"
+     make check
+     echo "<<< ENDING TESTS >>>"
+  fi
 }
 
 package() {
   cd $srcdir/$pkgname-$pkgver
   make DESTDIR=$pkgdir/ install
+  mv $pkgdir/usr/bin/cloog{,-ppl}
 }

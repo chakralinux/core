@@ -1,9 +1,12 @@
-#$Id: PKGBUILD 37370 2009-05-01 06:37:35Z eric $
-#Maintainer: Jan de Groot <jgc@archlinux.org>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=gperf
 pkgver=3.0.4
-pkgrel=1
+pkgrel=3
 pkgdesc="Perfect hash function generator."
 arch=('x86_64' 'i686')
 url="http://www.gnu.org/software/gperf/"
@@ -14,9 +17,14 @@ source=(ftp://ftp.gnu.org/gnu/gperf/${pkgname}-${pkgver}.tar.gz)
 md5sums=('c1f1db32fb6598d6a93e6e88796a8632')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR=${pkgdir} install || return 1
-  gzip ${pkgdir}/usr/share/info/gperf.info
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  ./configure --prefix=/usr \
+    --docdir=/usr/share/gperf/doc/
+  make
+}
+
+package() {
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  gzip "${pkgdir}"/usr/share/info/gperf.info
 }

@@ -2,6 +2,8 @@
 SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.35.tar.bz2"
 # Original source directory
 SRCORIG="linux-2.6.35"
+# Aufs
+_aufs="35-20111114"
 # Our source directory
 SRCNAME="linux-2.6.35-CHAKRA-LTS"
 # Patches:
@@ -10,30 +12,43 @@ SRCNAME="linux-2.6.35-CHAKRA-LTS"
 #   filename%patchlevel (file must be in patches/ subdirectory)
 PATCHES=(
          # add upstream patch from 2.6.35 series
-         http://www.kernel.org/pub/linux/kernel/v2.6/longterm/v2.6.35/patch-2.6.35.11.bz2%1
+         #http://www.kernel.org/pub/linux/kernel/v2.6/longterm/v2.6.35/patch-2.6.35.14.bz2%1
+         http://193.92.150.11/pub/linux/kernel/v2.6/longterm/v2.6.35/patch-2.6.35.14.bz2%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
          # add aufs2 support, in reference to:
          # http://aufs.sourceforge.net
-         http://chakra-project.org/sources/kernel26/patches/35/aufs2/aufs2-base-35.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/aufs2/aufs2-standalone-35.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/aufs2/aufs2-kbuild-35.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/aufs2/aufs2.1-standalone.tree-35-20110221.patch.bz2%1
-         # squashfs with lzma
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/001-squashfs-lzma-add-support-for-lzma-compressed-filesystems.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/002-squashfs-lzma-make-lzma-available-to-non-initramfs-initrd-code.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/003-squashfs-lzma-select-decompress-lzma-needed.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/004-squashfs-lzma-make-lzma-reentrant.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/005-squashfs-lzma-force-lzma-wrapper-to-be-retained.patch%1
-         http://chakra-project.org/sources/kernel26/patches/35/squash-lzma/006-squashfs-lzma-add-missing-slab.h-include-in-lzma-wrapper.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/aufs2.2/aufs2-base-$_aufs.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/aufs2.2/aufs2-standalone-$_aufs.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/aufs2.2/aufs2-kbuild-$_aufs.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/aufs2.2/aufs2.2-standalone.tree-$_aufs.patch.bz2%1
+         # squashfs with lzma2
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/squashfs-xz/kernel26-xz-support.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/squashfs-xz/kernel26-squashfs-xz.patch%1
          # sched_autogroup
-         http://chakra-project.org/sources/kernel26/patches/35/autogroup/2.6.35-sched-automated-per-tty-task-groups.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/autogroup/2.6.35-sched-automated-per-tty-task-groups.patch%1
+         # add acerhk 0.5.35
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/01_kernel26_acerhk-0.5.35.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/02_kernel26_64bits_support_for_aspire5100.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/03_kernel26_Add_Medion_MD97600_support.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/04_kernel26_3rd-acerhk-proc_dir_entry-owner.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/05_kernel26_kbuild.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/06_kernel26_lindent.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/07_kernel26_remove-ifdefs-for-ancient-kernels.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/08_kernel26_remove-ifdefs-for-ACERDEBUG.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/09_kernel26_bg-flag.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/acerhk/10_kernel26_Get-rid-off-bios-error.patch%1
+
+         # add tomoyo 2.5
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/tomoyo/tomoyo-3.2-rc4-backport-for-2.6.35.14.patch%1
+         http://chakra.sourceforge.net/sources/linux/patches/2.6/features/tomoyo/tomoyo-2.5-backport-for-2.6.35.14.patch%1
+
 
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-2.6.35.11-1-CHAKRA-LTS"
+PATCHNAME="patch-2.6.35.14-3-CHAKRA-LTS"
 
 # Run this before applying patches
 pre_apply() {

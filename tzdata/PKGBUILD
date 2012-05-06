@@ -1,36 +1,31 @@
-# $Id: PKGBUILD 80339 2010-05-15 15:09:59Z andyrtr $
-# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=tzdata
-pkgver=2010j
+pkgver=2012c
 pkgrel=1
-_tzcode=2010j
-_tzdata=2010j
 pkgdesc="Sources for time zone and daylight saving time data"
-arch=('i686' 'x86_64')
-url="http://www.twinsun.com/tz/tz-link.htm"
+arch=('any')
+url="http://www.iana.org/time-zones"
 license=('GPL')
-depends=()
-makedepends=()
-optdepends=('sh: required by tzselect')
 options=('!emptydirs')
-source=(ftp://elsie.nci.nih.gov/pub/tzcode${_tzcode}.tar.gz \
-        ftp://elsie.nci.nih.gov/pub/${pkgname}${_tzdata}.tar.gz \
-        Makefile.patch)
-md5sums=('5ba8345720296d3a659b349b2052d139'
-         'f668f66b260e14b477eac3f48bcfb5f4'
-         'a64ed97d1fc03c66ee8612c0d9f40507')
+source=(#http://www.iana.org/time-zones/repository/releases/${pkgname}${pkgver}.tar.gz
+        ftp://munnari.oz.au/pub/${pkgname}${pkgver}.tar.gz)
+sha1sums=('e0cd9c2cc0ac8d90ed842133b910d4bb3bc1a6dd')
 
-build() {
+timezones=('africa' 'antarctica' 'asia' 'australasia'
+           'europe' 'northamerica' 'southamerica'
+           'pacificnew' 'etcetera' 'backward'
+           'systemv' 'factory'
+           'solar87' 'solar88' 'solar89')
+
+package() {
   cd ${srcdir}
-
-  tar -xf tzcode${_tzcode}.tar.gz  || return 1
-  tar -xf ${pkgname}${_tzdata}.tar.gz || return 1
-
-  patch -Np1 -i "${srcdir}/Makefile.patch" || return 1
-
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
-
-  rm "${pkgdir}/usr/share/zoneinfo/localtime"
+  zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo ${timezones[@]}
+  zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo/posix ${timezones[@]}
+  zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo/right -L leapseconds ${timezones[@]}
+  zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo -p America/New_York
+  install -m444 -t ${pkgdir}/usr/share/zoneinfo iso3166.tab zone.tab
 }

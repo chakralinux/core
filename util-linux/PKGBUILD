@@ -5,21 +5,20 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=util-linux
-pkgver=2.20.1
-pkgrel=2
+pkgver=2.21
+pkgrel=1
 pkgdesc="Miscellaneous system utilities for Linux"
-url="http://userweb.kernel.org/~kzak/util-linux-ng/"
+url="http://www.kernel.org/pub/linux/utils/util-linux/"
 arch=('i686' 'x86_64')
 groups=('base')
-depends=('filesystem')
-optdepends=('perl: for chkdupexe support')
-replaces=('linux32' 'util-linux-ng')
-conflicts=('linux32' 'util-linux-ng' 'e2fsprogs<1.41.8-2')
-provides=('linux32' "util-linux-ng=${pkgver}")
+depends=('udev')
+conflicts=('util-linux-ng')
+provides=("util-linux-ng=${pkgver}")
 license=('GPL2')
 options=('!libtool')
-source=("ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('dd87a15e8d410b447e493a6f407f38c8')
+source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v${pkgver}/${pkgname}-${pkgver}.tar.xz
+	stable-fixes-2.21.patch)
+optdepends=('perl: for chkdupexe support')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -27,12 +26,13 @@ build() {
   # hardware clock
   sed -e 's%etc/adjtime%var/lib/hwclock/adjtime%' -i include/pathnames.h
 
-  ./configure --enable-arch \
+  patch -p1 -i ../stable-fixes-2.21.patch
+
+  ./configure --prefix=/usr \
+              --libdir=/usr/lib \
               --enable-write \
               --enable-raw \
-              --disable-wall \
-              --enable-partx \
-              --enable-libmount-mount
+              --disable-wall
 
   make
 }
@@ -40,9 +40,14 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  install -dm755 "${pkgdir}/var/lib/hwclock"
-
   make DESTDIR="${pkgdir}" install
-}
 
-# vim:set ts=2 sw=2 et:
+  cd "${pkgdir}"
+
+  install -dm755 var/lib/hwclock
+
+  # delete stray empty dir, fixed upstream
+  rm -r usr/share/man/ru
+}
+md5sums=('208aa058f4117759d2939d1be7d662fc'
+         '415b850a4efa9174cd9c34022949f177')

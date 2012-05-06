@@ -1,35 +1,30 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# $Id$
+# Maintainer: Eric Bélanger <eric@archlinux.org>
+# Maintainer: Thomas Bächler <thomas@archlinux.org>
 
 pkgbase=lvm2
 pkgname=('lvm2' 'device-mapper')
-pkgver=2.02.74
-_pkgverdm=1.02.52
-_pkgverlvm=${pkgver}
-pkgrel=1.1
+pkgver=2.02.87
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://sourceware.org/lvm2/"
 license=('GPL2' 'LGPL2.1')
 groups=('base')
-conflicts=('mkinitcpio<0.5.99')
-source=(ftp://sources.redhat.com/pub/lvm2/old/LVM2.${_pkgverlvm}.tgz
+source=(ftp://sources.redhat.com/pub/lvm2/LVM2.${pkgver}.tgz
         lvm2_install
-        lvm2_hook)
-md5sums=('3f86b528310183cad73c81c8efda0c34'
-         'f781c9f5dd4f9934952c687b73d26a18'
-         '95bed25bdbc2c2d8500e7a07aeff7f65')
-sha1sums=('fc6cd04e4a908906c6f596ad99948140728be99c'
-          '583424bb0a6f89ffe4e4ea446b912f0fedac7050'
-          '0dc0c0d620f634c4d078afdb78e3bae15ccf957b')
+        lvm2_hook
+        11-dm-initramfs.rules)
+md5sums=('4c36c7f216edfe65a6193d2adc389ecd'
+         'dcb82506d732cc7b10159a89b579dba8'
+         '8d613b84a175cd85f752a75198e40e15'
+         '69e40679cd8b3658bfc619e48baae125')
+sha1sums=('4b217d405133bdc6120568253574a49fae2caa4f'
+          '7f108b2f2056eb050fc898bf5190ecf9145aed8a'
+          'a0e0513c2efb183006e57e595d93ce18be297928'
+          'f6a554eea9557c3c236df2943bb6e7e723945c41')
 
 build() {
-  cd "${srcdir}/LVM2.${_pkgverlvm}"
+  cd "${srcdir}/LVM2.${pkgver}"
   sed -i 's|/usr/bin/tr|/bin/tr|' scripts/lvmdump.sh
   unset LDFLAGS
   ./configure --prefix= --sysconfdir=/etc --localstatedir=/var --datarootdir=/usr/share \
@@ -44,23 +39,23 @@ package_device-mapper() {
   url="http://sourceware.org/dm/"
   depends=('glibc' 'udev')
 
-  cd "${srcdir}/LVM2.${_pkgverlvm}"
+  cd "${srcdir}/LVM2.${pkgver}"
   make DESTDIR="${pkgdir}" install_device-mapper
+  # extra udev rule for device-mapper in initramfs
+  install -D -m644 "${srcdir}/11-dm-initramfs.rules" "${pkgdir}/lib/initcpio/udev/11-dm-initramfs.rules"
 }
 
 package_lvm2() {
   pkgdesc="Logical Volume Manager 2 utilities"
   depends=('bash' "device-mapper>=${pkgver}" 'udev' 'readline')
-  conflicts=('lvm' 'mkinitcpio<0.5.99')
+  conflicts=('lvm' 'mkinitcpio<0.7')
   backup=('etc/lvm/lvm.conf')
   options=('!makeflags')
 
-  cd "${srcdir}/LVM2.${_pkgverlvm}"
+  cd "${srcdir}/LVM2.${pkgver}"
   make DESTDIR="${pkgdir}" install_lvm2
   # install applib
-  cd liblvm
-  make DESTDIR="${pkgdir}" install
-  cd ..
+  make -C liblvm DESTDIR="${pkgdir}" install
   # /etc directories
   install -d "${pkgdir}"/etc/lvm/{archive,backup}
   # mkinitcpio hook

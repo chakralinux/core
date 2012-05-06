@@ -11,9 +11,9 @@ pkgbase="kernel26-lts"
 pkgname=('kernel26-lts' 'kernel26-lts-headers') # 'kernel26-lts-firmware' -  Build stock -CHAKRA-LTS kernel
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.35
-pkgver=${_basekernel}.12
-pkgrel=1
-_patchname="patch-${pkgver}-${pkgrel}-CHAKRA-LTS"
+pkgver=${_basekernel}.13
+pkgrel=2
+_patchname="patch-${pkgver}-1-CHAKRA-LTS"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
@@ -24,9 +24,9 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         # standard config files for mkinitcpio ramdisk
         ${pkgname}.preset)
 md5sums=('091abeb4684ce03d1d936851618687b6'
-         '0dd0074dbd2ebfcb4d6d289c90933ca9'
-         'f031e498b280fe3448f4ef45f3cd803e'
-         '71ae55a833f298c0579617853d8c8b02'
+         '5e6b25108e9f03fb5788668bc11cc249'
+         'bc15d306c5e26f25898fe26044f95768'
+         '6d42785b79be8d7ee8d1c55fcddeab9d'
          'a69bba023ee617a2b8f32296d7d46d0f')
 
 build() {
@@ -77,8 +77,8 @@ package_kernel26-lts() {
             'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
             'gspcav1' 'atl2' 'wlan-ng26' 'rt2500' 'kernel26-lts'
-            'aufs2')
-  provides=('aufs2' "kernel26=${pkgver}")
+            'aufs2' 'nouveau-drm-lts')
+  provides=('aufs2' "kernel26=${pkgver}" 'nouveau-drm')
   install=kernel26-lts.install
   optdepends=('crda: to set the correct wireless channels of your country')
 
