@@ -1,14 +1,11 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer : abveritas[at]chakra-project[dog]org>
+# maintainer : Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=apache
-pkgver=2.2.17
+pkgver=2.2.22
 pkgrel=1
 pkgdesc='A high performance Unix-based HTTP server'
 arch=('i686' 'x86_64')
@@ -23,7 +20,8 @@ backup=(etc/conf.d/apache etc/httpd/conf/httpd.conf
 depends=('openssl' 'zlib' 'apr-util' 'pcre')
 optdepends=('lynx: apachectl status')
 _itkurl=http://mpm-itk.sesse.net/apache2.2-mpm-itk-2.2.17-01
-source=(http://archive.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2
+source=(http://www.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2
+        http://www.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2.asc
         ${_itkurl}/02-rename-prefork-to-itk.patch
         ${_itkurl}/03-add-mpm-to-build-system.patch
         ${_itkurl}/04-correct-output-makefile-location.patch
@@ -38,8 +36,10 @@ source=(http://archive.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2
         apache.conf.d
         httpd.logrotate
         httpd
-        arch.layout)
-md5sums=('16eadc59ea6b38af33874d300973202e'
+        chakra.layout
+        pcre_info.patch)
+md5sums=('9fe3093194c8a57f085ff7c3fc43715f'
+         '41b3a6e4948679cab70b9caf490877c4'
          'f1d9d41360908ceb2374da55ae99197a'
          'cdfa04985a0efa850976aef01c2a0c40'
          '0930d2d0612eb0a53a0d00aea7e8687f'
@@ -54,42 +54,46 @@ md5sums=('16eadc59ea6b38af33874d300973202e'
          '08b3c875f6260644f2f52b4056d656b0'
          '6382331e9700ed9e8cc78ea51887b537'
          'c7e300a287ef7e2e066ac7639536f87e'
-         '3d659d41276ba3bfcb20c231eb254e0c')
+         '9404bc261cffce7ad88850f0569e9067'
+         'a8821a0785d40a0eb7be314fb6d3f920')
 
 build() {
 	cd "${srcdir}/httpd-${pkgver}"
 
-	patch -Np0 -i "${srcdir}/apachectl-confd.patch" || return 1
+	patch -p0 -i "${srcdir}/apachectl-confd.patch" 
+	patch -p1 -i "${srcdir}/pcre_info.patch" 
 
 	# set default user
 	sed -e 's#User daemon#User http#' \
 	    -e 's#Group daemon#Group http#' \
-	    -i docs/conf/httpd.conf.in || return 1
+	    -i docs/conf/httpd.conf.in 
 
-	cat "${srcdir}/arch.layout" >> config.layout
+	cat "${srcdir}/chakra.layout" >> config.layout
 
 	for mpm in prefork worker itk; do
 		if [ "${mpm}" = "itk" ]; then
+                         # Fix patch to apply with latest Apache version
+                         sed -i -e 's/mpmt_os2}/mpmt_os2|winnt}/g' "${srcdir}/03-add-mpm-to-build-system.patch"
 			mkdir -p server/mpm/experimental/itk
-			cp -r server/mpm/prefork/* server/mpm/experimental/itk/ || return 1
-			mv server/mpm/experimental/itk/prefork.c server/mpm/experimental/itk/itk.c || return 1
+			cp -r server/mpm/prefork/* server/mpm/experimental/itk/ 
+			mv server/mpm/experimental/itk/prefork.c server/mpm/experimental/itk/itk.c 
 
-			patch -Np1 -i "${srcdir}/02-rename-prefork-to-itk.patch" || return 1
-			patch -Np1 -i "${srcdir}/03-add-mpm-to-build-system.patch" || return 1
-			patch -Np1 -i "${srcdir}/04-correct-output-makefile-location.patch" || return 1
-			patch -Np1 -i "${srcdir}/05-add-copyright.patch" || return 1
-			patch -Np1 -i "${srcdir}/06-hook-just-after-merging-perdir-config.patch" || return 1
-			patch -Np1 -i "${srcdir}/07-base-functionality.patch" || return 1
-			patch -Np1 -i "${srcdir}/08-max-clients-per-vhost.patch" || return 1
-			patch -Np1 -i "${srcdir}/09-capabilities.patch" || return 1
-			patch -Np1 -i "${srcdir}/10-nice.patch" || return 1
-                        patch -Np1 -i "${srcdir}/11-fix-htaccess-reads-for-persistent-connections.patch" || return 1
+			patch -Np1 -i "${srcdir}/02-rename-prefork-to-itk.patch" 
+			patch -Np1 -i "${srcdir}/03-add-mpm-to-build-system.patch" 
+			patch -Np1 -i "${srcdir}/04-correct-output-makefile-location.patch" 
+			patch -Np1 -i "${srcdir}/05-add-copyright.patch"
+			patch -Np1 -i "${srcdir}/06-hook-just-after-merging-perdir-config.patch" 
+			patch -Np1 -i "${srcdir}/07-base-functionality.patch" 
+			patch -Np1 -i "${srcdir}/08-max-clients-per-vhost.patch"
+			patch -Np1 -i "${srcdir}/09-capabilities.patch" 
+			patch -Np1 -i "${srcdir}/10-nice.patch"
+                         patch -Np1 -i "${srcdir}/11-fix-htaccess-reads-for-persistent-connections.patch" 
 
-			autoconf || return 1
+			autoconf 
 		fi
 		mkdir build-${mpm}
 		pushd build-${mpm}
-		../configure --enable-layout=Arch \
+		../configure --enable-layout=Chakra \
 			--enable-modules=all \
 			--enable-mods-shared=all \
 			--enable-so \
@@ -109,19 +113,19 @@ build() {
 			--with-apr=/usr/bin/apr-1-config \
 			--with-apr-util=/usr/bin/apu-1-config \
 			--with-pcre=/usr \
-			--with-mpm=${mpm} || return 1
-		make || return 1
+			--with-mpm=${mpm} 
+		make
 		if [ "${mpm}" = "prefork" ]; then
-			make DESTDIR="${pkgdir}" install || return 1
+			make DESTDIR="${pkgdir}" install
 		else
 			install -m755 httpd "${pkgdir}/usr/sbin/httpd.${mpm}"
 		fi
 		popd
 	done
 
-	install -D -m755 "${srcdir}/httpd" "${pkgdir}/etc/rc.d/httpd" || return 1
-	install -D -m644 "${srcdir}/httpd.logrotate" "${pkgdir}/etc/logrotate.d/httpd" || return 1
-	install -D -m644 "${srcdir}/apache.conf.d" "${pkgdir}/etc/conf.d/apache" || return 1
+	install -D -m755 "${srcdir}/httpd" "${pkgdir}/etc/rc.d/httpd" 
+	install -D -m644 "${srcdir}/httpd.logrotate" "${pkgdir}/etc/logrotate.d/httpd" 
+	install -D -m644 "${srcdir}/apache.conf.d" "${pkgdir}/etc/conf.d/apache" 
 
 	# symlinks for /etc/httpd
 	ln -fs /var/log/httpd "${pkgdir}/etc/httpd/logs"
@@ -136,7 +140,7 @@ build() {
 	    -e 's|#\(Include conf/extra/httpd-languages.conf\)|\1|' \
 	    -e 's|#\(Include conf/extra/httpd-userdir.conf\)|\1|' \
 	    -e 's|#\(Include conf/extra/httpd-default.conf\)|\1|' \
-	    -i "${pkgdir}/etc/httpd/conf/httpd.conf" || return 1
+	    -i "${pkgdir}/etc/httpd/conf/httpd.conf"
 
 	# cleanup
 	rm -rf "${pkgdir}/usr/share/httpd/manual"
