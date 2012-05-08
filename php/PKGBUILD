@@ -1,7 +1,7 @@
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer : abveritas[at]chakra-project[dog]org>
+# maintainer : Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgbase=php
 pkgname=('php'
@@ -25,32 +25,29 @@ pkgname=('php'
          'php-sqlite'
          'php-tidy'
          'php-xsl')
-pkgver=5.3.6
+pkgver=5.4.3
 pkgrel=1
-_suhosinver=${pkgver}-0.9.10
 arch=('i686' 'x86_64')
 license=('PHP')
 url='http://www.php.net'
-makedepends=('apache' 'imap' 'postgresql-libs' 'mysql' 'libldap' 'postfix'
+makedepends=('apache' 'imap' 'postgresql-libs' 'mysql' 'libldap' 'postfix' 'libvpx'
              'sqlite3' 'unixodbc' 'net-snmp' 'libzip' 'enchant' 'file' 'freetds'
-             'libmcrypt' 'tidyhtml' 'aspell' 'libtool' 'libpng' 'libjpeg' 'icu'
+             'libmcrypt' 'tidyhtml' 'aspell' 'libltdl' 'libpng' 'libjpeg' 'icu'
              'curl' 'libxslt' 'openssl' 'bzip2' 'db' 'gmp' 'freetype2')
 source=("http://www.php.net/distributions/${pkgbase}-${pkgver}.tar.bz2"
-        "suhosin-patch-${_suhosinver}.patch.gz"
         'php.ini.patch' 'apache.conf' 'rc.d.php-fpm' 'php-fpm.conf.in.patch'
         'logrotate.d.php-fpm')
-md5sums=('2286f5a82a6e8397955a0025c1c2ad98'
-         'fff1a38877142f3ae6036dbe5a85d0a6'
-         '39eaa70d276fc3d45d6bcf6cd5ae1106'
-         '96ca078be6729b665be8a865535a97bf'
+md5sums=('51f9488bf8682399b802c48656315cac'
+         '0b0bc7a917fc592bdf11dcd3c5c255e9'
+         'e792470a40eaade691483ca424ea45ff'
          'b136a184dd055c559a03eb8bac562a3c'
-         'd50ff349da08110a7cc8c691ce2d0423'
+         '59b3a25f9eb3afc02f1adf9ee699808c'
          '07c4e412909ac65a44ec90e7a2c4bade')
 
 build() {
 	# ldap-sasl does not compile with --as-needed
-	export LDFLAGS="${LDFLAGS//-Wl,--as-needed}"
-	export LDFLAGS="${LDFLAGS//,--as-needed}"
+	#export LDFLAGS="${LDFLAGS//-Wl,--as-needed}"
+	#export LDFLAGS="${LDFLAGS//,--as-needed}"
 
 	phpconfig="--srcdir=../${pkgbase}-${pkgver} \
 		--prefix=/usr \
@@ -85,7 +82,6 @@ build() {
 		--enable-shmop=shared \
 		--enable-soap=shared \
 		--enable-sockets=shared \
-		--enable-sqlite-utf8 \
 		--enable-sysvmsg=shared \
 		--enable-sysvsem=shared \
 		--enable-sysvshm=shared \
@@ -125,7 +121,6 @@ build() {
 		--with-regex=php \
 		--with-snmp=shared \
 		--with-sqlite3=shared,/usr \
-		--with-sqlite=shared \
 		--with-tidy=shared \
 		--with-unixODBC=shared,/usr \
 		--with-xmlrpc=shared \
@@ -141,9 +136,6 @@ build() {
 	export PEAR_INSTALLDIR
 
 	cd ${srcdir}/${pkgbase}-${pkgver}
-
-	# apply suhosin patch
-	patch -p1 -i ${srcdir}/suhosin-patch-${_suhosinver}.patch
 
 	# adjust paths
 	patch -p0 -i ${srcdir}/php.ini.patch

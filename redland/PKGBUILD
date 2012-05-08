@@ -1,16 +1,13 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer : abveritas[at]chakra-project[dog]org>
+# maintainer : Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgbase=redland
 epoch=1
 pkgname=('redland' 'redland-storage-mysql' 'redland-storage-postgresql' 'redland-storage-virtuoso' 'redland-storage-sqlite')
-pkgver=1.0.14
+pkgver=1.0.15
 pkgrel=1
 url="http://librdf.org/"
 license=("GPL")
@@ -19,7 +16,7 @@ makedepends=('rasqal>=0.9.26' 'raptor>=2.0.4' 'db' 'postgresql-libs' 'libmysqlcl
 options=('!libtool')
 source=(http://download.librdf.org/source/$pkgname-$pkgver.tar.gz
         rpath.diff)
-md5sums=('3400579d137da82c4175debf9f6d53ba'
+md5sums=('b0deb87f3c7d3237a3d587c1e0f2f266'
          'acc85e784f01a656bd56777f95880787')
 
 build() {
@@ -33,14 +30,14 @@ build() {
 	--with-sqlite=3
 
   # nuke rpath
-  patch -Np0 -i ${srcdir}/rpath.diff
+  patch -p0 -i ${srcdir}/rpath.diff
 
   make
 }
 
 package_redland() {
  pkgdesc="Library that provides a high-level interface to RDF data"
- depends=('rasqal>=0.9.26' 'raptor>=2.0.4' 'libtool')
+ depends=('rasqal>=0.9.26' 'raptor>=2.0.4' 'libltdl')
  
   cd ${srcdir}/${pkgbase}-${pkgver}
   make DESTDIR=${pkgdir} install
