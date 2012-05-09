@@ -1,18 +1,17 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=perl-digest-sha1
 _realname=Digest-SHA1
 pkgver=2.13
-pkgrel=1
+pkgrel=2
 pkgdesc="Perl interface to the SHA-1 Algorithm"
 arch=(i686 x86_64)
 license=('PerlArtistic')
 url="http://search.cpan.org/dist/${_realname}/"
-depends=('perl>=5.10.0')
+depends=('perl>=5.14.2')
 options=(!emptydirs)
 source=(http://www.cpan.org/authors/id/G/GA/GAAS/${_realname}-${pkgver}.tar.gz)
 replaces=('digest-sha1')
@@ -25,15 +24,14 @@ build() {
   # install module in vendor directories.
   perl Makefile.PL INSTALLDIRS=vendor
   make
+}
+
+check() {
+  cd ${srcdir}/${_realname}-${pkgver}
   make test
 }
 
 package() {
   cd ${srcdir}/${_realname}-${pkgver}
-
   make install DESTDIR=${pkgdir}
-
-  # remove perllocal.pod and .packlist
-  find ${pkgdir} -name perllocal.pod -delete
-  find ${pkgdir} -name .packlist -delete
 }

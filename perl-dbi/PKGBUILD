@@ -1,21 +1,20 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=perl-dbi
 _realname=DBI
-pkgver=1.616
+pkgver=1.618
 pkgrel=1
 pkgdesc="Database independent interface for Perl"
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 license=('GPL' 'PerlArtistic')
 url="http://search.cpan.org/dist/${_realname}/"
-depends=('perl>=5.12.1')
-options=(!emptydirs)
+depends=('perl>=5.14.2')
+options=('!emptydirs')
 source=(http://www.cpan.org/authors/id/T/TI/TIMB/${_realname}-${pkgver}.tar.gz)
-md5sums=('799313e54a693beb635b47918458f7c4')
+md5sums=('5ad29b56f7457f22bd1ca1c871b30719')
 
 build() {
   cd "${srcdir}/${_realname}-${pkgver}"
@@ -23,6 +22,10 @@ build() {
   # install module in vendor directories.
   perl Makefile.PL INSTALLDIRS=vendor
   make
+}
+
+check() {
+  cd "${srcdir}/${_realname}-${pkgver}"
   make test
 }
 
