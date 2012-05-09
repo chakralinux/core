@@ -1,29 +1,33 @@
-# $Id: PKGBUILD 46679 2009-07-19 15:46:22Z jgc $
-# Maintainer: Jan de Groot <jgc@archlinux.org>
-# Contributor: Sarah Hay <sarah@archlinux.org>
+# Platform packages for Chakra
 
 pkgname=gtk2-perl
-_realname=Gtk2
-pkgver=1.223
+pkgver=1.241
 pkgrel=1
-pkgdesc="Gtk2-Perl allows Perl developers to write GTK+ 2.x applications."
+pkgdesc="Perl bindings for GTK+ 2.x"
 arch=(i686 x86_64)
 license=('LGPL')
 url="http://gtk2-perl.sourceforge.net/"
 makedepends=('perl-extutils-pkgconfig' 'perl-extutils-depends')
-depends=('gtk2>=2.16.5' 'pango-perl>=1.220')
+depends=('gtk2' 'pango-perl')
+checkdepends=('ttf-dejavu' 'xorg-server-xvfb')
 options=('!emptydirs')
-source=(http://downloads.sourceforge.net/sourceforge/gtk2-perl/${_realname}-${pkgver}.tar.gz)
-md5sums=('57459f0f39c20699a5062ea833a67817')
+source=(http://downloads.sourceforge.net/sourceforge/gtk2-perl/Gtk2-${pkgver}.tar.gz)
+md5sums=('82ee2af46ef9ab7b560601e3ae6f8f7a')
 
 build() {
-  cd "${srcdir}/${_realname}-${pkgver}"
-  # install module in vendor directories.
-  PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor || return 1
-  make || return 1
-  make install DESTDIR="${pkgdir}" || return 1
+  cd "${srcdir}/Gtk2-${pkgver}"
+  PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
+  make
+}
 
-  # remove perllocal.pod and .packlist
-  find "${pkgdir}" -name perllocal.pod -delete
-  find "${pkgdir}" -name .packlist -delete
+check() {
+  cd "${srcdir}/Gtk2-${pkgver}"
+  LD_PRELOAD="" Xvfb -nolisten tcp -extension GLX -screen 0 1280x1024x24 :99 &
+  LD_PRELOAD="" DISPLAY=:99 make test
+  kill $!
+}
+
+package() {
+  cd "${srcdir}/Gtk2-${pkgver}"
+  make install DESTDIR="${pkgdir}"
 }

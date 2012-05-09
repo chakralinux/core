@@ -1,31 +1,30 @@
-#
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=pango-perl
-_realname=Pango
-pkgver=1.221
-pkgrel=2
+pkgver=1.223
+pkgrel=1
 pkgdesc="Perl bindings for Pango"
 arch=(i686 x86_64)
 license=('LGPL')
 url="http://gtk2-perl.sourceforge.net/"
 makedepends=('perl-extutils-pkgconfig' 'perl-extutils-depends')
-depends=('pango>=1.26.0' 'glib-perl>=1.222' 'cairo-perl>=1.061')
+depends=('pango' 'glib-perl' 'cairo-perl')
 options=('!emptydirs')
-source=(http://downloads.sourceforge.net/gtk2-perl/${_realname}-${pkgver}.tar.gz)
-md5sums=('8d257209aa11bd6c3a2beb235c2f103f')
+source=(http://downloads.sourceforge.net/sourceforge/gtk2-perl/Pango-${pkgver}.tar.gz)
+md5sums=('628a6de54f47b6791c6b45edfb835215')
 
 build() {
-  cd "${srcdir}/${_realname}-${pkgver}"
-  # install module in vendor directories.
-  PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor || return 1
-  make || return 1
-  make install DESTDIR="${pkgdir}" || return 1
+  cd "${srcdir}/Pango-${pkgver}"
+  PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
+  make
+}
 
-  # remove perllocal.pod and .packlist
-  find "${pkgdir}" -name perllocal.pod -delete
-  find "${pkgdir}" -name .packlist -delete
+check() {
+  cd "${srcdir}/Pango-${pkgver}"
+  make test
+}
+
+package() {
+  cd "${srcdir}/Pango-${pkgver}"
+  make install DESTDIR="${pkgdir}"
 }
