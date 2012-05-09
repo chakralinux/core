@@ -1,13 +1,8 @@
-#
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=gconf-perl
-_realname=Gnome2-GConf
 pkgver=1.044
-pkgrel=3
+pkgrel=4
 pkgdesc="Gnome2-GConf perl bindings for gconf"
 arch=('i686' 'x86_64')
 license=('LGPL')
@@ -15,12 +10,21 @@ url="http://gtk2-perl.sourceforge.net/"
 makedepends=('perl-extutils-pkgconfig' 'perl-extutils-depends')
 depends=('glib-perl' 'gconf' 'perl')
 options=(!emptydirs)
-source=(http://downloads.sourceforge.net/sourceforge/gtk2-perl/${_realname}-${pkgver}.tar.gz)
+source=(http://downloads.sourceforge.net/sourceforge/gtk2-perl/Gnome2-GConf-${pkgver}.tar.gz)
 md5sums=('ea386003b18f067524833b0eeb271330')
 
 build() {
-  cd "${srcdir}/${_realname}-${pkgver}"
+  cd "${srcdir}/Gnome2-GConf-${pkgver}"
   perl Makefile.PL INSTALLDIRS=vendor
   make
+}
+
+check() {
+  cd "${srcdir}/Gnome2-GConf-${pkgver}"
+  dbus-launch --exit-with-session make test
+}
+
+package() {
+  cd "${srcdir}/Gnome2-GConf-${pkgver}"
   make DESTDIR="${pkgdir}" install
 }
