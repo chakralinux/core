@@ -1,86 +1,46 @@
-#
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=perl-libwww
-_realname=libwww-perl
-pkgver=5.836
+pkgver=6.04
 pkgrel=1
-pkgdesc="A set of Perl modules which provides a simple and consistent API to the WWW"
-arch=('any')
-license=('PerlArtistic')
-url="http://search.cpan.org/dist/${_realname}/"
-depends=('perl-uri' 'perl-html-parser')
-optdepends=('perl-crypt-ssleay: for SSL/TLS support')
-options=('!emptydirs')
-replaces=('libwww-perl')
-provides=(
-'perl-bundle-lwp'
-'perl-file-listing=5.814'
-'perl-html-form=5.829'
-'perl-http-config=5.835'
-'perl-http-cookies=5.833'
-'perl-http-cookies-microsoft'
-'perl-http-cookies-netscape=5.832'
-'perl-http-daemon=5.827'
-'perl-http-date=5.831'
-'perl-http-headers=5.835'
-'perl-http-headers-auth=5.817'
-'perl-http-headers-etag=5.810'
-'perl-http-headers-util=5.817'
-'perl-http-message=5.835'
-'perl-http-negotiate=5.835'
-'perl-http-request=5.827'
-'perl-http-request-common=5.824'
-'perl-http-response=5.836'
-'perl-http-status=5.817'
-'perl-lwp=5.836'
-'perl-lwp-authen-basic'
-'perl-lwp-authen-digest'
-'perl-lwp-authen-ntlm'
-'perl-lwp-conncache=5.810'
-'perl-lwp-debug'
-'perl-lwp-debugfile'
-'perl-lwp-mediatypes=5.835'
-'perl-lwp-membermixin'
-'perl-lwp-protocol=5.829'
-'perl-lwp-protocol-cpan'
-'perl-lwp-protocol-data'
-'perl-lwp-protocol-file'
-'perl-lwp-protocol-ftp'
-'perl-lwp-protocol-ghttp'
-'perl-lwp-protocol-gopher'
-'perl-lwp-protocol-http'
-'perl-lwp-protocol-http10'
-'perl-lwp-protocol-https'
-'perl-lwp-protocol-https10'
-'perl-lwp-protocol-loopback'
-'perl-lwp-protocol-mailto'
-'perl-lwp-protocol-nntp'
-'perl-lwp-protocol-nogo'
-'perl-lwp-robotua=5.835'
-'perl-lwp-simple=5.835'
-'perl-lwp-useragent=5.835'
-'perl-net-http=5.834'
-'perl-net-http-methods=5.834'
-'perl-net-http-nb=5.810'
-'perl-net-https=5.819'
-'perl-www-robotrules=5.832'
-'perl-www-robotrules-anydbm_file=5.835'
+pkgdesc="The World-Wide Web library for Perl"
+arch=(any)
+license=(PerlArtistic GPL)
+options=(!emptydirs)
+depends=('perl>=5.8.1' 'perl-encode-locale' 'perl-file-listing>=6'
+         'perl-html-parser' 'perl-http-cookies>=6' 'perl-http-daemon>=6'
+         'perl-http-date>=6' 'perl-http-negotiate>=6' 'perl-lwp-mediatypes>=6'
+         'perl-net-http>=6' 'perl-uri>=1.10' 'perl-www-robotrules>=6'
+         'perl-http-message>=6')
+optdepends=('perl-lwp-protocol-https: for https:// url schemes')
+url=https://metacpan.org/release/libwww-perl
+source=("http://search.cpan.org/CPAN/authors/id/G/GA/GAAS/libwww-perl-${pkgver}.tar.gz")
+md5sums=(24acf2fe33b2295f048f8859e9665ee3)
+sha512sums=(9ea578e6da99e4002a35ae82d1ee025caf15b3bc7e40fbe71abd7e8592036f16bd0268453dfeedc2c445d957c45ec473b1ed4a1738b644d475d65f7cbdb6927b)
+_distdir="${srcdir}/libwww-perl-${pkgver}"
+
+build()
+(
+    export PERL_MM_USE_DEFAULT=1 PERL5LIB=""                 \
+      PERL_AUTOINSTALL=--skipdeps                            \
+      PERL_MM_OPT="INSTALLDIRS=vendor DESTDIR='$pkgdir'"     \
+      PERL_MB_OPT="--installdirs vendor --destdir '$pkgdir'" \
+      MODULEBUILDRC=/dev/null
+
+    cd "$_distdir"
+    /usr/bin/perl Makefile.PL
+    make
 )
-source=(http://www.cpan.org/authors/id/G/GA/GAAS/${_realname}-${pkgver}.tar.gz)
-md5sums=('424325417ed5a85700e604317872b588')
 
-build() {
-  cd ${srcdir}/${_realname}-${pkgver}
-  # install module in vendor directories.
-  perl Makefile.PL --aliases INSTALLDIRS=vendor || return 1
-  make  || return 1
-  make install DESTDIR=${pkgdir} || return 1
+check()
+(
+    export PERL_MM_USE_DEFAULT=1 PERL5LIB=""
+    cd "$_distdir"
+    make test
+)
 
-  # remove perllocal.pod and .packlist
-  find ${pkgdir} -name perllocal.pod -delete
-  find ${pkgdir} -name .packlist -delete
+package() {
+    cd "$_distdir"
+    make DESTDIR="$pkgdir" install
+    find "$pkgdir" -name .packlist -o -name perllocal.pod -delete
 }
