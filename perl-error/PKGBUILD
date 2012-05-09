@@ -1,30 +1,31 @@
-#
 # Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=perl-error
 _realname=Error
-pkgver=0.17016
-pkgrel=3
+pkgver=0.17017
+pkgrel=1
 pkgdesc="Perl/CPAN Error module - Error/exception handling in an OO-ish way"
 url="http://search.cpan.org/dist/${_realname}/"
-arch=(i686 x86_64)
+arch=('any')
 license=('PerlArtistic' 'GPL')
-depends=('perl>=5.10.0')
+depends=('perl>=5.14.2')
 options=('!emptydirs')
 source=(http://search.cpan.org/CPAN/authors/id/S/SH/SHLOMIF/${_realname}-${pkgver}.tar.gz)
-md5sums=('eedcd3c6970568dd32092b5334328eff')
+md5sums=('d53e158fdb3d8fd54ddbed4dc2e44ad4')
 
 build() {
-  cd ${startdir}/src/${_realname}-${pkgver}
+  cd ${srcdir}/${_realname}-${pkgver}
   # install module in vendor directories.
-  perl Makefile.PL INSTALLDIRS=vendor || return 1
-  make  || return 1
-  make install DESTDIR=${startdir}/pkg || return 1
+  perl Makefile.PL INSTALLDIRS=vendor
+  make 
+}
 
-  # remove perllocal.pod and .packlist
-  find ${startdir}/pkg -name perllocal.pod -delete
-  find ${startdir}/pkg -name .packlist -delete
+check() {
+  cd ${srcdir}/${_realname}-${pkgver}
+  make test
+}
+
+package() {
+  cd ${srcdir}/${_realname}-${pkgver}
+  make install DESTDIR=${pkgdir}
 }
