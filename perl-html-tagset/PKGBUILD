@@ -1,15 +1,11 @@
-#
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=perl-html-tagset
 _realname=HTML-Tagset
 pkgver=3.20
-pkgrel=2
+pkgrel=3
 pkgdesc="Data tables useful in parsing HTML"
-arch=(any)
+arch=('any')
 license=('PerlArtistic')
 url="http://search.cpan.org/dist/${_realname}/"
 depends=('perl>=5.10.0')
@@ -24,14 +20,14 @@ build() {
   # install module in vendor directories.
   perl Makefile.PL INSTALLDIRS=vendor
   make
+}
+
+check() {
+  cd ${srcdir}/${_realname}-${pkgver}
   make test
 }
 
 package() {
   cd ${srcdir}/${_realname}-${pkgver}
   make install DESTDIR=${pkgdir}
-
-  # remove perllocal.pod and .packlist
-  find ${pkgdir} -name perllocal.pod -delete
-  find ${pkgdir} -name .packlist -delete
 }
