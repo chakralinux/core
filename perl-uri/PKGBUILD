@@ -1,30 +1,27 @@
-#
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=perl-uri
 _realname=URI
-pkgver=1.58
+pkgver=1.59
 pkgrel=1
 pkgdesc="Uniform Resource Identifiers (absolute and relative)"
-arch=(any)
-license=('PerlArtistic')
+arch=('any')
 url="http://search.cpan.org/dist/${_realname}/"
+license=('PerlArtistic')
 depends=('perl>=5.10.0')
-options=(!emptydirs)
+provides=('perl-uri-escape=3.30')
+options=('!emptydirs')
 source=(http://search.cpan.org/CPAN/authors/id/G/GA/GAAS/${_realname}-$pkgver.tar.gz)
-md5sums=('540575aee18616ad9a21e0af7a1e7b18')
+md5sums=('fecebf8fa20e2d26ea4a1649c095e96e')
 
 build() {
-  cd ${srcdir}/${_realname}-$pkgver
+  cd "${srcdir}/${_realname}-$pkgver"
   # install module in vendor directories.
-  perl Makefile.PL INSTALLDIRS=vendor || return 1
-  make || return 1
-  make install DESTDIR=${pkgdir} || return 1
+  perl Makefile.PL INSTALLDIRS=vendor
+  make
+}
 
-  # remove perllocal.pod and .packlist
-  find ${pkgdir} -name perllocal.pod -delete
-  find ${pkgdir} -name .packlist -delete
+package() {
+  cd "${srcdir}/${_realname}-$pkgver"
+  make install DESTDIR="${pkgdir}"
 }
