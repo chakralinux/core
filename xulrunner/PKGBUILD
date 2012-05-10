@@ -4,23 +4,25 @@
 # contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
 
 pkgname=xulrunner
-pkgver=11.0
-_ffoxver=11.0
+pkgver=12.0
+_ffoxver=12.0
 pkgrel=1
 pkgdesc="Mozilla Runtime Environment"
 arch=('i686' 'x86_64')
 license=('MPL' 'GPL' 'LGPL')
-depends=('gcc-libs' 'libidl2' 'mozilla-common' 'nss' 'qt' 'libxt' 'libxrender' 'hunspell' 'startup-notification' 'mime-types' 'dbus-glib' 'alsa-lib' 'libevent' 'sqlite3>=3.7.4')
-makedepends=('zip' 'pkg-config' 'diffutils' 'python2' 'wireless_tools' 'yasm' 'mesa' 'pango')
+depends=('python2' 'gcc-libs' 'libidl2' 'mozilla-common' 'nss' 'qt' 'libxt' 'libxrender' 'hunspell' 'startup-notification' 'mime-types' 'dbus-glib' 'alsa-lib' 'libevent' 'sqlite3>=3.7.4')
+makedepends=('zip' 'unzip' 'pkg-config' 'diffutils' 'wireless_tools' 'yasm' 'mesa' 'pango' 'autoconf2.13')
 url="http://wiki.mozilla.org/XUL:Xul_Runner"
 source=(http://releases.mozilla.org/pub/mozilla.org/firefox/releases/${_ffoxver}/source/firefox-${_ffoxver}.source.tar.bz2
         mozconfig
-        mozilla-pkgconfig.patch)
-options=('!emptydirs')
+        mozilla-pkgconfig.patch 
+        gcc47.patch)
+options=('!makeflags !emptydirs')
 replaces=('xulrunner-oss')
-md5sums=('4b07acf47857aff72776d805409cdd1b'
-         '52bbbb0117566b19c5a65e072725d47e'
-         '4a27a6f0f66a3c3e40817603e9c79c29')
+md5sums=('80c3e5927274de7f181fb5f931ac5fd4'
+         'e3be9cef491ef86f18252cc6ed8bffb4'
+         '4a27a6f0f66a3c3e40817603e9c79c29'
+         '79e471e0bd03b1d4e84fd3a6776bd619')
 
 build() {
   cd "${srcdir}/mozilla-release"
@@ -28,6 +30,7 @@ build() {
 
   #fix libdir/sdkdir - fedora
   patch -Np1 -i "${srcdir}/mozilla-pkgconfig.patch"
+  patch -Np1 -i "$srcdir/gcc47.patch"
 
   export LDFLAGS="-Wl,-rpath,/usr/lib/xulrunner-${pkgver} -Wl,-O1,--sort-common,--hash-style=gnu,--as-needed"
 
@@ -45,4 +48,7 @@ package() {
   #wtf mozilla!
   chmod +x "${pkgdir}/usr/lib/xulrunner-devel-$pkgver/sdk/bin/xpt.py"
   sed -i 's|!/usr/bin/env python|!/usr/bin/env python2|' "${pkgdir}/usr/lib/xulrunner-devel-$pkgver/sdk/bin/xpt.py"
-}
+  sed -i 's|!/usr/bin/env python|!/usr/bin/env python2|' "$pkgdir/usr/lib/xulrunner-devel-$pkgver/sdk/bin/header.py"
+  sed -i 's|!/usr/bin/env python|!/usr/bin/env python2|' "$pkgdir/usr/lib/xulrunner-devel-$pkgver/sdk/bin/typelib.py"
+  sed -i 's|!/usr/bin/env python|!/usr/bin/env python2|' "$pkgdir/usr/lib/xulrunner-devel-$pkgver/sdk/bin/xpidl.py"
+} 
