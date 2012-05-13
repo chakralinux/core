@@ -2,17 +2,9 @@
 # KDE SC Packages for Chakra, part of chakra-project.org
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
-
 
 # original name (used for the source and pkgnames)
 _origname=google-gadgets-qt
-
-
 
 pkgname=${_origname}
 pkgver=0.11.2
@@ -21,7 +13,7 @@ pkgdesc="Desktop Widgets (engine) from Google"
 arch=(i686 x86_64)
 url="http://code.google.com/p/google-gadgets-for-linux/"
 license=('APACHE')
-depends=('gstreamer0.10-base-plugins' 'librsvg' 'xulrunner>=2.0' "${_qtpkg}>=${_qtver}" 'desktop-file-utils' 'curl' 'spidermonkey')
+depends=('gstreamer0.10-base-plugins' 'librsvg' 'xulrunner>=12.0' "qt>=4.8.1" 'desktop-file-utils' 'curl' 'spidermonkey')
 makedepends=('zip' 'unzip')
 options=('!libtool' '!splitdbg' '!splithdr')
 conflicts=('google-gadgets-gtk' 'google-gadgets' 'google-gadgets-qt' 'google-gadgets-gtk-svn' 'google-gagdets-qt-svn')
@@ -36,8 +28,7 @@ md5sums=('279305553bcbf74f3e3615f6abc36a5e'  # google-gadgets-for-linux-0.11.2.t
 
 groups=("kde-uninstall" "kde-support")
 
-build()
-{
+build() {
         cd "${srcdir}/google-gadgets-for-linux-$pkgver"
 
         ./configure --prefix=/usr \
