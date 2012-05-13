@@ -4,29 +4,36 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
-pkgname=pkgconfig
-pkgver=0.25
-pkgrel=2
+pkgname=pkg-config
+pkgver=0.26
+pkgrel=1
 pkgdesc="A system for managing library compile/link flags"
 arch=('i686' 'x86_64')
 url="http://pkgconfig.freedesktop.org/wiki/"
 license=('GPL')
 groups=('base-devel')
-depends=('glibc')
-provides=("pkg-config=${pkgver}")
-source=(http://pkgconfig.freedesktop.org/releases/pkg-config-${pkgver}.tar.gz)
-md5sums=('a3270bab3f4b69b7dc6dbdacbcae9745')
+depends=('glibc' 'popt' 'glib2')
+provides=("pkgconfig=${pkgver}")
+conflicts=('pkgconfig')
+replaces=('pkgconfig')
+source=(http://pkg-config.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz)
+md5sums=('47525c26a9ba7ba14bf85e01509a7234')
 
 build() {
-  cd ${srcdir}/pkg-config-${pkgver}
-  ./configure --prefix=/usr
+  cd ${srcdir}/${pkgname}-${pkgver}
+
+  # Use system popt
+  ./configure --prefix=/usr --with-installed-popt 
+
   make
 }
 
+check() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make check
+}
+
 package() {
-  cd ${srcdir}/pkg-config-${pkgver}
+  cd ${srcdir}/${pkgname}-${pkgver}
   make DESTDIR=${pkgdir} install
 }
