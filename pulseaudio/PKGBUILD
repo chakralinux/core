@@ -1,27 +1,24 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgbase=pulseaudio
 pkgname=('pulseaudio' 'libpulse')
 pkgdesc="A featureful, general-purpose sound server"
-pkgver=1.1
-pkgrel=2
+pkgver=2.0
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
 makedepends=('libasyncns' 'libcap' 'attr' 'libxtst' 'libsm' 'libsamplerate'
-             'libtool' 'rtkit' 'speex' 'tdb' 'udev' 'dbus-core' 'xcb-util'
-             'avahi' 'bluez' 'intltool' 'jack' 'lirc-utils' 'openssl' 'fftw' 'orc' 'json-c')
+             'libltdl' 'rtkit' 'speex' 'tdb' 'udev' 'dbus-core' 'xcb-util'
+             'avahi' 'bluez' 'intltool' 'jack' 'lirc-utils' 'openssl' 'fftw' 'orc'
+             'json-c' 'webrtc-audio-processing')
 options=(!emptydirs !libtool !makeflags)
 source=("http://freedesktop.org/software/${pkgbase}/releases/${pkgbase}-${pkgver}.tar.xz"
         "${pkgbase}.xinit")
-sha256sums=('6fe531136f6ebce2d35872a2d2c914278cdc5dcdd5eea516dc52c81f9001f5ee'
+sha256sums=('28b42edd42f4879a6884af5f0ec11801ac001eb7582881215b36649aa37e2061'
             '4beae1ce931ae4bde3d2faca25735cc62a6eac182323f257dd9e703d499f7aa8')
 
 build() {
@@ -52,8 +49,8 @@ backup=(etc/pulse/client.conf)
 }
 
 package_pulseaudio() {
-depends=("libpulse=${pkgver}-${pkgrel}" 'rtkit' 'libtool' 'speex' 'tdb'
-         'udev' 'fftw' 'orc')
+depends=("libpulse=${pkgver}-${pkgrel}" 'rtkit' 'libltdl' 'speex' 'tdb'
+         'udev' 'fftw' 'orc' 'webrtc-audio-processing')
 optdepends=('avahi: zeroconf support'
             'bluez: bluetooth support'
             'gconf: configuration through gconf (paprefs)'
@@ -89,14 +86,18 @@ install="pulseaudio.install"
 
 ### Split libpulse
 
-  mkdir -p "${srcdir}"/libpulse/{etc/pulse,usr/{lib,share/man/man5}}
+  mkdir -p "$srcdir"/libpulse/{etc/pulse,usr/{lib/pulseaudio,share/man/man5}}
 
   mv {"${pkgdir}","${srcdir}/libpulse"}/etc/pulse/client.conf
 
-  mv "${pkgdir}"/usr/lib/libpulse{,dsp,-simple,-mainloop-glib}.so* \
-     "${pkgdir}"/usr/lib/libpulsecommon-*.so \
+  mv "${pkgdir}"/usr/lib/libpulse{,-simple,-mainloop-glib}.so* \
      "${srcdir}/libpulse/usr/lib"
 
+  mv "$pkgdir"/usr/lib/pulseaudio/libpulsedsp.so \
+     "$pkgdir"/usr/lib/pulseaudio/libpulsecommon-*.so \
+     "$srcdir/libpulse/usr/lib/pulseaudio"
+
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/lib/cmake
   mv {"${pkgdir}","${srcdir}/libpulse"}/usr/lib/pkgconfig
   mv {"${pkgdir}","${srcdir}/libpulse"}/usr/include
 

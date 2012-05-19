@@ -1,12 +1,11 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 pkgname=alsa-firmware
 pkgver=1.0.25
-pkgrel=2
+pkgrel=3
 pkgdesc="ALSA firmware package"
 arch=('i686' 'x86_64')
 url="http://alsa-project.org/"
@@ -39,18 +38,11 @@ build() {
 package() {
   cd $srcdir/$pkgname-$pkgver
   make DESTDIR=$pkgdir install
-  # remove files which conflicts with kernel26-firmware
-  rm -rf ${pkgdir}/lib/firmware/ess/maestro3_assp_kernel.fw
-  rm -rf ${pkgdir}/lib/firmware/ess/maestro3_assp_minisrc.fw
-  rm -rf ${pkgdir}/lib/firmware/korg/k1212.dsp
-  rm -rf ${pkgdir}/lib/firmware/sb16/alaw_main.csp
-  rm -rf ${pkgdir}/lib/firmware/sb16/ima_adpcm_capture.csp
-  rm -rf ${pkgdir}/lib/firmware/sb16/ima_adpcm_init.csp
-  rm -rf ${pkgdir}/lib/firmware/sb16/ima_adpcm_playback.csp
-  rm -rf ${pkgdir}/lib/firmware/sb16/mulaw_main.csp
-  rm -rf ${pkgdir}/lib/firmware/yamaha/ds1_ctrl.fw
-  rm -rf ${pkgdir}/lib/firmware/yamaha/ds1_dsp.fw
-  rm -rf ${pkgdir}/lib/firmware/yamaha/ds1e_ctrl.fw
-  rm -rf ${pkgdir}/lib/firmware/yamaha/yss225_registers.bin
+  # remove files which conflicts with linux-firmware
+  rm -rf ${pkgdir}/usr/lib/firmware/{ess,korg,sb16,yamaha}
+  # remove broken symlinks (broken upstream)
+  rm -rf ${pkgdir}/usr/lib/firmware/turtlebeach
+  # remove empty dir
+  rm -rf ${pkgdir}/usr/bin
 }
 

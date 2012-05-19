@@ -1,13 +1,12 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 
 pkgname=libao
 pkgver=1.1.0
-pkgrel=4
+pkgrel=5
 pkgdesc="A cross-platform audio output library and plugins"
 url="http://www.xiph.org/ao"
 arch=('i686' 'x86_64')
@@ -31,8 +30,8 @@ build() {
 
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install || return 1
+  make DESTDIR=${pkgdir} install 
 
   # Add conf file
-  install -Dm0644 ${srcdir}/libao.conf ${pkgdir}/etc/libao.conf || return 1
+  install -Dm0644 ${srcdir}/libao.conf ${pkgdir}/etc/libao.conf 
 }
