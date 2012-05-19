@@ -1,24 +1,19 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=ffmpeg
-pkgver=0.10
-pkgrel=2
-epoch=1
+pkgver=0.10.3
+pkgrel=1
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('i686' 'x86_64')
 url="http://ffmpeg.org/"
 license=('GPL')
-depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx' 'libva' 'openjpeg' 'rtmpdump' 'speex')
+depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx' 'libva' 'openjpeg' 'rtmpdump' 'speex' 'gsm' 'libpulse')
 makedepends=('yasm')
 source=("http://${pkgname}.org/releases/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('dc665cc599a739e3c5262ccdac13d129')
+md5sums=('775d184933f71ff44a2fff4968e78b2b')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -30,6 +25,7 @@ build() {
               --enable-libx264 \
               --enable-libvpx \
               --enable-libtheora \
+              --enable-libgsm \
               --enable-postproc \
               --enable-shared \
               --enable-x11grab \
@@ -38,6 +34,7 @@ build() {
               --enable-libschroedinger \
               --enable-libopenjpeg \
               --enable-librtmp \
+              --enable-libpulse \
               --enable-gpl \
               --enable-version3 \
               --enable-runtime-cpudetect \
