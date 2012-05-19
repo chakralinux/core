@@ -1,23 +1,19 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgbase=('gstreamer0.10-base')
 pkgname=('gstreamer0.10-base' 'gstreamer0.10-base-plugins')
-pkgver=0.10.35
-pkgrel=4
+pkgver=0.10.36
+pkgrel=1
 arch=('i686' 'x86_64')
 license=('LGPL')
 makedepends=('pkgconfig' "gstreamer0.10>=${pkgver}" 'orc' 'libxv' 'alsa-lib' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection')
 options=(!libtool !emptydirs)
 url="http://gstreamer.freedesktop.org/"
-source=(${url}/src/gst-plugins-base/gst-plugins-base-${pkgver}.tar.bz2)
-md5sums=('1d300983525f4f09030eb3ba47cb04b0')
+source=(${url}/src/gst-plugins-base/gst-plugins-base-${pkgver}.tar.xz)
+md5sums=('3d2337841b132fe996e5eb2396ac9438')
 
 build() {
   cd "${srcdir}/gst-plugins-base-${pkgver}"
@@ -34,7 +30,7 @@ build() {
 
 package_gstreamer0.10-base() {
   pkgdesc="GStreamer Multimedia Framework Base plugin libraries"
-  depends=('gstreamer0.10>=0.10.35' 'orc' 'libxv')
+  depends=('gstreamer0.10>=0.10.36' 'orc' 'libxv')
 
   cd "${srcdir}/gst-plugins-base-${pkgver}"
   make DESTDIR="${pkgdir}" install
