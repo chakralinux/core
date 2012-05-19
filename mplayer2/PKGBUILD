@@ -1,17 +1,15 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
  
 pkgname=mplayer2
-pkgver=2.0.3
-pkgrel=3
+pkgver=2.0.4
+pkgrel=1
 pkgdesc="A movie player"
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://www.mplayer2.org/"
-# sync deps with mplayer pkg
 depends=('desktop-file-utils' 'ttf-dejavu' 'enca' 'libxss' 'a52dec' 'libvpx' 'lirc-utils' 'x264' 'libmng' 'libdca' 'aalib' 'lame' 'fontconfig'  'libgl'
     'libxinerama' 'libvdpau' 'libpulse' 'smbclient' 'xvidcore' 'opencore-amr' 'jack' 'cdparanoia' 'libmad' 'sdl' 'libtheora' 'libcaca' 'libxxf86dga' 'fribidi'
     'libjpeg' 'faac' 'faad2' 'libxvmc' 'schroedinger' 'mpg123' 'libass' 'libxxf86vm' 'libbluray' 'ffmpeg')    
@@ -21,7 +19,7 @@ backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
 provides=('mplayer=99999')
 conflicts=('mplayer')
 source=("http://chakra-linux.org/sources/mplayer2/mplayer2-$pkgver.tar.xz")
-md5sums=('d110aa033b3ab38daa5ec89044d10b91')
+md5sums=('78e9cd71457d0f440426350f9267a7c0')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -34,27 +32,15 @@ mksource() {
 }
 
 build() {
-  # Custom CFLAGS break the mplayer build
-  #unset CFLAGS LDFLAGS
 
   cd "${srcdir}/${pkgname}"
 
-  # Drop internal mp3lib (FS#24149)
-  # Default decoder for mp3 will be mpg123
-  #rm -fr mp3lib
-  #patch -Np1 -i "${srcdir}/mplayer2-remove-mp3lib.patch"
-
-  # lower prostproc
-  sed -i -e s'/libpostproc >= 52.0.0/libpostproc >= 51.0.0/'g configure*
-
   ./configure --prefix=/usr \
               --enable-runtime-cpudetection \
-              --disable-arts \
               --disable-speex \
               --disable-openal \
               --disable-libdv \
               --disable-musepack \
-              --disable-esd \
               --disable-mga \
               --language=all \
               --enable-translation \
