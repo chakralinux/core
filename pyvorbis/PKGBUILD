@@ -1,15 +1,11 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=pyvorbis
 pkgver=1.4
-pkgrel=9
+pkgrel=10
 pkgdesc="Python vorbis wrapper library"
 arch=(i686 x86_64)
 license=('LGPL')
@@ -24,8 +20,8 @@ md5sums=('b4921e792c0a74f75b9d3057df10ee7c'
 
 build() {
 	cd ${srcdir}/${pkgname}-${pkgver}
-	patch -Np0 -i ${srcdir}/pyvorbis-1.4-python2.5.patch || return 1
-	patch -Np0 -i ${srcdir}/pyogg-ticket2-fix.patch || return 1
+	patch -Np0 -i ${srcdir}/pyvorbis-1.4-python2.5.patch 
+	patch -Np0 -i ${srcdir}/pyogg-ticket2-fix.patch 
 	python2 ./config_unix.py --prefix=/usr
 }
 

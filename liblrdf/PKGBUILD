@@ -1,12 +1,11 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 pkgname=liblrdf
-pkgver=0.4.8
-pkgrel=3
+pkgver=0.5.0
+pkgrel=1
 pkgdesc="A library for the manipulation of RDF file in LADSPA plugins"
 arch=('i686' 'x86_64')
 url="http://sourceforge.net/projects/lrdf" #"http://sourceforge.net/projects/lrdf"
@@ -14,21 +13,13 @@ depends=('raptor' 'ladspa')
 makedepends=('pkgconfig')
 license=('GPL')
 options=('!libtool')
-source=("http://chakra-linux.org/sources/liblrdf/swh-LRDF-0.5.0-0-g7ebc032.zip")
-	#md5.patch
-	#raptor2.diff
-        #pkgconfig-raptor.patch)
+source=("https://github.com/swh/LRDF/tarball/${pkgver}")
 groups=('ladspa-plugins')
-md5sums=('f1876798c0e1f841efab93b9febb134a')
-         #'a6d231d052dc188cbc4c1039cf3a2003'
-         #'80e938469da06a178e03107ca5b41e55'
-         #'b73879a8947d43b13f130da3219799cd')
+md5sums=('005ea24152620da7f2ee80a78e17f784')
 
 build() {
   cd "${srcdir}/swh-LRDF-7ebc032"
-  #patch -Np1 -i ${srcdir}/md5.patch
-  #patch -Np0 -i ${srcdir}/raptor2.diff
-  #patch -Np1 -i "${srcdir}/pkgconfig-raptor.patch"
+
   autoreconf -vfi
   ./configure --prefix=/usr
   make

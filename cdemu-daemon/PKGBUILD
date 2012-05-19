@@ -1,15 +1,11 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=cdemu-daemon
 pkgver=1.4.0
-pkgrel=4
+pkgrel=5
 pkgdesc="CD/DVD-ROM device emulator daemon"
 arch=('i686' 'x86_64')
 backup=('etc/conf.d/cdemud'
@@ -17,13 +13,15 @@ backup=('etc/conf.d/cdemud'
 url="http://cdemu.sourceforge.net/"
 license=('GPL')
 depends=('glib2' 'dbus' 'dbus-glib' 'libdaemon' 'vhba-module' "libmirage=$pkgver" 'libao')
+optdepends=('alsa-lib: to enable the ALSA audio driver'
+            'pulseaudio: to enable the PA audio driver')
 install=cdemud.install
 source=(http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.gz
         cdemud.conf
         cdemud.rc
         60-vhba.rules)
 md5sums=('f7ccc0abc33057d552ec7b0925fce63a'
-         'd852e04d4e95f7452382811b0e83944a'
+         'c3097a01d9e79093485181ff47a81542'
          '29b9bc0023ff17e14091f3fb8438ccb4'
          'f551504552d7693ac79e8e0d302f62b9')
 
