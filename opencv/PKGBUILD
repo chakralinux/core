@@ -7,14 +7,14 @@ pkgbase=opencv
 pkgname=('opencv' 'opencv-docs' 'opencv-samples')
 _realname=OpenCV
 pkgver=2.4.0
-pkgrel=1
+pkgrel=3
 pkgdesc="Open Source Computer Vision Library"
 arch=('i686' 'x86_64')
 license=('BSD')
 url="http://opencv.willowgarage.com/"
 depends=('jasper' 'gstreamer0.10-base' 'openexr'
          'xine-lib' 'libdc1394' 'v4l-utils' 'ffmpeg' 'qt')
-makedepends=('pkg-config' 'cmake' 'python-numpy' 'eigen')
+makedepends=('pkg-config' 'cmake' 'python-numpy' 'eigen' 'python-sphinx')
 optdepends=('python-numpy: Python 2.x interface'
             'eigen')
 options=('!libtool')
@@ -36,13 +36,15 @@ _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
             '-D INSTALL_PYTHON_EXAMPLES=ON'
             '-D WITH_XINE=ON'
             '-D WITH_QT=ON'
+	    '-D WITH_OPENGL=ON'
             '-D WITH_UNICAP=OFF'
             '-D WITH_PVAPI=OFF'
             '-D WITH_OPENNI=OFF'
             '-D WITH_TBB=OFF'
             '-D WITH_IPP=OFF'
             '-D WITH_CUDA=OFF'
-            '-D WITH_GTK=OFF')
+            '-D WITH_GTK=OFF'
+            '-D ENABLE_FAST_MATH=ON')
 
 build() {
   cd "$srcdir/$_realname-$pkgver"
@@ -50,16 +52,17 @@ build() {
   # x64, i.e "Athlon64" and upwards, can use SSE3
   [ $CARCH = x86_64 ] && \
     _cmakeopts=${_cmakeopts[@]/ENABLE_SSE3=OFF/ENABLE_SSE3=ON}
+ 
+  mkdir build && cd build
 
-  cmake ${_cmakeopts[@]} .
-
+  cmake ${_cmakeopts[@]} ..
   make
 }
 
 package_opencv() {
   install=$pkgname.install
 
-  cd "$srcdir/$_realname-$pkgver"
+  cd "$srcdir/$_realname-$pkgver/build"
 
   make DESTDIR="$pkgdir" install
 
