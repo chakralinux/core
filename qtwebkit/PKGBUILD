@@ -5,37 +5,51 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=qtwebkit
-pkgver=2.2.1
-pkgrel=2
+pkgver=2.2.2
+pkgrel=1
 pkgdesc="Standalone qtwebkit version"
 arch=('i686' 'x86_64')
 url="http://www.qtsoftware.com"
 license=('GPL3' 'LGPL')
-depends=('qt' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins' )
-makedepends=('gperf' 'sqlite3' 'fontconfig' 'phonon' 'perl' 'python' 'mesa')
+depends=('qt' 'qt-mobility' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins' )
+makedepends=('gperf' 'sqlite3' 'fontconfig' 'phonon' 'perl' 'python2' 'mesa')
 #source=("http://get.qt.nokia.com/qtwebkit/QtWebKit-${pkgver}.tar.gz")
-source=("http://chakra-linux.org/sources/$pkgname/QtWebKit-$pkgver.tar.gz"
-        "http://chakra-linux.org/sources/$pkgname/qwebview-4.8.0.tar.bz2")
+source=("http://chakra-linux.org/sources/$pkgname/qtwebkit-$pkgver-source.tar.gz"
+        "http://chakra-linux.org/sources/$pkgname/qwebview-4.8.2.tar.xz"
+        'glib.patch')
 
-md5sums=('1a77037379369ba151bb8a2d6bc6122a'
-         '13a4ac75d98452c2bf7ef710353e91d8')
+md5sums=('86702e3a908e2968e87baa6600cbf31f'
+         '24e7a7cc0f6046cb0736c1039f64361e'
+         '23e8db5dda7004dd589e0f86799dea4e')
 
 build() {
-          cd $srcdir/QtWebKit-$pkgver
+          cd "${srcdir}"/${pkgname}-${pkgver}-source
+  
+          patch -p1 -i "${srcdir}"/glib.patch
 
-          export QT4DIR=$srcdir/$pkgname
-          export PATH=${QT4DIR}/bin:${PATH}
-          Tools/Scripts/build-webkit --qt --3d-canvas          
+          #export QT4DIR=$srcdir/$pkgname
+          #export PATH=${QT4DIR}/bin:${PATH}
+          #Tools/Scripts/build-webkit --qt --release --3d-canvas --accelerated-2d-canvas --3d-rendering \
+          #                           --geolocation --blob --link-prefetch 
+
+          # move headers
+          #mv include Source/
+
+          cd Source
+          qmake
+          cd ../
+
+          make -C Source      
          
-          cd "${srcdir}"/QtWebKit-${pkgver}/qwebview-4.8.0/plugins/qwebview
+          cd "${srcdir}"/qtwebkit-${pkgver}-source/qwebview-4.8.2/plugins/qwebview
           qmake
           make
 }
 
 package() {
-          cd $srcdir/QtWebKit-$pkgver/WebKitBuild/Release
+          cd "${srcdir}"/${pkgname}-${pkgver}-source
           make INSTALL_ROOT=$pkgdir install
 
-          cd "${srcdir}"/QtWebKit-${pkgver}/qwebview-4.8.0/plugins/qwebview
+          cd "${srcdir}"/qtwebkKit-${pkgver}/qwebview-4.8.2/plugins/qwebview
           make INSTALL_ROOT="${pkgdir}" install
 }
