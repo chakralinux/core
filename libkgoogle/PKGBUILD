@@ -1,0 +1,30 @@
+# Desktop packages for Chakra
+
+pkgname=libkgoogle
+pkgver=0.3.2
+pkgrel=1
+pkgdesc="A KDE-based library for accessing various Google services via their public API"
+url='https://projects.kde.org/projects/kdereview/libkgoogle'
+arch=('i686' 'x86_64')
+license=('GPL' 'LGPL' 'FDL')
+depends=('kdepimlibs' 'qjson')
+makedepends=('cmake' 'automoc4' 'boost')
+replaces=('akonadi-google')
+conflicts=('akonadi-google')
+source=("ftp://ftp.kde.org/pub/kde/stable/libkgoogle/${pkgver}/libkgoogle-${pkgver}.tar.bz2")
+md5sums=('fa7cff3f8599cb5116be551ee85536e5')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  mkdir build
+  cd build
+  cmake ..\
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/build"
+  make DESTDIR="${pkgdir}" install
+}
