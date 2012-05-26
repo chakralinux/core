@@ -1,7 +1,6 @@
 #
 # KDE SC Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # include global config
@@ -33,8 +32,7 @@ md5sums=(`grep ${_origname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 #
 # build and install
 #
-build() 
-{
+build() {
 	cd $srcdir/$_origname-$pkgver
 	
 	patch -Np0 -i $startdir/install_svg_icons_too.patch || return 1
@@ -45,8 +43,7 @@ build()
 	make || return 1
 }
 
-package_oxygen-icons()
-{
+package_oxygen-icons() {
 	pkgdesc="Oxygen (Emot)Icons"
 	groups=("kde" "kde-minimal" "kde-uninstall")
 	
@@ -59,8 +56,7 @@ package_oxygen-icons()
         mv $pkgdir/usr/share/icons/oxygen/scalable $srcdir/svg
 }
 
-package_oxygen-icons-svg()
-{
+package_oxygen-icons-svg() {
 	pkgdesc="Oxygen (Emot)Icons - SVG Sources"
 	groups=("kde-uninstall")
 	depends=("${_origname}")
@@ -69,5 +65,3 @@ package_oxygen-icons-svg()
 	mv $srcdir/svg/scalable $pkgdir/usr/share/icons/oxygen
 	rm -rf $pkgdir/usr/share/icons/oxygen/scalable/apps/clock.svgz
 }
-
-
