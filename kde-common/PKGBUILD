@@ -28,7 +28,7 @@ provides=("kde-common=${_kdever}" "kde-agent=${_kdever}")
 groups=("kde" "kde-minimal" "kde-uninstall")
 
 # also add some obvious dependencies here, as there are users out there who dont update such stuff
-depends=("${_qtpkg}>=${_qtver}" 'pinentry' 'openssh' 'bash>=4.2' 'glibc>=2.11')
+depends=("${_qtpkg}>=${_qtver}" 'pinentry' 'openssh' 'bash>=4.2' 'glibc>=2.15')
 
 install=kde-common.install
 
@@ -89,8 +89,7 @@ md5sums=('2afd86671ad0db31718157aecd46d528'
 #
 # build and install
 #
-build()
-{
+build() {
 	# install scripts for gpg/ssh-agent
 	install -D -m 755 -o root -g root $srcdir/agent-startup.sh $pkgdir/etc/kde/env/agent-startup.sh
 	install -D -m 755 -o root -g root $srcdir/agent-shutdown.sh $pkgdir/etc/kde/shutdown/agent-shutdown.sh
