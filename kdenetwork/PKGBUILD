@@ -27,7 +27,7 @@ url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr' 'qca-ossl' 
+makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr' 'qca-ossl' 'telepathy-qt'
 	     "kde-workspace>=${_kdever}" "kde-baseapps>=${_kdever}" 'libvncserver' 'libmsn' 'libmms'
 	     'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage' 'libgadu' 
 	     'mediastreamer' 'msilbc' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.5' 'docbook-xsl')
@@ -46,7 +46,6 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
 #
 build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
-        patch -p4 -i "${srcdir}"/gcc47.patch
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
