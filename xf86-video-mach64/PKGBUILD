@@ -1,17 +1,16 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-mach64
-pkgver=6.9.0
+pkgver=6.9.1
 pkgrel=1
 pkgdesc="X.org mach64 video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('glibc' 'mach64-dri')
+depends=('glibc')
 makedepends=('pkgconfig' 'xorg-server>=1.10.1' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto')
 conflicts=('xorg-server<1.10.1')
 groups=('xorg-video-drivers')
@@ -19,27 +18,16 @@ options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
 sha1sums=('95a7ec9761fe11dadbcd9078c55148198a91b2f1')
 
-#source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz"
-#        LICENSE)
-#md5sums=("f454570563bf5adfe6ea3f6340ff188b" #  xf86-video-mach64-6.8.2.99-1.tar.xz
-#         '901824dae8053c63ef9d313cdaa129a0')
-
-# create tarball: source PKGBUILD && mksource
-
-mksource() {
-	  rm -vRf ${pkgname}
-	  git clone git://anongit.freedesktop.org/xorg/driver/${pkgname}
-	  rm -vRf ${pkgname}/.git
-	  pushd ${pkgname}
-	  popd
-	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz ${pkgname}/*
-	  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
-}
-
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --enable-dri
+
+  ./configure --prefix=/usr --disable-dri
   make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"

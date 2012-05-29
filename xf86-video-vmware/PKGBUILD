@@ -1,31 +1,33 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-vmware
-pkgver=11.0.3
-pkgrel=3
+pkgver=12.0.2
+pkgrel=1
 pkgdesc="X.org vmware video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('libdrm')
-makedepends=('pkgconfig' 'xorg-server' 'libdrm')
+depends=('libdrm' 'svga-dri')
+makedepends=('xorg-server'  'libx11' 'libxext')
 conflicts=('xorg-server<1.10.1')
 groups=('xorg-video-drivers')
-options=('!libtool')
+options=('!libtool' '!emptydirs')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('579bee487309b1bdc8329bf627d43413')
+md5sums=('0743ec7c479603fba60d118858fd5783')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr
+
+  ./configure --prefix=/usr --enable-vmwarectrl-client
   make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
