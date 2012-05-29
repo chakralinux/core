@@ -1,17 +1,13 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-cirrus
-pkgver=1.3.2
-pkgrel=7
+pkgver=1.4.0
+pkgrel=1
 pkgdesc="X.org Cirrus Logic video driver"
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
@@ -19,15 +15,20 @@ makedepends=('pkgconfig' 'xorg-server>=1.10.1')
 conflicts=('xorg-server<1.10.1')
 groups=('xorg-video-drivers')
 options=('!libtool')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
-        LICENSE)
-md5sums=('8195d03ed0be0975c03441e66a9f53b3'
-         'b9b570ac5c03f1fbe3e0cee5fe884b82')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('1e449789da866f974dbf6cbe3c8cc7bf')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
-  install -D -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
+
+  ./configure --prefix=/usr 
+  make 
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install 
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" 
 }
