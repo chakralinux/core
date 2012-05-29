@@ -1,55 +1,57 @@
 #
 # QT Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
+# contributor Mladen Pejaković <pejakm at gmail dot com>
 
 pkgname=qtwebkit
 pkgver=2.2.2
 pkgrel=1
-pkgdesc="Standalone qtwebkit version"
+_rev=r118179
 arch=('i686' 'x86_64')
-url="http://www.qtsoftware.com"
-license=('GPL3' 'LGPL')
-depends=('qt' 'qt-mobility' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins' )
-makedepends=('gperf' 'sqlite3' 'fontconfig' 'phonon' 'perl' 'python2' 'mesa')
-#source=("http://get.qt.nokia.com/qtwebkit/QtWebKit-${pkgver}.tar.gz")
-source=("http://chakra-linux.org/sources/$pkgname/qtwebkit-$pkgver-source.tar.gz"
-        "http://chakra-linux.org/sources/$pkgname/qwebview-4.8.2.tar.xz"
-        'glib.patch')
+url='http://trac.webkit.org/wiki/QtWebKit'
+pkgdesc='An open source web browser engine (Qt port)'
+license=('LGPL2.1' 'GPL3')
+depends=('qt' 'qt-mobility' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins')
+makedepends=('gperf' 'sqlite3' 'fontconfig' 'perl' 'python2' 'mesa')
+conflicts=('qt<4.8')
 
-md5sums=('86702e3a908e2968e87baa6600cbf31f'
-         '24e7a7cc0f6046cb0736c1039f64361e'
-         '23e8db5dda7004dd589e0f86799dea4e')
+source=("http://builds.nightly.webkit.org/files/trunk/src/WebKit-${_rev}.tar.bz2"
+        "http://chakra-linux.org/sources/$pkgname/qwebview-4.8.2.tar.xz")
+sha1sums=('8d8e21163951b55c17e27f88631bf36fba33d41d'
+          '33c83272ed8110180ee6e7e3733e68cc513e2802')
 
 build() {
-          cd "${srcdir}"/${pkgname}-${pkgver}-source
-  
-          patch -p1 -i "${srcdir}"/glib.patch
+  cd "${srcdir}"/WebKit-${_rev}
+  #rm -f "${srcdir}"/WebKit-${_rev}/qwebview-4.8.2
+  #ln -s "${srcdir}"/QtWebKit-${pkgver}/qwebview-4.8.2 "${srcdir}"/WebKit-${_rev}/
 
-          #export QT4DIR=$srcdir/$pkgname
-          #export PATH=${QT4DIR}/bin:${PATH}
-          #Tools/Scripts/build-webkit --qt --release --3d-canvas --accelerated-2d-canvas --3d-rendering \
-          #                           --geolocation --blob --link-prefetch 
+  cd Tools/Scripts
 
-          # move headers
-          #mv include Source/
+  QTDIR=/usr/share/qt ./build-webkit --prefix=/usr --qt --webgl --release --microdata \
+         --link-prefetch --accelerated-2d-canvas --3d-rendering \
+         --animation-api --input-type-date \
+         --input-type-datetime --input-type-datetimelocal --input-type-month --input-type-week --style-scoped \
+         --svg-dom-objc-bindings --svg-fonts --tiled-backing-store \
+         --web-sockets --web-timing --page-visibility-api \
+         --touch-events --touch-icon-loading --icon-database \
+         --javascript-debugger --progress-tag --download-attribute \
+         --sql-database --xslt \
+         --makeargs="${MAKEFLAGS}"  
 
-          cd Source
-          qmake
-          cd ../
-
-          make -C Source      
-         
-          cd "${srcdir}"/qtwebkit-${pkgver}-source/qwebview-4.8.2/plugins/qwebview
-          qmake
-          make
+  # Build the QWebView plugin
+  cd "${srcdir}"/qtwebkit-${pkgver}-source/qwebview-4.8.2/plugins/qwebview
+  qmake
+  make
 }
 
 package() {
-          cd "${srcdir}"/${pkgname}-${pkgver}-source
-          make INSTALL_ROOT=$pkgdir install
+  cd "${srcdir}"/WebKit-${_rev}
+  make INSTALL_ROOT="${pkgdir}" -C WebKitBuild/Release install
 
-          cd "${srcdir}"/qtwebkKit-${pkgver}/qwebview-4.8.2/plugins/qwebview
-          make INSTALL_ROOT="${pkgdir}" install
+  # Fix RPATH
+  #chrpath -r /usr/lib/ "${pkgdir}"/usr/lib/qt/imports/QtWebKit/libqmlwebkitplugin.so
+
+  cd "${srcdir}"/qtwebkit-${pkgver}-source/qwebview-4.8.2/plugins/qwebview
+  make INSTALL_ROOT="${pkgdir}" install
 }
