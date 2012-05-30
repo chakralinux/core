@@ -1,35 +1,35 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-tdfx
-pkgver=1.4.3
-pkgrel=7
+pkgver=1.4.4
+pkgrel=1
 pkgdesc="X.org tdfx video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('glibc' 'tdfx-dri')
-makedepends=('pkgconfig' 'xorg-server>=1.10.1' 'mesa>=7.10' 'xf86driproto' 'glproto')
+depends=('glibc')
+makedepends=('xorg-server>=1.10.1')
 conflicts=('xorg-server<1.10.1')
 options=(!libtool)
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
-        LICENSE)
-md5sums=('8161bbf2b100c21b609163f0010766b3'
-         '978e9486ffd4e4164c12dc68c84186e1')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('890d6c96c12e91e22b4ceaa9ef93b442')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr \
-              --enable-dri || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
 
-  install -D -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
+  ./configure --prefix=/usr  --disable-dri 
+  make 
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install 
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
