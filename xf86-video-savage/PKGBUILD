@@ -1,35 +1,34 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-savage
-pkgver=2.3.2
-pkgrel=3
+pkgver=2.3.4
+pkgrel=1
 pkgdesc="X.org savage video driver"
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('glibc' 'savage-dri')
-makedepends=('pkgconfig' 'xorg-server>=1.10.1' "mesa>=7.10" 'xf86driproto' 'glproto>=1.4.10')
+depends=('glibc')
+makedepends=('xorg-server>=1.10.1')
 conflicts=('xorg-server<1.10.1')
 options=(!libtool !makeflags)
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
-        LICENSE)
-md5sums=('09782fc710a1ce5a81c27d71951234c2'
-         '0f485840d3cee0a8d9952c0cd34f64c3')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('664c7d9c93049ebe96af262ec448451f')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr \
-              --enable-dri || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
 
-  install -D -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
+  ./configure --prefix=/usr --disable-dri 
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install 
+  install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
