@@ -38,7 +38,7 @@ sha1sums=('857d6377025c77851a3cc5f8ec2ce84164a2fdc6'
           '993798f3d22ad672d769dae5f48d1fa068d5578f')
 
 build() {
-  cd "${srcdir}/${pkgbase}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
   # Add pointer barrier support, patch from Fedora
   patch -Np1 -i "${srcdir}/xserver-1.10-pointer-barriers.patch"
 
@@ -77,41 +77,29 @@ build() {
 }
 
 package() {
-  # xorg-server-xephyr
-  cd "${srcdir}/${pkgname}-${pkgver}/hw/kdrive"
+  cd "${srcdir}/${pkgname}-${pkgver}"  
   make DESTDIR="${pkgdir}" install
 
-  # xorg-server-xdmx
-  cd "${srcdir}/${pkgname}-${pkgver}/hw/dmx"
-  make DESTDIR="${pkgdir}" install
+  install -m755 -d "${pkgdir}/usr/lib/xorg"
+  install -m644 dix/protocol.txt "${pkgdir}/usr/lib/xorg/"
 
-  # xorg-server-xvfb
-  cd "${srcdir}/${pkgname}-${pkgver}/hw/vfb"
-  make DESTDIR="${pkgdir}" install
   install -m755 "${srcdir}/xvfb-run" "${pkgdir}/usr/bin/"
   install -m644 "${srcdir}/xvfb-run.1" "${pkgdir}/usr/share/man/man1/"
-
-  # xorg-server-xnest
-  cd "${srcdir}/${pkgname}-${pkgver}/hw/xnest"
-  make DESTDIR="${pkgdir}" install
-
-  # xorg-server
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-
-  rm -rf "${pkgdir}/var/log"
 
   install -m755 -d "${pkgdir}/var/lib/xkb"
 
   # Install sane config files in /etc. 
   install -m755 -d "${pkgdir}/etc/X11/xorg.conf.d"
+  mv "${pkgdir}/usr/share/X11/xorg.conf.d" "${pkgdir}/etc/X11/"
   install -m644 "${srcdir}/10-quirks.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
 
-  rm -rf "${pkgdir}/usr/share/X11"
+  rmdir "${pkgdir}/usr/share/X11"
 
   # Needed for non-mesa drivers, libgl will restore it
   mv "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so" \
      "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.xorg"
+
+  rm -rf "${pkgdir}/var/log"
 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
