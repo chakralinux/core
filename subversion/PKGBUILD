@@ -4,7 +4,7 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=subversion
-pkgver=1.7.4
+pkgver=1.7.5
 pkgrel=1
 pkgdesc="A Modern Concurrent Version Control System"
 arch=('i686' 'x86_64')
@@ -20,8 +20,8 @@ options=('!makeflags' '!libtool')
 source=(http://apache.mirror.rafal.ca/subversion/$pkgname-$pkgver.tar.bz2{,.asc}
         svnserve svn svnserve.conf 
         subversion.rpath.fix.patch)
-md5sums=('99ace9433be21a4793fc1cdbf2fdea09'
-         '9d7a06743fbb692601d985d852af0f44'
+md5sums=('f6353b9b581081cdf97299300c9eada3'
+         'bc45359b2c002f56d4c5e23468d20392'
          'a2b029e8385007ffb99b437b30521c90'
          'a0db6dd43af33952739b6ec089852630'
          'c459e299192552f61578f3438abf0664'
@@ -59,10 +59,10 @@ package() {
 
    install -d "${pkgdir}"/usr/share/subversion
    cp -a tools/hook-scripts "${pkgdir}"/usr/share/subversion/
-   rm -f "${pkgdir}"/usr/share/subversion/hook-scripts/*.in
+   rm "${pkgdir}"/usr/share/subversion/hook-scripts/*.in
 
-   rm -f "${pkgdir}"/usr/lib/perl5/vendor_perl/auto/SVN/_Core/.packlist
-   rm -rf "${pkgdir}"/usr/lib/perl5/core_perl
+   rm "${pkgdir}"/usr/lib/perl5/vendor_perl/auto/SVN/_Core/.packlist
+   rm -r "${pkgdir}"/usr/lib/perl5/core_perl
 
    install -D -m 755 "${srcdir}"/svnserve "${pkgdir}"/etc/rc.d/svnserve
    install -D -m 644 "${srcdir}"/svn "${pkgdir}"/etc/xinetd.d/svn
