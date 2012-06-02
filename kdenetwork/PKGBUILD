@@ -33,12 +33,10 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr' 'qca
 	     'mediastreamer' 'msilbc' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.5' 'docbook-xsl')
 
 source=("$_mirror/${pkgbase}-$_kdever.tar.xz"
-        'lisa.daemon'
-        'gcc47.patch')
+        'lisa.daemon')
 
 md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
-         '66069c83fd5fa0df5d743d4486799033'  # lisa.daemon
-         '54da759d422b8fdc46cdd68a85211766')  #gcc47.patch
+         '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
 
 
 #
@@ -46,7 +44,7 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
 #
 build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
-        patch -p4 -i "${srcdir}"/gcc47.patch
+
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
