@@ -19,20 +19,8 @@ backup=(etc/fstab etc/crypttab etc/group etc/hosts etc/ld.so.conf etc/passwd
         etc/shadow etc/gshadow etc/resolv.conf etc/motd etc/nsswitch.conf
         etc/shells etc/host.conf etc/securetty etc/profile etc/issue
         etc/chakra-release)
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
-md5sums=('e201fff56c0de549e227af66d0486aa4')
-
-# create tarball: source PKGBUILD && mksource
-
-mksource() {
-	  rm -vRf chakra-${pkgname}
-	  git clone git://gitorious.org/chakra/chakra-${pkgname}.git
-	  rm -vRf chakra-${pkgname}/.git
-	  pushd chakra-${pkgname}
-	  popd
-	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz chakra-${pkgname}/*
-	  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
-}
+source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
+md5sums=('f0ae3abe0fa8b5dac619fcfcc7b9f889')
 
 package() {
 	cd ${srcdir}/chakra-${pkgname}
@@ -62,7 +50,7 @@ package() {
 		install -m600 ${srcdir}/chakra-${pkgname}/${f} ${pkgdir}/etc/
 	done
 
-	install -D -m644 ${srcdir}/chakra-${pkgname}/modprobe.d.usb-load-ehci-first ${pkgdir}/lib/modprobe.d/usb-load-ehci-first.conf
+	install -D -m644 ${srcdir}/chakra-${pkgname}/modprobe.d.usb-load-ehci-first ${pkgdir}/usr/lib/modprobe.d/usb-load-ehci-first.conf
 
 	#
 	# setup /var

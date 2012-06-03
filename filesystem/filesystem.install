@@ -1,45 +1,28 @@
 post_install() {
 	[ -f var/log/lastlog ] ||  : >var/log/lastlog
 	[ -f var/log/wtmp ]    ||  : >var/log/wtmp
-	[ -f var/run/utmp ]    ||  : >var/run/utmp
-	chown root:20 var/run/utmp
-	chmod 664 var/run/utmp
-	[ -f var/log/btmp ]    || (: >var/log/btmp && bin/chmod 600 var/log/btmp)
-	# workaround for bug #7194
-	# readded due to bug #9465
+	[ -f var/log/btmp ]    || (: >var/log/btmp && chmod 600 var/log/btmp)
 	# please do not remove!
-	bin/chmod 1777 var/spool/mail tmp var/tmp var/lock
-	# link conflicting folders
-	ln -sf /proc/self/mounts etc/mtab
+	chmod 1777 var/spool/mail tmp var/tmp var/lock
 }
 
 # args: <group> [options]
 _addgroup() {
-	if ! bin/grep -q "^$1:" etc/group; then
-		usr/sbin/groupadd ${@} >/dev/null
+	if ! getent group "$1" >/dev/null; then
+		groupadd "$@" >/dev/null
 	fi
 }
 
 # args: <group> [options]
 _adduser() {
-	if ! bin/grep -q "^$1:" etc/passwd; then
-		usr/sbin/useradd ${@} >/dev/null
+	if ! getent passwd "$1" >/dev/null; then
+		useradd "$@" >/dev/null
 	fi
 }
 
 post_upgrade() {
 	post_install
 
-	if [ -n "`grep /tmp /etc/fstab`" ]; then
-	  echo "Your system might have a damaged /etc/fstab file."
-	  echo "We try to fix your /etc/fstab file."
-	  echo "Your original /etc/fstab file will be saved as '/etc/fstab.backup'"
-	  cat /etc/fstab > /etc/fstab.backup
-	  cat /etc/fstab | grep -v -e "/tmp" > /etc/fstab.new
-	  mv /etc/fstab.new /etc/fstab
-	fi
-
-	_addgroup cdemu   -g 103
 	_addgroup optical -g 93
 	_addgroup audio   -g 92
 	_addgroup video   -g 91
@@ -52,23 +35,23 @@ post_upgrade() {
 	_addgroup games   -g 50
 	_addgroup uucp    -g 14
 	_addgroup http    -g 33
-	_adduser  http    -u 33 -d /srv/http -g http -s /bin/false http
+	_adduser  http    -u 33 -d /srv/http -g http -s /bin/false
 	_addgroup scanner -g 96
 	_addgroup rfkill  -g 24
 
-	# sync gshadow to group (fixes FS#19869
-	if ! bin/grep -q '^rfkill:' etc/gshadow; then
-		usr/sbin/grpconv >/dev/null
+	# sync gshadow to group
+	if ! grep -q '^rfkill:' etc/gshadow; then
+		grpconv >/dev/null
 	fi
 
-	if ! bin/grep -q '^include /etc/ld.so.conf.d/\*.conf$' etc/ld.so.conf; then
-		bin/echo 'include /etc/ld.so.conf.d/*.conf' >> etc/ld.so.conf
+	if ! grep -q '^include /etc/ld.so.conf.d/\*.conf$' etc/ld.so.conf; then
+		echo 'include /etc/ld.so.conf.d/*.conf' >> etc/ld.so.conf
 	fi
 
 	# set "Last password change" > 0; otherwise su $user wont work
 	for user in bin daemon mail ftp http nobody; do
-		if LANG=C usr/bin/chage -l ${user} | bin/grep -q 'password must be changed'; then
-			usr/bin/chage -d 14871 ${user}
+		if LANG=C chage -l ${user} | grep -q 'password must be changed'; then
+			chage -d 14871 ${user}
 		fi
 	done
 }
