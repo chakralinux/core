@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=telepathy-qt
-pkgver=0.9.0
+pkgver=0.9.1
 pkgrel=1
 pkgdesc="A library for Qt-based Telepathy clients."
 arch=('i686' 'x86_64')
@@ -13,21 +13,24 @@ url="http://telepathy.freedesktop.org"
 groups=('telepathy')
 license=('LGPL')
 options=('!libtool')
-depends=('qt' 'telepathy-farsight')
+depends=('qt' 'telepathy-farstream')
 makedepends=('libxslt' 'python2' 'cmake' 'doxygen')
 conflicts=('telepathy-qt4')
 provides=('telepathy-qt4')
-source=(http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz)
-md5sums=('c4605b222eba46b18541bc6c25455caa')
+source=("http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz"
+        'gcc47.patch')
+md5sums=('e0e6c1a987bbeae44c778344a2cc9d80'
+         '32aa8eb06c76cb03af5ced27a674ebfb')
 
 build() {
     cd "${srcdir}"
+    patch -Np0 -i gcc47.patch
 
     mkdir build
     cd build
     cmake ../${pkgname}-${pkgver} \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr 
+        -DCMAKE_INSTALL_PREFIX=/usr
     make
 }
 
@@ -35,4 +38,3 @@ package() {
     cd "${srcdir}"/build
     make DESTDIR="$pkgdir" install
 }
-
