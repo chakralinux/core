@@ -1,21 +1,17 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=rtkit
 pkgver=0.10
-pkgrel=1
+pkgrel=2
 pkgdesc="Realtime Policy and Watchdog Daemon"
 arch=('i686' 'x86_64')
 url="http://git.0pointer.de/?p=rtkit.git"
 license=('GPL' 'custom:BSD')
 depends=('dbus' 'polkit')
-makedepends=('pkgconfig')
+makedepends=('pkg-config')
 install=rtkit.install
 source=(http://0pointer.de/public/$pkgname-$pkgver.tar.gz)
 md5sums=('9ab7f2a25ddf05584ea2216dfe4cefd4')
@@ -23,7 +19,12 @@ md5sums=('9ab7f2a25ddf05584ea2216dfe4cefd4')
 build() {
   cd "$srcdir/$pkgname-$pkgver"
 
-  ./configure --libexecdir=/usr/lib --prefix=/usr --sysconfdir=/etc
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --libexecdir=/usr/lib \
+    --with-systemdsystemunitdir=/usr/lib/systemd/system
+
   make
 }
 

@@ -5,7 +5,7 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl' 'nvidia-settings')
-pkgver=295.49
+pkgver=295.53
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -15,13 +15,13 @@ options=('!strip')
 [ "$CARCH" = 'i686' ] && {
   ARCH='x86'
   _pkg="NVIDIA-Linux-${ARCH}-${pkgver}"
-  md5sums=('fd998f870d20b30b8d636ffce79d9e6c')
+  md5sums=('af353274ab078cb90aba428ca1f00f0e')
 }
 
 [ "$CARCH" = "x86_64" ] && {
   ARCH='x86_64'
   _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-  md5sums=('84b92aa6eec13a38e8748264138acc56')
+  md5sums=('c974ee20fc016c9fa9ef39fc2e298f8a')
 }
 
 source=("http://us.download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
@@ -45,7 +45,7 @@ build() {
 
 package_libcl() {
   pkgdesc="OpenCL library and ICD loader from NVIDIA"
-  pkgver=1.1.9
+  pkgver=1.1.9.1
 
   cd "${srcdir}/${_pkg}"
 

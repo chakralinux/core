@@ -1,8 +1,8 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer (x86_64:) Mateusz Krawczuk <willingmagic[at]gmail[dot]com>
+
 pkgname=systemd
 pkgver=44
 pkgrel=1
@@ -40,7 +40,7 @@ build() {
   cd "$pkgname-$pkgver"
 
     #https://bugzilla.redhat.com/show_bug.cgi?id=803358
-    patch -Np1 <"$srcdir/0001-util-never-follow-symlinks-in-rm_rf_children.patch"
+    patch -p1 <"$srcdir/0001-util-never-follow-symlinks-in-rm_rf_children.patch"
     
   sed -i -e '/^Environ.*LANG/s/^/#/' \
          -e '/^ExecStart/s/agetty/& -8/' units/getty@.service.m4
@@ -52,7 +52,7 @@ build() {
               --localstatedir=/var \
               --with-rootprefix= \
               --with-rootlibdir=/lib \
-              --with-distro=arch \
+              --with-distro=other \
               --disable-gtk
 
   make

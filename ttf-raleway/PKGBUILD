@@ -1,0 +1,18 @@
+# Platform packages for Chakra
+
+pkgname=ttf-raleway
+pkgver=1
+pkgrel=1
+pkgdesc="A sans-serif typeface"
+arch=('any')
+url="http://theleagueofmoveabletype.com/raleway/"
+license=('OFL')
+depends=('fontconfig' 'xorg-font-utils')
+install=ttf.install
+source=('http://theleagueofmoveabletype.com/raleway/download')
+md5sums=('ff280d51659a149751a3fe194d2944b4')
+
+package() {
+    install -d ${pkgdir}/usr/share/fonts/TTF/
+    install -m644 ${srcdir}/theleagueof-raleway-40afd9d/*.ttf ${pkgdir}/usr/share/fonts/TTF/
+}

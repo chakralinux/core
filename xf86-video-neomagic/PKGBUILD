@@ -1,17 +1,13 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-neomagic
-pkgver=1.2.5
-pkgrel=4
+pkgver=1.2.6
+pkgrel=1
 pkgdesc="X.org neomagic video driver"
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
@@ -20,12 +16,18 @@ conflicts=('xorg-server<1.10.1')
 groups=('xorg-video-drivers')
 options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('02c994e2eae191b50a8cd556e5b52d82725073b3')
+sha1sums=('35ac1d62357fa2ddc37473b24335db441bc70f4d')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+
   ./configure --prefix=/usr
   make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
   make DESTDIR="${pkgdir}" install
   install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"

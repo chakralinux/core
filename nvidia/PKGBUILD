@@ -8,7 +8,7 @@ _extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=nvidia
-pkgver=295.49
+pkgver=295.53
 pkgrel=1
 pkgdesc="NVIDIA drivers for linux."
 arch=('i686' 'x86_64')
@@ -23,12 +23,12 @@ if [ "$CARCH" = "i686" ]; then
     _ARCH='x86'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}"
     source=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-    md5sums=('fd998f870d20b30b8d636ffce79d9e6c')
+    md5sums=('af353274ab078cb90aba428ca1f00f0e')
 elif [ "$CARCH" = "x86_64" ]; then
     _ARCH='x86_64'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
     source=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-    md5sums=('84b92aa6eec13a38e8748264138acc56')
+    md5sums=('c974ee20fc016c9fa9ef39fc2e298f8a')
 fi
 
 build() {

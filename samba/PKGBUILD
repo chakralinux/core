@@ -1,19 +1,15 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase=samba
 pkgname=('smbclient' 'samba')
-pkgver=3.6.4
+pkgver=3.6.5
 # We use the 'A' to fake out pacman's version comparators.  Samba chooses
 # to append 'a','b',etc to their subsequent releases, which pamcan
 # misconstrues as alpha, beta, etc.  Bad samba!
-_realver=3.6.4
+_realver=3.6.5
 pkgrel=1
 arch=(i686 x86_64)
 url="http://www.samba.org"
@@ -26,6 +22,13 @@ source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${_realver}.tar.gz
         samba.pam 
         samba.conf.d
         fix-ipv6-mount.patch)
+md5sums=('2f0c14547333c1b48fd4728b031e7040'
+         'a3da19515a234c703876cf850c44e996'
+         '5697da77590ec092cc8a883bae06093c'
+         'a4bbfa39fee95bba2e7ad6b535fae7e6'
+         '96f82c38f3f540b53f3e5144900acf17'
+         'f2f2e348acd1ccb566e95fa8a561b828'
+         'c6a38a8c8fa24979e6217aed533358ea')
 ### UNINSTALL dmapi package before building!!!
 
 build() {
@@ -143,10 +146,4 @@ depends=('db' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap' 'kr
   # copy ldap example
   install -D -m644 ${srcdir}/samba-${_realver}/examples/LDAP/samba.schema ${pkgdir}/usr/share/doc/samba/examples/LDAP/samba.schema
 }
-md5sums=('d8e070e2a3b12f202f347e4427469bc2'
-         'a3da19515a234c703876cf850c44e996'
-         '5697da77590ec092cc8a883bae06093c'
-         'a4bbfa39fee95bba2e7ad6b535fae7e6'
-         '96f82c38f3f540b53f3e5144900acf17'
-         'f2f2e348acd1ccb566e95fa8a561b828'
-         'c6a38a8c8fa24979e6217aed533358ea')
+

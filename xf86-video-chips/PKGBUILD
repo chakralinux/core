@@ -1,51 +1,34 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakar-project.org
 
 pkgname=xf86-video-chips
 pkgver=1.2.4
-pkgrel=2
+pkgrel=3
 pkgdesc="X.org Chips and Technologies video driver"
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=(glibc)
+depends=('glibc')
 makedepends=('xorg-server')
 conflicts=('xorg-server<1.10.1')
 groups=('xorg-video-drivers')
 options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
 sha1sums=('71f474335d05f93b2451a7a0750c4409669641a4')
-#source=("http://chakra-project.org/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
-#md5sums=("c476696b7bf6c6431eaedf1eda0a751d") # xf86-video-chips-1.2.3.99-1.tar.xz
-
-# create tarball: source PKGBUILD && mksource
-
-mksource() {
-	  rm -vRf ${pkgname}
-	  git clone git://anongit.freedesktop.org/xorg/driver/${pkgname}
-	  rm -vRf ${pkgname}/.git
-	  pushd ${pkgname}
-	  popd
-	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz ${pkgname}/*
-	  md5sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
-}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  # enable on git version
-  #cd ${srcdir}/${pkgname}
-  autoreconf -v --install
   ./configure --prefix=/usr
   make
-  make DESTDIR="${pkgdir}" install
+}
 
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }

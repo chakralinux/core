@@ -1,22 +1,21 @@
 #
 # Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 pkgname=mysql-python
 pkgver=1.2.3
-pkgrel=1
+pkgrel=2
 pkgdesc="MySQL support for Python"
 arch=("i686" "x86_64")
 url="http://sourceforge.net/projects/mysql-python"
 license=('GPL2')
-depends=('python>=2.7' 'libmysqlclient>=5.5.10')
-makedepends=('mysql>=5.1.41-2' 'setuptools')
+depends=('python2' 'libmysqlclient')
+makedepends=('mysql' 'python-distribute')
 source=("http://downloads.sourceforge.net/${pkgname}/MySQL-python-${pkgver}.tar.gz")
 md5sums=('215eddb6d853f6f4be5b4afc4154292f')
 
-build() {
+package() {
   cd ${srcdir}/MySQL-python-${pkgver}
-  python setup.py install --root=${pkgdir} || return 1
+  python setup.py install --root=${pkgdir}
 }

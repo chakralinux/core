@@ -1,19 +1,15 @@
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakraproject.org
 
 pkgbase=cups
 pkgname=('libcups' 'cups')
-pkgver=1.5.2
+pkgver=1.5.3
 pkgrel=1
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://www.cups.org/"
-makedepends=('libtiff>=3.9.2-2' 'libpng>=1.4.0'  'acl' 'openslp' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'poppler>=0.12.3' 'xinetd' 'gzip' 'autoconf' 'php' 'libusb-compat' 'dbus-core' 'avahi'  'hicolor-icon-theme')
+makedepends=('libtiff>=3.9.2-2' 'libpng>=1.4.0'  'acl' 'openslp' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'poppler>=0.12.3' 'xinetd' 'gzip' 'autoconf' 'php' 'libusb' 'dbus-core' 'avahi'  'hicolor-icon-theme')
 source=("ftp://ftp.easysw.com/pub/cups/${pkgver}/${pkgbase}-${pkgver}-source.tar.bz2"
         #cups-avahi-1-config.patch
         #cups-avahi-2-backend.patch
@@ -22,8 +18,9 @@ source=("ftp://ftp.easysw.com/pub/cups/${pkgver}/${pkgbase}-${pkgver}-source.tar
         #cups-avahi-5-services.patch
         cups-no-export-ssllibs.patch
         cups-no-gcrypt.patch
+        cups-no-gzip-man.patch
         cups cups.logrotate cups.pam)
-md5sums=('9471d2a7c920cfbb17133c32d2e6866f'
+md5sums=('e1ad15257aa6f162414ea3beae0c5df8'
          #'fe3906f7733f8f63e05daf025d05abf3'
          #'80e2d7d6ffcf125f917dca795e161efd'
          #'eef9b879d9bdfb04c2042f57d07969b4'
@@ -31,6 +28,7 @@ md5sums=('9471d2a7c920cfbb17133c32d2e6866f'
          #'ca64df54a3a2dc53c28e6291e8d53d8f'
          '9b8467a1e51d360096b70e2c3c081e6c'
          '3733c23e77eb503bd94cc368e02830dc'
+         'd8fce4246d42186d9b190c1f07f5b911'
          '9657daa21760bb0b5fa3d8b51d5e01a1'
          'f861b18f4446c43918c8643dcbbd7f6d'
          '96f82c38f3f540b53f3e5144900acf17')
@@ -39,7 +37,7 @@ build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
 
   # Avahi support in the dnssd backend. patches from upstream/FC RawHide
-  patch -Np1 -i ${srcdir}/cups-avahi-1-config.patch
+  #patch -Np1 -i ${srcdir}/cups-avahi-1-config.patch
   #patch -Np1 -i ${srcdir}/cups-avahi-2-backend.patch
   #patch -Np1 -i ${srcdir}/cups-avahi-3-timeouts.patch
   #patch -Np1 -i ${srcdir}/cups-avahi-4-poll.patch
@@ -56,13 +54,13 @@ build() {
   ./configure --prefix=/usr \
               --sysconfdir=/etc \
               --localstatedir=/var \
+              --libdir=/usr/lib \
               --with-logdir=/var/log/cups \
               --with-docdir=/usr/share/cups/doc \
               --with-cups-user=daemon \
               --with-cups-group=lp \
               --enable-pam=yes \
               --disable-ldap \
-              --libdir=/usr/lib \
               --enable-raw-printing \
               --enable-dbus \
               --with-dbusdir=/etc/dbus-1 \
@@ -92,8 +90,6 @@ package_cups() {
 pkgdesc="The CUPS Printing System - deamon package"
 install=cups.install
 backup=(etc/cups/cupsd.conf
-        etc/cups/mime.convs
-        etc/cups/mime.types
         etc/cups/snmp.conf
         etc/cups/printers.conf
         etc/cups/classes.conf
@@ -103,7 +99,7 @@ backup=(etc/cups/cupsd.conf
         etc/logrotate.d/cups
         etc/pam.d/cups
         etc/xinetd.d/cups-lpd)
-depends=('acl' 'openslp' 'pam' "libcups>=${pkgver}" 'xdg-utils' 'poppler>=0.12.3' 'libusb-compat' 'dbus-core' 'hicolor-icon-theme')
+depends=('acl' 'openslp' 'pam' "libcups>=${pkgver}" 'xdg-utils' 'poppler>=0.12.3' 'dbus-core' 'hicolor-icon-theme')
 optdepends=('php: for included phpcups.so module')
 
   cd "${srcdir}/${pkgbase}-${pkgver}"

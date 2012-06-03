@@ -1,31 +1,36 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-v4l
 pkgver=0.2.0
-pkgrel=9
+pkgrel=10
 pkgdesc="X.org v4l video driver"
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('pkgconfig' 'xorg-server>=1.10.1')
+makedepends=('xorg-server>=1.10.1')
 conflicts=('xorg-server<1.10.1')
 groups=('xorg-video-drivers')
 options=('!libtool')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 LICENSE)
-md5sums=('2251ae2a0a905764941cd7b098e85ad1' '7d4d018f6bbff7e42672d1aabc75c5cf')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
+        LICENSE)
+md5sums=('2251ae2a0a905764941cd7b098e85ad1'
+         '7d4d018f6bbff7e42672d1aabc75c5cf')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
-  install -D -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+  ./configure --prefix=/usr 
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install 
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
