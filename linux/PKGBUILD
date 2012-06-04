@@ -8,7 +8,7 @@ pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') # Build stock -CHAKRA kernel
 # pkgname=linux-custom       # Build kernel with a different name
 _kernelname=${pkgname#linux}
-_basekernel=3.4
+_basekernel=3.4.1
 pkgver=${_basekernel}.1
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -35,9 +35,9 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.4.1.tar.bz2"
         'change-default-console-loglevel.patch'
         'i915-fix-ghost-tv-output.patch')
 md5sums=('3b101768a97ec65292b55c02bf0a8c7a'
-         '0c9de293b4d34d2d91de453592c4a89f'
-         '594d958690a589b0d762992fe346230e'
-         'cf3820c34cb37eb9d52f565b113432ab'
+         '9bcefced1f4be50ef2720944f656e5d7'
+         'eccab7a50869a58ec476ab5b4fc087e8'
+         'a0aac33ce142f819220d77751585dd2f'
          'af987a06ae369a1aa2c1b53621bf71f3'
          'eefdf533f13bdfa90937856e3e97f981'
          '9dc1aa9fcc12b3c2f52f605830c02939'
@@ -73,7 +73,7 @@ build() {
   patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
 
   #aufs patches for Live:
-  patch -p1 -i "${srcdir}/aufs3-loopback.patch"
+  #patch -p1 -i "${srcdir}/aufs3-loopback.patch"
   patch -p1 -i "${srcdir}/aufs3-base.patch"
   patch -p1 -i "${srcdir}/aufs3-proc_map.patch"
   patch -p1 -i "${srcdir}/aufs3-fix-export-__devcgroup_inode_permission.patch"
