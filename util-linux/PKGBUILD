@@ -16,12 +16,8 @@ conflicts=('util-linux-ng')
 provides=("util-linux-ng=${pkgver}")
 license=('GPL2')
 options=('!libtool')
-source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v2.21/${pkgname}-${pkgver}.tar.xz
-        pam-login
-        pam-common)
-md5sums=('54ba880f1d66782c2287ee2c898520e9'
-         '6aca1c10dad9c0feea2af6497de6ca82'
-         'a31374fef2cba0ca34dfc7078e2969e4')
+source=("ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v2.21/${pkgname}-${pkgver}.tar.xz")
+md5sums=('54ba880f1d66782c2287ee2c898520e9')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -31,18 +27,20 @@ build() {
 
   ./configure --prefix=/usr \
               --libdir=/usr/lib \
+              --disable-wall \
               --enable-fs-paths-extra=/usr/bin:/usr/sbin \
               --enable-write \
               --enable-raw \
-              --disable-wall \
               --enable-new-mount \
-              --enable-login-utils
+              --enable-rename \
+              --enable-schedutils \
+              --disable-login-utils
 
   make
 }
 
 check() {
-  make -C "$pkgname-$pkgver" check
+  make -C "${pkgname}-${pkgver}" check
 }
 
 package() {
@@ -52,19 +50,13 @@ package() {
 
   cd "${pkgdir}"
 
-  install -dm755 var/lib/hwclock
+  install -d -m755 var/lib/hwclock
 
   # broken tool, going away in next major release, so just remove it now
   rm "${pkgdir}"/usr/{bin/chkdupexe,share/man/man1/chkdupexe.1}
 
   # delete stray empty dir, fixed upstream
   rm -r usr/share/man/ru
-
-  # setuid chfn and chsh
-  chmod 4755 "$pkgdir"/usr/bin/ch{sh,fn}
-
-  # install PAM files for login-utils
-  install -Dm644 "$srcdir/pam-common" "$pkgdir/etc/pam.d/chfn"
-  install -m644 "$srcdir/pam-common" "$pkgdir/etc/pam.d/chsh"
-  install -m644 "$srcdir/pam-login" "$pkgdir/etc/pam.d/login"
 }
+
+# vim:set ts=2 sw=2 et:
