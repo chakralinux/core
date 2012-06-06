@@ -6,12 +6,15 @@
 
 pkgname=linux-firmware
 pkgver=20120227
+_b43=4.178.10.4
+_legacy=3.130.20.0
 pkgrel=1
 pkgdesc="Firmware files for Linux"
 arch=('any')
 url="http://git.kernel.org/?p=linux/kernel/git/dwmw2/linux-firmware.git;a=summary"
 license=('GPL2' 'GPL3' 'custom')
-provides=('kernel26-firmware=2.6.34.99')
+makedepends=('b43-fwcutter')
+provides=('kernel26-firmware=3.1.99' 'linux-firmware=3.1.99')
 conflicts=('linux-firmware-git'
            'kernel26-firmware'
            'ar9170-fw'
@@ -23,7 +26,9 @@ conflicts=('linux-firmware-git'
            'iwlwifi-6000-ucode'
            'rt2870usb-fw'
            'rt2x00-rt61-fw'
-           'rt2x00-rt71w-fw')
+           'rt2x00-rt71w-fw'
+           'b43-firmware'
+           'b43-firmware-legacy')
 replaces=('kernel26-firmware'
            'ar9170-fw'
            'iwlwifi-1000-ucode'
@@ -34,10 +39,27 @@ replaces=('kernel26-firmware'
            'iwlwifi-6000-ucode'
            'rt2870usb-fw'
            'rt2x00-rt61-fw'
-           'rt2x00-rt71w-fw')
+           'rt2x00-rt71w-fw'
+           'b43-firmware'
+           'b43-firmware-legacy')
 options=(!strip)
-source=(ftp://ftp.archlinux.org/other/linux-firmware/$pkgname-$pkgver.tar.xz)
-sha256sums=('bc1cbee23ab8be8478be66e5486008d81b91fbf6de50347fd1be58b5e56bc6b7')
+source=(http://chakra.sourceforge.net/sources/linux-firmware/$pkgname-$pkgver.tar.xz
+        http://mirror2.openwrt.org/sources/broadcom-wl-${_b43}.tar.bz2
+        http://downloads.openwrt.org/sources/wl_apsta-${_legacy}.o)
+sha256sums=('bc1cbee23ab8be8478be66e5486008d81b91fbf6de50347fd1be58b5e56bc6b7'
+            '32f6ad98facbb9045646fdc8b54bb03086d204153253f9c65d0234a5d90ae53f'
+            '7dba610b1d96dd14e901bcbce14cd6ecd1b1ac6f5c0035b0d6b6dc46a7c3ef90')
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+	  rm -vRf linux-firmware*
+	  git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
+	  pushd ${pkgname}
+          git archive --format=tar --prefix linux-firmware-$(date +%Y%m%d)/ master | xz -9 > ../linux-firmware-$(date +%Y%m%d).tar.xz
+	  popd
+	  sha256sum linux-firmware-$(date +%Y%m%d).tar.xz
+}
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -47,5 +69,11 @@ package() {
   install -d -m755 "${pkgdir}/usr/share/licenses/linux-firmware/"
   rm -f "${pkgdir}/usr/lib/firmware/GPL*"
   mv "${pkgdir}/usr/lib/firmware"/{LICEN*,WHENCE} "${pkgdir}/usr/share/licenses/linux-firmware/"
+
+  # install b43-firmware
+  b43-fwcutter -w "${pkgdir}/usr/lib/firmware/" ${srcdir}/broadcom-wl-${_b43}/linux/wl_apsta.o
+
+  # install b43-legacy-firmware
+  b43-fwcutter -w "${pkgdir}/usr/lib/firmware/" ${srcdir}/wl_apsta-${_legacy}.o
 }
 # vim:set ts=2 sw=2 et:
