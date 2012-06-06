@@ -70,10 +70,11 @@ package() {
   rm -f "${pkgdir}/usr/lib/firmware/GPL*"
   mv "${pkgdir}/usr/lib/firmware"/{LICEN*,WHENCE} "${pkgdir}/usr/share/licenses/linux-firmware/"
 
+  install -d -m755 "${pkgdir}/lib/firmware"
   # install b43-firmware
-  b43-fwcutter -w "${pkgdir}/usr/lib/firmware/" ${srcdir}/broadcom-wl-${_b43}/linux/wl_apsta.o
+  b43-fwcutter -w "${pkgdir}/lib/firmware/" ${srcdir}/broadcom-wl-${_b43}/linux/wl_apsta.o
 
   # install b43-legacy-firmware
-  b43-fwcutter -w "${pkgdir}/usr/lib/firmware/" ${srcdir}/wl_apsta-${_legacy}.o
+  b43-fwcutter -w "${pkgdir}/lib/firmware/" ${srcdir}/wl_apsta-${_legacy}.o
 }
 # vim:set ts=2 sw=2 et:
