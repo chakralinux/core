@@ -1,35 +1,34 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
-# Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_extramodules=extramodules-3.4.1-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=ndiswrapper
 pkgver=1.57
-pkgrel=4
+pkgrel=5
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://ndiswrapper.sourceforge.net"
 install="ndiswrapper.install"
-depends=('linux>=3.2' 'linux<3.3')
+depends=('linux>=3.4' 'linux<3.5')
 provides=("ndiswrapper-utils=$pkgver")
 replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
-source=(http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz)
-md5sums=('7a401dc540938bf07893c67f418b6152')
+source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
+        'linux34.patch')
+md5sums=('7a401dc540938bf07893c67f418b6152'
+         '46cb26e68de91dc3c650866fc1189c28')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
 
+  sed -i "/modinfo/s/s/usr\//" driver/Makefile
+  patch -p0 -i "$srcdir/linux34.patch"
   make KVERS=$_kver
 }
 
@@ -40,5 +39,4 @@ package() {
     KVERS=$_kver DESTDIR="$pkgdir/" install
 
   gzip "$pkgdir/lib/modules/$_extramodules/$pkgname.ko"
-  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" ${startdir}/*.install
 }

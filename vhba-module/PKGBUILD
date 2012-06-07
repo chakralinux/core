@@ -1,25 +1,23 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
-# Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_extramodules=extramodules-3.4.1-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=vhba-module
-pkgver=20110915
-pkgrel=4
+pkgver=20120422
+pkgrel=1
 pkgdesc="Kernel module that emulates SCSI devices"
 arch=('i686' 'x86_64')
 url="http://cdemu.sourceforge.net/"
 license=('GPL2')
-depends=('linux>=3.2' 'linux<3.3')
+depends=('linux>=3.4' 'linux<3.5')
 makedepends=('linux-headers')
 install=vhba-module.install
 source=(http://sourceforge.net/projects/cdemu/files/vhba-module/vhba-module-$pkgver.tar.bz2)
-md5sums=('8bb99b427ca67bad448f4dd211bdd1a2')
+md5sums=('d97372da1d270d1605742b2995fb6678')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
