@@ -1,22 +1,21 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
-# Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_extramodules=extramodules-3.4.1-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=rtl8192
 pkgver=0005.1230.2011
-pkgrel=5
+pkgrel=6
 pkgdesc="Driver for Realtek 8192CE/DE/SE PCI wireless chipsets."
+arch=('i686' 'x86_64')
 license=("GPL")
-depends=('linux>=3.2' 'linux<3.3' 'linux-headers')
+depends=('linux>=3.4' 'linux<3.5' 'linux-headers')
 replaces=(rtl8192se)
 source=("http://chakra.sourceforge.net/sources/$pkgname/92ce_se_de_linux_mac80211_${pkgver}.tar.gz")
-arch=('i686' 'x86_64')
+md5sums=('f7d166274151276a7f7035813a5d5336')
 url="http://www.realtek.com.tw/"
 install="${pkgname}.install"
 
@@ -38,5 +37,3 @@ package() {
    cp -f rtlwifi.ko ${pkgdir}/lib/modules/${_extramodules}
    find ${pkgdir}/lib/modules/${_extramodules} -name '*.ko' -exec gzip {} \;
 }
-
-md5sums=('f7d166274151276a7f7035813a5d5336')

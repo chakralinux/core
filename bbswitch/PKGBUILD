@@ -1,26 +1,24 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
-# Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_extramodules=extramodules-3.4.1-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
  
 pkgname=bbswitch
-pkgver=0.4.1
-pkgrel=3
+pkgver=0.4.2
+pkgrel=1
 pkgdesc="kernel module allowing to switch dedicated graphics card on Optimus laptops"
 arch=('i686' 'x86_64')
 url=("http://github.com/Bumblebee-Project/bbswitch")
 license=('GPL')
 provides=('bbswitch')
 install=bbswitch.install
-depends=('linux>=3.2' 'linux<3.3')
+depends=('linux>=3.4' 'linux<3.5')
 makedepends=('linux' 'linux-headers')
 source=("https://github.com/downloads/Bumblebee-Project/bbswitch/${pkgname}-${pkgver}.tar.gz")
-md5sums=('9b2ab87770987af6264812ef99759c95')
+md5sums=('0db72765c6accb49426a40c4cb1556d3')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
