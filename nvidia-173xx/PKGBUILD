@@ -1,42 +1,43 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
-# Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_extramodules=extramodules-3.4-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=nvidia-173xx
-pkgver=173.14.31
-pkgrel=9
+pkgver=173.14.35
+pkgrel=1
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86
 [ "$CARCH" = "x86_64" ] && ARCH=x86_64
 url="http://www.nvidia.com/"
-depends=('linux>=3.2' 'linux<3.3' 'nvidia-173xx-utils')
+depends=('linux>=3.4' 'linux<3.5' 'nvidia-173xx-utils')
 makedepends=('linux-headers')
 conflicts=('nvidia-96xx' 'nvidia')
 license=('custom')
 install=nvidia.install
 source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run")
-md5sums=('01cd3b91196cd4495f56c34494f310b5')
-[ "$CARCH" = "x86_64" ] && md5sums=('d53e8faf8ac90ad98b8998f25f121535')
+md5sums=('0fa45e6fc23a2dc69faa8a66ae0e0cc5')
+[ "$CARCH" = "x86_64" ] && md5sums=('6934b522d2cf313ae6e94e25763fe1a8')
 
 build() {
-    sh "NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run" --extract-only
-    cd "NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/"
-    ln -s Makefile.kbuild Makefile
-    make SYSSRC=/lib/modules/${_kver}/build module || return 1
+	cd $srcdir
+	sh NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run --extract-only
+	cd NVIDIA-Linux-$ARCH-${pkgver}-pkg0
+	cd usr/src/nv/
+	ln -s Makefile.kbuild Makefile
+	make SYSSRC=/lib/modules/${_kver}/build/ module
 }
 
 package() {
-    cd "NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/"
-    mkdir -p $pkgdir//lib/modules/${_extramodules}
+    cd $srcdir/"NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/"
+    mkdir -p $pkgdir/lib/modules/${_extramodules}
     install -m644 nvidia.ko $pkgdir/lib/modules/${_extramodules}
-    install -d -m755 "${pkgdir}/etc/modprobe.d"
-    echo "blacklist nouveau" >> "${pkgdir}/etc/modprobe.d/nouveau_blacklist.conf"
-    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
+    mkdir -p "${pkgdir}/etc/modprobe.d"
+    echo "blacklist nouveau" >> $pkgdir/etc/modprobe.d/nouveau_blacklist.conf
+    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" $startdir/nvidia.install
+    # gzip -9 module
     gzip "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
 }

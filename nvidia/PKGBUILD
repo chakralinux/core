@@ -3,17 +3,16 @@
 #
 # maintainer abveritas@chakra-project.org
 
-# Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
+_extramodules=extramodules-3.4-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=nvidia
 pkgver=295.53
-pkgrel=1
+pkgrel=2
 pkgdesc="NVIDIA drivers for linux."
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-depends=('linux>=3.2' 'linux<3.3' "nvidia-utils=${pkgver}")
+depends=('linux>=3.4' 'linux<3.5' "nvidia-utils=${pkgver}")
 makedepends=('linux-headers')
 conflicts=('nvidia-96xx' 'nvidia-173xx')
 license=('custom')
