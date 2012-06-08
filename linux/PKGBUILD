@@ -74,12 +74,14 @@ build() {
   patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
 
   #aufs patches for Live:
-  #patch -p1 -i "${srcdir}/aufs3-loopback.patch"
-  patch -p1 -i "${srcdir}/aufs3-base.patch"
-  patch -p1 -i "${srcdir}/aufs3-proc_map.patch"
-  patch -p1 -i "${srcdir}/aufs3-fix-export-__devcgroup_inode_permission.patch"
-  patch -p1 -i "${srcdir}/aufs3-standalone.patch"
   patch -p1 -i "${srcdir}/aufs3.patch"
+  patch -p1 -i "${srcdir}/aufs3-base.patch"
+  patch -p1 -i "${srcdir}/aufs3-kbuild.patch"
+  patch -p1 -i "${srcdir}/aufs3-loopback.patch"
+  patch -p1 -i "${srcdir}/aufs3-proc_map.patch"
+  #patch -p1 -i "${srcdir}/aufs3-fix-export-__devcgroup_inode_permission.patch"
+  patch -p1 -i "${srcdir}/aufs3-standalone.patch"
+  
 
   if [ "${CARCH}" = "x86_64" ]; then
     cat "${srcdir}/config.x86_64" > ./.config
@@ -125,9 +127,9 @@ package_linux() {
   groups=('base')
   depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7')
   optdepends=('crda: to set the correct wireless channels of your country')
-  provides=('nouveau-drm' 'kernel26' 'acerhk=0.5.35' 'nvidia-96xx')
-  conflicts=('kernel26' 'nvidia-96xx')
-  replaces=('kernel26' 'nvidia-96xx')
+  provides=('nouveau-drm' 'kernel26' 'acerhk=0.5.35' 'nvidia-96xx' 'aufs3')
+  conflicts=('kernel26' 'nvidia-96xx' 'acerhk')
+  replaces=('kernel26' 'nvidia-96xx' 'aufs3' 'nouveau-drm')
   backup=("etc/mkinitcpio.d/${pkgname}.preset")
   install=${pkgname}.install
 
