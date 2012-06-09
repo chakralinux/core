@@ -5,7 +5,7 @@
 
 pkgname=pciutils
 pkgver=3.1.9
-pkgrel=1
+pkgrel=2
 pkgdesc="PCI bus configuration space access library and tools"
 arch=(i686 x86_64)
 license=('GPL2')
@@ -13,7 +13,7 @@ groups=('base')
 url="http://mj.ucw.cz/pciutils.html"
 optdepends=('sh: required by update-pciids') 
 makedepends=('wget')
-depends=('glibc')
+depends=('glibc' 'hwids')
 source=(ftp://ftp.kernel.org/pub/software/utils/${pkgname}/${pkgname}-${pkgver}.tar.xz)
 md5sums=('82b649eb00d12b81ab57f83780bc2bc8')
 
@@ -30,4 +30,6 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make SHARED=yes PREFIX=/usr SHAREDIR=/usr/share/hwdata MANDIR=/usr/share/man DESTDIR="${pkgdir}" install install-lib
   install -m644 "${srcdir}/libpci.a" "${pkgdir}/usr/lib/"
+  # this is now supplied by the hwids package
+  rm -rf $pkgdir/usr/{sbin/update-pciids,share/{man/man8/update-pciids.8.gz,hwdata}}
 }
