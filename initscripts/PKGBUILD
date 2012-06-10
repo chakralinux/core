@@ -64,5 +64,8 @@ package() {
   cd ${srcdir}
   make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
+
+  # Avoid conflicts
+  mv ${pkgdir}/etc/profile.d/locale.sh ${pkgdir}/etc/profile.d/locale.sh.new
 }
 
