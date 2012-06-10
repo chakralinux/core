@@ -32,14 +32,14 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 build() {
 	cd "${srcdir}"
 	
-	mkdir build
-	cd build
+        rm -rf build 
+	mkdir build && cd build
 	
 	cmake ../pykde4-${pkgver} \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=/usr \
-		-DPYTHON_EXECUTABLE=/usr/bin/python2 
-		#-DWITH_Soprano=OFF
+		-DPYTHON_EXECUTABLE=/usr/bin/python2 \
+		-DWITH_Soprano=OFF
 	make
 }
 
