@@ -55,11 +55,8 @@ md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
 
-	# Fixme: why this?
-	export CFLAGS="-fPIC ${CFLAGS[@]}"
-	export CXXFLAGS="-fPIC ${CXXFLAGS[@]}"
-	
 	patch -p0 -i ${startdir}/fixdoc.patch
+	patch -p0 -i ${startdir}/fixbuild.patch
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
