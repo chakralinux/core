@@ -5,7 +5,7 @@
 
 pkgname=udev
 pkgver=182
-pkgrel=1
+pkgrel=2
 pkgdesc="The userspace dev tools (udev)"
 depends=('util-linux' 'libusb-compat' 'glib2' 'kmod' 'pciutils' 'usbutils' 'acl')
 install=udev.install
@@ -30,7 +30,7 @@ build() {
               --with-rootprefix= \
               --sysconfdir=/etc \
               --libdir=/usr/lib \
-              --libexecdir=/lib \
+              --libexecdir=/usr/lib \
               --with-systemdsystemunitdir=/lib/systemd/system \
               --enable-udev_acl
 
@@ -56,7 +56,7 @@ package() {
   done
 
   # install the mkinitpcio hook
-  install -D -m644 ../initcpio-hooks-udev ${pkgdir}/lib/initcpio/hooks/udev
-  install -D -m644 ../initcpio-install-udev ${pkgdir}/lib/initcpio/install/udev
+  install -D -m644 ../initcpio-hooks-udev ${pkgdir}/usr/lib/initcpio/hooks/udev
+  install -D -m644 ../initcpio-install-udev ${pkgdir}/usr/lib/initcpio/install/udev
 }
 
