@@ -9,7 +9,7 @@ pkgname=('linux' 'linux-headers' 'linux-docs') # Build stock -CHAKRA kernel
 # pkgname=linux-custom       # Build kernel with a different name
 _kernelname=${pkgname#linux}
 _basekernel=3.4
-pkgver=${_basekernel}.1
+pkgver=${_basekernel}.2
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -35,7 +35,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.4.tar.xz"
         'change-default-console-loglevel.patch'
         'i915-fix-ghost-tv-output.patch')
 md5sums=('967f72983655e2479f951195953e8480'
-         '52adc59c547c4c7926686145b9ade5f1'
+         'ac52d3d82c20c7e80740fc5fb00b6ed4'
          '9bcefced1f4be50ef2720944f656e5d7'
          'eccab7a50869a58ec476ab5b4fc087e8'
          'a0aac33ce142f819220d77751585dd2f'
@@ -127,9 +127,9 @@ package_linux() {
   groups=('base')
   depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7')
   optdepends=('crda: to set the correct wireless channels of your country')
-  provides=('nouveau-drm' 'kernel26' 'acerhk=0.5.35' 'nvidia-96xx' 'aufs3')
-  conflicts=('kernel26' 'nvidia-96xx' 'acerhk')
-  replaces=('kernel26' 'nvidia-96xx' 'aufs3' 'nouveau-drm')
+  provides=('nouveau-drm' 'kernel26' 'acerhk=0.5.35' 'aufs3')
+  conflicts=('kernel26' 'nvidia-96xx=96.43.20-9' 'acerhk')
+  replaces=('kernel26' 'aufs3' 'nouveau-drm')
   backup=("etc/mkinitcpio.d/${pkgname}.preset")
   install=${pkgname}.install
 
