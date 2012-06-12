@@ -5,7 +5,7 @@
 
 pkgname=cdemu-daemon
 pkgver=1.4.0
-pkgrel=5
+pkgrel=6
 pkgdesc="CD/DVD-ROM device emulator daemon"
 arch=('i686' 'x86_64')
 backup=('etc/conf.d/cdemud'
@@ -18,16 +18,14 @@ optdepends=('alsa-lib: to enable the ALSA audio driver'
 install=cdemud.install
 source=(http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.gz
         cdemud.conf
-        cdemud.rc
-        60-vhba.rules)
+        cdemud.rc)
 md5sums=('f7ccc0abc33057d552ec7b0925fce63a'
          'c3097a01d9e79093485181ff47a81542'
-         '29b9bc0023ff17e14091f3fb8438ccb4'
-         'f551504552d7693ac79e8e0d302f62b9')
+         '29b9bc0023ff17e14091f3fb8438ccb4')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  ./configure --prefix=/usr --sysconfdir=/etc
+  ./configure --prefix=/usr --sysconfdir=/etc --libexecdir=/usr/lib/$pkgname
   make
 }
 
@@ -37,7 +35,8 @@ package() {
   install -m 644 -D ../cdemud.conf $pkgdir/etc/conf.d/cdemud
   install -m 755 -D ../cdemud.rc $pkgdir/etc/rc.d/cdemud
 
-  # Install udev rule for non-root mounting of iso's 
-  install -D -m 755 "${srcdir}/60-vhba.rules"  "$pkgdir/lib/udev/rules.d/60-vhba.rules"
+  # for systemd
+  install -d "$pkgdir/usr/lib/modules-load.d"
+  echo "vhba" > "$pkgdir/usr/lib/modules-load.d/cdemu.conf"
 
 }
