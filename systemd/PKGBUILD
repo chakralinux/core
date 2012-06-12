@@ -5,7 +5,7 @@
 
 pkgname=systemd
 pkgver=44
-pkgrel=1
+pkgrel=2
 pkgdesc="Session and Startup manager"
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -48,13 +48,11 @@ build() {
   ./configure --sysconfdir=/etc \
               --libexecdir=/usr/lib \
               --libdir=/usr/lib \
-              --with-pamlibdir=/lib/security \
+              --with-pamlibdir=/usr/lib/security \
               --localstatedir=/var \
-              --with-rootprefix= \
-              --with-rootlibdir=/lib \
               --with-distro=other \
-              --disable-gtk
-
+              --disable-gtk 
+          
   make
 
   # fix .so links in manpages
@@ -71,7 +69,8 @@ package() {
   printf "d /run/console 755 root root\n" > "$pkgdir/usr/lib/tmpfiles.d/console.conf"
 
   # symlink to /bin/systemd for compat and sanity
-  ln -s ../lib/systemd/systemd "$pkgdir"/bin/systemd
+  install -dm755 "$pkgdir/bin"
+  ln -s ../usr/lib/systemd/systemd "$pkgdir/bin/systemd"
 
   # fix systemd-analyze for python2
   sed -i '1s/python$/python2/' "$pkgdir/usr/bin/systemd-analyze"

@@ -1,30 +1,26 @@
+
+
 pkgname=systemd-units
-pkgver=0.20111101
+pkgver=20120528
 pkgrel=1
 pkgdesc="Chakra GNU/Linux specific Systemd unit files"
 arch=('any')
-url="https://gitorious.org/chakra/chakra-systemd-units"
+url="http://github.com/falconindy/systemd-arch-units"
 license=('MIT')
-depends=('systemd>=37')
+depends=('systemd>=44')
 groups=('systemd')
 install=systemd-units.install
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}-${pkgrel}.tar.xz")
-sha256sums=('f76cb7c742b3cd0da4860d688ff3902478a8400eb4d61a055aff02b25f8360dd')
+source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('1bef86deec263d52032114ee696323b2')
 
-# create tarball: source PKGBUILD && mksource
 
-mksource() {
-	  rm -vRf chakra-${pkgname}
-	  git clone git://gitorious.org/chakra/chakra-${pkgname}.git
-	  rm -vRf chakra-${pkgname}/.git
-	  pushd chakra-${pkgname}
-	  popd
-	  tar -cvJf ${pkgname}-${pkgver}-${pkgrel}.tar.xz chakra-${pkgname}/*
-	  sha256sum ${pkgname}-${pkgver}-${pkgrel}.tar.xz
-}
 
 package() {
-  cd "$srcdir/chakra-${pkgname}"
+  cd "$srcdir/${pkgname}-${pkgver}"
 
   make DESTDIR="$pkgdir" install
+
+  sed -i 's/udev-settle/systemd-&/' "$pkgdir"/usr/lib/systemd/system/{lvm,dmraid}.service
+  rm "$pkgdir"/usr/lib/systemd/system/bluetooth.service
+  rm "$pkgdir"/usr/lib/systemd/system/cups.service
 }
