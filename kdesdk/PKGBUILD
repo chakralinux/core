@@ -31,6 +31,7 @@ pkgname=('kdesdk-cervisia'
          'kdesdk-poxml'
          'kdesdk-scripts'
          'kdesdk-strigi-analyzer'
+	 'kdesdk-thumbnailers'
          'kdesdk-umbrello')
 
 arch=('i686' 'x86_64')
@@ -349,6 +350,23 @@ package_kdesdk-strigi-analyzer() {
 		done
 }
 
+package_kdesdk-thumbnailers() {
+        pkgdesc="KDE SDK thumbnailers for several development files"
+        depends=("kde-runtime>=${_kdever}")
+        groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+        categories=('programming')
+        install=${pkgbase}.install
+        replaces=('po-thunbnailer')
+        conflicts=('po-thunbnailer')
+        provides=('po-thunbnailer')
+
+        splitdirs="thumbnailers"  
+                for i in ${splitdirs} ; do
+                        cd ${srcdir}/${pkgbase}-${pkgver}/${i}
+                        make DESTDIR=${pkgdir} install || return 1
+                done
+}
+
 package_kdesdk-umbrello() {
 	pkgdesc="An UML modeling tool for KDE"
 	screenshot="http://uml.sourceforge.net/screenshots/umbrello-2.0.png"
@@ -358,7 +376,7 @@ package_kdesdk-umbrello() {
 	categories=('programming')
 	install=${pkgbase}.install
 
-	splitdirs="umbrello doc/umbrello" # FIXME: doc/umbrello
+	splitdirs="umbrello doc/umbrello"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
