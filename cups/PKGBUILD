@@ -9,7 +9,7 @@ pkgrel=1
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://www.cups.org/"
-makedepends=('libtiff>=3.9.2-2' 'libpng>=1.4.0'  'acl' 'openslp' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'poppler>=0.12.3' 'xinetd' 'gzip' 'autoconf' 'php' 'libusb' 'dbus-core' 'avahi'  'hicolor-icon-theme')
+makedepends=('libtiff>=3.9.2-2' 'libpng>=1.4.0'  'acl' 'openslp' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'poppler>=0.12.3' 'xinetd' 'gzip' 'autoconf' 'php' 'libusb' 'dbus-core' 'avahi'  'hicolor-icon-theme' 'systemd')
 source=("ftp://ftp.easysw.com/pub/cups/${pkgver}/${pkgbase}-${pkgver}-source.tar.bz2"
         #cups-avahi-1-config.patch
         #cups-avahi-2-backend.patch
@@ -19,7 +19,8 @@ source=("ftp://ftp.easysw.com/pub/cups/${pkgver}/${pkgbase}-${pkgver}-source.tar
         cups-no-export-ssllibs.patch
         cups-no-gcrypt.patch
         cups-no-gzip-man.patch
-        cups cups.logrotate cups.pam)
+        cups cups.logrotate cups.pam
+        cups-systemd-socket.patch)
 md5sums=('e1ad15257aa6f162414ea3beae0c5df8'
          #'fe3906f7733f8f63e05daf025d05abf3'
          #'80e2d7d6ffcf125f917dca795e161efd'
@@ -31,7 +32,8 @@ md5sums=('e1ad15257aa6f162414ea3beae0c5df8'
          'd8fce4246d42186d9b190c1f07f5b911'
          '9657daa21760bb0b5fa3d8b51d5e01a1'
          'f861b18f4446c43918c8643dcbbd7f6d'
-         '96f82c38f3f540b53f3e5144900acf17')
+         '96f82c38f3f540b53f3e5144900acf17'
+         '4d89eef028c012fbb89652bd719f342a')
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
@@ -43,9 +45,12 @@ build() {
   #patch -Np1 -i ${srcdir}/cups-avahi-4-poll.patch
   #patch -Np1 -i ${srcdir}/cups-avahi-5-services.patch
 
+  # add systemd socket support - Fedora patch
+  patch -p1 -i ${srcdir}/cups-systemd-socket.patch
+
   # Do not export SSL libs in cups-config
-  patch -Np1 -i "${srcdir}/cups-no-export-ssllibs.patch"
-  patch -Np1 -i "${srcdir}/cups-no-gcrypt.patch"
+  patch -p1 -i "${srcdir}/cups-no-export-ssllibs.patch"
+  patch -p1 -i "${srcdir}/cups-no-gcrypt.patch"
   
   # Rebuild configure script for --enable-avahi.
   aclocal -I config-scripts
@@ -54,6 +59,7 @@ build() {
   ./configure --prefix=/usr \
               --sysconfdir=/etc \
               --localstatedir=/var \
+              --with-systemdsystemunitdir=/usr/lib/systemd/system \
               --libdir=/usr/lib \
               --with-logdir=/var/log/cups \
               --with-docdir=/usr/share/cups/doc \
