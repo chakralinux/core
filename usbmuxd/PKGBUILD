@@ -5,7 +5,7 @@
 
 pkgname=usbmuxd
 pkgver=1.0.7
-pkgrel=1
+pkgrel=2
 pkgdesc="USB Multiplex Daemon"
 url="http://marcansoft.com/blog/iphonelinux/usbmuxd/"
 arch=('i686' 'x86_64')
@@ -20,7 +20,7 @@ md5sums=('6f431541f3177fa06aa6df9ceecb2da0'
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -p1 -i "${srcdir}/usbmuxd-udevuser.patch"
+  #patch -p1 -i "${srcdir}/usbmuxd-udevuser.patch"
   mkdir build
   cd build
   cmake ../ -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLIB_SUFFIX=""
@@ -30,6 +30,18 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}/build"
   make DESTDIR="${pkgdir}" install
+
+  # Fix dirty versioning
+  if [ -e ${pkgdir}/usr/lib/libusbmuxd.so.-dirty ] ; then
+  sed -i -e "s~-dirty~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
+  mv ${pkgdir}/usr/lib/libusbmuxd.so.-dirty ${pkgdir}/usr/lib/libusbmuxd.so.${pkgver}
+  elif [ -e ${pkgdir}/usr/lib/libusbmuxd.so.UNKNOWN ] ; then
+  sed -i -e "s~-UNKNOWN~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
+  mv ${pkgdir}/usr/lib/libusbmuxd.so.UNKNOWN ${pkgdir}/usr/lib/libusbmuxd.so.${pkgver}
+  fi
+  
+  cd ${pkgdir}/usr/lib/
+  ln -sfv libusbmuxd.so.${pkgver} libusbmuxd.so.1
 
   # udev moved to /usr/lib
   mv "${pkgdir}/lib/udev" "${pkgdir}/usr/lib/"
