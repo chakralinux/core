@@ -1,12 +1,11 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 pkgname=libgpod
 pkgver=0.8.0
-pkgrel=7
+pkgrel=8
 pkgdesc="libgpod is a shared library to access the contents of an iPod"
 arch=(i686 x86_64)
 license=('LGPL')
@@ -19,11 +18,15 @@ md5sums=('6660f74cc53293dcc847407aa5f672ce')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr \
-       --enable-udev || return 1
-  make PREFIX=/usr || return 1
-  make PREFIX=/usr DESTDIR="${pkgdir}" install || return 1
-  
+  ./configure --prefix=/usr --with-udev-dir=/usr/lib/udev \
+      --enable-udev --with-python=/usr/bin/python2
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+
   #copy headers
   cp -v ${srcdir}/${pkgname}-${pkgver}/src/*.h ${pkgdir}/usr/include/gpod-1.0/gpod/
 }
