@@ -4,8 +4,8 @@
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=usbmuxd
-pkgver=1.0.6
-pkgrel=3
+pkgver=1.0.7
+pkgrel=2
 pkgdesc="USB Multiplex Daemon"
 url="http://marcansoft.com/blog/iphonelinux/usbmuxd/"
 arch=('i686' 'x86_64')
@@ -15,12 +15,12 @@ makedepends=('cmake')
 install=usbmuxd.install
 source=(http://marcansoft.com/uploads/${pkgname}/${pkgname}-${pkgver}.tar.bz2
         usbmuxd-udevuser.patch)
-md5sums=('c8909cfd9253d8d1a5e26f2ff7e5908b'
-         '299349dcacd60af9dceecec1ceebce06')
+md5sums=('6f431541f3177fa06aa6df9ceecb2da0'
+         '0b27e0feb409244cc1003fac510ee811')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np1 -i "${srcdir}/usbmuxd-udevuser.patch"
+  #patch -p1 -i "${srcdir}/usbmuxd-udevuser.patch"
   mkdir build
   cd build
   cmake ../ -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLIB_SUFFIX=""
@@ -30,5 +30,21 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}/build"
   make DESTDIR="${pkgdir}" install
+
+  # Fix dirty versioning
+  if [ -e ${pkgdir}/usr/lib/libusbmuxd.so.-dirty ] ; then
+  sed -i -e "s~-dirty~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
+  mv ${pkgdir}/usr/lib/libusbmuxd.so.-dirty ${pkgdir}/usr/lib/libusbmuxd.so.${pkgver}
+  elif [ -e ${pkgdir}/usr/lib/libusbmuxd.so.UNKNOWN ] ; then
+  sed -i -e "s~-UNKNOWN~${pkgver}~g" ${pkgdir}/usr/lib/pkgconfig/libusbmuxd.pc
+  mv ${pkgdir}/usr/lib/libusbmuxd.so.UNKNOWN ${pkgdir}/usr/lib/libusbmuxd.so.${pkgver}
+  fi
+  
+  cd ${pkgdir}/usr/lib/
+  ln -sfv libusbmuxd.so.${pkgver} libusbmuxd.so.1
+
+  # udev moved to /usr/lib
+  mv "${pkgdir}/lib/udev" "${pkgdir}/usr/lib/"
+  rmdir "${pkgdir}/lib"
 }
 

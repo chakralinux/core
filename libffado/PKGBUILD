@@ -5,7 +5,7 @@
 
 pkgname=libffado
 pkgver=2.0.1.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Driver for FireWire audio devices"
 arch=('i686' 'x86_64')
 url="http://www.ffado.org/"
@@ -40,7 +40,7 @@ package() {
 
   # add audio device rules
   install -Dm644 "$srcdir/ffado/libffado/60-ffado.rules" \
-    "$pkgdir/lib/udev/rules.d/60-ffado.rules"
+    "$pkgdir/usr/lib/udev/rules.d/60-ffado.rules"
 
   # python2 fix
   for i in $(grep '^#!.*bin.*python' -R "$pkgdir" | sed 's/:.*//'); do

@@ -4,8 +4,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=bluez
-pkgver=4.96
-pkgrel=2
+pkgver=4.99
+pkgrel=1
 pkgdesc="Libraries and tools for the Bluetooth protocol stack"
 url="http://www.bluez.org/"
 arch=('i686' 'x86_64')
@@ -28,7 +28,7 @@ backup=(etc/bluetooth/{main,rfcomm,audio,network,input,serial}.conf
 source=("http://www.kernel.org/pub/linux/bluetooth/${pkgname}-${pkgver}.tar.bz2"
         'bluetooth.conf.d'
         'rc.bluetooth')
-md5sums=('255c3dda8b93210ab0dcf8d04ddaf69f'
+md5sums=('2387053eb5a7b02f37df4871df022a02'
          '8f60a5eb9d84b9c64c478d63e1c24b10'
          'ca4c39eb4bb201bd2eacad01492cd735')
 
@@ -50,9 +50,9 @@ build() {
     --enable-pand \
     --enable-dund \
     --enable-cups \
-    --enable-udevrules \
-    --enable-configfiles \
-    --enable-wiimote
+    --enable-wiimote \
+    --with-systemdunitdir=/usr/lib/systemd/system
+
   make
 }
 
@@ -76,6 +76,6 @@ package() {
   sed -i 's#/usr/bin/python#/usr/bin/python2#' \
     ${pkgdir}/usr/bin/bluez-simple-agent
 
-  # http://mailman.archlinux.org/pipermail/arch-general/2011-April/019787.html
-  rm "${pkgdir}"/lib/udev/rules.d/97-bluetooth.rules
+  #can be removed on next update 
+  rm "${pkgdir}"/usr/lib/udev/rules.d/97-bluetooth.rules
 }

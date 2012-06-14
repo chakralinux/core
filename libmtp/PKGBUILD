@@ -1,27 +1,28 @@
-# $Id: PKGBUILD 67200 2010-02-04 14:57:41Z ibiru $
-# Contributor: damir <damir@archlinux.org>
-# Contributor: Kevin Edmonds <edmondskevin@hotmail.com>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas@chakra-project.org
 
 pkgname=libmtp
-pkgver=1.0.2
-pkgrel=2
-pkgdesc="library implementation of the Media Transfer Protocol"
+pkgver=1.1.3
+pkgrel=1
+pkgdesc="Library implementation of the Media Transfer Protocol"
 arch=("i686" "x86_64")
 url="http://libmtp.sourceforge.net"
-license=("LGPL")
-depends=("libusb-compat")
-#makedepends=('doxygen')
-source=("http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('cdc1cc6afa6be287ff6bc331e71bdc47')
+license=('LGPL')
+depends=('libusb' 'libgcrypt')
 options=('!libtool')
+source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('11529eedaf0e1fc00cdd6119eec525f0')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
-  ./configure --prefix=/usr
-  make || return 1
-  make DESTDIR=$pkgdir install
-  install -D -m0644 libmtp.rules \
-         $pkgdir/lib/udev/rules.d/52-libmtp.rules
-  install -D -m0644 libmtp.fdi \
-         $pkgdir/usr/share/hal/fdi/information/20thirdparty/libmtp.fdi
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --with-udev=/usr/lib/udev
+  make
 }
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
+
