@@ -1,7 +1,8 @@
 # Maintainer: Daniele Cocca <jmc@chakra-project.org>
 
 pkgname=pypy
-pkgver=1.7
+pkgver=1.9
+_shasum=('341e1e3821ff')
 pkgrel=1
 pkgdesc="PyPy is a fast, compliant alternative implementation of the Python language (2.7.1)."
 arch=('i686' 'x86_64')
@@ -10,10 +11,10 @@ license=('MIT')
 depends=('expat' 'zlib' 'bzip2' 'openssl' 'python-greenlet')
 makedepends=('pypy')
 source=("https://bitbucket.org/${pkgname}/${pkgname}/get/release-${pkgver}.tar.bz2")
-md5sums=('fc22184c931ead98bdae9ec3e79595c2')
+md5sums=('f92c0171a9578a3e4a0f74947ec596ab')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgname}-release-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgname}-${_shasum}"
   cd "pypy/translator/goal"
 
   pypy translate.py -Ojit
@@ -23,23 +24,21 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgname}-release-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgname}-${_shasum}"
+  install -D -m644 LICENSE "${pkgdir}/usr/share/licences/${pkgname}/LICENSE"
+
   cd "pypy/tool/release"
-
-  # Make PyPy release package first
+  # Clean up the /tmp directory from previous packaging attempts
+  rm -r "/tmp/usession-release-${pkgver}"-*
+  # Generate the PyPy release tarball
   pypy package.py ../../.. "${pkgname}"
-
   # Then, install it under "${pkgdir}/opt"
-  install -d "${pkgdir}/opt"
-  tar -jxvf "/tmp/usession-unknown-${USER}/build/${pkgname}.tar.bz2" -C "${pkgdir}/opt"
+  install -d -m755 "${pkgdir}/opt"
+  tar -jxvf "/tmp/usession-release-${pkgver}-0/build/${pkgname}.tar.bz2" -C "${pkgdir}/opt"
 
   # Install binary symlink
-  install -d "${pkgdir}/usr/bin"
+  install -d -m755 "${pkgdir}/usr/bin"
   ln -sf "/opt/${pkgname}/bin/pypy" "${pkgdir}/usr/bin/pypy"
-
-  # Install license file
-  cd "${srcdir}/${pkgname}-${pkgname}-release-${pkgver}"
-  install -Dm644 LICENSE "${pkgdir}/usr/share/licences/${pkgname}/LICENSE"
 }
 
 # vim:set ts=2 sw=2 et:
