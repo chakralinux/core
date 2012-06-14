@@ -1,13 +1,9 @@
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=hplip
-pkgver=3.12.2
+pkgver=3.12.4
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('i686' 'x86_64')
@@ -19,8 +15,8 @@ depends=('python2' 'ghostscript>=8.64-6' 'foomatic-db' 'foomatic-db-engine'
 options=('!libtool')
 install=hplip.install
 source=(http://downloads.sourceforge.net/${pkgname}/$pkgname-$pkgver.tar.gz{,.asc})
-md5sums=('6572ec99c1818cc92d97b793bff08633'
-         '18e93ef17754a3503692d440db6bceba')
+md5sums=('a063f76aa47edab55a3f31ff2558df07'
+         '2fe18f4091afb3dec200271dc7836128')
 
 optdepends=('cups: for printing support'
             'dbus-python: for dbus support'
@@ -67,5 +63,9 @@ package() {
 
 	# remove config provided by sane and autostart of hp-daemon
 	rm -rf "$pkgdir"/etc/{sane.d,xdg}
+   
+        # move to /usr
+        mv "$pkgdir"/lib/udev "$pkgdir"/usr/lib/
+        rm "$pkgdir"/lib -r
 }
 
