@@ -1,15 +1,11 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=libgcrypt
 pkgver=1.5.0
-pkgrel=2
+pkgrel=3
 pkgdesc="a general purpose crypto library based on the code used"
 arch=('i686' 'x86_64')
 url="http://www.gnupg.org"
@@ -21,17 +17,13 @@ sha1sums=('3e776d44375dc1a710560b98ae8437d5da6e32cf')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  # keep static library for , needed for cryptsetup
-  ./configure --prefix=/usr --disable-padlock-support
+
+  ./configure --prefix=/usr --disable-padlock-support --disable-static
   make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
 
-  # Move dynamic libraries to /lib
-  install -d -m755 "${pkgdir}"/lib/ || return 1
-  mv "${pkgdir}"/usr/lib/libgcrypt.so* "${pkgdir}"/lib/ || return 1
-  ln -sf /lib/libgcrypt.so "${pkgdir}/usr/lib/libgcrypt.so" || return 1
+  make DESTDIR="${pkgdir}" install
 }
