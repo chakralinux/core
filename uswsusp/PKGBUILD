@@ -1,49 +1,44 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=uswsusp
-pkgver=0.8
+pkgver=1.0
 pkgrel=1
 pkgdesc='Allows suspending with new userspace suspend.'
 arch=('i686' 'x86_64')
 url='http://suspend.sourceforge.net'
 license=('GPL')
-depends=('lzo2' 'libx86' 'libgcrypt')
-makedepends=('libgcrypt')
+depends=('lzo2' 'libx86' 'libgcrypt' 'pciutils')
 options=('docs' 'zipman')
 backup=(etc/suspend.conf)
 install=uswsusp.install
-source=("http://downloads.sourceforge.net/suspend/suspend-${pkgver}.tar.gz"
+source=("http://sourceforge.net/projects/suspend/files/suspend/suspend-${pkgver}/suspend-utils-${pkgver}.tar.bz2"
         "uresume-hook"
         "uresume-install")
-md5sums=('c81817b2ba2be899cdb32c00de016bff'
+md5sums=('02f7d4b679bad1bb294a0efe48ce5934'
 	 'c0c73b3ba0969722a7b2a87f22d856d4'
 	 '74f05dbedbc8d0c0900cdea5f5dd395a')
 
 build() {
-  cd suspend-${pkgver}
+  cd suspend-utils-${pkgver}
   
   ./configure \
     --enable-compress \
     --enable-encrypt \
-	--disable-resume-static \
+    --enable-threads \
+    --disable-resume-static \
     --disable-static \
-	--prefix=/usr \
+    --prefix=/usr \
     --sysconfdir=/etc
 }
 
 package() {
-  cd suspend-${pkgver}
+  cd suspend-utils-${pkgver}
 
   make DESTDIR=${pkgdir} install
   
-  install -D -m644 ../uresume-hook ${pkgdir}/lib/initcpio/hooks/uresume
-
-  install -D -m644 ../uresume-install ${pkgdir}/lib/initcpio/install/uresume
+  install -D -m644 ../uresume-hook ${pkgdir}/usr/lib/initcpio/hooks/uresume
+  install -D -m644 ../uresume-install ${pkgdir}/usr/lib/initcpio/install/uresume
 }
