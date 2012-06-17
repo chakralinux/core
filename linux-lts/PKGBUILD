@@ -9,42 +9,90 @@ pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs') # Build stock -CHAKRA
 # pkgname=linux-custom       # Build kernel with a different name
 _kernelname=${pkgname#linux-lts}
 _basekernel=3.0
-pkgver=${_basekernel}.24
+pkgver=${_basekernel}.34
 pkgrel=1
-_aufs="3.0-20120109"
 makedepends=('xmlto' 'docbook-xsl')
-_patchname="patch-${pkgver}-1-CHAKRA-LTS"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
 options=(!strip)
-source=(ftp://ftp.kernel.org/pub/linux/kernel/v3.0/linux-$_basekernel.tar.bz2
-        http://chakra.sourceforge.net/sources/linux/${_patchname}.bz2
+source=("ftp://ftp.kernel.org/pub/linux/kernel/v3.0/linux-$_basekernel.tar.bz2"
+        "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
-        config.i686 config.x86_64
+        'config' 'config.x86_64'
+        #aufs patches
+        'aufs3.0-loopback.patch'
+        'aufs3.0-base.patch'
+        'aufs3.0-proc_map.patch'
+        'aufs3.0-standalone.patch'
+        'aufs3.0-kbuild.patch'
+        'aufs3.0.patch'
+        'config.aufs'
         # standard config files for mkinitcpio ramdisk
-        linux-lts.preset)
+        'linux-lts.preset'
+        'change-default-console-loglevel.patch'
+        'i915-fix-ghost-tv-output.patch'
+        'ext4-options.patch')
 md5sums=('398e95866794def22b12dfbc15ce89c0'
-         '1aa4155854e9352a4a73ed9cc3a48f08'
-         '4641adbc91eb89d98870d8984abd10c1'
-         '46aa71d1918a8a167aa6a6ab503375c4'
-         '56cdd0978dd4a539a25813fd4273c834')
+         '080b631fcdcb8fc1aea5ecf17c44d6a6'
+         '78383062c45a0aaf1e733ee16115bd75'
+         'eb3a80c9bd76e7c1f281bfbc0943dce3'
+         '821e1112493f187dc70df9412e61f324'
+         'b9248a75a3fe415a18d4730887daa339'
+         '798336f60f73b1fb63331225b9c9c971'
+         'd5ca601dc80b35fda18b078daf4aeb61'
+         '967195f0bf1d9a3b54ce8ae6173072d8'
+         'fcb34283bfb627a15b31f3b3e3228c05'
+         '52f4a2c7f6277774117c834d949d6b81'
+         '1277dd4aa587632fc27964edde49970f'
+         '9d3c56a4b999c8bfbd4018089a62f662'
+         '263725f20c0b9eb9c353040792d644e5'
+         '74d2b710d6c97aee441d7566f8f68815')
 
 build() {
   cd ${srcdir}/linux-$_basekernel
 
-  # fix setlocalversion
-  sed -i 's|echo "+"|# echo "+"|g' ./scripts/setlocalversion
+  # add upstream patch
+  patch -p1 -i "${srcdir}/patch-${pkgver}"
 
-  # Add -CHAKRA-LTS patches
-  patch -Np1 -i ${srcdir}/${_patchname}
+  # add latest fixes from stable queue, if needed
+  # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
+
+  # Some chips detect a ghost TV output
+  patch -p1 -i "${srcdir}/i915-fix-ghost-tv-output.patch"
+
+  # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
+  # remove this when a Kconfig knob is made available by upstream
+  # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
+  patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
+
+  # fix ext4 module to mount ext3/2 correct
+  patch -p1 -i "${srcdir}/ext4-options.patch"
+
+  #aufs patches for Live:
+  patch -p1 -i "${srcdir}/aufs3.0.patch"
+  patch -p1 -i "${srcdir}/aufs3.0-base.patch"
+  patch -p1 -i "${srcdir}/aufs3.0-kbuild.patch"
+  patch -p1 -i "${srcdir}/aufs3.0-loopback.patch"
+  patch -p1 -i "${srcdir}/aufs3.0-proc_map.patch"
+  #patch -p1 -i "${srcdir}/aufs3.0-fix-export-__devcgroup_inode_permission.patch"
+  patch -p1 -i "${srcdir}/aufs3.0-standalone.patch"
 
   # create .config
-  cat "${srcdir}/config.${CARCH}" > ./.config
+  if [ "${CARCH}" = "x86_64" ]; then
+    cat "${srcdir}/config.x86_64" > ./.config
+  else
+    cat "${srcdir}/config" > ./.config
+  fi
+
+    cat "${srcdir}/config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
   fi
+
+  # set extraversion to pkgrel
+  sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
 
   # get kernel version
   make prepare
@@ -73,11 +121,10 @@ build() {
 package_linux-lts() {
   pkgdesc="The Linux LTS-Kernel and modules"
   groups=('lts')
-  depends=('coreutils' 'linux-firmware' 'module-init-tools>=3.16' 'mkinitcpio>=0.7.5')
+  depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7.5')
   optdepends=('crda: to set the correct wireless channels of your country')
-  replaces=('kernel24' 'kernel24-scsi' 'kernel26-lts' 'linux-scsi'
-            'alsa-driver' 'ieee80211' 'hostap-driver26'
-            'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
+  replaces=('kernel26-lts' 'linux-scsi'
+            'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
             'gspcav1' 'atl2' 'wlan-ng26' 'rt2500'
             'aufs3' 'nouveau-drm')
@@ -202,25 +249,18 @@ package_linux-lts-headers() {
   cp net/mac80211/*.h "${pkgdir}/usr/src/linux-${_kernver}/net/mac80211/"
 
   # add dvb headers for external modules
-  # in reference to:
-  # http://bugs.archlinux.org/task/9912
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-core"
   cp drivers/media/dvb/dvb-core/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-core/"
   # and...
-  # http://bugs.archlinux.org/task/11194
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/"
   cp include/config/dvb/*.h "${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/"
 
   # add dvb headers for http://mcentral.de/hg/~mrec/em28xx-new
-  # in reference to:
-  # http://bugs.archlinux.org/task/13146
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/"
   cp drivers/media/dvb/frontends/lgdt330x.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/"
   cp drivers/media/video/msp3400-driver.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/"
 
   # add dvb headers
-  # in reference to:
-  # http://bugs.archlinux.org/task/20402
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-usb"
   cp drivers/media/dvb/dvb-usb/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-usb/"
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends"
