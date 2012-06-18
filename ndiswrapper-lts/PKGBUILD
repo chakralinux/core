@@ -1,19 +1,15 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 # Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux-lts | cut -c11-13 | sed 's/linux-lts //g'`-CHAKRA-LTS
+_extramodules=extramodules-3.0-lts
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=ndiswrapper-lts
 pkgver=1.57
-pkgrel=3
+pkgrel=4
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=(i686 x86_64)
