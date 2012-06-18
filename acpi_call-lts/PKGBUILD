@@ -1,16 +1,15 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 # Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux-lts | cut -c11-13 | sed 's/linux-lts //g'`-CHAKRA-LTS
+_extramodules=extramodules-`pacman -Q linux-lts | cut -c11-13 | sed 's/linux-lts //g'`-lts
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=acpi_call-lts
-pkgver=20120115
-pkgrel=2
+pkgver=20120613
+pkgrel=1
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('i686' 'x86_64')
 url=("http://github.com/mkottman/acpi_call")
@@ -18,8 +17,8 @@ license=('GPL')
 depends=('linux-lts>=3.0' 'linux-lts<3.1' 'linux-lts-headers')
 makedepends=('git')
 install=acpi_call.install
-source=(http://chakra.sourceforge.net/sources/acpi_call/acpi_call-${pkgver}.tar.xz)
-md5sums=('129841dd806887492609214462792413')
+source=("http://chakra-linux.org/sources/acpi_call/acpi_call-${pkgver}.tar.xz")
+md5sums=('fcee74cba78ff644b43d60e046864b9e')
 
 
 # create tarball: source PKGBUILD && mksource
@@ -36,24 +35,24 @@ build() {
   cd ${srcdir}
 
  ## Build
-  rm -rf ${srcdir}/acpi_call-build
-  cp -r ${srcdir}/acpi_call ${srcdir}/acpi_call-build
-  cd ${srcdir}/acpi_call-build
+  #rm -rf ${srcdir}/acpi_call-build
+  #cp -r ${srcdir}/acpi_call ${srcdir}/acpi_call-build
+  cd ${srcdir}/acpi_call-${pkgver}
 
   sed \
-    -e  's/$(shell uname -r)/3.0-CHAKRA-LTS/g' \
+    -e  's/$(shell uname -r)/3.0.35-1-lts/g' \
     -i Makefile
   make
 }
 package() {
-  cd ${srcdir}/acpi_call-build
-  install -d ${pkgdir}/usr/share/acpi_call || return 1
-  install -d ${pkgdir}/usr/bin || return 1
-  install -d ${pkgdir}/usr/share/acpi_call/doc || return 1
-  install -Dm755  ${srcdir}/acpi_call-build/test_off.sh \
-    ${pkgdir}/usr/share/acpi_call/test_off-lts.sh || return 1
+  cd ${srcdir}/acpi_call-${pkgver}
+  install -d ${pkgdir}/usr/share/acpi_call 
+  install -d ${pkgdir}/usr/bin 
+  install -d ${pkgdir}/usr/share/acpi_call/doc 
+  install -Dm755  ${srcdir}/acpi_call-${pkgver}/test_off.sh \
+    ${pkgdir}/usr/share/acpi_call/test_off-lts.sh 
   ln -s /usr/share/acpi_call/test_off-lts.sh \
-    ${pkgdir}/usr/bin/test_off-lts.sh || return 1
+    ${pkgdir}/usr/bin/test_off-lts.sh 
   install -Dm644 README \
     ${pkgdir}/usr/share/acpi_call/README-lts
 
