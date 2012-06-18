@@ -4,16 +4,17 @@
 # Contributor: Balwinder S "bsd" Dheeman (bdheeman AT gmail.com)
 #
 
-pkgname=dkms
+pkgname=dkms-lts
+_pkgname=dkms
 pkgver=2.2.0.3
-pkgrel=2
+pkgrel=1
 pkgdesc='Dynamic Kernel Modules System'
 arch=('any')
 url='http://linux.dell.com/dkms/'
 license=('GPL2')
-depends=('linux-headers' 'kmod')
+depends=('linux-lts-headers' 'kmod')
 backup=('etc/dkms/framework.conf' "etc/conf.d/$pkgname")
-source=("http://linux.dell.com/$pkgname/permalink/$pkgname-$pkgver.tar.gz"
+source=("http://linux.dell.com/$pkgname/permalink/$_pkgname-$pkgver.tar.gz"
         "$pkgname.rc"
         "$pkgname.conf"
         '01-broken-uninstall.patch')
@@ -24,7 +25,7 @@ md5sums=('11a8aaade2ebec2803653837c7593030'
 
 build() {
   patches=("$srcdir"/*.patch)
-  cd $pkgname-$pkgver
+  cd $_pkgname-$pkgver
   for p in "${patches[@]}"; do
     msg2 "Apply patch: ${p##*/}"
     patch -p1 -i "$p"
@@ -33,7 +34,7 @@ build() {
 
 package() {
   # upstream installer
-  pushd $pkgname-$pkgver
+  pushd $_pkgname-$pkgver
   make DESTDIR="$pkgdir" install
   popd
   # fix hardcoded paths
