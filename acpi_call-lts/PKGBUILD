@@ -3,13 +3,12 @@
 #
 # maintainer abveritas@chakra-project.org
 
-# Find the kernel name inside the chroot
-_extramodules=extramodules-3.0-lts
-_kver="$(cat /lib/modules/${_extramodules}/version)"
+_kver="3.0.35-1-lts"
 
 pkgname=acpi_call-lts
+_pkgname=acpi_call
 pkgver=20120613
-pkgrel=1
+pkgrel=2
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('i686' 'x86_64')
 url=("http://github.com/mkottman/acpi_call")
@@ -37,24 +36,32 @@ build() {
  ## Build
   #rm -rf ${srcdir}/acpi_call-build
   #cp -r ${srcdir}/acpi_call ${srcdir}/acpi_call-build
-  cd ${srcdir}/acpi_call-${pkgver}
+  cd ${srcdir}/$_pkgname-${pkgver}
 
   sed \
     -e  's/$(shell uname -r)/3.0.35-1-lts/g' \
     -i Makefile
+
   make
 }
 package() {
-  cd ${srcdir}/acpi_call-${pkgver}
-  install -d ${pkgdir}/usr/share/acpi_call 
-  install -d ${pkgdir}/usr/bin 
-  install -d ${pkgdir}/usr/share/acpi_call/doc 
-  install -Dm755  ${srcdir}/acpi_call-${pkgver}/test_off.sh \
-    ${pkgdir}/usr/share/acpi_call/test_off-lts.sh 
-  ln -s /usr/share/acpi_call/test_off-lts.sh \
+  cd ${srcdir}/$_pkgname-${pkgver}
+  install -d ${pkgdir}/usr/share/$_pkgname 
+  install -d ${pkgdir}/usr/bin  
+  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/asus1215n.sh \
+    ${pkgdir}/usr/share/$_pkgname/asus1215n-lts.sh 
+  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/m11xr2.sh \
+    ${pkgdir}/usr/share/$_pkgname/m11xr2-lts.sh 
+  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/query_dsdt.pl \
+    ${pkgdir}/usr/share/$_pkgname/query_dsdt-lts.pl 
+  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/test_off.sh \
+    ${pkgdir}/usr/share/$_pkgname/test_off-lts.sh 
+  ln -s /usr/share/$_pkgname/test_off.sh \
     ${pkgdir}/usr/bin/test_off-lts.sh 
+  cp -R windump_hack \
+    ${pkgdir}/usr/share/$_pkgname/
   install -Dm644 README \
-    ${pkgdir}/usr/share/acpi_call/README-lts
+    ${pkgdir}/usr/share/$_pkgname/README-lts
 
   msg2 "Building module for $_kver..."
 
@@ -62,5 +69,5 @@ package() {
   make KDIR=/usr/src/linux-${_kver} clean
   make KDIR=/usr/src/linux-${_kver}
 
-  install -D -m644 acpi_call.ko $pkgdir/lib/modules/$_extramodules/acpi_call.ko
+  install -D -m644 acpi_call.ko $pkgdir/lib/modules/${_kver}/kernel/drivers/acpi/acpi_call.ko
 }
