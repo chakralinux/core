@@ -42,6 +42,7 @@ package() {
   
   make DESTDIR="${pkgdir}" install
   
+  rmdir "${pkgdir}"/usr/{lib,sbin}
   install -Dm755 ../ntpd "${pkgdir}"/etc/rc.d/ntpd
   install -Dm755 ../ntpdate "${pkgdir}"/etc/rc.d/ntpdate
   install -Dm644 ../ntp.conf "${pkgdir}"/etc/ntp.conf
@@ -55,7 +56,6 @@ package() {
   mv "${pkgdir}/usr/share/man/man8/ntpd.8" "${pkgdir}/usr/share/man/man8/ntp-ntpd.8" # we should ditch openntpd
   cd ..
   
-  rmdir "${pkgdir}"/usr/{lib,sbin}
   install -d "${pkgdir}/var/lib/ntp"
   install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
