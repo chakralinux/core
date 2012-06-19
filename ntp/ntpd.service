@@ -1,12 +1,12 @@
 [Unit]
 Description=Network Time Service
-BindTo=systemd-timedated-ntp.target
+After=network.target
 
 [Service]
 Type=forking
-PrivateTmp=true
-ExecStart=/usr/bin/ntpd -u ntp:ntp
-ControlGroup=cpu:/
+PIDFile=/run/ntpd.pid
+EnvironmentFile=/etc/conf.d/ntpd.conf
+ExecStart=/usr/bin/ntpd $NTPD_ARGS -p /run/ntpd.pid
 
 [Install]
 WantedBy=multi-user.target
