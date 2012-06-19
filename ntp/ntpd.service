@@ -1,0 +1,12 @@
+[Unit]
+Description=Network Time Service
+BindTo=systemd-timedated-ntp.target
+
+[Service]
+Type=forking
+PrivateTmp=true
+ExecStart=/usr/bin/ntpd -u ntp:ntp
+ControlGroup=cpu:/
+
+[Install]
+WantedBy=multi-user.target
