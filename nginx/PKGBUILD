@@ -11,7 +11,7 @@ _group=http
 
 pkgname=nginx
 pkgver=1.2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="small, but very powerful and efficient web server and mail proxy"
 arch=('i686' 'x86_64')
 depends=('pcre' 'zlib' 'openssl')
@@ -30,9 +30,11 @@ backup=("etc/nginx/conf/fastcgi.conf"
 	"etc/logrotate.d/nginx"
 	"etc/conf.d/nginx")
 source=(http://nginx.org/download/nginx-$pkgver.tar.gz
-	nginx)
+	nginx
+	nginx.service)
 md5sums=('a02ef93d65a7031a1ea3256ad5eba626'
-         '0e8032d3ba26c3276e8c7c30588d375f')
+         '0e8032d3ba26c3276e8c7c30588d375f'
+         '16c6b4cbe24001a3f4f58b9d5f4e3d4c')
 
 build() {
 	cd $srcdir/nginx-${pkgver}
@@ -106,4 +108,6 @@ EOF
 	mkdir -p $pkgdir/etc/conf.d
 	echo "NGINX_CONFIG=/etc/nginx/conf/nginx.conf" >$pkgdir/etc/conf.d/nginx
 	rm -rf $pkgdir/var/run
+
+	install -Dm644 "$srcdir/nginx.service" "$pkgdir/usr/lib/systemd/system/nginx.service"
 }
