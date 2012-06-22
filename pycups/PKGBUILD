@@ -1,28 +1,26 @@
-# $Id: PKGBUILD,v 1.7 2008/11/01 12:31:55 BaSh Exp $
-# Maintainer: Andrea Scarpino <andrea@archlinux.org>
-# Contributor: nesl247 <nesl247@gmail.com>
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer: abveritas@chakra-project.org
 
 pkgname=pycups
-pkgver=1.9.51
-pkgrel=2
+pkgver=1.9.61
+pkgrel=1
 pkgdesc="Python CUPS Bindings"
 url="http://cyberelk.net/tim/software/pycups/"
 arch=('i686' 'x86_64')
 license=('GPL')
 depends=('libcups' 'python2')
-source=("http://cyberelk.net/tim/data/${pkgname}/${pkgname}-${pkgver}.tar.bz2" "version.patch")
-md5sums=('7e9de64bce9496ce2d36ab513dd69dd5'
-         'c7e94deda362cfe785bd259d09645a33')
+source=(http://cyberelk.net/tim/data/${pkgname}/${pkgname}-${pkgver}.tar.bz2{,.asc})
+md5sums=('7464093b349b907dcdefb913674e959b'
+         'cb780142a614300792a08d462e198589')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  # Patch don't apply 
-  # see http://bugs.sourcemage.org/show_bug.cgi?id=15656
-  # patch -Np1 -i ${startdir}/version.patch || return 1
-  make || return 1
+  python2 setup.py build
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
+  python2 setup.py install --root="${pkgdir}" --optimize=1
 }
