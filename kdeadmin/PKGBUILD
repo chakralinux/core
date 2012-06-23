@@ -18,7 +18,7 @@ pkgname=('kdeadmin-kcron'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=3
 pkgdesc="split package"
 url="http://www.kde.org/"
 license=('GPL' 'LGPL' 'FDL')
@@ -43,13 +43,18 @@ build() {
 	msg "fixing syslog path"
 	patch -p1 -i ${srcdir}/syslog-path.patch
 	
+	cd ${srcdir}
+        rm -rf build
+	mkdir build && cd build
+	
 	msg "starting build ..."
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+	cmake ../${pkgbase}-${pkgver} \
+		-DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
 		-DCMAKE_SKIP_RPATH=ON \
-            	-DBUILD_strigi-analyzer=OFF \
-		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-
+		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' \
+		-DBUILD_strigi-analyzer=OFF \
+	     	-DPYTHON_EXECUTABLE=/usr/bin/python2
 	make
 }
 
@@ -66,7 +71,7 @@ package_kdeadmin-kcron() {
 
 	splitdirs="kcron doc/kcron"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
+			cd ${srcdir}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -79,7 +84,7 @@ package_kdeadmin-kdat() {
 
 	splitdirs="kdat"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
+			cd ${srcdir}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -94,7 +99,7 @@ package_kdeadmin-ksystemlog() {
 
 	splitdirs="ksystemlog doc/ksystemlog"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
+			cd ${srcdir}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -109,7 +114,7 @@ package_kdeadmin-kuser() {
 
 	splitdirs="kuser doc/kuser"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
+			cd ${srcdir}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 }
@@ -122,7 +127,7 @@ package_kdeadmin-system-config-printer() {
 
 	splitdirs="system-config-printer-kde"
 		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
+			cd ${srcdir}/build/${i}
 			make DESTDIR=${pkgdir} install || return 1
 		done
 
