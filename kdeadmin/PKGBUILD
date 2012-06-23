@@ -63,25 +63,10 @@ build() {
 #
 # split-install functions
 #
-package_kdeadmin-strigi-analyzer() {
-	pkgdesc="KDE Administrative Tools - Common files and libraries"
-	depends=("kde-runtime>=${_kdever}")
-        provides=('kdeadmin-common')
-	replaces=('kdeadmin-common')
-	groups=("${pkgbase}" "kde" "kde-uninstall")
-	categories=('system')
-
-	splitdirs="strigi-analyzer"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-
-}
 
 package_kdeadmin-kcron() {
 	pkgdesc="Crontab editor"
-	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
+	depends=("kde-runtime>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 	conflicts=("kdeadmin-doc")
 	categories=('system')
@@ -95,7 +80,7 @@ package_kdeadmin-kcron() {
 
 package_kdeadmin-kdat() {
 	pkgdesc="Tar-based tape archiver"
-	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
+	depends=("kde-runtime>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 	categories=('system')
 
@@ -109,7 +94,7 @@ package_kdeadmin-kdat() {
 package_kdeadmin-ksystemlog() {
 	pkgdesc="Log viewer"
 	screenshot="http://www.kde.org/images/screenshots/ksystemlog.png"
-	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
+	depends=("kde-runtime>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 	conflicts=("kdeadmin-doc")
 	categories=('system')
@@ -124,7 +109,7 @@ package_kdeadmin-ksystemlog() {
 package_kdeadmin-kuser() {
 	pkgdesc="Manage users and groups"
 	screenshot="http://www.kde.org/images/screenshots/kuser.png"
-	depends=("kdeadmin-strigi-analyzer>=${_kdever}")
+	depends=("kde-runtime>=${_kdever}")
 	groups=("${pkgbase}" "kde" "kde-minimal" "kde-uninstall")
 	conflicts=("kdeadmin-doc")
 	categories=('system')
@@ -138,7 +123,7 @@ package_kdeadmin-kuser() {
 
 package_kdeadmin-system-config-printer() {
 	pkgdesc="Printer configuration"
-	depends=("kdeadmin-strigi-analyzer>=${_kdever}" "system-config-printer" "kdebindings-pykde4>=${_kdever}" "pygobject" "cups")
+	depends=("kde-runtime>=${_kdever}" "system-config-printer" "kdebindings-pykde4>=${_kdever}" "pygobject" "cups")
 	groups=("${pkgbase}" "kde" "kde-uninstall")
 	categories=('system')
 
