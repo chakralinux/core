@@ -4,7 +4,7 @@
 
 pkgname=sane
 pkgver=1.0.22
-pkgrel=1
+pkgrel=2
 pkgdesc="Scanner Access Now Easy"
 url="http://www.sane-project.org"
 arch=('i686' 'x86_64')
@@ -65,10 +65,9 @@ package () {
   install -D -m644 tools/sane-backends.pc \
      "${pkgdir}/usr/lib/pkgconfig/sane-backends.pc"
 
-  # TODO: install systemd files , this conflicts with systemd-units 
-  # and this will be removed later.
-  #install -D -m644 ${srcdir}/saned.socket \
-  #    "${pkgdir}/usr/lib/systemd/system/saned.socket"
-  #install -D -m644 ${srcdir}/saned.service \
-  #    "${pkgdir}/usr/lib/systemd/system/saned@.service"
+  # install systemd files
+  install -D -m644 ${srcdir}/saned.socket \
+      "${pkgdir}/usr/lib/systemd/system/saned.socket"
+  install -D -m644 ${srcdir}/saned.service \
+      "${pkgdir}/usr/lib/systemd/system/saned@.service"
 }
