@@ -5,7 +5,7 @@
 
 pkgname=udisks
 pkgver=1.0.4
-pkgrel=3
+pkgrel=4
 pkgdesc="Disk Management Service"
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/udisks"
@@ -14,8 +14,10 @@ depends=('udev' 'sg3_utils' 'glib2' 'dbus-glib' 'polkit' 'parted' 'device-mapper
 makedepends=('intltool' 'docbook-xsl')
 options=(!libtool)
 replaces=('devicekit-disks')
-source=(http://hal.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz)
-sha256sums=('854b89368733b9c3a577101b761ad5397ae75a05110c8698ac5b29de9a8bf8f5')
+source=(http://hal.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz
+	udisks.service)
+sha256sums=('854b89368733b9c3a577101b761ad5397ae75a05110c8698ac5b29de9a8bf8f5'
+            '0b9cbf41935feed3e4e2430fd4e06eb29864554dbb9f330c9d2a5fa2ef185131')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -35,4 +37,7 @@ package() {
   
   #fix ntfs mounts
   sed -i -e 's|<allow_active>auth_admin_keep</allow_active>|<allow_active>yes</allow_active>|' ${pkgdir}/usr/share/polkit-1/actions/org.freedesktop.udisks.policy
+
+  # install systemd units
+  install -Dm644 "${srcdir}/udisks.service" "${pkgdir}/usr/lib/systemd/system/udisks.service"
 }
