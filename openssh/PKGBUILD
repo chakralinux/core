@@ -6,7 +6,7 @@
 
 pkgname=openssh
 pkgver=5.9p1
-pkgrel=1
+pkgrel=2
 pkgdesc='Free version of the SSH connectivity tools'
 arch=('i686' 'x86_64')
 license=('custom:BSD')
@@ -16,11 +16,21 @@ depends=('krb5' 'openssl' 'libedit')
 source=("ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${pkgname}-${pkgver}.tar.gz"
         'sshd.confd'
         'sshd.pam'
-        'sshd')
+        'sshd'
+	'sshdgenkeys.service'
+	'sshd.service'
+	'sshd@.service'
+	'sshd.socket'
+	'tmpfiles.d')
 sha1sums=('ac4e0055421e9543f0af5da607a72cf5922dcc56'
           'ec102deb69cad7d14f406289d2fc11fee6eddbdd'
           '07fecd5880b1c4fdd8c94ddb2e89ddce88effdc1'
-          '6b7f8ebf0c1cc37137a7d9a53447ac8a0ee6a2b5')
+          '6b7f8ebf0c1cc37137a7d9a53447ac8a0ee6a2b5'
+          '6c71de2c2ca9622aa8e863acd94b135555e11125'
+          '83a257b8f6a62237383262cb0e2583e5609ddac0'
+          'bd6eae36c7ef9efb7147778baad7858b81f2d660'
+          'a30fb5fda6d0143345bae47684edaffb8d0a92a7'
+          'b5cf44205e8f4365c00bfbee110d7c0e563627aa')
 
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
@@ -64,4 +74,9 @@ package() {
 	sed -i	-e '/^#ChallengeResponseAuthentication yes$/c ChallengeResponseAuthentication no' \
 		-e '/^#UsePAM no$/c UsePAM yes' \
 		"${pkgdir}"/etc/ssh/sshd_config
+
+	# install systemd units
+	install -dm755 "$pkgdir/usr/lib/systemd/system/"
+	install -m644 "$srcdir"/sshd{{,@,genkeys}.service,.socket} "$pkgdir/usr/lib/systemd/system/"
+	install -Dm644 "$srcdir"/tmpfiles.d "$pkgdir"/usr/lib/tmpfiles.d/openssh.conf
 }
