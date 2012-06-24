@@ -6,7 +6,7 @@
 
 pkgname=dmraid
 pkgver=1.0.0.rc16.3
-pkgrel=2
+pkgrel=3
 pkgdesc="Device mapper RAID interface"
 url="http://people.redhat.com/~heinzm/sw/dmraid/"
 depends=('device-mapper>=2.0.54')
@@ -15,11 +15,13 @@ license=('GPL')
 source=(#ftp://ftp.archlinux.org/other/dmraid/$pkgname-$pkgver.tar.bz2
         http://people.redhat.com/~heinzm/sw/dmraid/src/$pkgname-1.0.0.rc16-3.tar.bz2
         dmraid_install
-        dmraid_hook)
+        dmraid_hook
+	dmraid.service)
 install=dmraid.install
 md5sums=('819338fcef98e8e25819f0516722beeb'
          'd01908b414e1686c0f3233ff37de78a5'
-         '0a748b6e78b156f2f9dda45fc629651f')
+         '0a748b6e78b156f2f9dda45fc629651f'
+         'ad9328bb52328eab47e12b7f9df32b82')
 
 build() {
   cd "$srcdir"/$pkgname/1.0.0.rc16-3/$pkgname
@@ -37,4 +39,7 @@ package() {
   # fix permissions
   chmod 644 "$pkgdir"/lib/libdmraid.a
   chmod 644 "$pkgdir"/usr/include/dmraid/*
+  
+  # install systemd unit
+  install -Dm644 "$srcdir/dmraid.service" "$pkgdir/usr/lib/systemd/system/dmraid.service"
 }
