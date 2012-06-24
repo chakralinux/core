@@ -5,7 +5,7 @@
 
 pkgname=systemd
 pkgver=44
-pkgrel=2
+pkgrel=3
 pkgdesc="Session and Startup manager"
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -88,4 +88,7 @@ package() {
     IFS='/' read section page <<< "$manpage"
     mv "$manpage" "$section/systemd.$page"
   done
+
+   # get rid of uneeded lock directories
+   sed -ri '/\/run\/lock\/(subsys|lockdev)/d' "$pkgdir"/usr/lib/tmpfiles.d/legacy.conf
 }
