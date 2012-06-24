@@ -15,11 +15,13 @@ source=(ftp://sources.redhat.com/pub/lvm2/LVM2.${pkgver}.tgz
         lvm2_install
         lvm2_hook
 	lvm.service
+	lvm2.conf
         11-dm-initramfs.rules)
 md5sums=('bd470a802046c807603618a443732ea7'
          'd2a2376dd247ae15044dbc5f28479b23'
          '14b42c38324160d79b63743b62cb45c4'
          'a9019147f885ab81ce0f582a2d3f2b90'
+         '89adcaa1c019d6f494f5714ebf733265'
          '69e40679cd8b3658bfc619e48baae125')
 
 build() {
@@ -64,4 +66,5 @@ package_lvm2() {
 
   # install systemd unit
   install -Dm 644 "$srcdir/lvm.service" "$pkgdir/usr/lib/systemd/system/lvm.service"
+  install -Dm 644 "$srcdir/lvm2.conf" "$pkgdir/usr/lib/tmpfiles.d/lvm2.conf"
 }
