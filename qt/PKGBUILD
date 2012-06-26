@@ -6,7 +6,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers')
 pkgver=4.8.2
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -89,7 +89,7 @@ build() {
                  -reduce-relocations \
                  -dbus-linked \
                  -no-openvg \
-                 --enable-debug \
+                 -separate-debug-info \
                  -xcursor
 	 make
 }
@@ -104,7 +104,7 @@ package_qt() {
 	  'unixodbc: ODBC driver'
 	  'libxinerama: Xinerama support'
 	  'libxfixes: Xfixes support')
-    conflicts=('qt-doc' 'qt-debug' 'qt-demos' 'qt-tools')
+    conflicts=('qt-doc' 'qt-demos' 'qt-tools')
     provides=('qt-tools')
     install='qt.install'
 	
@@ -133,7 +133,7 @@ package_qt() {
 		-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
 }
 
-package_qt-private-headers(){
+package_qt-private-headers() {
     pkgdesc="Qt private headers for development"
     depends=("qt=${pkgver}")
 
@@ -149,3 +149,4 @@ package_qt-private-headers(){
       cp -r ${srcdir}/$_pkgfqn/src/${i} ${pkgdir}/usr/src/
     done
 }
+
