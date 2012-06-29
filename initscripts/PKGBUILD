@@ -5,7 +5,7 @@
 
 pkgname=initscripts
 pkgver=2012.05
-pkgrel=2
+pkgrel=3
 pkgdesc="System initialization/bootup scripts"
 arch=('i686' 'x86_64')
 url="http://www.chakra-project.org"
@@ -18,7 +18,7 @@ optdepends=('net-tools: legacy networking support'
             'bridge-utils: Network bridging support'
             'dhcpcd: DHCP network configuration'
             'wireless_tools: Wireless networking')
-makedepends=(asciidoc)
+makedepends=('asciidoc')
 install=initscripts.install
 source=('Makefile' 'binfmt.d.5.txt' 'chakra-tmpfiles' 'hostname.5.txt' 'locale.conf.5.txt'
         'network' 'rc.d.8.txt' 'rc.shutdown' 'wireless.conf.d' 'bootlog' 'chakra-tmpfiles'
@@ -28,7 +28,7 @@ source=('Makefile' 'binfmt.d.5.txt' 'chakra-tmpfiles' 'hostname.5.txt' 'locale.c
         'rc.d' 'rc.multi' 'tmpfiles.conf' 'vconsole.conf.5.txt')
 md5sums=('022d743d6c324fa1325d8187e9354365'
          '94bf95df61a06ec45107c4ce9bb59439'
-         '31969954d2762f5a1f0118f1843a9975'
+         'e5e9f79dac305c9a0ffa2077a817d354'
          'bdb87ed9c8bd97fcc8ae0c643909c813'
          'b772c5a6489881f796a6ec13a4e48cc3'
          'e886ba94b6d5fd7987ecf9dfee7cbab3'
@@ -36,14 +36,14 @@ md5sums=('022d743d6c324fa1325d8187e9354365'
          'e4798daef2b565e3b6f2ec5e0d5ce3d2'
          'dc5462ed765fa34c907f974d67fb776a'
          '5d253f4da16e543efaff53ac9684c1c6'
-         '31969954d2762f5a1f0118f1843a9975'
+         'e5e9f79dac305c9a0ffa2077a817d354'
          '75e147e59b91751b451dcc7bab225278'
          'b772c5a6489881f796a6ec13a4e48cc3'
          '727e677a2dca88a9dde4fc5846076b69'
          'bd236a57bc00aa4727b98c5ae401c457'
          'bbdeefad2a1732af6b04484b02527266'
          '00ee10313b866a3fe6520a86f6318518'
-         'd98b09250e49a09cd6f33fa296ebe24b'
+         'f9b3005a8eaae5eb69d2c3d5641534ed'
          'a6affe9c73bd416a97d727a54b0b40dd'
          'c366072d0b230eb9ee7ab31dd77cf245'
          'b910fd6e0b5c421d083de72da03d9d1a'
@@ -63,7 +63,4 @@ package() {
   cd ${srcdir}
   make DESTDIR=${pkgdir} install
   install -D -m644 ${srcdir}/wireless.conf.d ${pkgdir}/etc/conf.d/wireless
-
-  # Avoid conflicts
-  mv ${pkgdir}/etc/profile.d/locale.sh ${pkgdir}/etc/profile.d/locale.sh.new
 }
