@@ -1,6 +1,6 @@
 #! /bin/sh
 # Autodetection script for scanning /sys for hardware
-# for Chakra GNU/Linux by Tobias Powalowski <tpowa@archlinux.org>
+# for The Chakra Project by Tobias Powalowski <tpowa@archlinux.org>
 # '--modules-not-loaded' patch by Grzegorz Wierzowiecki <grzegorz.wierzowiecki_4t_pjwstk.edu.pl>
 usage () {
 	echo "$0 [options]"
@@ -9,6 +9,7 @@ usage () {
 	echo ""
 	echo "  Options:"
 	echo "    --kernel_version=      use kernel version (no autodetect)"
+	echo "    --kernel_directory=    use kernel module directory (no autodetect)"
 	echo "    --ide-legacy           use old ide modules instead of pata"
 	echo "    --load-modules         load all detected modules"
 	echo "    --unload-modules       unload all detected modules"
@@ -35,7 +36,6 @@ usage () {
 	echo "  For /etc/mkinitcpio.conf use:"
 	echo "    --filesystem           add filesystems to MODULES="
 	echo "    --hostcontroller       show MODULES= for all hostcontrollers"
-	echo "    --vmware               add BusLogic to MODULES for vmware"
 	echo "    --ati-kms              add ati kernel mode setting" 
 	echo "    --intel-kms            add intel kernel mode setting"
 	echo "    --nvidia-kms           add nvidia kernel mode setting"
@@ -52,14 +52,14 @@ usage () {
 	echo "    --pcmcia               add pcmcia to HOOKS="
 	echo "    --nfs                  add net to HOOKS="
 	echo "    --btrfs                add btrfs to HOOKS="
+	echo "    --shutdown             add shutdown to HOOKS="
 	echo ""
-	echo "  For /etc/rc.conf use:"
-	echo "    --net                  show network MODULES"
-	echo "    --sound                show sound MODULES"
-	echo "    --usbhost              show usb hostcontroller MODULES"
+	echo "  For persistent sound and network files use:"
+	echo "    --net                  generate /tmp/network_persistent.rules"
+	echo "    --sound                generate /tmp/sound_persistent.conf"
+	echo ""
 	echo "    --modules              show all detected MODULES"
 	echo "    --modules-not-loaded   show all detected MODULES but not actually loaded"
-	echo "    --blacklist            activates blacklisting for net,sound and usbhost"
 	echo ""
 	exit 1
 }
@@ -68,15 +68,29 @@ usage () {
 [ "$1" = "--help" ] && usage
 [ "$1" = "-h" ]     && usage
 
-# setting kernel version
-case $1 in
-	--kernel_version=*)
-	KERNEL_VERSION="$(echo $1 | awk -F= '{print $2;}')"
-	;;
-	--rootdevice=*)
-	ROOTDEVICE="$(echo $1 | awk -F= '{print $2;}')"
-	;;
-esac
+# setting parameters
+PARAMETER="$(echo $*)"
+parameter() {
+	while [ -n "$1" ]; do
+		case $1 in
+			--kernel_directory=*)
+			KERNEL_DIRECTORY="$(echo $1 | awk -F= '{print $2;}')"
+			;;
+			--kernel_version=*)
+			KERNEL_VERSION="$(echo $1 | awk -F= '{print $2;}')"
+			;;
+			--rootdevice=*)
+			ROOTDEVICE="$(echo $1 | awk -F= '{print $2;}')"
+			;;
+			-hooks-dir=*|--hooks-dir=*)
+			HOOKS_DIR="$(echo $1 | awk -F= '{print $2;}')"
+			;;
+		esac
+		shift
+	done
+}
+
+parameter $PARAMETER
 
 if [ "$KERNEL_VERSION" = "" ]; then
 	KERNEL_VERSION="$(uname -r)"
@@ -109,17 +123,14 @@ fi
 # nfs switch
 [ "$(echo $* | grep '\-nfs')" ] && NFS=1
 
-# nfs switch
+# btrfs switch
 [ "$(echo $* | grep '\-btrfs')" ] && BTRFS=1
 
-# vmware switch
-[ "$(echo $* | grep '\-vmware')" ] && VMWARE=1
+# shutdown switch
+[ "$(echo $* | grep '\-shutdown')" ] && SHUTDOWN=1
 
-# vmware switch
+# hooks switch
 [ "$(echo $* | grep '\-hooks')" ] && HOOKS=1
-
-# blacklist switch
-[ "$(echo $* | grep '\-blacklist')" ] && BLACKLIST=1
 
 ADVANCED=""
 # root device check
@@ -221,12 +232,6 @@ if ! [ "$ROOTDEVICE" = "" ]; then
 	fi
 fi
 
-# checking /sys
-if ! [ -d /sys/ ]; then
-	echo "/sys/ is not present -- mount /sys first" >&2
-	exit 1
-fi
-
 : >/tmp/modules-plain
 : >/tmp/modules-stripped
 : >/tmp/modules-sorted
@@ -234,23 +239,17 @@ fi
 : >/tmp/.blkid
 
 # generate blkid
-/sbin/blkid -c /dev/null -s TYPE > /tmp/.blkid
+blkid -c /dev/null -s TYPE > /tmp/.blkid
 
 # find pci aliases
 aliases=$(find /sys/ -noleaf -name modalias  -exec cat {} +)
 
-# check for empty aliases
-if [ "$aliases" = "" ]; then
-	echo "hwdetect aborted -- you need a kernel >= 2.6.12" >&2
-	exit 1
-fi
-
 # generate files for the different actions
-modprobe -i -a --set-version=$KERNEL_VERSION --show-depends $aliases >> /tmp/modules-plain 2>/dev/null
+modprobe -i -a --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends $aliases >> /tmp/modules-plain 2>/dev/null
 
 # fix ide cdrom detection on proliant 1600
 if [ "$(echo $aliases | grep 'pci:v00000E11d00000001sv00000000sd00000000bc06sc02i00')" ]; then
-	modprobe -i --set-version=$KERNEL_VERSION --show-depends ide-generic >> /tmp/modules-plain 2>/dev/null
+	modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends ide-generic >> /tmp/modules-plain 2>/dev/null
 fi
 
 # find PNP devices like parports, soundcards etc.
@@ -261,35 +260,35 @@ if [ "$(find /sys/devices -noleaf -name 'id' | grep /pnp)" ]; then
 		[ "$devid" ] || continue
 	
 		modprobe -i --set-version=$KERNEL_VERSION --show-depends pnp:d${devid} >> /tmp/modules-plain 2>/dev/null
-		[ "$devid" = "PNP0800" ] && modprobe -i --set-version=$KERNEL_VERSION --show-depends pcspkr >> /tmp/modules-plain  2>/dev/null
-		[ "$devid" = "PNP0510" ] && modprobe -i --set-version=$KERNEL_VERSION --show-depends irtty-sir >> /tmp/modules-plain 2>/dev/null
-		[ "$devid" = "PNP0511" ] && modprobe -i --set-version=$KERNEL_VERSION --show-depends irtty-sir >> /tmp/modules-plain 2>/dev/null
-		[ "$devid" = "PNPb02f" ] && modprobe -i --set-version=$KERNEL_VERSION --show-depends analog >> /tmp/modules-plain 2>/dev/null
+		[ "$devid" = "PNP0800" ] && modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends pcspkr >> /tmp/modules-plain  2>/dev/null
+		[ "$devid" = "PNP0510" ] && modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends irtty-sir >> /tmp/modules-plain 2>/dev/null
+		[ "$devid" = "PNP0511" ] && modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends irtty-sir >> /tmp/modules-plain 2>/dev/null
+		[ "$devid" = "PNPb02f" ] && modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends analog >> /tmp/modules-plain 2>/dev/null
 
 		# load ppp-generic if serial ports are detected for modems
-		[ "$devid" = "PNP0501" ] && modprobe -i --set-version=$KERNEL_VERSION --show-depends ppp-generic >> /tmp/modules-plain 2>/dev/null
+		[ "$devid" = "PNP0501" ] && modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends ppp-generic >> /tmp/modules-plain 2>/dev/null
 	done
 fi
 
 # SCSI disks/cdroms/tapes/generic devices
 if [ "$(find /sys/devices -noleaf -name 'type')" ]; then
 	for i in $(cat $(find /sys/devices -noleaf -name "type")); do
-		case $i in (4|5)       modprobe -i --set-version=$KERNEL_VERSION --show-depends sr_mod >> /tmp/modules-plain 2>/dev/null ;; esac
-		case $i in (2|3|6|8|9) modprobe -i --set-version=$KERNEL_VERSION --show-depends sg >> /tmp/modules-plain 2>/dev/null ;; esac
-		case $i in (0|7|14)    modprobe -i --set-version=$KERNEL_VERSION --show-depends sd_mod >> /tmp/modules-plain 2>/dev/null ;; esac
-		case $i in (1)         modprobe -i --set-version=$KERNEL_VERSION --show-depends st >> /tmp/modules-plain 2>/dev/null ;; esac
+		case $i in (4|5)       modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends sr_mod >> /tmp/modules-plain 2>/dev/null ;; esac
+		case $i in (2|3|6|8|9) modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends sg >> /tmp/modules-plain 2>/dev/null ;; esac
+		case $i in (0|7|14)    modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends sd_mod >> /tmp/modules-plain 2>/dev/null ;; esac
+		case $i in (1)         modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends st >> /tmp/modules-plain 2>/dev/null ;; esac
 	done
 fi
 
 # add Buslogic for vmware
 if [ "$VMWARE" = "1" ]; then
-	 modprobe -i --set-version=$KERNEL_VERSION --show-depends BusLogic >> /tmp/modules-plain 2>/dev/null
+	 modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends BusLogic >> /tmp/modules-plain 2>/dev/null
 fi
 
 # Parport modules
 if [ "$(grep 'parport' /tmp/modules-plain)" ]; then
-	modprobe -i --set-version=$KERNEL_VERSION --show-depends lp >> /tmp/modules-plain 2>/dev/null
-	modprobe -i --set-version=$KERNEL_VERSION --show-depends ppdev >> /tmp/modules-plain 2>/dev/null
+	modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends lp >> /tmp/modules-plain 2>/dev/null
+	modprobe -i --dirname=$KERNEL_DIRECTORY --set-version=$KERNEL_VERSION --show-depends ppdev >> /tmp/modules-plain 2>/dev/null
 fi
 
 sort -u /tmp/modules-plain >> /tmp/modules-stripped
@@ -389,19 +388,12 @@ showlist4() {
 }
 
 # starting different actions
-while [ $# -gt 0 ]; do
+while [ -n "$*"  ]; do
 	case $1 in
-		-hooks-dir=*|--hooks-dir=*)
-			HOOKS_DIR="$(echo $1 | awk -F= '{print $2;}')"
-			 ;;
 		--load-modules)
 			# load all detected pci modules
 			for i in $(cat /tmp/moduleslist); do
-				if [ -e /lib/udev/load-modules.sh ]; then 
-					/lib/udev/load-modules.sh $i > /dev/null 2>&1
-				else
-					modprobe $i > /dev/null 2>&1
-				fi
+				modprobe $i > /dev/null 2>&1
 			done
 			;;
 
@@ -492,67 +484,20 @@ while [ $# -gt 0 ]; do
 				MODULES_INITRAMFS="$FB $MODULES_INITRAMFS "
 				! [ "$HOOKS" = "1" ] && showlist2 "MODULES" \"$MODULES_INITRAMFS\" | sed -e 's/(\  /(/g' -e 's/"\ /"/g' -e 's/\ "/"/g' -e 's/\ \ /\ /g'
 				;;
-		--net)  if [ "$(showlist2 "MODULES"  \($(listmods drivers/net/ irda ppp_generic slhc) $(listmods drivers/usb/net/) $(listmods drivers/staging/) \) | sed -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g' | grep '8139cp')" ] ; then
-				if [ "$(dmesg | grep 'use 8139too')" ]; then
-					NET_EXPORTED="$(echo $(listmods drivers/net/ irda ppp_generic slhc) $(listmods drivers/usb/net/) $(listmods drivers/staging/) | sed -e 's/8139cp//g')"
-					MODULES_EXPORTED="$MODULES_EXPORTED $NET_EXPORTED"
-					BLACKLIST_UDEV="8139cp"
-					for i in $NET_EXPORTED; do
-						BLACKLIST_UDEV="$BLACKLIST_UDEV $i"
-					done
-					showlist2 "MODULES"  \($MODULES_EXPORTED\) | sed -e 's/(\  /(/g' -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
-				else
-					NET_EXPORTED="$(echo $(listmods drivers/net/ irda ppp_generic slhc) $(listmods drivers/usb/net/) $(listmods drivers/staging/) | sed -e 's/8139too//g')"
-					MODULES_EXPORTED="$MODULES_EXPORTED $NET_EXPORTED"
-					BLACKLIST_UDEV="8139too"
-					for i in $NET_EXPORTED; do
-						BLACKLIST_UDEV="$BLACKLIST_UDEV $i"
-					done
-					showlist2 "MODULES"  \($MODULES_EXPORTED\) | sed -e 's/(\  /(/g' -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
-				fi
-			else
-				NET_EXPORTED="$(listmods drivers/net/ irda ppp_generic slhc) $(listmods drivers/usb/net/) $(listmods drivers/staging/)"
-				MODULES_EXPORTED="$MODULES_EXPORTED $NET_EXPORTED" 
-				BLACKLIST_UDEV=""
-				for i in $NET_EXPORTED; do
-					BLACKLIST_UDEV="$BLACKLIST_UDEV $i"
-				done
-				showlist2 "MODULES"  \($MODULES_EXPORTED\) | sed -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
-			fi
-                        : >/tmp/blacklist_net.conf
-			if [ "$BLACKLIST" = "1" ]; then	
-				for i in $BLACKLIST_UDEV; do
-					echo "blacklist $i" >> /tmp/blacklist_net.conf
-				done
-                        fi
+		--net)  : >/tmp/network_persistent.rules
+			for i in $(ls /sys/class/net/ | grep -v ^lo); do
+			      echo "SUBSYSTEM==\"net\", ATTR{address}==\"$(cat /sys/class/net/${i}/address)\", NAME=\"${i}\"" >>/tmp/network_persistent.rules
+			done
+
 			;;
-		--sound) SOUND_EXPORTED="$(listmods pcspkr) $(listmods sound/)"
-			 MODULES_EXPORTED="$MODULES_EXPORTED $SOUND_EXPORTED"
-			 BLACKLIST_UDEV=""
-			 for i in $SOUND_EXPORTED; do
-				BLACKLIST_UDEV="$BLACKLIST_UDEV $i"
-			 done
-			 showlist2 "MODULES" \($MODULES_EXPORTED\) | sed -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
-                         : >/tmp/blacklist_sound.conf
-			 if [ "$BLACKLIST" = "1" ]; then	
-			 	for i in $BLACKLIST_UDEV; do
-			 		echo "blacklist $i" >> /tmp/blacklist_sound.conf
-			 	done
-                         fi
-			 ;;
-		--usbhost)  USBHOST_EXPORTED="$(listmods xhci-hcd) $(listmods ehci-hcd) $(listmods uhci-hcd) $(listmods ohci-hcd)"
-			    MODULES_EXPORTED="$MODULES_EXPORTED $USBHOST_EXPORTED"
-			    BLACKLIST_UDEV=""
-			    for i in $USBHOST_EXPORTED; do
-				    BLACKLIST_UDEV="$BLACKLIST_UDEV $i"
-			    done
-			    showlist2 "MODULES" \($MODULES_EXPORTED\) | sed -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
-			    : >/tmp/blacklist_usbhost.conf
-			    if [ "$BLACKLIST" = "1" ]; then	
-				  for i in $BLACKLIST_UDEV; do
-			 		echo "blacklist $i" >> /tmp/blacklist_usbhost.conf
-				  done
-			    fi
+		--sound) : >/tmp/sound_persistent.conf
+			 SOUND_EXPORTED=""
+			 if [ -e /proc/asound/modules ]; then
+				for i in $(cat /proc/asound/modules | cut -d ' ' -f 3); do
+					SOUND_EXPORTED="$SOUND_EXPORTED $i"
+				done
+				! [[ "$SOUND_EXPORTED" = "" ]] && echo "options snd slots=$(echo $SOUND_EXPORTED | sed -e 's# #,#g' -e 's#^,##g')" >> /tmp/sound_persistent.conf
+			 fi
 			 ;;
 		--modules) showlist2 "MODULES" \($(listmods modules/)\) | sed -e 's/(\ /(/g' -e 's/\ )/)/g' -e 's/\ \ /\ /g'
 			 ;;
@@ -560,9 +505,9 @@ while [ $# -gt 0 ]; do
 			 ;;
 		--hooks) 
 			if [ "$HOOKS_DIR" = "" ]; then
-				HOOKS_DIR="/lib/initcpio/install"
+				HOOKS_DIR="/usr/lib/initcpio/install"
 			fi
-			START_HOOKS="base v86d udev keymap autodetect ide pata scsi sata usb fw pcmcia net dmraid usbinput $ADVANCED btrfs filesystems"
+			START_HOOKS="base v86d udev keymap fsck autodetect ide pata scsi sata usb fw pcmcia net dmraid usbinput $ADVANCED btrfs filesystems shutdown"
 			# remove the ones that don't exist on the system
 			for i in ${START_HOOKS}; do
 				if ! [ -e "${HOOKS_DIR}/$i" ]; then 
@@ -601,6 +546,9 @@ while [ $# -gt 0 ]; do
 			fi
 			if ! [ "$BTRFS" = "1" ]; then
 				START_HOOKS=$(echo $START_HOOKS | sed -e "s/btrfs//g")
+			fi
+			if ! [ "$SHUTDOWN" = "1" ]; then
+				START_HOOKS=$(echo $START_HOOKS | sed -e "s/shutdown//g")
 			fi
 			echo "HOOKS=\"$START_HOOKS\"" | sed -e 's/"\ /"/g' -e 's/\ "/"/g' -e 's/\ \ /\ /g'
 		;;

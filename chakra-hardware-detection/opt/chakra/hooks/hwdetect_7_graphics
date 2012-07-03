@@ -105,26 +105,6 @@ hwdetect_graphics()
 				
 					# add a status file in /tmp
 					touch /tmp/nvidia-173xx
-
-				# or maybe another legacy card
-				elif [ $(grep -i "$CARD_NVIDIA" ${HW_DB_PATH}/${NV96XX_DB}) ] 
-				then
-				
-					printhl "NVIDIA hardware detected"
-					printhl "Installing driver: nvidia-96xx. This can take some seconds."
-				
-					rmmod -f nouveau
-					rmmod -f ttm
-					rmmod -f drm_kms_helper
-					rmmod -f drm
-					pacman -Rdd --noconfirm libgl &>/dev/null
-					pacman -Rdd --noconfirm nouveau-dri &>/dev/null
-					pacman -Rdd --noconfirm xf86-video-nv &>/dev/null
-					pacman -Rdd --noconfirm xf86-video-nouveau &>/dev/null
-					pacman -Udf --noconfirm ${HW_DRIVER_PATH}/nvidia-96xx* &>/dev/null
-				
-					# add a status file in /tmp
-					touch /tmp/nvidia-96xx
 				else
 					printhl "No non-free drivers available for this hardware"
 				fi

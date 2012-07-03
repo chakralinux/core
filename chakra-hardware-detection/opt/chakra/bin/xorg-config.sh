@@ -91,24 +91,6 @@
 			sed -i '/^.*GLcore.*/d' /etc/X11/xorg.conf
 			sed -i '/^.*"DRI"    "true".*/d' /etc/X11/xorg.conf
 
-		elif [ -e "/tmp/nvidia-96xx" ] ; then
-			printhl "Loading tainted kernel module: nvidia"
-			modprobe nvidia &>/dev/null
-	
-			printhl "Setting up X.Org driver: nvidia"
-			DRIVER_NVIDIA="Driver\t\"nvidia\""
-			sed -i -e /'Section "Device"'/,/'EndSection'/s/'Driver.*'/$DRIVER_NVIDIA/g /etc/X11/xorg.conf
-
-			# setup extra options
-			sed -i /'Section "Device"'/,/'EndSection'/s/'EndSection'/"\tOption      \"NoLogo\"    \"true\"\nEndSection"/g /etc/X11/xorg.conf
-
-			# remove stuff we dont need
-			sed -i '/^.*VBERestore.*/d' /etc/X11/xorg.conf
-			sed -i '/^.*XAANoOffscreenPixmaps.*/d' /etc/X11/xorg.conf
-			sed -i '/^.*AIGLX.*/d' /etc/X11/xorg.conf
-			sed -i '/^.*GLcore.*/d' /etc/X11/xorg.conf
-			sed -i '/^.*"DRI"    "true".*/d' /etc/X11/xorg.conf
-
 		elif [ -e "/tmp/nvidia" ] ; then
 			printhl "Loading tainted kernel module: nvidia"
 			modprobe nvidia &>/dev/null

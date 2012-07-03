@@ -63,8 +63,6 @@ output_detected_driver() {
 
 		if [ -e "/tmp/nvidia-173xx" ] ; then
 		    USED_DRIVER="nvidia"
-		elif [ -e "/tmp/nvidia-96xx" ] ; then
-		    USED_DRIVER="nvidia"
 		elif [ -e "/tmp/nvidia" ] ; then
 		    USED_DRIVER="nvidia"
 		elif [ -e "/tmp/catalyst" ] ; then
