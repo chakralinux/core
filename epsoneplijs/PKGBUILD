@@ -2,12 +2,9 @@
 #
 # contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=epsoneplijs
 pkgver=0.4.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Printer driver which gives ghostscript the ability to print to Epson EPL-5700L, EPL-5800L, EPL-5900L, EPL-6100L and EPL-6200L laser printers."
 arch=(i686 x86_64)
 license=('custom')
@@ -20,7 +17,7 @@ md5sums=('0840e15c6a96584138d9a1045c16997d'
 build() {
     cd $srcdir/$pkgname-$pkgver
     ./configure --prefix=/usr --with-libusb
-    make || return 1
+    make 
 
     mkdir -p $pkgdir/usr/bin
     make prefix=$pkgdir/usr install
