@@ -5,32 +5,27 @@
 
 pkgbase=mysql
 pkgname=('libmysqlclient' 'mysql-clients' 'mysql')
-pkgver=5.5.14
+pkgver=5.5.25
+_pkgver=5.5.25a
 pkgrel=1
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://www.mysql.com/"
 makedepends=('cmake' 'openssl' 'tcp_wrappers' 'zlib')
 options=('!libtool')
-source=("http://ftp.gwdg.de/pub/misc/mysql/Downloads/MySQL-5.5/${pkgbase}-${pkgver}.tar.gz"
+source=("http://ftp.gwdg.de/pub/misc/mysql/Downloads/MySQL-5.5/${pkgbase}-${_pkgver}.tar.gz"
         'mysqld'
         'my.cnf')
-md5sums=('19f43bb9c72b1b5f7ff86a7f921c9244'
+md5sums=('0841fbc79872c5f467d8c8842f45257a'
          '2234207625baa29b2ff7d7b4f088abce'
          '1c949c0dbea5206af0db14942d9927b6')
 
 build() {
-  cd "${srcdir}"/${pkgbase}-${pkgver}
-
   cd "${srcdir}"
   mkdir build
   cd build
 
-  # CFLAGS/CXXFLAGS as suggested upstream
-  CFLAGS="-fPIC ${CFLAGS} -fno-strict-aliasing -DBIG_JOINS=1 -fomit-frame-pointer" \
-  CXXFLAGS="-fPIC ${CXXFLAGS} -fno-strict-aliasing -DBIG_JOINS=1 -felide-constructors -fno-rtti" \
-
-  cmake ../${pkgbase}-${pkgver} \
+  cmake ../${pkgbase}-${_pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DMYSQL_DATADIR=/var/lib/mysql \
@@ -41,6 +36,7 @@ build() {
     -DINSTALL_SCRIPTDIR=bin \
     -DINSTALL_INCLUDEDIR=include/mysql \
     -DINSTALL_DOCREADMEDIR=share/mysql \
+    -DINSTALL_DOCDIR=share/mysql/docs \
     -DINSTALL_SUPPORTFILESDIR=share/mysql \
     -DINSTALL_MYSQLSHAREDIR=share/mysql \
     -DINSTALL_SHAREDIR=share/mysql \
@@ -59,8 +55,10 @@ build() {
     -DWITHOUT_ARCHIVE_STORAGE_ENGINE=1 \
     -DWITHOUT_BLACKHOLE_STORAGE_ENGINE=1 \
     -DWITHOUT_FEDERATED_STORAGE_ENGINE=1 \
-    -DWITH_INNOBASE_STORAGE_ENGINE=1
-
+    -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+    -DWITH_MYSQLD_LDFLAGS="${LDFLAGS}" \
+    -DCMAKE_C_FLAGS="-fPIC ${CFLAGS} -fno-strict-aliasing -DBIG_JOINS=1 -fomit-frame-pointer" \
+    -DCMAKE_CXX_FLAGS="-fPIC ${CXXFLAGS} -fno-strict-aliasing -DBIG_JOINS=1 -felide-constructors -fno-rtti"
   make
 }
 
@@ -77,7 +75,7 @@ package_libmysqlclient(){
   install -m755 scripts/mysql_config "${pkgdir}/usr/bin/"
   install -d "${pkgdir}/usr/share/man/man1"
   for man in mysql_config mysql_client_test_embedded mysqltest_embedded; do
-    install -m644 "${srcdir}/${pkgbase}-${pkgver}/man/$man.1" "${pkgdir}/usr/share/man/man1/$man.1"
+    install -m644 "${srcdir}/${pkgbase}-${_pkgver}/man/$man.1" "${pkgdir}/usr/share/man/man1/$man.1"
   done
 }
 
@@ -92,7 +90,7 @@ package_mysql-clients(){
   # install man pages
   install -d "${pkgdir}/usr/share/man/man1"
   for man in mysql mysqladmin mysqlcheck mysqldump mysqlimport mysqlshow mysqlslap; do
-    install -m644 "${srcdir}/${pkgbase}-${pkgver}/man/$man.1" "${pkgdir}/usr/share/man/man1/$man.1"
+    install -m644 "${srcdir}/${pkgbase}-${_pkgver}/man/$man.1" "${pkgdir}/usr/share/man/man1/$man.1"
   done
 
   # provided by mysql
@@ -123,13 +121,9 @@ package_mysql(){
   rm ${pkgdir}/usr/bin/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}
   rm ${pkgdir}/usr/share/man/man1/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}.1
 
-  # not needed
-  rm -r ${pkgdir}/usr/{mysql-test,sql-bench}
+ # not needed
+  rm -r "${pkgdir}"/usr/{data,mysql-test,sql-bench}
+  rm "${pkgdir}"/usr/share/man/man1/mysql-test-run.pl.1
 
-  # These shouldn't be here
-  rm -r ${pkgdir}/usr/docs
-  install -d ${pkgdir}/var/lib/mysql
-  cp -r ${pkgdir}/usr/data/* ${pkgdir}/var/lib/mysql/
-  chmod -R 700 ${pkgdir}/var/lib/mysql
-  rm -r ${pkgdir}/usr/data
+  install -dm700 "${pkgdir}"/var/lib/mysql
 }
