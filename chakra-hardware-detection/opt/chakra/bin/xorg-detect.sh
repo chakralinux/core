@@ -67,6 +67,8 @@ output_detected_driver() {
 		    USED_DRIVER="nvidia"
 		elif [ -e "/tmp/catalyst" ] ; then
 		    USED_DRIVER="fglrx"
+		elif [ -e "/tmp/catalyst-legacy" ] ; then
+		    USED_DRIVER="fglrx"
 		elif [ -e "/tmp/vesa" ] ; then
 		    USED_DRIVER="vesa"
 		else
