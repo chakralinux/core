@@ -17,9 +17,7 @@ conflicts=('catalyst-test' 'nvidia-utils' 'libgl' 'catalystpxp-utils' 'catalyst-
 provides=('libgl' "libatical=${pkgver}" 'catalyst-utils')
 install=${pkgname}.install
 
-source=(
-    #http://www2.ati.com/drivers/linux/amd-driver-installer-${pkgver/./-}-x86.x86_64.run
-    http://www2.ati.com/drivers/legacy/amd-driver-installer-12.6-legacy-x86.x86_64.zip
+source=(http://www2.ati.com/drivers/legacy/amd-driver-installer-${pkgver}-legacy-x86.x86_64.zip
     catalyst.sh
     amdcccle.desktop
     atieventsd.sh)
@@ -30,7 +28,7 @@ md5sums=('36d5a91d60673b26705e9ac2df952daf'
          'f729bf913613f49b0b9759c246058a87')
 build() {
   ## Unpack archive
-    /bin/sh ./amd-driver-installer-12.6-legacy-x86.x86_64.run --extract archive_files
+    /bin/sh ./amd-driver-installer-${pkgver}-legacy-x86.x86_64.run --extract archive_files
 }
 
 package() {
