@@ -32,6 +32,18 @@ check_libdri_so(){
 post_install(){
     check_libdri_so
     whisperer
+
+    CARD_ATI=$(lspci -n | sed -n "s/.* 0300: 1002:\(....\).*/\1/p")
+    if [ "$CARD_ATI" != "" ]
+    then
+       [ $(grep -i "$CARD_ATI" hw_ati_legacy_hwdb) ]
+    then
+       echo "WARNING WARNING WARNING WARNING"
+       echo "ATI LEGACY hardware detected"
+       echo "This driver is not compatible, install catalyst-legacy before rebooting."
+       echo "sudo pacman -S catalyst-legacy"
+       echo "WARNING WARNING WARNING WARNING"
+     fi
 }
 
 post_upgrade(){
