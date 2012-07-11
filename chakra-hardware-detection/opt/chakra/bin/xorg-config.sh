@@ -2,7 +2,7 @@
 #
 #**************************************************************************
 #   Copyright (C) 2008-2009 Jan Mette                                     *
-#   Copyright (C) 2009 Phil Miller                                    *
+#   Copyright (C) 2009 Phil Miller                                        *
 #   Copyright (C) 2012 Manuel Tortosa and the team behind Chakra          *
 #                                                                         *
 #   This script is free software; you can redistribute it and/or modify   *
@@ -65,10 +65,10 @@ set_free_config() {
 case "$NONFREE" in
   yes)
     if [ -e "/tmp/nvidia-173xx" ] ; then
-      printhl "Loading tainted kernel module: nvidia"
+      printhl "Loading tainted kernel module: nvidia-173xx"
       modprobe nvidia &>/dev/null
 
-      printhl "Setting up X.Org driver: nvidia"
+      printhl "Setting up X.Org driver: nvidia-173xx"
       nvidia-xconfig 
     elif [ -e "/tmp/nvidia" ] ; then
       printhl "Loading tainted kernel module: nvidia"
@@ -82,13 +82,19 @@ case "$NONFREE" in
   
       printhl "Setting up X.Org driver: catalyst"
       aticonfig --initial -force
-     else                   
+    elif [ -e "/tmp/catalyst-legacy" ] ; then
+      printhl "Loading tainted kernel module: catalyst-legacy"
+      modprobe fglrx &>/dev/null
+  
+      printhl "Setting up X.Org driver: catalyst-legacy"
+      aticonfig --initial -force
+    else                   
       set_free_config
     fi                     
   ;;
 
   *)
-      set_free_config
+    set_free_config
   ;;
 
 esac
