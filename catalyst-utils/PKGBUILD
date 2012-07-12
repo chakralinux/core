@@ -21,12 +21,14 @@ source=(
     http://www2.ati.com/drivers/linux/amd-driver-installer-${pkgver/./-}-x86.x86_64.run
     catalyst.sh
     amdcccle.desktop
-    atieventsd.sh)
+    atieventsd.sh
+    hw_ati_legacy_hwdb)
 
 md5sums=('6bd4f0875202390ed7122696db29be77'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '4efa8414a8fe9eeb50da38b5522ef81d'
-         'f729bf913613f49b0b9759c246058a87')
+         'f729bf913613f49b0b9759c246058a87'
+         'e88b99bb50f38bc96c880407b36b45a8')
 build() {
   ## Unpack archive
     /bin/sh ./amd-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
@@ -155,4 +157,7 @@ package() {
 
     # License
       install -m644 "${srcdir}/archive_files/LICENSE.TXT" "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+      
+    # hwdb
+      install -m644 "${srcdir}/hw_ati_legacy_hwdb" "${pkgdir}/usr/share/applications/hw_ati_legacy_hwdb"
 }
