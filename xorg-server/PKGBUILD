@@ -26,18 +26,23 @@ source=("${url}/releases/individual/xserver/${pkgname}-${pkgver}.tar.bz2"
         'autoconfig-nvidia.patch'
         'xvfb-run'
         'xvfb-run.1'
-        '10-quirks.conf')
+        '10-quirks.conf'
+        'autoconfig-sis.patch')
 sha1sums=('f3f3d59f3c5e15459152987ffc644f06a0d1374f'
           '746f0204050ceca7caa111b52a87336b7356dcd2'
           'c94f742d3f9cabf958ae58e4015d9dd185aabedc'
           '6838fc00ef4618c924a77e0fb03c05346080908a'
-          '993798f3d22ad672d769dae5f48d1fa068d5578f')
+          '993798f3d22ad672d769dae5f48d1fa068d5578f'
+          '175de5630b43dbc97778adfba5563b7fdd77f11f')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   # Use nouveau/nv/nvidia drivers for nvidia devices
   patch -p1 -i "${srcdir}/autoconfig-nvidia.patch"
+  
+  # Use unofficial imedia SiS driver for supported SiS devices
+  patch -p0 -i "${srcdir}/autoconfig-sis.patch"
 
   autoreconf -fiv
   ./configure --prefix=/usr \
