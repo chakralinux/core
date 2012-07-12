@@ -1,28 +1,30 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=inputproto
-pkgver=2.0.2
+pkgver=2.2
 pkgrel=1
 pkgdesc="X11 Input extension wire protocol"
 arch=(any)
 license=('custom')
 url="http://xorg.freedesktop.org/"
+makedepends=('xorg-util-macros' 'asciidoc')
 source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('a34c01c67aa2ed9058ff19ace0041978b1d8d711')
+sha1sums=('500e0a6dac3523887c0b82753fe5e9d4bb982137')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr 
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  make DESTDIR="${pkgdir}" install 
 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" 
 }

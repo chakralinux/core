@@ -4,8 +4,8 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xorg-server
-pkgver=1.10.4
-pkgrel=4
+pkgver=1.12.3
+pkgrel=1
 pkgdesc="X.Org X servers"
 arch=('i686' 'x86_64')
 license=('custom')
@@ -22,31 +22,22 @@ backup=('etc/X11/xorg.conf.d/10-evdev.conf' 'etc/X11/xorg.conf.d/10-quirks.conf'
 options=('!libtool')
 provides=('x-server')
 groups=('xorg')
-source=(${url}/releases/individual/xserver/${pkgname}-${pkgver}.tar.bz2
-        bg-none-revert.patch
-        xserver-1.10-pointer-barriers.patch
-        autoconfig-nvidia.patch
-        xvfb-run
-        xvfb-run.1
-        10-quirks.conf)
-sha1sums=('857d6377025c77851a3cc5f8ec2ce84164a2fdc6'
-          '629c6d8d52126eab81ee1b72a9e4209535f8cb81'
-          '1b95e91384a57d966428c7db98ed06f4cc562f91'
-          'f9328fd7bc931bb02c8909ecfcef35403de33782'
+source=("${url}/releases/individual/xserver/${pkgname}-${pkgver}.tar.bz2"
+        'autoconfig-nvidia.patch'
+        'xvfb-run'
+        'xvfb-run.1'
+        '10-quirks.conf')
+sha1sums=('f3f3d59f3c5e15459152987ffc644f06a0d1374f'
+          '746f0204050ceca7caa111b52a87336b7356dcd2'
           'c94f742d3f9cabf958ae58e4015d9dd185aabedc'
           '6838fc00ef4618c924a77e0fb03c05346080908a'
           '993798f3d22ad672d769dae5f48d1fa068d5578f')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  # Add pointer barrier support, patch from Fedora
-  patch -Np1 -i "${srcdir}/xserver-1.10-pointer-barriers.patch"
-
-  # Patches from ~ajax/xserver xserver-next branch
-  patch -Np1 -i "${srcdir}/bg-none-revert.patch"
 
   # Use nouveau/nv/nvidia drivers for nvidia devices
-  patch -Np1 -i "${srcdir}/autoconfig-nvidia.patch"
+  patch -p1 -i "${srcdir}/autoconfig-nvidia.patch"
 
   autoreconf -fiv
   ./configure --prefix=/usr \
@@ -61,6 +52,9 @@ build() {
       --enable-xephyr \
       --enable-glx-tls \
       --enable-kdrive \
+      --enable-kdrive-evdev \
+      --enable-kdrive-kbd \
+      --enable-kdrive-mouse \
       --enable-install-setuid \
       --enable-config-udev \
       --disable-config-dbus \
@@ -89,7 +83,7 @@ package() {
   install -m755 -d "${pkgdir}/var/lib/xkb"
 
   # Install sane config files in /etc. 
-  install -m755 -d "${pkgdir}/etc/X11/xorg.conf.d"
+  install -m755 -d "${pkgdir}/etc/X11"
   mv "${pkgdir}/usr/share/X11/xorg.conf.d" "${pkgdir}/etc/X11/"
   install -m644 "${srcdir}/10-quirks.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
 
