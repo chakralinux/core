@@ -4,9 +4,9 @@
 # maintainer abveritas@chakra-project.org
 
 pkgbase=mesa
-pkgname=('mesa' 'libgl' 'libglapi' 'libgles' 'libegl' 'khrplatform-devel' 'ati-dri' 'intel-dri' 'nouveau-dri' 'svga-dri')
+pkgname=('mesa' 'libgl' 'libglapi' 'libgles' 'libegl' 'khrplatform-devel' 'ati-dri' 'intel-dri' 'svga-dri')
 pkgver=8.0.3
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 makedepends=('glproto>=1.4.14' 'libdrm>=2.4.26' 'libxxf86vm>=1.1.1' 'libxdamage>=1.1.3' 'expat>=2.0.1' 'libx11>=1.4.3' 'libxt>=1.1.1' 
              'gcc-libs>=4.6.1' 'dri2proto>=2.6' 'python2' 'libxml2' 'imake' 'llvm' 'udev')
@@ -23,7 +23,8 @@ build() {
    autoreconf -vfi
     ./configure --prefix=/usr \
     --with-dri-driverdir=/usr/lib/xorg/modules/dri \
-    --with-gallium-drivers=r300,r600,nouveau,svga,swrast \
+    --with-gallium-drivers=r300,r600,svga,swrast \
+    --with-dri-drivers=i915,i965,r200,radeon,swrast \
     --enable-gallium-llvm \
     --enable-gallium-egl \
     --enable-shared-glapi\
@@ -178,15 +179,15 @@ package_intel-dri() {
   make -C ${srcdir}/?esa-*/src/mesa/drivers/dri/i965 DESTDIR="${pkgdir}" install
 }
 
-package_nouveau-dri() {
-  depends=("libgl")
-  pkgdesc="Mesa classic DRI + Gallium3D drivers for Nouveau"
+#package_nouveau-dri() {
+#  depends=("libgl")
+#  pkgdesc="Mesa classic DRI + Gallium3D drivers for Nouveau"
 
   # classic mesa driver for nv10 , nv20 nouveau_vieux_dri.so
-  make -C ${srcdir}/?esa-*/src/mesa/drivers/dri/nouveau DESTDIR="${pkgdir}" install
+#  make -C ${srcdir}/?esa-*/src/mesa/drivers/dri/nouveau DESTDIR="${pkgdir}" install
   # gallium3D driver for nv30 - nv40 - nv50 nouveau_dri.so
-  make -C ${srcdir}/?esa-*/src/gallium/targets/dri-nouveau DESTDIR="${pkgdir}" install
-}
+#  make -C ${srcdir}/?esa-*/src/gallium/targets/dri-nouveau DESTDIR="${pkgdir}" install
+#}
 
 package_svga-dri() {
   depends=("mesa=${pkgver}")
