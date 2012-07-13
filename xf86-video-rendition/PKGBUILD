@@ -5,22 +5,24 @@
 
 pkgname=xf86-video-rendition
 pkgver=4.2.4
-pkgrel=5
+pkgrel=6
 pkgdesc="X.org Rendition video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
 makedepends=('xorg-server')
-conflicts=('xorg-server<1.10.1')
+conflicts=('xorg-server<1.12.3')
 options=('!libtool' '!strip')
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('16148c25183f7829c22bc9dfdb588c1a16bf4565')
+source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2"
+        'rendition-4.2.4-git.patch')
+sha1sums=('16148c25183f7829c22bc9dfdb588c1a16bf4565'
+          '1715a29b953df5f2aecb900de5e73bed96f6d4e0')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
+  patch -p1 -i ${srcdir}/rendition-4.2.4-git.patch
   ./configure --prefix=/usr
   make
 }

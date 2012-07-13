@@ -4,40 +4,28 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-nouveau
-_gitdate=20111128
-pkgver=0.0.16_git${_gitdate} # see configure.ac
-pkgrel=2
+pkgver=1.0.1
+pkgrel=1
 pkgdesc="Open Source 3D acceleration driver for nVidia cards (experimental)"
 arch=('i686' 'x86_64')
-url="http://nouveau.freedesktop.org/wiki/"
+url="http://nouveau.freedesktop.org/"
 license=('GPL') #and MIT, not yet a license file, see http://nouveau.freedesktop.org/wiki/FAQ#head-09f75d03eb30011c754038a3893119a70745de4e
 depends=('libdrm' 'udev' 'libgl')
 optdepends=('nouveau-dri:	experimental gallium3d features')
-makedepends=('xorg-server' 'libdrm>=2.4.24' 'xf86driproto')
-conflicts=('xorg-server<1.10.1')
+makedepends=('xorg-server' 'xf86driproto')
+conflicts=('xorg-server<1.12.3')
 options=('!libtool') # 'force')
 install=${pkgname}.install
-source=(http://chakra.sourceforge.net/sources/xf86-video-nouveau/xf86-video-nouveau-${_gitdate}.tar.bz2)
-md5sums=('25c12b344fafe103ce4a6b0f922977f3')
-
-# source PKGBUILD && mksource
-mksource() {
-	mkdir /tmp/${pkgname}-${_gitdate}
-	pushd /tmp/${pkgname}-${_gitdate}
-	git clone -v --depth 1 git://anongit.freedesktop.org/nouveau/xf86-video-nouveau
-	cd xf86-video-nouveau
-	git archive --prefix=xf86-video-nouveau-${_gitdate}/ --format=tar HEAD | bzip2 > /tmp/${pkgname}-${_gitdate}/${pkgname}-${_gitdate}.tar.bz2
-	md5sum /tmp/${pkgname}-${_gitdate}/${pkgname}-${_gitdate}.tar.bz2
-	popd
-}
+source=("$url/release/$pkgname-$pkgver.tar.bz2")
+md5sums=('d120bdd4ee9fc3581f3b93e3b31c4574')
 
 build() {
-  cd ${srcdir}/xf86-video-nouveau-${_gitdate}
-  ./autogen.sh --prefix=/usr
+  cd ${srcdir}/$pkgname-$pkgver
+  ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd ${srcdir}/xf86-video-nouveau-${_gitdate}
+  cd ${srcdir}/$pkgname-$pkgver
   make DESTDIR=${pkgdir} install
 }

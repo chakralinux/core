@@ -5,14 +5,14 @@
 
 pkgname=xf86-video-intel
 pkgver=2.19.0
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('intel-dri' 'libxvmc' 'libpciaccess' 'libdrm' 'xcb-util' 'libxfixes' 'udev')
-makedepends=('xorg-server>=1.10' 'libx11' 'xf86driproto' 'glproto' 'mesa' 'libxrender')
-conflicts=('xorg-server<1.10' 'xf86-video-i810' 'xf86-video-intel-legacy')
+makedepends=('xorg-server>=1.12.3' 'libx11' 'xf86driproto' 'glproto' 'mesa' 'libxvmc' 'libxrender')
+conflicts=('xorg-server<1.12.3' 'xf86-video-i810' 'xf86-video-intel-legacy')
 options=('!libtool')
 groups=('xorg-drivers' 'xorg')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
@@ -21,7 +21,7 @@ sha1sums=('131934cf5e90bd48c883804cc644c4cb8b1de100')
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr --enable-dri
+  ./configure --prefix=/usr --enable-dri --enable-sna --enable-vmap --enable-uxa
   make
 }
 
