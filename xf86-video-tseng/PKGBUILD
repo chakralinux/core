@@ -5,22 +5,24 @@
 
 pkgname=xf86-video-tseng
 pkgver=1.2.4
-pkgrel=5
+pkgrel=6
 pkgdesc="X.org tseng video driver"
 arch=(i686 x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
 makedepends=('xorg-server')
-conflicts=('xorg-server<1.10.1')
+conflicts=('xorg-server<1.12.3')
 groups=('xorg-video-drivers')
 options=('!libtool')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('1b45f55657b2c92f30abb0769cae57fca98d93b7')
+source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2"
+        'tseng-1.2.4-git.patch')
+sha1sums=('1b45f55657b2c92f30abb0769cae57fca98d93b7'
+          '0dbf93d608a6888b4bc83d0e42f38014b439ad78')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
+  patch -p1 -i ${srcdir}/tseng-1.2.4-git.patch
   ./configure --prefix=/usr
   make
 }
