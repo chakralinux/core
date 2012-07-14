@@ -1,25 +1,15 @@
 
-post_install(){
-    CARD_ATI=$(lspci -n | sed -n "s/.* 0300: 1002:\(....\).*/\1/p")
-    if [ "$CARD_ATI" != "" ] && [ $(grep -i "$CARD_ATI" /usr/share/applications/hw_ati_legacy_hwdb) ] ; then
-       echo "WARNING WARNING WARNING WARNING"
-       echo "--------------------------------"
-       echo "ATI LEGACY hardware detected"
-       echo "This driver is not compatible, install catalyst-legacy before rebooting."
-       echo "sudo pacman -S catalyst-legacy"
-       echo "--------------------------------"
-       echo "WARNING WARNING WARNING WARNING"
-     fi
-}
-
-post_upgrade(){
- 	post_install
-}
-
 whisperer(){
     echo "----------------------------------------------------------------"
-    echo "For more info and troubleshooting visit:"
-    echo "http://chakra-linux.org/news"
+    echo "WARNING WARNING WARNING WARNING"
+    echo "--------------------------------"
+    echo "For ATI HD 4xxxx and below graphics users:"
+    echo "This driver is not compatible, install catalyst-legacy before rebooting."
+    echo "sudo pacman -S catalyst-legacy"
+    echo "You can use the tool 'aticonfig' to regenerate an xorg.conf file."
+    echo "Further reading: http://chakra-project.org/bbs/viewtopic.php?pid=56704#p56704"
+    echo "--------------------------------"
+    echo "WARNING WARNING WARNING WARNING"
     echo "----------------------------------------------------------------"
 }
 
