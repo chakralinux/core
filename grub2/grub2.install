@@ -8,11 +8,17 @@ show_important_message() {
   echo -e "\033[0;0m  Also you can run \033[0;32m 'update-grub' \033[0;0m as root for generating grub.cfg"
 }
 
-post_install() {
+restore_grubcfg() {
   if [ -f /boot/grub/grub.cfg.pacsave ]; then
-    echo "Copying /boot/grub/grub.cfg.pacsave to /boot/grub/grub.cfg"
-    install -D -m644 /boot/grub/grub.cfg.pacsave /boot/grub/grub.cfg
+    echo -n "Copying /boot/grub/grub.cfg.pacsave to /boot/grub/grub.cfg... "
+    install -D -m644 /boot/grub/grub.cfg.pacsave \
+                     /boot/grub/grub.cfg
+    echo "done."
   fi
+}
+
+post_install() {
+  restore_grubcfg
 
   echo -n "Generating grub.cfg.example config file... "
   grub-mkconfig -o /boot/grub/grub.cfg.example 2> /dev/null
@@ -26,6 +32,8 @@ post_install() {
 }
 
 post_upgrade() {
+  restore_grubcfg
+
   for file in "${filelist[@]}"; do
     install-info "${infodir}/${file}.gz" "${infodir}/dir" 2> /dev/null
   done
