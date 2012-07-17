@@ -4,29 +4,19 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=('phonon-backend-gstreamer')
-pkgver=4.6.0
-pkgrel=3
+pkgver=4.6.1
+pkgrel=1
 pkgdesc="Phonon GStreamer backend"
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
 license=('LGPL')
 depends=('gstreamer0.10-base-plugins' 'phonon')
-makedepends=('qt' 'pkgconfig' 'cmake' 'automoc4' 'git' 'mesa')
+makedepends=('pkgconfig' 'cmake' 'automoc4' 'mesa')
 groups=("kde-complete" "kde-uninstall")
 conflicts=('phonon-gstreamer')
 replaces=('phonon-gstreamer')
-source=(""http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.xz"")
-md5sums=('cc380c7612aaaa87294185ded702f88a')
-
-# create tarball: source PKGBUILD && mksource
-
-mksource() {
-        git clone git://anongit.kde.org/${_pkgname}
-        pushd ${_pkgname}
-        popd
-        tar -cvJf ${_pkgname}-${pkgver}.tar.xz ${_pkgname}/*
-        md5sum ${_pkgname}-${pkgver}.tar.xz
-}
+source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.xz")
+md5sums=('c0c8a1064e32c83dd6976187dcc491a3')
 
 build() {
 	cd ${srcdir}
