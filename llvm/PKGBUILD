@@ -5,35 +5,19 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=('llvm' 'llvm-ocaml' 'clang' 'clang-analyzer')
-pkgver=3.0
+pkgver=3.1
 _gcc_ver=4.7.0
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://llvm.org/"
 license=('custom:University of Illinois/NCSA Open Source License')
 makedepends=('gcc-libs' 'libffi' 'python2' 'ocaml' "gcc=${_gcc_ver}" 'groff')
-source=("http://llvm.org/releases/${pkgver}/${pkgname}-${pkgver}.tar.gz"
-        "http://llvm.org/releases/${pkgver}/clang-${pkgver}.tar.gz"
-        'clang-fix-gcc-paths.patch'
-        'archlinux-clang-pure64.patch'
-        'archlinux-enable-lto.patch'
-        'archlinux-fix-gold-lto-linking.patch'
-        'fedora-llvm-2.6-timestamp.patch')
-md5sums=('a8e5f5f1c1adebae7b4a654c376a6005'
-         '43350706ae6cf05d0068885792ea0591'
-         '0dfddfb58f23470a14d8ef5e0c668137'
-         'ddf6c1d4aaf5c58a933247f423cf6c59'
-         '76f40a48805347fd5e0ba6f93517fec1'
-         '33eb8f686eb9b7bb02051e7fd7b53467'
-         '43c540ec04f23f07620357211d28c25c')
+source=("http://llvm.org/releases/${pkgver}/${pkgname}-${pkgver}.src.tar.gz"
+        "http://llvm.org/releases/${pkgver}/clang-${pkgver}.src.tar.gz")
+md5sums=('16eaa7679f84113f65b12760fdfe4ee1'
+         '59bf2d3120a3805f27cafda3823caaf8')
 
 build() {
-  # Apply external patches
-  cd "${srcdir}/clang-${pkgver}.src"
-  patch -Np0 -i "${srcdir}/archlinux-clang-pure64.patch"
-  patch -Np0 -i "${srcdir}/archlinux-enable-lto.patch"
-  patch -Np1 -i "${srcdir}/clang-fix-gcc-paths.patch"
-
   cd "${srcdir}/${pkgname}-${pkgver}.src"
 
   # At the present, clang must reside inside the LLVM source code tree to build
@@ -42,16 +26,18 @@ build() {
   cp -r "${srcdir}/clang-${pkgver}.src" tools/clang
 
   # Fix symbolic links from OCaml bindings to LLVM libraries
-  sed -i 's:\$(PROJ_libdir):/usr/lib/llvm:' bindings/ocaml/Makefile.ocaml
+  sed -e 's:\$(PROJ_libdir):/usr/lib/llvm:' \
+      -i bindings/ocaml/Makefile.ocaml
 
   # Fix installation directories, ./configure doesn't seem to set them right
-  sed -i -e 's:\$(PROJ_prefix)/etc/llvm:/etc/llvm:' \
-         -e 's:\$(PROJ_prefix)/lib:$(PROJ_prefix)/lib/llvm:' \
-         -e 's:\$(PROJ_prefix)/docs/llvm:$(PROJ_prefix)/share/doc/llvm:' \
-    Makefile.config.in
+  sed -e 's:\$(PROJ_prefix)/etc/llvm:/etc/llvm:' \
+      -e 's:\$(PROJ_prefix)/lib:$(PROJ_prefix)/lib/llvm:' \
+      -e 's:\$(PROJ_prefix)/docs/llvm:$(PROJ_prefix)/share/doc/llvm:' \
+      -i Makefile.config.in
 
   # Fix insecure rpath (http://bugs.archlinux.org/task/14017)
-  sed -i 's:$(RPATH) -Wl,$(\(ToolDir\|LibDir\|ExmplDir\))::g' Makefile.rules
+  sed -e 's:$(RPATH) -Wl,$(\(ToolDir\|LibDir\|ExmplDir\))::g' \
+      -i Makefile.rules
 
   # Apply strip option to configure
   _optimized_switch="enable"
@@ -72,10 +58,6 @@ build() {
     _32bit_headers="32"
   fi
 
-  # Apply external patches
-  patch -Np1 -i "${srcdir}/archlinux-fix-gold-lto-linking.patch"
-  patch -Np1 -i "${srcdir}/fedora-llvm-2.6-timestamp.patch"
-
   ./configure --prefix=/usr \
               --libdir=/usr/lib/llvm \
               --sysconfdir=/etc \
@@ -89,20 +71,21 @@ build() {
               --with-cxx-include-root="${_cxx_headers}" \
               --with-cxx-include-arch="${CHOST}" \
               --with-cxx-include-32bit-dir="${_32bit_headers}" \
-              --"${_optimized_switch}"-optimized
+              "--${_optimized_switch}-optimized"
 
   make REQUIRES_RTTI=1
 }
 
 package_llvm() {
-  pkgdesc="Low Level Virtual Machine"
-  depends=('perl' 'libffi')
+pkgdesc="Low Level Virtual Machine"
+depends=('perl' 'libffi')
 
   cd "${srcdir}/${pkgname}-${pkgver}.src"
 
   # The OCaml binding installation is currently broken, let's fix it
   # see https://github.com/mxcl/homebrew/issues/8947#issuecomment-3256464
-  sed -i 's#^install-meta:: \$(ObjDir)/META.llvm$#install-meta:: $(OcamlDir)/META.llvm#g' bindings/ocaml/llvm/Makefile
+  sed -e 's:\$(ObjDir)/META.llvm:\$(OcamlDir)/META.llvm:' \
+      -i bindings/ocaml/llvm/Makefile
 
   # We move the clang directory out of the tree so it won't get installed and
   # then we bring it back in for the clang package
@@ -122,7 +105,8 @@ package_llvm() {
   chmod -x "${pkgdir}"/usr/lib/llvm/*.a
 
   # Fix libdir in llvm-config (http://bugs.archlinux.org/task/14487)
-  sed -i 's:\(ABS_RUN_DIR/lib\):\1/llvm:' "${pkgdir}/usr/bin/llvm-config"
+  sed -e 's:\(ABS_RUN_DIR/lib\):\1/llvm:' \
+      -i "${pkgdir}/usr/bin/llvm-config"
 
   # Get rid of example Hello transformation
   rm "${pkgdir}"/usr/lib/llvm/*LLVMHello.*
@@ -134,12 +118,12 @@ package_llvm() {
   install -d "${pkgdir}/etc/ld.so.conf.d"
   echo /usr/lib/llvm >"${pkgdir}/etc/ld.so.conf.d/llvm.conf"
 
-  install -Dm644 LICENSE.TXT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -D -m644 LICENSE.TXT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
 
 package_llvm-ocaml() {
-  pkgdesc="OCaml bindings for LLVM"
-  depends=("llvm=${pkgver}-${pkgrel}" 'ocaml')
+pkgdesc="OCaml bindings for LLVM"
+depends=("llvm=${pkgver}-${pkgrel}" 'ocaml')
 
   cd "${srcdir}/${pkgname}-${pkgver}.src"
 
@@ -150,19 +134,19 @@ package_llvm-ocaml() {
   # Remove execute bit from static libraries
   chmod -x "${pkgdir}"/usr/lib/ocaml/libllvm*.a
 
-  install -Dm644 LICENSE.TXT "${pkgdir}/usr/share/licenses/llvm-ocaml/LICENSE"
+  install -D -m644 LICENSE.TXT "${pkgdir}/usr/share/licenses/llvm-ocaml/LICENSE"
 }
 
 package_clang() {
-  pkgdesc="C language family frontend for LLVM"
-  url="http://clang.llvm.org/"
-  # It looks like clang still needs GCC to assemble and link object files
-  # See http://old.nabble.com/%22clang--v%22-shows-a-GCC-call-td28378453.html
-  depends=("llvm=${pkgver}-${pkgrel}" "gcc=${_gcc_ver}")
+pkgdesc="C language family frontend for LLVM"
+url="http://clang.llvm.org/"
+# It looks like clang still needs GCC to assemble and link object files
+# See http://old.nabble.com/%22clang--v%22-shows-a-GCC-call-td28378453.html
+depends=("llvm=${pkgver}-${pkgrel}" "gcc=${_gcc_ver}")
 
   # Fix installation path for clang docs
-  sed -i 's:$(PROJ_prefix)/share/doc/llvm:$(PROJ_prefix)/share/doc/clang:' \
-    "${srcdir}/${pkgname}-${pkgver}.src/Makefile.config"
+  sed -e 's:$(PROJ_prefix)/share/doc/llvm:$(PROJ_prefix)/share/doc/clang:' \
+      -i "${srcdir}/${pkgname}-${pkgver}.src/Makefile.config"
 
   cd "${srcdir}/${pkgname}-${pkgver}.src/tools/clang"
   make DESTDIR="${pkgdir}" install
@@ -171,21 +155,21 @@ package_clang() {
   chmod -x "${pkgdir}"/usr/lib/llvm/*.a
 
   # Revert the path change in case we want to do a repackage later
-  sed -i 's:$(PROJ_prefix)/share/doc/clang:$(PROJ_prefix)/share/doc/llvm:' \
-    "${srcdir}/${pkgname}-${pkgver}.src/Makefile.config"
+  sed -e 's:$(PROJ_prefix)/share/doc/clang:$(PROJ_prefix)/share/doc/llvm:' \
+      -i "${srcdir}/${pkgname}-${pkgver}.src/Makefile.config"
 
   # Install old libstdc++ headers. Contains combined headers from
   # gcc 4.5.2-6-i686 and gcc-multilib-4.5.2-6-x86_64
   # install -d "${pkgdir}/usr/include/c++"
   # cp -rd "${srcdir}/gcc-headers-${_gcc_ver}" "${pkgdir}/usr/include/c++/clang-${pkgver}"
 
-  install -Dm644 LICENSE.TXT "${pkgdir}/usr/share/licenses/clang/LICENSE"
+  install -D -m644 LICENSE.TXT "${pkgdir}/usr/share/licenses/clang/LICENSE"
 }
 
 package_clang-analyzer() {
-  pkgdesc="A source code analysis framework"
-  url="http://clang-analyzer.llvm.org/"
-  depends=("clang=${pkgver}-${pkgrel}" 'python2')
+pkgdesc="A source code analysis framework"
+url="http://clang-analyzer.llvm.org/"
+depends=("clang=${pkgver}-${pkgrel}" 'python2')
 
   cd "${srcdir}/${pkgname}-${pkgver}.src/tools/clang"
 
@@ -196,15 +180,15 @@ package_clang-analyzer() {
   done
 
   # Use Python 2
-  sed -i 's/env python$/&2/' \
-    "${pkgdir}/usr/lib/clang-analyzer/scan-view/scan-view" \
-    "${pkgdir}/usr/lib/clang-analyzer/scan-build/set-xcode-analyzer"
+  sed -e 's/env python$/&2/' \
+      -i "${pkgdir}/usr/lib/clang-analyzer/scan-view/scan-view" \
+      -i "${pkgdir}/usr/lib/clang-analyzer/scan-build/set-xcode-analyzer"
 
   # Compile Python scripts
   python2 -m compileall "${pkgdir}/usr/lib/clang-analyzer"
   python2 -O -m compileall "${pkgdir}/usr/lib/clang-analyzer"
 
-  install -Dm644 LICENSE.TXT "${pkgdir}/usr/share/licenses/clang-analyzer/LICENSE"
+  install -D -m644 LICENSE.TXT "${pkgdir}/usr/share/licenses/clang-analyzer/LICENSE"
 }
 
 # vim:set ts=2 sw=2 et:
