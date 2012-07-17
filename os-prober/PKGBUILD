@@ -1,11 +1,10 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=os-prober
-pkgver=1.49
+pkgver=1.54
 pkgrel=1
 pkgdesc="Utility to detect other OSes on a set of drives"
 url="http://joey.kitenet.net/code/os-prober/"
@@ -14,15 +13,19 @@ license=('GPL')
 depends=()
 makedepends=('gcc' 'sed')
 source=(ftp://ftp.us.debian.org/debian/pool/main/o/${pkgname}/${pkgname}_${pkgver}.tar.gz)
-md5sums=('5a981493a7c16174e6454fcf6b39b1b5')
+md5sums=('9a7e8e5adeeaff4913f727fa2c95490a')
 
 build() {
-  cd $srcdir/${pkgname}
+  cd $srcdir/${pkgname}-${pkgver}
 
   # adjust lib dir to allow detection of 64-bit distros
   sed -i -e "s:/lib/ld\*\.so\*:/lib*/ld*.so*:g" os-probes/mounted/common/90linux-distro  || die "sed failed on 90linux-distro"
 
   make
+}
+
+package() {
+  cd $srcdir/$pkgname-$pkgver
 
   install -Dm755 linux-boot-prober $pkgdir/usr/bin/linux-boot-prober
   install -Dm755 os-prober $pkgdir/usr/bin/os-prober
