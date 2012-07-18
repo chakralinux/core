@@ -59,7 +59,7 @@ generate_initial_config() {
 # output the detected graphics driver
 output_detected_driver() {
 		# keep in sync with the addedpacks list inside the profile
-		XORG_DRIVERS="apm ark ati chips cirrus geode glint i128 i740 intel-legacy intel mach64 mga neomagic nouveau nv openchrome r128 rendition s3 s3virge savage siliconmotion sisusb tdfx trident tseng v4l vesa voodoo"
+		XORG_DRIVERS="apm ark ati chips cirrus geode glint i128 i740 intel-legacy intel mach64 mga neomagic nouveau nv openchrome r128 rendition s3 s3virge savage siliconmotion sis sisusb tdfx trident tseng v4l vesa voodoo"
 
 		if [ -e "/tmp/nvidia-173xx" ] ; then
 		    USED_DRIVER="nvidia"
