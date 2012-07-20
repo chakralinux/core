@@ -5,7 +5,7 @@
 
 pkgname=cdemu-daemon
 pkgver=1.4.0
-pkgrel=6
+pkgrel=7
 pkgdesc="CD/DVD-ROM device emulator daemon"
 arch=('i686' 'x86_64')
 backup=('etc/conf.d/cdemud'
@@ -16,12 +16,14 @@ depends=('glib2' 'dbus' 'dbus-glib' 'libdaemon' 'vhba-module' "libmirage=$pkgver
 optdepends=('alsa-lib: to enable the ALSA audio driver'
             'pulseaudio: to enable the PA audio driver')
 install=cdemud.install
-source=(http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.gz
-        cdemud.conf
-        cdemud.rc)
+source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.gz"
+        'cdemud.conf'
+        'cdemud.rc'
+        'cdemu-daemon.service')
 md5sums=('f7ccc0abc33057d552ec7b0925fce63a'
          'c3097a01d9e79093485181ff47a81542'
-         '29b9bc0023ff17e14091f3fb8438ccb4')
+         '29b9bc0023ff17e14091f3fb8438ccb4'
+         'be9a8f50da3f42129c0a0e3dea8cd56c')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
@@ -32,11 +34,15 @@ build() {
 package() {
   cd $srcdir/$pkgname-$pkgver
   make DESTDIR=$pkgdir install
-  install -m 644 -D ../cdemud.conf $pkgdir/etc/conf.d/cdemud
-  install -m 755 -D ../cdemud.rc $pkgdir/etc/rc.d/cdemud
-
-  # for systemd
+  install -Dm644 "$srcdir/cdemud.conf" "$pkgdir/etc/conf.d/cdemud"
+  install -Dm755 "$srcdir/cdemud.rc" "$pkgdir/etc/rc.d/cdemud"
   install -d "$pkgdir/usr/lib/modules-load.d"
   echo "vhba" > "$pkgdir/usr/lib/modules-load.d/cdemu.conf"
+
+  # for systemd
+  install -Dm644 "$srcdir/cdemu-daemon.service" \
+    "$pkgdir/usr/lib/systemd/system/cdemu-daemon.service"
+  echo "SystemdService=cdemu-daemon.service" >> \
+    "$pkgdir/usr/share/dbus-1/system-services/net.sf.cdemu.CDEMUD_Daemon.service"
 
 }
