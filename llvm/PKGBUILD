@@ -7,7 +7,7 @@
 pkgname=('llvm' 'llvm-ocaml' 'clang' 'clang-analyzer')
 pkgver=3.1
 _gcc_ver=4.7.0
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="http://llvm.org/"
 license=('custom:University of Illinois/NCSA Open Source License')
@@ -34,6 +34,13 @@ build() {
       -e 's:\$(PROJ_prefix)/lib:$(PROJ_prefix)/lib/llvm:' \
       -e 's:\$(PROJ_prefix)/docs/llvm:$(PROJ_prefix)/share/doc/llvm:' \
       -i Makefile.config.in
+
+  sed -e '/ActiveLibDir = ActivePrefix/s:lib:lib/llvm:' \
+      -i tools/llvm-config/llvm-config.cpp
+
+  sed -e 's:LLVM_LIBDIR="${prefix}/lib":LLVM_LIBDIR="${prefix}/lib/llvm":' \
+      -i autoconf/configure.ac \
+      -i configure
 
   # Fix insecure rpath (http://bugs.archlinux.org/task/14017)
   sed -e 's:$(RPATH) -Wl,$(\(ToolDir\|LibDir\|ExmplDir\))::g' \
