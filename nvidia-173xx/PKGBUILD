@@ -6,32 +6,36 @@
 _extramodules=extramodules-3.4-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
-pkgname=nvidia-173xx
+pkgname=(nvidia-173xx chd-nvidia-173xx)
 pkgver=173.14.35
 pkgrel=3
 arch=('i686' 'x86_64')
 [ "$CARCH" = "i686"   ] && ARCH=x86
 [ "$CARCH" = "x86_64" ] && ARCH=x86_64
 url="http://www.nvidia.com/"
-depends=('linux>=3.4' 'linux<3.5' 'nvidia-173xx-utils')
 makedepends=('linux-headers')
-conflicts=('nvidia-96xx' 'nvidia')
 license=('custom')
-install=nvidia.install
-source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run")
+source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run"
+	"nvidia_supported")
 md5sums=('0fa45e6fc23a2dc69faa8a66ae0e0cc5')
 [ "$CARCH" = "x86_64" ] && md5sums=('6934b522d2cf313ae6e94e25763fe1a8')
+md5sums+=('62d0cdb856cfae64753c0f3acf729d47')
 
 build() {
-	cd $srcdir
-	sh NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run --extract-only
-	cd NVIDIA-Linux-$ARCH-${pkgver}-pkg0
-	cd usr/src/nv/
-	ln -s Makefile.kbuild Makefile
-	make SYSSRC=/lib/modules/${_kver}/build/ module
+    cd $srcdir
+    sh NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run --extract-only
+    cd NVIDIA-Linux-$ARCH-${pkgver}-pkg0
+    cd usr/src/nv/
+    ln -s Makefile.kbuild Makefile
+    make SYSSRC=/lib/modules/${_kver}/build/ module
 }
 
-package() {
+package_nvidia-173xx() {
+    pkgdesc="Legacy NVIDIA drivers for linux."
+    depends=('linux>=3.4' 'linux<3.5' 'nvidia-173xx-utils')
+    conflicts=('nvidia-96xx' 'nvidia')
+    install=nvidia.install
+
     cd $srcdir/"NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/"
     mkdir -p $pkgdir/lib/modules/${_extramodules}
     install -m644 nvidia.ko $pkgdir/lib/modules/${_extramodules}
@@ -40,4 +44,15 @@ package() {
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" $startdir/nvidia.install
     # gzip -9 module
     gzip "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
+}
+
+package_chd-nvidia-173xx() {
+    pkgdesc="CHD ids for nvidia $pkgver"
+    arch=('any')
+
+    cd "${srcdir}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/"
+
+    install -dm755 "${pkgdir}/opt/chakra/hwdb"
+    sh -e "${srcdir}/nvidia_supported" ../../share/doc/README.txt nv-kernel.o \
+        > "${pkgdir}/opt/chakra/hwdb/hw_nvidia173xx_hwdb"
 }

@@ -5,26 +5,23 @@
 
 _kernver="3.4.6-1-CHAKRA"
 
-pkgname=catalyst-legacy
+pkgname=(catalyst-legacy chd-catalyst-legacy)
 pkgver=12.6
 pkgrel=4
-pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
-screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 license=('custom')
-depends=('linux>=3.4' 'linux<3.5' 'catalyst-legacy-utils')
 makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers')
-conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri' 'catalyst')
-install=catalyst.install
 
 source=("http://www2.ati.com/drivers/legacy/amd-driver-installer-${pkgver}-legacy-x86.x86_64.zip"
         'ati_make.sh'
-        'makefile_compat.patch')
+        'makefile_compat.patch'
+	'fglrx_supported')
 
 md5sums=('36d5a91d60673b26705e9ac2df952daf'
          '660396540b0ceaff71d6155c986734de'
-         '3e1b82bd69774ea808da69c983d6a43b')
+         '3e1b82bd69774ea808da69c983d6a43b'
+         '8bd182de340d6ed8b2dfcedfd3e5a389')
 
 build() {
 
@@ -67,7 +64,12 @@ build() {
     PAGE_ATTR_FIX=$PAGE_ATTR_FIX COMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE modules 
 }
 
-package() {
+package_catalyst-legacy() {
+    pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
+    screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
+    depends=('linux>=3.4' 'linux<3.5' 'catalyst-legacy-utils')
+    conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri' 'catalyst')
+    install=catalyst.install
 
     # here we are checking kernel's extramodules dir
     for r in /lib/modules/*; do
@@ -95,4 +97,15 @@ package() {
     install -m644 "${srcdir}/archive_files/LICENSE.TXT" "${pkgdir}/usr/share/licenses/${pkgname}/" 
 
     sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/*.install
+}
+
+package_chd-catalyst-legacy() {
+    pkgdesc="CHD ids for catalyst $pkgver"
+    arch=('any')
+
+    cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod/"
+
+    install -dm755 "${pkgdir}/opt/chakra/hwdb"
+    sh -e "${srcdir}/fglrx_supported" fglrxko_pci_ids.h \
+        > "${pkgdir}/opt/chakra/hwdb/hw_ati_legacy_hwdb"
 }

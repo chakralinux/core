@@ -5,30 +5,27 @@
 
 _kernver="3.4.6-1-CHAKRA"
 
-pkgname=catalyst
+pkgname=(catalyst chd-catalyst)
 pkgver=12.6
 pkgrel=2
-pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
-screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 license=('custom')
-depends=('linux>=3.4' 'linux<3.5' 'catalyst-utils')
-makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers')
-conflicts=('nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri' 'catalyst-legacy')
-install=catalyst.install
+makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers' 'linux>=3.4' 'linux<=3.5')
 
 source=(http://www2.ati.com/drivers/linux/amd-driver-installer-${pkgver/./-}-x86.x86_64.run
         ati_make.sh
         makefile_compat.patch
         3.2.8.patch
-        catalyst/3.4.patch)
+        catalyst/3.4.patch
+	fglrx_supported)
 
 md5sums=('6bd4f0875202390ed7122696db29be77'
          '660396540b0ceaff71d6155c986734de'
          '3e1b82bd69774ea808da69c983d6a43b'
          '32c8142c73dcfed5db426f494feda9e3'
-         '7b229c6e48ee3f1af0d97059b9fa5cfe')
+         '7b229c6e48ee3f1af0d97059b9fa5cfe'
+	 '8bd182de340d6ed8b2dfcedfd3e5a389')
 
 build() {
 
@@ -74,7 +71,12 @@ build() {
     PAGE_ATTR_FIX=$PAGE_ATTR_FIX COMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE modules 
 }
 
-package() {
+package_catalyst() {
+    pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
+    screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
+    depends=('linux>=3.4' 'linux<3.5' 'catalyst-utils')
+    conflicts=('nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'ati-dri' 'catalyst-legacy')
+    install=catalyst.install
 
     # here we are checking kernel's extramodules dir
     for r in /lib/modules/*; do
@@ -102,4 +104,15 @@ package() {
     install -m644 "${srcdir}/archive_files/LICENSE.TXT" "${pkgdir}/usr/share/licenses/${pkgname}/" 
 
     sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/*.install
+}
+
+package_chd-catalyst() {
+    pkgdesc="CHD ids for catalyst $pkgver"
+    arch=('any')
+
+    cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod/"
+
+    install -dm755 "${pkgdir}/opt/chakra/hwdb"
+    sh -e "${srcdir}/fglrx_supported" fglrxko_pci_ids.h \
+        > "${pkgdir}/opt/chakra/hwdb/hw_ati_hwdb"
 }

@@ -6,28 +6,26 @@
 _extramodules=extramodules-3.4-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
-pkgname=nvidia
+pkgname=('nvidia' 'chd-nvidia')
 pkgver=302.17
 pkgrel=2
-pkgdesc="NVIDIA drivers for linux."
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-depends=('linux>=3.4' 'linux<3.5' "nvidia-utils=${pkgver}")
 makedepends=('linux-headers')
-conflicts=('nvidia-96xx' 'nvidia-173xx')
 license=('custom')
-install=nvidia.install
+source=(nvidia_supported) # change this to url when git repo for chd is up
+md5sums=('62d0cdb856cfae64753c0f3acf729d47')
 
 if [ "$CARCH" = "i686" ]; then
     _ARCH='x86'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}"
-    source=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-    md5sums=('b7f908ea08218df08db06026215ec419')
+    source+=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
+    md5sums+=('b7f908ea08218df08db06026215ec419')
 elif [ "$CARCH" = "x86_64" ]; then
     _ARCH='x86_64'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
-    source=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-    md5sums=('7e768412a16853078b04037a7cc9c8ac')
+    source+=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
+    md5sums+=('7e768412a16853078b04037a7cc9c8ac')
 fi
 
 build() {
@@ -37,11 +35,27 @@ build() {
     make SYSSRC=/lib/modules/"${_kver}/build" module
 }
 
-package() {
+package_nvidia() {
+    pkgdesc="NVIDIA drivers for linux."
+    depends=('linux>=3.4' 'linux<3.5' "nvidia-utils=${pkgver}")
+    conflicts=('nvidia-96xx' 'nvidia-173xx')
+    install=nvidia.install
+    
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
         "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
     install -d -m755 "${pkgdir}/etc/modprobe.d"
     echo "blacklist nouveau" >> "${pkgdir}/etc/modprobe.d/nouveau_blacklist.conf"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
     gzip "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
+}
+
+package_chd-nvidia() {
+    pkgdesc="CHD ids for nvidia $pkgver"
+    arch=('any')
+
+    cd "${srcdir}/${_pkg}"
+
+    install -dm755 "${pkgdir}/opt/chakra/hwdb"
+    sh -e "${srcdir}/nvidia_supported" README.txt kernel/nv-kernel.o \
+        > "${pkgdir}/opt/chakra/hwdb/hw_nvidia_hwdb"
 }
