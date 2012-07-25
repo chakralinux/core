@@ -6,7 +6,7 @@
 
 
 pkgname=texlive-core
-pkgver=2011.24722
+pkgver=2012.26892
 _revnr=${pkgver#2011.}
 pkgrel=1
 pkgdesc="TeX Live core distribution"
@@ -27,13 +27,12 @@ conflicts=('tetex' 'texlive-latex3')
 provides=('tetex' 'texlive-latex3')
 replaces=('tetex' 'texlive-latex3')
 url='http://tug.org/texlive/'
-source=("http://mirror.ancl.hawaii.edu/linux/archlinux/other/texlive/$pkgname-$pkgver-src.zip"
+source=("ftp://ftp.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
         "$pkgname.maps")
 options=(!strip)
 install=texlive.install
-md5sums=('3c02f6dd6b3b03b37a5cfd60457bc07a'
-         'b71ac4faaf8a8dd13a2c544c9a64c2e8')
-
+md5sums=('c913b3c01bdcf81da80e4833cd4cc691'
+         '82c03f7226e1df4440f30c89c05ee653')
 
 build() {
    cd "${srcdir}"
@@ -73,6 +72,9 @@ package() {
    rm -f $pkgdir/usr/share/texmf-dist/tex/plain/config/{omega,aleph}.ini
    rm -rf $pkgdir/usr/share/texmf-dist/scripts/context/stubs/mswin/
 
+   # remove upstream updmap.cfg: it contains too many maps.
+   rm "${pkgdir}/usr/share/texmf-dist/web2c/updmap.cfg"
+
     # link programs from /usr/share/texmf-dist/scripts
     _linked_scripts="
 accfonts/mkt1font
@@ -80,6 +82,7 @@ accfonts/vpl2ovp
 accfonts/vpl2vpl
 bundledoc/arlatex
 bundledoc/bundledoc
+checkcites/checkcites.lua
 context/perl/mptopdf.pl
 ctanify/ctanify
 ctanupload/ctanupload.pl
@@ -89,17 +92,14 @@ epstopdf/epstopdf.pl
 findhyph/findhyph
 fontools/afm2afm
 fontools/autoinst
-fontools/cmap2enc
-fontools/font2afm
 fontools/ot2kpx
-fontools/pfm2kpx
-fontools/showglyphs
 fragmaster/fragmaster.pl
 installfont/installfont-tl
 latex2man/latex2man
 latexdiff/latexdiff-vc.pl
 latexdiff/latexdiff.pl
 latexdiff/latexrevise.pl
+latexfileversion/latexfileversion
 latexmk/latexmk.pl
 luaotfload/mkluatexfontdb.lua
 match_parens/match_parens

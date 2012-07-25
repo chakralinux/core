@@ -6,8 +6,8 @@
 
 
 pkgname=texlive-bibtexextra
-pkgver=2011.24688
-_revnr=${pkgver#2011.}
+pkgver=2012.26868
+_revnr=${pkgver#2012.}
 pkgrel=1
 pkgdesc="TeX Live - Additional BibTeX styles and bibliography databases"
 license=('GPL')
@@ -15,9 +15,9 @@ arch=(any)
 depends=('texlive-core')
 groups=('texlive-most')
 url='http://tug.org/texlive/'
-source=("http://mirror.ancl.hawaii.edu/linux/archlinux/other/texlive/${pkgname}-${pkgver}-src.zip")
+source=("ftp://ftp.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip")
 install=texlive.install
-md5sums=('0d9e2606d39e901b820aaa0dee70b8e3')
+md5sums=('6781ae49bf64b298037028d627bb4870')
 
 build() {
    cd "${srcdir}"
@@ -53,6 +53,7 @@ package() {
    install -m755 -d $pkgdir/usr/bin
 
    ln -s /usr/share/texmf-dist/scripts/bibexport/bibexport.sh $pkgdir/usr/bin/bibexport
+   ln -s /usr/share/texmf-dist/scripts/listbib/listbib $pkgdir/usr/bin/listbib
    ln -s /usr/share/texmf-dist/scripts/urlbst/urlbst $pkgdir/usr/bin/urlbst
 }
 
