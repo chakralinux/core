@@ -1,0 +1,109 @@
+=== modified file 'linux-boot-probes/common/50mounted-tests'
+--- linux-boot-probes/common/50mounted-tests	2011-04-10 00:36:21 +0000
++++ linux-boot-probes/common/50mounted-tests	2011-04-21 15:53:23 +0000
+@@ -43,6 +43,26 @@
+ 	for type in $types; do
+ 		if mount -o ro -t "$type" "$partition" "$tmpmnt" 2>/dev/null; then
+ 			mounted=1
++			case "$type" in
++			  btrfs|fuse)
++				if [ -x "$tmpmnt/@/lib" ]; then
++					if ! mount --bind "$tmpmnt/@" \
++						"$tmpmnt"; 
++					then
++						warn "failed to bind mount" \
++						"the subvolume:@ on $partition"
++						if ! umount $tmpmnt
++						then
++							warn "failed to" \
++							"unmount $tmpmnt"
++						fi
++						mounted=
++					fi
++				fi
++				;;
++			  *)
++				;;
++			esac	
+ 			break
+ 		fi
+ 	done
+@@ -62,6 +82,23 @@
+ 				if ! umount "$tmpmnt"; then
+ 					warn "failed to umount $tmpmnt"
+ 				fi
++				case $type in
++				  btrfs|fuse)
++					if [ -x "$tmpmnt/@/lib" ]
++					then
++						# umount to account
++						# for the mount-bind
++						if ! umount $tmpmnt
++						then
++							warn "failed to "\
++							"umount $tmpmnt"
++						fi
++					fi
++					;;
++				  *)
++					;;
++				esac
++						
+ 				rmdir "$tmpmnt" || true
+ 				exit 0
+ 			fi
+
+=== modified file 'os-probes/common/50mounted-tests'
+--- os-probes/common/50mounted-tests	2011-04-10 00:36:21 +0000
++++ os-probes/common/50mounted-tests	2011-04-21 15:53:23 +0000
+@@ -57,6 +57,26 @@
+ 		if mount -o ro -t "$type" "$partition" "$tmpmnt" 2>/dev/null; then
+ 			debug "mounted as $type filesystem"
+ 			mounted=1
++			case "$type" in
++			  btrfs|fuse)
++				if [ -x "$tmpmnt/@/lib" ]; then
++					if ! mount --bind "$tmpmnt/@" \
++						"$tmpmnt" 
++					then
++						warn "failed to bind mount" \
++						"the subvolume:@ on $partition"
++						if ! umount $tmpmnt
++						then
++							warn "failed to" \
++							"unmount $tmpmnt"
++						fi
++						mounted=
++					fi
++				fi
++				;;
++			  *)
++				;;
++			esac	
+ 			break
+ 		fi
+ 	done
+@@ -71,6 +91,22 @@
+ 				if ! umount "$tmpmnt"; then
+ 					warn "failed to umount $tmpmnt"
+ 				fi
++				case "$type" in
++				  btrfs|fuse)
++					if [ -x "$tmpmnt/@/lib" ]
++					then
++					# umount to account
++					# for the mount-bind
++						if ! umount $tmpmnt
++						then
++							warn "failed to "\
++							"umount $tmpmnt"
++						fi
++					fi
++					;;
++				  *)
++					;;
++				esac
+ 				rmdir "$tmpmnt" || true
+ 				exit 0
+ 			fi
+

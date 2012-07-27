@@ -5,18 +5,23 @@
 
 pkgname=os-prober
 pkgver=1.54
-pkgrel=1
+pkgrel=2
 pkgdesc="Utility to detect other operating systems on a set of drives."
 url="http://joey.kitenet.net/code/os-prober/"
 arch=('i686' 'x86_64')
 license=('GPL')
 depends=('sh')
 makedepends=('gcc' 'sed')
-source=("ftp://ftp.us.debian.org/debian/pool/main/o/${pkgname}/${pkgname}_${pkgver}.tar.gz")
-md5sums=('9a7e8e5adeeaff4913f727fa2c95490a')
+source=("ftp://ftp.us.debian.org/debian/pool/main/o/${pkgname}/${pkgname}_${pkgver}.tar.gz"
+        'ubuntu-os-prober.fix764893')
+md5sums=('9a7e8e5adeeaff4913f727fa2c95490a'
+         'db7f45253ab938a5079d84cb00ee8b39')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+
+  # patch to make it recognize systems on Btrfs volumes
+  patch -Np0 -i "${srcdir}/ubuntu-os-prober.fix764893"
 
   # adjust lib dir to allow detection of 64-bit distros
   sed -e "s:/lib/ld\*\.so\*:/lib*/ld*.so*:g" \
