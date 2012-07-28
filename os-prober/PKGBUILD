@@ -13,7 +13,7 @@ license=('GPL')
 depends=('sh')
 makedepends=('gcc' 'sed')
 source=("ftp://ftp.us.debian.org/debian/pool/main/o/${pkgname}/${pkgname}_${pkgver}.tar.gz"
-        'ubuntu-os-prober.fix764893')
+        'btrfs-detection.patch')
 md5sums=('9a7e8e5adeeaff4913f727fa2c95490a'
          'c12d27b045ee044eb57d971ff74aaefe')
 
@@ -21,7 +21,7 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   # patch to make it recognize systems on Btrfs volumes
-  patch -p1 -i "${srcdir}/ubuntu-os-prober.fix764893"
+  patch -p1 -i "${srcdir}/btrfs-detection.patch"
 
   # adjust lib dir to allow detection of 64-bit distros
   sed -e "s:/lib/ld\*\.so\*:/lib*/ld*.so*:g" \
