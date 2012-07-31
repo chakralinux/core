@@ -1,5 +1,7 @@
-# $ Id: $
-# Maintainer: Pierre Schmitz <pierre@archlinux.de>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Samir Benmendil <ram-z[at]chakra-project[dot]org>
 
 pkgname=automoc4
 pkgver=0.9.88
@@ -21,6 +23,10 @@ build() {
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=/usr
 	make
+}
+
+package() {
+	cd ${srcdir}
 	make DESTDIR=$pkgdir install
 
 	grep -A 21 '^    Copyright' ${srcdir}/${pkgname}-${pkgver}/kde4automoc.cpp > license.txt
