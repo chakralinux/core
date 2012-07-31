@@ -1,40 +1,47 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer: Samir Benmendil <ram-z[at]chakra-project[dot]org>
 
 pkgbase=dhcp
 pkgname=('dhcp'
          'dhclient')
 # separate patch levels with a period to maintain proper versioning.
-pkgver=4.2.0
-_pkgver=4.2.0
+pkgver=4.2.4.1
+_pkgver=4.2.4-P1
 pkgrel=1
 arch=('i686' 'x86_64')
 license=('custom:isc-dhcp')
 url="https://www.isc.org/software/dhcp"
-source=(http://ftp.isc.org/isc/${pkgname}/${pkgname}-${_pkgver}.tar.gz
-dhcpd dhcp.conf.d dhcp-4.1.1-missing-ipv6-not-fatal.patch dhclient-script-pathFixes.patch)
-md5sums=('83abd7c4f9c24d8dd024ca5a71380c0a'
-         'df22cffa7d7415ece7bb025b7bf774dd'
-         '49da3192e5c885e3c7d02f447c2dea5e'
+source=(ftp://ftp.isc.org/isc/${pkgbase}/${_pkgver}/${pkgbase}-${_pkgver}.tar.gz
+	dhcp4 dhcp6 dhcp.conf.d 
+	dhcp-4.1.1-missing-ipv6-not-fatal.patch 
+	dhclient-script-pathFixes.patch)
+md5sums=('0ca7181024651f6323951d5498c8020b'
+         'c49b1497837ba56c54e401a66e1bab9b'
+         '12c2f3ae47ed23eb698eb7f1bfd80f20'
+         '8f357e46e1efcbb746f38737a3f977a2'
          'fd64aeb4f399dcc41ea43089a3811094'
-         'ddcc5cd576ec631ade6c4da21952b50b')
+         '0fc1241ef7879d8be0fe140deb8ae48d')
 
 build() {
   cd ${srcdir}/${pkgname}-${_pkgver}
+
   # Define _GNU_SOURCE to fix IPV6.
   sed '/^CFLAGS="$CFLAGS/ s/INGS"/INGS -D_GNU_SOURCE"/' -i configure
+
   # Make not having ipv6 non-fatal.
-  patch -Np0 -i ${srcdir}/dhcp-4.1.1-missing-ipv6-not-fatal.patch
+  patch -p0 -i ${srcdir}/dhcp-4.1.1-missing-ipv6-not-fatal.patch
+
   ./configure --prefix=/usr --sysconfdir=/etc \
       --with-srv-lease-file=/var/state/dhcp/dhcpd.leases \
-      --with-srv6-lease-file=/var/state/dhcp/dhcpd6.leases
-  make || return 1
+      --with-srv6-lease-file=/var/state/dhcp/dhcpd6.leases \
+      --with-cli-lease-file=/var/state/dhclient/dhclient.leases \
+      --with-cli6-lease-file=/var/state/dhclient/dhclient6.leases
+
+  make
+
+  patch -i "${srcdir}/dhclient-script-pathFixes.patch" client/scripts/linux
 }
 
 package_dhcp(){
@@ -43,42 +50,36 @@ package_dhcp(){
   backup=('etc/dhcpd.conf' 'etc/conf.d/dhcp')
   install=dhcp.install
   
-  cd ${srcdir}/${pkgname}-${_pkgver}
-  make DESTDIR=${pkgdir} install
-  install -D -m755 ${srcdir}/dhcpd ${pkgdir}/etc/rc.d/dhcpd
-  install -D -m644 ${srcdir}/dhcp.conf.d ${pkgdir}/etc/conf.d/${pkgbase}
-  mkdir -p ${pkgdir}/var/state/dhcp
-  rm -f ${pkgdir}/etc/dhclient.conf
-  rm -f ${pkgdir}/usr/sbin/dhclient
-  rm -f ${pkgdir}/usr/share/man/man{5,8}/dhclient*
-  
+  cd "${srcdir}/${pkgname}-${_pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -D -m755 "${srcdir}/dhcp4" "${pkgdir}/etc/rc.d/dhcp4"
+  install -D -m755 "${srcdir}/dhcp6" "${pkgdir}/etc/rc.d/dhcp6"
+  install -D -m644 "${srcdir}/dhcp.conf.d" "${pkgdir}/etc/conf.d/${pkgbase}"
+  mkdir -p "${pkgdir}/var/state/dhcp"
+
+  # Remove dhclient
+  make -C client DESTDIR="${pkgdir}" uninstall 
+
   # install licenses
-  install -m644 -D ${srcdir}/${pkgbase}-${_pkgver}/LICENSE \
-                   ${pkgdir}/usr/share/licenses/dhcp/LICENSE
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/dhcp/LICENSE"
 }
 
 package_dhclient(){
-  
   pkgdesc="dhclient is standalone client from the dhcp package"
-  depends=('bash')
+  depends=('bash' 'iproute2' 'net-tools')
 
-  cd ${srcdir}/${pkgname}-${_pkgver}/client/scripts
-  patch -Np1 -i ${srcdir}/dhclient-script-pathFixes.patch linux || return 1
-  cd ${srcdir}/${pkgname}-${_pkgver}/client
-  make DESTDIR=${pkgdir} install
-  install -m755 -d ${startdir}/pkg/var/lib/dhclient
-
-  #not needed after fresh install
-  rm -f ${pkgdir}/var/lib/dhclient/dhcpd.leases
+  cd "${srcdir}/${pkgname}-${_pkgver}"
+  make -C client DESTDIR="${pkgdir}" install 
 
   #move dhclient.conf to dhclient.conf.example
-  mv ${pkgdir}/etc/dhclient.conf ${pkgdir}/etc/dhclient.conf.example
+  mv "${pkgdir}"/etc/dhclient.conf{,.example}
+
+  install -d "${pkgdir}/var/state/dhclient"
 
   # install dhclient linux script
-  mkdir ${pkgdir}/sbin
-  install -m755 -D ${srcdir}/${pkgname}-${_pkgver}/client/scripts/linux \
-                   ${pkgdir}/sbin/dhclient-script
+  install -Dm755 client/scripts/linux "${pkgdir}/sbin/dhclient-script"
+
   # install licenses
-  install -m644 -D ${srcdir}/${pkgname}-${_pkgver}/LICENSE \
-                   ${pkgdir}/usr/share/licenses/dhclient/LICENSE
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/dhclient/LICENSE"
 }
