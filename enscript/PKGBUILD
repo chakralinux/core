@@ -1,7 +1,7 @@
 # Maintainer: Manuel Tortosa <manutortosa@gmail.com>
 
 pkgname=enscript
-pkgver=1.6.5.1
+pkgver=1.6.5.2
 pkgrel=1
 pkgdesc="Convert ASCII files to PostScript suitable for printing"
 arch=(i686 x86_64)
@@ -9,16 +9,20 @@ backup=('etc/enscript/enscript.cfg')
 depends=('glibc')
 license=('GPL2')
 source=(ftp://ftp.gnu.org/gnu/$pkgname/$pkgname-$pkgver.tar.gz)
-md5sums=('2d9568800bfa2831c82b6e216adaad78')
+md5sums=('c1d2a0d4b44ca30634742b299881b0e2')
 url="http://git.savannah.gnu.org/cgit/enscript.git"
 
 build() {
-  cd $startdir/src/$pkgname-$pkgver || return 1
+  cd "$srcdir/$pkgname-$pkgver"
   ./configure --prefix=/usr --sysconfdir=/etc/enscript --mandir=/usr/share/man \
-      --infodir=/usr/share/info || return 1
-  /usr/bin/make || return 1
-  /usr/bin/make prefix=$startdir/pkg/usr \
-      sysconfdir=$startdir/pkg/etc/enscript mandir=$startdir/pkg/usr/share/man \
-      infodir=$startdir/pkg/usr/share/info install || return 1
+    --infodir=/usr/share/info
+  make
 }
+
+pagkage() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make prefix="$pkgdir/usr" sysconfdir="$pkgdir/etc/enscript" mandir="$pkgdir/usr/share/man" \
+    infodir=$startdir/pkg/usr/share/info install
+}
+
 # vim: ts=2 sw=2 et ft=sh
