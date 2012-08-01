@@ -6,7 +6,7 @@
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl' 'nvidia-settings')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
-pkgver=302.17
+pkgver=304.30
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -22,10 +22,10 @@ options=('!strip')
 [ "$CARCH" = "x86_64" ] && {
   ARCH='x86_64'
   _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-  md5sums=('7e768412a16853078b04037a7cc9c8ac')
+  md5sums=('780561a808dffbfc74be84547733f30f')
 }
 
-source=("http://us.download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
+source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
         'nvidia-restore-settings.desktop')
 md5sums=("${md5sums[@]}"
          '9237516792da7b6df32f8c7e8a98f475')
@@ -46,7 +46,7 @@ build() {
 
 package_libcl() {
   pkgdesc="OpenCL library and ICD loader from NVIDIA"
-  pkgver=1.1.9.2
+  pkgver=1.1.9.3
 
   cd "${srcdir}/${_pkg}"
 

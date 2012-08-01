@@ -7,11 +7,11 @@ _extramodules=extramodules-3.4-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=('nvidia' 'chd-nvidia')
-pkgver=302.17
-pkgrel=2
+pkgver=304.30
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-makedepends=('linux-headers')
+makedepends=('linux-headers' 'linux>=3.4' 'linux<3.5' "nvidia-utils=${pkgver}")
 license=('custom')
 source=(nvidia_supported) # change this to url when git repo for chd is up
 md5sums=('62d0cdb856cfae64753c0f3acf729d47')
@@ -25,7 +25,7 @@ elif [ "$CARCH" = "x86_64" ]; then
     _ARCH='x86_64'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
     source+=("http://us.download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-    md5sums+=('7e768412a16853078b04037a7cc9c8ac')
+    md5sums+=('780561a808dffbfc74be84547733f30f')
 fi
 
 build() {
