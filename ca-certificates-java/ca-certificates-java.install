@@ -1,20 +1,18 @@
 post_install() {
-  if [ ! -f /etc/ssl/certs/java/cacerts ]; then
-    for jvm in /usr/lib/jvm/java-6-openjdk /opt/java/jre; do
-      if [ -x $jvm/bin/keytool ]; then
-        break
-      fi
-    done
-    if [ -x $jvm/bin/keytool ]; then
-      /usr/sbin/init-jks-keystore
-    fi
-  fi
+	if [ ! -f etc/ssl/certs/java/cacerts ]; then
+		if which java >/dev/null 2>&1; then
+			usr/sbin/init-jks-keystore
+		fi
+	fi
 }
 
 post_upgrade() {
-  post_install
+	if [ $(vercmp $2 20110426-2) -lt 0 ]; then
+		mv etc/ssl/certs/java/cacerts etc/ssl/certs/java/cacerts.pacsave
+	fi
+	post_install
 }
 
 post_remove() {
-  rm -rf /etc/ssl/certs/java
+	rm -rf etc/ssl/certs/java
 }

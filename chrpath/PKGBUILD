@@ -1,4 +1,7 @@
-# Contributor: Gerardo Exequiel Pozzi <vmlinuz386@yahoo.com.ar>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Samir Benmendil <ram-z[at]chakra-project[dot]org>
 
 pkgname=chrpath
 pkgver=0.13
@@ -16,5 +19,8 @@ build() {
 
   ./configure --prefix=/usr --mandir=/usr/share/man
   make || return 1
+}
+package(){
+  cd $srcdir/$pkgname-$pkgver
   make DESTDIR=$pkgdir docdir=/usr/share/doc/chrpath install
 }

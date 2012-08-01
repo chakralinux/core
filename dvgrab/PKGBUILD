@@ -1,11 +1,7 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer: Samir Benmendil <ram-z[at]chakra-project[dot]org>
 
 pkgname=dvgrab
 pkgver=3.5
@@ -22,6 +18,9 @@ md5sums=('b39a242ce63e80fc347ab59931f75649')
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr
-  make || return 1
+  make
+}
+
+package() {
   make DESTDIR="${pkgdir}" install
 }
