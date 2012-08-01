@@ -1,8 +1,8 @@
 #
 # KDE SC Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: abveritas[at]chakra-project[dog]org>
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
@@ -18,12 +18,11 @@ pkgdesc="KDE bindings for python"
 url="http://kde.org/"
 arch=('i686' 'x86_64')
 license=('GPL' 'LGPL' 'FDL')
-depends=('pyqt' 'qscintilla' 'boost-libs' 'kdepim-runtime')
+depends=('pyqt' 'qscintilla' 'boost-libs' "kdepim-runtime>=${_kdever}")
 makedepends=('cmake' 'automoc4' 'polkit-qt' 'boost')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-        #"fix-pykde4.patch")
 md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
-         #'3096e7ad08058c4fce32e5bf4846f4d0')
+  
 groups=("kde" "kdebindings" "kde-uninstall")
 provides=('kdebindings-python' 'pykde4')
 replaces=('kdebindings-python')
@@ -33,13 +32,13 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 build() {
 	cd "${srcdir}"
 	
-	mkdir build
-	cd build
+        rm -rf build 
+	mkdir build && cd build
 	
 	cmake ../pykde4-${pkgver} \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=/usr \
-		-DPYTHON_EXECUTABLE=/usr/bin/python2
+		-DPYTHON_EXECUTABLE=/usr/bin/python2 
 	make
 }
 

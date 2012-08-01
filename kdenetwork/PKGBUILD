@@ -1,8 +1,8 @@
 #
 # KDE SC Packages for Chakra, part of chakra-project.org
 #
-# maintainer: abveritas[at]chakra-project[dog]org>
-# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
@@ -21,32 +21,29 @@ pkgname=('kdenetwork-filesharing'
 
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr' 'qca-ossl' 
+makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr' 'qca-ossl' 'telepathy-qt'
 	     "kde-workspace>=${_kdever}" "kde-baseapps>=${_kdever}" 'libvncserver' 'libmsn' 'libmms'
 	     'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage' 'libgadu' 
 	     'mediastreamer' 'msilbc' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.5' 'docbook-xsl')
 
 source=("$_mirror/${pkgbase}-$_kdever.tar.xz"
-        'lisa.daemon'
-        'gcc47.patch')
+        'lisa.daemon')
 
 md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
-         '66069c83fd5fa0df5d743d4486799033'   # lisa.daemon
-         '2437b44ca9609b89c2a8f8f3a9f3df98')  #gcc47.patch
+         '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
+
 
 #
 # build function
 #
 build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
-        	patch -p4 -i "${srcdir}"/gcc47.patch
-
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
@@ -143,7 +140,7 @@ package_kdenetwork-kppp() {
 package_kdenetwork-krdc() {
 	pkgdesc="Desktop Sharing Client"
 	url="http://kde.org/applications/internet/krdc/"
-	depends=("kde-runtime>=${_kdever}" 'libvncserver' 'rdesktop' 'telepathy-qt4')
+	depends=("kde-runtime>=${_kdever}" 'libvncserver' 'rdesktop' 'telepathy-qt')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
 	categories=('network')
         conflicts=("kdenetwork-common" "kdenetwork-doc")
