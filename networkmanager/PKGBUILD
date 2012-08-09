@@ -5,8 +5,8 @@
 # contributor: Radu Andries <admiral0[at]tuxfamily[dot]org>
 
 pkgname=networkmanager
-pkgver=0.9.4.0
-pkgrel=2
+pkgver=0.9.6.0
+pkgrel=1
 pkgdesc="Network Management daemon"
 arch=('i686' 'x86_64')
 license=('GPL')
@@ -17,16 +17,14 @@ optdepends=('modemmanager: for modem management service')
 options=('!libtool')
 backup=('etc/NetworkManager/nm-system-settings.conf')
 source=(http://ftp.gnome.org/pub/gnome/sources/NetworkManager/0.9/NetworkManager-${pkgver}.tar.xz
-        nm-system-settings.conf disable_set_hostname.patch dont-fight-over-ipv6.patch)
-sha256sums=('eb4f124008b3d855a37205d03ef035b7218639cd7332bdae5567095977e93e0f'
+        nm-system-settings.conf disable_set_hostname.patch)
+sha256sums=('3982b623b7b199ac99e2ddd0840fe7d088245a49e3f680237e8baebf0cf86d07'
             '44b048804c7c0b8b3b0c29b8632b6ad613c397d0a1635ec918e10c0fbcdadf21'
-            '25056837ea92e559f09563ed817e3e0cd9333be861b8914e45f62ceaae2e0460'
-            '3dfd7b56179111b9fe510ba888d2d0080beecd7ead10c897120eb254e8b1fae3')
+            '25056837ea92e559f09563ed817e3e0cd9333be861b8914e45f62ceaae2e0460')
 build() {
   cd "${srcdir}/NetworkManager-${pkgver}"
 
   patch -p1 -i "${srcdir}/disable_set_hostname.patch"
-  patch -p1 -i ../dont-fight-over-ipv6.patch
 
   ./configure \
     --prefix=/usr \
