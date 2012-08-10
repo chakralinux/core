@@ -1,0 +1,64 @@
+# Maintainer: Daniele Cocca <jmc@chakra-project.org>
+
+pkgname=openjdk7
+_pkgdate="02_may_2012"
+_pkgver="7u4"
+_pkgbld="b22"
+pkgver="${_pkgver}.${_pkgbld}"
+pkgrel=1
+pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
+arch=('i686' 'x86_64')
+url="http://openjdk.java.net/projects/jdk7/"
+license=('GPL')
+depends=( 'alsa-lib' 'libpulse' 'giflib' 'libpng' 'freetype2')
+makedepends=('openjdk6' 'apache-ant' 'zip' 'unzip' 'fastjar'
+             'cpio' 'cups' 'orbit2')
+
+# Source and MD5 sum can be found at http://jdk7.java.net/source.html
+source=("http://www.java.net/download/openjdk/jdk${_pkgver}/promoted/${_pkgbld}/openjdk-${_pkgver}-fcs-src-${_pkgbld}-${_pkgdate}.zip")
+md5sums=('37699588f783c07a71fbae00623889fa')
+
+build() {
+  cd "${srcdir}/openjdk"
+
+  . /etc/profile.d/apache-ant.sh
+  . /etc/profile.d/openjdk6.sh
+
+  # Fix the value of some environmental variables
+  export ALT_BOOTDIR="${JAVA_HOME}" \
+         LANG="C" \
+         LC_ALL="C" \
+         MILESTONE="fcs" \
+         BUILD_NUMBER="${_pkgbld}" \
+         SKIP_DEBUG_BUILD="true" \
+
+  # Unset some harmful variables
+  unset LD_PRELOAD MAKEFLAGS JAVA_HOME
+
+  # Fix some paths, so OpenJDK 7 is able to see our tools, and some options too
+  sed -e 's,\$(UTILS_COMMAND_PATH)touch,/usr/bin/touch,g' \
+      -e 's,\$(USRBIN_PATH)gawk,/bin/gawk,g' \
+      -e 's,SHARED_LIBRARY_FLAG = -shared -mimpure-text,SHARED_LIBRARY_FLAG = -shared,g' \
+      -i jdk/make/common/shared/Defs-utils.gmk \
+      -i jdk/make/common/shared/Compiler-gcc.gmk \
+      -i corba/make/common/shared/Defs-utils.gmk
+
+  # Setup the generic environmental variables and start the build
+  source jdk/make/jdk_generic_profile.sh
+  make sanity && make ALLOW_DOWNLOADS=true
+}
+
+package() {
+  cd "${srcdir}/openjdk"
+
+  [ "${CARCH}" = 'i686' ] \
+    && local _destdir="linux-i586" \
+    || local _destdir="linux-amd64"
+
+  install -d -m755 "${pkgdir}/opt"
+
+  cp -r "build/${_destdir}/j2sdk-image" \
+        "${pkgdir}/opt/openjdk7"
+}
+
+# vim:set ts=2 sw=2 et:
