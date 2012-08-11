@@ -18,13 +18,10 @@ makedepends=('openjdk6' 'apache-ant' 'zip' 'unzip' 'fastjar'
 source=("http://www.java.net/download/openjdk/jdk${_pkgver}/promoted/${_pkgbld}/openjdk-${_pkgver}-fcs-src-${_pkgbld}-${_pkgdate}.zip")
 md5sums=('37699588f783c07a71fbae00623889fa')
 
-[ "${CARCH}" = 'i686' ] && {
-  _cpubits=32
-  _cpuname=i586
-} || {
-  _cpubits=64
-  _cpuname=amd64
-}
+# CPU-dependant values
+[ "${CARCH}" = 'i686' ] \
+  && _cpuname=i586 \
+  || _cpuname=amd64
 
 build() {
   cd "${srcdir}/openjdk"
@@ -32,33 +29,37 @@ build() {
   . /etc/profile.d/apache-ant.sh
   . /etc/profile.d/openjdk6.sh
 
-  # Determine the number of CPU cores
-  local _cpucores="$(grep -c '^processor' /proc/cpuinfo)"
+  # Fix options for parallel builds
+  export ALT_PARALLEL_COMPILE_JOBS="${MAKEFLAGS/-j}"
+  export HOTSPOT_BUILD_JOBS="${ALT_PARALLEL_COMPILE_JOBS}"
 
   # Fix the value of some environmental variables
-  export ALT_BOOTDIR="${JAVA_HOME}" \
-         LANG="C" \
-         LC_ALL="C" \
-         MILESTONE="fcs" \
-         BUILD_NUMBER="${_pkgbld}" \
-         SKIP_DEBUG_BUILD="true" \
-         HOTSPOT_BUILD_JOBS="${_cpucores}" \
-         ALT_PARALLEL_COMPILE_JOBS="${_cpucores}"
+  export LANG="C"
+  export LC_ALL="C"
+  export USER="chakra-buildbot"
+  export MILESTONE="fcs"
+  export SKIP_DEBUG_BUILD="true"
+  export ALT_BOOTDIR="${JAVA_HOME}"
+  export BUILD_NUMBER="${_pkgbld}"
+
+  if [ "${CARCH}" != "$(uname -m)" ]; then
+    export CROSS_COMPILE_ARCH="${_cpuname}"
+    export ALT_COMPILER_PATH="$(dirname "$(which gcc)")"
+  fi
 
   # Unset some harmful variables
-  unset LD_PRELOAD MAKEFLAGS JAVA_HOME
+  unset LD_PRELOAD MAKEFLAGS JAVA_HOME JDK_HOME
 
   # Apply some fixes, needed for a correct build in a Chakra environment
-  sed -e 's,\$(UTILS_COMMAND_PATH)touch,/usr/bin/touch,g' \
-      -e 's,\$(USRBIN_PATH)gawk,/bin/gawk,g' \
+  sed -e 's,\$(UTILS_COMMAND_PATH)touch,touch,g' \
+      -e 's,\$(USRBIN_PATH)gawk,gawk,g' \
+      -e 's,SHARED_LIBRARY_FLAG = -shared -mimpure-text,SHARED_LIBRARY_FLAG = -shared,g' \
       -i jdk/make/common/shared/Defs-utils.gmk \
-      -i jdk/make/common/shared/Compiler-gcc.gmk
-  sed -e 's,SHARED_LIBRARY_FLAG = -shared -mimpure-text,SHARED_LIBRARY_FLAG = -shared,g' \
-      -i corba/make/common/shared/Defs-utils.gmk
-  sed -e "s,\$(uname -m),\"${CARCH}\",g" \
-      -i jdk/make/jdk_generic_profile.sh
+      -i jdk/make/common/shared/Compiler-gcc.gmk \
+      -i corba/make/common/shared/Defs-utils.gmk \
+      -i corba/make/common/shared/Platform.gmk
 
-  # Setup the generic environmental variables and start the build
+  # Test the environment and start the build
   . jdk/make/jdk_generic_profile.sh
   make sanity && make ALLOW_DOWNLOADS=true
 }
