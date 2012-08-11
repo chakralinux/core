@@ -6,26 +6,24 @@
 
 pkgname=mjpegtools
 pkgver=2.0.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Set of tools that can do recording of videos and playback, simple cut-and-paste editing and the MPEG compression of audio and video"
 arch=(i686 x86_64)
 license=('GPL')
 url="http://mjpeg.sourceforge.net/"
 depends=('libjpeg>=8' 'libpng>=1.4.0' 'sdl' 'gcc-libs' 'libdv')
+makedeends=('v4l-utils')
 options=('!makeflags' '!libtool')
-source=(http://downloads.sourceforge.net/sourceforge/mjpeg/${pkgname}-${pkgver}.tar.gz)
-        #mjpegtools-1.9.0-glibc-2.10.patch
-        #png2yuv-fix-memleak.patch)
-md5sums=('903e1e3b967eebcc5fe5626d7517dc46')
-         #'b8ae66237d83be533db8eea166fd3357'
-         #'39e1def8fb0f7c58a217b22dc251a86a')
+source=("http://downloads.sourceforge.net/sourceforge/mjpeg/${pkgname}-${pkgver}.tar.gz"
+        "mjpegtools-v41-2.6.38.patch")
+md5sums=('903e1e3b967eebcc5fe5626d7517dc46'
+         '529dc1735c4f1e5b7b61c8e61c716811')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np0 -i "${srcdir}/mjpegtools-v41-2.6.38.patch"
   sed -i -e '/ARCHFLAGS=/s:=.*:=:' configure
-  #patch -Np1 -i "$srcdir/mjpegtools-1.9.0-glibc-2.10.patch"
-  #patch -Np1 -i "${srcdir}/png2yuv-fix-memleak.patch"
-  #patch -Np0 -i "${srcdir}/mjpegtools-1.9.0-jpeg-7.patch"
+  sed -i -e '2199s/DeleteRegion (a_pRegion);/this->DeleteRegion (a_pRegion);/' y4mdenoise/MotionSearcher.hh
   ./configure --prefix=/usr --enable-largefile
   make
 }

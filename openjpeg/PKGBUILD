@@ -1,39 +1,38 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: Fabian Kosmale <0inkane@googlemail.com>
+# Contributor (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# Contributor (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=openjpeg
-pkgver=1.4
-_pkgver=v1_4
-_revision=r697
+pkgver=1.5.0
 pkgrel=1
 pkgdesc="An open source JPEG 2000 codec"
 arch=(i686 x86_64)
 license=('BSD')
 url="http://www.openjpeg.org"
 depends=('zlib')
-source=(http://openjpeg.googlecode.com/files/openjpeg_${_pkgver}_sources_${_revision}.tgz
-	openjpeg-1.4-autoconf.patch)
-md5sums=('7870bb84e810dec63fcf3b712ebb93db'
-         '46d1d26b59ce546444f3fe8d7c685775')
+source=(http://openjpeg.googlecode.com/files/${pkgname}-${pkgver}.tar.gz)
+md5sums=("e5d66193ddfa59a87da1eb08ea86293b")
 
-options=('!makeflags' '!libtool')
+options=('!libtool')
 
 build() {
-  cd "${srcdir}/${pkgname}_${_pkgver}_sources_${_revision}"
-  patch -Np1 -i ${srcdir}/openjpeg-1.4-autoconf.patch
-  # make sure we use system libs
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  # make sure we use system libs with --disable-static
+  # we want the most informative output during build,
+  # thus we pass --disable-silent-rules to configure
   rm -rf libs
   ./configure --prefix=/usr \
-	--disable-static
+        --disable-static --disable-silent-rules
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}_${_pkgver}_sources_${_revision}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/openjpeg"
   install -m644 LICENSE "${pkgdir}/usr/share/licenses/openjpeg/LICENSE"
 }
+
