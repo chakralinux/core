@@ -1,22 +1,27 @@
 # Maintainer: Daniele Cocca <jmc@chakra-project.org>
 
-pkgname=openjdk7
+pkgname=('openjdk7' 'openjdk7-src')
+pkgbase=openjdk7
 _pkgdate="02_may_2012"
 _pkgver="7u4"
 _pkgbld="b22"
 pkgver="${_pkgver}.${_pkgbld}"
 pkgrel=1
-pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
-arch=('i686' 'x86_64')
 url="http://openjdk.java.net/projects/jdk7/"
-license=('GPL')
-depends=( 'alsa-lib' 'libpulse' 'giflib' 'libpng' 'freetype2')
-makedepends=('openjdk6' 'apache-ant' 'zip' 'unzip' 'fastjar'
-             'cpio' 'cups' 'orbit2')
+arch=('i686' 'x86_64')
+license=('GPL2 with the Classpath exception')
+makedepends=('openjdk6' 'apache-ant>=1.6.5' 'zip' 'unzip' 'fastjar' 'cpio'
+             'cups' 'orbit2' 'alsa-lib' 'libpulse>=0.9.11' 'giflib' 'libjpeg'
+             'libpng' 'freetype2' 'wget' 'rhino' 'ca-certificates-java'
+             'libxt' 'libxtst' 'xdg-utils' 'nspr' 'gtk2')
 
 # Source and MD5 sum can be found at http://jdk7.java.net/source.html
-source=("http://www.java.net/download/openjdk/jdk${_pkgver}/promoted/${_pkgbld}/openjdk-${_pkgver}-fcs-src-${_pkgbld}-${_pkgdate}.zip")
-md5sums=('37699588f783c07a71fbae00623889fa')
+source=("http://www.java.net/download/openjdk/jdk${_pkgver}/promoted/${_pkgbld}/openjdk-${_pkgver}-fcs-src-${_pkgbld}-${_pkgdate}.zip"
+        'openjdk7.profile.sh'
+        'openjdk7.profile.csh')
+md5sums=('37699588f783c07a71fbae00623889fa'
+         '64885c74918f07afe88f31692177b0c5'
+         '3baf9768e5be92d6fe80641dcc35f017')
 
 # CPU-dependant values
 [ "${CARCH}" = 'i686' ] \
@@ -64,13 +69,56 @@ build() {
   make sanity && make ALLOW_DOWNLOADS=true
 }
 
-package() {
+package_openjdk7() {
+pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
+install="openjdk7.install"
+conflicts=('java-environment' 'java-runtime')
+provides=('java-environment=7' 'java-runtime=7')
+replaces=('openjdk6')
+depends=('alsa-lib' 'libpulse' 'giflib' 'libjpeg' 'libpng' 'freetype2'
+         'libpulse>=0.9.11')
+optdepends=('gtk2: for the GTK+ Look And Feel')
+
   cd "${srcdir}/openjdk"
 
-  install -d -m755 "${pkgdir}/opt"
-
+  # Copy the built OpenJDK image to the target directory
+  install -d -m755 "${pkgdir}/usr/lib/jvm"
   cp -r "build/linux-${_cpuname}/j2sdk-image" \
-        "${pkgdir}/opt/openjdk7"
+        "${pkgdir}/usr/lib/jvm/java-7-openjdk"
+
+  # Remove the .zip file which is going to be inside openjdk7-src
+  rm "${pkgdir}/usr/lib/jvm/java-7-openjdk/src.zip"
+
+  # Symlink the binaries into /usr/bin
+  install -d -m755 "${pkgdir}/usr/bin"
+  pushd "${pkgdir}/usr/lib/jvm/java-7-openjdk/bin" >/dev/null
+    for executable in *; do
+      ln -s "/usr/lib/jvm/java-7-openjdk/bin/${executable}" \
+            "${pkgdir}/usr/bin"
+    done
+  popd >/dev/null
+
+  # Move the manual pages in the right place
+  install -d -m755 "${pkgdir}/usr/share"
+  mv "${pkgdir}/usr/lib/jvm/java-7-openjdk/man" \
+     "${pkgdir}/usr/share/man"
+  rm "${pkgdir}/usr/share/man/ja" # avoid conflicts with man-db
+
+  # Setup the shell profile dropin configuration
+  install -D -m755 "${srcdir}/openjdk7.profile.sh" \
+                   "${pkgdir}/etc/profile.d/openjdk7.sh"
+  install -D -m755 "${srcdir}/openjdk7.profile.csh" \
+                   "${pkgdir}/etc/profile.d/openjdk7.csh"
+}
+
+package_openjdk7-src() {
+pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform. (Source package)"
+arch=('any')
+depends=('openjdk7')
+
+  cd "${srcdir}/openjdk"
+  install -D -m644 "build/linux-${_cpuname}/j2sdk-image/src.zip" \
+                   "${pkgdir}/usr/lib/jvm/java-7-openjdk/src.zip"
 }
 
 # vim:set ts=2 sw=2 et:
