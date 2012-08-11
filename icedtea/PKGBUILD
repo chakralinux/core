@@ -109,7 +109,6 @@ build() {
               --with-pkgversion="Chakra Linux build ${pkgver}-${pkgrel}-${CARCH}" \
               --disable-tests \
               --disable-bootstrap \
-              --with-ecj-jar="/usr/share/java/eclipse-ecj.jar" \
               --enable-nss \
               --enable-pulse-java \
               --enable-system-zlib \
@@ -133,38 +132,48 @@ provides=('java-environment=7' 'java-runtime=7')
 replaces=('openjdk6')
 depends=('alsa-lib' 'libpulse' 'giflib' 'libjpeg' 'libpng' 'freetype2'
          'libpulse>=0.9.11' 'ca-certificates-java')
-optdepends=('gtk2: for the GTK+ Look And Feel')
+optdepends=('icedtea-web: web browser plugin and Java Web Start support'
+            'gtk2: for the GTK+ Look And Feel')
 
   cd "${srcdir}/build"
 
   # Copy the built OpenJDK image to the target directory
-  install -d -m755 "${pkgdir}/usr/lib/jvm"
+  install -d -m755 "${pkgdir}/${_jvmdir%/*}"
   cp -r "openjdk.build/j2sdk-image" \
-        "${pkgdir}/usr/lib/jvm/java-7-openjdk"
+        "${pkgdir}/${_jvmdir#/}"
 
   # Remove the .zip file which is going to be inside openjdk7-src
-  rm "${pkgdir}/usr/lib/jvm/java-7-openjdk/src.zip"
+  rm "${pkgdir}/${_jvmdir#/}/src.zip"
 
   # Symlink the binaries into /usr/bin
   install -d -m755 "${pkgdir}/usr/bin"
-  pushd "${pkgdir}/usr/lib/jvm/java-7-openjdk/bin" >/dev/null
+  pushd "${pkgdir}/${_jvmdir#/}/bin" >/dev/null
     for executable in *; do
-      ln -s "/usr/lib/jvm/java-7-openjdk/bin/${executable}" \
+      ln -s "${_jvmdir}/bin/${executable}" \
             "${pkgdir}/usr/bin"
     done
   popd >/dev/null
 
   # Move the manual pages in the right place
   install -d -m755 "${pkgdir}/usr/share"
-  mv "${pkgdir}/usr/lib/jvm/java-7-openjdk/man" \
+  mv "${pkgdir}/${_jvmdir#/}/man" \
      "${pkgdir}/usr/share/man"
   rm "${pkgdir}/usr/share/man/ja" # avoid conflicts with man-db
+
+  # link JKS keystore from ca-certificates-java
+  rm -f "${pkgdir}/${_jvmdir#/}/jre/lib/security/cacerts"
+  ln -s /etc/ssl/certs/java/cacerts \
+        "${pkgdir}/${_jvmdir#/}/jre/lib/security/cacerts"
 
   # Setup the shell profile dropin configuration
   install -D -m755 "${srcdir}/openjdk7.profile.sh" \
                    "${pkgdir}/etc/profile.d/openjdk7.sh"
   install -D -m755 "${srcdir}/openjdk7.profile.csh" \
                    "${pkgdir}/etc/profile.d/openjdk7.csh"
+
+  # Install the license file
+  install -D -m644 "openjdk/LICENSE" \
+                   "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
 
 package_openjdk7-src() {
@@ -174,7 +183,7 @@ depends=('openjdk7')
 
   cd "${srcdir}/build"
   install -D -m644 "openjdk.build/j2sdk-image/src.zip" \
-                   "${pkgdir}/usr/lib/jvm/java-7-openjdk/src.zip"
+                   "${pkgdir}/${_jvmdir#/}/src.zip"
 }
 
 # vim:set ts=2 sw=2 et:
