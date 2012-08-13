@@ -5,7 +5,7 @@ pkgbase='openjdk7'
 _icedtea_release="2.2.1"
 _pkgver="7u5"
 pkgver="${_pkgver}_${_icedtea_release}"
-pkgrel=1
+pkgrel=2
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 arch=('i686' 'x86_64')
 url="http://icedtea.classpath.org/"
@@ -109,6 +109,7 @@ build() {
               --with-pkgversion="Chakra Linux build ${pkgver}-${pkgrel}-${CARCH}" \
               --disable-tests \
               --disable-bootstrap \
+              --disable-system-gtk \
               --enable-nss \
               --enable-pulse-java \
               --enable-system-zlib \
@@ -116,7 +117,6 @@ build() {
               --enable-system-png \
               --enable-system-gif \
               --enable-system-lcms \
-              --enable-system-gtk \
               --enable-system-gio \
               --enable-system-fontconfig \
   || return 1
