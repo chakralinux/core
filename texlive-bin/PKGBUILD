@@ -24,6 +24,7 @@ source=('texmf.cnf'
         'poppler-0.20.patch'
         'http://mirrors.kernel.org/archlinux/other/texlive/texlive-bin-source-20120623.tar.xz'
         'http://mirrors.kernel.org/archlinux/other/texlive/texlive-bin-texmf-20120623.tar.xz'
+        'poppler-0.20.patch'
         'luatex-r4449-radical-rule-thickness.patch'
 )
 backup=(etc/texmf/web2c/texmf.cnf \
@@ -45,6 +46,7 @@ md5sums=('220a4f4cc0d915bf8fcbcb553dcee1ae'
          '34e8168fbf6c3d07c4bec1893c089798'
          'ac2c3c3aa765581f8504e21a5edbfb9f'
          'f315a860158cfc952c82a6d759961024'
+         '34e8168fbf6c3d07c4bec1893c089798'
          '5190f3295eb9a604c5f17f5bd607299b')
 
 build() {
@@ -57,7 +59,7 @@ build() {
    # this patch removes spurious error message with locale "xx_YY.utf8"
    patch -p0 -i fix-fontforge-encoding.patch
    # fix build with poppler >= 0.20
-#   patch -p0 -i poppler-0.20.patch
+   patch -p0 -i poppler-0.20.patch
    # fix radical rule thickness regression in Luatex
    # http://tex.stackexchange.com/q/61952/729
    patch -p0 -i luatex-r4449-radical-rule-thickness.patch
