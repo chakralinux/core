@@ -1,9 +1,11 @@
 post_install() {
-	[ -f var/log/lastlog ] ||  : >var/log/lastlog
-	[ -f var/log/wtmp ]    ||  : >var/log/wtmp
-	[ -f var/log/btmp ]    || (: >var/log/btmp && chmod 600 var/log/btmp)
+	[ -f var/log/lastlog ] ||   : >var/log/lastlog
+	[ -f var/log/wtmp ]    ||   : >var/log/wtmp
+	[ -f var/log/btmp ]    || { : >var/log/btmp && chmod 600 var/log/btmp; }
+	# workaround for bug #7194
+	# readded due to bug #9465
 	# please do not remove!
-	chmod 1777 var/spool/mail tmp var/tmp var/lock
+	chmod 1777 var/spool/mail tmp var/tmp
 }
 
 # args: <group> [options]
@@ -38,9 +40,10 @@ post_upgrade() {
 	_adduser  http    -u 33 -d /srv/http -g http -s /bin/false
 	_addgroup scanner -g 96
 	_addgroup rfkill  -g 24
+	_addgroup lock    -g 54
 
-	# sync gshadow to group
-	if ! grep -q '^rfkill:' etc/gshadow; then
+	# sync gshadow to group (fixes FS#19869
+	if ! grep -q '^lock:' etc/gshadow; then
 		grpconv >/dev/null
 	fi
 

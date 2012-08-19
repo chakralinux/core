@@ -4,8 +4,8 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=kmod
-pkgver=8
-pkgrel=1
+pkgver=9
+pkgrel=2
 pkgdesc="Linux kernel module handling"
 arch=('i686' 'x86_64')
 url='http://git.kernel.org/?p=utils/kernel/kmod/kmod.git;a=summary'
@@ -21,22 +21,22 @@ source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/$pkgname/$pkgname-$pkgver.t
         "0002-config-hardcode-the-path-to-modules-to-be-lib-module.patch"
         "0001-libkmod-file-gracefully-handle-errors-from-zlib.patch"
         "0002-depmod-report-failures-in-loading-symbols.patch")
-md5sums=('d4e3d038b5370b1e8ff237c55666aa64'
+md5sums=('c8ae2d2694fbca2b28e238b30543a0cd'
          '285fc738c220ff84419995fc8c6d6ca1'
-         '1a1feb93633384655e668eb3a22729ac'
-         'bcd3a0b2d1922f4960e7f7778ae2577f'
+         '925cf8994139370113319e5ad7eeadc8'
+         '5fc146b486f4c164ad8316b90b6c9aec'
          'ce4b6a0679a0c933251b20b848d6a524'
          '1f443aba41dee586d46c3abb35912c6a')
 
 build() {
   cd "$pkgname-$pkgver"
 
-  patch -Np1 <"$srcdir"/0001-split-usr-read-configs-from-lib-depmod.d-modprobe.d.patch
-  patch -Np1 <"$srcdir"/0002-config-hardcode-the-path-to-modules-to-be-lib-module.patch
+  patch -p1 <"$srcdir"/0001-split-usr-read-configs-from-lib-depmod.d-modprobe.d.patch
+  patch -p1 <"$srcdir"/0002-config-hardcode-the-path-to-modules-to-be-lib-module.patch
 
   # fix crash on corrupted zlib compression
-  patch -Np1 <"$srcdir"/0001-libkmod-file-gracefully-handle-errors-from-zlib.patch
-  patch -Np1 <"$srcdir"/0002-depmod-report-failures-in-loading-symbols.patch
+  #patch -Np1 <"$srcdir"/0001-libkmod-file-gracefully-handle-errors-from-zlib.patch
+  #patch -Np1 <"$srcdir"/0002-depmod-report-failures-in-loading-symbols.patch
 
   ./configure \
     --sysconfdir=/etc \
