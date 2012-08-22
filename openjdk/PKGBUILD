@@ -6,7 +6,7 @@ _icedtea_release="2.2.1"
 _icedtea_jdkver="7"
 _pkgver="7u5"
 pkgver="${_pkgver}_${_icedtea_release}"
-pkgrel=1
+pkgrel=2
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 arch=('i686' 'x86_64')
 url="http://icedtea.classpath.org/"
@@ -188,9 +188,11 @@ depends=("openjdk=${pkgver}")
   install -D -m644 "openjdk.build/j2sdk-image/src.zip" \
                    "${pkgdir}/${_jvmdir#/}/src.zip"
 
-  # Install the license file
-  install -D -m644 "openjdk/LICENSE" \
-                   "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  # Not installing the license file anymore, since we depend on openjdk,
+  # which already provides it.
+  #
+  # install -D -m644 "openjdk/LICENSE" \
+  #                  "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
 
 # vim:set ts=2 sw=2 et:
