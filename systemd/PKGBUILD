@@ -36,9 +36,10 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-install-timestamp'
         '0001-Reinstate-TIMEOUT-handling.patch'
         'locale.sh'
-        0001-shutdown-recursively-mark-root-as-private-before-piv.patch
-        0001-systemctl-fix-issue-with-systemctl-daemon-reexec.patch
-        'use-split-usr-path.patch')
+        '0001-shutdown-recursively-mark-root-as-private-before-piv.patch'
+        '0001-systemctl-fix-issue-with-systemctl-daemon-reexec.patch'
+        'use-split-usr-path.patch'
+        '99-default.preset')
 md5sums=('d89b42699695554949d072ef46c0dfc9'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          '59e91c4d7a69b7bf12c86a9982e37ced'
@@ -47,7 +48,8 @@ md5sums=('d89b42699695554949d072ef46c0dfc9'
          'f15956945052bb911e5df81cf5e7e5dc'
          '49d145ef3ca299025c085555314212b6'
          'bccb994f4cfbd251b6c34d7d90a6ba0f'
-         '482dba45a783f06c2239f1355f4ce72f')
+         '482dba45a783f06c2239f1355f4ce72f'
+         'a1bf25da736d3719e9720b2e4caea341')
 
 build() {
   cd "$pkgname-$pkgver"
@@ -70,6 +72,7 @@ build() {
       --disable-gtk-doc \
       --disable-audit \
       --disable-ima \
+      --with-distro=other \
       --with-pamlibdir=/usr/lib/security \
       --with-usb-ids-path=/usr/share/hwdata/usb.ids \
       --with-pci-ids-path=/usr/share/hwdata/pci.ids \
@@ -136,6 +139,9 @@ package() {
   # XXX: kill off coredump rule until the journal can recover coredumps
   # this file needs to come back as part of systemd, not systemd-tools
   rm "$pkgdir/usr/lib/sysctl.d/coredump.conf"
+  
+  # Chakra specific .preset
+  install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset "
 }
 
 # vim: ft=sh syn=sh et
