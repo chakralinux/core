@@ -3,11 +3,10 @@ post_install()
     DKMS=`which dkms 2>/dev/null`
 
     echo ">>> DKMS: Module add, build, and install "
-    _pkgver="${1%-*}"
 
-    $DKMS add  -m nvidia -v "$_pkgver"
-    $DKMS build -m nvidia -v "$_pkgver"
-    $DKMS install -m nvidia -v "$_pkgver"
+    $DKMS add  -m nvidia -v '304.37'
+    $DKMS build -m nvidia -v '304.37'
+    $DKMS install -m nvidia -v '304.37'
 
     /sbin/depmod -a
 }
@@ -27,8 +26,11 @@ pre_remove()
     DKMS=`which dkms 2>/dev/null`
     echo ">>> DKMS: Module uninstall "
 
-    _pkgver="${1%-*}"
-    $DKMS remove -m nvidia -v $_pkgver --all
+    line=`$DKMS status -m nvidia`
+    if echo "$line" | grep -E 'added|built|installed'; then
+        version=`echo "$line" | sed "s/nvidia,\([^,]*\)[,:].*/\1/;t;d"`
+        $DKMS remove -m nvidia -v $version --all
+    fi
 
 }
 
