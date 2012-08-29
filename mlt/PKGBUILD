@@ -7,34 +7,36 @@
 
 pkgbase=mlt
 pkgname=('mlt' 'mlt-python-bindings')
-pkgver=0.8.0
+pkgver=0.8.2
 pkgrel=1
 pkgdesc="An open source multimedia framework"
 arch=('i686' 'x86_64')
 url="http://www.mltframework.org"
 license=('GPL')
-depends=('sdl_image' 'libsamplerate' 'libdv' 'qt' 'sox' 'libxml2' 'ffmpeg>=0.8.9' 'frei0r-plugins' 'swig' 'python2')
+depends=('sdl_image' 'libsamplerate' 'libdv' 'qt' 'sox' 'libxml2' 'ffmpeg>=0.11' 'frei0r-plugins' 'swig' 'python2')
 optdepends=('jack')
 makedepends=('subversion')
 conflicts=('mlt++<=0.3.8')
 source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('d56e0cdfba9c5b5608bf84493322615f')
+md5sums=('c7a8c4ca7485bb615cbcf851d8742a1c')
 
 build() {
   # mlt
-  cd $srcdir/mlt-$pkgver
+  cd "${srcdir}/mlt-${pkgver}"
 
 #  [ $CARCH == "i686" ] && SSE2=--disable-sse2 || SSE2=
   SSE2=--disable-sse2
+  SSE=--disable-sse
 
   msg "SSE2=$SSE2"
+  msg "SSE=$SSE"
   ./configure --prefix=/usr \
               --enable-gpl \
               --qimage-libdir=/usr/lib/ \
               --qimage-includedir=/usr/include/Qt \
               --avformat-vdpau \
               --disable-gtk2 \
-              --avformat-swscale $SSE2
+              --avformat-swscale $SSE2 $SSE
   make
 
   # mlt python bindings
@@ -46,7 +48,7 @@ build() {
 }
 
 package_mlt() {
-  depends=('sdl_image' 'libsamplerate' 'libdv' 'sox' 'libxml2' 'ffmpeg' 'frei0r-plugins')
+  depends=('sdl_image' 'libsamplerate' 'libdv' 'sox' 'libxml2' 'ffmpeg>=0.11' 'frei0r-plugins')
   optdepends=('jack' 'libexif' 'qt' "ladspa")
   conflicts=('mlt++<=0.3.8')
 
@@ -55,7 +57,7 @@ package_mlt() {
 }
 
 package_mlt-python-bindings() {
-  depends=('python2' 'mlt')
+  depends=('python2' 'mlt>=0.8')
 
   cd "$srcdir/mlt-$pkgver/src/swig/python"
   mkdir -p "$pkgdir/usr/lib/python2.7/"
