@@ -7,8 +7,8 @@
 
 pkgbase=mlt
 pkgname=('mlt' 'mlt-python-bindings')
-pkgver=0.7.8
-pkgrel=3
+pkgver=0.8.0
+pkgrel=1
 pkgdesc="An open source multimedia framework"
 arch=('i686' 'x86_64')
 url="http://www.mltframework.org"
@@ -17,8 +17,8 @@ depends=('sdl_image' 'libsamplerate' 'libdv' 'qt' 'sox' 'libxml2' 'ffmpeg>=0.8.9
 optdepends=('jack')
 makedepends=('subversion')
 conflicts=('mlt++<=0.3.8')
-source=(http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz)
-md5sums=('4bdce45d832e065ac4c8c8ca56765e1d')
+source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz")
+md5sums=('d56e0cdfba9c5b5608bf84493322615f')
 
 build() {
   # mlt
@@ -28,15 +28,17 @@ build() {
   SSE2=--disable-sse2
 
   msg "SSE2=$SSE2"
-  ./configure --prefix=/usr --enable-gpl \
-	--qimage-libdir=/usr/lib/ --qimage-includedir=/usr/include/Qt \
-	--avformat-vdpau \
-        --disable-gtk2 \
-	--avformat-swscale $SSE2
+  ./configure --prefix=/usr \
+              --enable-gpl \
+              --qimage-libdir=/usr/lib/ \
+              --qimage-includedir=/usr/include/Qt \
+              --avformat-vdpau \
+              --disable-gtk2 \
+              --avformat-swscale $SSE2
   make
 
   # mlt python bindings
-  cd $srcdir/mlt-$pkgver/src/swig/python
+  cd "$srcdir/mlt-$pkgver/src/swig/python"
   sed -i 's_path=`which python_path=`which python2_' build
   sed -i 's_`python -c_`python2 -c_' build
   sed -i 's#python-config#python2-config#' build
@@ -48,16 +50,16 @@ package_mlt() {
   optdepends=('jack' 'libexif' 'qt' "ladspa")
   conflicts=('mlt++<=0.3.8')
 
-  cd $srcdir/mlt-$pkgver
-  make DESTDIR=$pkgdir install
+  cd "$srcdir/mlt-$pkgver"
+  make DESTDIR="$pkgdir" install
 }
 
 package_mlt-python-bindings() {
   depends=('python2' 'mlt')
 
-  cd $srcdir/mlt-$pkgver/src/swig/python
-  mkdir -p $pkgdir/usr/lib/python2.7/
-  install -m755 mlt.py $pkgdir/usr/lib/python2.7/
-  install -m755 _mlt.so $pkgdir/usr/lib/python2.7/
-  install -m755 mlt_wrap.o $pkgdir/usr/lib/python2.7/
+  cd "$srcdir/mlt-$pkgver/src/swig/python"
+  mkdir -p "$pkgdir/usr/lib/python2.7/"
+  install -m755 mlt.py "$pkgdir/usr/lib/python2.7/"
+  install -m755 _mlt.so "$pkgdir/usr/lib/python2.7/"
+  install -m755 mlt_wrap.o "$pkgdir/usr/lib/python2.7/"
 }

@@ -4,8 +4,8 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=('phonon-backend-vlc')
-pkgver=0.5.0
-pkgrel=5
+pkgver=0.6.0
+pkgrel=1
 pkgdesc='Phonon VLC backend'
 arch=('i686' 'x86_64')
 url='http://phonon.kde.org'
@@ -16,7 +16,7 @@ groups=("kde-complete" "kde-uninstall")
 replaces=('phonon-vlc-svn' 'phonon-vlc')
 conflicts=('phonon-vlc-svn' 'phonon-vlc')
 source=("http://download.kde.org/stable/phonon/${pkgname}/$pkgver/src/${pkgname}-$pkgver.tar.xz")
-md5sums=('fc5dc2b353fa0d9e428ecfc3c485eb66')
+md5sums=('13c7adb90f62cb568d17bc9ced9406e9')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -29,16 +29,16 @@ mksource() {
 }
 
 build() {
-	cd ${srcdir}
+	cd "${srcdir}"
 	mkdir -p build
 	cd build
-	cmake ../${pkgname}-$pkgver \
+	cmake "../${pkgname}-$pkgver" \
 		 -DCMAKE_BUILD_TYPE=Release \
 		 -DCMAKE_INSTALL_PREFIX=/usr
 	make
 }
 
 package() {
-	cd ${srcdir}/build
-	make DESTDIR=${pkgdir} install
+	cd "${srcdir}/build"
+	make DESTDIR="${pkgdir}" install
 } 

@@ -6,8 +6,8 @@
 pkgbase=pulseaudio
 pkgname=('pulseaudio' 'libpulse')
 pkgdesc="A featureful, general-purpose sound server"
-pkgver=2.0
-pkgrel=2
+pkgver=2.1
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
@@ -18,7 +18,7 @@ makedepends=('libasyncns' 'libcap' 'attr' 'libxtst' 'libsm' 'libsamplerate'
 options=(!emptydirs !libtool !makeflags)
 source=("http://freedesktop.org/software/${pkgbase}/releases/${pkgbase}-${pkgver}.tar.xz"
         "${pkgbase}.xinit")
-sha256sums=('28b42edd42f4879a6884af5f0ec11801ac001eb7582881215b36649aa37e2061'
+sha256sums=('ef6b347bf47abfb98080795f1583018ac959b4aeb4df916b879f9e1eaba0ca7f'
             '4beae1ce931ae4bde3d2faca25735cc62a6eac182323f257dd9e703d499f7aa8')
 
 build() {
@@ -39,27 +39,27 @@ build() {
 }
 
 package_libpulse() {
-pkgdesc="${pkgdesc} (client library)"
-depends=('dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm'
-         'libsamplerate' 'json-c')
-optdepends=('alsa-plugins: ALSA support'
-            'avahi: zeroconf support')
-backup=(etc/pulse/client.conf)
+  pkgdesc="${pkgdesc} (client library)"
+  depends=('dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm'
+           'libsamplerate' 'json-c')
+  optdepends=('alsa-plugins: ALSA support'
+              'avahi: zeroconf support')
+  backup=(etc/pulse/client.conf)
 
   mv "${srcdir}/libpulse"/* "${pkgdir}"
 }
 
 package_pulseaudio() {
-depends=("libpulse=${pkgver}-${pkgrel}" 'rtkit' 'libltdl' 'speex' 'tdb'
-         'udev' 'fftw' 'orc' 'webrtc-audio-processing' 'systemd')
-optdepends=('avahi: zeroconf support'
-            'bluez: bluetooth support'
-            'gconf: configuration through gconf (paprefs)'
-            'jack: jack support'
-            'lirc-utils: infra-red support'
-            'openssl: RAOP support')
-backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
-install="pulseaudio.install"
+  depends=("libpulse=${pkgver}-${pkgrel}" 'rtkit' 'libltdl' 'speex' 'tdb'
+           'udev' 'fftw' 'orc' 'webrtc-audio-processing' 'systemd')
+  optdepends=('avahi: zeroconf support'
+              'bluez: bluetooth support'
+              'gconf: configuration through gconf (paprefs)'
+              'jack: jack support'
+              'lirc-utils: infra-red support'
+              'openssl: RAOP support')
+  backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
+  install="pulseaudio.install"
 
   cd "${srcdir}/${pkgbase}-${pkgver}"
   make DESTDIR="${pkgdir}" install
@@ -85,7 +85,7 @@ install="pulseaudio.install"
 
   rm "${pkgdir}/etc/dbus-1/system.d/pulseaudio-system.conf"
 
-### Split libpulse
+  ### Split libpulse
 
   mkdir -p "$srcdir"/libpulse/{etc/pulse,usr/{lib/pulseaudio,share/man/man5}}
 
