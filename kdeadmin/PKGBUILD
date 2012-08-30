@@ -16,9 +16,11 @@ pkgname=('kdeadmin-kcron'
          'kdeadmin-ksystemlog'
          'kdeadmin-system-config-printer')
 
+        # 'kdeadmin-strigi-analyzer'  : Generates and empty pkg
+
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 pkgdesc="split package"
 url="http://www.kde.org/"
 license=('GPL' 'LGPL' 'FDL')
@@ -26,7 +28,7 @@ install=kdeadmin.install
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' "kdepimlibs>=${_kdever}"  "kde-runtime>=${_kdever}"
-	     "kdebindings-pykde4>=${_kdever}" 'system-config-printer' "kdepim-runtime>=${_kdever}" "docbook-xsl")
+	     "kdebindings-pykde4>=${_kdever}" 'system-config-printer-common' "kdepim-runtime>=${_kdever}" "docbook-xsl")
 
 source=("$_mirror/${pkgbase}-$_kdever.tar.xz" 
         "syslog-path.patch")
@@ -54,7 +56,7 @@ build() {
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' \
 		-DBUILD_strigi-analyzer=OFF \
-	     	-DPYTHON_EXECUTABLE=/usr/bin/python2
+	        -DPYTHON_EXECUTABLE=/usr/bin/python2
 	make
 }
 
@@ -132,6 +134,6 @@ package_kdeadmin-system-config-printer() {
 		done
 
 	msg "fixing i18n ..."
-	#fix locations
+	#fix localizations
 	sed -i -e 's~special_choice=_("Automatic rotation")),~special_choice=i18n("Automatic rotation")),~g' ${pkgdir}/usr/share/apps/system-config-printer-kde/system-config-printer-kde.py
 }
