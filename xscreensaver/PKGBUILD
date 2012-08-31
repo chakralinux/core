@@ -10,7 +10,7 @@ pkgdesc="Screen saver and locker for the X Window System"
 arch=('i686' 'x86_64')
 url="http://www.jwz.org/xscreensaver/"
 license=('BSD')
-depends=('libxxf86misc' 'mesa' 'pam' 'xorg-res-utils' 'libxmu' 'libjpeg-turbo' 'libglade')
+depends=('libxxf86misc' 'mesa' 'pam' 'xorg-res-utils' 'libxmu' 'libjpeg-turbo')
 makedepends=('bc' 'libxpm')
 backup=('etc/pam.d/xscreensaver')
 source=(http://www.jwz.org/xscreensaver/${pkgname}-${pkgver}.tar.gz
@@ -28,7 +28,7 @@ build() {
   patch -p0 -i "${srcdir}/add-electricsheep.diff" 
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --libexecdir=/usr/lib --with-x-app-defaults=/usr/share/X11/app-defaults \
-    --with-pam --without-motif --with-gtk --with-gl \
+    --with-pam --without-motif --without-gtk --with-gl \
     --without-gle --with-xpm --with-jpeg 
   make 
 }
@@ -39,5 +39,5 @@ package() {
   install -D -m644 ../LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" 
   install -D -m644 ../xscreensaver.pam "${pkgdir}/etc/pam.d/xscreensaver" 
   chmod 755 "${pkgdir}/usr/bin/xscreensaver" 
-  echo "NotShowIn=KDE;" >> "${pkgdir}/usr/share/applications/xscreensaver-properties.desktop" 
+  #echo "NotShowIn=KDE;" >> "${pkgdir}/usr/share/applications/xscreensaver-properties.desktop" 
 }
