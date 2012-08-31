@@ -2,11 +2,12 @@
 
 pkgname=('openjdk' 'openjdk-src')
 pkgbase='openjdk'
-_icedtea_release="2.2.1"
+_icedtea_release="2.3.1"
 _icedtea_jdkver="7"
-_pkgver="7u5"
-pkgver="${_pkgver}_${_icedtea_release}"
-pkgrel=2
+_openjdk_build="b30"
+_pkgver="7u6"
+pkgver="${_pkgver}_${_openjdk_build}_${_icedtea_release}"
+pkgrel=1
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 arch=('i686' 'x86_64')
 url="http://icedtea.classpath.org/"
@@ -17,14 +18,14 @@ makedepends=('java-environment=7' 'apache-ant>=1.6.5' 'zip' 'unzip'
              'libpng' 'giflib' 'lcms2' 'freetype2' 'rhino' 'nss' 'libxt'
              'libxtst' 'libxp' 'libxrender' 'ca-certificates-java')
 
-_hg_url="http://icedtea.classpath.org/hg/release/icedtea7-forest-2.2"
-_corba_changeset="38deb372c569"
-_hotspot_changeset="889dffcf4a54"
-_jaxp_changeset="335fb0b059b7"
-_jaxws_changeset="5471e01ef43b"
-_jdk_changeset="6c3b742b735d"
-_langtools_changeset="beea46c7086b"
-_openjdk_changeset="0b776ef59474"
+_hg_url="http://icedtea.classpath.org/hg/release/icedtea7-forest-2.3"
+_corba_changeset="e9b200124386"
+_jaxp_changeset="9bd1d8e8b802"
+_jaxws_changeset="9a744f20cfc5"
+_jdk_changeset="507eee662587"
+_langtools_changeset="0cf6181d44db"
+_openjdk_changeset="a3fa5d49d528"
+_hotspot_changeset="3e0087ab5e92"
 _jvmdir="/usr/lib/jvm/java-${_icedtea_jdkver}-openjdk"
 
 source=("http://icedtea.classpath.org/download/source/icedtea-${_icedtea_release}.tar.gz"
@@ -35,22 +36,20 @@ source=("http://icedtea.classpath.org/download/source/icedtea-${_icedtea_release
         "${_hg_url}/jdk/archive/${_jdk_changeset}.tar.gz"
         "${_hg_url}/langtools/archive/${_langtools_changeset}.tar.gz"
         "${_hg_url}/hotspot/archive/${_hotspot_changeset}.tar.gz"
-        'archlinux-disable_Werror.diff'
         'archlinux-fontconfig-paths.diff'
         'archlinux-fix_corba_cmds_path.diff'
         'archlinux-openjdk7_fix_jdk_cmds_path.diff'
         'archlinux-openjdk7_nonreparenting-wm.diff'
         'openjdk.profile.sh'
         'openjdk.profile.csh')
-sha256sums=('0f5ba163904f7c50374ab345216dd1b66c077fc431592eb3d4801f7ecda200b6'
-            '15a6eab62f5108efbf7937b1de7697bd789971886fc1fc08ee8199e16a5c10fe'
-            'b892b0db6f3e4f89fd480d46ecb7c9ce5c71a884ae5bfe953b4bda9eedf7ea93'
-            'ff4ab3710fe316b7adc4e57d4d21ff967ca20e2ccc5267ac26b93cd22db8b3fd'
-            '1ef055749ee46ebf7a5be94403b461d8d32e95c98906da459aeb217a0784ff1d'
-            '48a513d18c919ec08d44cffdc12ae65f1e8942924c6cfcca5c1ffa8ca38afd0e'
-            '17055cf1490fab1cccc57bf3aa5b32d655c408859790c7f671bfde180ddf70cb'
-            'b29a8929bb4aadbc033e99dca6a381ca6342f0373b9c3f67827bfc025187ba41'
-            '557910dc4e5e9b551641db129c3910abe572aba8744a83cc4bcbc1314c1d8386'
+sha256sums=('4d5f253fb20d4026ae55e8ab97840e257ca5b89897593a68dd18bb1c48b6f3e9'
+            'c9c03e96be355de46f7aef23209afe2e9ff58c9bd4cf3e6fa4bebfb8f7dc89aa'
+            '07dcf05edc38ae63e4b667437cd23e5c3edbf6e03ffd7ce4b3eb24ea4c868468'
+            '2bddebe957905927dde720619601ffc22d3067448e6079a2befe2ba30de99a15'
+            'd8a6012bfb7217d3033b4b2c530753f336a5ea52e487f776f0399c87d7979b99'
+            'b7a309b177f53281fba881f379619a6ce36f1f733da610af1275ed160dbe6d02'
+            '9fbd9e68422aaae9b6962bb7a9400a45959bf36b5f1ea443fbbd270dda9feca1'
+            '3e85e236b683c14bad9505f414a0acd876956bb8e67362acd6a5bbae99bbe9e4'
             '9ad943ceb3dbcdf45d72974fc3667886a7ed65c69ab9abc17be5412827551a7f'
             '7b2db65bfb9d5014e1522178d65cabf05dfa85e0926cde5648b5a338db376479'
             'bd19edc12831b09834fbdbe60fd65577884a6bd9f175d21228ae75a84bd88f3a'
@@ -70,7 +69,7 @@ build() {
 
   # Prepare the patches
   cp *.diff "${srcdir}/icedtea-${_icedtea_release}/patches"
-  export DISTRIBUTION_PATCHES="patches/archlinux-disable_Werror.diff patches/archlinux-fontconfig-paths.diff patches/archlinux-fix_corba_cmds_path.diff patches/archlinux-openjdk7_fix_jdk_cmds_path.diff patches/archlinux-openjdk7_nonreparenting-wm.diff"
+  export DISTRIBUTION_PATCHES="patches/archlinux-fontconfig-paths.diff patches/archlinux-fix_corba_cmds_path.diff patches/archlinux-openjdk7_fix_jdk_cmds_path.diff patches/archlinux-openjdk7_nonreparenting-wm.diff"
 
   rm -rf build
   cp -r "icedtea-${_icedtea_release}" \
@@ -89,6 +88,7 @@ build() {
   export ALT_BOOTDIR="${_java_home}"
   export ALT_PARALLEL_COMPILE_JOBS="${MAKEFLAGS/-j}"
   export HOTSPOT_BUILD_JOBS="${ALT_PARALLEL_COMPILE_JOBS}"
+  export COMPILER_WARNINGS_FATAL="false"
 
   # Unset harmful variables
   unset JAVA_HOME JDK_HOME CLASSPATH JAVAC JAVACFLAGS
