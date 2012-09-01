@@ -4,30 +4,31 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=cdemu-daemon
-pkgver=1.4.0
-pkgrel=7
+pkgver=1.5.0
+pkgrel=2
 pkgdesc="CD/DVD-ROM device emulator daemon"
 arch=('i686' 'x86_64')
 backup=('etc/conf.d/cdemud'
 	'etc/dbus-1/system.d/cdemud-dbus.conf')
 url="http://cdemu.sourceforge.net/"
 license=('GPL')
-depends=('glib2' 'dbus' 'dbus-glib' 'libdaemon' 'vhba-module' "libmirage=$pkgver" 'libao')
+depends=('glib2' 'dbus' 'dbus-glib' 'libdaemon' 'vhba-module' "libmirage=$pkgver" 'libao' 'systemd-units')
 optdepends=('alsa-lib: to enable the ALSA audio driver'
             'pulseaudio: to enable the PA audio driver')
-install=cdemud.install
-source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.gz"
+source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2"
         'cdemud.conf'
         'cdemud.rc'
         'cdemu-daemon.service')
-md5sums=('f7ccc0abc33057d552ec7b0925fce63a'
-         'c3097a01d9e79093485181ff47a81542'
-         '29b9bc0023ff17e14091f3fb8438ccb4'
+md5sums=('5ba780caa26d855942512b5b3c22405a'
+         '914b3577284e9ae1ebe442aa837eea2d'
+         '6d32f6a4b7465adaf7b92a3537279e7b'
          'be9a8f50da3f42129c0a0e3dea8cd56c')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  ./configure --prefix=/usr --sysconfdir=/etc --libexecdir=/usr/lib/$pkgname
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --libexecdir=/usr/lib/$pkgname
   make
 }
 
@@ -46,3 +47,4 @@ package() {
     "$pkgdir/usr/share/dbus-1/system-services/net.sf.cdemu.CDEMUD_Daemon.service"
 
 }
+
