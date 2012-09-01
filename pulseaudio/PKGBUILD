@@ -7,7 +7,7 @@ pkgbase=pulseaudio
 pkgname=('pulseaudio' 'libpulse')
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=2.1
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
@@ -84,6 +84,10 @@ package_pulseaudio() {
   install -D -m755 "${srcdir}/pulseaudio.xinit" "${pkgdir}/etc/X11/xinit/xinitrc.d/pulseaudio"
 
   rm "${pkgdir}/etc/dbus-1/system.d/pulseaudio-system.conf"
+  
+  # Delay of sound notification workaround, needs to be removed once fixed in systemd
+  sed -i -e 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' "${pkgdir}/etc/pulse/default.pa"
+
 
   ### Split libpulse
 
