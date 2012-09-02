@@ -1,6 +1,7 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
+# Maintainer: Fabian Kosmale <0inkane@googlemail.com>
 # contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
 
 # include global config
@@ -8,23 +9,29 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=strigi
 pkgver=0.7.7
-pkgrel=1
+pkgrel=2
 pkgdesc="Fast crawling desktop search engine with Qt4 GUI"
 arch=('i686' 'x86_64')
 url="http://www.vandenoever.info/software/strigi/"
 license=('GPL2')
-depends=('bzip2' 'exiv2' 'libxml2' 'boost-libs')
+depends=('bzip2' 'exiv2' 'libxml2' 'boost-libs' 'ffmpeg')
 makedepends=('qt' 'cmake' 'pkgconfig' 'boost')
 provides=('strigi-git')
 replaces=('strigi-git')
 conflicts=('strigi-git')
-source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('ca0a0fd5c2b99879f6330837aeede996')
+source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
+        "new_ffmpeg.patch")
+md5sums=('ca0a0fd5c2b99879f6330837aeede996'
+         '86f8d736f21daab6a3b666cf00037099')
 options=('!libtool')
 
 build() {
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  sed -i '/stdio/a #include <unistd.h>' strigidaemon/bin/daemon/eventlistener/eventlistenerqueue.cpp 
   cd "${srcdir}"/${pkgname}-${pkgver}/libstreamanalyzer
 
+  mv "${srcdir}"/new_ffmpeg.patch .
+  patch -p1 < new_ffmpeg.patch
   cd "${srcdir}"
   mkdir build
   cd build
@@ -36,7 +43,7 @@ build() {
     -DENABLE_FAM=OFF \
     -DENABLE_CLUCENE=OFF \
     -DENABLE_CLUCENE_NG=OFF \
-    -DENABLE_FFMPEG=OFF
+    -DENABLE_FFMPEG=ON
   make
 }
 
