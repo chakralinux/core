@@ -6,7 +6,7 @@
 
 pkgname=libao
 pkgver=1.1.0
-pkgrel=8
+pkgrel=9
 pkgdesc="A cross-platform audio output library and plugins"
 url="http://www.xiph.org/ao"
 arch=('i686' 'x86_64')
@@ -21,11 +21,12 @@ md5sums=('2b2508c29bc97e4dc218fa162cf883c8'
          '5c29f3197ccaac2264c89450b4a298d5')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   ./configure --prefix=/usr \
               --enable-alsa-mmap \
-              --enable-pulse
+              --enable-pulse \
+              --disable-nas
   make
 }
 

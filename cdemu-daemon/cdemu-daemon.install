@@ -13,6 +13,8 @@ post_install () {
     to control a session daemon.
 MSG
 
+  getent group cdemu >/dev/null 2>&1 || groupadd -g 103 cdemu &>/dev/null
+
   return 0
 }
 
@@ -24,5 +26,10 @@ post_upgrade () {
   return 0
 }
 
-# vim:set ts=2 sw=2 et:
+post_remove () {
+  if getent group cdemu >/dev/null 2>&1; then
+    groupdel cdemu
+  fi
+}
 
+# vim:set ts=2 sw=2 et:
