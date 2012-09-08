@@ -5,7 +5,7 @@
 
 pkgname=cdemu-daemon
 pkgver=1.5.0
-pkgrel=7
+pkgrel=8
 pkgdesc="CD/DVD-ROM device emulator daemon"
 arch=('i686' 'x86_64')
 backup=('etc/conf.d/cdemud'
@@ -15,26 +15,17 @@ license=('GPL')
 depends=('glib2' 'dbus' 'dbus-glib' 'libdaemon' 'vhba-module' "libmirage=$pkgver" 'libao' 'systemd-units')
 optdepends=('alsa-lib: to enable the ALSA audio driver'
             'pulseaudio: to enable the PA audio driver')
-install="${pkgname}.install"
 source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2"
         'cdemud.conf'
         'cdemud.rc'
-        'cdemu-daemon.service'
-        'system.patch'
-        'cdemud-dbus.conf')
+        'cdemu-daemon.service')
 md5sums=('5ba780caa26d855942512b5b3c22405a'
-         'e320740fca36de66074de7192221aac9'
-         '1c3d8d346ca2d7f9413ee5e2391104a6'
-         'be9a8f50da3f42129c0a0e3dea8cd56c'
-         '658fba359ec02386d79e115a6ff9741d'
-         '5a80d05f58f0fb5e6b9a7f9d61bb2622')
+         '2edf08fc6c773813084ca7ba4e07221f'
+         'cbc0937ef4ac50db3ce5cdbbe2e17a3b'
+         'be9a8f50da3f42129c0a0e3dea8cd56c')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  # make things Chakra-friendly
-  patch -Np1 -i "$srcdir/system.patch"
-
+  cd $srcdir/$pkgname-$pkgver
   ./configure --prefix=/usr \
               --sysconfdir=/etc \
               --libexecdir=/usr/lib/$pkgname
@@ -42,13 +33,8 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-
-  # Custom dbus policy, tightening security to console and 'cdemu' group
-  install -m644 "$srcdir/cdemud-dbus.conf" \
-    "$pkgdir/etc/dbus-1/system.d/cdemud-dbus.conf"
-
+  cd $srcdir/$pkgname-$pkgver
+  make DESTDIR=$pkgdir install
   install -Dm644 "$srcdir/cdemud.conf" "$pkgdir/etc/conf.d/cdemud"
   install -Dm755 "$srcdir/cdemud.rc" "$pkgdir/etc/rc.d/cdemud"
   install -d "$pkgdir/usr/lib/modules-load.d"
@@ -61,4 +47,3 @@ package() {
     "$pkgdir/usr/share/dbus-1/system-services/net.sf.cdemu.CDEMUD_Daemon.service"
 
 }
-
