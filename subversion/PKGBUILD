@@ -4,7 +4,7 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=subversion
-pkgver=1.7.5
+pkgver=1.7.6
 pkgrel=1
 pkgdesc="A Modern Concurrent Version Control System"
 arch=('i686' 'x86_64')
@@ -19,12 +19,18 @@ provides=('svn')
 options=('!makeflags' '!libtool')
 source=(http://apache.mirror.rafal.ca/subversion/$pkgname-$pkgver.tar.bz2{,.asc}
         svnserve svn svnserve.conf 
+	svnserve.tmpfiles
+	svnserve.service
+        subversion-1.7.6-kwallet-gcc47.patch
         subversion.rpath.fix.patch)
-md5sums=('f6353b9b581081cdf97299300c9eada3'
-         'bc45359b2c002f56d4c5e23468d20392'
+md5sums=('4baa434db7709bb059b05d02a2547663'
+         '62b1a7dcfcda6a07c0a9804b2322614d'
          'a2b029e8385007ffb99b437b30521c90'
          'a0db6dd43af33952739b6ec089852630'
          'c459e299192552f61578f3438abf0664'
+         'bb2857eceafcfac35dde39dcffad2314'
+         'e8020c7a1d1a0c47091b5fdd034f81c5'
+         'f02cef1ab91cc5f345ebf3d281288db3'
          '6b4340ba9d8845cd8497e013ae01be3f')
 
 build() {
@@ -34,6 +40,8 @@ build() {
 
    patch -p0 -i ../subversion.rpath.fix.patch
    sed -i 's|/usr/bin/env python|/usr/bin/env python2|' tools/hook-scripts/{,mailer/{,tests/}}*.py
+
+   patch -p1 -i ../subversion-1.7.6-kwallet-gcc47.patch
 
    # configure
    autoreconf
@@ -64,12 +72,21 @@ package() {
    rm "${pkgdir}"/usr/lib/perl5/vendor_perl/auto/SVN/_Core/.packlist
    rm -r "${pkgdir}"/usr/lib/perl5/core_perl
 
+   ## svnserve
+   install -D -m 644 "${srcdir}"/svnserve.conf "${pkgdir}"/etc/conf.d/svnserve
+
+   # rc.d
    install -D -m 755 "${srcdir}"/svnserve "${pkgdir}"/etc/rc.d/svnserve
    install -D -m 644 "${srcdir}"/svn "${pkgdir}"/etc/xinetd.d/svn
-   install -D -m 644 "${srcdir}"/svnserve.conf "${pkgdir}"/etc/conf.d/svnserve
+
+   # systemd
+   install -D -m 644 "${srcdir}"/svnserve.service  "${pkgdir}"/usr/lib/systemd/system/svnserve.service
+   install -D -m 644 "${srcdir}"/svnserve.tmpfiles "${pkgdir}"/usr/lib/tmpfiles.d/svnserve.conf
 
    # bash completion
    install -Dm 644 tools/client-side/bash_completion \
-     "${pkgdir}"/etc/bash_completion.d/subversion
+     "${pkgdir}"/usr/share/bash-completion/completions/subversion
+   for i in svn svnadmin svndumpfilter svnlook svnsync svnversion; do
+      ln -sf subversion "${pkgdir}"/usr/share/bash-completion/completions/${i}
+   done
 }
-
