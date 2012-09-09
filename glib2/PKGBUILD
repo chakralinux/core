@@ -5,7 +5,7 @@
 
 pkgname=glib2
 pkgver=2.32.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Common C routines used by GTK+ and other libs"
 url="http://www.gtk.org/"
 arch=(i686 x86_64)
@@ -40,7 +40,7 @@ package() {
   install -m755 "${srcdir}/glib2.sh" "${pkgdir}/etc/profile.d/"
   install -m755 "${srcdir}/glib2.csh" "${pkgdir}/etc/profile.d/"
 
-  for _i in "${pkgdir}/usr/share/bash-completion/completions"*; do
+  for _i in "${pkgdir}/usr/share/bash-completion/completions/"*; do
       chmod -x "${_i}"
   done
   sed -i "s|#!/usr/bin/env python|#!/usr/bin/env python2|" "$pkgdir"/usr/bin/gdbus-codegen
