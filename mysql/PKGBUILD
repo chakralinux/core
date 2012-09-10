@@ -7,7 +7,7 @@ pkgbase=mysql
 pkgname=('libmysqlclient' 'mysql-clients' 'mysql')
 pkgver=5.5.25
 _pkgver=5.5.25a
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://www.mysql.com/"
@@ -15,10 +15,16 @@ makedepends=('cmake' 'openssl' 'tcp_wrappers' 'zlib')
 options=('!libtool')
 source=("http://ftp.gwdg.de/pub/misc/mysql/Downloads/MySQL-5.5/${pkgbase}-${_pkgver}.tar.gz"
         'mysqld'
-        'my.cnf')
+        'my.cnf'
+        'mysqld.service'
+        'mysqld-tmpfile.conf'
+        'mysqld-post.sh')
 md5sums=('0841fbc79872c5f467d8c8842f45257a'
          '2234207625baa29b2ff7d7b4f088abce'
-         '1c949c0dbea5206af0db14942d9927b6')
+         '1c949c0dbea5206af0db14942d9927b6'
+         'e21c4059b51e62571ab42ff42043327b'
+         '2fa6e456964d4ff5e6d4f9ff0126aed6'
+         '6ea6ceb360d09a774e87335ee098ddd5')
 
 build() {
   cd "${srcdir}"
@@ -106,20 +112,24 @@ package_mysql(){
   categories=('system')
 
   cd "${srcdir}"/build
-  make DESTDIR=${pkgdir} install
+  make DESTDIR="${pkgdir}" install
 
-  install -Dm644 ${srcdir}/my.cnf ${pkgdir}/etc/mysql/my.cnf
-  install -Dm755 ${srcdir}/mysqld ${pkgdir}/etc/rc.d/mysqld
+  install -Dm644 "${srcdir}"/my.cnf "${pkgdir}"/etc/mysql/my.cnf
+  install -Dm755 "${srcdir}"/mysqld "${pkgdir}"/etc/rc.d/mysqld
+  install -Dm755 "${srcdir}"/mysqld-post.sh "${pkgdir}"/usr/bin/mysqld-post
+  install -Dm644 "${srcdir}"/mysqld-tmpfile.conf "${pkgdir}"/usr/lib/tmpfiles.d/mysqld.conf
+  install -d "${pkgdir}"/usr/lib/systemd/system
+  install -Dm644 "${srcdir}"/mysqld.service "${pkgdir}"/usr/lib/systemd/system/
 
   # provided by libmysqlclient
-  rm ${pkgdir}/usr/bin/{mysql_config,mysql_client_test_embedded,mysqltest_embedded}
-  rm ${pkgdir}/usr/lib/libmysql*
-  rm -r ${pkgdir}/usr/include/
-  rm ${pkgdir}/usr/share/man/man1/{mysql_config,mysql_client_test_embedded,mysqltest_embedded}.1
+  rm "${pkgdir}"/usr/bin/{mysql_config,mysql_client_test_embedded,mysqltest_embedded}
+  rm "${pkgdir}"/usr/lib/libmysql*
+  rm -r "${pkgdir}"/usr/include/
+  rm "${pkgdir}"/usr/share/man/man1/{mysql_config,mysql_client_test_embedded,mysqltest_embedded}.1
   
   # provided by mysql-clients
-  rm ${pkgdir}/usr/bin/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}
-  rm ${pkgdir}/usr/share/man/man1/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}.1
+  rm "${pkgdir}"/usr/bin/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}
+  rm "${pkgdir}"/usr/share/man/man1/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}.1
 
  # not needed
   rm -r "${pkgdir}"/usr/{data,mysql-test,sql-bench}
