@@ -12,7 +12,7 @@ pkgname=('jack2' 'jack2-dbus')
 #pkgname= # single build (overrides split)
 _tarname=jack
 pkgver=1.9.8
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="http://jackaudio.org/"
 backup=(etc/security/limits.d/99-audio.conf)
@@ -79,7 +79,7 @@ package_jack2() {
               'dbus-core: jackdbus'
               'python2: jack_control')
   conflicts=('jack')
-  provides=('jack' 'jackmp' 'jackdmp' 'jackdbus')
+  provides=('jack' 'jackmp' 'jackdmp' 'jackdbus' 'jack-audio-connection-kit')
 
   cd "${srcdir}/${_tarname}-${pkgver}/${_tarname}-${pkgver}"
 
@@ -105,7 +105,7 @@ package_jack2-dbus() {
   optdepends=('libffado: FireWire support'
               'python2: jack_control')
   conflicts=('jack' 'jack2')
-  provides=('jack' 'jack2' 'jackmp' 'jackdmp' 'jackdbus')
+  provides=('jack' 'jack2' 'jackmp' 'jackdmp' 'jackdbus' 'jack-audio-connection-kit')
 
   cd "${srcdir}/${_tarname}-${pkgver}/${_tarname}-dbus-${pkgver}"
 
