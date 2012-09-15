@@ -6,7 +6,7 @@
 
 pkgname=apache
 pkgver=2.4.3
-pkgrel=1
+pkgrel=2
 pkgdesc='A high performance Unix-based HTTP server'
 arch=('i686' 'x86_64')
 options=('!libtool')
@@ -25,7 +25,6 @@ source=("http://www.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2"
         "http://mpm-itk.sesse.net/apache2.4-mpm-itk-2.4.2-01.patch"
         'apache.conf.d'
         'httpd.logrotate'
-        'httpd'
         'chakra.layout'
         'httpd.service'
         'httpd-tmpfile.conf')
@@ -34,7 +33,6 @@ md5sums=('87aaf7bc7e8715f0455997bb8c6791aa'
          '7b5fb06ba65d80d40f19e32f95426486'
          '08b3c875f6260644f2f52b4056d656b0'
          '6382331e9700ed9e8cc78ea51887b537'
-         'c7e300a287ef7e2e066ac7639536f87e'
          '9404bc261cffce7ad88850f0569e9067'
          '4af19522704050f98ba13e40d3eaca0b'
          '110a056408252de4356be7f53872b11d')
@@ -108,9 +106,6 @@ package() {
     popd >/dev/null
   done
 
-  install -D -m755 "${srcdir}/httpd" \
-                   "${pkgdir}/etc/rc.d/httpd" 
-
   install -D -m644 "${srcdir}/httpd.logrotate" \
                    "${pkgdir}/etc/logrotate.d/httpd" 
 
@@ -144,5 +139,3 @@ package() {
       -e 's|#\(LoadModule slotmem_shm_module modules/mod_slotmem_shm.so\)|\1|' \
       -i "${pkgdir}/etc/httpd/conf/httpd.conf"
 }
-
-# vim:set ts=2 sw=2 et:
