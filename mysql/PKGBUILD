@@ -5,31 +5,30 @@
 
 pkgbase=mysql
 pkgname=('libmysqlclient' 'mysql-clients' 'mysql')
-pkgver=5.5.25
-_pkgver=5.5.25a
-pkgrel=4
+pkgver=5.5.27
+pkgrel=1
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://www.mysql.com/"
 makedepends=('cmake' 'openssl' 'tcp_wrappers' 'zlib')
 options=('!libtool')
-source=("http://ftp.gwdg.de/pub/misc/mysql/Downloads/MySQL-5.5/${pkgbase}-${_pkgver}.tar.gz"
+source=("http://ftp.gwdg.de/pub/misc/mysql/Downloads/MySQL-5.5/${pkgbase}-${pkgver}.tar.gz"
         'my.cnf'
         'mysqld.service'
         'mysqld-tmpfile.conf'
         'mysqld-post.sh')
-md5sums=('0841fbc79872c5f467d8c8842f45257a'
-         '1c949c0dbea5206af0db14942d9927b6'
-         'e21c4059b51e62571ab42ff42043327b'
-         '2fa6e456964d4ff5e6d4f9ff0126aed6'
-         '6ea6ceb360d09a774e87335ee098ddd5')
+sha256sums=('51ffafbd82039f8afbe5b3c26f15cc338ed6cd4f67e56d7dd33efaa28c9d99e4'
+            '400e9a6e6517bbfe0971b65456dfacfb363cb54a644e4c2bacd373171611d5aa'
+            '1288b512b08cf0458437357c6ca378db66c78884868afab5ddea4ad61059c168'
+            '2af318c52ae0fe5428e8a9245d1b0fc3bc5ce153842d1563329ceb1edfa83ddd'
+            '9e98b2f942b407032f3a98914dc1d9a6a4bfe09d10b652bc040b0c213fc7a91b')
 
 build() {
   cd "${srcdir}"
   mkdir build
   cd build
 
-  cmake ../${pkgbase}-${_pkgver} \
+  cmake ../${pkgbase}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DMYSQL_DATADIR=/var/lib/mysql \
@@ -79,7 +78,7 @@ package_libmysqlclient(){
   install -m755 scripts/mysql_config "${pkgdir}/usr/bin/"
   install -d "${pkgdir}/usr/share/man/man1"
   for man in mysql_config mysql_client_test_embedded mysqltest_embedded; do
-    install -m644 "${srcdir}/${pkgbase}-${_pkgver}/man/$man.1" "${pkgdir}/usr/share/man/man1/$man.1"
+    install -m644 "${srcdir}/${pkgbase}-${pkgver}/man/$man.1" "${pkgdir}/usr/share/man/man1/$man.1"
   done
 }
 
@@ -94,7 +93,7 @@ package_mysql-clients(){
   # install man pages
   install -d "${pkgdir}/usr/share/man/man1"
   for man in mysql mysqladmin mysqlcheck mysqldump mysqlimport mysqlshow mysqlslap; do
-    install -m644 "${srcdir}/${pkgbase}-${_pkgver}/man/$man.1" "${pkgdir}/usr/share/man/man1/$man.1"
+    install -m644 "${srcdir}/${pkgbase}-${pkgver}/man/$man.1" "${pkgdir}/usr/share/man/man1/$man.1"
   done
 
   # provided by mysql
@@ -128,7 +127,7 @@ package_mysql(){
   rm "${pkgdir}"/usr/bin/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}
   rm "${pkgdir}"/usr/share/man/man1/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}.1
 
- # not needed
+  # not needed
   rm -r "${pkgdir}"/usr/{data,mysql-test,sql-bench}
   rm "${pkgdir}"/usr/share/man/man1/mysql-test-run.pl.1
 
