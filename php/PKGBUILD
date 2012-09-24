@@ -25,7 +25,7 @@ pkgname=('php'
          'php-sqlite'
          'php-tidy'
          'php-xsl')
-pkgver=5.4.5
+pkgver=5.4.7
 pkgrel=1
 arch=('i686' 'x86_64')
 license=('PHP')
@@ -39,13 +39,17 @@ source=("http://www.php.net/distributions/${pkgbase}-${pkgver}.tar.bz2"
         'apache.conf'
         'rc.d.php-fpm'
         'php-fpm.conf.in.patch'
-        'logrotate.d.php-fpm')
-md5sums=('ffcc7f4dcf2b79d667fe0c110e6cb724'
-         '0b0bc7a917fc592bdf11dcd3c5c255e9'
-         'e792470a40eaade691483ca424ea45ff'
-         'b136a184dd055c559a03eb8bac562a3c'
-         '59b3a25f9eb3afc02f1adf9ee699808c'
-         '07c4e412909ac65a44ec90e7a2c4bade')
+        'logrotate.d.php-fpm'
+	'php-fpm.service'
+	'php-fpm.tmpfiles')
+sha256sums=('6a456a572e9e3572768a5abf3ec94fa7dd957e1e4fb3410524d120ffd4cc3f92'
+            '119c04af11f771b83b28660cecda85ce1c0f0f48c9067ef2c02def7164700d3f'
+            '49f5a2e06a0decbcd451bc485fe489b96226b67b4c4c0ec3d0a8faa141f16f7b'
+            '065663d8ebb952524b346a2de35d495c985474225389dd2f5e536f26dd766766'
+            '686d3612779d97d294c23036c5e289833049623680e14125d4c4196e3318ef4e'
+            'df0ebfaf826b9aca3e059bdf9c9f97a6f94729fd67e2e09863f566e09a6eeee3'
+            '5ae2e10725e232c933aefbe51cf1a6b310f8cd48b0e66649496985a59cdd9e81'
+            '640dba0d960bfeaae9ad38d2826d3f6b5d6c175a4d3e16664eefff29141faad5')
 
 build() {
   # ldap-sasl does not compile with --as-needed
@@ -253,6 +257,7 @@ package_php-fpm() {
   pkgdesc='FastCGI Process Manager for PHP'
   depends=('php')
   backup=('etc/php/php-fpm.conf')
+  install='php-fpm.install'
 
   install -D -m755 "${srcdir}/build-fpm/sapi/fpm/php-fpm" "${pkgdir}/usr/sbin/php-fpm"
   install -D -m644 "${srcdir}/build-fpm/sapi/fpm/php-fpm.8" "${pkgdir}/usr/share/man/man8/php-fpm.8"
@@ -261,6 +266,8 @@ package_php-fpm() {
   install -D -m644 "${srcdir}/logrotate.d.php-fpm" "${pkgdir}/etc/logrotate.d/php-fpm"
   install -d -m755 "${pkgdir}/var/run/php-fpm"
   install -d -m755 "${pkgdir}/etc/php/fpm.d"
+  install -D -m644 "${srcdir}/php-fpm.tmpfiles" "${pkgdir}/usr/lib/tmpfiles.d/php-fpm.conf"
+  install -D -m644 "${srcdir}/php-fpm.service" "${pkgdir}/usr/lib/systemd/system/php-fpm.service"
 }
 
 package_php-embed() {
