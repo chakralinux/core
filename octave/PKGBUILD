@@ -4,7 +4,7 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=octave
-pkgver=3.6.1
+pkgver=3.6.3
 pkgrel=1
 pkgdesc="A high-level language, primarily intended for numerical computations."
 arch=('i686' 'x86_64')
@@ -18,7 +18,7 @@ optdepends=('texinfo: for help-support in octave'
 source=("ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.bz2")
 options=('!emptydirs')
 install=octave.install
-sha1sums=('46fdc0b3d7db1b0266975a7443e26769c939a9c7')
+md5sums=('29ab7e502e5c963c058906f788670245')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
@@ -27,7 +27,8 @@ build() {
   FFLAGS="-O -ffloat-store" \
 
   ./configure --prefix=/usr --libexecdir=/usr/lib \
-  --enable-shared --disable-static --disable-docs
+  --enable-shared --disable-static --disable-docs \
+  --enable-64
 
   make
 }
