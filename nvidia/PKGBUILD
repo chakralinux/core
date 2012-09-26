@@ -3,15 +3,15 @@
 #
 # maintainer abveritas@chakra-project.org
 
-_extramodules=extramodules-3.4-CHAKRA
+_extramodules=extramodules-3.5-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=('nvidia' 'chd-nvidia')
 pkgver=304.51
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-makedepends=('linux-headers' 'linux>=3.4' 'linux<3.5' "nvidia-utils=${pkgver}")
+makedepends=('linux-headers' 'linux>=3.5' 'linux<3.6' "nvidia-utils=${pkgver}")
 license=('custom')
 source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47')
@@ -37,7 +37,7 @@ build() {
 
 package_nvidia() {
     pkgdesc="NVIDIA drivers for linux."
-    depends=('linux>=3.4' 'linux<3.5' "nvidia-utils=${pkgver}")
+    depends=('linux>=3.5' 'linux<3.6' "nvidia-utils=${pkgver}")
     conflicts=('nvidia-96xx' 'nvidia-173xx')
     install=nvidia.install
     
