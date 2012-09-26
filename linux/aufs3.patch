@@ -1,5 +1,5 @@
 --- /dev/null
-+++ linux-3.4/Documentation/ABI/testing/debugfs-aufs	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/ABI/testing/debugfs-aufs	2012-08-16 17:25:25.607871479 +0200
 @@ -0,0 +1,37 @@
 +What:		/debug/aufs/si_<id>/
 +Date:		March 2009
@@ -39,7 +39,7 @@
 +		When the aufs mount option 'noxino' is specified, it
 +		will be empty. About XINO files, see the aufs manual.
 --- /dev/null
-+++ linux-3.4/Documentation/ABI/testing/sysfs-aufs	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/ABI/testing/sysfs-aufs	2012-08-16 17:25:25.607871479 +0200
 @@ -0,0 +1,24 @@
 +What:		/sys/fs/aufs/si_<id>/
 +Date:		March 2009
@@ -66,7 +66,7 @@
 +		When the aufs mount option 'noxino' is specified, it
 +		will be empty. About XINO files, see the aufs manual.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/README	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/README	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,330 @@
 +
 +Aufs3 -- advanced multi layered unification filesystem version 3.x
@@ -379,7 +379,7 @@
 +Pavel Pronskiy made a donation (2011/2).
 +Iridium and Inmarsat satellite phone retailer (www.mailasail.com), Nippy
 +	Networks (Ed Wildgoose) made a donation for hardware (2011/3).
-+Max Lekomcev (DOM-TV project) made a donation (2011/7, 12 and 2012/3).
++Max Lekomcev (DOM-TV project) made a donation (2011/7, 12 and 2012/3, 6).
 +Sam Liddicott made a donation (2011/9).
 +
 +Thank you very much.
@@ -399,7 +399,7 @@
 +# mode: text;
 +# End: ;
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/01intro.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/01intro.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,162 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -564,7 +564,7 @@
 +helper, instead of doing in kernel space. Actually I am still thinking
 +about it. But currently I have implemented it in kernel space.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/02struct.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/02struct.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,226 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -793,7 +793,7 @@
 +When the trigger systemcall does not update the timestamps of the parent
 +dir, aufs reverts it after copy-up.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/03lookup.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/03lookup.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,106 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -902,7 +902,7 @@
 +   aufs performance when system surely hide the aufs branches from user,
 +   by over-mounting something (or another method).
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/04branch.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/04branch.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,76 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -981,7 +981,7 @@
 +  - a regular file on the branch is opened for write and there is no
 +    same named entry on the upper branch.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/05wbr_policy.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/05wbr_policy.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,65 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -1049,7 +1049,7 @@
 +  one. If the selected branch is readonly, then aufs follows the
 +  copyup policy.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/06mmap.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/06mmap.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,47 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -1099,7 +1099,7 @@
 +approach, aufs met a hard problem and I could not solve it without
 +switching the approach.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/07export.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/07export.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,59 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -1161,7 +1161,7 @@
 +- readdir(): call lockdep_on/off() because filldir in NFSD calls
 +  lookup_one_len(), vfs_getattr(), encode_fh() and others.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/08shwh.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/08shwh.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,53 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -1217,7 +1217,7 @@
 +This new squashfs archive can be stored on the boot device and the
 +initramfs will use it to replace the old one at the next boot.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/10dynop.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/10dynop.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,47 @@
 +
 +# Copyright (C) 2010-2011 Junjiro R. Okajima
@@ -1267,7 +1267,7 @@
 +Currently this approach is applied to file_operations and
 +vm_operations_struct for regular files only.
 --- /dev/null
-+++ linux-3.4/Documentation/filesystems/aufs/design/99plan.txt	2012-05-23 11:23:37.267235775 +0200
++++ linux-3.5/Documentation/filesystems/aufs/design/99plan.txt	2012-08-16 17:25:25.611204634 +0200
 @@ -0,0 +1,96 @@
 +
 +# Copyright (C) 2005-2011 Junjiro R. Okajima
@@ -1366,7 +1366,7 @@
 +/new.
 +Otherwise from /new.
 --- /dev/null
-+++ linux-3.4/fs/aufs/Kconfig	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/Kconfig	2012-08-16 17:25:25.614537789 +0200
 @@ -0,0 +1,203 @@
 +config AUFS_FS
 +	tristate "Aufs (Advanced multi layered unification filesystem) support"
@@ -1572,7 +1572,7 @@
 +	When aufs supports Magic SysRq, enabled automatically.
 +endif
 --- /dev/null
-+++ linux-3.4/fs/aufs/Makefile	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/Makefile	2012-08-16 17:25:25.614537789 +0200
 @@ -0,0 +1,42 @@
 +
 +include ${src}/magic.mk
@@ -1617,7 +1617,7 @@
 +aufs-$(CONFIG_AUFS_DEBUG) += debug.o
 +aufs-$(CONFIG_AUFS_MAGIC_SYSRQ) += sysrq.o
 --- /dev/null
-+++ linux-3.4/fs/aufs/aufs.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/aufs.h	2012-08-16 17:25:25.614537789 +0200
 @@ -0,0 +1,60 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -1680,7 +1680,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/branch.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/branch.c	2012-08-16 17:25:25.614537789 +0200
 @@ -0,0 +1,1169 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -1935,14 +1935,14 @@
 +	if (au_opt_test(au_mntflags(sb), WARN_PERM)) {
 +		h_inode = au_h_dptr(root, 0)->d_inode;
 +		if ((h_inode->i_mode & S_IALLUGO) != (inode->i_mode & S_IALLUGO)
-+		    || h_inode->i_uid != inode->i_uid
-+		    || h_inode->i_gid != inode->i_gid)
-+			pr_warning("uid/gid/perm %s %u/%u/0%o, %u/%u/0%o\n",
-+				   add->pathname,
-+				   inode->i_uid, inode->i_gid,
-+				   (inode->i_mode & S_IALLUGO),
-+				   h_inode->i_uid, h_inode->i_gid,
-+				   (h_inode->i_mode & S_IALLUGO));
++		    || !uid_eq(h_inode->i_uid, inode->i_uid)
++		    || !gid_eq(h_inode->i_gid, inode->i_gid))
++			pr_warn("uid/gid/perm %s %u/%u/0%o, %u/%u/0%o\n",
++				add->pathname,
++				i_uid_read(inode), i_gid_read(inode),
++				(inode->i_mode & S_IALLUGO),
++				i_uid_read(h_inode), i_gid_read(h_inode),
++				(h_inode->i_mode & S_IALLUGO));
 +	}
 +
 +out:
@@ -2537,8 +2537,8 @@
 +	/* revert */
 +	rerr = au_br_init_wh(sb, br, br->br_perm, del->h_path.dentry);
 +	if (rerr)
-+		pr_warning("failed re-creating base whiteout, %s. (%d)\n",
-+			   del->pathname, rerr);
++		pr_warn("failed re-creating base whiteout, %s. (%d)\n",
++			del->pathname, rerr);
 +out:
 +	return err;
 +}
@@ -2649,7 +2649,7 @@
 +
 +	n = 0;
 +	p = a;
-+	lg_global_lock(files_lglock);
++	lg_global_lock(&files_lglock);
 +	do_file_list_for_each_entry(sb, f) {
 +		if (au_fi(f)
 +		    && file_count(f)
@@ -2660,7 +2660,7 @@
 +			AuDebugOn(n > max);
 +		}
 +	} while_file_list_for_each_entry;
-+	lg_global_unlock(files_lglock);
++	lg_global_unlock(&files_lglock);
 +
 +	return n;
 +}
@@ -2852,7 +2852,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/branch.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/branch.h	2012-08-16 17:25:25.614537789 +0200
 @@ -0,0 +1,230 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -3085,7 +3085,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_BRANCH_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/conf.mk	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/conf.mk	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,38 @@
 +
 +AuConfStr = CONFIG_AUFS_FS=${CONFIG_AUFS_FS}
@@ -3126,7 +3126,7 @@
 +
 +-include ${srctree}/${src}/conf_priv.mk
 --- /dev/null
-+++ linux-3.4/fs/aufs/cpup.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/cpup.c	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,1084 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -3274,7 +3274,7 @@
 +
 +	err = vfsub_notify_change(&dt->dt_h_path, &attr);
 +	if (unlikely(err))
-+		pr_warning("restoring timestamps failed(%d). ignored\n", err);
++		pr_warn("restoring timestamps failed(%d). ignored\n", err);
 +}
 +
 +/* ---------------------------------------------------------------------- */
@@ -4213,7 +4213,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/cpup.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/cpup.h	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,81 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -4297,7 +4297,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_CPUP_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/dbgaufs.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dbgaufs.c	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,334 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -4634,7 +4634,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/dbgaufs.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dbgaufs.h	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,49 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -4686,7 +4686,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __DBGAUFS_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/dcsub.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dcsub.c	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,243 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -4932,7 +4932,7 @@
 +	return path_is_under(path + 0, path + 1);
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/dcsub.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dcsub.h	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,94 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -5029,7 +5029,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DCSUB_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/debug.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/debug.c	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,489 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -5511,7 +5511,7 @@
 +	AuDebugOn(destr.len < NAME_MAX);
 +
 +#ifdef CONFIG_4KSTACKS
-+	pr_warning("CONFIG_4KSTACKS is defined.\n");
++	pr_warn("CONFIG_4KSTACKS is defined.\n");
 +#endif
 +
 +#ifdef AuForceNoBrs
@@ -5521,7 +5521,7 @@
 +	return 0;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/debug.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/debug.h	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,242 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -5588,7 +5588,7 @@
 +#define AuWarn1(fmt, ...) do { \
 +	static unsigned char _c; \
 +	if (!_c++) \
-+		pr_warning(fmt, ##__VA_ARGS__); \
++		pr_warn(fmt, ##__VA_ARGS__); \
 +} while (0)
 +
 +#define AuErr1(fmt, ...) do { \
@@ -5766,7 +5766,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DEBUG_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/dentry.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dentry.c	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,1140 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -6116,8 +6116,8 @@
 +struct au_iattr {
 +	unsigned long		i_ino;
 +	/* unsigned int		i_nlink; */
-+	uid_t			i_uid;
-+	gid_t			i_gid;
++	kuid_t			i_uid;
++	kgid_t			i_gid;
 +	u64			i_version;
 +/*
 +	loff_t			i_size;
@@ -6144,8 +6144,8 @@
 +{
 +	return ia->i_ino != h_inode->i_ino
 +		/* || ia->i_nlink != h_inode->i_nlink */
-+		|| ia->i_uid != h_inode->i_uid
-+		|| ia->i_gid != h_inode->i_gid
++		|| !uid_eq(ia->i_uid, h_inode->i_uid)
++		|| !gid_eq(ia->i_gid, h_inode->i_gid)
 +		|| ia->i_version != h_inode->i_version
 +/*
 +		|| ia->i_size != h_inode->i_size
@@ -6909,7 +6909,7 @@
 +	.d_release	= aufs_d_release
 +};
 --- /dev/null
-+++ linux-3.4/fs/aufs/dentry.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dentry.h	2012-08-16 17:25:25.617870944 +0200
 @@ -0,0 +1,237 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -7149,7 +7149,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DENTRY_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/dinfo.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dinfo.c	2012-08-16 17:25:25.621204099 +0200
 @@ -0,0 +1,543 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -7695,7 +7695,7 @@
 +	return -1;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/dir.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dir.c	2012-08-16 17:25:25.621204099 +0200
 @@ -0,0 +1,636 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -8334,7 +8334,7 @@
 +	.fsync		= aufs_fsync_dir
 +};
 --- /dev/null
-+++ linux-3.4/fs/aufs/dir.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dir.h	2012-08-16 17:25:25.621204099 +0200
 @@ -0,0 +1,137 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -8474,7 +8474,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DIR_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/dynop.c	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dynop.c	2012-08-16 17:25:25.621204099 +0200
 @@ -0,0 +1,377 @@
 +/*
 + * Copyright (C) 2010-2012 Junjiro R. Okajima
@@ -8854,7 +8854,7 @@
 +		WARN_ON(!list_empty(&dynop[i].head));
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/dynop.h	2012-05-23 11:23:37.270569179 +0200
++++ linux-3.5/fs/aufs/dynop.h	2012-08-16 17:25:25.621204099 +0200
 @@ -0,0 +1,76 @@
 +/*
 + * Copyright (C) 2010-2012 Junjiro R. Okajima
@@ -8933,8 +8933,8 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DYNOP_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/export.c	2012-05-23 11:23:37.273902583 +0200
-@@ -0,0 +1,803 @@
++++ linux-3.5/fs/aufs/export.c	2012-08-16 17:25:25.621204099 +0200
+@@ -0,0 +1,810 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -9223,9 +9223,9 @@
 +	};
 +
 +	get_fs_root(current->fs, &root);
-+	br_read_lock(vfsmount_lock);
++	br_read_lock(&vfsmount_lock);
 +	err = iterate_mounts(au_compare_mnt, &args, root.mnt);
-+	br_read_unlock(vfsmount_lock);
++	br_read_unlock(&vfsmount_lock);
 +	path_put(&root);
 +	AuDebugOn(!err);
 +	AuDebugOn(!args.mnt);
@@ -9593,19 +9593,16 @@
 +
 +/* ---------------------------------------------------------------------- */
 +
-+static int aufs_encode_fh(struct dentry *dentry, __u32 *fh, int *max_len,
-+			  int connectable)
++static int aufs_encode_fh(struct inode *inode, __u32 *fh, int *max_len,
++			  struct inode *dir)
 +{
 +	int err;
-+	aufs_bindex_t bindex, bend;
++	aufs_bindex_t bindex;
 +	struct super_block *sb, *h_sb;
-+	struct inode *inode;
-+	struct dentry *parent, *h_parent;
++	struct dentry *dentry, *parent, *h_parent;
++	struct inode *h_dir;
 +	struct au_branch *br;
 +
-+	AuDebugOn(au_test_anon(dentry));
-+
-+	parent = NULL;
 +	err = -ENOSPC;
 +	if (unlikely(*max_len <= Fh_tail)) {
 +		AuWarn1("NFSv2 client (max_len %d)?\n", *max_len);
@@ -9613,49 +9610,58 @@
 +	}
 +
 +	err = FILEID_ROOT;
-+	if (IS_ROOT(dentry)) {
-+		AuDebugOn(dentry->d_inode->i_ino != AUFS_ROOT_INO);
++	if (inode->i_ino == AUFS_ROOT_INO) {
++		AuDebugOn(inode->i_ino != AUFS_ROOT_INO);
 +		goto out;
 +	}
 +
 +	h_parent = NULL;
-+	err = aufs_read_lock(dentry, AuLock_FLUSH | AuLock_IR | AuLock_GEN);
++	sb = inode->i_sb;
++	err = si_read_lock(sb, AuLock_FLUSH);
 +	if (unlikely(err))
 +		goto out;
 +
-+	inode = dentry->d_inode;
-+	AuDebugOn(!inode);
-+	sb = dentry->d_sb;
 +#ifdef CONFIG_AUFS_DEBUG
 +	if (unlikely(!au_opt_test(au_mntflags(sb), XINO)))
 +		AuWarn1("NFS-exporting requires xino\n");
 +#endif
 +	err = -EIO;
-+	parent = dget_parent(dentry);
-+	di_read_lock_parent(parent, !AuLock_IR);
-+	bend = au_dbtaildir(parent);
-+	for (bindex = au_dbstart(parent); bindex <= bend; bindex++) {
-+		h_parent = au_h_dptr(parent, bindex);
-+		if (h_parent) {
-+			dget(h_parent);
-+			break;
-+		}
++	parent = NULL;
++	ii_read_lock_child(inode);
++	bindex = au_ibstart(inode);
++	if (!dir) {
++		dentry = d_find_alias(inode);
++		if (unlikely(!dentry))
++			goto out_unlock;
++		AuDebugOn(au_test_anon(dentry));
++		parent = dget_parent(dentry);
++		dput(dentry);
++		if (unlikely(!parent))
++			goto out_unlock;
++		dir = parent->d_inode;
 +	}
++
++	ii_read_lock_parent(dir);
++	h_dir = au_h_iptr(dir, bindex);
++	ii_read_unlock(dir);
++	if (unlikely(!h_dir))
++		goto out_parent;
++	h_parent = d_find_alias(h_dir);
 +	if (unlikely(!h_parent))
-+		goto out_unlock;
++		goto out_hparent;
 +
 +	err = -EPERM;
 +	br = au_sbr(sb, bindex);
 +	h_sb = br->br_mnt->mnt_sb;
 +	if (unlikely(!h_sb->s_export_op)) {
 +		AuErr1("%s branch is not exportable\n", au_sbtype(h_sb));
-+		goto out_dput;
++		goto out_hparent;
 +	}
 +
 +	fh[Fh_br_id] = br->br_id;
 +	fh[Fh_sigen] = au_sigen(sb);
 +	encode_ino(fh + Fh_ino, inode->i_ino);
-+	encode_ino(fh + Fh_dir_ino, parent->d_inode->i_ino);
++	encode_ino(fh + Fh_dir_ino, dir->i_ino);
 +	fh[Fh_igen] = inode->i_generation;
 +
 +	*max_len -= Fh_tail;
@@ -9670,12 +9676,13 @@
 +	else
 +		AuWarn1("%s encode_fh failed\n", au_sbtype(h_sb));
 +
-+out_dput:
++out_hparent:
 +	dput(h_parent);
-+out_unlock:
-+	di_read_unlock(parent, !AuLock_IR);
++out_parent:
 +	dput(parent);
-+	aufs_read_unlock(dentry, AuLock_IR);
++out_unlock:
++	ii_read_unlock(inode);
++	si_read_unlock(sb);
 +out:
 +	if (unlikely(err < 0))
 +		err = 255;
@@ -9739,8 +9746,8 @@
 +	atomic_set(&sbinfo->si_xigen_next, u);
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/f_op.c	2012-05-23 11:23:37.273902583 +0200
-@@ -0,0 +1,729 @@
++++ linux-3.5/fs/aufs/f_op.c	2012-08-16 17:25:25.621204099 +0200
+@@ -0,0 +1,727 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -10226,7 +10233,6 @@
 +static int aufs_mmap(struct file *file, struct vm_area_struct *vma)
 +{
 +	int err;
-+	unsigned long prot;
 +	aufs_bindex_t bstart;
 +	const unsigned char wlock
 +		= (file->f_mode & FMODE_WRITE) && (vma->vm_flags & VM_SHARED);
@@ -10266,9 +10272,8 @@
 +	lockdep_on();
 +
 +	au_vm_file_reset(vma, h_file);
-+	prot = au_prot_conv(vma->vm_flags);
-+	err = security_file_mmap(h_file, /*reqprot*/prot, prot,
-+				 au_flag_conv(vma->vm_flags), vma->vm_start, 0);
++	err = security_mmap_file(h_file, au_prot_conv(vma->vm_flags),
++				 au_flag_conv(vma->vm_flags));
 +	if (!err)
 +		err = h_file->f_op->mmap(h_file, vma);
 +	if (unlikely(err))
@@ -10471,8 +10476,8 @@
 +#endif
 +};
 --- /dev/null
-+++ linux-3.4/fs/aufs/f_op_sp.c	2012-05-23 11:23:37.273902583 +0200
-@@ -0,0 +1,298 @@
++++ linux-3.5/fs/aufs/f_op_sp.c	2012-08-16 17:25:25.621204099 +0200
+@@ -0,0 +1,295 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -10549,9 +10554,6 @@
 +	/* do not change the file in kio */
 +	AuDebugOn(!h_file->f_op || !h_file->f_op->aio_write);
 +	err = h_file->f_op->aio_write(kio, iov, nv, pos);
-+	if (err > 0 && wbr)
-+		file_update_time(h_file);
-+
 +	return err;
 +}
 +
@@ -10772,7 +10774,7 @@
 +	return ret;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/file.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/file.c	2012-08-16 17:25:25.621204099 +0200
 @@ -0,0 +1,676 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -11451,7 +11453,7 @@
 +#endif /* CONFIG_AUFS_DEBUG */
 +};
 --- /dev/null
-+++ linux-3.4/fs/aufs/file.h	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/file.h	2012-08-16 17:25:25.624537255 +0200
 @@ -0,0 +1,298 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -11682,7 +11684,7 @@
 +{
 +	if (atomic_inc_return(&au_fi(f)->fi_mmapped))
 +		return;
-+	pr_warning("fi_mmapped wrapped around\n");
++	pr_warn("fi_mmapped wrapped around\n");
 +	while (!atomic_inc_return(&au_fi(f)->fi_mmapped))
 +		;
 +}
@@ -11752,7 +11754,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_FILE_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/finfo.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/finfo.c	2012-08-16 17:25:25.624537255 +0200
 @@ -0,0 +1,156 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -11911,7 +11913,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/fstype.h	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/fstype.h	2012-08-16 17:25:25.624537255 +0200
 @@ -0,0 +1,496 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -12410,8 +12412,8 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_FSTYPE_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/hfsnotify.c	2012-05-23 11:23:37.273902583 +0200
-@@ -0,0 +1,260 @@
++++ linux-3.5/fs/aufs/hfsnotify.c	2012-08-16 17:25:25.624537255 +0200
+@@ -0,0 +1,257 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -12557,10 +12559,7 @@
 +	struct au_hnotify *hnotify;
 +	struct inode *h_dir, *h_inode;
 +	__u32 mask;
-+	struct qstr h_child_qstr = {
-+		.name	= event->file_name,
-+		.len	= event->name_len
-+	};
++	struct qstr h_child_qstr = QSTR_INIT(event->file_name, event->name_len);
 +
 +	AuDebugOn(event->data_type != FSNOTIFY_EVENT_INODE);
 +
@@ -12673,7 +12672,7 @@
 +	.init_br	= au_hfsn_init_br
 +};
 --- /dev/null
-+++ linux-3.4/fs/aufs/hfsplus.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/hfsplus.c	2012-08-16 17:25:25.624537255 +0200
 @@ -0,0 +1,57 @@
 +/*
 + * Copyright (C) 2010-2012 Junjiro R. Okajima
@@ -12733,7 +12732,7 @@
 +	}
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/hnotify.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/hnotify.c	2012-08-16 17:25:25.624537255 +0200
 @@ -0,0 +1,712 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -12845,7 +12844,7 @@
 +
 +	err = 0;
 +	if (unlikely(inode->i_ino == AUFS_ROOT_INO)) {
-+		pr_warning("branch root dir was changed\n");
++		pr_warn("branch root dir was changed\n");
 +		goto out;
 +	}
 +
@@ -12940,7 +12939,7 @@
 +
 +	err = 1;
 +	if (unlikely(inode->i_ino == AUFS_ROOT_INO)) {
-+		pr_warning("branch root dir was changed\n");
++		pr_warn("branch root dir was changed\n");
 +		err = 0;
 +		goto out;
 +	}
@@ -12996,7 +12995,7 @@
 +	if (IS_ROOT(dentry)
 +	    /* || (inode && inode->i_ino == AUFS_ROOT_INO) */
 +		) {
-+		pr_warning("branch root dir was changed\n");
++		pr_warn("branch root dir was changed\n");
 +		return 0;
 +	}
 +
@@ -13095,8 +13094,8 @@
 +	if (au_ftest_hnjob(a->flags, MNTPNT)
 +	    && a->dentry
 +	    && d_mountpoint(a->dentry))
-+		pr_warning("mount-point %.*s is removed or renamed\n",
-+			   AuDLNPair(a->dentry));
++		pr_warn("mount-point %.*s is removed or renamed\n",
++			AuDLNPair(a->dentry));
 +
 +	return 0;
 +}
@@ -13158,7 +13157,7 @@
 +		goto out;
 +
 +	if (unlikely(inode->i_ino == AUFS_ROOT_INO)) {
-+		pr_warning("wrong root branch\n");
++		pr_warn("wrong root branch\n");
 +		iput(inode);
 +		inode = NULL;
 +		goto out;
@@ -13448,8 +13447,8 @@
 +		au_hn_destroy_cache();
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/i_op.c	2012-05-23 11:23:37.273902583 +0200
-@@ -0,0 +1,993 @@
++++ linux-3.5/fs/aufs/i_op.c	2012-08-16 17:25:25.624537255 +0200
+@@ -0,0 +1,1009 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -13658,18 +13657,13 @@
 +	ret = d_splice_alias(inode, dentry);
 +	if (unlikely(IS_ERR(ret) && inode)) {
 +		ii_write_unlock(inode);
-+		lc_idx = AuLcNonDir_IIINFO;
-+		if (S_ISLNK(inode->i_mode))
-+			lc_idx = AuLcSymlink_IIINFO;
-+		else if (S_ISDIR(inode->i_mode))
-+			lc_idx = AuLcDir_IIINFO;
-+		au_rw_class(&au_ii(inode)->ii_rwsem, au_lc_key + lc_idx);
 +		iput(inode);
++		inode = NULL;
 +	}
 +
 +out_unlock:
 +	di_write_unlock(dentry);
-+	if (unlikely(IS_ERR(ret) && inode)) {
++	if (inode) {
 +		lc_idx = AuLcNonDir_DIINFO;
 +		if (S_ISLNK(inode->i_mode))
 +			lc_idx = AuLcSymlink_DIINFO;
@@ -14155,7 +14149,8 @@
 +			goto out_unlock;
 +	} else if ((ia->ia_valid & (ATTR_UID | ATTR_GID))
 +		   && (ia->ia_valid & ATTR_CTIME)) {
-+		err = security_path_chown(&a->h_path, ia->ia_uid, ia->ia_gid);
++		err = security_path_chown(&a->h_path, vfsub_ia_uid(ia),
++					  vfsub_ia_gid(ia));
 +		if (unlikely(err))
 +			goto out_unlock;
 +	}
@@ -14205,8 +14200,8 @@
 +	unsigned int n;
 +
 +	inode->i_mode = st->mode;
-+	inode->i_uid = st->uid;
-+	inode->i_gid = st->gid;
++	i_uid_write(inode, st->uid);
++	i_gid_write(inode, st->gid);
 +	inode->i_atime = st->atime;
 +	inode->i_mtime = st->mtime;
 +	inode->i_ctime = st->ctime;
@@ -14403,11 +14398,25 @@
 +
 +/* ---------------------------------------------------------------------- */
 +
-+static void aufs_truncate_range(struct inode *inode __maybe_unused,
-+				loff_t start __maybe_unused,
-+				loff_t end __maybe_unused)
++static int aufs_update_time(struct inode *inode, struct timespec *ts, int flags)
 +{
-+	AuUnsupport();
++	int err;
++	struct super_block *sb;
++	struct inode *h_inode;
++
++	sb = inode->i_sb;
++	/* mmap_sem might be acquired already, cf. aufs_mmap() */
++	lockdep_off();
++	si_read_lock(sb, AuLock_FLUSH);
++	ii_write_lock_child(inode);
++	lockdep_on();
++	h_inode = au_h_iptr(inode, au_ibstart(inode));
++	err = vfsub_update_time(h_inode, ts, flags);
++	lockdep_off();
++	ii_write_unlock(inode);
++	si_read_unlock(sb);
++	lockdep_on();
++	return err;
 +}
 +
 +/* ---------------------------------------------------------------------- */
@@ -14416,9 +14425,12 @@
 +	.permission	= aufs_permission,
 +	.setattr	= aufs_setattr,
 +	.getattr	= aufs_getattr,
++
 +	.readlink	= aufs_readlink,
 +	.follow_link	= aufs_follow_link,
-+	.put_link	= aufs_put_link
++	.put_link	= aufs_put_link,
++
++	/* .update_time	= aufs_update_time */
 +};
 +
 +struct inode_operations aufs_dir_iop = {
@@ -14434,17 +14446,20 @@
 +
 +	.permission	= aufs_permission,
 +	.setattr	= aufs_setattr,
-+	.getattr	= aufs_getattr
++	.getattr	= aufs_getattr,
++
++	.update_time	= aufs_update_time
 +};
 +
 +struct inode_operations aufs_iop = {
 +	.permission	= aufs_permission,
 +	.setattr	= aufs_setattr,
 +	.getattr	= aufs_getattr,
-+	.truncate_range	= aufs_truncate_range
++
++	.update_time	= aufs_update_time
 +};
 --- /dev/null
-+++ linux-3.4/fs/aufs/i_op_add.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/i_op_add.c	2012-08-16 17:25:25.624537255 +0200
 @@ -0,0 +1,712 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -15159,7 +15174,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/i_op_del.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/i_op_del.c	2012-08-16 17:25:25.624537255 +0200
 @@ -0,0 +1,478 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -15640,7 +15655,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/i_op_ren.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/i_op_ren.c	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,1026 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -15898,8 +15913,8 @@
 +	    || au_test_fs_remote(a->h_dst->d_sb)) {
 +		err = au_whtmp_rmdir(dir, a->btgt, a->h_dst, &a->whlist);
 +		if (unlikely(err))
-+			pr_warning("failed removing whtmp dir %.*s (%d), "
-+				   "ignored.\n", AuDLNPair(a->h_dst), err);
++			pr_warn("failed removing whtmp dir %.*s (%d), "
++				"ignored.\n", AuDLNPair(a->h_dst), err);
 +	} else {
 +		au_nhash_wh_free(&a->thargs->whlist);
 +		a->thargs->whlist = a->whlist;
@@ -16669,7 +16684,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/iinfo.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/iinfo.c	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,264 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -16936,8 +16951,8 @@
 +	AuRwDestroy(&iinfo->ii_rwsem);
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/inode.c	2012-05-23 11:23:37.273902583 +0200
-@@ -0,0 +1,471 @@
++++ linux-3.5/fs/aufs/inode.c	2012-08-16 17:25:25.627870411 +0200
+@@ -0,0 +1,478 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -17266,7 +17281,7 @@
 +	struct super_block *sb;
 +	struct mutex *mtx;
 +	ino_t h_ino, ino;
-+	int err;
++	int err, lc_idx;
 +	aufs_bindex_t bstart;
 +
 +	sb = dentry->d_sb;
@@ -17307,6 +17322,13 @@
 +
 +	AuDbg("%lx, new %d\n", inode->i_state, !!(inode->i_state & I_NEW));
 +	if (inode->i_state & I_NEW) {
++		lc_idx = AuLcNonDir_IIINFO;
++		if (S_ISLNK(h_inode->i_mode))
++			lc_idx = AuLcSymlink_IIINFO;
++		else if (S_ISDIR(h_inode->i_mode))
++			lc_idx = AuLcDir_IIINFO;
++		au_rw_class(&au_ii(inode)->ii_rwsem, au_lc_key + lc_idx);
++
 +		ii_write_lock_new_child(inode);
 +		err = set_inode(inode, dentry);
 +		if (!err) {
@@ -17396,7 +17418,7 @@
 +
 +int au_test_h_perm(struct inode *h_inode, int mask)
 +{
-+	if (!current_fsuid())
++	if (uid_eq(current_fsuid(), GLOBAL_ROOT_UID))
 +		return 0;
 +	return inode_permission(h_inode, mask);
 +}
@@ -17410,7 +17432,7 @@
 +	return au_test_h_perm(h_inode, mask);
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/inode.h	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/inode.h	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,560 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -17973,7 +17995,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_INODE_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/ioctl.c	2012-05-23 11:23:37.273902583 +0200
++++ linux-3.5/fs/aufs/ioctl.c	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,196 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -18172,7 +18194,7 @@
 +#endif
 +#endif
 --- /dev/null
-+++ linux-3.4/fs/aufs/loop.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/loop.c	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,133 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -18283,8 +18305,8 @@
 +
 +pr:
 +	spin_unlock(&spin);
-+	pr_warning("you may want to try another patch for loopback file "
-+		   "on %s(0x%lx) branch\n", au_sbtype(h_sb), magic);
++	pr_warn("you may want to try another patch for loopback file "
++		"on %s(0x%lx) branch\n", au_sbtype(h_sb), magic);
 +}
 +
 +int au_loopback_init(void)
@@ -18308,7 +18330,7 @@
 +	kfree(au_warn_loopback_array);
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/loop.h	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/loop.h	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,50 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -18361,7 +18383,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_LOOP_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/magic.mk	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/magic.mk	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,54 @@
 +
 +# defined in ${srctree}/fs/fuse/inode.c
@@ -18418,7 +18440,7 @@
 +ccflags-y += -DHFSPLUS_SUPER_MAGIC=0x482b
 +endif
 --- /dev/null
-+++ linux-3.4/fs/aufs/module.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/module.c	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,196 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -18617,7 +18639,7 @@
 +module_init(aufs_init);
 +module_exit(aufs_exit);
 --- /dev/null
-+++ linux-3.4/fs/aufs/module.h	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/module.h	2012-08-16 17:25:25.627870411 +0200
 @@ -0,0 +1,105 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -18725,7 +18747,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_MODULE_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/opts.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/opts.c	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,1677 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -18943,7 +18965,7 @@
 +		else {
 +			if (p)
 +				*p = '+';
-+			pr_warning("ignored branch attribute %s\n", str);
++			pr_warn("ignored branch attribute %s\n", str);
 +			break;
 +		}
 +		if (p)
@@ -18966,7 +18988,7 @@
 +	if (!val) {
 +		if (p)
 +			*p = '+';
-+		pr_warning("ignored branch permission %s\n", perm);
++		pr_warn("ignored branch permission %s\n", perm);
 +		val = AuBrPerm_RO;
 +		goto out;
 +	}
@@ -19852,7 +19874,7 @@
 +			break;
 +
 +		case Opt_ignore:
-+			pr_warning("ignored %s\n", opt_str);
++			pr_warn("ignored %s\n", opt_str);
 +			/*FALLTHROUGH*/
 +		case Opt_ignore_silent:
 +			skipped = 1;
@@ -20188,14 +20210,14 @@
 +
 +	if (!(sb_flags & MS_RDONLY)) {
 +		if (unlikely(!au_br_writable(au_sbr_perm(sb, 0))))
-+			pr_warning("first branch should be rw\n");
++			pr_warn("first branch should be rw\n");
 +		if (unlikely(au_opt_test(sbinfo->si_mntflags, SHWH)))
-+			pr_warning("shwh should be used with ro\n");
++			pr_warn("shwh should be used with ro\n");
 +	}
 +
 +	if (au_opt_test((sbinfo->si_mntflags | pending), UDBA_HNOTIFY)
 +	    && !au_opt_test(sbinfo->si_mntflags, XINO))
-+		pr_warning("udba=*notify requires xino\n");
++		pr_warn("udba=*notify requires xino\n");
 +
 +	err = 0;
 +	root = sb->s_root;
@@ -20405,7 +20427,7 @@
 +	return au_mntflags(sb) & AuOptMask_UDBA;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/opts.h	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/opts.h	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,209 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -20617,8 +20639,8 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_OPTS_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/plink.c	2012-05-23 11:23:37.277235987 +0200
-@@ -0,0 +1,515 @@
++++ linux-3.5/fs/aufs/plink.c	2012-08-16 17:25:25.631203566 +0200
+@@ -0,0 +1,511 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -20849,9 +20871,7 @@
 +	struct inode *h_dir;
 +	int wkq_err;
 +	char a[PLINK_NAME_LEN];
-+	struct qstr tgtname = {
-+		.name	= a
-+	};
++	struct qstr tgtname = QSTR_INIT(a, 0);
 +
 +	AuDebugOn(au_plink_maint(inode->i_sb, AuLock_NOPLM));
 +
@@ -20860,7 +20880,7 @@
 +	h_dir = h_parent->d_inode;
 +	tgtname.len = plink_name(a, sizeof(a), inode, bindex);
 +
-+	if (current_fsuid()) {
++	if (!uid_eq(current_fsuid(), GLOBAL_ROOT_UID)) {
 +		struct au_do_plink_lkup_args args = {
 +			.errp		= &h_dentry,
 +			.tgtname	= &tgtname,
@@ -20937,9 +20957,7 @@
 +	struct dentry *h_parent;
 +	struct inode *h_dir;
 +	char a[PLINK_NAME_LEN];
-+	struct qstr tgtname = {
-+		.name = a
-+	};
++	struct qstr tgtname = QSTR_INIT(a, 0);
 +
 +	wbr = au_sbr(inode->i_sb, bindex)->br_wbr;
 +	h_parent = wbr->wbr_plink;
@@ -20947,7 +20965,7 @@
 +	tgtname.len = plink_name(a, sizeof(a), inode, bindex);
 +
 +	/* always superio. */
-+	if (current_fsuid()) {
++	if (!uid_eq(current_fsuid(), GLOBAL_ROOT_UID)) {
 +		struct do_whplink_args args = {
 +			.errp		= &err,
 +			.tgt		= &tgtname,
@@ -21045,7 +21063,7 @@
 +
 +out:
 +	if (unlikely(err)) {
-+		pr_warning("err %d, damaged pseudo link.\n", err);
++		pr_warn("err %d, damaged pseudo link.\n", err);
 +		if (tmp) {
 +			au_spl_del_rcu(&tmp->list, &sbinfo->si_plink);
 +			call_rcu(&tmp->rcu, do_put_plink_rcu);
@@ -21135,7 +21153,7 @@
 +	}
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/poll.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/poll.c	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,56 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -21194,7 +21212,7 @@
 +	return mask;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/procfs.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/procfs.c	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,170 @@
 +/*
 + * Copyright (C) 2010-2012 Junjiro R. Okajima
@@ -21367,7 +21385,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/rdu.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/rdu.c	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,384 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -21754,7 +21772,7 @@
 +}
 +#endif
 --- /dev/null
-+++ linux-3.4/fs/aufs/rwsem.h	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/rwsem.h	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,188 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -21945,7 +21963,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_RWSEM_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/sbinfo.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/sbinfo.c	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,343 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -22291,7 +22309,7 @@
 +	spin_unlock(&sbinfo->au_si_pid.tree_lock);
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/spl.h	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/spl.h	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,62 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -22356,7 +22374,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_SPL_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/super.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/super.c	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,962 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -23321,7 +23339,7 @@
 +	.owner		= THIS_MODULE,
 +};
 --- /dev/null
-+++ linux-3.4/fs/aufs/super.h	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/super.h	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,546 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -23870,7 +23888,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_SUPER_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/sysaufs.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/sysaufs.c	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,105 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -23978,7 +23996,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/sysaufs.h	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/sysaufs.h	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,104 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -24085,7 +24103,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __SYSAUFS_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/sysfs.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/sysfs.c	2012-08-16 17:25:25.631203566 +0200
 @@ -0,0 +1,257 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -24340,12 +24358,12 @@
 +			 "%d", bindex);
 +		err = sysfs_create_file(kobj, &br->br_attr);
 +		if (unlikely(err))
-+			pr_warning("failed %s under sysfs(%d)\n",
-+				   br->br_name, err);
++			pr_warn("failed %s under sysfs(%d)\n",
++				br->br_name, err);
 +	}
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/sysrq.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/sysrq.c	2012-08-16 17:25:25.634536721 +0200
 @@ -0,0 +1,148 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -24433,14 +24451,14 @@
 +	}
 +#endif
 +	printk(KERN_WARNING AUFS_NAME ": files\n");
-+	lg_global_lock(files_lglock);
++	lg_global_lock(&files_lglock);
 +	do_file_list_for_each_entry(sb, file) {
 +		umode_t mode;
 +		mode = file->f_dentry->d_inode->i_mode;
 +		if (!special_file(mode) || au_special_file(mode))
 +			au_dpri_file(file);
 +	} while_file_list_for_each_entry;
-+	lg_global_unlock(files_lglock);
++	lg_global_unlock(&files_lglock);
 +	printk(KERN_WARNING AUFS_NAME ": done\n");
 +
 +	au_plevel = plevel;
@@ -24496,7 +24514,7 @@
 +		pr_err("err %d (ignored)\n", err);
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/vdir.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/vdir.c	2012-08-16 17:25:25.634536721 +0200
 @@ -0,0 +1,885 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -25384,7 +25402,7 @@
 +	return 0;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/vfsub.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/vfsub.c	2012-08-16 17:25:25.634536721 +0200
 @@ -0,0 +1,832 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -26219,8 +26237,8 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/vfsub.h	2012-05-23 11:23:37.277235987 +0200
-@@ -0,0 +1,232 @@
++++ linux-3.5/fs/aufs/vfsub.h	2012-08-16 17:25:25.634536721 +0200
+@@ -0,0 +1,252 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -26254,12 +26272,12 @@
 +
 +/* copied from linux/fs/internal.h */
 +/* todo: BAD approach!! */
-+DECLARE_BRLOCK(vfsmount_lock);
++extern struct lglock vfsmount_lock;
 +extern void file_sb_list_del(struct file *f);
 +extern spinlock_t inode_sb_list_lock;
 +
 +/* copied from linux/fs/file_table.c */
-+DECLARE_LGLOCK(files_lglock);
++extern struct lglock files_lglock;
 +#ifdef CONFIG_SMP
 +/*
 + * These macros iterate all files on all CPUs for a given superblock.
@@ -26321,6 +26339,19 @@
 +	AuDebugOn(!S_ISDIR(inode->i_mode));
 +	inode->i_flags |= S_DEAD;
 +	clear_nlink(inode);
++}
++
++/* ---------------------------------------------------------------------- */
++
++/* cf. i_[ug]id_read() in linux/include/fs.h */
++static inline uid_t vfsub_ia_uid(struct iattr *ia)
++{
++	return from_kuid(&init_user_ns, ia->ia_uid);
++}
++
++static inline gid_t vfsub_ia_gid(struct iattr *ia)
++{
++	return from_kgid(&init_user_ns, ia->ia_gid);
 +}
 +
 +/* ---------------------------------------------------------------------- */
@@ -26394,6 +26425,13 @@
 +	vfsub_update_h_iattr(&h_path, /*did*/NULL); /*ignore*/
 +}
 +
++static inline int vfsub_update_time(struct inode *h_inode, struct timespec *ts,
++				    int flags)
++{
++	return update_time(h_inode, ts, flags);
++	/* no vfsub_update_h_iattr() since we don't have struct path */
++}
++
 +long vfsub_splice_to(struct file *in, loff_t *ppos,
 +		     struct pipe_inode_info *pipe, size_t len,
 +		     unsigned int flags);
@@ -26454,7 +26492,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_VFSUB_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/wbr_policy.c	2012-05-23 11:23:37.277235987 +0200
++++ linux-3.5/fs/aufs/wbr_policy.c	2012-08-16 17:25:25.634536721 +0200
 @@ -0,0 +1,700 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -27157,8 +27195,8 @@
 +	}
 +};
 --- /dev/null
-+++ linux-3.4/fs/aufs/whout.c	2012-05-23 11:23:37.280569391 +0200
-@@ -0,0 +1,1049 @@
++++ linux-3.5/fs/aufs/whout.c	2012-08-16 17:25:25.634536721 +0200
+@@ -0,0 +1,1041 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
 + *
@@ -27189,10 +27227,8 @@
 + * If a directory contains this file, then it is opaque.  We start with the
 + * .wh. flag so that it is blocked by lookup.
 + */
-+static struct qstr diropq_name = {
-+	.name = AUFS_WH_DIROPQ,
-+	.len = sizeof(AUFS_WH_DIROPQ) - 1
-+};
++static struct qstr diropq_name = QSTR_INIT(AUFS_WH_DIROPQ,
++					   sizeof(AUFS_WH_DIROPQ) - 1);
 +
 +/*
 + * generate whiteout name, which is NOT terminated by NULL.
@@ -27317,7 +27353,7 @@
 +			goto out_name;
 +		dput(dentry);
 +	}
-+	/* pr_warning("could not get random name\n"); */
++	/* pr_warn("could not get random name\n"); */
 +	dentry = ERR_PTR(-EEXIST);
 +	AuDbg("%.*s\n", AuLNPair(&qs));
 +	BUG();
@@ -27375,7 +27411,7 @@
 +	 * this may be a violation of unix fs semantics.
 +	 */
 +	force = (h_dir->i_mode & S_ISVTX)
-+		&& h_path->dentry->d_inode->i_uid != current_fsuid();
++		&& !uid_eq(current_fsuid(), h_path->dentry->d_inode->i_uid);
 +	return vfsub_unlink(h_dir, h_path, force);
 +}
 +
@@ -27435,8 +27471,8 @@
 +		mnt_drop_write(whpath->mnt);
 +	}
 +	if (unlikely(err))
-+		pr_warning("failed removing %.*s (%d), ignored.\n",
-+			   AuDLNPair(whpath->dentry), err);
++		pr_warn("failed removing %.*s (%d), ignored.\n",
++			AuDLNPair(whpath->dentry), err);
 +}
 +
 +static int test_linkable(struct dentry *h_root)
@@ -27609,18 +27645,12 @@
 +	struct inode *h_dir;
 +	struct au_wbr *wbr = br->br_wbr;
 +	static const struct qstr base_name[] = {
-+		[AuBrWh_BASE] = {
-+			.name	= AUFS_BASE_NAME,
-+			.len	= sizeof(AUFS_BASE_NAME) - 1
-+		},
-+		[AuBrWh_PLINK] = {
-+			.name	= AUFS_PLINKDIR_NAME,
-+			.len	= sizeof(AUFS_PLINKDIR_NAME) - 1
-+		},
-+		[AuBrWh_ORPH] = {
-+			.name	= AUFS_ORPHDIR_NAME,
-+			.len	= sizeof(AUFS_ORPHDIR_NAME) - 1
-+		}
++		[AuBrWh_BASE] = QSTR_INIT(AUFS_BASE_NAME,
++					  sizeof(AUFS_BASE_NAME) - 1),
++		[AuBrWh_PLINK] = QSTR_INIT(AUFS_PLINKDIR_NAME,
++					   sizeof(AUFS_PLINKDIR_NAME) - 1),
++		[AuBrWh_ORPH] = QSTR_INIT(AUFS_ORPHDIR_NAME,
++					  sizeof(AUFS_ORPHDIR_NAME) - 1)
 +	};
 +	struct au_wh_base base[] = {
 +		[AuBrWh_BASE] = {
@@ -27740,8 +27770,8 @@
 +			mnt_drop_write(a->br->br_mnt);
 +		}
 +	} else {
-+		pr_warning("%.*s is moved, ignored\n",
-+			   AuDLNPair(wbr->wbr_whbase));
++		pr_warn("%.*s is moved, ignored\n",
++			AuDLNPair(wbr->wbr_whbase));
 +		err = 0;
 +	}
 +	dput(wbr->wbr_whbase);
@@ -28132,8 +28162,8 @@
 +		return 0; /* success */
 +	}
 +
-+	pr_warning("failed removing %.*s(%d), ignored\n",
-+		   AuDLNPair(wh_dentry), err);
++	pr_warn("failed removing %.*s(%d), ignored\n",
++		AuDLNPair(wh_dentry), err);
 +	return err;
 +}
 +
@@ -28203,13 +28233,13 @@
 +	args->wh_dentry = dget(wh_dentry);
 +	wkq_err = au_wkq_nowait(call_rmdir_whtmp, args, sb, /*flags*/0);
 +	if (unlikely(wkq_err)) {
-+		pr_warning("rmdir error %.*s (%d), ignored\n",
-+			   AuDLNPair(wh_dentry), wkq_err);
++		pr_warn("rmdir error %.*s (%d), ignored\n",
++			AuDLNPair(wh_dentry), wkq_err);
 +		au_whtmp_rmdir_free(args);
 +	}
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/whout.h	2012-05-23 11:23:37.280569391 +0200
++++ linux-3.5/fs/aufs/whout.h	2012-08-16 17:25:25.634536721 +0200
 @@ -0,0 +1,88 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -28300,7 +28330,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_WHOUT_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/wkq.c	2012-05-23 11:23:37.280569391 +0200
++++ linux-3.5/fs/aufs/wkq.c	2012-08-16 17:25:25.634536721 +0200
 @@ -0,0 +1,214 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -28350,7 +28380,7 @@
 +{
 +	struct au_wkinfo *wkinfo = container_of(wk, struct au_wkinfo, wk);
 +
-+	AuDebugOn(current_fsuid());
++	AuDebugOn(!uid_eq(current_fsuid(), GLOBAL_ROOT_UID));
 +	AuDebugOn(rlimit(RLIMIT_FSIZE) != RLIM_INFINITY);
 +
 +	wkinfo->func(wkinfo->args);
@@ -28517,7 +28547,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/fs/aufs/wkq.h	2012-05-23 11:23:37.280569391 +0200
++++ linux-3.5/fs/aufs/wkq.h	2012-08-16 17:25:25.634536721 +0200
 @@ -0,0 +1,92 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -28612,7 +28642,7 @@
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_WKQ_H__ */
 --- /dev/null
-+++ linux-3.4/fs/aufs/xino.c	2012-05-23 11:23:37.280569391 +0200
++++ linux-3.5/fs/aufs/xino.c	2012-08-16 17:25:25.637869876 +0200
 @@ -0,0 +1,1264 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -28932,7 +28962,7 @@
 +
 +	ii_read_unlock(dir);
 +	if (unlikely(err))
-+		pr_warning("err b%d, (%d)\n", bindex, err);
++		pr_warn("err b%d, (%d)\n", bindex, err);
 +	atomic_dec(&br->br_xino_running);
 +	atomic_dec(&br->br_count);
 +	si_write_unlock(sb);
@@ -29879,7 +29909,7 @@
 +	return err;
 +}
 --- /dev/null
-+++ linux-3.4/include/linux/aufs_type.h	2012-05-23 11:23:37.280569391 +0200
++++ linux-3.5/include/linux/aufs_type.h	2012-08-16 17:25:25.637869876 +0200
 @@ -0,0 +1,233 @@
 +/*
 + * Copyright (C) 2005-2012 Junjiro R. Okajima
@@ -29922,7 +29952,7 @@
 +
 +#include <linux/limits.h>
 +
-+#define AUFS_VERSION	"3.4-20120521"
++#define AUFS_VERSION	"3.5-20120813"
 +
 +/* todo? move this to linux-2.6.19/include/magic.h */
 +#define AUFS_SUPER_MAGIC	('a' << 24 | 'u' << 16 | 'f' << 8 | 's')

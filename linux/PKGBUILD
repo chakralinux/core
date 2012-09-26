@@ -8,15 +8,15 @@ pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') # Build stock -CHAKRA kernel
 # pkgname=linux-custom       # Build kernel with a different name
 _kernelname=${pkgname#linux}
-_basekernel=3.4
-pkgver=${_basekernel}.6
+_basekernel=3.5
+pkgver=${_basekernel}.4
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl')
 options=('!strip')
-source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.4.tar.xz"
+source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.5.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config' 'config.x86_64'
@@ -31,25 +31,25 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.4.tar.xz"
         'config.aufs'
         # standard config files for mkinitcpio ramdisk
         "${pkgname}.preset"
-        'fix-acerhdf-1810T-bios.patch'
         'change-default-console-loglevel.patch'
-        'i915-fix-ghost-tv-output.patch')
-md5sums=('967f72983655e2479f951195953e8480'
-         '14443e53d3ab88e6eac45d954d891e00'
+        'watchdog-3.5.x.patch'
+        'i915-i2c-crash-3.5.x.patch')
+md5sums=('24153eaaa81dedc9481ada8cd9c3b83d'
+         '4d34e5098b490670261b1aea71d26023'
          '9bcefced1f4be50ef2720944f656e5d7'
-         'eccab7a50869a58ec476ab5b4fc087e8'
-         'a0aac33ce142f819220d77751585dd2f'
-         'af987a06ae369a1aa2c1b53621bf71f3'
-         'eefdf533f13bdfa90937856e3e97f981'
+         '013e265d1abe67816a36c91e088875ac'
+         '934a8a8b181f97e113a410f616e9f517'
+         '185c6ea92c3f3baf740bea83be443c9e'
+         '99e1c1de3af4fb90c66f9279c206b632'
          '9dc1aa9fcc12b3c2f52f605830c02939'
-         'ee8123b76008a6a79764ed90fb8ba635'
-         '4245486a126775e5a6e469fd6f7484f1'
-         '28761067a33e8a359700480c8a7541e4'
+         '62691fb5a20d3d28a73ec0640e9c7b3c'
+         'a9e4407bf818e4a379b884e03362522b'
+         '77894d0a8fce44e26728be3f079ed668'
          '52f4a2c7f6277774117c834d949d6b81'
          'eb14dcfd80c00852ef81ded6e826826a'
-         '3cb9e819538197398aad5db5529b22d6'
          '65cbe8e4c8efaf96dd162102e46ce81d'
-         '342071f852564e1ad03b79271a90b1a5')
+         'ae13ed1e92bba07e9b17cf5c8d89683c'
+         'ff4a203dd52e4dfb5d60948bb667d06d')
 
 build() {
   cd "${srcdir}/linux-${_basekernel}"
@@ -60,13 +60,13 @@ build() {
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
-  # Some chips detect a ghost TV output
-  patch -p1 -i "${srcdir}/i915-fix-ghost-tv-output.patch"
+  # Broken watchdog
+  # https://bugzilla.kernel.org/show_bug.cgi?id=44991
+  patch -p1 -i "${srcdir}/watchdog-3.5.x.patch"
 
-  # Patch submitted upstream, waiting for inclusion:
-  # https://lkml.org/lkml/2012/2/19/51
-  # add support for latest bios of Acer 1810T acerhdf module
-  patch -p1 -i "${srcdir}/fix-acerhdf-1810T-bios.patch"
+  # i915 i2c crash
+  # https://bugzilla.kernel.org/show_bug.cgi?id=46381
+  patch -p1 -i "${srcdir}/i915-i2c-crash-3.5.x.patch"
 
   # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
   # remove this when a Kconfig knob is made available by upstream
@@ -227,7 +227,7 @@ package_linux-headers() {
 
   cp drivers/media/video/*.h  "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/"
 
-  for i in bt8xx cpia2 cx25840 cx88 em28xx et61x251 pwc saa7134 sn9c102; do
+  for i in bt8xx cpia2 cx25840 cx88 em28xx pwc saa7134 sn9c102; do
     mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/${i}"
     cp -a drivers/media/video/${i}/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/${i}"
   done
