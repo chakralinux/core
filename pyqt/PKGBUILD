@@ -1,11 +1,10 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=pyqt
-pkgver=4.8.5
+pkgver=4.9.4
 pkgrel=1
 pkgdesc="A set of Python bindings for the Qt toolkit"
 arch=('i686' 'x86_64')
@@ -20,10 +19,16 @@ optdepends=('phonon: enable audio and video in PyQt applications'
 provides=('pyqt4')
 replaces=('pyqt4')
 conflicts=('pyqt4')
-source=("http://riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-x11-gpl-${pkgver}.tar.gz")
-md5sums=('0e4264bb912edfbda319bb236ac84407')
+source=("http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-${pkgver}/PyQt-x11-gpl-${pkgver}.tar.gz"
+        'fix-pyuic4.patch')
+md5sums=('a0b6a820633366365af5124ddbd059c7'
+         '097651aea0bafded5abdfd6d62afd2ad')
 
 build() {
+  cd "${srcdir}"/PyQt-x11-gpl-${pkgver}
+  patch -p1 -i "${srcdir}"/fix-pyuic4.patch
+  cd ..
+
   cd ${srcdir}/PyQt-x11-gpl-${pkgver}
 
   python2 configure.py \
