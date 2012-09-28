@@ -8,7 +8,7 @@
 pkgbase=mlt
 pkgname=('mlt' 'mlt-python-bindings')
 pkgver=0.8.2
-pkgrel=1
+pkgrel=2
 pkgdesc="An open source multimedia framework"
 arch=('i686' 'x86_64')
 url="http://www.mltframework.org"
@@ -18,7 +18,7 @@ optdepends=('jack')
 makedepends=('subversion')
 conflicts=('mlt++<=0.3.8')
 source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('c7a8c4ca7485bb615cbcf851d8742a1c')
+sha256sums=('36c743d2abc68ce737ac526507fc2caf71b3d6a53a2bf31d22e8193a8b899577')
 
 build() {
   # mlt
@@ -40,7 +40,7 @@ build() {
   make
 
   # mlt python bindings
-  cd "$srcdir/mlt-$pkgver/src/swig/python"
+  cd "${srcdir}/mlt-${pkgver}/src/swig/python"
   sed -i 's_path=`which python_path=`which python2_' build
   sed -i 's_`python -c_`python2 -c_' build
   sed -i 's#python-config#python2-config#' build
@@ -52,16 +52,16 @@ package_mlt() {
   optdepends=('jack' 'libexif' 'qt' "ladspa")
   conflicts=('mlt++<=0.3.8')
 
-  cd "$srcdir/mlt-$pkgver"
-  make DESTDIR="$pkgdir" install
+  cd "${ssrcdir}/mlt-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }
 
 package_mlt-python-bindings() {
   depends=('python2' 'mlt>=0.8')
 
   cd "$srcdir/mlt-$pkgver/src/swig/python"
-  mkdir -p "$pkgdir/usr/lib/python2.7/"
-  install -m755 mlt.py "$pkgdir/usr/lib/python2.7/"
-  install -m755 _mlt.so "$pkgdir/usr/lib/python2.7/"
-  install -m755 mlt_wrap.o "$pkgdir/usr/lib/python2.7/"
+  mkdir -p "${pkgdir}/usr/lib/python2.7/"
+  install -m0755 mlt.py "${pkgdir}/usr/lib/python2.7/"
+  install -m0755 _mlt.so "${pkgdir}/usr/lib/python2.7/"
+  install -m0755 mlt_wrap.o "${pkgdir}/usr/lib/python2.7/"
 }
