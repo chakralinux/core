@@ -18,7 +18,7 @@ pkgname=('kdegames-common'
          'kdegames-kajongg'
          'kdegames-kapman'
          'kdegames-katomic'
-         'kdegames-kbattleship'
+         'kdegames-knavalbattle'
          'kdegames-kblackbox'
          'kdegames-kblocks'
          'kdegames-kbounce'
@@ -45,7 +45,7 @@ pkgname=('kdegames-common'
          'kdegames-kspaceduel'
          'kdegames-ksquares'
          'kdegames-ksudoku'
-	 'kdegames-ktron'
+	 'kdegames-ksnakeduel'
          'kdegames-ktuberling'
          'kdegames-kubrick'
          'kdegames-lskat'
@@ -198,15 +198,16 @@ package_kdegames-katomic() {
 		done
 }
 
-package_kdegames-kbattleship() {
+package_kdegames-knavalbattle() {
 	pkgdesc="Implentation of the popular game Battleship where you have to try to sink the opponents ships"
 	depends=("${pkgbase}-common>=${_kdever}" 'ggz-client-libs')
-        conflicts=('kdegames-doc')
+	conflicts=('kdegames-doc' 'kdegames-kbattleship')
+	provides=('kdegames-kbattleship')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
 	categories=('games')
-	install=${pkgbase}-kbattleship.install
+	install=${pkgbase}-knavalbattle.install
 
-	splitdirs="kbattleship kbattleship/doc"
+	splitdirs="knavalbattle knavalbattle/doc"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
@@ -613,15 +614,16 @@ package_kdegames-ksudoku() {
 		done
 }
 
-package_kdegames-ktron() {
+package_kdegames-ksnakeduel() {
 	pkgdesc="Well known from the famous movie, KTron is a popular computer game for two players."
 	depends=("${pkgbase}-common>=${_kdever}")
-        conflicts=('kdegames-doc')
+	conflicts=('kdegames-doc' 'kdegames-ktron')
+	provides=('kdegames-ktron')
 	groups=("kde" "${pkgbase}" "kde-uninstall")
 	categories=('games')
 	install=${pkgbase}.install
 
-	splitdirs="ktron ktron/doc"
+	splitdirs="ksnakeduel ksnakeduel/doc"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
 			make DESTDIR=${pkgdir} install || return 1
