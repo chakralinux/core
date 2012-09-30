@@ -16,7 +16,7 @@ _origname=common
 pkgname=kde-common
 arch=(i686 x86_64)
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="KDE SC - Common Configuration Files, Scripts and Artwork"
 url="http://www.kde.org"
@@ -44,7 +44,6 @@ source=(http://www.kde-apps.org/CONTENT/content-files/48411-rootactions_servicem
 	Chakra-Forum.desktop
 	Chakra-Homepage.desktop
 	Chakra.directory
-	kdm.daemon
 	chakra-config-updater.sh
 	chakra-fix-configs.sh
 	chakra-update-icons.sh
@@ -71,7 +70,6 @@ md5sums=('2afd86671ad0db31718157aecd46d528'
          'bc5b22b54679603acd85746303bd9ad7'
          'f498246464d05c726be7263e75a9006b'
          'ad4cefe6e10e0985a89a0aea6aec530c'
-         '0688a20010ad27e35755e77c26c94d2c'
          '535501ac9f3ad05ddd18f8cfee4a2e06'
          '1cad70fdf0306e5590899865bbfb430b'
          '78a20a4ccaf943f5a2089f4d436fdf32'
@@ -95,7 +93,7 @@ build() {
 	install -D -m 755 -o root -g root $srcdir/agent-shutdown.sh $pkgdir/etc/kde/shutdown/agent-shutdown.sh
 
 	# install kdm rc script
-	install -D -m755 -o root -g root ${srcdir}/kdm.daemon ${pkgdir}/etc/rc.d/kdm
+	#install -D -m755 -o root -g root ${srcdir}/kdm.daemon ${pkgdir}/etc/rc.d/kdm
 
 	# install config updater scripts
 	install -D -m755 -o root -g root ${srcdir}/chakra-config-updater.sh ${pkgdir}/usr/bin/chakra-config-updater
