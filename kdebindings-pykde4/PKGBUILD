@@ -13,15 +13,17 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=kdebindings-pykde4
 _pkgname=pykde4
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 pkgdesc="KDE bindings for python"
 url="http://kde.org/"
 arch=('i686' 'x86_64')
 license=('GPL' 'LGPL' 'FDL')
 depends=('pyqt' 'qscintilla' 'boost-libs' "kdepim-runtime>=${_kdever}")
 makedepends=('cmake' 'automoc4' 'polkit-qt' 'boost')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
+source=("$_mirror/${_pkgname}-$_kdever.tar.xz"
+        'QVector.diff')
+md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
+         '78c55560512ff35631c6a140a2f20279')
   
 groups=("kde" "kdebindings" "kde-uninstall")
 provides=('kdebindings-python' 'pykde4')
@@ -31,6 +33,8 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 
 build() {
 	cd "${srcdir}"
+	
+	patch -p1 -N -i ${srcdir}/QVector.diff 
 	
         rm -rf build 
 	mkdir build && cd build
