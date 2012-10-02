@@ -1,6 +1,7 @@
---- common/discover.c	2009-09-29 21:44:49.000000000 +0200
-+++ common/discover.c_new	2010-06-30 19:40:02.000000000 +0200
-@@ -443,7 +443,7 @@
+diff -Naur dhcp-4.2.4-P2/common/discover.c dhcp-4.2.4-P2.fixed/common/discover.c
+--- dhcp-4.2.4-P2/common/discover.c	2012-08-24 19:11:21.000000000 +0000
++++ dhcp-4.2.4-P2.fixed/common/discover.c	2012-10-02 18:05:29.353084310 +0000
+@@ -455,7 +455,7 @@
  	}
  
  #ifdef DHCPv6
@@ -9,7 +10,7 @@
  		ifaces->fp6 = fopen("/proc/net/if_inet6", "r");
  		if (ifaces->fp6 == NULL) {
  			log_error("Error opening '/proc/net/if_inet6' to "
-@@ -454,6 +454,8 @@
+@@ -466,6 +466,8 @@
  			ifaces->fp = NULL;
  			return 0;
  		}
@@ -18,7 +19,7 @@
  	}
  #endif
  
-@@ -721,7 +723,7 @@
+@@ -733,7 +735,7 @@
  		return 1;
  	}
  #ifdef DHCPv6
@@ -27,7 +28,7 @@
  		if (local_family == AF_INET6)
  			return next_iface6(info, err, ifaces);
  	}
-@@ -740,7 +742,8 @@
+@@ -752,7 +754,8 @@
  	ifaces->sock = -1;
  #ifdef DHCPv6
  	if (local_family == AF_INET6) {
