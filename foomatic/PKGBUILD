@@ -6,7 +6,7 @@
 pkgbase="foomatic"
 pkgname=('foomatic-db' 'foomatic-filters' 'foomatic-db-engine' 'foomatic-db-nonfree')
 arch=('i686' 'x86_64') # needs to be changed  in the subpackages when makepkg will support it
-_snapdate=20120704
+_snapdate=20121003
 _filtersver=4.0.17
 _relver=4.0.8
 pkgver=${_filtersver}_${_snapdate}
@@ -20,8 +20,8 @@ url="http://www.linuxprinting.org/foomatic.html"
 options=('!emptydirs')
 sha256sums=('a2e2e53e502571e88eeb9010c45a0d54671f15707ee104f5c9c22b59ea7a33e3'  #foomatic-filters-4.0.17.tar.gz
             'f0c4892ae5566ea2efaae8bd58352fd32001d112f2f9dfff63f7de03b46733e1'  #foomatic-db-engine-4.0.8.tar.gz
-            'f1cd8ffc673a9fc232c82266b1ba585d8a0e95a8ccda694b59268dff443558c4'  #foomatic-db-4.0-20120704.tar.gz
-            '747026b21636c34e8a8ea4a872678abf209b647e69f5016dce599bfb0742f9dd') #foomatic-db-nonfree-20120704.tar.gz
+            '9fc867ecb126f671876d295369937155ba2ee9b5eed0236aa3f4a6b072c219bd'  #foomatic-db-4.0-20121003.tar.gz
+            'ebb96c815a31bdeb6753d20b0c7d7422a6c7c72df66909b21ea6e6f0e0090138') #foomatic-db-nonfree-20121003.tar.gz
 
 # source PKGBUILD && _get-tarballs
 _get-tarballs() {
@@ -38,7 +38,7 @@ _get-tarballs() {
 package_foomatic-db() {
 
   pkgdesc="Foomatic - The collected knowledge about printers, drivers, and driver options in XML files, used by foomatic-db-engine to generate PPD files."
-  # arch=('any')
+  arch=('any')
   license=('GPL' 'custom')
   depends=('perl' 'libxml2')
 
@@ -51,7 +51,7 @@ package_foomatic-db() {
 package_foomatic-filters() {
 
   pkgdesc="Foomatic - Filter scripts used by the printer spoolers to convert the incoming PostScript data into the printer's native format."
-  # arch=('i686' 'x86_64')
+  arch=('i686' 'x86_64')
   license=('GPL')
   backup=(etc/foomatic/filter.conf)
   depends=('glibc' 'dbus-core')
@@ -67,7 +67,7 @@ package_foomatic-filters() {
 package_foomatic-db-engine() {
 
   pkgdesc="Foomatic - Foomatic's database engine generates PPD files from the data in Foomatic's XML database. It also contains scripts to directly generate print queues and handle jobs."
-  # arch=(i686 x86_64)
+  arch=(i686 x86_64)
   license=('GPL')
   depends=('perl' 'libxml2' 'foomatic-filters' 'bash')
 
@@ -87,7 +87,7 @@ package_foomatic-db-engine() {
 package_foomatic-db-nonfree() {
 
   pkgdesc="Foomatic - database extension consisting of manufacturer-supplied PPD files released under non-free licenses"
-  # arch=('any')
+  arch=('any')
   license=('custom')
   depends=('perl' 'libxml2' "foomatic-db-engine" 'foomatic-db')
 
