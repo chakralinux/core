@@ -42,11 +42,11 @@ md5sums=('b232aef26f23fe33ea8305d276637086'
 
 build() {
         # configure
-        cd ${srcdir}/lirc-$pkgver 
-        patch -p1 -i "${srcdir}/lirc_wpc8769l.patch"
-        patch -p1 -i "${srcdir}/lircd-handle-large-config.patch"
-        patch -p1 -i "${srcdir}/lirc_atiusb-kfifo.patch"
-        patch -p1 -i "${srcdir}/kernel-2.6.39.patch"
+        cd "${srcdir}/lirc-$pkgver" 
+        patch -p1 -i ""${srcdir}"/lirc_wpc8769l.patch"
+        patch -p1 -i ""${srcdir}"/lircd-handle-large-config.patch"
+        patch -p1 -i ""${srcdir}"/lirc_atiusb-kfifo.patch"
+        patch -p1 -i ""${srcdir}"/kernel-2.6.39.patch"
 
       # Disabling lirc_gpio driver as it does no longer work Kernel 2.6.22+
 	sed -i -e "s:lirc_gpio\.o::" drivers/lirc_gpio/Makefile.am 
@@ -73,33 +73,33 @@ build() {
 
 package() {
         cd "${srcdir}/lirc-${pkgver}"
-	make DESTDIR=${pkgdir} install 
-	mkdir -p ${pkgdir}/usr/share/lirc ${pkgdir}/etc/rc.d \
-		
-	cp ${srcdir}/{lircd,lircmd,irexecd} ${pkgdir}/etc/rc.d/ \
+	make DESTDIR=""${pkgdir}"" install 
+	install -d ""${pkgdir}""/usr/share/lirc "${pkgdir}"/etc/rc.d 
+	cp ""${srcdir}""/{lircd,lircmd,irexecd} "${pkgdir}"/etc/rc.d/ 
+	
 	install -D -m644 "${srcdir}"/lircm.service "${pkgdir}"/usr/lib/systemd/system/lircm.service
 	install -D -m644 "${srcdir}"/irexec.service "${pkgdir}"/usr/lib/systemd/system/irexec.service
 	install -D -m644 "${srcdir}"/lirc.tmpfiles "${pkgdir}"/usr/lib/tmpfiles.d/lirc.conf
 		
-	cp -rp remotes ${pkgdir}/usr/share/lirc 
-	chmod -R go-w ${pkgdir}/usr/share/lirc/ 
+	cp -rp remotes "${pkgdir}"/usr/share/lirc 
+	chmod -R go-w "${pkgdir}"/usr/share/lirc/ 
 
 
 	# install the logrotate config
-    	install -D -m644 ${srcdir}/lirc.logrotate \
-        	${pkgdir}/etc/logrotate.d/lirc 
+    	install -D -m644 "${srcdir}"/lirc.logrotate \
+        	"${pkgdir}"/etc/logrotate.d/lirc 
     
 	# install conf.d file
-	install -D -m644 ${srcdir}/lircd.conf \
-        	${pkgdir}/etc/conf.d/lircd.conf 
+	install -D -m644 "${srcdir}"/lircd.conf \
+        	"${pkgdir}"/etc/conf.d/lircd.conf 
 
 	# install conf.d file
-        install -D -m644 ${srcdir}/irexec.conf \
-                ${pkgdir}/etc/conf.d/irexec.conf 
+        install -D -m644 "${srcdir}"/irexec.conf \
+                "${pkgdir}"/etc/conf.d/irexec.conf 
 
-	install -d -m755 ${pkgdir}/etc/lirc 
-	install -d -m755 ${pkgdir}/var/run/lirc 
+	install -d -m755 "${pkgdir}"/etc/lirc 
+	install -d -m755 "${pkgdir}"/var/run/lirc 
 
 	# remove built modules
-	rm -r ${pkgdir}/lib/
+	rm -r "${pkgdir}"/lib/
 }
