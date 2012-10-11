@@ -5,8 +5,14 @@ sd_booted() {
 }
 
 post_install() {
-  # enable getty@tty1 by default, but don't track the file
+  # enable by default, following http://pkgs.fedoraproject.org/cgit/systemd.git/tree/90-default.preset
   systemctl enable getty@.service
+  systemctl enable sshd.service
+  systemctl enable upower.service
+  systemctl enable udisks.service
+  systemctl enable avahi-daemon.service
+  systemctl enable NetworkManager.service
+  systemctl enable kdm.service
 
 }
 
