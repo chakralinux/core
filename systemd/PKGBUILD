@@ -5,7 +5,7 @@
 
 pkgname=systemd
 pkgver=194
-pkgrel=2
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
@@ -87,8 +87,8 @@ package() {
 
   # don't write units to /etc by default -- we'll enable this on post_install
   # as a sane default
-  #rm "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service"
-  #rmdir "$pkgdir/etc/systemd/system/getty.target.wants"
+  rm "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service"
+  rmdir "$pkgdir/etc/systemd/system/getty.target.wants"
 
   # Remove rpm dir
   rm -r "$pkgdir/etc/rpm"
@@ -130,7 +130,7 @@ package() {
   rm "$pkgdir/usr/lib/sysctl.d/coredump.conf"
   
   # Chakra specific .preset
-  #install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset "
+  install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset "
 }
 
 # vim: ft=sh syn=sh et
