@@ -6,7 +6,7 @@
 pkgbase=mysql
 pkgname=('libmysqlclient' 'mysql-clients' 'mysql')
 pkgver=5.5.27
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 license=('GPL')
 url="http://www.mysql.com/"
@@ -16,12 +16,14 @@ source=("http://ftp.gwdg.de/pub/misc/mysql/Downloads/MySQL-5.5/${pkgbase}-${pkgv
         'my.cnf'
         'mysqld.service'
         'mysqld-tmpfile.conf'
-        'mysqld-post.sh')
+        'mysqld-post.sh'
+        'mysqld.rc')
 sha256sums=('51ffafbd82039f8afbe5b3c26f15cc338ed6cd4f67e56d7dd33efaa28c9d99e4'
             '400e9a6e6517bbfe0971b65456dfacfb363cb54a644e4c2bacd373171611d5aa'
-            '1288b512b08cf0458437357c6ca378db66c78884868afab5ddea4ad61059c168'
-            '2af318c52ae0fe5428e8a9245d1b0fc3bc5ce153842d1563329ceb1edfa83ddd'
-            '9e98b2f942b407032f3a98914dc1d9a6a4bfe09d10b652bc040b0c213fc7a91b')
+            '10399597f40de9ee8bf9a9aa3f185096e49b62d6207994f0bf90d3c50fdfdfcc'
+            'badf6a701d9dc6ea3b4ddca26cb0f42b6236432ccdbc14c64962147802594a60'
+            '9e98b2f942b407032f3a98914dc1d9a6a4bfe09d10b652bc040b0c213fc7a91b'
+            '0399f1104074cbe8721d808a360f55ee55489063d37f7a5e5a8bdb5fd3be63bc')
 
 build() {
   cd "${srcdir}"
@@ -112,10 +114,10 @@ package_mysql(){
   make DESTDIR="${pkgdir}" install
 
   install -Dm644 "${srcdir}"/my.cnf "${pkgdir}"/etc/mysql/my.cnf
+  install -Dm755 "${srcdir}"/mysqld.rc "${pkgdir}"/etc/rc.d/mysqld
   install -Dm755 "${srcdir}"/mysqld-post.sh "${pkgdir}"/usr/bin/mysqld-post
   install -Dm644 "${srcdir}"/mysqld-tmpfile.conf "${pkgdir}"/usr/lib/tmpfiles.d/mysqld.conf
-  install -d "${pkgdir}"/usr/lib/systemd/system
-  install -Dm644 "${srcdir}"/mysqld.service "${pkgdir}"/usr/lib/systemd/system/
+  install -Dm644 "${srcdir}"/mysqld.service "${pkgdir}"/usr/lib/systemd/system/mysqld.service
 
   # provided by libmysqlclient
   rm "${pkgdir}"/usr/bin/{mysql_config,mysql_client_test_embedded,mysqltest_embedded}
