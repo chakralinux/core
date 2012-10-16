@@ -1,4 +1,5 @@
 #!/bin/sh
+# tputcolors
 # arg 1:  the new package version
 # arg 2:  the old package version
 post_upgrade() {
@@ -6,6 +7,12 @@ post_upgrade() {
 	if [ "$(vercmp $2 3.0.2)" -lt 0 ]; then
 		_resetbackups
 	fi
+	# systemd switch
+	echo -e '\e[31;46m WARNING'
+        echo -e '\e[31;46m>>> Chakra is making a full systemd switch, follow the instructions to upgrade:' 
+        echo -e '\e[31;46m>>> http://chakra-linux.org/news/'
+        echo -e '\e[31;46m>>> DO NOT USE THE FORCE switch to perform this update'
+        echo -e '\e[0m>>> For further questions, use the forum thread'
 }
 
 _resetbackups() {
