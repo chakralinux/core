@@ -4,15 +4,15 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=chakra-hardware-detection
-pkgver=20121015
-pkgrel=2
+pkgver=20121018
+pkgrel=1
 pkgdesc="Hardware detection scripts for Chakra"
 arch=('any')
 url="http://www.chakra-project.org"
-depends=('bc' 'util-linux' 'chd-nvidia' 'chd-nvidia-173xx' 'chd-catalyst' 'chd-catalyst-legacy')
+depends=('bc' 'util-linux' 'chd-nvidia' 'chd-nvidia-173xx' 'chd-catalyst' 'chd-catalyst-legacy' 'dmidecode')
 license=('GPL')
 source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=('f9f10b7f2632f19398de9f4c4cbbd6b1a6e579647a273839be5e2194616bf3f0')
+sha256sums=('45bed358f371c73c81f4181df94dbb1ace36ae4370e5ffb6b8aa05fcac3e40c9')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -23,7 +23,7 @@ mksource() {
 	  pushd ${pkgname}-${pkgver}
 	  popd
 	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}-${pkgver}/*
-	  md5sum ${pkgname}-${pkgver}.tar.xz
+	  sha256sum ${pkgname}-${pkgver}.tar.xz
 }
 
 package(){
