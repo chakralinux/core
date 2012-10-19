@@ -3,9 +3,9 @@
 #
 # maintainer abveritas@chakra-project.org
 
-pkgname='vlc'
-pkgver=2.0.3
-pkgrel=5
+pkgname=vlc
+pkgver=2.0.4
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.videolan.org/vlc/"
 license=('GPL')
@@ -13,11 +13,11 @@ depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libxpm' 'libcdio'
          'libdca' 'qt' 'libproxy' 'sdl_image' 'libdvdnav' 'mesa'
          'lua' 'v4l-utils' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
          'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp'
-         'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug' 
+         'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug' 'opus'
          'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'desktop-file-utils' 'xcb-util-keysyms')
 makedepends=('avahi' 'pkgconfig' 'live-media' 'libnotify' 'libbluray'
              'flac' 'libtheora' 'alsa-lib' 'jack' 'kdelibs' 'udev'
-             'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'libpulse'
+             'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'pulseaudio'
              'lirc-utils' 'gnutls' 'libcaca')
 optdepends=('avahi: for service discovery using bonjour protocol'
             'libnotify: for notification plugin'
@@ -26,7 +26,7 @@ optdepends=('avahi: for service discovery using bonjour protocol'
             'lirc-utils: for lirc plugin'
             'libavc1394: for devices using the 1394ta AV/C'
             'libdc1394: for IEEE 1394 plugin'
-            'libpulse: PulseAudio support'
+            'pulseaudio: PulseAudio support'
             'vdpau-video: vdpau back-end for nvidia'
             'libva-driver-intel: back-end for intel cards'
             'libbluray: for Blu-Ray disks')
@@ -39,8 +39,8 @@ backup=('usr/share/vlc/http/.hosts'
 categories=('multimedia')
 options=('!libtool')
 install="vlc.install"
-source=("http://downloads.sourceforge.net/project/$pkgname/$pkgver/$pkgname-$pkgver.tar.xz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2F$pkgname%2Ffiles%2F$pkgver%2F&ts=1329594862&use_mirror=iweb")
-sha256sums=('fba9805f7415aebf5b88614de83802dc59d3282ff339128da41addf7e375d2d2')
+source=("http://sourceforge.net/projects/$pkgname/files/$pkgver/$pkgname-$pkgver.tar.xz")
+sha1sums=('4d9ec642593a5bac282f0793d9c78140b28523f9')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -54,10 +54,10 @@ build() {
               --enable-nls \
               --enable-lirc \
               --enable-pvr \
-              --enable-ncurses \
               --enable-upnp \
               --enable-realrtsp \
-              --enable-bluray
+              --enable-bluray \
+              --enable-opus
   make
 }
 
