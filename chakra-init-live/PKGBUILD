@@ -1,0 +1,30 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer: abveritas[at]chakra-project[dot]org>
+
+pkgname=chakra-init-live
+pkgver=2012.10
+pkgrel=1
+pkgdesc="Live-session systemd startup scripts"
+arch=('x86_64')
+url="http://www.chakra-project.org"
+license=('GPL2')
+depends=('spun-live')
+makedepends=('asciidoc')
+install=${pkgname}.install
+source=('live' 'locale_setup.sh' '10-keyboard.conf')
+md5sums=('9a3480b6795a0bb48523e7714195a549'
+         '32428f48d276e15e9e927593f12d4c92'
+         '4df9f3c64316cf8b7f93729b389d704f')
+
+package() {
+  cd ${srcdir}
+  # setup /etc
+  mkdir ${pkgdir}/etc
+  install -m755 -t ${pkgdir}/etc live
+  install -m755 -t ${pkgdir}/etc locale_setup.sh
+  mkdir ${pkgdir}/etc/skel
+  install -m755 -t ${pkgdir}/etc/skel 10-keyboard.conf 
+	
+}
