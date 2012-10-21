@@ -4,7 +4,7 @@
 
 pkgname=wicd
 pkgver=1.7.2.4
-pkgrel=1
+pkgrel=2
 pkgdesc="New and alternative wireless/wired network management utility"
 arch=('i686' 'x86_64')
 url="http://wicd.sourceforge.net/"
@@ -17,14 +17,14 @@ optdepends=('python-wpactrl:	needed if you want to use the new experimental ioct
 conflicts=('wicd-svn')
 install=wicd.install
 source=(https://launchpad.net/wicd/1.7/$pkgver/+download/$pkgname-$pkgver.tar.gz     
-        wicd-daemon
+        wicd.service
         wicd.desktop
         dbus_string_fix.patch)
 categories=('network')
 options=('emptydirs')
 backup=('etc/wicd/encryption/templates/active')
 md5sums=('c2435ddfdef0b9898852d72a85a45f0f'
-         'f40e5f59998d0829707a7c9976afa8f8'
+         '509e6aadb061f3272933a22b4d05d5a8'
          '326df163a5732d38741371baa4fce9e5'
          '1d28a46ef05a972cd5a69530f5b53856')
 
@@ -52,8 +52,8 @@ package() {
   cd $srcdir/$pkgname-$pkgver
   python2 setup.py install --optimize=1 --root=$pkgdir
   
-  # Add custom rc.d script
-  install -Dm755 $srcdir/wicd-daemon $pkgdir/etc/rc.d/wicd
+  # Add wicd.service
+  install -Dm755 $srcdir/wicd.service $pkgdir/usr/lib/systemd/system
   
   cd build/lib/wicd
   for i in *.py; do
