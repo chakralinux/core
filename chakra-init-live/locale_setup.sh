@@ -354,6 +354,7 @@ set_locale() {
 		# except the # in a group and replace it with this group (that's the \1)
 		local TLANG=${LOCALE%.*} # remove everything after the ., including the dot from LOCALE
 		sed -i -r "s/#(.*${TLANG}.*UTF-8)/\1/g" /etc/locale.gen
+		sed -i -r "s/#(en_US.*UTF-8)/\1/g" /etc/locale.gen
 		echo "LANG=$LOCALE" > /etc/locale.conf
 		echo "LC_MESSAGES=$LOCALE" >> /etc/locale.conf
 		# generate LOCALE
