@@ -3,7 +3,8 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=hplip
-pkgver=3.12.9
+pkgver=3.12.10.2
+_pkgver=3.12.10a
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('i686' 'x86_64')
@@ -20,16 +21,16 @@ optdepends=('cups: for printing support'
             'pygobject: for running hp-toolbox')
 options=('!libtool')
 install=${pkgname}.install
-source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${_pkgver}.tar.gz"
 	"cups-1.6-buildfix.diff")
-sha256sums=('e7361b9d6e968ce3306dc438e622a4412156e7c2d71b2a6face5952cf52e23c4'
+sha256sums=('616a30f260407f959874d35d351eaf73c74f7f8f016a7826286c88d923a4b1fc'
             '9813f754670f9b4a01e6094c673f63ac62421817c7eb463999abf828358e67df')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${_pkgver}"
 
   # fix build with cups 1.6 - FC hplip-ipp-accessors.patch
-  patch -Np1 -i ${srcdir}/cups-1.6-buildfix.diff
+  patch -p1 -i ${srcdir}/cups-1.6-buildfix.diff
 
   export PYTHON=python2
   find . -type f -exec sed -i 's~^#.*env python~#!/usr/bin/env python2~' {} +
@@ -57,7 +58,7 @@ build() {
 
 	./configure --prefix=/usr \
              --enable-qt4 \
-             --enable-foomatic-rip-hplip-install \
+             --disable-foomatic-rip-hplip-install \
              --enable-foomatic-ppd-install \
              --enable-hpcups-install \
              --enable-new-hpcups \
@@ -67,12 +68,11 @@ build() {
              --enable-foomatic-drv-install \
              --enable-pp-build \
              --enable-udev-acl-rules
-
   make 
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${_pkgver}"
 
   make rulesdir=/lib/udev/rules.d DESTDIR="${pkgdir}/" install
 
