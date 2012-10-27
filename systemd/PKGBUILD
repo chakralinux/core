@@ -4,7 +4,7 @@
 # maintainer: abveritas@chakra-project.org
 
 pkgname=systemd
-pkgver=194
+pkgver=195
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -27,7 +27,7 @@ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
 provides=("udev=$pkgver")
 conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
 replaces=('udev')
-group=('base')
+groups=('base')
 install="systemd.install"
 options=('!libtool')
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
@@ -38,7 +38,7 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'locale.sh'
         'use-split-usr-path.patch'
         '99-default.preset')
-md5sums=('0ebb73aea444693b9b86f7a76f5df23c'
+md5sums=('38e8c8144e7e6e5bc3ce32eb4260e680'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          'fb37e34ea006c79be1c54cbb0f803414'
          'df69615503ad293c9ddf9d8b7755282d'
@@ -82,7 +82,9 @@ package() {
   # move bash-completion and symlink for loginctl
   install -Dm644 "$pkgdir/etc/bash_completion.d/systemd-bash-completion.sh" \
     "$pkgdir/usr/share/bash-completion/completions/systemctl"
-  ln -s systemctl "$pkgdir/usr/share/bash-completion/completions/loginctl"
+  for ctl in {login,journal,timedate,locale,hostname}ctl; do
+    ln -s systemctl "$pkgdir/usr/share/bash-completion/completions/$ctl"
+  done
   rm -rf "$pkgdir/etc/bash_completion.d"
 
   # don't write units to /etc by default -- we'll enable this on post_install
@@ -130,7 +132,10 @@ package() {
   rm "$pkgdir/usr/lib/sysctl.d/coredump.conf"
   
   # Chakra specific .preset
-  install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset "
+  install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
+  # Make journalctl persistent
+  install -dm755 "$pkgdir/var/log/journal"
+  sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
 }
 
 # vim: ft=sh syn=sh et
