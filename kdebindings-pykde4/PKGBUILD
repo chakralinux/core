@@ -20,10 +20,8 @@ arch=('i686' 'x86_64')
 license=('GPL' 'LGPL' 'FDL')
 depends=('pyqt' 'qscintilla' 'boost-libs' "kdepim-runtime>=${_kdever}")
 makedepends=('cmake' 'automoc4' 'polkit-qt' 'boost')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz"
-        'QVector.diff')
-md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
-         '78c55560512ff35631c6a140a2f20279')
+source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
+md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
   
 groups=("kde" "kdebindings" "kde-uninstall")
 provides=('kdebindings-python' 'pykde4')
@@ -32,9 +30,7 @@ conflicts=('kdebindings-python')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 build() {
-	cd "${srcdir}"
-	
-	patch -p1 -N -i ${srcdir}/QVector.diff 
+	cd "${srcdir}" 
 	
         rm -rf build 
 	mkdir build && cd build
