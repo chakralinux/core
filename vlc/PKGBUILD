@@ -5,8 +5,8 @@
 
 pkgname=vlc
 pkgver=2.0.4
-pkgrel=1
-arch=('i686' 'x86_64')
+pkgrel=2
+arch=('x86_64')
 url="http://www.videolan.org/vlc/"
 license=('GPL')
 depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libxpm' 'libcdio'
@@ -16,12 +16,12 @@ depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libxpm' 'libcdio'
          'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug' 'opus'
          'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'desktop-file-utils' 'xcb-util-keysyms')
 makedepends=('avahi' 'pkgconfig' 'live-media' 'libnotify' 'libbluray'
-             'flac' 'libtheora' 'alsa-lib' 'jack' 'kdelibs' 'udev'
+             'flac' 'libtheora' 'alsa-lib' 'jack' 'kdelibs' 'systemd'
              'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'pulseaudio'
-             'lirc-utils' 'gnutls' 'libcaca')
+             'lirc-utils' 'gnutls' 'libcaca' 'librsvg')
 optdepends=('avahi: for service discovery using bonjour protocol'
             'libnotify: for notification plugin'
-            'ncurses: for ncurses interface support'
+            #'ncurses: for ncurses interface support'
             'libdvdcss: for decoding encrypted DVDs'
             'lirc-utils: for lirc plugin'
             'libavc1394: for devices using the 1394ta AV/C'
@@ -48,6 +48,7 @@ build() {
   sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
 
   ./configure --prefix=/usr \
+              --sysconfdir=/etc \
               --disable-rpath \
               --enable-faad \
               --enable-dbus-control \
