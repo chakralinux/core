@@ -27,12 +27,12 @@ CONSOLEMAP="$(kernel_cmdline vconsole.font.map)"
 USENONFREE="$(kernel_cmdline nonfree no)"
 
 #Polkit issue, reinstall needed?
-pacman -Udf --noconfirm /opt/chakra/pkgs/polkit* &>/dev/null
-systemctl --system daemon-reload
-systemctl reload dbus.service
-systemctl start polkit.service
-systemctl stop NetworkManager.service
-systemctl start NetworkManager.service
+#pacman -Udf --noconfirm /opt/chakra/pkgs/polkit* &>/dev/null
+#systemctl --system daemon-reload
+#systemctl reload dbus.service
+#systemctl start polkit.service
+#systemctl stop NetworkManager.service
+#systemctl start NetworkManager.service
 
 #edit /etc/environment
 echo "LANG=${LOCALE}" >> /etc/environment
@@ -55,7 +55,7 @@ set_locale # sets locale settings and hwclock
 cp -a /etc/skel/. /root/
    
 #This will go into workspace soon
-   sed -i -e 's/halt/poweroff/' /usr/share/config/kdm/kdmrc
+#  sed -i -e 's/halt/poweroff/' /usr/share/config/kdm/kdmrc
 
 # set correct permissions for live user
 chown -R live:users /home/live
