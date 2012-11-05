@@ -4,10 +4,10 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=qtwebkit
-pkgver=20121101
+pkgver=20121105
 pkgrel=1
 _rev=r124698
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='http://trac.webkit.org/wiki/QtWebKit'
 pkgdesc='An open source web browser engine (Qt port)'
 license=('LGPL2.1' 'GPL3')
@@ -20,12 +20,12 @@ conflicts=('qt<4.8')
 #sha1sums=('49d0427370553c5af3160d27c9aac08a66b4ad78'
 #          '33c83272ed8110180ee6e7e3733e68cc513e2802')
 
-_gitroot="git://gitorious.org/+qtwebkit-developers/webkit/qtwebkit-23.git"
-_gitname=qtwebkit-23
+_gitroot="git://gitorious.org/~adjam/webkit/kde-qt-webkit.git"
+_gitname=kde-qt-webkit
 
 build() {
 	if [ ! -d "${_gitname}" ]; then
-		git clone --branch=qtwebkit-2.3-staging ${_gitroot} ${_gitname} && cd ${_gitname}
+		git clone ${_gitroot} ${_gitname} && cd ${_gitname}
 	else
 		cd ${_gitname} && git reset --hard && git pull origin && git clean -dfx
 	fi
