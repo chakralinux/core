@@ -5,7 +5,7 @@
 
 pkgname=vlc
 pkgver=2.0.4
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
 license=('GPL')
@@ -18,7 +18,7 @@ depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libxpm' 'libcdio'
 makedepends=('avahi' 'pkgconfig' 'live-media' 'libnotify' 'libbluray'
              'flac' 'libtheora' 'alsa-lib' 'jack' 'kdelibs' 'systemd'
              'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'pulseaudio'
-             'lirc-utils' 'gnutls' 'libcaca' 'librsvg')
+             'lirc-utils' 'gnutls' 'libcaca' 'librsvg' 'oss')
 optdepends=('avahi: for service discovery using bonjour protocol'
             'libnotify: for notification plugin'
             #'ncurses: for ncurses interface support'
@@ -29,7 +29,8 @@ optdepends=('avahi: for service discovery using bonjour protocol'
             'pulseaudio: PulseAudio support'
             'vdpau-video: vdpau back-end for nvidia'
             'libva-driver-intel: back-end for intel cards'
-            'libbluray: for Blu-Ray disks')
+            'libbluray: for Blu-Ray disks'
+            'oss: for oss sound support')
 conflicts=('vlc-plugin')
 replaces=('vlc-plugin')
 backup=('usr/share/vlc/http/.hosts'
@@ -51,6 +52,7 @@ build() {
               --sysconfdir=/etc \
               --disable-rpath \
               --enable-faad \
+              --enable-oss \
               --enable-dbus-control \
               --enable-nls \
               --enable-lirc \
@@ -71,5 +73,6 @@ package() {
     install -D -m644 "${srcdir}/vlc-${pkgver}/share/icons/${res}x${res}/vlc.png" \
         "${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png"
   done
+  
 }
 
