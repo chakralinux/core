@@ -4,43 +4,48 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=qtwebkit
-pkgver=20121105
+pkgver=2.2.2
 pkgrel=1
-_rev=r124698
 arch=('x86_64')
 url='http://trac.webkit.org/wiki/QtWebKit'
 pkgdesc='An open source web browser engine (Qt port)'
 license=('LGPL2.1' 'GPL3')
-depends=('qt' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins')
+depends=('qt' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins'
+         'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg'
+         'gstreamer0.10-ugly-plugins')
 makedepends=('gperf' 'sqlite3' 'fontconfig' 'perl' 'python2' 'mesa' 'ruby')
-conflicts=('qt<4.8')
-
-#source=("http://builds.nightly.webkit.org/files/trunk/src/WebKit-${_rev}.tar.bz2"
-#        "http://chakra-linux.org/sources/$pkgname/qwebview-4.8.2.tar.xz")
-#sha1sums=('49d0427370553c5af3160d27c9aac08a66b4ad78'
-#          '33c83272ed8110180ee6e7e3733e68cc513e2802')
-
-_gitroot="git://gitorious.org/~adjam/webkit/kde-qt-webkit.git"
-_gitname=kde-qt-webkit
+source=("${pkgname}-${pkgver}-source.tar.gz"
+        'glib.patch')
+sha1sums=('914d7cc099e5b6181c2d74fc7a74e1b4478b75a4'
+          'dff60039b212c2f53a7b425dfcf6af78e09a80af')
 
 build() {
-	if [ ! -d "${_gitname}" ]; then
-		git clone ${_gitroot} ${_gitname} && cd ${_gitname}
-	else
-		cd ${_gitname} && git reset --hard && git pull origin && git clean -dfx
-	fi
+  cd "${srcdir}"/${pkgname}-${pkgver}-source
 
-	msg "GIT checkout done."
-	
-        export QTDIR=$srcdir/$pkgname
-        export PATH=${QTDIR}/bin:${PATH}
-        QMAKEPATH=$WEBKITDIR/Tools/qmake
-        Tools/Scripts/build-webkit --qt --makeargs="${MAKEFLAGS}" 
-#	Tools/Scripts/build-webkit --qt --qmake=Tools/qmake --release
+  patch -p1 -i "${srcdir}"/glib.patch
+
+  # move headers
+  mv include Source/
+
+  cd Source
+  qmake
+  cd ../
+
+  make -C Source
+
+  # Build the QWebView plugin (FS#27914)
+  #cd "${srcdir}"/${pkgname}-${pkgver}-source/qwebview-${_qtver}/plugins/qwebview
+  #qmake
+  #make
 }
 
 package() {
-	cd "${_gitname}"
+  cd "${srcdir}"/${pkgname}-${pkgver}-source
+  make INSTALL_ROOT="${pkgdir}" -C Source install
 
-	make INSTALL_ROOT="${pkgdir}" -C WebKitBuild/Release install
+  # Fix RPATH
+  #chrpath -r /usr/lib/ "${pkgdir}"/usr/lib/qt/imports/QtWebKit/libqmlwebkitplugin.so
+
+  #cd "${srcdir}"/${pkgname}-${pkgver}-source/qwebview-${_qtver}/plugins/qwebview
+  #make INSTALL_ROOT="${pkgdir}" install
 }
