@@ -1,9 +1,6 @@
-##!/bin/bash
+#!/bin/bash
 
-. /etc/rc.conf
-. /etc/rc.d/functions
 . /etc/conf.d/dkms
-
 
 # list dkms modules for the current running kernel
 list_dkms_modules() {
@@ -49,22 +46,16 @@ unload_dkms_modules() {
 
 case "$1" in
   start)
-    status 'Starting DKMS autoinstall' dkms autoinstall -k "$(uname -r)"
-    [[ $LOAD =~ [Yy][Ee][Ss] ]] &&
-      status -v 'Loading DKMS modules' load_dkms_modules
+    dkms autoinstall -k "$(uname -r)"
+    [[ $LOAD =~ [Yy][Ee][Ss] ]] && load_dkms_modules
   ;;
   stop)
-    if [[ $UNLOAD =~ [Yy][Ee][Ss] ]]; then
-      status -v 'Unloading DKMS modules' unload_dkms_modules
-    else
-      status 'Stopping DKMS'
-    fi
+    [[ $UNLOAD =~ [Yy][Ee][Ss] ]] && unload_dkms_modules
   ;;
   *)
-    echo "usage: ${0##*/} {start|stop}" >&2
+    echo "usage: $0 {start|stop}" >&2
   ;;
 esac
 
 :
 # vim:set ts=2 sw=2 ft=sh et:
-
