@@ -1,40 +1,65 @@
 #!/bin/bash
 
+daemon_name="nscd"
+
 . /etc/rc.conf
 . /etc/rc.d/functions
 
-PID=`pidof -o %PPID /usr/sbin/nscd`
+
+get_pid() {
+	pidof -o %PPID $daemon_name
+}
+
 case "$1" in
-  start)
-    stat_busy "Starting nscd"
-    # create necessary directories if they don't already exist
-    mkdir -p /var/run/nscd /var/db/nscd 2>/dev/null
-    # remove stale files
-    rm -f /var/db/nscd/* /var/run/nscd/* 2>/dev/null
-    [ -z "$PID" ] && /usr/sbin/nscd
-    if [ $? -gt 0 ]; then
-      stat_fail
-    else
-      add_daemon nscd
-      stat_done
-    fi
-    ;;
-  stop)
-    stat_busy "Stopping nscd"
-    [ ! -z "$PID" ]  && kill $PID &> /dev/null
-    if [ $? -gt 0 ]; then
-      stat_fail
-    else
-      rm_daemon nscd
-      stat_done
-    fi
-    ;;
-  restart)
-    $0 stop
-    sleep 1
-    $0 start
-    ;;
-  *)
-    echo "usage: $0 {start|stop|restart}"  
+	start)
+		stat_busy "Starting $daemon_name daemon"
+		PID=$(get_pid)
+		if [[ -z $PID ]]; then
+			rm -f /run/$daemon_name.pid
+			mkdir -p /run/nscd /var/db/nscd
+			rm -f /run/nscd/* /var/db/nscd/*
+			$daemon_name
+			if (( $? > 0 )); then
+				stat_fail
+				exit 1
+			else
+				echo $(get_pid) > /var/run/$daemon_name.pid
+				add_daemon $daemon_name
+				stat_done
+			fi
+		else
+			stat_fail
+			exit 1
+		fi
+		;;
+
+	stop)
+		stat_busy "Stopping $daemon_name daemon"
+		PID=$(get_pid)
+		[[ -n $PID ]] && nscd --shutdown &> /dev/null
+		if (( $? > 0 )); then
+			stat_fail
+			exit 1
+		else
+			rm -f /run/$daemon_name.pid &> /dev/null
+			rm_daemon $daemon_name
+			stat_done
+		fi
+		;;
+
+	restart)
+		$0 stop
+		sleep 3
+		$0 start
+		;;
+
+	status)
+		stat_busy "Checking $daemon_name status";
+		ck_status $daemon_name
+		;;
+
+	*)
+		echo "usage: $0 {start|stop|restart|status}"
 esac
+
 exit 0

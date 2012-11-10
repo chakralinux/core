@@ -52,6 +52,8 @@ source=(http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}_${
         glibc-2.15-nearbyintf-rounding.patch
         glibc-2.15-confstr-local-buffer-extent.patch
         nscd
+        nscd.service
+        nscd.tmpfiles
         locale.gen.txt
         locale-gen)
 md5sums=('c0487f4e83db1b9b30d7989fc47dbead'
@@ -83,7 +85,9 @@ md5sums=('c0487f4e83db1b9b30d7989fc47dbead'
          '104300a586580bb340bb70162a196c80'
          '50dc7006874cbd86ee436044752f5228'
          '4ed0bb09c3851cd9cb5e39c946a8a334'
-         'b587ee3a70c9b3713099295609afde49'
+         '589d79041aa767a5179eaa4e2737dd3f'
+         'f3fb741c73ae5fd46e03beae4e6948c9'
+         'bccbe5619e75cf1d97312ec3681c605c'
          '07ac979b6ab5eeb778d55f041529d623'
          '476e9113489f93b348b21e144b6a8fcf')
 
@@ -212,9 +216,6 @@ build() {
   # http://sourceware.org/git/?p=glibc.git;a=commit;h=d6a403f9
   patch -p1 -i ${srcdir}/glibc-2.15-confstr-local-buffer-extent.patch
 
-  install -dm755 ${pkgdir}/etc
-  touch ${pkgdir}/etc/ld.so.conf
-
   cd ${srcdir}
   rm -vRf glibc-build
   mkdir glibc-build
@@ -249,19 +250,24 @@ check() {
 
 package() {
   cd ${srcdir}/glibc-build
+
+  install -dm755 ${pkgdir}/etc
+  touch ${pkgdir}/etc/ld.so.conf
+
   make install_root=${pkgdir} install
 
   rm -f ${pkgdir}/etc/ld.so.{cache,conf}
 
-  install -dm755 ${pkgdir}/etc/rc.d
-  install -dm755 ${pkgdir}/usr/sbin
-  install -dm755 ${pkgdir}/usr/lib/locale
+  install -dm755 ${pkgdir}/{etc/rc.d,usr/{sbin,lib/{,locale,systemd/system,tmpfiles.d}}}
+
   install -m644 ${srcdir}/glibc/nscd/nscd.conf ${pkgdir}/etc/nscd.conf
+  sed -i -e 's/^\tserver-user/#\tserver-user/' ${pkgdir}/etc/nscd.conf
   install -m755 ${srcdir}/nscd ${pkgdir}/etc/rc.d/nscd
+  install -m644 ${srcdir}/nscd.service ${pkgdir}/usr/lib/systemd/system
+  install -m644 ${srcdir}/nscd.tmpfiles ${pkgdir}/usr/lib/tmpfiles.d/nscd.conf
+
   install -m755 ${srcdir}/locale-gen ${pkgdir}/usr/sbin
   install -m644 ${srcdir}/glibc/posix/gai.conf ${pkgdir}/etc/gai.conf
-
-  sed -i -e 's/^\tserver-user/#\tserver-user/' ${pkgdir}/etc/nscd.conf
 
   # create /etc/locale.gen
   install -m644 ${srcdir}/locale.gen.txt ${pkgdir}/etc/locale.gen
