@@ -8,15 +8,15 @@
 
 pkgname=glibc
 pkgver=2.15
-pkgrel=1
+pkgrel=2
 _glibcdate=20120419
 pkgdesc="GNU C Library"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.gnu.org/software/libc"
 license=('GPL' 'LGPL')
 groups=('base')
-depends=('linux-api-headers>=3.2' 'tzdata')
-makedepends=('gcc>=4.6')
+depends=('linux-api-headers>=3.5' 'tzdata')
+makedepends=('gcc>=4.7')
 backup=(etc/gai.conf
         etc/locale.gen
         etc/nscd.conf)
@@ -221,11 +221,6 @@ build() {
   mkdir glibc-build
   cd glibc-build
 
-  if [[ ${CARCH} = "i686" ]]; then
-    # Hack to fix NPTL issues with Xen, only required on 32bit platforms
-    export CFLAGS="${CFLAGS} -mno-tls-direct-seg-refs"
-  fi
-
   echo "slibdir=/lib" >> configparms
 
   ${srcdir}/glibc/configure --prefix=/usr \
@@ -258,11 +253,10 @@ package() {
 
   rm -f ${pkgdir}/etc/ld.so.{cache,conf}
 
-  install -dm755 ${pkgdir}/{etc/rc.d,usr/{sbin,lib/{,locale,systemd/system,tmpfiles.d}}}
+  install -dm755 ${pkgdir}/{usr/{sbin,lib/{,locale,systemd/system,tmpfiles.d}}}
 
   install -m644 ${srcdir}/glibc/nscd/nscd.conf ${pkgdir}/etc/nscd.conf
   sed -i -e 's/^\tserver-user/#\tserver-user/' ${pkgdir}/etc/nscd.conf
-  install -m755 ${srcdir}/nscd ${pkgdir}/etc/rc.d/nscd
   install -m644 ${srcdir}/nscd.service ${pkgdir}/usr/lib/systemd/system
   install -m644 ${srcdir}/nscd.tmpfiles ${pkgdir}/usr/lib/tmpfiles.d/nscd.conf
 
@@ -277,26 +271,19 @@ package() {
   cat ${srcdir}/glibc/localedata/SUPPORTED >> ${pkgdir}/etc/locale.gen
   sed -i "s|^|#|g" ${pkgdir}/etc/locale.gen
 
-  if [[ ${CARCH} = "x86_64" ]]; then
-    # fix for the linker
-    sed -i '/RTLDLIST/s%lib64%lib%' ${pkgdir}/usr/bin/ldd
-    # Comply with multilib binaries, they look for the linker in /lib64
-    mkdir ${pkgdir}/lib64
-    cd ${pkgdir}/lib64
-    ln -v -s ../lib/ld* .
-  fi
+  # fix for the linker
+  sed -i '/RTLDLIST/s%lib64%lib%' ${pkgdir}/usr/bin/ldd
+  # Comply with multilib binaries, they look for the linker in /lib64
+  mkdir ${pkgdir}/lib64
+  cd ${pkgdir}/lib64
+  ln -v -s ../lib/ld* .
   
-  # manually strip files as stripping libpthread-*.so and libthread_db.so
-  # with the default $STRIP_SHARED breaks gdb and stripping ld-*.so breaks
-  # valgrind on x86_64
-
-  cd $pkgdir
+  cd ${pkgdir}
   strip $STRIP_BINARIES sbin/{ldconfig,sln} \
                         usr/bin/{gencat,getconf,getent,iconv,locale} \
                         usr/bin/{localedef,pcprofiledump,rpcgen,sprof} \
                         usr/lib/getconf/* \
                         usr/sbin/{iconvconfig,nscd}
-  [[ $CARCH = "i686" ]] && strip $STRIP_BINARIES usr/bin/lddlibc4
 
   strip $STRIP_STATIC usr/lib/*.a \
                       lib/{{ld,libpthread}-${pkgver},libthread_db-1.0}.so
