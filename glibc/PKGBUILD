@@ -276,10 +276,6 @@ package() {
   cd ${pkgdir}/lib64
   ln -v -s ../lib/ld* .
 
-  # transitional fix while we move all to /usr/lib
-  ln -s ${pkgdir}/lib/libm-2.15.so ${pkgdir}/usr/lib/libm.so.6
-  ln -s ${pkgdir}/lib/libpthread-2.15.so ${pkgdir}/usr/lib/libpthread.so.0
-  
   cd ${pkgdir}
   strip $STRIP_BINARIES sbin/{ldconfig,sln} \
                         usr/bin/{gencat,getconf,getent,iconv,locale} \
@@ -295,4 +291,5 @@ package() {
                       lib/{libdl,libm,libnsl,libresolv,librt,libutil}-${pkgver}.so \
                       lib/{libmemusage,libpcprofile,libSegFault}.so \
                       usr/lib/{pt_chown,{audit,gconv}/*.so}
+
 }
