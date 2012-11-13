@@ -7,7 +7,7 @@ pkgname=gmp
 pkgver=5.0.5
 pkgrel=1
 pkgdesc="A free library for arbitrary precision arithmetic"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://gmplib.org/"
 depends=('gcc-libs' 'sh')
 license=('LGPL3')
@@ -18,7 +18,6 @@ md5sums=('8aef50959acec2a1ad41d144ffe0f3b5')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  [ "${CARCH}" = "i686" ] && export ABI="32"
   ./configure --build=${CHOST} \
     --prefix=/usr --infodir=/usr/share/info \
     --enable-cxx
@@ -29,4 +28,3 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 }
-
