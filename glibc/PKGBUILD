@@ -51,7 +51,6 @@ source=(http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}_${
         glibc-2.15-rintf-rounding.patch
         glibc-2.15-nearbyintf-rounding.patch
         glibc-2.15-confstr-local-buffer-extent.patch
-        nscd
         nscd.service
         nscd.tmpfiles
         locale.gen.txt
@@ -85,7 +84,6 @@ md5sums=('c0487f4e83db1b9b30d7989fc47dbead'
          '104300a586580bb340bb70162a196c80'
          '50dc7006874cbd86ee436044752f5228'
          '4ed0bb09c3851cd9cb5e39c946a8a334'
-         '589d79041aa767a5179eaa4e2737dd3f'
          'f3fb741c73ae5fd46e03beae4e6948c9'
          'bccbe5619e75cf1d97312ec3681c605c'
          '07ac979b6ab5eeb778d55f041529d623'
@@ -227,7 +225,7 @@ build() {
       --libdir=/usr/lib --libexecdir=/usr/lib \
       --with-headers=/usr/include \
       --enable-add-ons=nptl,libidn \
-      --enable-kernel=2.6.27 \
+      --enable-kernel=2.6.32 \
       --with-tls --with-__thread \
       --enable-bind-now --without-gd \
       --without-cvs --disable-profile \
@@ -253,7 +251,7 @@ package() {
 
   rm -f ${pkgdir}/etc/ld.so.{cache,conf}
 
-  install -dm755 ${pkgdir}/{usr/{sbin,lib/{,locale,systemd/system,tmpfiles.d}}}
+  install -dm755 ${pkgdir}/{,usr/{sbin,lib/{,locale,systemd/system,tmpfiles.d}}}
 
   install -m644 ${srcdir}/glibc/nscd/nscd.conf ${pkgdir}/etc/nscd.conf
   sed -i -e 's/^\tserver-user/#\tserver-user/' ${pkgdir}/etc/nscd.conf
@@ -277,6 +275,10 @@ package() {
   mkdir ${pkgdir}/lib64
   cd ${pkgdir}/lib64
   ln -v -s ../lib/ld* .
+
+  # transitional fix while we move all to /usr/lib
+  ln -s ${pkgdir}/lib/libm-2.15.so ${pkgdir}/usr/lib/libm.so.6
+  ln -s ${pkgdir}/lib/libpthread-2.15.so ${pkgdir}/usr/lib/libpthread.so.0
   
   cd ${pkgdir}
   strip $STRIP_BINARIES sbin/{ldconfig,sln} \
