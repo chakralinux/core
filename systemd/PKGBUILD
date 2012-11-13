@@ -5,8 +5,8 @@
 
 pkgname=systemd
 pkgver=195
-pkgrel=1
-arch=('i686' 'x86_64')
+pkgrel=2
+arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
 depends=('acl' 'bash' 'glibc' 'glib2' 'kmod' 'hwids' 'util-linux' 'kbd' 'kmod' 'libcap' 'libxslt'
@@ -35,7 +35,6 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-install-udev'
         'initcpio-install-timestamp'
         '0001-Reinstate-TIMEOUT-handling.patch'
-        'locale.sh'
         'use-split-usr-path.patch'
         '99-default.preset')
 md5sums=('38e8c8144e7e6e5bc3ce32eb4260e680'
@@ -43,7 +42,6 @@ md5sums=('38e8c8144e7e6e5bc3ce32eb4260e680'
          'fb37e34ea006c79be1c54cbb0f803414'
          'df69615503ad293c9ddf9d8b7755282d'
          '5543be25f205f853a21fa5ee68e03f0d'
-         'f15956945052bb911e5df81cf5e7e5dc'
          '58f26fd4cdcac88bd3ca690f4d3e3e99'
          'a1bf25da736d3719e9720b2e4caea341')
 
@@ -105,8 +103,6 @@ package() {
   done
 
   ln -s '../usr/lib/systemd/systemd' "$pkgdir/sbin/init"
-
-  install -Dm755 "$srcdir/locale.sh" "$pkgdir/etc/profile.d/locale.sh"
 
   # the path to udevadm is hardcoded in some places
   install -d "$pkgdir/sbin"
