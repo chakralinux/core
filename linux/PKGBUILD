@@ -8,18 +8,18 @@ pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') # Build stock -CHAKRA kernel
 # pkgname=linux-custom       # Build kernel with a different name
 _kernelname=${pkgname#linux}
-_basekernel=3.5
-pkgver=${_basekernel}.6
+_basekernel=3.6
+pkgver=3.6.6
 pkgrel=1
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl')
 options=('!strip')
-source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.5.tar.xz"
+source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.6.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
-        'config' 'config.x86_64'
+        'config.x86_64'
         #aufs patches
         'aufs3-loopback.patch'
         'aufs3-base.patch'
@@ -30,26 +30,25 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.5.tar.xz"
         'aufs3.patch'
         'config.aufs'
         # standard config files for mkinitcpio ramdisk
-        "${pkgname}.preset"
+        'linux.preset'
         'change-default-console-loglevel.patch'
-        'watchdog-3.5.x.patch'
-        'i915-i2c-crash-3.5.x.patch')
-md5sums=('24153eaaa81dedc9481ada8cd9c3b83d'
-         'e9502f047c251db3b0c911e53344bad5'
-         '9bcefced1f4be50ef2720944f656e5d7'
-         '013e265d1abe67816a36c91e088875ac'
-         '934a8a8b181f97e113a410f616e9f517'
-         '185c6ea92c3f3baf740bea83be443c9e'
-         '99e1c1de3af4fb90c66f9279c206b632'
+        'module-symbol-waiting-3.6.patch'
+        'module-init-wait-3.6.patch')
+md5sums=('1a1760420eac802c541a20ab51a093d1'
+         '11d6d8749d4612a77f43f0531c0f2824'
+         '8aeb4b852fdaa3cc013784aa73537a9a'
+         '360b92a032eb7611583956314636d30f'
+         'a0b105ee94cbb37a9bfb9d565ad92edf'
+         '41bd3b4e3d69d5ca030927e409278011'
          '9dc1aa9fcc12b3c2f52f605830c02939'
-         '62691fb5a20d3d28a73ec0640e9c7b3c'
-         'a9e4407bf818e4a379b884e03362522b'
-         '77894d0a8fce44e26728be3f079ed668'
+         '388890521b4f06820377f0ad7ab42d5a'
+         '7fa97ab324207992081aa5967ad6eed3'
+         '9ca80ba287ad2f0d5e59c0098a8de1ac'
          '52f4a2c7f6277774117c834d949d6b81'
          'eb14dcfd80c00852ef81ded6e826826a'
          '65cbe8e4c8efaf96dd162102e46ce81d'
-         'ae13ed1e92bba07e9b17cf5c8d89683c'
-         'ff4a203dd52e4dfb5d60948bb667d06d')
+         '670931649c60fcb3ef2e0119ed532bd4'
+         '8a71abc4224f575008f974a099b5cf6f')
 
 build() {
   cd "${srcdir}/linux-${_basekernel}"
@@ -60,13 +59,9 @@ build() {
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
-  # Broken watchdog
-  # https://bugzilla.kernel.org/show_bug.cgi?id=44991
-  patch -p1 -i "${srcdir}/watchdog-3.5.x.patch"
-
-  # i915 i2c crash
-  # https://bugzilla.kernel.org/show_bug.cgi?id=46381
-  patch -p1 -i "${srcdir}/i915-i2c-crash-3.5.x.patch"
+  # fix module initialisation
+  patch -p1 -i "${srcdir}/module-symbol-waiting-3.6.patch"
+  patch -p1 -i "${srcdir}/module-init-wait-3.6.patch"
 
   # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
   # remove this when a Kconfig knob is made available by upstream
@@ -82,21 +77,20 @@ build() {
   #patch -p1 -i "${srcdir}/aufs3-fix-export-__devcgroup_inode_permission.patch"
   patch -p1 -i "${srcdir}/aufs3-standalone.patch"
   
+  cat "${srcdir}/config.x86_64" > ./.config
 
-  if [ "${CARCH}" = "x86_64" ]; then
-    cat "${srcdir}/config.x86_64" > ./.config
-  else
-    cat "${srcdir}/config" > ./.config
-  fi
-
-    cat "${srcdir}/config.aufs" >> ./.config
+  cat "${srcdir}/config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
+    sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
   fi
 
   # set extraversion to pkgrel
   sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
+  
+  # don't run depmod on 'make install'. We'll do this ourselves in packaging
+  sed -i '2iexit 0' scripts/depmod.sh
 
   # get kernel version
   make prepare
@@ -108,6 +102,9 @@ build() {
   #make xconfig # X-based configuration
   #make oldconfig # using old config from previous kernel version
   # ... or manually edit .config
+  
+  # rewrite configuration
+  yes "" | make config >/dev/null
 
   ####################
   # stop here
@@ -116,10 +113,8 @@ build() {
   #return 1
   ####################
 
-  yes "" | make config
-
   # build!
-  make ${MAKEFLAGS} bzImage modules
+  make ${MAKEFLAGS} LOCALVERSION= bzImage modules
 }
 
 package_linux() {
@@ -131,35 +126,36 @@ package_linux() {
   conflicts=('kernel26' 'nvidia-96xx=96.43.20-9' 'acerhk')
   replaces=('kernel26' 'aufs3' 'nouveau-drm')
   backup=("etc/mkinitcpio.d/${pkgname}.preset")
-  install=${pkgname}.install
+  install=linux.install
 
   cd "${srcdir}/linux-${_basekernel}"
 
   KARCH=x86
 
   # get kernel version
-  _kernver="$(make kernelrelease)"
+  _kernver="$(make LOCALVERSION= kernelrelease)"
 
   mkdir -p "${pkgdir}"/{lib/modules,lib/firmware,boot}
-  make INSTALL_MOD_PATH="${pkgdir}" modules_install
+  make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}" modules_install
   cp arch/$KARCH/boot/bzImage "${pkgdir}/boot/vmlinuz-${pkgname}"
 
   # add vmlinux
   install -D -m644 vmlinux "${pkgdir}/usr/src/linux-${_kernver}/vmlinux"
 
   # install fallback mkinitcpio.conf file and preset file for kernel
-  install -D -m644 "${srcdir}/${pkgname}.preset" "${pkgdir}/etc/mkinitcpio.d/${pkgname}.preset"
+  install -D -m644 "${srcdir}/linux.preset" "${pkgdir}/etc/mkinitcpio.d/linux.preset"
 
   # set correct depmod command for install
   sed \
-    -e  "s/KERNEL_NAME=.*/KERNEL_NAME=${_kernelname}/g" \
-    -e  "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/g" \
-    -i "${startdir}/${pkgname}.install"
+    -e  "s/KERNEL_NAME=.*/KERNEL_NAME=${_kernelname}/" \
+    -e  "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" \
+    -i "${startdir}/linux.install"
   sed \
-    -e "s|ALL_kver=.*|ALL_kver=\"/boot/vmlinuz-${pkgname}\"|g" \
-    -e "s|default_image=.*|default_image=\"/boot/initramfs-${pkgname}.img\"|g" \
-    -e "s|fallback_image=.*|fallback_image=\"/boot/initramfs-${pkgname}-fallback.img\"|g" \
-    -i "${pkgdir}/etc/mkinitcpio.d/${pkgname}.preset"
+    -e "1s|'linux.*'|'${pkgname}'|" \
+    -e "s|ALL_kver=.*|ALL_kver=\"/boot/vmlinuz-${pkgname}\"|" \
+    -e "s|default_image=.*|default_image=\"/boot/initramfs-${pkgname}.img\"|" \
+    -e "s|fallback_image=.*|fallback_image=\"/boot/initramfs-${pkgname}-fallback.img\"|" \
+    -i "${pkgdir}/etc/mkinitcpio.d/linux.preset"
 
   # remove build and source links
   rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
@@ -172,6 +168,12 @@ package_linux() {
   # add real version for building modules and running depmod from post_install/upgrade
   mkdir -p "${pkgdir}/lib/modules/extramodules-${_basekernel}${_kernelname:--CHAKRA}"
   echo "${_kernver}" > "${pkgdir}/lib/modules/extramodules-${_basekernel}${_kernelname:--CHAKRA}/version"
+  
+  # Call depmod...
+  depmod -b "$pkgdir" -F System.map "$_kernver"
+
+  # Move module /lib -> /usr/lib
+  mv "$pkgdir/lib" "$pkgdir/usr"
 }
 
 package_linux-headers() {
@@ -180,10 +182,10 @@ package_linux-headers() {
   conflicts=('kernel26-headers')
   replaces=('kernel26-headers')
 
-  mkdir -p "${pkgdir}/lib/modules/${_kernver}"
+  install -dm755 "${pkgdir}/usr/lib/modules/${_kernver}"
 
-  cd "${pkgdir}/lib/modules/${_kernver}"
-  ln -sf ../../../usr/src/linux-${_kernver} build
+  cd "${pkgdir}/usr/lib/modules/${_kernver}"
+  ln -sf ../../../src/linux-${_kernver} build
 
   cd "${srcdir}/linux-${_basekernel}"
   install -D -m644 Makefile \
@@ -215,10 +217,6 @@ package_linux-headers() {
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/arch/${KARCH}/kernel"
 
   cp arch/${KARCH}/Makefile "${pkgdir}/usr/src/linux-${_kernver}/arch/${KARCH}/"
-
-  if [ "${CARCH}" = "i686" ]; then
-    cp arch/${KARCH}/Makefile_32.cpu "${pkgdir}/usr/src/linux-${_kernver}/arch/${KARCH}/"
-  fi
 
   cp arch/${KARCH}/kernel/asm-offsets.s "${pkgdir}/usr/src/linux-${_kernver}/arch/${KARCH}/kernel/"
 
