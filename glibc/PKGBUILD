@@ -54,7 +54,8 @@ source=(http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}_${
         nscd.service
         nscd.tmpfiles
         locale.gen.txt
-        locale-gen)
+        locale-gen
+        glibc.conf)
 md5sums=('c0487f4e83db1b9b30d7989fc47dbead'
          '349227bcedb19cea008fbcb2c7e1a582'
          '880439de2c608177ed1d749722d26820'
@@ -87,7 +88,8 @@ md5sums=('c0487f4e83db1b9b30d7989fc47dbead'
          'f3fb741c73ae5fd46e03beae4e6948c9'
          'bccbe5619e75cf1d97312ec3681c605c'
          '07ac979b6ab5eeb778d55f041529d623'
-         '476e9113489f93b348b21e144b6a8fcf')
+         '476e9113489f93b348b21e144b6a8fcf'
+         '8b3298de2392a10905a64ceccf56d2c1')
 
 mksource() {
     git clone git://sourceware.org/git/glibc.git
@@ -292,4 +294,6 @@ package() {
                       lib/{libmemusage,libpcprofile,libSegFault}.so \
                       usr/lib/{pt_chown,{audit,gconv}/*.so}
 
+  # Add /usr/lib32 to the default library search path
+  install -Dm644 "$srcdir/glibc.conf" "$pkgdir/etc/ld.so.conf.d/glibc.conf"
 }
