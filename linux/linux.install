@@ -10,7 +10,7 @@ export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 post_install () {
   # updating module dependencies
   echo ">>> Updating module dependencies. Please wait ..."
-  depmod -b /usr ${KERNEL_VERSION}
+  depmod ${KERNEL_VERSION}
   echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
   mkinitcpio -p linux${KERNEL_NAME}
 
@@ -40,7 +40,7 @@ post_upgrade() {
 
   # updating module dependencies
   echo ">>> Updating module dependencies. Please wait ..."
-  depmod -b /usr ${KERNEL_VERSION}
+  depmod ${KERNEL_VERSION}
   echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
   mkinitcpio -p linux${KERNEL_NAME}
 }
