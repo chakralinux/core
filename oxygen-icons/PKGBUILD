@@ -27,7 +27,6 @@ options=('log')
 makedepends=('pkgconfig' 'cmake' 'automoc4')
 
 source=($_mirror/${_origname}-$_kdever.tar.xz)
-
 md5sums=(`grep ${_origname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 
 #
@@ -41,7 +40,7 @@ build() {
 	cmake . -DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix}
 
-	make || return 1
+	make
 }
 
 package_oxygen-icons() {
@@ -66,5 +65,4 @@ package_oxygen-icons-svg() {
 	mv $srcdir/svg/scalable $pkgdir/usr/share/icons/oxygen
 	rm -rf $pkgdir/usr/share/icons/oxygen/scalable/apps/clock.svgz
 }
-
 
