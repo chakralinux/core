@@ -11,10 +11,10 @@ pkgname=nvidia-utils-bumblebee
 #  pacman --print --print-format $1 -S nvidia-utils | grep nvidia-utils
 #}
 
-pkgver=304.51
-pkgrel=2
+pkgver=310.19
+pkgrel=1
 pkgdesc="NVIDIA drivers utilities and libraries. Repacked and installed in different folder to be used simultaneously with libgl."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.nvidia.com/"
 depends=('xorg-server' 'libxvmc' "dkms-nvidia=$pkgver" "opencl-nvidia=$pkgver")
 optdepends=('gtk2: nvidia-settings' 'pkgconfig: nvidia-xconfig')
@@ -23,17 +23,10 @@ provides=("nvidia-utils=$pkgver" 'nvidia-settings')
 license=('custom')
 install=nvidia.install
 
-if [ "$CARCH" = "i686" ]; then
-    _carch='x86'
-    _pkg="NVIDIA-Linux-${_carch}-${pkgver}"
-    source=("ftp://download.nvidia.com/XFree86/Linux-${_carch}/${pkgver}/${_pkg}.run")
-    md5sums=('b7f908ea08218df08db06026215ec419')
-elif [ "$CARCH" = "x86_64" ]; then
     _carch='x86_64'
     _pkg="NVIDIA-Linux-${_carch}-${pkgver}-no-compat32"
     source=("ftp://download.nvidia.com/XFree86/Linux-${_carch}/${pkgver}/${_pkg}.run")
-    md5sums=('2ca10e05cd3b5d2a87caaaad9fd93c06')
-fi
+    md5sums=('0ba08d32852e442ebba5ba22c7abed36')
 
 create_links() {
     # create soname links
@@ -60,9 +53,6 @@ package() {
     install -D -m755 "libGL.so.${pkgver}" "${pkgdir}/usr/lib/nvidia-bumblebee/libGL.so.${pkgver}"
     # OpenGL core library
     install -D -m755 "libnvidia-glcore.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-glcore.so.${pkgver}"
-    # XvMC
-    install -D -m644 libXvMCNVIDIA.a "${pkgdir}/usr/lib/libXvMCNVIDIA.a"
-    install -D -m755 "libXvMCNVIDIA.so.${pkgver}" "${pkgdir}/usr/lib/libXvMCNVIDIA.so.${pkgver}"
     # VDPAU
     install -D -m755 "libvdpau_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/vdpau/libvdpau_nvidia.so.${pkgver}"
     # nvidia-tls library

@@ -6,8 +6,8 @@
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl' 'nvidia-settings')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
-pkgver=304.51
-pkgrel=3
+pkgver=310.19
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
@@ -16,7 +16,7 @@ options=('!strip')
 [ "$CARCH" = "x86_64" ] && {
   ARCH='x86_64'
   _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-  md5sums=('2ca10e05cd3b5d2a87caaaad9fd93c06')
+  md5sums=('0ba08d32852e442ebba5ba22c7abed36')
 }
 
 source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
@@ -27,10 +27,10 @@ md5sums=("${md5sums[@]}"
 create_links() {
   # create soname links
   while read -d '' _lib; do
-    _soname="$(dirname "${_lib}")/$(readelf -d "${_lib}" | sed -nr 's/.*Library soname: \[(.*)\].*/\1/p')"
-    [ -e "${_soname}" ] || ln -s "$(basename "${_lib}")" "${_soname}"
-    [ -e "${_soname/.[0-9]*/}" ] || ln -s "$(basename "${_soname}")" "${_soname/.[0-9]*/}"
-  done < <(find "${pkgdir}" -type f -name '*.so*' -print0)
+        _soname="$(dirname "${_lib}")/$(LC_ALL=C readelf -d "${_lib}" | sed -nr 's/.*Library soname: \[(.*)\].*/\1/p')"
+        [[ -e "${_soname}" ]] || ln -s "$(basename "${_lib}")" "${_soname}"
+        [[ -e "${_soname/.[0-9]*/}" ]] || ln -s "$(basename "${_soname}")" "${_soname/.[0-9]*/}"
+    done < <(find "${pkgdir}" -type f -name '*.so*' -print0)
 }
 
 build() {
@@ -40,7 +40,7 @@ build() {
 
 package_libcl() {
   pkgdesc="OpenCL library and ICD loader from NVIDIA"
-  pkgver=1.1.9.5
+  pkgver=1.1.9.6
 
   cd "${srcdir}/${_pkg}"
 
@@ -83,9 +83,6 @@ package_nvidia-utils() {
   install -D -m755 "libGL.so.${pkgver}" "${pkgdir}/usr/lib/libGL.so.${pkgver}"
   # OpenGL core library
   install -D -m755 "libnvidia-glcore.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-glcore.so.${pkgver}"
-  # XvMC
-  install -D -m644 libXvMCNVIDIA.a "${pkgdir}/usr/lib/libXvMCNVIDIA.a"
-  install -D -m755 "libXvMCNVIDIA.so.${pkgver}" "${pkgdir}/usr/lib/libXvMCNVIDIA.so.${pkgver}"
   # VDPAU
   install -D -m755 "libvdpau_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/vdpau/libvdpau_nvidia.so.${pkgver}"
   # nvidia-tls library
