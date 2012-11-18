@@ -6,12 +6,12 @@
 _extramodules=extramodules-3.6-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
-pkgname=('nvidia' 'chd-nvidia')
-pkgver=310.19
-pkgrel=2
+pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
+pkgver=304.51
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
-makedepends=('linux-headers' 'linux>=3.6' 'linux<3.7' "nvidia-utils=${pkgver}")
+makedepends=('linux-headers' 'linux>=3.6' 'linux<3.7' "nvidia-304xx-utils=${pkgver}")
 license=('custom')
 source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47')
@@ -19,7 +19,7 @@ md5sums=('62d0cdb856cfae64753c0f3acf729d47')
     _ARCH='x86_64'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
     source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-    md5sums+=('0ba08d32852e442ebba5ba22c7abed36')
+    md5sums+=('2ca10e05cd3b5d2a87caaaad9fd93c06')
 
 build() {
     cd "${srcdir}"
@@ -28,10 +28,10 @@ build() {
     make SYSSRC=/lib/modules/"${_kver}/build" module
 }
 
-package_nvidia() {
+package_nvidia-304xx() {
     pkgdesc="NVIDIA drivers for linux."
-    depends=('linux>=3.6' 'linux<3.7' "nvidia-utils=${pkgver}")
-    conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx')
+    depends=('linux>=3.6' 'linux<3.7' "nvidia-304xx-utils=${pkgver}")
+    conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia')
     install=nvidia.install
     
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
@@ -42,7 +42,7 @@ package_nvidia() {
     gzip "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
 }
 
-package_chd-nvidia() {
+package_chd-nvidia-304xx() {
     pkgdesc="CHD ids for nvidia $pkgver"
     arch=('any')
 
