@@ -3,16 +3,16 @@
 #
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-_kernver="3.5.6-1-CHAKRA"
+_kernver="3.6.6-1-CHAKRA"
 
 pkgname=(catalyst chd-catalyst)
 pkgver=12.8
-pkgrel=5
+pkgrel=6
 _amdver=8.982
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
-makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers' 'linux>=3.5' 'linux<=3.6' 'catalyst-utils')
+makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers' 'linux>=3.6' 'linux<=3.7' 'catalyst-utils')
 
 source=(http://www2.ati.com/drivers/linux/amd-driver-installer-${pkgver/./-}-x86.x86_64.zip
         ati_make.sh
@@ -41,15 +41,8 @@ build() {
     msg "Unpacking archive ..."
     /bin/sh ./amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
 
-
-    if [ "${CARCH}" = "x86_64" ]; then
-	BUILDARCH=x86_64
-	_archdir=x86_64
-    fi
-    if [ "${CARCH}" = "i686" ]; then
-	BUILDARCH=i386
-	_archdir=x86
-    fi
+    BUILDARCH=x86_64
+   _archdir=x86_64
 
     cd "${srcdir}/archive_files/"
 
