@@ -5,9 +5,6 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-#
-# package info
-#
 pkgbase=('kdenetwork')
 pkgname=('kdenetwork-filesharing'
          'kdenetwork-kdnssd'
@@ -17,7 +14,7 @@ pkgname=('kdenetwork-filesharing'
          'kdenetwork-krdc'
          'kdenetwork-krfb')
 
-arch=('i686' 'x86_64')
+arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="split package"
@@ -30,16 +27,9 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' 'speex' 'ortp' 'libotr' 'qca
 	     'ppp' 'libv4l' 'libidn' 'rdesktop' 'qimageblitz' 'libxss' 'libxdamage' 'libgadu'
 	     'mediastreamer' 'msilbc' 'kwebkitpart>=0.9.6' 'libktorrent>=1.0.5' 'docbook-xsl')
 
-source=("$_mirror/${pkgbase}-$_kdever.tar.xz"
-        'lisa.daemon')
+source=("$_mirror/${pkgbase}-$_kdever.tar.xz")
+md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 
-md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
-         '66069c83fd5fa0df5d743d4486799033')  # lisa.daemon
-
-
-#
-# build function
-#
 build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
 	msg "starting build ..."
@@ -54,9 +44,6 @@ build() {
 	make || return 1
 }
 
-#
-# split-install functions
-#
 package_kdenetwork-filesharing() {
 	pkgdesc='Konqueror properties dialog plugin to share a directory with the local network'
 	depends=("kdelibs>=${_kdever}" 'smbclient')
