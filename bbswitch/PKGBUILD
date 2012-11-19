@@ -7,7 +7,7 @@ _KERNELS=`pacman -Ql $_PACKAGES | grep /modules.alias.bin | sed 's/.*\/lib\/modu
 
 pkgname=bbswitch
 pkgver=0.5
-pkgrel=1
+pkgrel=2
 pkgdesc="kernel module allowing to switch dedicated graphics card on Optimus laptops"
 arch=('i686' 'x86_64')
 url=("http://github.com/Bumblebee-Project/bbswitch")
@@ -35,7 +35,7 @@ package() {
   cd ${srcdir}/${pkgname}-${pkgver}
 
    # Find all extramodules directories
-  _EXTRAMODULES=`find /usr/lib/modules -name version | sed 's|\/usr\/lib\/modules\/||; s|\/version||'`
+  _EXTRAMODULES=`find /lib/modules -name version | sed 's|\/lib\/modules\/||; s|\/version||'`
 
   # Loop through all detected kernels
   for _kernver in $_KERNELS; do
@@ -43,10 +43,10 @@ package() {
     # Loop through all detected extramodules directories
     for _moduledirs in $_EXTRAMODULES; do
       # Check which extramodules directory corresponds with the built module
-      if [ `cat "/usr/lib/modules/${_moduledirs}/version"` = $_kernver ]; then
-        mkdir -p "${pkgdir}/usr/lib/modules/${_moduledirs}/"
-        install -m644 bbswitch.ko "${pkgdir}/usr/lib/modules/${_moduledirs}/"
-        gzip "${pkgdir}/usr/lib/modules/${_moduledirs}/bbswitch.ko"
+      if [ `cat "/lib/modules/${_moduledirs}/version"` = $_kernver ]; then
+        mkdir -p "${pkgdir}/lib/modules/${_moduledirs}/"
+        install -m644 bbswitch.ko "${pkgdir}/lib/modules/${_moduledirs}/"
+        gzip "${pkgdir}/lib/modules/${_moduledirs}/bbswitch.ko"
       fi
     done
   done
