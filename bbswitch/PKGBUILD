@@ -1,53 +1,39 @@
-# Maintainer: Neophytos Kolokotronis <tetris4@gmail,com>
-# Contributors from AUR: M0Rf30
-#                        Samsagax <samsagax@gmail.com>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas@chakra-project.org
 
-_PACKAGES=`pacman -Qsq linux`
-_KERNELS=`pacman -Ql $_PACKAGES | grep /modules.alias.bin | sed 's/.*\/lib\/modules\/\(.*\)\/modules.alias.bin/\1/g'`
+_extramodules=extramodules-3.6-CHAKRA
+_kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=bbswitch
 pkgver=0.5
-pkgrel=2
+pkgrel=3
 pkgdesc="kernel module allowing to switch dedicated graphics card on Optimus laptops"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url=("http://github.com/Bumblebee-Project/bbswitch")
 license=('GPL')
 provides=('bbswitch')
-makedepends=('linux-headers')
 install=bbswitch.install
+depends=('linux>=3.6' 'linux<3.7')
+makedepends=('linux' 'linux-headers')
 source=("https://github.com/downloads/Bumblebee-Project/bbswitch/${pkgname}-${pkgver}.tar.gz")
 md5sums=('5e0e6eb9c5e8c10db56e5b349b43bba7')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  sed -i "s|/lib/modules|/usr/lib/modules|g" Makefile
-
-  for _kernver in $_KERNELS; do
-    msg2 "Building module for $_kernver..."
-
-    # KDIR is necessary even when cleaning
-    make KDIR=/usr/src/linux-${_kernver} clean
-    make KDIR=/usr/src/linux-${_kernver}
-  done
+  make
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+    cd ${srcdir}/${pkgname}-${pkgver}
+    msg2 "Building module for $_kver..."
 
-   # Find all extramodules directories
-  _EXTRAMODULES=`find /lib/modules -name version | sed 's|\/lib\/modules\/||; s|\/version||'`
-
-  # Loop through all detected kernels
-  for _kernver in $_KERNELS; do
-
-    # Loop through all detected extramodules directories
-    for _moduledirs in $_EXTRAMODULES; do
-      # Check which extramodules directory corresponds with the built module
-      if [ `cat "/lib/modules/${_moduledirs}/version"` = $_kernver ]; then
-        mkdir -p "${pkgdir}/lib/modules/${_moduledirs}/"
-        install -m644 bbswitch.ko "${pkgdir}/lib/modules/${_moduledirs}/"
-        gzip "${pkgdir}/lib/modules/${_moduledirs}/bbswitch.ko"
-      fi
-    done
-  done
+    # KDIR is necessary even when cleaning
+    #make KDIR=/usr/src/linux-${_kver} clean
+    make KDIR=/usr/src/linux-${_kver}
+    mkdir -p $pkgdir//lib/modules/${_extramodules}
+    install -D -m644 bbswitch.ko $pkgdir/lib/modules/${_extramodules}
+    gzip "${pkgdir}/lib/modules/${_extramodules}/bbswitch.ko"
+    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/bbswitch.install"
 }

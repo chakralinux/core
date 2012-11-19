@@ -1,11 +1,15 @@
 post_install() {
-  depmod -a
+    EXTRAMODULES='extramodules-3.6-CHAKRA'
+    depmod $(cat /lib/modules/$EXTRAMODULES/version)
+    echo 'In order to use nvidia module, reboot the system.'
 }
 
 post_upgrade() {
-  depmod -a
+    EXTRAMODULES='extramodules-3.6-CHAKRA'
+    depmod $(cat /lib/modules/$EXTRAMODULES/version)
 }
 
 post_remove() {
-  depmod -a
+    EXTRAMODULES='extramodules-3.6-CHAKRA'
+    depmod $(cat /lib/modules/$EXTRAMODULES/version)
 }
