@@ -7,7 +7,7 @@ _kernver="3.6.6-1-CHAKRA"
 
 pkgname=('catalyst-legacy' 'chd-catalyst-legacy')
 pkgver=12.6
-pkgrel=8
+pkgrel=9
 arch=('x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
@@ -36,15 +36,8 @@ build() {
     msg "Unpacking archive ..."
     /bin/sh ./amd-driver-installer-${pkgver}-legacy-x86.x86_64.run --extract archive_files
 
-
-    if [ "${CARCH}" = "x86_64" ]; then
 	BUILDARCH=x86_64
 	_archdir=x86_64
-    fi
-    if [ "${CARCH}" = "i686" ]; then
-	BUILDARCH=i386
-	_archdir=x86
-    fi
 
     cd "${srcdir}/archive_files/"
 
@@ -71,7 +64,7 @@ build() {
 package_catalyst-legacy() {
     pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
     screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
-    depends=('linux>=3.5' 'linux<3.6' 'catalyst-legacy-utils')
+    depends=('linux>=3.6' 'linux<3.7' 'catalyst-legacy-utils')
     conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'catalyst')
     install=catalyst.install
 
@@ -105,7 +98,7 @@ package_catalyst-legacy() {
 
 package_chd-catalyst-legacy() {
     pkgdesc="CHD ids for catalyst $pkgver"
-    arch=('any')
+    arch=('x86_64')
 
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod/"
 
