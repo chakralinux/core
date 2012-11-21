@@ -4,36 +4,48 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=octave
-pkgver=3.6.1
-pkgrel=2
+pkgver=3.6.3
+pkgrel=1
 pkgdesc="A high-level language, primarily intended for numerical computations."
 arch=('x86_64')
 url="http://www.octave.org"
 license=('GPL')
-depends=('fftw' 'pcre' 'curl' 'lapack' 'libx11' 'graphicsmagick' 'glpk' 'hdf5' 'gcc-libs' 'qhull')
-makedepends=('texinfo' 'graphicsmagick' 'gcc-fortran' 'umfpack' 'python2')
+depends=('fftw' 'pcre' 'curl' 'libx11' 'graphicsmagick' 'glpk' 'hdf5' 'gcc-libs' 'qhull'
+         'arpack' 'suitesparse')
+makedepends=('texlive-core' 'gcc-fortran' 'python2')
 optdepends=('texinfo: for help-support in octave'
-            'gnuplot: alternative plotting'
-            'umfpack: LU decomposition of some large sparse matrices')
-source=("ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.bz2")
+            'gnuplot: alternative plotting')
+source=("ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.bz2"
+        'gethelp.patch')
 options=('!emptydirs')
 install='octave.install'
-md5sums=('b543dd5ca743cba8c1d3474b1b99ae41')
+md5sums=('29ab7e502e5c963c058906f788670245'
+         'f86f91022d54ed926453b10bc8edd662')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
+
+  # gentoo.org patch
+  patch -p0 -i "${srcdir}/gethelp.patch"
+
+  autoreconf -vfi
 
   # http://www.nabble.com/Random-rounding-errors-td16010966.html
   FFLAGS="-O -ffloat-store" \
 
   ./configure --prefix=/usr --libexecdir=/usr/lib \
-  --enable-shared --disable-static --disable-docs 
+  --enable-shared --disable-static \
+  --with-umfpack="-lumfpack -lsuitesparseconfig" 
 
-  make
+  LANG=C make
 }
 
 package(){
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
+
+  # add path to ld.so.conf.d
+  install -d "${pkgdir}/etc/ld.so.conf.d"
+  echo "/usr/lib/${pkgname}/${pkgver}" > "${pkgdir}/etc/ld.so.conf.d/${pkgname}.conf"
 }
