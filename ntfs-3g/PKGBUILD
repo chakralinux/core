@@ -1,12 +1,12 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
 #
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=ntfs-3g
 _realname=ntfs-3g_ntfsprogs
 pkgver=2012.1.15
-pkgrel=3
+pkgrel=4
 pkgdesc="Stable read and write NTFS driver"
 url="http://www.tuxera.com"
 arch=('x86_64')
@@ -31,7 +31,7 @@ build() {
 package() {
   cd "${srcdir}/${_realname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  
+
   mv "$pkgdir"/bin/* "$pkgdir"/usr/bin/
   rm -rf "$pkgdir"/{s,}bin
 
@@ -39,7 +39,7 @@ package() {
   ln -s ntfs-3g mount.ntfs
   ln -s ntfs-3g mount.ntfs-3g
   ln -s lowntfs-3g mount.lowntfs-3g
-  
+
   mv "$pkgdir"/lib/* "$pkgdir"/usr/lib/
   rm -rf "$pkgdir"/lib
 }
