@@ -21,6 +21,7 @@ post_upgrade() {
   if [ "$(vercmp 196 "$2")" -eq 1 ]; then
     mv /etc/systemd/system/getty.target.wants/getty@tty1.service /etc/systemd/system/getty.target.wants/getty@tty1.service.pacsave
     mv /etc/systemd/system/getty.target.wants/getty@tty1new.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+    rm /etc/systemd/system/getty.target.wants/getty@tty1.service.pacsave
   fi
   
   if sd_booted; then
