@@ -6,7 +6,7 @@
 
 pkgname=git
 pkgver=1.8.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 arch=('i686' 'x86_64')
 url="http://git-scm.com/"
@@ -84,6 +84,7 @@ package() {
   install -m644 ./contrib/completion/git-prompt.sh "${pkgdir}/usr/share/git/git-prompt.sh"
   # more contrib stuff
   cp -a ./contrib/* "${pkgdir}/usr/share/git/"
+
   # scripts are for python 2.x
   find "${pkgdir}" -name '*.py' \
        -exec sed -e 's|#![ ]*/usr/bin/env python|#!/usr/bin/env python2|' -i \{\} \+
@@ -107,12 +108,11 @@ package() {
   rm -rf "${pkgdir}/usr/lib/perl5"
 
   # git daemon script
-  install -D -m755 "${srcdir}/git-daemon" "${pkgdir}/etc/rc.d/git-daemon"
   install -D -m644 "${srcdir}/git-daemon.conf" "${pkgdir}/etc/conf.d/git-daemon.conf"
 
   # systemd stuff
-  install -D -m 644 "${srcdir}"/git-daemon@.service "${pkgdir}"/usr/lib/systemd/system/git-daemon@.service
-  install -D -m 644 "${srcdir}"/git-daemon.socket "${pkgdir}"/usr/lib/systemd/system/git-daemon.socket
+  install -D -m644 "${srcdir}/git-daemon@.service" "${pkgdir}/usr/lib/systemd/system/git-daemon@.service"
+  install -D -m644 "${srcdir}/git-daemon.socket" "${pkgdir}/usr/lib/systemd/system/git-daemon.socket"
 }
 
 # vim:set ts=2 sw=2 et:
