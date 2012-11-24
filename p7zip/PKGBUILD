@@ -1,11 +1,9 @@
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
-# Contributors from Arch: Thayer Williams <thayer@archlinux.org>
-#  			  Hugo Doria <hugo@archlinux.org>
-#                         TuxSpirit<tuxspirit@archlinux.fr>
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/p7zip/
 
 pkgname=p7zip
 pkgver=9.20.1
-pkgrel=1
+pkgrel=2
 pkgdesc="A command-line port of the 7zip compression utility"
 arch=('x86_64')
 license=('GPL')
@@ -21,9 +19,6 @@ md5sums=('bd6caaea567dc0d995c990c5cc883c89'
 build() {
 	cd "${srcdir}/${pkgname}_${pkgver}"
 
-	#[[ $CARCH = x86_64 ]] \
-	#&& cp makefile.linux_amd64_asm makefile.machine \
-	#|| cp makefile.linux_x86_asm_gcc_4.X makefile.machine
         cp makefile.linux_amd64_asm makefile.machine
 
 	make all3 OPTFLAGS="${CXXFLAGS}"
@@ -44,14 +39,6 @@ package() {
 		/usr/share/doc/p7zip/DOCS/unRarLicense.txt
 
 	# Integration with stuff...
-	install -D GUI/p7zip_32.png "${pkgdir}"/usr/share/icons/hicolor/32x32/apps/p7zip.png
-	install -d "${pkgdir}"/usr/share/{applications,kde4/services/ServiceMenus}
-	cp GUI/kde4/* "${pkgdir}"/usr/share/kde4/services/ServiceMenus/
-	cp ../7z.desktop "${pkgdir}"/usr/share/applications/
 	ln -s 7zCon.sfx "${pkgdir}"/usr/lib/p7zip/7z.sfx
-
-	find GUI/help -type d -exec chmod 755 {} \;
-	cp -r GUI/help "${pkgdir}"/usr/lib/p7zip/
-
 	chmod -R u+w "${pkgdir}/usr"
 }
