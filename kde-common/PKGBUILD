@@ -10,13 +10,10 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # original name (used for the source and pkgnames)
 _origname=common
 
-#
-# package info
-#
 pkgname=kde-common
 arch=('x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 
 pkgdesc="KDE SC - Common Configuration Files, Scripts and Artwork"
 url="http://www.kde.org"
@@ -82,9 +79,6 @@ md5sums=('2afd86671ad0db31718157aecd46d528'
          '7daec96c125e1e238a35f31ea4a476f0'
          '18e8d01124b19f7df2937c06e177bf7f')
 
-#
-# build and install
-#
 build() {
 	# install scripts for gpg/ssh-agent
 	install -D -m 755 -o root -g root $srcdir/agent-startup.sh $pkgdir/etc/kde/env/agent-startup.sh
@@ -118,10 +112,14 @@ build() {
         cd ${srcdir}/rootactions_servicemenu_2.4.10/Root_Actions_2.4.10
         patch -p2 < ${srcdir}/servicemenu-rootactions.patch      
 	install -Dm755 rootactions-servicemenu.pl ${pkgdir}/usr/bin/rootactions-servicemenu.pl
-
+        sed "s~Icon=terminal~Icon=utilities-terminal~g" -i ${pkgdir}/usr/share/kde4/services/ServiceMenus/10-rootactionsfolders.desktop
+        sed "s~Icon=terminal~Icon=utilities-terminal~g" -i ${pkgdir}/usr/share/kde4/services/ServiceMenus/11-rootactionsfiles.desktop
+ 
 	# install all other service menus
 	install -m755 ${srcdir}/servicemenu-copy-path.desktop ${pkgdir}/usr/share/kde4/services/ServiceMenus/copy-path.desktop
+
 	install -m755 ${srcdir}/102825-compressattach.desktop ${pkgdir}/usr/share/kde4/services/ServiceMenus/compress-attach.desktop
+        sed "s~Icon=attach~Icon=mail-attachment~g" -i ${pkgdir}/usr/share/kde4/services/ServiceMenus/compress-attach.desktop
 
 	# install chakra icons
 	cd ${srcdir}/chakra-icons/
