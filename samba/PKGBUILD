@@ -20,15 +20,22 @@ options=(!makeflags)
 backup=(etc/logrotate.d/samba
         etc/pam.d/samba
         etc/xinetd.d/swat)
+install='samba.install'
 source=("http://us1.samba.org/samba/ftp/stable/${pkgname}-${_realver}.tar.gz"
         'samba.logrotate' 
         'swat.xinetd' 
         'samba.pam'
+        'smbd.service'
+        'nmbd.service'
+        'winbindd.service'
         'samba.conf')
 md5sums=('0c48bbeb9549fcda37f108aa3c2a817f'
          '5697da77590ec092cc8a883bae06093c'
          'a4bbfa39fee95bba2e7ad6b535fae7e6'
          '96f82c38f3f540b53f3e5144900acf17'
+         '4b9c54d6fed4d0a225a84963516fc46f'
+         '67ce9229c4e343a91d70edba6de29437'
+         '617079917cdc84b450d109557b1fe2e1'
          '8e7ed39b54968e427f9506e9107bfb45')
 
 build() {
@@ -60,29 +67,12 @@ build() {
 
 package() {
   cd ${srcdir}/${pkgname}-${_realver}/source3
-  mkdir -p ${pkgdir}/usr/bin ${pkgdir}/usr/lib
-  install -m755 bin/{smbclient,rpcclient,smbspool,smbtree,smbcacls,smbcquotas,smbget,net,nmblookup} ${pkgdir}/usr/bin/
-  for i in libnetapi* libwbclient* libsmbclient*;do
-      cp  -a bin/${i}*.so* ${pkgdir}/usr/lib/
-  done
-  install -m755 script/smbtar ${pkgdir}/usr/bin/
-  mkdir -p ${pkgdir}/usr/lib/cups/backend
-  ln -sf /usr/bin/smbspool ${pkgdir}/usr/lib/cups/backend/smb
-  mkdir -p ${pkgdir}/usr/include
-  install -m644 include/libsmbclient.h ${pkgdir}/usr/include/
-  install -m644 lib/netapi/netapi.h ${pkgdir}/usr/include/
-  mkdir -p ${pkgdir}/usr/share/man/man{1,7}
-  for man in rpcclient smbcacls smbclient smbcquotas smbget \
-      smbtree smbtar nmblookup; do
-      install -m644 ../docs/manpages/${man}.1 ${pkgdir}/usr/share/man/man1/
-  done
-  install -m644 ../docs/manpages/libsmbclient.7 ${pkgdir}/usr/share/man/man7/
-
   mkdir -p ${pkgdir}/etc/samba/private
   chmod 700 ${pkgdir}/etc/samba/private
-  make DESTDIR=${pkgdir} install
+  make DESTDIR="$pkgdir" install
+  mkdir -p ${pkgdir}/usr/lib/cups/backend
+  ln -sf /usr/bin/smbspool ${pkgdir}/usr/lib/cups/backend/smb
   chmod 644 ${pkgdir}/usr/include/*.h
-  (cd script; cp installbin.sh i; cat i | sed 's/\/sbin\///' > installbin.sh)
   mkdir -p ${pkgdir}/etc/samba
   cat ../examples/smb.conf.default | \
     sed 's|log file = .*$|log file = /var/log/samba/log.%m|g' >${pkgdir}/etc/samba/smb.conf.default
@@ -103,13 +93,10 @@ package() {
   mkdir -p ${pkgdir}/usr/lib/krb5/plugins/libkrb5
   install -d -m 0755 ${pkgdir}/usr/lib/krb5/plugins/libkrb5
   install -m 755 bin/winbind_krb5_locator.so ${pkgdir}/usr/lib/krb5/plugins/libkrb5/winbind_krb5_locator.so
-  # copy ldap example
-  install -D -m644 ${srcdir}/samba-${_realver}/examples/LDAP/samba.schema ${pkgdir}/usr/share/doc/samba/examples/LDAP/samba.schema
   # systemd files
-  for i in smb nmb winbind; do
-  install -D -m644 ${srcdir}/samba-${_realver}/packaging/systemd/$i.service ${pkgdir}/usr/lib/systemd/system/${i}d.service
+  for i in smbd nmbd winbindd; do
+  install -D -m644 ${srcdir}/$i.service ${pkgdir}/usr/lib/systemd/system/$i.service
   done
-  install -D -m644 ${srcdir}/samba-${_realver}/packaging/systemd/samba.sysconfig ${pkgdir}/usr/lib/systemd/system/samba.sysconfig
   # create non-persistent dirs via tmpfiles instead of shipping packaged-in
   install -D -m644 ${srcdir}/samba.conf ${pkgdir}/usr/lib/tmpfiles.d/samba.conf
   rm -rf ${pkgdir}/var/run
@@ -117,5 +104,7 @@ package() {
   for man in tdbbackup tdbdump tdbtool; do
       rm -f ${pkgdir}/usr/share/man/man8/${man}.8
   done
+  # copy ldap example
+  install -D -m644 ${srcdir}/samba-${_realver}/examples/LDAP/samba.schema ${pkgdir}/usr/share/doc/samba/examples/LDAP/samba.schema
  }
 
