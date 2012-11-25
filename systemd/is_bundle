@@ -1,0 +1,9 @@
+#!/bin/sh
+
+is_bundle=$(cat /proc/mounts | egrep "($1+.*cinstall.*)" | wc -l)
+
+if [ $is_bundle -eq 1 -o $is_bundle -gt 1 ]; then
+       echo 1
+else
+       echo 0
+fi
