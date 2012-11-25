@@ -25,7 +25,7 @@ pkgname=('php'
          'php-sqlite'
          'php-tidy'
          'php-xsl')
-pkgver=5.4.8
+pkgver=5.4.9
 pkgrel=1
 arch=('x86_64')
 license=('PHP')
@@ -40,9 +40,9 @@ source=("http://www.php.net/distributions/${pkgbase}-${pkgver}.tar.bz2"
         'rc.d.php-fpm'
         'php-fpm.conf.in.patch'
         'logrotate.d.php-fpm'
-	'php-fpm.service'
-	'php-fpm.tmpfiles')
-sha256sums=('d02810b7949938ee7190116e7483e1a06b3fa8373d3bbc0ea65a41265afce79f'
+	      'php-fpm.service'
+      	'php-fpm.tmpfiles')
+sha256sums=('c0649971cfa9723701d085e227376374569689689b8421e4dcfac56c2f6fcac5'
             '119c04af11f771b83b28660cecda85ce1c0f0f48c9067ef2c02def7164700d3f'
             '49f5a2e06a0decbcd451bc485fe489b96226b67b4c4c0ec3d0a8faa141f16f7b'
             '065663d8ebb952524b346a2de35d495c985474225389dd2f5e536f26dd766766'
@@ -56,86 +56,88 @@ build() {
   #export LDFLAGS="${LDFLAGS//-Wl,--as-needed}"
   #export LDFLAGS="${LDFLAGS//,--as-needed}"
 
-  phpconfig="--srcdir=${srcdir}/${pkgbase}-${pkgver} \
-    --prefix=/usr \
-    --sysconfdir=/etc/php \
-    --localstatedir=/var \
-    --with-layout=GNU \
-    --with-config-file-path=/etc/php \
-    --with-config-file-scan-dir=/etc/php/conf.d \
-    --enable-inline-optimization \
-    --disable-debug \
-    --disable-rpath \
-    --disable-static \
-    --enable-shared \
-    --mandir=/usr/share/man \
-    --without-pear \
-    "
+  local phpconfig=(
+    --srcdir="${srcdir}/${pkgbase}-${pkgver}"
+    --prefix=/usr
+    --sysconfdir=/etc/php
+    --localstatedir=/var
+    --with-layout=GNU
+    --with-config-file-path=/etc/php
+    --with-config-file-scan-dir=/etc/php/conf.d
+    --enable-inline-optimization
+    --disable-debug
+    --disable-rpath
+    --disable-static
+    --enable-shared
+    --mandir=/usr/share/man
+    --without-pear
+  )
 
-  phpextensions="--enable-bcmath=shared \
-    --enable-calendar=shared \
-    --enable-dba=shared \
-    --enable-exif=shared \
-    --enable-ftp=shared \
-    --enable-gd-native-ttf \
-    --enable-intl=shared \
-    --enable-json=shared \
-    --enable-mbregex \
-    --enable-mbstring \
-    --enable-pdo \
-    --enable-phar=shared \
-    --enable-posix=shared \
-    --enable-session \
-    --enable-shmop=shared \
-    --enable-soap=shared \
-    --enable-sockets=shared \
-    --enable-sysvmsg=shared \
-    --enable-sysvsem=shared \
-    --enable-sysvshm=shared \
-    --enable-xml \
-    --enable-zip=shared \
-    --with-bz2=shared \
-    --with-curl=shared \
-    --with-db4=/usr \
-    --with-enchant=shared,/usr \
-    --with-freetype-dir=shared,/usr \
-    --with-gd=shared \
-    --with-gdbm=shared \
-    --with-gettext=shared \
-    --with-gmp=shared \
-    --with-iconv=shared \
-    --with-icu-dir=/usr \
-    --with-imap-ssl=shared \
-    --with-imap=shared \
-    --with-jpeg-dir=shared,/usr \
-    --with-ldap=shared \
-    --with-ldap-sasl \
-    --with-mcrypt=shared \
-    --with-mhash \
-    --with-mssql=shared \
-    --with-mysql-sock=/var/run/mysqld/mysqld.sock \
-    --with-mysql=shared,mysqlnd \
-    --with-mysqli=shared,mysqlnd \
-    --with-openssl=shared \
-    --with-pcre-regex=/usr \
-    --with-pdo-mysql=shared,mysqlnd \
-    --with-pdo-odbc=shared,unixODBC,/usr \
-    --with-pdo-pgsql=shared \
-    --with-pdo-sqlite=shared,/usr \
-    --with-pgsql=shared \
-    --with-png-dir=shared,/usr \
-    --with-pspell=shared \
-    --with-regex=php \
-    --with-snmp=shared \
-    --with-sqlite3=shared,/usr \
-    --with-tidy=shared \
-    --with-unixODBC=shared,/usr \
-    --with-xmlrpc=shared \
-    --with-xsl=shared \
-    --with-zlib \
-    --without-db2 \
-    --without-db3 \
-    "
+  local phpextensions=(
+    --enable-bcmath=shared
+    --enable-calendar=shared
+    --enable-dba=shared
+    --enable-exif=shared
+    --enable-ftp=shared
+    --enable-gd-native-ttf
+    --enable-intl=shared
+    --enable-json=shared
+    --enable-mbregex
+    --enable-mbstring
+    --enable-pdo
+    --enable-phar=shared
+    --enable-posix=shared
+    --enable-session
+    --enable-shmop=shared
+    --enable-soap=shared
+    --enable-sockets=shared
+    --enable-sysvmsg=shared
+    --enable-sysvsem=shared
+    --enable-sysvshm=shared
+    --enable-xml
+    --enable-zip=shared
+    --with-bz2=shared
+    --with-curl=shared
+    --with-db4=/usr
+    --with-enchant=shared,/usr
+    --with-freetype-dir=shared,/usr
+    --with-gd=shared
+    --with-gdbm=shared
+    --with-gettext=shared
+    --with-gmp=shared
+    --with-iconv=shared
+    --with-icu-dir=/usr
+    --with-imap-ssl=shared
+    --with-imap=shared
+    --with-jpeg-dir=shared,/usr
+    --with-ldap=shared
+    --with-ldap-sasl
+    --with-mcrypt=shared
+    --with-mhash
+    --with-mssql=shared
+    --with-mysql-sock=/var/run/mysqld/mysqld.sock
+    --with-mysql=shared,mysqlnd
+    --with-mysqli=shared,mysqlnd
+    --with-openssl=shared
+    --with-pcre-regex=/usr
+    --with-pdo-mysql=shared,mysqlnd
+    --with-pdo-odbc=shared,unixODBC,/usr
+    --with-pdo-pgsql=shared
+    --with-pdo-sqlite=shared,/usr
+    --with-pgsql=shared
+    --with-png-dir=shared,/usr
+    --with-pspell=shared
+    --with-regex=php
+    --with-snmp=shared
+    --with-sqlite3=shared,/usr
+    --with-tidy=shared
+    --with-unixODBC=shared,/usr
+    --with-xmlrpc=shared
+    --with-xsl=shared
+    --with-zlib
+    --without-db2
+    --without-db3
+  )
 
   EXTENSION_DIR=/usr/lib/php/modules
   export EXTENSION_DIR
@@ -153,61 +155,61 @@ build() {
   mkdir -p "${srcdir}/build-php"
   cd "${srcdir}/build-php"
   ln -sf "${srcdir}/${pkgbase}-${pkgver}/configure"
-  ./configure ${phpconfig} \
-    --disable-cgi \
-    --with-readline \
-    --enable-pcntl \
-    ${phpextensions}
+  ./configure "${phpconfig[@]}" \
+              --disable-cgi \
+              --with-readline \
+              --enable-pcntl \
+              "${phpextensions[@]}"
   make
 
   # cgi and fcgi
   # reuse the previous run; this will save us a lot of time
   cp -a "${srcdir}/build-php" "${srcdir}/build-cgi"
   cd "${srcdir}/build-cgi"
-  ./configure ${phpconfig} \
-    --disable-cli \
-    --enable-cgi \
-    ${phpextensions}
+  ./configure "${phpconfig[@]}" \
+              --disable-cli \
+              --enable-cgi \
+              "${phpextensions[@]}"
   make
 
   # apache
   cp -a "${srcdir}/build-php" "${srcdir}/build-apache"
   cd "${srcdir}/build-apache"
-  ./configure ${phpconfig} \
-    --disable-cli \
-    --with-apxs2 \
-    ${phpextensions}
+  ./configure "${phpconfig[@]}" \
+              --disable-cli \
+              --with-apxs2 \
+              "${phpextensions[@]}"
   make
 
   # fpm
   cp -a "${srcdir}/build-php" "${srcdir}/build-fpm"
   cd "${srcdir}/build-fpm"
-  ./configure ${phpconfig} \
-    --disable-cli \
-    --enable-fpm \
-    --with-fpm-user=http \
-    --with-fpm-group=http \
-    ${phpextensions}
+  ./configure "${phpconfig[@]}" \
+              --disable-cli \
+              --enable-fpm \
+              --with-fpm-user=http \
+              --with-fpm-group=http \
+              "${phpextensions[@]}"
   make
 
   # embed
   cp -a "${srcdir}/build-php" "${srcdir}/build-embed"
   cd "${srcdir}/build-embed"
-  ./configure ${phpconfig} \
-    --disable-cli \
-    --enable-embed=shared \
-    ${phpextensions}
+  ./configure "${phpconfig[@]}" \
+              --disable-cli \
+              --enable-embed=shared \
+              "${phpextensions[@]}"
   make
 
   # pear
   cp -a "${srcdir}/build-php" "${srcdir}/build-pear"
   cd "${srcdir}/build-pear"
-  ./configure ${phpconfig} \
-    --disable-cgi \
-    --with-readline \
-    --enable-pcntl \
-    --with-pear \
-    ${phpextensions}
+  ./configure "${phpconfig[@]}" \
+              --disable-cgi \
+              --with-readline \
+              --enable-pcntl \
+              --with-pear \
+              "${phpextensions[@]}"
   make
 }
 
