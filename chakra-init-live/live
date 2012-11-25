@@ -53,9 +53,6 @@ set_locale # sets locale settings and hwclock
 
 #do_configsforroot
 cp -a /etc/skel/. /root/
-   
-#This will go into workspace soon
-#  sed -i -e 's/halt/poweroff/' /usr/share/config/kdm/kdmrc
 
 # set correct permissions for live user
 chown -R live:users /home/live
@@ -66,5 +63,8 @@ chmod 0440 /etc/sudoers
 # misc exports
 export KDE_NO_IPV6="TRUE"
 export OPERAPLUGINWRAPPER_PRIORITY=0
+
+# in case proprietary drivers load takes longer
+systemctl restart kdm.service
 
 
