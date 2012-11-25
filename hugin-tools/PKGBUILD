@@ -5,25 +5,23 @@
 
 pkgname=hugin-tools
 _pkgname=hugin
-pkgver=2011.4.0
+pkgver=2012.0.0
 pkgrel=1
 pkgdesc="Hugin libs and tools to be used by Kipi-plugins"
 arch=('x86_64')
 url="http://hugin.sourceforge.net/"
 license=('LGPL')
-depends=('boost-libs' 'enblend-enfuse' 'exiv2' 'openexr' 'autopano-sift-c'
-         'lapack' 'desktop-file-utils' 'make' 'perl-exiftool')
-makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap')
+depends=('boost-libs' 'enblend-enfuse' 'exiv2' 'openexr' 'libpano13>=2.9.18'
+         'lapack' 'desktop-file-utils' 'icu' 'libxt' 'lensfun')
+makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap' 'python2' 'swig')
 conflict=('hugin')
 provides=('hugin')
-source=("http://downloads.sourceforge.net/${_pkgname}/${_pkgname}-${pkgver}.tar.bz2"
-        'gcc47.patch')
-sha1sums=('21ec7331d5e196aca2a8771d3c9101dd181ad93b'
-          'b2d377579943fca6abd9d1f5bec621f099cb93b5')
+source=("http://downloads.sourceforge.net/${_pkgname}/${_pkgname}-${pkgver}.tar.bz2")
+md5sums=('6a4fb2585eb3539ba6769cf4557f6e88')
 
 build() {
   cd "${srcdir}"
-  patch -p1 -i "${srcdir}/gcc47.patch"
+
   mkdir build 
   cd build
 
@@ -32,7 +30,6 @@ build() {
   mkdir ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
   cp ${srcdir}/${_pkgname}-${pkgver}/src/hugin1/PT/*.h ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
 
-  export CXXFLAGS+=" -fpermissive"
   cmake "${srcdir}/${_pkgname}-${pkgver}" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
