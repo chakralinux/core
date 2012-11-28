@@ -3,14 +3,15 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=hplip
-pkgver=3.12.10.2
-_pkgver=3.12.10a
+pkgver=3.12.11
+# incase a or b is used in hplip rls:
+_pkgver=3.12.11
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('i686' 'x86_64')
 url="http://hplipopensource.com"
 license=('GPL')
-makedepends=('pyqt' 'pygobject' 'pkgconfig' 'sane' 'rpcbind' 'dbus-python' 'cups')
+makedepends=('pyqt' 'python2-gobject' 'pkgconfig' 'sane' 'rpcbind' 'dbus-python' 'cups')
 depends=('python2' 'ghostscript>=8.64-6' 'foomatic-db' 'foomatic-db-engine'
 	'libcups' 'net-snmp>=5.5' 'libusb-compat')
 optdepends=('cups: for printing support'
@@ -18,12 +19,12 @@ optdepends=('cups: for printing support'
             'sane: for scanner support'
             'rpcbind: for network support'
             'pyqt: for running hp-toolbox'
-            'pygobject: for running hp-toolbox')
+            'python2-gobject: for running hp-toolbox')
 options=('!libtool')
 install=${pkgname}.install
 source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${_pkgver}.tar.gz"
 	"cups-1.6-buildfix.diff")
-sha256sums=('616a30f260407f959874d35d351eaf73c74f7f8f016a7826286c88d923a4b1fc'
+sha256sums=('c5b81167b21aa4ee6bdf3f5c120bfa050d0c794608da8bcc32e2580234919ffa'
             '9813f754670f9b4a01e6094c673f63ac62421817c7eb463999abf828358e67df')
 
 build() {
@@ -42,9 +43,8 @@ build() {
   sed -i 's|python %HOME%|python2 %HOME%|' base/utils.py
   sed -i 's|python ./plugin.py|python2 ./plugin.py|' base/pkit.py
 
-  # https://bugs.archlinux.org/task/30085 - hack found in Gentoo
+  # from Gentoo
   # Use system foomatic-rip for hpijs driver instead of foomatic-rip-hplip
-  # The hpcups driver does not use foomatic-rip
   local i
   for i in ppd/hpijs/*.ppd.gz ; do
     rm -f ${i}.temp
@@ -81,8 +81,4 @@ package() {
   
   # remove HAL .fdi file because HAL is no longer used
   rm -rf "${pkgdir}"/usr/share/hal
-
-  # move to /usr
-  mv "${pkgdir}"/lib/udev "${pkgdir}"/usr/lib/
-  rm "${pkgdir}"/lib -r
 }
