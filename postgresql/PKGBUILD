@@ -8,21 +8,19 @@ pkgbase=postgresql
 pkgname=('postgresql-libs' 'postgresql-docs' 'postgresql')
 pkgver=9.2.1
 _majorver=${pkgver%.*}
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="http://www.postgresql.org/"
 license=('custom:PostgreSQL')
 makedepends=('krb5' 'libxml2' 'python2' 'perl' 'tcl' 'openssl>=1.0.0')
 source=("ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar.bz2"
-        'postgresql.rcd'
 	'postgresql.confd'
 	'postgresql.pam'
 	'postgresql.logrotate'
 	'postgresql.service'
 	'postgresql-initdb')
 sha256sums=('db61d498105a7d5fe46185e67ac830c878cdd7dc1f82a87f06b842217924c461'
-            'b2931d7a719e765f14811b9109310b2418d3064bfcedef699573fc25854a2201'
-            '3de5c059eead8816db15c2c5588e6196d6c4b0d704faf1a20912796cf589ba81'
+            '419550699aae3d19715e87e51f32d1ad50cbb5d3175794f5476697572383b4e3'
             '57dfd072fd7ef0018c6b0a798367aac1abb5979060ff3f9df22d1048bb71c0d5'
             '6abb842764bbed74ea4a269d24f1e73d1c0b1d8ecd6e2e6fb5fb10590298605e'
             '7014ccc8f3bbac8be9473a43fca2ed4037ee04e56d8e07d6027b3b4ef0317c89'
@@ -135,9 +133,6 @@ package_postgresql() {
   find "${pkgdir}/usr/include" -maxdepth 1 -type f -execdir rm {} +
   rmdir "${pkgdir}/usr/share/doc/postgresql/html"
 
-  # install launch script
-  install -Dm0755 "${srcdir}/postgresql.rcd" "${pkgdir}/etc/rc.d/postgresql"
-
   # install conf file
   install -Dm0644 "${srcdir}/postgresql.confd" "${pkgdir}/etc/conf.d/postgresql"
 
@@ -149,5 +144,5 @@ package_postgresql() {
 
   # install systemd unit
   install -Dm0644 "${srcdir}/postgresql.service" "${pkgdir}/usr/lib/systemd/system/postgresql.service"
-  install -Dm0644 "$srcdir/postgresql-initdb" "$pkgdir/usr/lib/systemd/scripts/postgresql-initdb"
+  install -Dm0755 "$srcdir/postgresql-initdb" "$pkgdir/usr/lib/systemd/scripts/postgresql-initdb"
 }
