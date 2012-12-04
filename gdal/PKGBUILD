@@ -1,12 +1,9 @@
-#
-# Apps Packages for Chakra, part of chakra-project.org
-#
+# Platform Packages for Chakra, part of chakra-project.org
 # maintainer abveritas@chakra-project.org
 
-
 pkgname=gdal
-pkgver=1.9.0
-pkgrel=2
+pkgver=1.9.2
+pkgrel=1
 pkgdesc="A translator library for raster geospatial data formats"
 arch=('x86_64')
 url="http://www.gdal.org/"
@@ -16,14 +13,14 @@ depends=('curl' 'geos' 'giflib' 'hdf5' 'libgeotiff' 'libjpeg' 'libpng' 'libtiff'
 makedepends=('perl' 'swig')
 options=('!libtool' '!makeflags')
 source=("http://download.osgeo.org/${pkgname}/${pkgname}-${pkgver}.tar.gz"
-	'gdal-1.5.1-python-install.patch') 
-md5sums=('1853f3d8eb5232ae030abe007840cade'
+	'gdal-1.5.1-python-install.patch')
+md5sums=('3f39db89f4710269b3a8bf94178e07aa'
          '81afc1c26d29cee84aadb6924fe33861')
 
 build() {
   export CFLAGS="$CFLAGS -fno-strict-aliasing"
   export LDFLAGS="$LDFLAGS -Wl,--as-needed"
- 
+
   cd ${srcdir}/$pkgname-$pkgver
   patch -p0 -i ${srcdir}/gdal-1.5.1-python-install.patch
 
