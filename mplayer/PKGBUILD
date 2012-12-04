@@ -5,9 +5,9 @@
 
 pkgname=mplayer
 pkgver=35127
-pkgrel=2
+pkgrel=3
 pkgdesc="Multimedia player."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 depends=('a52dec' 'aalib' 'alsa-lib' 'bzip2' 'cdparanoia' 'directfb' 'enca' 'faac' 'faad2'
          'fontconfig' 'freetype2' 'fribidi' 'gcc-libs' 'giflib' 'glibc' 'gsm' 'jack' 'ladspa' 'lame'
          'libass' 'libbluray' 'libbs2b' 'libcaca' 'libcdio' 'libdca' 'libdv'
@@ -70,8 +70,6 @@ build() {
       --enable-runtime-cpudetection \
       --language=all \
       --prefix=/usr
-        
-    [ "$CARCH" = "i686" ] &&  sed 's|-march=i486|-march=i686|g' -i config.mak
 
     make
 }

@@ -5,12 +5,12 @@
 pkgbase="cups"
 pkgname=('libcups' 'cups')
 pkgver=1.6.1
-pkgrel=1
-arch=('i686' 'x86_64')
+pkgrel=4
+arch=('x86_64')
 license=('GPL')
 url="http://www.cups.org/"
 makedepends=('libtiff' 'libpng' 'acl' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'cups-filters' 'bc'
-             'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus-core' 'avahi'  'hicolor-icon-theme' 'systemd')
+             'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus-core' 'avahi'  'hicolor-icon-theme' 'systemd' 'colord')
 source=(ftp://ftp.easysw.com/pub/cups/${pkgver}/cups-${pkgver}-source.tar.bz2
         cups-no-export-ssllibs.patch
         cups-no-gcrypt.patch
@@ -26,7 +26,7 @@ md5sums=('87ade07e3d1efd03c9c3add949cf9c00'
          '9b8467a1e51d360096b70e2c3c081e6c'
          '3733c23e77eb503bd94cc368e02830dc'
          '90c30380d4c8cd48a908cfdadae1ea24'
-         '7d2347b6d444e223f6b7dc6e706b9ffe'
+         'b4868b83f7f2d6ec24a1be76509379f0'
          '9657daa21760bb0b5fa3d8b51d5e01a1'
          'f861b18f4446c43918c8643dcbbd7f6d'
          '96f82c38f3f540b53f3e5144900acf17'
@@ -124,7 +124,7 @@ backup=(etc/cups/cupsd.conf
         etc/logrotate.d/cups
         etc/pam.d/cups
         etc/xinetd.d/cups-lpd)
-depends=('acl' 'pam' "libcups>=${pkgver}" 'cups-filters' 'bc' 'libusb' 'dbus-core' 'systemd' 'hicolor-icon-theme')
+depends=('acl' 'pam' "libcups>=${pkgver}" 'cups-filters' 'bc' 'libusb' 'dbus-core' 'systemd' 'hicolor-icon-theme' 'colord')
 optdepends=('xdg-utils: xdg .desktop file support')
 
   cd ${srcdir}/${pkgbase}-${pkgver}

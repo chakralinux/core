@@ -3,13 +3,15 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=hplip
-pkgver=3.12.9
+pkgver=3.12.11
+# incase a or b is used in hplip rls:
+_pkgver=3.12.11
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('i686' 'x86_64')
 url="http://hplipopensource.com"
 license=('GPL')
-makedepends=('pyqt' 'pygobject' 'pkgconfig' 'sane' 'rpcbind' 'dbus-python' 'cups')
+makedepends=('pyqt' 'python2-gobject' 'pkgconfig' 'sane' 'rpcbind' 'dbus-python' 'cups')
 depends=('python2' 'ghostscript>=8.64-6' 'foomatic-db' 'foomatic-db-engine'
 	'libcups' 'net-snmp>=5.5' 'libusb-compat')
 optdepends=('cups: for printing support'
@@ -17,19 +19,19 @@ optdepends=('cups: for printing support'
             'sane: for scanner support'
             'rpcbind: for network support'
             'pyqt: for running hp-toolbox'
-            'pygobject: for running hp-toolbox')
+            'python2-gobject: for running hp-toolbox')
 options=('!libtool')
 install=${pkgname}.install
-source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${_pkgver}.tar.gz"
 	"cups-1.6-buildfix.diff")
-sha256sums=('e7361b9d6e968ce3306dc438e622a4412156e7c2d71b2a6face5952cf52e23c4'
+sha256sums=('c5b81167b21aa4ee6bdf3f5c120bfa050d0c794608da8bcc32e2580234919ffa'
             '9813f754670f9b4a01e6094c673f63ac62421817c7eb463999abf828358e67df')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${_pkgver}"
 
   # fix build with cups 1.6 - FC hplip-ipp-accessors.patch
-  patch -Np1 -i ${srcdir}/cups-1.6-buildfix.diff
+  patch -p1 -i ${srcdir}/cups-1.6-buildfix.diff
 
   export PYTHON=python2
   find . -type f -exec sed -i 's~^#.*env python~#!/usr/bin/env python2~' {} +
@@ -41,9 +43,8 @@ build() {
   sed -i 's|python %HOME%|python2 %HOME%|' base/utils.py
   sed -i 's|python ./plugin.py|python2 ./plugin.py|' base/pkit.py
 
-  # https://bugs.archlinux.org/task/30085 - hack found in Gentoo
+  # from Gentoo
   # Use system foomatic-rip for hpijs driver instead of foomatic-rip-hplip
-  # The hpcups driver does not use foomatic-rip
   local i
   for i in ppd/hpijs/*.ppd.gz ; do
     rm -f ${i}.temp
@@ -57,7 +58,7 @@ build() {
 
 	./configure --prefix=/usr \
              --enable-qt4 \
-             --enable-foomatic-rip-hplip-install \
+             --disable-foomatic-rip-hplip-install \
              --enable-foomatic-ppd-install \
              --enable-hpcups-install \
              --enable-new-hpcups \
@@ -67,22 +68,17 @@ build() {
              --enable-foomatic-drv-install \
              --enable-pp-build \
              --enable-udev-acl-rules
-
   make 
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${_pkgver}"
 
-  make rulesdir=/lib/udev/rules.d DESTDIR="${pkgdir}/" install
+  make rulesdir=/usr/lib/udev/rules.d DESTDIR="${pkgdir}/" install
 
   # remove config provided by sane and autostart of hp-daemon
   rm -rf "${pkgdir}"/etc/{sane.d,xdg}
   
   # remove HAL .fdi file because HAL is no longer used
   rm -rf "${pkgdir}"/usr/share/hal
-
-  # move to /usr
-  mv "${pkgdir}"/lib/udev "${pkgdir}"/usr/lib/
-  rm "${pkgdir}"/lib -r
 }

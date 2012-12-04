@@ -3,37 +3,43 @@
 #
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgbase=samba
-pkgname=('smbclient' 'samba')
-pkgver=3.6.7
-# We use the 'A' to fake out pacman's version comparators.  Samba chooses
-# to append 'a','b',etc to their subsequent releases, which pamcan
-# misconstrues as alpha, beta, etc.  Bad samba!
-_realver=3.6.7
+pkgname=samba
+pkgver=3.6.9
+#In case version contains a or b
+_realver=3.6.9
 pkgrel=1
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.samba.org"
 license=('GPL3')
-makedepends=('db>=4.7' 'popt' 'libcups' 'acl' 'libldap' 'libcap>=2.16' 'krb5' 'pam' 'gamin' 'gnutls>=2.4.1' 'talloc' 'tdb' 'cifs-utils')
+depends=('readline' 'popt' 'libldap' 'libcap' 'krb5' 'db' 'e2fsprogs' 'tdb' 'talloc'
+         'cifs-utils' 'libcups' 'acl' 'pam' 'gamin' 'gnutls')
+provides=('smbclient')
+conflicts=('smbclient')
+replaces=('smbclient')
 options=(!makeflags)
-source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${_realver}.tar.gz
-        samba.logrotate 
-        swat.xinetd 
-        samba.pam 
-        smbd.service
-        nmbd.service
-        winbindd.service)
-md5sums=('b23be56c15dd52f64eb7ba54c0ea1ed5'
+backup=(etc/logrotate.d/samba
+        etc/pam.d/samba
+        etc/xinetd.d/swat)
+install='samba.install'
+source=("http://us1.samba.org/samba/ftp/stable/${pkgname}-${_realver}.tar.gz"
+        'samba.logrotate' 
+        'swat.xinetd' 
+        'samba.pam'
+        'smbd.service'
+        'nmbd.service'
+        'winbindd.service'
+        'samba.conf')
+md5sums=('0c48bbeb9549fcda37f108aa3c2a817f'
          '5697da77590ec092cc8a883bae06093c'
          'a4bbfa39fee95bba2e7ad6b535fae7e6'
          '96f82c38f3f540b53f3e5144900acf17'
          '4b9c54d6fed4d0a225a84963516fc46f'
          '67ce9229c4e343a91d70edba6de29437'
-         '617079917cdc84b450d109557b1fe2e1')
-### UNINSTALL dmapi package before building!!!
+         '617079917cdc84b450d109557b1fe2e1'
+         '8e7ed39b54968e427f9506e9107bfb45')
 
 build() {
-  cd ${srcdir}/${pkgbase}-${_realver}/source3
+  cd ${srcdir}/${pkgname}-${_realver}/source3
   ./configure --prefix=/usr \
               --libdir=/usr/lib/ \
               --localstatedir=/var \
@@ -59,43 +65,14 @@ build() {
   make
 }
 
-package_smbclient () {
-pkgdesc="Tools to access a server's filespace and printers via SMB"
-depends=('readline' 'popt' 'libldap' 'libcap' 'krb5' 'db' 'e2fsprogs' 'tdb' 'talloc' 'cifs-utils')
-  cd ${srcdir}/${pkgbase}-${_realver}/source3
-  mkdir -p ${pkgdir}/usr/bin ${pkgdir}/usr/lib
-  install -m755 bin/{smbclient,rpcclient,smbspool,smbtree,smbcacls,smbcquotas,smbget,net,nmblookup} ${pkgdir}/usr/bin/
-  for i in libnetapi* libwbclient* libsmbclient*;do
-      cp  -a bin/${i}*.so* ${pkgdir}/usr/lib/
-  done
-  install -m755 script/smbtar ${pkgdir}/usr/bin/
-  mkdir -p ${pkgdir}/usr/lib/cups/backend
-  ln -sf /usr/bin/smbspool ${pkgdir}/usr/lib/cups/backend/smb
-  mkdir -p ${pkgdir}/usr/include
-  install -m644 include/libsmbclient.h ${pkgdir}/usr/include/
-  install -m644 lib/netapi/netapi.h ${pkgdir}/usr/include/
-  mkdir -p ${pkgdir}/usr/share/man/man{1,7}
-  for man in rpcclient smbcacls smbclient smbcquotas smbget \
-      smbtree smbtar nmblookup; do
-      install -m644 ../docs/manpages/${man}.1 ${pkgdir}/usr/share/man/man1/
-  done
-  install -m644 ../docs/manpages/libsmbclient.7 ${pkgdir}/usr/share/man/man7/
-}
-
-package_samba () {
-pkgdesc="Tools to access a server's filespace and printers via SMB"
-backup=(etc/logrotate.d/samba
-        etc/pam.d/samba
-        etc/xinetd.d/swat)
-depends=('db' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap' 'krb5' 'pam' 'gamin' 'gnutls' 'e2fsprogs' 'tdb' 'talloc')
-  cd ${srcdir}/samba-${_realver}/source3
+package() {
+  cd ${srcdir}/${pkgname}-${_realver}/source3
   mkdir -p ${pkgdir}/etc/samba/private
   chmod 700 ${pkgdir}/etc/samba/private
-  make DESTDIR=${pkgdir} install
+  make DESTDIR="$pkgdir" install
+  mkdir -p ${pkgdir}/usr/lib/cups/backend
+  ln -sf /usr/bin/smbspool ${pkgdir}/usr/lib/cups/backend/smb
   chmod 644 ${pkgdir}/usr/include/*.h
-  rm -rf ${pkgdir}/usr/var
-  rm -rf ${pkgdir}/var/run/samba
-  (cd script; cp installbin.sh i; cat i | sed 's/\/sbin\///' > installbin.sh)
   mkdir -p ${pkgdir}/etc/samba
   cat ../examples/smb.conf.default | \
     sed 's|log file = .*$|log file = /var/log/samba/log.%m|g' >${pkgdir}/etc/samba/smb.conf.default
@@ -108,43 +85,26 @@ depends=('db' 'popt' 'libcups' 'acl' 'libldap' "smbclient>=$pkgver" 'libcap' 'kr
   # fix logrotate
   sed -i -e 's|log.%m|%m.log|g' ${pkgdir}/etc/samba/smb.conf.default
   # nsswitch libraries
-  install -D -m755 ${srcdir}/samba-${_realver}/nsswitch/libnss_wins.so ${pkgdir}/lib/libnss_wins.so
-  ln -s libnss_wins.so ${pkgdir}/lib/libnss_wins.so.2
-  install -D -m755 ${srcdir}/samba-${_realver}/nsswitch/libnss_winbind.so ${pkgdir}/lib/libnss_winbind.so
-  ln -s libnss_winbind.so ${pkgdir}/lib/libnss_winbind.so.2
+  install -D -m755 ${srcdir}/samba-${_realver}/nsswitch/libnss_wins.so ${pkgdir}/usr/lib/libnss_wins.so
+  ln -s libnss_wins.so ${pkgdir}/usr/lib/libnss_wins.so.2
+  install -D -m755 ${srcdir}/samba-${_realver}/nsswitch/libnss_winbind.so ${pkgdir}/usr/lib/libnss_winbind.so
+  ln -s libnss_winbind.so ${pkgdir}/usr/lib/libnss_winbind.so.2
   # winbind krb5 locator
   mkdir -p ${pkgdir}/usr/lib/krb5/plugins/libkrb5
   install -d -m 0755 ${pkgdir}/usr/lib/krb5/plugins/libkrb5
   install -m 755 bin/winbind_krb5_locator.so ${pkgdir}/usr/lib/krb5/plugins/libkrb5/winbind_krb5_locator.so
-  # remove conflict files of smbclient
-  for man in libsmbclient smbspool \
-      mount.cifs net cifs.upcall; do
-      rm -f ${pkgdir}/usr/share/man/man8/${man}.8
-  done
-  for i in libnetapi* libwbclient* libsmbclient* winbind_krb5*;do
-      rm -f ${pkgdir}/usr/lib/$i
-  done
-  for bin in net \
-      nmblookup rpcclient smbcacls smbclient \
-      smbcquotas smbget smbspool smbtar smbtree; do
-      rm -f ${pkgdir}/usr/bin/$bin
-  done
-  rm -f ${pkgdir}/usr/sbin/cifs.upcall
-  rm -f ${pkgdir}/usr/include/netapi.h
-  for man in rpcclient smbcacls smbclient smbcquotas \
-      smbtree smbtar nmblookup smbget; do
-      rm -f ${pkgdir}/usr/share/man/man1/${man}.1
-  done
-  for man in tdbbackup tdbdump tdbtool; do
-      rm -f ${pkgdir}/usr/share/man/man8/${man}.8
-  done
-  rm -f ${pkgdir}/usr/share/man/man7/libsmbclient.7
-  rm -f ${pkgdir}/usr/include/libsmbclient.h
-  # copy ldap example
-  install -D -m644 ${srcdir}/samba-${_realver}/examples/LDAP/samba.schema ${pkgdir}/usr/share/doc/samba/examples/LDAP/samba.schema
-  # install systemd files
+  # systemd files
   for i in smbd nmbd winbindd; do
   install -D -m644 ${srcdir}/$i.service ${pkgdir}/usr/lib/systemd/system/$i.service
   done
-}
+  # create non-persistent dirs via tmpfiles instead of shipping packaged-in
+  install -D -m644 ${srcdir}/samba.conf ${pkgdir}/usr/lib/tmpfiles.d/samba.conf
+  rm -rf ${pkgdir}/var/run
+  # remove tdb provided files
+  for man in tdbbackup tdbdump tdbtool; do
+      rm -f ${pkgdir}/usr/share/man/man8/${man}.8
+  done
+  # copy ldap example
+  install -D -m644 ${srcdir}/samba-${_realver}/examples/LDAP/samba.schema ${pkgdir}/usr/share/doc/samba/examples/LDAP/samba.schema
+ }
 

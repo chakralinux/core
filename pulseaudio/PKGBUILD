@@ -6,13 +6,13 @@
 pkgname=pulseaudio
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=2.1
-pkgrel=7
-arch=('i686' 'x86_64')
+pkgrel=8
+arch=('x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
 depends=('dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm'
          'libsamplerate' 'json-c' 'rtkit' 'libltdl' 'speex' 'tdb'
-         'fftw' 'orc' 'webrtc-audio-processing' 'systemd>=189')
+         'fftw' 'orc' 'webrtc-audio-processing' 'systemd>=195')
 makedepends=('attr' 'libltdl' 'avahi' 'bluez' 'intltool' 'jack' 'lirc-utils' 'openssl')
 optdepends=('avahi: zeroconf support'
             'bluez: bluetooth support'
@@ -37,7 +37,6 @@ build() {
               --localstatedir=/var \
               --with-udev-rules-dir=/usr/lib/udev/rules.d \
               --with-database=tdb \
-              --disable-hal \
               --disable-tcpwrap \
               --disable-rpath \
               --disable-default-build-tests
@@ -49,19 +48,10 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
-  # Lower resample quality, saves CPU
-  sed -e '/resample-method/iresample-method=speex-float-0' \
-      -i "${pkgdir}/etc/pulse/daemon.conf"
-
   # Disable cork-request module, can result in e.g. media players unpausing
   # when there's a Skype call incoming
   sed -e 's|/usr/bin/pactl load-module module-x11-cork-request|#&|' \
       -i "${pkgdir}/usr/bin/start-pulseaudio-x11"
-
-  # Make some modules optional
-  sed -e $'/load-module module-console-kit/{i.nofail\n;a.fail\n;}' \
-      -e '/load-module module-jackdbus-detect/s/^/#/' \
-      -i "${pkgdir}/etc/pulse/default.pa"
 
   # Python fix
   sed -i '1s:python$:&2:' "${pkgdir}/usr/bin/qpaeq"
@@ -69,6 +59,6 @@ package() {
   rm "${pkgdir}/etc/dbus-1/system.d/pulseaudio-system.conf"
   
   # Delay of sound notification workaround, needs to be removed once fixed in systemd
-  sed -i -e 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' "${pkgdir}/etc/pulse/default.pa"
+  #sed -i -e 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' "${pkgdir}/etc/pulse/default.pa"
 
 }

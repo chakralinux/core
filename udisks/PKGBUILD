@@ -4,42 +4,33 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=udisks
-pkgver=1.0.4
-pkgrel=5
+pkgver=2.0.0
+pkgrel=1
 pkgdesc="Disk Management Service"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/udisks"
 license=('GPL')
-depends=('systemd' 'sg3_utils' 'glib2' 'dbus-glib' 'polkit' 'parted' 'device-mapper' 'libatasmart' 'lsof' 'lvm2' 'eject')
-makedepends=('intltool' 'docbook-xsl')
+depends=('systemd' 'sg3_utils' 'glib2' 'dbus-glib' 'polkit' 'parted' 'device-mapper'
+         'libatasmart' 'lsof' 'lvm2' 'util-linux')
+makedepends=('intltool' 'docbook-xsl' 'python2' 'gobject-introspection')
 options=(!libtool)
 replaces=('devicekit-disks')
-source=(http://hal.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz
-	udisks.service)
-sha256sums=('854b89368733b9c3a577101b761ad5397ae75a05110c8698ac5b29de9a8bf8f5'
-            '0b9cbf41935feed3e4e2430fd4e06eb29864554dbb9f330c9d2a5fa2ef185131')
+source=("http://udisks.freedesktop.org/releases/udisks-$pkgver.tar.bz2")
+md5sums=('79fb343fbec6ed6b9e76fbe828622d38')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
-      --libexecdir=/usr/lib/udisks --disable-static
-
+      --with-systemdsystemunitdir=/usr/lib/systemd/system --disable-static
   make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make profiledir=/usr/share/bash-completion/completions DESTDIR="${pkgdir}" install
-  chmod 644 "${pkgdir}/usr/share/bash-completion/completions/udisks-bash-completion.sh"
-  # move udev helpers and rules to /usr/lib
-  mv "${pkgdir}"/lib/udev "${pkgdir}"/usr/lib/
-  rm -r "${pkgdir}"/lib
+  make DESTDIR="${pkgdir}" install
+     bash_completiondir=/usr/share/bash-completion/completions
   
   #fix ntfs mounts
-  sed -i -e 's|<allow_active>auth_admin_keep</allow_active>|<allow_active>yes</allow_active>|' ${pkgdir}/usr/share/polkit-1/actions/org.freedesktop.udisks.policy
-
-  # install systemd units
-  install -Dm644 "${srcdir}/udisks.service" "${pkgdir}/usr/lib/systemd/system/udisks.service"
-  echo "SystemdService=udisks.service" \
-    >> "$pkgdir/usr/share/dbus-1/system-services/org.freedesktop.UDisks.service"
+  sed -i -e 's|<allow_active>auth_admin_keep</allow_active>|<allow_active>yes</allow_active>|' ${pkgdir}/usr/share/polkit-1/actions/org.freedesktop.udisks2.policy
 }
