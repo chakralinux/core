@@ -1,0 +1,16 @@
+#!/bin/bash
+# Check if a mirror is synced
+
+echo "Checking..."
+
+mirror="$(grep '^[^#]erver' /etc/pacman.d/mirrorlist | 
+            head -1 | cut -d' ' -f3 | 
+            sed 's,$repo.*,testing/x86_64/testing.db.tar.gz,')"
+
+wget -qO /tmp/.${UID}mirrordb.tmp "$mirror"
+wget -qO /tmp/.${UID}maindb.tmp "http://chakra-project.org/repo/testing/x86_64/testing.db.tar.gz"
+
+md5sum -b /tmp/.${UID}mirrordb.tmp | sed 's/mirror/main/' > /tmp/.${UID}checkmd5.tmp
+md5sum -c /tmp/.${UID}checkmd5.tmp >/dev/null 2>/dev/null &&
+    echo "Your mirror is synced." ||
+    echo "Your mirror is not synced."
