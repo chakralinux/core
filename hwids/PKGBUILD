@@ -4,18 +4,20 @@
 # maintainer: abveritas@chakra-project.org
 
 pkgname=hwids
-pkgver=20121024
+pkgver=20121203
 pkgrel=1
 pkgdesc="hardware identification databases"
 url="https://github.com/gentoo/hwids"
 license=('GPL2')
 arch=('any')
 source=("https://github.com/gentoo/${pkgname}/tarball/${pkgname}-${pkgver}")
-md5sums=('f0193c0b48db44ebee8c5e666295768c')
+md5sums=('32c1e06a2a4d72f52fb8e2085ef9ab67')
 
 package() {
   cd ${srcdir}/*
-  mkdir -p "${pkgdir}/usr/share/hwdata"
-  cp pci.ids usb.ids "${pkgdir}/usr/share/hwdata/"
+
+  for ids in pci.ids usb.ids; do
+    install -Dm644 "$ids" "${pkgdir}/usr/share/hwdata/${ids}"
+  done
 }
 
