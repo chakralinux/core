@@ -17,5 +17,16 @@ if [ -e /sys/fs/cgroup/systemd ]; then
                         timedate1 false false
                 ;;
         esac
-fi
+else
+        if [ -e "/etc/rc.d/ntpd" ]; then
+                case "$2" in
+                        up)
+                                rc.d start ntpd
+                        ;;
+                        down)
+                                rc.d stop ntpd
+                        ;;
+                esac
+        fi
 
+fi

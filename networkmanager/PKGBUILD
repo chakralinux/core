@@ -5,10 +5,10 @@
 
 pkgname=networkmanager
 _pkgname=NetworkManager
-pkgver=0.9.6.0
-pkgrel=5
+pkgver=0.9.6.4
+pkgrel=1
 pkgdesc="Network Management daemon"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL')
 url="http://www.gnome.org/projects/$_pkgname/"
 depends=('dbus-glib' 'iproute2' 'libnl' 'nss' 'polkit' 'systemd' 'wpa_supplicant' 'ppp' 'dhcpcd'
@@ -23,22 +23,32 @@ optdepends=('modemmanager: for modem management service'
 options=('!libtool')
 backup=('etc/NetworkManager/NetworkManager.conf')
 install=networkmanager.install
+
 source=(http://ftp.gnome.org/pub/gnome/sources/$_pkgname/${pkgver:0:3}/$_pkgname-$pkgver.tar.xz
-        NetworkManager.conf disable_set_hostname.patch dnsmasq-path.patch
-        org.freedesktop.NetworkManager.conf)
-sha256sums=('3982b623b7b199ac99e2ddd0840fe7d088245a49e3f680237e8baebf0cf86d07'
+        NetworkManager.conf 
+        disable_set_hostname.patch 
+        dnsmasq-path.patch
+        nm-polkit-permissive.patch 
+        repair-signals.patch 
+        systemd-sleep.patch)
+sha256sums=('511b411e055d187bc8f26c519fdb3e55e07fc40d4adecbbec623c0249380a7eb'
             '44b048804c7c0b8b3b0c29b8632b6ad613c397d0a1635ec918e10c0fbcdadf21'
             '25056837ea92e559f09563ed817e3e0cd9333be861b8914e45f62ceaae2e0460'
             '65124505048cc8396daf0242c9f5d532fa669b4bbca305998c248ab2329490cb'
-            '964f37a41a03a062d178542168a14dbbc2b806a9928d114120abc28d6e0a405c')
+            '25838aaa4f28b5ac54353154c40ec02c2662c70e4df44bb4e000c3a9c5869f31'
+            '6e16254be867654fb89cee87d149896b387800a1e42eb5720d56b2a64b8c344c'
+            'd0891197fdc33389047418b049608e98cee22fb3919a2f52005b074775861626')
 
 build() {
   cd $_pkgname-$pkgver
 
-  patch -p1 -i ../disable_set_hostname.patch
-  patch -p1 -i ../dnsmasq-path.patch
+  patch -Np1 -i ../disable_set_hostname.patch
+  patch -Np1 -i ../dnsmasq-path.patch
+  patch -Np1 -i ../nm-polkit-permissive.patch
+  patch -Np1 -i ../repair-signals.patch
+  patch -Np1 -i ../systemd-sleep.patch
 
-
+  AUTOPOINT="intltoolize -f -c --automake" autoreconf -fi
   ./configure \
     --prefix=/usr \
     --sysconfdir=/etc \
@@ -47,7 +57,7 @@ build() {
     --with-crypto=nss \
     --with-distro=arch \
     --with-dhclient=/usr/sbin/dhclient \
-    --with-dhcpcd=/sbin/dhcpcd \
+    --with-dhcpcd=/usr/sbin/dhcpcd \
     --with-iptables=/usr/sbin/iptables \
     --with-systemdsystemunitdir=/usr/lib/systemd/system \
     --with-udev-dir=/usr/lib/udev \
@@ -66,14 +76,5 @@ package() {
 
   install -m644 ../NetworkManager.conf "$pkgdir/etc/NetworkManager/"
 
-  rm -r "$pkgdir/var/run"
-  
-  # workaround to make nm-applet work with native systemd, try to remove on polkit, nm update
-  rm "$pkgdir/etc/dbus-1/system.d/org.freedesktop.NetworkManager.conf"
-  install -d etc/dbus-1/system.d/
-  install -D -m644 $srcdir/org.freedesktop.NetworkManager.conf $pkgdir/etc/dbus-1/system.d/
-
-  ln -s NetworkManager.service "$pkgdir/usr/lib/systemd/system/networkmanager.service"
-  echo "SystemdService=NetworkManager.service" \
-    >> "$pkgdir/usr/share/dbus-1/system-services/org.freedesktop.NetworkManager.service"
+  rm -r "$pkgdir/var/run"  
 }
