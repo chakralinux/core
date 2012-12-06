@@ -1,16 +1,31 @@
 #!/bin/bash
 # Check if a mirror is synced
+# Usage: 
+#   mirror-check             checks all repos
+#   mirror-check [REPOS...]  checks repos given in REPOS
 
-echo "Checking..."
+if [[ "$#" == "0" ]]; then
+    repos=('core' 'platform' 'desktop' 'apps' 'games' 'lib32' 'testing' 'lib32-testing')
+else 
+    repos=($*)
+fi
 
-mirror="$(grep '^[^#]erver' /etc/pacman.d/mirrorlist | 
-            head -1 | cut -d' ' -f3 | 
-            sed 's,$repo.*,testing/x86_64/testing.db.tar.gz,')"
+echo "Checking ${repos[@]}..."
+for repo in ${repos[@]}; do
+    mirror="$(grep '^[^#]erver' /etc/pacman.d/mirrorlist | 
+                head -1 | cut -d' ' -f3 | 
+                sed 's,$repo.*,'"$repo/x86_64/${repo}.db.tar.gz,")"
 
-wget -qO /tmp/.${UID}mirrordb.tmp "$mirror"
-wget -qO /tmp/.${UID}maindb.tmp "http://chakra-project.org/repo/testing/x86_64/testing.db.tar.gz"
+    wget -qO /tmp/.${UID}mirrordb.tmp "$mirror" 
+    cmirror="http://chakra-project.org/repo/$repo/x86_64/${repo}.db.tar.gz"
+    wget -qO /tmp/.${UID}maindb.tmp "$cmirror"
+    if [[ $? != 0 ]]; then
+        echo "Repo '$repo' could not be found" >&2
+        continue
+    fi
 
-md5sum -b /tmp/.${UID}mirrordb.tmp | sed 's/mirror/main/' > /tmp/.${UID}checkmd5.tmp
-md5sum -c /tmp/.${UID}checkmd5.tmp >/dev/null 2>/dev/null &&
-    echo "Your mirror is synced." ||
-    echo "Your mirror is not synced."
+    md5sum -b /tmp/.${UID}mirrordb.tmp | sed 's/mirror/main/' > /tmp/.${UID}checkmd5.tmp
+    md5sum -c /tmp/.${UID}checkmd5.tmp >/dev/null 2>/dev/null &&
+        echo "$repo is synced." ||
+        echo "$repo is not synced."
+done
