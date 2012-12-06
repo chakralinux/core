@@ -6,7 +6,7 @@
 
 pkgname=util-linux
 pkgver=2.22.1
-pkgrel=1
+pkgrel=3
 pkgdesc="Miscellaneous system utilities for Linux"
 url="http://www.kernel.org/pub/linux/utils/util-linux/"
 arch=('x86_64')
@@ -21,7 +21,12 @@ source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v2.22/${pkgname}-${pkgve
         uuidd.tmpfiles
         pam-login
         pam-common
-        pam-su)
+        pam-su
+        system-auth
+        system-local-login
+        system-login
+        system-remote-login
+        system-services)
 backup=(etc/pam.d/chfn
         etc/pam.d/chsh
         etc/pam.d/login
@@ -32,7 +37,12 @@ md5sums=('730cf9932531ed09b53a04ca30fcb4c9'
          'a39554bfd65cccfd8254bb46922f4a67'
          '4368b3f98abd8a32662e094c54e7f9b1'
          'a31374fef2cba0ca34dfc7078e2969e4'
-         'fa85e5cce5d723275b14365ba71a8aad')
+         'fa85e5cce5d723275b14365ba71a8aad'
+         '5f169a4ffe7ed69f58e106cdd2d760df'
+         '477237985820117a0e6e1b13a86eb599'
+         '17c691f2da319df8fe851bc47cc1d662'
+         '477237985820117a0e6e1b13a86eb599'
+         '30fe7d41e054ee43fab7855bf88a07e5')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -71,6 +81,11 @@ package() {
   install -m644 "$srcdir/pam-login" "$pkgdir/etc/pam.d/login"
   install -m644 "$srcdir/pam-su" "${pkgdir}/etc/pam.d/su"
   install -m644 "$srcdir/pam-su" "${pkgdir}/etc/pam.d/su-l"
+  install -m644 "$srcdir/system-auth" "${pkgdir}/etc/pam.d/system-auth"
+  install -m644 "$srcdir/system-local-login" "${pkgdir}/etc/pam.d/system-local-login"
+  install -m644 "$srcdir/system-login" "${pkgdir}/etc/pam.d/system-login"
+  install -m644 "$srcdir/system-remote-login" "${pkgdir}/etc/pam.d/system-remote-login"
+  install -m644 "$srcdir/system-services" "${pkgdir}/etc/pam.d/system-services"
 
   install -Dm644 "$srcdir/uuidd.tmpfiles" "$pkgdir/usr/lib/tmpfiles.d/uuidd.conf"
 }

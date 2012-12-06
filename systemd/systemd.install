@@ -3,11 +3,12 @@
 sd_booted() {
   [ -e sys/fs/cgroup/systemd ]
 }
-
+   
 post_install() {
-  # enable getty@tty1 by default, but don't track the file
-  systemctl enable getty@.service
+  udevadm hwdb --update 
   
+  mv /etc/systemd/system/getty.target.wants/getty@tty1new.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+
   if sd_booted; then
     systemctl --system daemon-reexec
   fi
@@ -15,18 +16,19 @@ post_install() {
 }
 
 post_upgrade() {
+  udevadm hwdb --update
+
+  journalctl --update-catalog
+  
+  mv /etc/systemd/system/getty.target.wants/getty@tty1.service /etc/systemd/system/getty.target.wants/getty@tty1.service.pacsave
+  mv /etc/systemd/system/getty.target.wants/getty@tty1new.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+  rm /etc/systemd/system/getty.target.wants/getty@tty1.service.pacsave
+  rm /etc/systemd/system/getty.target.wants/getty@tty1new.service
+  
   if sd_booted; then
     systemctl --system daemon-reexec
     systemctl restart systemd-logind.service
   fi
 
-  # getty@tty1.service is no longer enabled by default, but we don't want to break
-  # existing setups.
-  if [ "$(vercmp 183 "$2")" -eq 1 ]; then
-    # systemctl seems to be whiny on sysvinit. this will succeed unless something
-    # horrific happens, so just mask the error.
-    systemctl -q enable getty@.service || true
-  fi
 }
 
-# vim:set ts=2 sw=2 et:

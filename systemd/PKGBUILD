@@ -4,15 +4,15 @@
 # maintainer: abveritas@chakra-project.org
 
 pkgname=systemd
-pkgver=195
-pkgrel=2
+pkgver=196
+pkgrel=1
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
 depends=('acl' 'bash' 'glibc' 'glib2' 'kmod' 'hwids' 'util-linux' 'kbd' 'kmod' 'libcap' 'libxslt'
          'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus-core') 
 makedepends=('docbook-xsl' 'gobject-introspection' 'gperf' 'intltool')
-optdepends=('pycairo: systemd-analyze'
+optdepends=('python2-gobject3: systemd-analyze'
             'dbus-python: systemd-analyze')
 backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/dbus-1/system.d/org.freedesktop.hostname1.conf
@@ -34,22 +34,21 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-hook-udev'
         'initcpio-install-udev'
         'initcpio-install-timestamp'
-        '0001-Reinstate-TIMEOUT-handling.patch'
         'use-split-usr-path.patch'
-        '99-default.preset')
-md5sums=('38e8c8144e7e6e5bc3ce32eb4260e680'
+        '99-default.preset'
+        '98-chakra.rules'
+        'is_bundle')
+md5sums=('05ebd7f108e420e2b4e4810ea4b3c810'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          'fb37e34ea006c79be1c54cbb0f803414'
          'df69615503ad293c9ddf9d8b7755282d'
-         '5543be25f205f853a21fa5ee68e03f0d'
-         '58f26fd4cdcac88bd3ca690f4d3e3e99'
-         'a1bf25da736d3719e9720b2e4caea341')
+         '21572b99173a7cdeaff965e0a5e9182b'
+         'a1bf25da736d3719e9720b2e4caea341'
+         '40f1d228553f939430e6d8d781f06daf'
+         '05d26a1936bf5b075bedd76952ab1b53')
 
 build() {
   cd "$pkgname-$pkgver"
-
-  # still waiting on ipw2x00 to get fixed...
-  patch -p1 -i "$srcdir/0001-Reinstate-TIMEOUT-handling.patch"
   
   patch -p1 -i "$srcdir/use-split-usr-path.patch"
 
@@ -62,8 +61,6 @@ build() {
       --disable-audit \
       --disable-ima \
       --with-distro=other \
-      --with-usb-ids-path=/usr/share/hwdata/usb.ids \
-      --with-pci-ids-path=/usr/share/hwdata/pci.ids \
       --with-firmware-path=/usr/lib/firmware/updates:/lib/firmware/updates:/usr/lib/firmware:/lib/firmware
 
   make
@@ -85,15 +82,9 @@ package() {
   done
   rm -rf "$pkgdir/etc/bash_completion.d"
 
-  # don't write units to /etc by default -- we'll enable this on post_install
-  # as a sane default
-  rm "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service"
-  rmdir "$pkgdir/etc/systemd/system/getty.target.wants"
-
   # Remove rpm dir
   rm -r "$pkgdir/etc/rpm"
 
-  # can't use py3k yet with systemd-analyze -- the 'plot' verb will not work.
   # https://pokersource.info/show_bug.cgi?id=50989
   sed -i '1s/python$/python2/' "$pkgdir/usr/bin/systemd-analyze"
 
@@ -123,15 +114,17 @@ package() {
   install -Dm644 "$srcdir/initcpio-install-udev" "$pkgdir/usr/lib/initcpio/install/udev"
   install -Dm644 "$srcdir/initcpio-hook-udev" "$pkgdir/usr/lib/initcpio/hooks/udev"
   install -Dm644 "$srcdir/initcpio-install-timestamp" "$pkgdir/usr/lib/initcpio/install/timestamp"
-
-  # XXX: kill off coredump rule until the journal can recover coredumps
-  rm "$pkgdir/usr/lib/sysctl.d/coredump.conf"
   
   # Chakra specific .preset
   install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
+  #hide bundles in Doplhin places
+  install -m644 "$srcdir/98-chakra.rules" "$pkgdir/usr/lib/udev/rules.d/98-chakra.rules"
+  install -m755 "$srcdir/is_bundle" "$pkgdir/usr/lib/udev/is_bundle"
   # Make journalctl persistent
   install -dm755 "$pkgdir/var/log/journal"
   sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
+  # Moving previous .install enabled file, remove with #197
+  mv "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service" "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1new.service"
 }
 
-# vim: ft=sh syn=sh et
+
