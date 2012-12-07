@@ -4,22 +4,25 @@
 # maintainer abveritas@chakra-project.org
  
 pkgname=mplayer2
-pkgver=20120827
-pkgrel=3
+pkgver=20121207
+pkgrel=1
 pkgdesc="A movie player"
 arch=('x86_64')
 license=('GPL')
 url="http://www.mplayer2.org/"
-depends=('desktop-file-utils' 'ttf-dejavu' 'enca' 'libxss' 'a52dec' 'libvpx' 'lirc-utils' 'x264' 'libmng' 'libdca' 'aalib' 'lame' 'fontconfig'  'libgl'
-    'libxinerama' 'libvdpau' 'libpulse' 'smbclient' 'xvidcore' 'opencore-amr' 'jack' 'cdparanoia' 'libmad' 'sdl' 'libtheora' 'libcaca' 'libxxf86dga' 'fribidi'
-    'libjpeg' 'faac' 'faad2' 'libxvmc' 'schroedinger' 'mpg123' 'libass' 'libxxf86vm' 'libbluray' 'ffmpeg' 'libbs2b' 'directfb' 'nas')    
-makedepends=('live-media' 'mesa' 'unzip' 'yasm' 'python3')
+depends=('desktop-file-utils' 'ttf-dejavu' 'enca' 'libxss' 'a52dec' 'libvpx' 'lirc-utils'
+         'x264' 'libmng' 'libdca' 'aalib' 'lame' 'fontconfig'  'libgl' 'libxinerama'
+         'libvdpau' 'libpulse' 'smbclient' 'xvidcore' 'opencore-amr' 'jack' 'cdparanoia'
+         'libmad' 'sdl' 'libtheora' 'libcaca' 'libxxf86dga' 'fribidi' 'libjpeg-turbo'
+         'faac' 'faad2' 'libxvmc' 'schroedinger' 'mpg123' 'libass' 'libxxf86vm' 'libbluray'
+         'ffmpeg' 'libbs2b' 'directfb' 'nas')    
+makedepends=('live-media' 'mesa' 'unzip' 'yasm' 'python3' 'docutils')
 categories=('multimedia')
 backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
 provides=('mplayer=99999')
 conflicts=('mplayer')
 source=("http://chakra-linux.org/sources/mplayer2/mplayer2-$pkgver.tar.xz")
-sha1sums=('0f7e505c82ec5e7ba963dc27ddf09c34b47dd149')
+sha1sums=('751334e473a95d23be9d92953568cfe8d7eac152')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -46,7 +49,6 @@ build() {
               --disable-openal \
               --disable-libdv \
               --disable-musepack \
-              --disable-mga \
               --language=all \
               --enable-translation \
               --confdir=/etc/mplayer
