@@ -1,6 +1,6 @@
 diff -Naur transcode-1.1.7/export/export_ffmpeg.c fixed-tc/export/export_ffmpeg.c
---- transcode-1.1.7/export/export_ffmpeg.c	2011-11-19 16:50:27.000000000 +0000
-+++ fixed-tc/export/export_ffmpeg.c	2012-08-29 09:17:18.796437760 +0000
+--- transcode-1.1.7/export/export_ffmpeg.c	2011-11-19 11:50:27.000000000 -0500
++++ fixed-tc/export/export_ffmpeg.c	2012-07-05 16:22:41.095346080 -0400
 @@ -180,7 +180,7 @@
  
  
@@ -26,7 +26,7 @@ diff -Naur transcode-1.1.7/export/export_ffmpeg.c fixed-tc/export/export_ffmpeg.
  
          break;
  
-@@ -674,7 +672,6 @@
+@@ -674,7 +673,6 @@
  
          lavc_param_rc_buffer_size = 224 * 8;
          lavc_param_rc_buffer_aggressivity = 99;
@@ -35,8 +35,8 @@ diff -Naur transcode-1.1.7/export/export_ffmpeg.c fixed-tc/export/export_ffmpeg.
          break;
  
 diff -Naur transcode-1.1.7/export/ffmpeg_cfg.c fixed-tc/export/ffmpeg_cfg.c
---- transcode-1.1.7/export/ffmpeg_cfg.c	2011-11-19 16:50:27.000000000 +0000
-+++ fixed-tc/export/ffmpeg_cfg.c	2012-08-29 09:17:49.133561320 +0000
+--- transcode-1.1.7/export/ffmpeg_cfg.c	2011-11-19 11:50:27.000000000 -0500
++++ fixed-tc/export/ffmpeg_cfg.c	2012-07-05 15:26:29.112103273 -0400
 @@ -160,9 +160,7 @@
      {"vcelim", &lavc_param_chroma_elim_threshold, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, -99, 99},
      {"vpsize", &lavc_param_packet_size, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, 0, 100000000},
@@ -47,7 +47,7 @@ diff -Naur transcode-1.1.7/export/ffmpeg_cfg.c fixed-tc/export/ffmpeg_cfg.c
      {"mpeg_quant", &lavc_param_mpeg_quant, TCCONF_TYPE_FLAG, 0, 0, 1},
      {"vi_qfactor", &lavc_param_vi_qfactor, TCCONF_TYPE_FLOAT, TCCONF_FLAG_RANGE, -31.0, 31.0},
      {"vi_qoffset", &lavc_param_vi_qoffset, TCCONF_TYPE_FLOAT, TCCONF_FLAG_RANGE, 0.0, 31.0},
-@@ -211,7 +209,6 @@
+@@ -211,7 +211,6 @@
  #else
      {"aic", &lavc_param_aic, TCCONF_TYPE_FLAG, 0, 0, CODEC_FLAG_AC_PRED},
  #endif    
@@ -55,7 +55,7 @@ diff -Naur transcode-1.1.7/export/ffmpeg_cfg.c fixed-tc/export/ffmpeg_cfg.c
      {"ibias", &lavc_param_ibias, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, -512, 512},
      {"pbias", &lavc_param_pbias, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, -512, 512},
      {"coder", &lavc_param_coder, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, 0, 10},
-@@ -223,9 +220,6 @@
+@@ -223,9 +223,6 @@
      {"nr", &lavc_param_noise_reduction, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, 0, 1000000},
      {"qprd", &lavc_param_qp_rd, TCCONF_TYPE_FLAG, 0, 0, CODEC_FLAG_QP_RD},
      {"threads", &lavc_param_threads, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, 1, 16},
@@ -66,8 +66,8 @@ diff -Naur transcode-1.1.7/export/ffmpeg_cfg.c fixed-tc/export/ffmpeg_cfg.c
      {"inter_threshold", &lavc_param_inter_threshold, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, -1000000, 1000000},
      {"sc_threshold", &lavc_param_sc_threshold, TCCONF_TYPE_INT, TCCONF_FLAG_RANGE, -1000000, 1000000},
 diff -Naur transcode-1.1.7/filter/filter_pp.c fixed-tc/filter/filter_pp.c
---- transcode-1.1.7/filter/filter_pp.c	2011-11-19 16:50:27.000000000 +0000
-+++ fixed-tc/filter/filter_pp.c	2012-08-29 09:18:21.497382078 +0000
+--- transcode-1.1.7/filter/filter_pp.c	2011-11-19 11:50:27.000000000 -0500
++++ fixed-tc/filter/filter_pp.c	2012-07-05 15:26:28.945436613 -0400
 @@ -38,8 +38,8 @@
  
  /* FIXME: these use the filter ID as an index--the ID can grow
@@ -80,8 +80,8 @@ diff -Naur transcode-1.1.7/filter/filter_pp.c fixed-tc/filter/filter_pp.c
  static int pre[100];
  
 diff -Naur transcode-1.1.7/import/decode_lavc.c fixed-tc/import/decode_lavc.c
---- transcode-1.1.7/import/decode_lavc.c	2011-11-19 16:50:27.000000000 +0000
-+++ fixed-tc/import/decode_lavc.c	2012-08-29 09:19:38.008534454 +0000
+--- transcode-1.1.7/import/decode_lavc.c	2011-11-19 11:50:27.000000000 -0500
++++ fixed-tc/import/decode_lavc.c	2012-07-05 15:26:28.842103278 -0400
 @@ -181,7 +181,7 @@
  #if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
    lavc_dec_context->error_resilience  = 2;
@@ -92,8 +92,8 @@ diff -Naur transcode-1.1.7/import/decode_lavc.c fixed-tc/import/decode_lavc.c
    lavc_dec_context->error_concealment = 3;
    lavc_dec_context->workaround_bugs = FF_BUG_AUTODETECT;
 diff -Naur transcode-1.1.7/import/import_ffmpeg.c fixed-tc/import/import_ffmpeg.c
---- transcode-1.1.7/import/import_ffmpeg.c	2011-11-19 16:50:27.000000000 +0000
-+++ fixed-tc/import/import_ffmpeg.c	2012-08-29 09:20:21.839194652 +0000
+--- transcode-1.1.7/import/import_ffmpeg.c	2011-11-19 11:50:27.000000000 -0500
++++ fixed-tc/import/import_ffmpeg.c	2012-07-05 15:26:28.848769946 -0400
 @@ -314,7 +314,7 @@
  #if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
      lavc_dec_context->error_resilience  = 2;
@@ -104,8 +104,8 @@ diff -Naur transcode-1.1.7/import/import_ffmpeg.c fixed-tc/import/import_ffmpeg.
      lavc_dec_context->error_concealment = 3;
      lavc_dec_context->workaround_bugs = FF_BUG_AUTODETECT;
 diff -Naur transcode-1.1.7/import/probe_ffmpeg.c fixed-tc/import/probe_ffmpeg.c
---- transcode-1.1.7/import/probe_ffmpeg.c	2011-11-19 16:50:27.000000000 +0000
-+++ fixed-tc/import/probe_ffmpeg.c	2012-08-29 09:21:40.853718199 +0000
+--- transcode-1.1.7/import/probe_ffmpeg.c	2011-11-19 11:50:27.000000000 -0500
++++ fixed-tc/import/probe_ffmpeg.c	2012-07-05 15:26:28.838769947 -0400
 @@ -99,8 +99,8 @@
  
      TC_INIT_LIBAVCODEC;
@@ -118,8 +118,8 @@ diff -Naur transcode-1.1.7/import/probe_ffmpeg.c fixed-tc/import/probe_ffmpeg.c
          tc_log_error(__FILE__, "unable to open '%s'"
                                 " (libavformat failure)",
 diff -Naur transcode-1.1.7/libtc/tcavcodec.h fixed-tc/libtc/tcavcodec.h
---- transcode-1.1.7/libtc/tcavcodec.h	2011-11-19 16:50:27.000000000 +0000
-+++ fixed-tc/libtc/tcavcodec.h	2012-08-29 09:22:17.480936619 +0000
+--- transcode-1.1.7/libtc/tcavcodec.h	2011-11-19 11:50:27.000000000 -0500
++++ fixed-tc/libtc/tcavcodec.h	2012-07-05 15:26:28.828769951 -0400
 @@ -53,7 +53,6 @@
  
  #define TC_INIT_LIBAVCODEC do { \
@@ -128,3 +128,14 @@ diff -Naur transcode-1.1.7/libtc/tcavcodec.h fixed-tc/libtc/tcavcodec.h
      avcodec_register_all(); \
      TC_UNLOCK_LIBAVCODEC; \
  } while (0)
+--- transcode-1.1.7/export/export_ffmpeg.c.orig	2012-10-19 23:25:16.442303175 -0400
++++ transcode-1.1.7/export/export_ffmpeg.c	2012-10-19 23:26:23.904268733 -0400
+@@ -1249,7 +1249,7 @@
+       return TC_EXPORT_ERROR;
+     }
+ 
+-    if (lavc_venc_context->codec->encode == NULL) {
++    if (lavc_venc_context->codec->encode2 == NULL) {
+       tc_log_warn(MOD_NAME, "could not open FFMPEG codec "
+               "(lavc_venc_context->codec->encode == NULL)");
+       return TC_EXPORT_ERROR;
