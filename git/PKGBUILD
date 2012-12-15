@@ -1,17 +1,16 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=git
-pkgver=1.8.0
+pkgver=1.8.0.2
 pkgrel=2
 pkgdesc="Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://git-scm.com/"
 license=('GPL2')
-depends=('curl' 'expat>=2.0' 'perl-error' 'perl')
+depends=('curl' 'expat>=2.0' 'perl-error' 'perl' 'pcre')
 makedepends=('python2' 'emacs')
 optdepends=('tk: gitk and git gui'
             'perl-libwww: git svn'
@@ -26,16 +25,14 @@ backup=('etc/conf.d/git-daemon.conf')
 install="git.install"
 source=("http://git-core.googlecode.com/files/git-${pkgver}.tar.gz"
         "http://git-core.googlecode.com/files/git-manpages-${pkgver}.tar.gz"
-        'git-daemon'
         'git-daemon.conf'
         'git-daemon@.service'
         'git-daemon.socket')
-sha1sums=('a03afc33f8f0723ad12649d79f1e8968526b4bf7'
-          'a6fa49be36f265e85b7252d36364d4c7f38530ea'
-          'f2b41828bd912b72e2cb3e14677739c4f370de66'
-          '149e2da1ecb48872ddb31c0945afeaad1f9653d7'
-          '5b37353dc72ba60e1cfac2d2fccf1270f7277b6c'
-          'df1a5a04c3ab756d36a3409146763d95a1761c95')
+md5sums=('1aca109d4a719fe5bc43d25927fbc7d9'
+         'ab83283a5b3c73ab711a9f02896ca12e'
+         '2e42bf97779a1c6411d89043334c9e78'
+         '042524f942785772d7bd52a1f02fe5ae'
+         'f67869315c2cc112e076f0c73f248002')
 
 build() {
   export PYTHON_PATH='/usr/bin/python2'
