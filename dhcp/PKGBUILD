@@ -9,26 +9,22 @@ pkgname=('dhcp'
 # separate patch levels with a period to maintain proper versioning.
 pkgver=4.2.4.2
 _pkgver=4.2.4-P2
-pkgrel=1
-arch=('i686' 'x86_64')
+pkgrel=2
+arch=('x86_64')
 license=('custom:isc-dhcp')
 url="https://www.isc.org/software/dhcp"
 source=(ftp://ftp.isc.org/isc/${pkgbase}/${_pkgver}/${pkgbase}-${_pkgver}.tar.gz
-        dhcp4
-        dhcp6 
         dhcp.conf.d 
         dhcpd4.service
         dhcpd6.service
         dhcp-4.2.4-P2-missing-ipv6-not-fatal.patch
         dhclient-script-pathFixes.patch)
-sha256sums=('0f75170e323cd9573e6e09a5d9236725f3e56e3cac5a70a01fe2a9d76b436499'
-            'e857d57c860fef26eabe0142fd6e4fc19453dff2cc1ee4cc9f611368b351229f'
-            '6211936c07986437f6ff982653ad4f26324859c7873cfea41b0f0ed32027d18c'
-            '83bfd784c8496f7543d81c145ccfb31bcbbfbce01c0410d0f6337a59eba53f47'
-            '02ba5fb78c242f6ff57da83b3d4499cf57d54bc95473b182bed1ea7eb47876e8'
-            '8a4a92b0cbd423294dc19d56df753a26f7634494540ef89cca3aff7335b7297d'
-            '96d85d4cdc92a90c54c420fdea993cd02f9339af2220ac5c82e10853ff2c06a4'
-            'c4ec67c0bb06f8113e871e20a7784fea2dd9baa14435b1624b963370fef29136')
+md5sums=('fe36056f2d274fa4b82a5422f192e65f'
+         '8f357e46e1efcbb746f38737a3f977a2'
+         '7045e63a5d294c761ce306084eec2c67'
+         'a2ebf4460c049cbee3e49cb26a475f68'
+         '55967504078bfd7f821d2bd7c2542b29'
+         '0fc1241ef7879d8be0fe140deb8ae48d')
 
 build() {
   cd "${srcdir}/${pkgname}-${_pkgver}"
@@ -60,8 +56,6 @@ package_dhcp() {
   cd "${srcdir}/${pkgname}-${_pkgver}"
   make DESTDIR="${pkgdir}" install
 
-  install -D -m0755 "${srcdir}/dhcp4" "${pkgdir}/etc/rc.d/dhcp4"
-  install -D -m0755 "${srcdir}/dhcp6" "${pkgdir}/etc/rc.d/dhcp6"
   install -D -m0644 "${srcdir}/dhcp.conf.d" "${pkgdir}/etc/conf.d/${pkgbase}"
   mkdir -p "${pkgdir}/var/state/dhcp"
 
