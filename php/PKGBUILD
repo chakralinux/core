@@ -26,7 +26,7 @@ pkgname=('php'
          'php-tidy'
          'php-xsl')
 pkgver=5.4.9
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 license=('PHP')
 url='http://www.php.net'
@@ -37,15 +37,13 @@ makedepends=('apache' 'imap' 'postgresql-libs' 'mysql' 'libldap' 'postfix' 'libv
 source=("http://www.php.net/distributions/${pkgbase}-${pkgver}.tar.bz2"
         'php.ini.patch'
         'apache.conf'
-        'rc.d.php-fpm'
         'php-fpm.conf.in.patch'
         'logrotate.d.php-fpm'
-	      'php-fpm.service'
+        'php-fpm.service'
       	'php-fpm.tmpfiles')
 sha256sums=('c0649971cfa9723701d085e227376374569689689b8421e4dcfac56c2f6fcac5'
             '119c04af11f771b83b28660cecda85ce1c0f0f48c9067ef2c02def7164700d3f'
             '49f5a2e06a0decbcd451bc485fe489b96226b67b4c4c0ec3d0a8faa141f16f7b'
-            '065663d8ebb952524b346a2de35d495c985474225389dd2f5e536f26dd766766'
             '686d3612779d97d294c23036c5e289833049623680e14125d4c4196e3318ef4e'
             'df0ebfaf826b9aca3e059bdf9c9f97a6f94729fd67e2e09863f566e09a6eeee3'
             '5ae2e10725e232c933aefbe51cf1a6b310f8cd48b0e66649496985a59cdd9e81'
@@ -264,7 +262,6 @@ package_php-fpm() {
   install -D -m755 "${srcdir}/build-fpm/sapi/fpm/php-fpm" "${pkgdir}/usr/sbin/php-fpm"
   install -D -m644 "${srcdir}/build-fpm/sapi/fpm/php-fpm.8" "${pkgdir}/usr/share/man/man8/php-fpm.8"
   install -D -m644 "${srcdir}/build-fpm/sapi/fpm/php-fpm.conf" "${pkgdir}/etc/php/php-fpm.conf"
-  install -D -m755 "${srcdir}/rc.d.php-fpm" "${pkgdir}/etc/rc.d/php-fpm"
   install -D -m644 "${srcdir}/logrotate.d.php-fpm" "${pkgdir}/etc/logrotate.d/php-fpm"
   install -d -m755 "${pkgdir}/var/run/php-fpm"
   install -d -m755 "${pkgdir}/etc/php/fpm.d"
