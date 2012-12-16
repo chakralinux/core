@@ -8,7 +8,7 @@
 
 pkgname=glibc
 pkgver=2.15
-pkgrel=2
+pkgrel=3
 _glibcdate=20120419
 pkgdesc="GNU C Library"
 arch=('x86_64')
@@ -31,6 +31,7 @@ source=(http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}_${
         glibc-2.14-reexport-rpc-interface.patch
         glibc-2.14-reinstall-nis-rpc-headers.patch
         glibc-2.15-fix-res_query-assert.patch
+	glibc-2.15-rpcgen-cpp-path.patch
         glibc-2.15-lddebug-scopes.patch
         glibc-2.15-revert-c5a0802a.patch
         glibc-2.15-scanf.patch
@@ -65,6 +66,7 @@ md5sums=('c0487f4e83db1b9b30d7989fc47dbead'
          'c5de2a946215d647c8af5432ec4b0da0'
          '55febbb72139ac7b65757df085024b83'
          '684073467137906fb9411f4c7f00db10'
+         '8f26740c248d8b0de68eef8a00f09583'
          '207483814b5034d9841ad090c75bedf4'
          '62288103a28f5f779da4ee64621d81d1'
          '34baaa90a8fcd500adfbe8c609ed81f1'
@@ -130,6 +132,10 @@ build() {
   # fix res_query assertion
   # http://sourceware.org/bugzilla/show_bug.cgi?id=13013
   patch -p1 -i ${srcdir}/glibc-2.15-fix-res_query-assert.patch
+
+  # prevent need for /lib/cpp symlink
+  # http://sourceware.org/git/?p=glibc.git;a=commit;h=bf9b740a
+  patch -p1 -i ${srcdir}/glibc-2.15-rpcgen-cpp-path.patch
 
   # propriety nvidia crash - https://bugzilla.redhat.com/show_bug.cgi?id=737223
   # http://sourceware.org/git/?p=glibc.git;a=commitdiff;h=0c95ab64  (fedora branch)
@@ -227,6 +233,7 @@ build() {
       --libdir=/usr/lib --libexecdir=/usr/lib \
       --with-headers=/usr/include \
       --enable-add-ons=nptl,libidn \
+      --enable-obsolete-rpc \
       --enable-kernel=2.6.32 \
       --with-tls --with-__thread \
       --enable-bind-now --without-gd \
