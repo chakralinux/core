@@ -4,7 +4,7 @@
 # maintainer abveritas@chakra-project.org
 
 pkgbase=qt5
-pkgname=('qt5')
+pkgname=('qt5' 'qt5-private-headers')
 pkgver=5.0.0
 _pkgver=5.0.0
 pkgrel=2
@@ -77,20 +77,22 @@ package_qt5() {
 	make INSTALL_ROOT=$pkgdir install
 }
 
-package_qt-private-headers() {
+package_qt5-private-headers() {
     pkgdesc="Qt private headers for development"
-    depends=("qt=${pkgver}")
+    depends=("qt5=${pkgver}")
 
-    install -d ${pkgdir}/usr/include/{QtCore,QtDeclarative,QtGui,QtScript}
-    install -d ${pkgdir}/usr/src/{corelib,declarative,gui,script}
+    install -d ${pkgdir}/opt/include/{QtCore,QtDeclarative,QtGui,QtScript}
+    install -d ${pkgdir}/opt/src/{corelib,declarative,gui,script}
     
-    for i in QtCore QtDeclarative QtGui QtScript; do
-      cp -r ${srcdir}/$_pkgfqn/include/${i}/private/ \
-        ${pkgdir}/usr/include/${i}/
-    done
+    cp -r ${srcdir}/$_pkgfqn/qtbase/include/QtCore/${pkgver}/QtCore/private/ ${pkgdir}/opt/include/QtCore/
+    cp -r ${srcdir}/$_pkgfqn/qtbase/include/QtGui/${pkgver}/QtGui/private/ ${pkgdir}/opt/include/QtGui/
+    cp -r ${srcdir}/$_pkgfqn/qtdeclarative/include/QtQml/${pkgver}/QtQml/private/ ${pkgdir}/opt/include/QtQml/
+    cp -r ${srcdir}/$_pkgfqn/qtscript/include/QtScript/${pkgver}/QtScript/private/ ${pkgdir}/opt/include/QtScript/
 
-    for i in corelib declarative gui script; do
-      cp -r ${srcdir}/$_pkgfqn/src/${i} ${pkgdir}/usr/src/
+    for i in corelib gui; do
+      cp -r ${srcdir}/$_pkgfqn/qtbase/src/${i} ${pkgdir}/opt/src/
     done
+    cp -r ${srcdir}/$_pkgfqn/qtscript/src/script ${pkgdir}/opt/src/
+    cp -r ${srcdir}/$_pkgfqn/qtdeclarative/src/qml ${pkgdir}/opt/src/
 }
 
