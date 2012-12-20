@@ -4,10 +4,10 @@
 # maintainer abveritas@chakra-project.org
 
 pkgbase=qt5
-pkgname=('qt5' 'qt5-private-headers')
+pkgname=('qt5')
 pkgver=5.0.0
 _pkgver=5.0.0
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -21,13 +21,18 @@ makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'db
 options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${_pkgver}"
 source=("http://origin.releases.qt-project.org/qt5/${_pkgver}/single/qt-everywhere-opensource-src-${_pkgver}.tar.xz"
-        'assistant.desktop' 'designer.desktop' 'linguist.desktop'
-        'qtconfig.desktop')
+        'assistant.desktop' 'designer.desktop' 'linguist.desktop' 'qtconfig.desktop'
+        'youtubeview.desktop' 'flickrview.desktop' 'browser.desktop' 'fancybrowser.desktop' 'qmlviewer.desktop')
 md5sums=('6b4f2f3f1e6252fbce3a57ac5165baff'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
-         '6b771c8a81dd90b45e8a79afa0e5bbfd')
+         '6b771c8a81dd90b45e8a79afa0e5bbfd'
+         '0ccbd672059286c94ed2c59660cfe5c7'
+         '792ac598893e8088089d40432742e998'
+         '3b7ea368a2700dc61bc22fc78e759b1c'
+         '188ece1d836c7ad5fd354c72d2f4c424'
+         '6e46b35387ef39916423f6903abc41f2')
 
 build() {
 	cd $srcdir/$_pkgfqn
@@ -75,6 +80,13 @@ package_qt5() {
 	
     cd $srcdir/$_pkgfqn
 	make INSTALL_ROOT=$pkgdir install
+	
+    install -d ${pkgdir}/usr/share/applications
+    install -m644 ${srcdir}/youtubeview.desktop ${pkgdir}/usr/share/applications/
+    install -m644 ${srcdir}/flickrview.desktop ${pkgdir}/usr/share/applications/
+    install -m644 ${srcdir}/browser.desktop ${pkgdir}/usr/share/applications/
+    install -m644 ${srcdir}/fancybrowser.desktop ${pkgdir}/usr/share/applications/
+    install -m644 ${srcdir}/qmlviewer.desktop ${pkgdir}/usr/share/applications/
 }
 
 package_qt5-private-headers() {
@@ -95,4 +107,3 @@ package_qt5-private-headers() {
     cp -r ${srcdir}/$_pkgfqn/qtscript/src/script ${pkgdir}/opt/src/
     cp -r ${srcdir}/$_pkgfqn/qtdeclarative/src/qml ${pkgdir}/opt/src/
 }
-
