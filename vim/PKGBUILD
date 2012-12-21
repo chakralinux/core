@@ -102,9 +102,9 @@ build() {
 ##### Packaging #####
 
 package_vim() {
-  pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor.'
-  depends=("vim-runtime=${pkgver}-${pkgrel}" 'gpm' 'perl')
-  conflicts=('gvim')
+pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor.'
+depends=("vim-runtime=${pkgver}-${pkgrel}" 'gpm' 'perl')
+conflicts=('gvim')
 
   cd "${srcdir}/vim-build"
   make -j1 VIMRCLOC=/etc DESTDIR="${pkgdir}" install
@@ -130,12 +130,13 @@ package_vim() {
 }
 
 package_gvim() {
-  pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (with advanced features, such as a GUI).'
-  depends=("vim-runtime=${pkgver}-${pkgrel}" 'gpm' 'perl' 'python2>=2.7.1' 'ruby' 'libxt' 'libxext'
-           'libxpm' 'libxmu' 'desktop-file-utils' 'lesstif')
-  provides=("vim=${pkgver}-${pkgrel}")
-  conflicts=('vim')
-  install=gvim.install
+pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor (with advanced features, such as a GUI).'
+depends=("vim-runtime=${pkgver}-${pkgrel}" 'gpm' 'perl' 'python2>=2.7.1'
+         'ruby' 'libxt' 'libxext' 'libxpm' 'libxmu' 'desktop-file-utils'
+         'motif')
+provides=("vim=${pkgver}-${pkgrel}")
+conflicts=('vim')
+install="gvim.install"
 
   cd "${srcdir}/gvim-build"
   make -j1 VIMRCLOC=/etc DESTDIR="${pkgdir}" install
@@ -166,8 +167,8 @@ package_gvim() {
 }
 
 package_vim-runtime() {
-  pkgdesc='Runtime for vim and gvim.'
-  backup=(etc/vimrc)
+pkgdesc='Runtime for vim and gvim.'
+backup=(etc/vimrc)
 
   # Install the runtime split from gvim
   install -d -m755 "${pkgdir}/usr/share"
