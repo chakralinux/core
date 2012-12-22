@@ -5,7 +5,7 @@
 #   mirror-check [REPOS...]  checks repos given in REPOS
 
 if [[ "$#" == "0" ]]; then
-    repos=('core' 'platform' 'desktop' 'apps' 'games' 'lib32' 'testing' 'lib32-testing')
+    repos="$(cat /etc/pacman.conf | grep -v "#" | grep -v "options" | grep "\[" | cut -d[ -f2 | cut -d] -f1 | uniq | sed "{:q;N;s/\n/ /g;t q}")"
 else 
     repos=($*)
 fi
