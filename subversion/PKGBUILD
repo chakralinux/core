@@ -4,33 +4,30 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=subversion
-pkgver=1.7.6
+pkgver=1.7.8
 pkgrel=1
 pkgdesc="A Modern Concurrent Version Control System"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('apache' 'bsd')
 depends=('neon' 'apr-util' 'sqlite3' 'file')
 optdepends=('kdeutils-kwallet' 'bash-completion: for svn bash completion')
 makedepends=('krb5' 'apache' 'python2' 'perl' 'swig' 'ruby' 'java-runtime' 
              'autoconf' 'db' 'e2fsprogs' 'kdelibs')
-backup=('etc/xinetd.d/svn' 'etc/conf.d/svnserve')
+#backup=('etc/xinetd.d/svn' 'etc/conf.d/svnserve')
 url="http://subversion.apache.org/"
 provides=('svn')
 options=('!makeflags' '!libtool')
 source=(http://apache.mirror.rafal.ca/subversion/$pkgname-$pkgver.tar.bz2{,.asc}
-        svnserve svn svnserve.conf 
+        svn svnserve.conf 
 	svnserve.tmpfiles
 	svnserve.service
-        subversion-1.7.6-kwallet-gcc47.patch
         subversion.rpath.fix.patch)
-md5sums=('4baa434db7709bb059b05d02a2547663'
-         '62b1a7dcfcda6a07c0a9804b2322614d'
-         'a2b029e8385007ffb99b437b30521c90'
+md5sums=('454b9f398415c3504435bf8c3f6ed127'
+         '8fc10351ec75a103b0c0c69d8ed786b7'
          'a0db6dd43af33952739b6ec089852630'
          'c459e299192552f61578f3438abf0664'
          'bb2857eceafcfac35dde39dcffad2314'
          'e8020c7a1d1a0c47091b5fdd034f81c5'
-         'f02cef1ab91cc5f345ebf3d281288db3'
          '6b4340ba9d8845cd8497e013ae01be3f')
 
 build() {
@@ -40,8 +37,6 @@ build() {
 
    patch -p0 -i ../subversion.rpath.fix.patch
    sed -i 's|/usr/bin/env python|/usr/bin/env python2|' tools/hook-scripts/{,mailer/{,tests/}}*.py
-
-   patch -p1 -i ../subversion-1.7.6-kwallet-gcc47.patch
 
    # configure
    autoreconf
@@ -74,10 +69,6 @@ package() {
 
    ## svnserve
    install -D -m 644 "${srcdir}"/svnserve.conf "${pkgdir}"/etc/conf.d/svnserve
-
-   # rc.d
-   install -D -m 755 "${srcdir}"/svnserve "${pkgdir}"/etc/rc.d/svnserve
-   install -D -m 644 "${srcdir}"/svn "${pkgdir}"/etc/xinetd.d/svn
 
    # systemd
    install -D -m 644 "${srcdir}"/svnserve.service  "${pkgdir}"/usr/lib/systemd/system/svnserve.service

@@ -1,23 +1,32 @@
+#
+# Core packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas[at]chakra-project[dot]org>
+
 pkgname=openvpn
-pkgver=2.1.4
-pkgrel=4
+pkgver=2.2.2
+pkgrel=1
 pkgdesc="An easy-to-use, robust, and highly configurable VPN (Virtual Private Network)"
-arch=(i686 x86_64)
+arch=('x86_64')
 url="http://openvpn.net/index.php/open-source.html"
-depends=('openssl' 'lzo2')
+depends=('openssl' 'lzo2' 'iproute2')
 license=('custom')
 backup=(usr/share/openvpn/easy-rsa/vars
         usr/share/openvpn/easy-rsa/openssl.cnf
         etc/conf.d/openvpn-tapdev)
-source=(http://swupdate.openvpn.net/community/releases/openvpn-${pkgver}.tar.gz
-	openvpn@.service)
-md5sums=('96a11868082685802489254f03ff3bde'
+source=("http://swupdate.openvpn.net/community/releases/openvpn-${pkgver}.tar.gz"
+	'openvpn@.service')
+md5sums=('c5181e27b7945fa6276d21873329c5c7'
          '44047df812a3fcd57a7e36a61732a9b9')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
   # Build openvpn
-  CFLAGS="$CFLAGS -DPLUGIN_LIBDIR=\\\"/usr/lib/openvpn\\\"" ./configure --prefix=/usr --enable-password-save --mandir=/usr/share/man
+  CFLAGS="$CFLAGS -DPLUGIN_LIBDIR=\\\"/usr/lib/openvpn\\\""
+     ./configure --prefix=/usr \
+        --enable-password-save \
+        --mandir=/usr/share/man \
+        --enable-iproute2
   make
 
   # Build plugins
