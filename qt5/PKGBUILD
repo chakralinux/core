@@ -7,7 +7,7 @@ pkgbase=qt5
 pkgname=('qt5')
 pkgver=5.0.0
 _pkgver=5.0.0
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -22,7 +22,8 @@ options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${_pkgver}"
 source=("http://origin.releases.qt-project.org/qt5/${_pkgver}/single/qt-everywhere-opensource-src-${_pkgver}.tar.xz"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop' 'qtconfig.desktop'
-        'youtubeview.desktop' 'flickrview.desktop' 'browser.desktop' 'fancybrowser.desktop' 'qmlviewer.desktop')
+        'youtubeview.desktop' 'flickrview.desktop' 'browser.desktop' 'fancybrowser.desktop' 'qmlviewer.desktop'
+        'defaultbookmarks_new.diff')
 md5sums=('6b4f2f3f1e6252fbce3a57ac5165baff'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
@@ -32,10 +33,12 @@ md5sums=('6b4f2f3f1e6252fbce3a57ac5165baff'
          '792ac598893e8088089d40432742e998'
          '3b7ea368a2700dc61bc22fc78e759b1c'
          '188ece1d836c7ad5fd354c72d2f4c424'
-         '6e46b35387ef39916423f6903abc41f2')
+         '6e46b35387ef39916423f6903abc41f2'
+         'ee9108cd20761a193c0c69d158b091ac')
 
 build() {
 	cd $srcdir/$_pkgfqn
+	patch -p0 -i "$srcdir/defaultbookmarks_new.diff"
 
         unset QTDIR
         export PATH="$PWD/qtbase/bin:$PWD/qtrepotools/bin:$PATH"

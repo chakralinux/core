@@ -3,7 +3,7 @@
 # maintainer abveritas@chakraproject.org
 
 pkgname=cups-filters
-pkgver=1.0.28
+pkgver=1.0.29
 pkgrel=1
 pkgdesc="OpenPrinting CUPS Filters"
 arch=('x86_64')
@@ -19,13 +19,14 @@ backup=(etc/fonts/conf.d/99pdftoopvp.conf)
 options=(!libtool)
 source=("http://www.openprinting.org/download/cups-filters/$pkgname-$pkgver.tar.gz"
         'cups-browsed.service')
-md5sums=('20e9aeb5080ef4c997edc5e5106184b8'
-         '2beb8d9cebf20ddcc6c7598aab4812a6')
+md5sums=('0640a02a3fb88d3dbdb224e3becd400d'
+         'c1101c052abfd93759d4963f6f6c36f0')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
   ./configure --prefix=/usr  \
     --sysconfdir=/etc \
+    --with-rcdir=no \
     --enable-avahi \
     --with-test-font-path=/usr/share/fonts/TTF/DejaVuSans.ttf
   make
