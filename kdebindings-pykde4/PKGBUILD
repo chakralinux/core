@@ -18,9 +18,11 @@ license=('GPL' 'LGPL' 'FDL')
 depends=('pyqt' 'qscintilla' 'boost-libs' "kdepim-runtime>=${_kdever}")
 makedepends=('cmake' 'automoc4' 'polkit-qt' 'boost')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz"
-        'pykdeuic4.patch')
+        'pykdeuic4_1.patch'
+        'CMakeLists.diff')
 md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
-         '9cffaa289dabe5570ea02615e3b3da65')
+         '9cffaa289dabe5570ea02615e3b3da65'
+         'fbdeefc300581174155e8248ddb16226')
   
 groups=("kde" "kdebindings" "kde-uninstall")
 provides=('kdebindings-python' 'pykde4')
@@ -30,7 +32,8 @@ options=('docs' '!splithdr' 'splitdbg' 'log')
 
 build() {
 	cd "${srcdir}" 
-	patch -p1 -i ${srcdir}/pykdeuic4.patch
+	patch -p1 -i ${srcdir}/pykdeuic4_1.patch
+	patch -p1 -i ${srcdir}/CMakeLists.diff
 	
         rm -rf build 
 	mkdir build && cd build
