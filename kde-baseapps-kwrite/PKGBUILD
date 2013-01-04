@@ -21,17 +21,13 @@ groups=('kde' 'kde-baseapps' 'kde-uninstall')
 provides=('kdebase-kwrite' 'kwrite')
 replaces=('kdebase-kwrite')
 install='kde-baseapps-kwrite.install'
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz"
-        'pkgbuild-syntax-highlight.patch')
-md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
-         '8bd4ccaf58c40b8020c37228659f9f21')
+source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
+md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 build() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
-
-	patch -p1 -i "${srcdir}"/pkgbuild-syntax-highlight.patch
 
         rm -rf build
         mkdir build && cd build      
