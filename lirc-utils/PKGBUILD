@@ -3,17 +3,17 @@
 #
 # maintainer abveritas@chakra-project.org
 
-
 pkgname=lirc-utils
 pkgver=0.9.0
-pkgrel=7
+pkgrel=8
 pkgdesc="Linux Infrared Remote Control utils"
 arch=('x86_64')
 url="http://www.lirc.org/"
 license=('GPL')
 _kernver='3.6.6-1'
-depends=('alsa-lib' 'libusbx' 'libx11' 'libsm' 'python2' 'libftdi' 'linux')
-makedepends=('help2man' 'linux-headers')
+depends=('alsa-lib' 'libx11' 'libftdi' 'linux')
+makedepends=('help2man' 'linux-headers' 'python2')
+optdepends=('python2: pronto2lirc utility')
 replaces=('lirc+pctv')
 backup=('etc/conf.d/lircd.conf' 'etc/conf.d/irexec.conf')
 options=('!libtool' '!makeflags')
@@ -24,7 +24,7 @@ source=(http://sourceforge.net/projects/lirc/files/LIRC/$pkgver/lirc-$pkgver.tar
         lirc_atiusb-kfifo.patch
         kernel-2.6.39.patch
         lirc.logrotate lircd.conf irexec.conf 
-	lircm.service irexec.service lirc.tmpfiles)
+	lirc.service lircm.service irexec.service lirc.tmpfiles)
 md5sums=('b232aef26f23fe33ea8305d276637086'
          '1cce37e18e3f6f46044abab29016d18f'
          '1014f2ea03a557c673c9084118676111'
@@ -33,6 +33,7 @@ md5sums=('b232aef26f23fe33ea8305d276637086'
          '3deb02604b37811d41816e9b4385fcc3'
          '5b1f8c9cd788a39a6283f93302ce5c6e'
          'f0c0ac930326168035f0c8e24357ae55'
+         'dab8a73bcc5fd5479d8750493d8d97dc'
          'c2e20fe68b034df752dba2773db16ebe'
          '07131d117fcfe9dcd50c453c3a5e9531'
          'febf25c154a7d36f01159e84f26c2d9a')
@@ -54,16 +55,14 @@ build() {
 	./configure --enable-sandboxed --prefix=/usr \
 	--with-driver=all --with-kerneldir=/usr/src/linux-${_kernver} \
 	--with-moduledir=/lib/modules/${_kernver}/kernel/drivers/misc \
-	--with-transmitter \
+	--with-transmitter
 		
-	# disable parallel and bt829
-        # because of incompatibility with smp systems
+        # Remove drivers already in kernel
         sed -e "s:lirc_dev::" -e "s:lirc_bt829::" -e "s:lirc_igorplugusb::" \
             -e "s:lirc_imon::" -e "s:lirc_parallel::" -e "s:lirc_sasem::" \
             -e "s:lirc_serial::" -e "s:lirc_sir::" -e "s:lirc_ttusbir::" \
             -i Makefile drivers/Makefile drivers/*/Makefile tools/Makefile 
                 
-
   	# build
 	make 
 }
@@ -72,6 +71,7 @@ package() {
         cd "${srcdir}/lirc-${pkgver}"
 	make DESTDIR=""${pkgdir}"" install 
 	
+        install -D -m644 "${srcdir}"/lirc.service "${pkgdir}"/usr/lib/systemd/system/lirc.service
 	install -D -m644 "${srcdir}"/lircm.service "${pkgdir}"/usr/lib/systemd/system/lircm.service
 	install -D -m644 "${srcdir}"/irexec.service "${pkgdir}"/usr/lib/systemd/system/irexec.service
 	install -D -m644 "${srcdir}"/lirc.tmpfiles "${pkgdir}"/usr/lib/tmpfiles.d/lirc.conf
@@ -81,20 +81,13 @@ package() {
 
 
 	# install the logrotate config
-    	install -D -m644 "${srcdir}"/lirc.logrotate \
-        	"${pkgdir}"/etc/logrotate.d/lirc 
+    	install -D -m644 "${srcdir}"/lirc.logrotate "${pkgdir}"/etc/logrotate.d/lirc 
     
 	# install conf.d file
-	install -D -m644 "${srcdir}"/lircd.conf \
-        	"${pkgdir}"/etc/conf.d/lircd.conf 
+	install -D -m644 "${srcdir}"/lircd.conf "${pkgdir}"/etc/conf.d/lircd.conf 
 
 	# install conf.d file
-        install -D -m644 "${srcdir}"/irexec.conf \
-                "${pkgdir}"/etc/conf.d/irexec.conf 
+        install -D -m644 "${srcdir}"/irexec.conf "${pkgdir}"/etc/conf.d/irexec.conf 
 
 	install -d -m755 "${pkgdir}"/etc/lirc 
-	install -d -m755 "${pkgdir}"/var/run/lirc 
-
-	# remove built modules
-	rm -r "${pkgdir}"/lib/
 }
