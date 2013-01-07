@@ -1,25 +1,22 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
-# Find the kernel name inside the chroot
-_extramodules=extramodules-`pacman -Q linux | cut -c7-9 | sed 's/linux //g'`-CHAKRA
-_kver="$(cat /lib/modules/${_extramodules}/version)"
+_kver="3.6.6-1-CHAKRA"
 
 pkgname=acpi_call
-pkgver=20120115
-pkgrel=4
+pkgver=20120613
+pkgrel=6
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url=("http://github.com/mkottman/acpi_call")
 license=('GPL')
-depends=('linux>=3.2' 'linux<3.3' 'linux-headers')
+depends=('linux>=3.6' 'linux<3.7' 'linux-headers')
 makedepends=('git')
 install=acpi_call.install
-source=(http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz)
-md5sums=('129841dd806887492609214462792413')
+source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('fcee74cba78ff644b43d60e046864b9e')
 
 
 # create tarball: source PKGBUILD && mksource
@@ -36,32 +33,36 @@ build() {
   cd ${srcdir}
 
  ## Build
-  rm -rf ${srcdir}/$pkgname-build
-  cp -r ${srcdir}/$pkgname ${srcdir}/$pkgname-build
-  cd ${srcdir}/$pkgname-build
+  #rm -rf ${srcdir}/$pkgname-${pkgver}-build
+  #cp -r ${srcdir}/$pkgname-${pkgver} ${srcdir}/$pkgname${pkgver}-build
+  cd ${srcdir}/$pkgname-${pkgver}
 
-  sed \
-    -e  's/$(shell uname -r)/3.2-CHAKRA/g' \
-    -i Makefile
   make
 }
 package() {
-  cd ${srcdir}/$pkgname-build
-  install -d ${pkgdir}/usr/share/$pkgname || return 1
-  install -d ${pkgdir}/usr/bin || return 1
-  install -d ${pkgdir}/usr/share/$pkgname/doc || return 1
-  install -Dm755  ${srcdir}/$pkgname-build/test_off.sh \
-    ${pkgdir}/usr/share/$pkgname || return 1
+  cd ${srcdir}/$pkgname-${pkgver}
+  install -d ${pkgdir}/usr/share/$pkgname 
+  install -d ${pkgdir}/usr/bin  
+  install -Dm755  ${srcdir}/$pkgname-${pkgver}/asus1215n.sh \
+    ${pkgdir}/usr/share/$pkgname 
+  install -Dm755  ${srcdir}/$pkgname-${pkgver}/m11xr2.sh \
+    ${pkgdir}/usr/share/$pkgname 
+  install -Dm755  ${srcdir}/$pkgname-${pkgver}/query_dsdt.pl \
+    ${pkgdir}/usr/share/$pkgname 
+  install -Dm755  ${srcdir}/$pkgname-${pkgver}/test_off.sh \
+    ${pkgdir}/usr/share/$pkgname 
   ln -s /usr/share/$pkgname/test_off.sh \
-    ${pkgdir}/usr/bin/test_off.sh || return 1
+    ${pkgdir}/usr/bin/test_off.sh 
+  cp -R windump_hack \
+    ${pkgdir}/usr/share/$pkgname/
   install -Dm644 README \
     ${pkgdir}/usr/share/$pkgname/README
 
-  msg2 "Building module for $_kver..."
+    msg2 "Building module for $_kver..."
 
   # KDIR is necessary even when cleaning
-  make KDIR=/usr/src/linux-${_kver} clean
+  #make KDIR=/usr/src/linux-${_kver} clean
   make KDIR=/usr/src/linux-${_kver}
 
-  install -D -m644 acpi_call.ko $pkgdir/lib/modules/$_extramodules/acpi_call.ko
+  install -D -m644 acpi_call.ko $pkgdir/lib/modules/${_kver}/kernel/drivers/acpi/acpi_call.ko
 }

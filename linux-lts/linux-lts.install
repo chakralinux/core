@@ -1,21 +1,22 @@
 # arg 1:  the new package version
 # arg 2:  the old package version
 
-KERNEL_NAME=
-KERNEL_VERSION=3.0-CHAKRA-LTS
+KERNEL_NAME=-lts
+KERNEL_VERSION=3.0.43-1-lts
 
 post_install () {
   # updating module dependencies
   echo ">>> Updating module dependencies. Please wait ..."
   depmod ${KERNEL_VERSION}
   echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
-  mkinitcpio -p linux-lts${KERNEL_NAME}
+  mkinitcpio -p linux${KERNEL_NAME}
 
+  
   # add compat symlinks for the initramfs images
-  ln -sf initramfs-linux-lts${KERNEL_NAME}.img boot/kernel26${KERNEL_NAME}.img
-  ln -sf initramfs-linux-lts${KERNEL_NAME}-fallback.img \
+  ln -sf initramfs-linux${KERNEL_NAME}.img boot/kernel26${KERNEL_NAME}.img
+  ln -sf initramfs-linux${KERNEL_NAME}-fallback.img \
     boot/kernel26${KERNEL_NAME}-fallback.img
-  ln -sf vmlinuz-linux-lts${KERNEL_NAME} /boot/vmlinuz26${KERNEL_NAME}
+  ln -sf vmlinuz-linux${KERNEL_NAME} /boot/vmlinuz26${KERNEL_NAME}
 }
 
 post_upgrade() {
@@ -39,20 +40,13 @@ post_upgrade() {
 
   if findmnt --fstab -uno SOURCE /boot &>/dev/null && ! mountpoint -q /boot; then
     echo "WARNING: /boot appears to be a separate partition but is not mounted."
-    echo "         You probably just broke your system. Congratulations."
   fi
 
   # updating module dependencies
   echo ">>> Updating module dependencies. Please wait ..."
   depmod ${KERNEL_VERSION}
   echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
-  mkinitcpio -p linux-lts${KERNEL_NAME}
-
-  # add compat symlinks for the initramfs images
-  ln -sf initramfs-linux-lts${KERNEL_NAME}.img boot/kernel26${KERNEL_NAME}.img
-  ln -sf initramfs-linux-lts${KERNEL_NAME}-fallback.img \
-    boot/kernel26${KERNEL_NAME}-fallback.img
-  ln -sf vmlinuz-linux-lts${KERNEL_NAME} /boot/vmlinuz26${KERNEL_NAME}
+  mkinitcpio -p linux${KERNEL_NAME}
 }
 
 post_remove() {
@@ -60,3 +54,5 @@ post_remove() {
   rm -f boot/{initramfs-linux,kernel26}${KERNEL_NAME}.img
   rm -f boot/{initramfs-linux,kernel26}${KERNEL_NAME}-fallback.img
 }
+
+

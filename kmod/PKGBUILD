@@ -1,14 +1,13 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=kmod
-pkgver=6
+pkgver=11
 pkgrel=1
 pkgdesc="Linux kernel module handling"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='http://git.kernel.org/?p=utils/kernel/kmod/kmod.git;a=summary'
 license=('GPL2')
 depends=('glibc' 'zlib')
@@ -18,24 +17,28 @@ conflicts=('module-init-tools')
 replaces=('module-init-tools')
 source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/$pkgname/$pkgname-$pkgver.tar.xz"
         "depmod-search.conf")
-md5sums=('bad08102fad212cd34405136d9a7eb94'
-         '285fc738c220ff84419995fc8c6d6ca1')
+md5sums=('607e33b0144625c2e5221e5a7df49c7a'
+         '9ae9acc68ca27134f55a0959073b8e53')
 
 build() {
   cd "$pkgname-$pkgver"
 
   ./configure \
     --sysconfdir=/etc \
-    --with-zlib
+    --with-zlib 
 
   make
 }
+
+#check() {
+#  make -C "$pkgname-$pkgver" check 
+#}
 
 package() {
   make -C "$pkgname-$pkgver" DESTDIR="$pkgdir" install
 
   # extra directories
-  install -dm755 "$pkgdir"/{etc,lib}/{depmod,modprobe}.d "$pkgdir/sbin"
+  install -dm755 "$pkgdir"/{etc,usr/lib}/{depmod,modprobe}.d "$pkgdir/sbin"
 
   # add symlinks to kmod
   ln -s ../usr/bin/kmod "$pkgdir/sbin/modprobe"
@@ -46,7 +49,5 @@ package() {
   done
 
   # install depmod.d file for search/ dir
-  install -Dm644 "$srcdir/depmod-search.conf" "$pkgdir/lib/depmod.d/search.conf"
+  install -Dm644 "$srcdir/depmod-search.conf" "$pkgdir/usr/lib/depmod.d/search.conf"
 }
-
-# vim: ft=sh syn=sh et

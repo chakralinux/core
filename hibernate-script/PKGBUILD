@@ -1,12 +1,11 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas@chakra-project.org
 
 pkgname=hibernate-script
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Set of scripts for managing tux on ice, hibernation and suspend to RAM"
 arch=('any')
 url="http://www.tuxonice.net"
@@ -24,12 +23,12 @@ source=(http://tuxonice.net/files/${pkgname}-${pkgver}.tar.gz
         hibernate.rc)
 md5sums=('5c21770afbae503450e3c4a5502bf29d'
          '09e0d47e0d46d94da64c26a12a29afee'
-         '5d7e83902a00bf72b1de97a5450a558e')
+         '93d5794a3c82df78b8e685647d4c643b')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
   # Fix scriptlets to work properly with Chakra GNU/Linux
-  patch -Np1 -i ${srcdir}/${pkgname}-${pkgver}-chakra.patch
+  patch -p1 -i ${srcdir}/${pkgname}-${pkgver}-chakra.patch
 }
 
 package() {

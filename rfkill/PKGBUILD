@@ -1,6 +1,7 @@
-# $Id: PKGBUILD 67405 2010-02-06 19:20:13Z thomas $
-# Maintainer: Thomas Bächler <thomas@archlinux.org>
-# Contributor: Giovanni Scafora <giovanni@archlinux.org>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas@chakra-project.org
 
 pkgname=rfkill
 pkgver=0.4
@@ -22,14 +23,17 @@ md5sums=('727892c0fb35c80ee3849fbe89b45350'
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  make
+}
 
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
   # License
-  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
   # Udev rule
-  install -Dm644 "${srcdir}/60-rfkill.rules" "${pkgdir}/lib/udev/rules.d/60-rfkill.rules" || return 1
+  install -Dm644 "${srcdir}/60-rfkill.rules" "${pkgdir}/usr/lib/udev/rules.d/60-rfkill.rules"
   # Init script
-  install -Dm644 "${srcdir}/rfkill.conf.d" "${pkgdir}/etc/conf.d/rfkill" || return 1
-  install -Dm755 "${srcdir}/rfkill.rc.d" "${pkgdir}/etc/rc.d/rfkill" || return 1
+  install -Dm644 "${srcdir}/rfkill.conf.d" "${pkgdir}/etc/conf.d/rfkill"
+  install -Dm755 "${srcdir}/rfkill.rc.d" "${pkgdir}/etc/rc.d/rfkill"
 }

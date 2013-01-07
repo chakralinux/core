@@ -1,32 +1,34 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=cmake
-pkgver=2.8.7
-pkgrel=2
+pkgver=2.8.9
+pkgrel=1
 pkgdesc="A cross-platform open-source make system"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('custom')
 url="http://www.cmake.org"
 depends=('curl' 'libarchive' 'shared-mime-info')
 makedepends=('qt')
 install=${pkgname}.install
-source=("http://www.cmake.org/files/v2.8/${pkgname}-${pkgver}.tar.gz")
-md5sums=('e1b237aeaed880f65dec9c20602452f6')
+source=("http://www.cmake.org/files/v2.8/${pkgname}-${pkgver}.tar.gz"
+        'fix-pkg-config.patch')
+md5sums=('801f4c87f8b604f727df5bf1f05a59e7'
+         '1d0e7fddd703a36df30262d7616a59be')
 
 build() {
   cd "${srcdir}"/${pkgname}-${pkgver}
+
+  #patch -p1 -i "${srcdir}"/fix-pkg-config.patch
 
   ./bootstrap --prefix=/usr \
     --mandir=/share/man \
     --docdir=/share/doc/cmake \
     --system-libs \
     --qt-gui \
-    --parallel=2
+    --parallel=$(/usr/bin/getconf _NPROCESSORS_ONLN)
   make
 }
 
@@ -38,5 +40,6 @@ package() {
   install -Dm644 Docs/cmake-indent.vim ${vimpath}/indent/cmake-indent.vim
   install -Dm644 Docs/cmake-syntax.vim ${vimpath}/syntax/cmake-syntax.vim
   install -Dm644 Docs/cmake-mode.el ${pkgdir}/usr/share/emacs/site-lisp/cmake-mode.el
+
   install -Dm644 Copyright.txt ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }

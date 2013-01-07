@@ -1,23 +1,16 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer abveritas@chakra-project.org
 
 pkgname=acl
 pkgver=2.2.51
-pkgrel=2
+pkgrel=3
 pkgdesc="Library for filesystem ACL support"
 arch=('i686' 'x86_64')
 url="http://savannah.nongnu.org/projects/acl"
 license=('LGPL')
 depends=('attr>=2.4.46')
-replaces=('xfsacl')
-provides=('xfsacl')
-conflicts=('xfsacl')
 options=('!libtool')
 source=(http://download.savannah.gnu.org/releases/${pkgname}/${pkgname}-${pkgver}.src.tar.gz)
 sha256sums=('06854521cf5d396801af7e54b9636680edf8064355e51c07657ec7442a185225')
@@ -26,7 +19,7 @@ build() {
   cd "${srcdir}"/${pkgname}-${pkgver}
 
   export INSTALL_USER=root INSTALL_GROUP=root 
-  ./configure --prefix=/usr --libdir=/lib --libexecdir=/usr/lib
+  ./configure --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/lib
   make 
 }
 
@@ -36,6 +29,6 @@ package() {
   make DIST_ROOT="${pkgdir}" install install-lib install-dev
 
   # tidy up
-  rm -f ${pkgdir}/lib/libacl.a
-  chmod 0755 ${pkgdir}/lib/libacl.so.*.*.*
+  rm -f ${pkgdir}/usr/lib/libacl.a
+  chmod 0755 ${pkgdir}/usr/lib/libacl.so.*.*.*
 }

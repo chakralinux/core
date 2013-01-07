@@ -1,5 +1,5 @@
 infodir=usr/share/info
-filelist=(grub.info grub-dev.info)
+filelist=('grub.info' 'grub-dev.info')
 
 show_important_message() {
   echo -e "\033[0;31m IMPORTANT"
@@ -8,60 +8,43 @@ show_important_message() {
   echo -e "\033[0;0m  Also you can run \033[0;32m 'update-grub' \033[0;0m as root for generating grub.cfg"
 }
 
-delete_symlinks() {
-  if [ `readlink /boot/kernel26.img` ] ;
-  then
-    echo "removing backward-symlink"
-    rm -v /boot/kernel26.img
-  fi
-  if [ `readlink /boot/kernel26-lts.img` ] ;
-  then
-    echo "removing backward-symlink"
-    rm -v /boot/kernel26-lts.img
-  fi
-  if [ `readlink /boot/vmlinuz26` ] ;
-  then
-    echo "removing backward-symlink"
-    rm -v /boot/vmlinuz26
-  fi
-  if [ `readlink /boot/vmlinuz26-lts` ] ;
-  then
-    echo "removing backward-symlink"
-    rm -v /boot/vmlinuz26-lts
+restore_grubcfg() {
+  if [ -f /boot/grub/grub.cfg.pacsave ]; then
+    echo -n "Copying /boot/grub/grub.cfg.pacsave to /boot/grub/grub.cfg... "
+    install -D -m644 /boot/grub/grub.cfg.pacsave \
+                     /boot/grub/grub.cfg
+    echo "done."
   fi
 }
 
 post_install() {
-  if [ -f /boot/grub/grub.cfg.pacsave ]; then
-    echo "Copying /boot/grub/grub.cfg.pacsave to /boot/grub/grub.cfg"
-    install -Dm644 /boot/grub/grub.cfg.pacsave /boot/grub/grub.cfg
-  fi
+  restore_grubcfg
 
   echo -n "Generating grub.cfg.example config file... "
   grub-mkconfig -o /boot/grub/grub.cfg.example 2> /dev/null
   echo "done."
 
-  for file in ${filelist[@]}; do
-    install-info $infodir/$file.gz $infodir/dir 2> /dev/null
+  for file in "${filelist[@]}"; do
+    install-info "${infodir}/${file}.gz" "${infodir}/dir" 2> /dev/null
   done
-  delete_symlinks
+
   show_important_message
 }
 
 post_upgrade() {
-  for file in ${filelist[@]}; do
-    install-info $infodir/$file.gz $infodir/dir 2> /dev/null
+  restore_grubcfg
+
+  for file in "${filelist[@]}"; do
+    install-info "${infodir}/${file}.gz" "${infodir}/dir" 2> /dev/null
   done
-  delete_symlinks
+
   show_important_message
-  if [ -s /boot/grub/grub.cfg ]
-  then
-     update-grub
-  fi     
 }
 
 pre_remove() {
-  for file in ${filelist[@]}; do
-    install-info --delete $infodir/$file $infodir/dir 2> /dev/null
+  for file in "${filelist[@]}"; do
+    install-info --delete "${infodir}/${file}" "${infodir}/dir" 2> /dev/null
   done
 }
+
+# vim:set ts=2 sw=2 et:

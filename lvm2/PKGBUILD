@@ -1,53 +1,58 @@
-# $Id$
-# Maintainer: Eric Bélanger <eric@archlinux.org>
-# Maintainer: Thomas Bächler <thomas@archlinux.org>
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+# maintainer: abveritas@chakra-project.org
 
 pkgbase=lvm2
 pkgname=('lvm2' 'device-mapper')
-pkgver=2.02.87
+pkgver=2.02.97
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://sourceware.org/lvm2/"
 license=('GPL2' 'LGPL2.1')
 groups=('base')
-source=(ftp://sources.redhat.com/pub/lvm2/LVM2.${pkgver}.tgz
+source=(ftp://sources.redhat.com/pub/lvm2/LVM2.${pkgver}.tgz{,.asc}
         lvm2_install
         lvm2_hook
-        11-dm-initramfs.rules)
-md5sums=('4c36c7f216edfe65a6193d2adc389ecd'
-         'dcb82506d732cc7b10159a89b579dba8'
-         '8d613b84a175cd85f752a75198e40e15'
-         '69e40679cd8b3658bfc619e48baae125')
-sha1sums=('4b217d405133bdc6120568253574a49fae2caa4f'
-          '7f108b2f2056eb050fc898bf5190ecf9145aed8a'
-          'a0e0513c2efb183006e57e595d93ce18be297928'
-          'f6a554eea9557c3c236df2943bb6e7e723945c41')
+        11-dm-initramfs.rules
+        lvm.service
+	lvm-on-crypt.service
+        lvm2.conf)
+sha1sums=('ca92d976628246745f0981d1514a79a4a8e32314'
+          '9f0c6047fe3c275db7af20f383bd41744fcafc33'
+          '3e1680f9b76ce9150d08865d99db90fd15532271'
+          'cedc9948123c870f9c5aa3357d0075b41a9c8135'
+          'f6a554eea9557c3c236df2943bb6e7e723945c41'
+          '17df8689630a77e46899a8bd56997d9db896d5af'
+          '7336aa1d53db9c843916b2cbb433434e4e354a24'
+          'ccefad65fde3d50331a42b0e90a1539dc7c8b9e4')
 
 build() {
   cd "${srcdir}/LVM2.${pkgver}"
-  sed -i 's|/usr/bin/tr|/bin/tr|' scripts/lvmdump.sh
   unset LDFLAGS
-  ./configure --prefix= --sysconfdir=/etc --localstatedir=/var --datarootdir=/usr/share \
-    --includedir=/usr/include --with-usrlibdir=/usr/lib \
-    --enable-pkgconfig --enable-readline --enable-dmeventd --enable-cmdlib --enable-applib \
-    --with-udevdir=/lib/udev/rules.d/ --enable-udev_sync --enable-udev_rules
+
+  ./configure --prefix=/ --sbindir=/sbin --sysconfdir=/etc --localstatedir=/var --datarootdir=/usr/share \
+    --includedir=/usr/include --with-usrlibdir=/usr/lib  --libdir=/usr/lib --with-udev-prefix=/usr \
+    --with-systemdsystemunitdir=/usr/lib/systemd/system --enable-pkgconfig --enable-readline \
+    --enable-dmeventd --enable-cmdlib --enable-applib --enable-udev_sync --enable-udev_rules  \
+    --with-default-locking-dir=/run/lock/lvm
   make
 }
 
 package_device-mapper() {
   pkgdesc="Device mapper userspace library and tools"
   url="http://sourceware.org/dm/"
-  depends=('glibc' 'udev')
+  depends=('glibc' 'systemd')
 
   cd "${srcdir}/LVM2.${pkgver}"
   make DESTDIR="${pkgdir}" install_device-mapper
   # extra udev rule for device-mapper in initramfs
-  install -D -m644 "${srcdir}/11-dm-initramfs.rules" "${pkgdir}/lib/initcpio/udev/11-dm-initramfs.rules"
+  install -D -m644 "${srcdir}/11-dm-initramfs.rules" "${pkgdir}/usr/lib/initcpio/udev/11-dm-initramfs.rules"
 }
 
 package_lvm2() {
   pkgdesc="Logical Volume Manager 2 utilities"
-  depends=('bash' "device-mapper>=${pkgver}" 'udev' 'readline')
+  depends=('bash' "device-mapper>=${pkgver}" 'systemd' 'readline')
   conflicts=('lvm' 'mkinitcpio<0.7')
   backup=('etc/lvm/lvm.conf')
   options=('!makeflags')
@@ -59,6 +64,10 @@ package_lvm2() {
   # /etc directories
   install -d "${pkgdir}"/etc/lvm/{archive,backup}
   # mkinitcpio hook
-  install -D -m644 "${srcdir}/lvm2_hook" "${pkgdir}/lib/initcpio/hooks/lvm2"
-  install -D -m644 "${srcdir}/lvm2_install" "${pkgdir}/lib/initcpio/install/lvm2"
+  install -D -m644 "${srcdir}/lvm2_hook" "${pkgdir}/usr/lib/initcpio/hooks/lvm2"
+  install -D -m644 "${srcdir}/lvm2_install" "${pkgdir}/usr/lib/initcpio/install/lvm2"
+  # systemd support
+  install -D -m644 "${srcdir}/lvm.service" "${pkgdir}/usr/lib/systemd/system/lvm.service"
+  install -D -m644 "${srcdir}/lvm-on-crypt.service" "${pkgdir}/usr/lib/systemd/system/lvm-on-crypt.service"
+  install -D -m644 "${srcdir}/lvm2.conf" "${pkgdir}/usr/lib/tmpfiles.d/lvm2.conf"
 }
