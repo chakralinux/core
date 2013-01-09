@@ -1,0 +1,33 @@
+#!/bin/sh
+
+sd_booted() {
+  [ -e sys/fs/cgroup/systemd ]
+}
+   
+post_install() {
+  udevadm hwdb --update 
+  
+  mv /etc/systemd/system/getty.target.wants/getty@tty1new.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+
+  if sd_booted; then
+    systemctl --system daemon-reexec
+  fi
+
+}
+
+post_upgrade() {
+  udevadm hwdb --update
+
+  journalctl --update-catalog
+  
+  #mv /etc/systemd/system/getty.target.wants/getty@tty1.service /etc/systemd/system/getty.target.wants/getty@tty1.service.pacsave
+  #mv /etc/systemd/system/getty.target.wants/getty@tty1new.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+  #rm /etc/systemd/system/getty.target.wants/getty@tty1.service.pacsave
+  
+  if sd_booted; then
+    systemctl --system daemon-reexec
+    systemctl restart systemd-logind.service
+  fi
+
+}
+
