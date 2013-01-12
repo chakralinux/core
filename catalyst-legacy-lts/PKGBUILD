@@ -1,15 +1,15 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas[at]chakra-project[dot]org>
 
-_kernver="3.0.43-1-lts"
+_kernver="3.0.58-1-lts"
 
 pkgname=catalyst-legacy-lts
 pkgver=12.6
-pkgrel=3
+pkgrel=4
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.ati.amd.com"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 license=('custom')
@@ -37,15 +37,8 @@ build() {
     msg "Unpacking archive ..."
     /bin/sh ./amd-driver-installer-${pkgver}-legacy-x86.x86_64.run --extract archive_files
 
-
-    if [ "${CARCH}" = "x86_64" ]; then
-	BUILDARCH=x86_64
-	_archdir=x86_64
-    fi
-    if [ "${CARCH}" = "i686" ]; then
-	BUILDARCH=i386
-	_archdir=x86
-    fi
+    BUILDARCH=x86_64
+    _archdir=x86_64
 
     cd "${srcdir}/archive_files/"
 
