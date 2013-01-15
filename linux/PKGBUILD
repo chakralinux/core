@@ -33,7 +33,9 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.7.tar.xz"
         'change-default-console-loglevel.patch'
         'fat-3.6.x.patch'
         'fix-watchdog-3.7.patch'
-        'drm-fix-track-free-areas-3.7.patch')
+        'drm-fix-track-free-areas-3.7.patch'
+        'sp5100_tco-Add-SB8x0-chipset-support.patch'
+        'ath3k.patch')
 md5sums=('21223369d682bcf44bcdfe1521095983'
          '132211742278e18b8f4808754d85e66c'
          '327570e1825dd67b15b46215f5652ae5'
@@ -48,7 +50,9 @@ md5sums=('21223369d682bcf44bcdfe1521095983'
          '65cbe8e4c8efaf96dd162102e46ce81d'
          '88d501404f172dac6fcb248978251560'
          '3485d6c7ae3af35d16e09d6d9a7ed32a'
-         'e365972f002482a7b25cd5360467d75f')
+         'e365972f002482a7b25cd5360467d75f'
+         '6ec1824a41721593a4d5127e59be10e2'
+         'd393a0bbd762bf9d6f42d770b89e6811')
 
 build() {
   cd "${srcdir}/linux-${_basekernel}"
@@ -65,6 +69,10 @@ build() {
   patch -p1 -i "${srcdir}/fix-watchdog-3.7.patch"
   # fix GPU hang
   patch -p1 -i "${srcdir}/drm-fix-track-free-areas-3.7.patch"
+  # "kernel: sp5100_tco: mmio address 0xfec000f0 already in use" error
+  patch -p1 -i "${srcdir}/sp5100_tco-Add-SB8x0-chipset-support.patch"
+  # bug http://chakra-linux.org/bugs/index.php?do=details&task_id=501
+  patch -p1 -i "${srcdir}/ath3k.patch"
 
   # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
   # remove this when a Kconfig knob is made available by upstream
