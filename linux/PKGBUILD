@@ -9,7 +9,7 @@ pkgname=('linux' 'linux-headers' 'linux-docs') # Build stock -CHAKRA kernel
 # pkgname=linux-custom       # Build kernel with a different name
 _kernelname=${pkgname#linux}
 _basekernel=3.7
-pkgver=3.7.2
+pkgver=3.7.3
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -32,12 +32,10 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.7.tar.xz"
         'linux.preset'
         'change-default-console-loglevel.patch'
         'fat-3.6.x.patch'
-        'fix-watchdog-3.7.patch'
-        'drm-fix-track-free-areas-3.7.patch'
         'sp5100_tco-Add-SB8x0-chipset-support2.patch'
         'ath3k.patch')
 md5sums=('21223369d682bcf44bcdfe1521095983'
-         '132211742278e18b8f4808754d85e66c'
+         'd4aa39ec9610e9fbd7bb4f5aff2c5db8'
          '327570e1825dd67b15b46215f5652ae5'
          '2e33819e859125ba0176072d2cd5ac81'
          '6a1ffafeacb79be96c97e4638cea2452'
@@ -49,8 +47,6 @@ md5sums=('21223369d682bcf44bcdfe1521095983'
          'eb14dcfd80c00852ef81ded6e826826a'
          '65cbe8e4c8efaf96dd162102e46ce81d'
          '88d501404f172dac6fcb248978251560'
-         '3485d6c7ae3af35d16e09d6d9a7ed32a'
-         'e365972f002482a7b25cd5360467d75f'
          '57ee9aa09bdec07a5ce2b553b94c7039'
          'd393a0bbd762bf9d6f42d770b89e6811')
 
@@ -65,10 +61,6 @@ build() {
 
   # fix cosmetic fat issue
   patch -p1 -i "${srcdir}/fat-3.6.x.patch"
-  # fix watchdog enable/disable regression
-  patch -p1 -i "${srcdir}/fix-watchdog-3.7.patch"
-  # fix GPU hang
-  patch -p1 -i "${srcdir}/drm-fix-track-free-areas-3.7.patch"
   # "kernel: sp5100_tco: mmio address 0xfec000f0 already in use" error
   # https://bugzilla.kernel.org/show_bug.cgi?id=43176
   patch -p1 -i "${srcdir}/sp5100_tco-Add-SB8x0-chipset-support2.patch"
