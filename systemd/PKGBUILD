@@ -4,8 +4,8 @@
 # maintainer: abveritas@chakra-project.org
 
 pkgname=systemd
-pkgver=196
-pkgrel=2
+pkgver=197
+pkgrel=1
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
@@ -38,7 +38,7 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         '99-default.preset'
         '98-chakra.rules'
         'is_bundle')
-md5sums=('05ebd7f108e420e2b4e4810ea4b3c810'
+md5sums=('56a860dceadfafe59f40141eb5223743'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          'fb37e34ea006c79be1c54cbb0f803414'
          'df69615503ad293c9ddf9d8b7755282d'
@@ -53,6 +53,8 @@ build() {
   patch -p1 -i "$srcdir/use-split-usr-path.patch"
 
   ./configure \
+      PYTHON=python2 \
+      PYTHON_CONFIG=python2-config \
       --libexecdir=/usr/lib \
       --localstatedir=/var \
       --sysconfdir=/etc \
@@ -60,7 +62,6 @@ build() {
       --disable-gtk-doc \
       --disable-audit \
       --disable-ima \
-      --with-distro=other \
       --with-firmware-path=/usr/lib/firmware/updates:/lib/firmware/updates:/usr/lib/firmware:/lib/firmware
 
   make
@@ -84,9 +85,6 @@ package() {
 
   # Remove rpm dir
   rm -r "$pkgdir/etc/rpm"
-
-  # https://pokersource.info/show_bug.cgi?id=50989
-  sed -i '1s/python$/python2/' "$pkgdir/usr/bin/systemd-analyze"
 
   install -dm755 "$pkgdir/sbin"
   for tool in runlevel reboot shutdown poweroff halt telinit; do
@@ -123,8 +121,6 @@ package() {
   # Make journalctl persistent
   install -dm755 "$pkgdir/var/log/journal"
   sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
-  # Moving previous .install enabled file, remove with #197
-  mv "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service" "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1new.service"
 }
 
 
