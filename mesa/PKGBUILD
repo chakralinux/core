@@ -55,13 +55,19 @@ package_libgl() {
   pkgdesc="Mesa 3-D graphics library and DRI software rasterizer"
   replaces=('unichrome-dri' 'mach64-dri' 'mga-dri' 'r128-dri' 'savage-dri' 'sis-dri' 'tdfx-dri')
 
-  cd ${srcdir}/?esa-*
-  install -m755 -d "${pkgdir}/usr/lib"
-  install -m755 -d "${pkgdir}/usr/lib/xorg/modules/extensions"
+  # linking because of split package
+  make -C ${srcdir}/?esa-*/src/mapi/shared-glapi DESTDIR="${pkgdir}" install
 
-  cd src/mesa/drivers/dri
+  # libGL & libdricore
+  make -C ${srcdir}/?esa-*/src/glx DESTDIR="${pkgdir}" install
+  make -C ${srcdir}/?esa-*/src/mesa/libdricore DESTDIR="${pkgdir}" install
+
+  # remove conflicting files
+  make -C ${srcdir}/?esa-*/src/mapi/shared-glapi DESTDIR="${pkgdir}" uninstall
+
   make -C ${srcdir}/?esa-*/src/gallium/targets/dri-swrast DESTDIR="${pkgdir}" install
 
+  install -m755 -d "${pkgdir}/usr/lib/xorg/modules/extensions"
   ln -s libglx.xorg "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so"
 
   install -m755 -d "${pkgdir}/usr/share/licenses/libgl"
@@ -72,8 +78,7 @@ package_libglapi() {
   depends=('glibc')
   pkgdesc="free implementation of the GL API -- shared library. The Mesa GL API module is responsible for dispatching all the gl* functions"
 
-  cd ${srcdir}/?esa-*   
-  install -m755 -d "${pkgdir}/usr/lib"
+  make -C ${srcdir}/?esa-*/src/mapi/shared-glapi DESTDIR="${pkgdir}" install
 
   install -m755 -d "${pkgdir}/usr/share/licenses/libglapi"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/libglapi/"
@@ -91,8 +96,11 @@ package_mesa() {
   make DESTDIR="${pkgdir}" install
 
   rm -f "${pkgdir}/usr/lib/libGL.so"*
+  rm -f "${pkgdir}/usr/lib/libGL.la"
   rm -f "${pkgdir}/usr/lib/libglapi.so"*
   rm -f "${pkgdir}/usr/lib/xorg/modules/dri/swrast_dri.so"*
+  make -C ${srcdir}/?esa-*/src/mapi/shared-glapi DESTDIR="${pkgdir}" uninstall
+  make -C ${srcdir}/?esa-*/src/mesa/libdricore DESTDIR="${pkgdir}" uninstall
 
   install -m755 -d "${pkgdir}/usr/share/licenses/mesa"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/mesa/"
