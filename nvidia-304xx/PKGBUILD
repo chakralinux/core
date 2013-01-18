@@ -3,18 +3,20 @@
 #
 # maintainer abveritas@chakra-project.org
 
-_extramodules=extramodules-3.6-CHAKRA
+_extramodules=extramodules-3.7-CHAKRA
 _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
 pkgver=304.51
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
-makedepends=('linux-headers' 'linux>=3.6' 'linux<3.7' "nvidia-304xx-utils=${pkgver}")
+makedepends=('linux-headers' 'linux>=3.7' 'linux<3.8' "nvidia-304xx-utils=${pkgver}")
 license=('custom')
-source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
-md5sums=('62d0cdb856cfae64753c0f3acf729d47')
+source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported"
+        'uapi-3.7.patch')
+md5sums=('62d0cdb856cfae64753c0f3acf729d47'
+        '42f2ad1cf9b48b1da8ed82200a045a8a')
 
     _ARCH='x86_64'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
@@ -25,12 +27,13 @@ build() {
     cd "${srcdir}"
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}/kernel"
+    patch -Np0 -i "${srcdir}/uapi-3.7.patch"
     make SYSSRC=/lib/modules/"${_kver}/build" module
 }
 
 package_nvidia-304xx() {
     pkgdesc="NVIDIA drivers for linux."
-    depends=('linux>=3.6' 'linux<3.7' "nvidia-304xx-utils=${pkgver}")
+    depends=('linux>=3.7' 'linux<3.8' "nvidia-304xx-utils=${pkgver}")
     conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia')
     install=nvidia.install
     
