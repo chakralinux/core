@@ -5,9 +5,9 @@
 
 pkgname=catalyst-utils
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 1x.x
-pkgver=12.12
+pkgver=13.1
 pkgrel=1
-_amdver=9.01
+_amdver=9.012
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('x86_64')
 url="http://www.amd.com/us/Pages/AMDHomePage.aspx"
@@ -20,14 +20,14 @@ provides=('libgl' "libatical=${pkgver}")
 install=${pkgname}.install
 
 source=(
-    http://www2.ati.com/drivers/embedded/9.01-121106a-150335C-EDG_Direct.zip
+    http://www2.ati.com/drivers/linux/amd-driver-installer-catalyst-${pkgver}-linux-x86.x86_64.zip
     catalyst.sh
     amdcccle.desktop
     atieventsd.service
     catalyst.conf
     hw_ati_legacy_hwdb)
 
-md5sums=('8682744e49fcd529a7e0c07a167d9df3'
+md5sums=('b5d9de9b000448dcc2a9eb74a889116d'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '4efa8414a8fe9eeb50da38b5522ef81d'
          'bccf181a981ff429fe66f6ca5c3ea75a'
@@ -35,7 +35,7 @@ md5sums=('8682744e49fcd529a7e0c07a167d9df3'
          'e88b99bb50f38bc96c880407b36b45a8')
 build() {
   ## Unpack archive
-    /bin/sh ./amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
+    /bin/sh ./amd-driver-installer-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
 }
 
 package() {
