@@ -6,7 +6,7 @@
 pkgname=pulseaudio
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=3.0
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
@@ -57,8 +57,7 @@ package() {
   sed -i '1s:python$:&2:' "${pkgdir}/usr/bin/qpaeq"
 
   rm "${pkgdir}/etc/dbus-1/system.d/pulseaudio-system.conf"
+  rm "${pkgdir}/etc/xdg/autostart/pulseaudio.desktop"
+  rm "${pkgdir}/etc/xdg/autostart/pulseaudio-kde.desktop"
   
-  # Delay of sound notification workaround, needs to be removed once fixed in systemd
-  #sed -i -e 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' "${pkgdir}/etc/pulse/default.pa"
-
 }
