@@ -5,7 +5,7 @@
 
 pkgname=ffmpeg
 pkgver=1.0.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('x86_64')
 url="http://ffmpeg.org/"
@@ -14,12 +14,20 @@ depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora'
          'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx>=1.1.0'
          'libva' 'openjpeg' 'rtmpdump' 'speex' 'gsm' 'pulseaudio')
 makedepends=('yasm')
-source=("http://${pkgname}.org/releases/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('dbbb88ce5525dea22b24aaa098a9bcc2')
+source=("http://${pkgname}.org/releases/${pkgname}-${pkgver}.tar.bz2"
+        "openjpeg1.5.1.patch"
+       )
+md5sums=('dbbb88ce5525dea22b24aaa098a9bcc2'
+         'a4b39642b8885e4cd7d4f30bdc043351')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
+   # openjpeg 1.5.1 is installed in a different place than 1.5.0, this patch makes it search there
+   # patch is from http://patches.libav.org/patch/32269/
+   # this patch should be unnecessary with newer versions of ffmpeg
+   mv ../openjpeg1.5.1.patch .
+   patch < openjpeg1.5.1.patch
   ./configure --prefix=/usr \
               --enable-libmp3lame \
               --enable-libvorbis \
@@ -54,4 +62,3 @@ package() {
   make DESTDIR="${pkgdir}" install install-man
   install -D -m755 tools/qt-faststart "${pkgdir}/usr/bin/qt-faststart"
 }
-
