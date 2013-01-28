@@ -6,14 +6,14 @@
 pkgname=hugin-tools
 _pkgname=hugin
 pkgver=2012.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Hugin libs and tools to be used by Kipi-plugins"
 arch=('x86_64')
 url="http://hugin.sourceforge.net/"
 license=('LGPL')
 depends=('boost-libs' 'enblend-enfuse' 'exiv2' 'openexr' 'libpano13>=2.9.18'
          'lapack' 'desktop-file-utils' 'icu' 'libxt' 'lensfun')
-makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap' 'python2' 'swig')
+makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap')
 conflict=('hugin')
 provides=('hugin')
 source=("http://downloads.sourceforge.net/${_pkgname}/${_pkgname}-${pkgver}.tar.bz2")
@@ -34,11 +34,12 @@ build() {
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_EXE_LINKER_FLAGS="-lpthread" \
-    -DENABLE_LAPACK=yes 
+    -DENABLE_LAPACK=yes \
+    -DBUILD_HSI=no
   make
 }
 
-package(){
+package() {
   cd "${srcdir}/build"
   make DESTDIR="${pkgdir}" install
 }
