@@ -9,7 +9,7 @@ pkgname=('linux' 'linux-headers' 'linux-docs') # Build stock -CHAKRA kernel
 # pkgname=linux-custom       # Build kernel with a different name
 _kernelname=${pkgname#linux}
 _basekernel=3.7
-pkgver=3.7.3
+pkgver=3.7.5
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -35,8 +35,8 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.7.tar.xz"
         'sp5100_tco-Add-SB8x0-chipset-support2.patch'
         'ath3k.patch')
 md5sums=('21223369d682bcf44bcdfe1521095983'
-         'd4aa39ec9610e9fbd7bb4f5aff2c5db8'
-         '327570e1825dd67b15b46215f5652ae5'
+         'c100b62e571bfb80e8c290e811c0963c'
+         '12e36473d668c31113d83eac0b0ae209'
          '2e33819e859125ba0176072d2cd5ac81'
          '6a1ffafeacb79be96c97e4638cea2452'
          '3074dfe1c01219b1b005a4e5f00e25cd'
@@ -63,7 +63,7 @@ build() {
   patch -p1 -i "${srcdir}/fat-3.6.x.patch"
   # "kernel: sp5100_tco: mmio address 0xfec000f0 already in use" error
   # https://bugzilla.kernel.org/show_bug.cgi?id=43176
-  patch -p1 -i "${srcdir}/sp5100_tco-Add-SB8x0-chipset-support2.patch"
+  #patch -p1 -i "${srcdir}/sp5100_tco-Add-SB8x0-chipset-support2.patch"
   # bug http://chakra-linux.org/bugs/index.php?do=details&task_id=501
   patch -p1 -i "${srcdir}/ath3k.patch"
 
