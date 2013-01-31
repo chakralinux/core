@@ -22,14 +22,11 @@ provides=('print-manager')
 replaces=('kdeadmin-system-config-printer' 'print-manager' 'kdeutils-printer-applet')
 conflicts=('print-manager')
 options=('docs' '!splithdr' 'splitdbg' 'log')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz"
-       'KCupsServer.diff' )
-md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
-         '6bd7c36cf84a9690237e1039faf78884')
+source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
+md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 
 build() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
-	patch -Rp1 -i ${srcdir}/KCupsServer.diff 
 	
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
                 -DCMAKE_INSTALL_PREFIX=${_installprefix} \
