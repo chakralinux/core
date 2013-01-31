@@ -5,9 +5,9 @@
 
 pkgbase=qt5
 pkgname=('qt5')
-pkgver=5.0.0
-_pkgver=5.0.0
-pkgrel=4
+pkgver=5.0.1
+_pkgver=5.0.1
+pkgrel=1
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -24,7 +24,7 @@ source=("http://origin.releases.qt-project.org/qt5/${_pkgver}/single/qt-everywhe
         'assistant.desktop' 'designer.desktop' 'linguist.desktop' 'qtconfig.desktop'
         'youtubeview.desktop' 'flickrview.desktop' 'browser.desktop' 'fancybrowser.desktop' 'qmlviewer.desktop'
         'defaultbookmarks_new.diff')
-md5sums=('6b4f2f3f1e6252fbce3a57ac5165baff'
+md5sums=('00a577bd88e682d1b4d01d41d1d699cf'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
@@ -38,7 +38,7 @@ md5sums=('6b4f2f3f1e6252fbce3a57ac5165baff'
 
 build() {
 	cd $srcdir/$_pkgfqn
-	patch -p0 -i "$srcdir/defaultbookmarks_new.diff"
+	patch -p1 -i "$srcdir/defaultbookmarks_new.diff"
 
         unset QTDIR
         export PATH="$PWD/qtbase/bin:$PWD/qtrepotools/bin:$PATH"
@@ -48,6 +48,7 @@ build() {
 		-system-sqlite \
                  -openssl-linked \
                  -nomake demos \
+                 -nomake tests \
                  -nomake examples \
                  -nomake docs \
                  -optimized-qmake \

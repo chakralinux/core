@@ -4,39 +4,30 @@
 # contributor Michael Haesel <michael DOT haesel AT gmail DOT com>
 # contributor Bartłomiej Piotrowski <nospam@bpiotrowski.pl>
 
-pkgname=mariadb
-pkgdesc="A fast SQL database server, drop-in replacement for MySQL"
-pkgver=5.5.28.a
-_pkgver=${pkgver/.a/a}
+pkgbase=mariadb
+pkgname=('libmariadbclient' 'mariadb-clients' 'mariadb')
+pkgver=5.5.29
 pkgrel=1
 arch=('x86_64')
 license=('GPL')
 url="http://mariadb.org/"
-backup=('etc/mysql/my.cnf')
-makedepends=('cmake' 'openssl' 'zlib')
-depends=('mariadb-clients')
-optdepends=('perl-dbi' 'perl-dbd-mysql')
-conflicts=('mysql')
-provides=("mysql=${_pkgver}")
-install=${pkgname}.install
-options=('!libtool' 'emptydirs')
-source=("http://mirrors.supportex.net/${pkgname}/${pkgname}-${_pkgver}/kvm-tarbake-jaunty-x86/${pkgname}-${_pkgver}.tar.gz"
+source=("http://mirrors.supportex.net/${pkgbase}/${pkgbase}-${pkgver}/kvm-tarbake-jaunty-x86/${pkgbase}-${pkgver}.tar.gz"
         'mariadb.service'
         'mariadb.tmpfiles')
-sha256sums=('66c908592763c641f2a1e9fd83f080458a0d3375cda9aaf7700a37877b1e9968'
+sha256sums=('b0e25b5451dbf8e8c8bf243bbd0aeb264db0da2caceafc7e2c9fad77b8d4be74'
             'ef3524c227ce0219e511fd4f3e17ec869fcde7ebf653d21e53bbf4d543cfcc20'
             '51ac45bce09f408d305dd770d75c7893e9f7612d9cf223a30aa22967dd7738de')
 
 build() {
   cd "${srcdir}"
-  mkdir build
+  #mkdir build
   cd build
 
   # CFLAGS/CXXFLAGS as suggested upstream
   CFLAGS="-fPIC ${CFLAGS} -fno-strict-aliasing -DBIG_JOINS=1 -fomit-frame-pointer" \
   CXXFLAGS="-fPIC ${CXXFLAGS} -fno-strict-aliasing -DBIG_JOINS=1 -felide-constructors -fno-rtti" \
 
-  cmake ../${pkgname}-${_pkgver} \
+  cmake ../${pkgbase}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DSYSCONFDIR=/etc/mysql \
@@ -73,7 +64,54 @@ build() {
   make
 }
 
-package() {
+package_libmariadbclient(){
+  pkgdesc="MariaDB client libraries"
+  depends=('openssl')
+  conflicts=('libmysqlclient')
+  provides=("libmysqlclient=${pkgver}")
+  
+  cd "${srcdir}"/build
+  for dir in include libmysql libmysqld libservices; do
+    make -C ${dir} DESTDIR="${pkgdir}" install
+  done
+
+  install -d "${pkgdir}"/usr/bin
+  install -m755 scripts/mysql_config "${pkgdir}"/usr/bin/
+  install -d "${pkgdir}"/usr/share/man/man1
+  for man in mysql_config mysql_client_test_embedded mysqltest_embedded; do
+    install -m644 "${srcdir}"/${pkgbase}-${pkgver}/man/$man.1 "${pkgdir}"/usr/share/man/man1/$man.1
+  done
+}
+
+package_mariadb-clients() {
+  pkgdesc="MariaDB client tools"
+  depends=('libmariadbclient')
+  conflicts=('mysql-clients')
+  provides=("mysql-clients=${pkgver}")
+  
+  cd "${srcdir}"/build
+  make -C client DESTDIR="${pkgdir}" install
+
+  # install man pages
+  install -d "${pkgdir}"/usr/share/man/man1
+  for man in mysql mysqladmin mysqlcheck mysqldump mysqlimport mysqlshow mysqlslap; do
+    install -m644 "${srcdir}"/${pkgbase}-${pkgver}/man/$man.1 "${pkgdir}"/usr/share/man/man1/$man.1
+  done
+
+  # provided by mariadb
+  rm "${pkgdir}"/usr/bin/{mysql_{plugin,upgrade},mysqlbinlog,mysqltest}
+}
+
+package_mariadb() {
+  pkgdesc="A fast SQL database server, drop-in replacement for MySQL"
+  backup=('etc/mysql/my.cnf')
+  install=mariadb.install
+  depends=('mariadb-clients')
+  conflicts=('mysql')
+  provides=("mysql=${pkgver}")
+  optdepends=('perl-dbi' 'perl-dbd-mysql')
+  options=('emptydirs')
+  
   cd "${srcdir}"/build
   make DESTDIR="${pkgdir}" install
 
