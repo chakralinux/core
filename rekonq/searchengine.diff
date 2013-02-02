@@ -1,0 +1,35 @@
+diff --git a/src/opensearch/searchengine.cpp b/src/opensearch/searchengine.cpp
+index aef06a7..2adb2a5 100644
+--- a/src/opensearch/searchengine.cpp
++++ b/src/opensearch/searchengine.cpp
+@@ -61,7 +61,7 @@ void SearchEngine::reload()
+ 
+     //load favorite engines
+     QStringList favoriteEngines;
+-    favoriteEngines = cg.readEntry("FavoriteSearchEngines", favoriteEngines);
++    favoriteEngines = cg.readEntry("PreferredWebShortcuts", favoriteEngines);
+     KService::List favorites;
+     KService::Ptr service;
+     Q_FOREACH(const QString & engine, favoriteEngines)
+@@ -78,7 +78,7 @@ void SearchEngine::reload()
+     d->favorites = favorites;
+ 
+     //load default engine
+-    QString dse = cg.readEntry("DefaultSearchEngine");
++    QString dse = cg.readEntry("DefaultWebShortcut");
+     d->defaultEngine = KService::serviceByDesktopPath(QString("searchproviders/%1.desktop").arg(dse));
+ 
+     d->isLoaded = true;
+diff --git a/src/urlbar/urlbar.cpp b/src/urlbar/urlbar.cpp
+index 21debce..f5b47b8 100644
+--- a/src/urlbar/urlbar.cpp
++++ b/src/urlbar/urlbar.cpp
+@@ -293,6 +293,8 @@ void UrlBar::keyPressEvent(QKeyEvent *event)
+     if (currentText.isEmpty())
+         return KLineEdit::keyPressEvent(event);
+ 
++    activateSuggestions(true);
++
+     // this handles the Modifiers + Return key combinations
+     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+     {

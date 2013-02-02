@@ -1,0 +1,56 @@
+#
+# Apps Packages for Chakra, part of chakra-project.org
+#
+# maintainer: abveritas@chakra-project.org
+
+pkgname=rekonq
+pkgver=2.1
+pkgrel=2
+pkgdesc='A WebKit based web browser for KDE'
+arch=('x86_64')
+url='http://rekonq.sourceforge.net/'
+license=('GPL')
+depends=('kde-baseapps' 'qoauth' 'qca-ossl')
+makedepends=('cmake' 'automoc4' 'docbook-xsl')
+categories=('network')
+screenshot=('http://rekonq.kde.org/sites/rekonq.kde.org/files/images/Rekonq-0.6.0.png')
+install=${pkgname}.install
+source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
+        'background.png'
+        'background.diff'
+        'searchengine.diff')
+md5sums=('90b3737246feb22a8f142f9c45d31512'
+         'cd493df91e34030a8195eaf8b6d68140'
+         '5d7bab51b8f4b78c0f7cd94c885f22c3'
+         '7ab9dc2e4397a66c7a64e08265171996')
+         
+# source PKGBUILD && mksource
+mksource() {
+  git clone git://anongit.kde.org/rekonq.git
+  pushd rekonq
+  popd
+  tar -cvJf rekonq-${pkgver}.tar.xz rekonq/*
+  md5sum rekonq-${pkgver}.tar.xz
+}
+
+build(){
+  cd ${srcdir}/${pkgname}-${pkgver}  
+  # Chakra theme:
+  patch -p1 -i "${srcdir}/background.diff"
+  
+  cd ${srcdir}
+  mkdir -p build 
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  make 
+}
+
+package() {
+  cd ${srcdir}/build
+  
+  make DESTDIR=${pkgdir} install
+  rm ${pkgdir}/usr/share/apps/rekonq/pics/background.png
+  install -m 644 -p ${srcdir}/background.png ${pkgdir}/usr/share/apps/rekonq/pics/background.png
+}

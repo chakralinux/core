@@ -7,10 +7,6 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-
-#
-# package info
-#
 pkgbase=('kdesdk')
 pkgname=('kdesdk-cervisia'
 	 'kdesdk-dolphin-plugins'
@@ -34,7 +30,7 @@ pkgname=('kdesdk-cervisia'
 	 'kdesdk-thumbnailers'
          'kdesdk-umbrello')
 
-arch=('i686' 'x86_64')
+arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 
@@ -50,14 +46,8 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' "kde-runtime>=${_kdever}" 'a
 source=("$_mirror/${pkgbase}-$_kdever.tar.xz")
 md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 
-#
-# build function
-#
 build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
-
-	#patch -p0 -i ${startdir}/fixdoc.patch
-	#patch -p0 -i ${startdir}/fixbuild.patch
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
@@ -67,9 +57,6 @@ build() {
 }
 
 
-#
-# split-install functions
-#
 package_kdesdk-dolphin-plugins() {
 	pkgdesc='Extra Dolphin plugins'
 	depends=("kde-baseapps-dolphin>=${_kdever}" 'subversion' 'git' "kdesdk-kompare>=${_kdever}")

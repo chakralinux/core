@@ -1,0 +1,49 @@
+#
+# Apps Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Anke Boersma <abveritas@chakra-project.org>
+# contributor: Neophytos Kolokotronis <tetris4@gmail.com>
+# contributor: Fabian Kosmale <0inkane@googlemail.com>
+
+pkgname=qupzilla
+pkgver=1.3.5
+pkgrel=8
+_commit=8f06ad8
+pkgdesc="A very fast open source browser based on WebKit core"
+url="http://www.qupzilla.com"
+arch=('x86_64')
+license=('GPL3')
+depends=('qtwebkit' 'qtwebkit-plugins')
+categories=('network') 
+source=("https://github.com/QupZilla/QupZilla/tarball/master/QupZilla-qupzilla-${pkgver}.tar.gz"
+        #"https://github.com/downloads/QupZilla/qupzilla/QupZilla-${pkgver}.tar.gz"
+        'searchenginesmanager.diff'
+        'speeddial.diff'
+        'preferences.diff'
+        'qupzilla.diff'
+        'start-white.png')
+md5sums=('1c103e6d394058027316fa29d66e1d34'
+         'c5c0f9e3640d0f5695034aef63648967'
+         'b58d03f2e52ea3391e63c0eeea3e82a4'
+         'c2bf22cac2fcdd6ea82ab7fcdd08a706'
+         '152c8168e80e3a1c8987aa895d9f0d48'
+         'fc705d7aba952361a626a2c79726bbfa')
+
+build() {
+   cd "${srcdir}/QupZilla-qupzilla-${_commit}/"
+   patch -p0 -i "${srcdir}/searchenginesmanager.diff"
+   patch -p0 -i "${srcdir}/speeddial.diff"
+   patch -p0 -i "${srcdir}/preferences.diff"
+   patch -p0 -i "${srcdir}/qupzilla.diff"
+   export USE_WEBGL="true"
+   export KDE="true"
+   qmake QupZilla.pro
+   make
+}
+
+package() {
+   cd "${srcdir}/QupZilla-qupzilla-${_commit}/"
+   mkdir -p ${pkgdir}/usr/share/icons
+   install -m 644 -p ${srcdir}/start-white.png ${pkgdir}/usr/share/icons/
+   make INSTALL_ROOT=$pkgdir install
+}

@@ -1,15 +1,11 @@
 #
 # KDE SC Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-#
-# package info
-#
 pkgbase=('kdetoys')
 pkgname=('kdetoys-amor'
          'kdetoys-kteatime'
@@ -29,10 +25,6 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' "kde-workspace>=${_kdever}")
 source=($_mirror/${pkgbase}-$_kdever.tar.xz)
 md5sums=(`grep ${pkgbase}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 
-
-#
-# build function
-#
 build() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
 
@@ -46,9 +38,6 @@ build() {
 	make || return 1
 }
 
-#
-# split-install functions
-#
 package_kdetoys-amor() {
 	pkgdesc="Amusing Misuse Of Resources puts comic figures above your windows"
 	conflicts=("kdetoys-common" "kdetoys-doc")
