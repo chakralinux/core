@@ -1,0 +1,107 @@
+ 2013-01-22  Anders Carlsson  <andersca@apple.com>
+ 
+         Use a platforom strategy for local storage
+diff --git a/Source/WebCore/page/DOMWindow.cpp b/Source/WebCore/page/DOMWindow.cpp
+index 2f51a81750ca5cd8f5bd5d24decde0845e0afc6a..61f9a6bd1465cf650aed0a5681dba73e8c74df3d 100644
+--- a/Source/WebCore/page/DOMWindow.cpp
++++ b/Source/WebCore/page/DOMWindow.cpp
+@@ -339,8 +339,11 @@ FloatRect DOMWindow::adjustWindowRect(Page* page, const FloatRect& pendingChange
+         window.setHeight(pendingChanges.height());
+ 
+     FloatSize minimumSize = page->chrome()->client()->minimumWindowSize();
+-    window.setWidth(min(max(minimumSize.width(), window.width()), screen.width()));
+-    window.setHeight(min(max(minimumSize.height(), window.height()), screen.height()));
++    // Let size 0 pass through, since that indicates default size, not minimum size.
++    if (window.width())
++        window.setWidth(min(max(minimumSize.width(), window.width()), screen.width()));
++    if (window.height())
++        window.setHeight(min(max(minimumSize.height(), window.height()), screen.height()));
+ 
+     // Constrain the window position within the valid screen area.
+     window.setX(max(screen.x(), min(window.x(), screen.maxX() - window.width())));
+diff --git a/Source/WebKit/qt/tests/qwebpage/tst_qwebpage.cpp b/Source/WebKit/qt/tests/qwebpage/tst_qwebpage.cpp
+index 2853d600a2f15fbdc26bad512a7fe58c23888425..aae3bbcca422a96a2a00c12a3d1c57e33e1fbe2a 100644
+--- a/Source/WebKit/qt/tests/qwebpage/tst_qwebpage.cpp
++++ b/Source/WebKit/qt/tests/qwebpage/tst_qwebpage.cpp
+@@ -186,6 +186,7 @@ private Q_SLOTS:
+     void renderOnRepaintRequestedShouldNotRecurse();
+     void loadSignalsOrder_data();
+     void loadSignalsOrder();
++    void openWindowDefaultSize();
+ 
+ #ifdef Q_OS_MAC
+     void macCopyUnicodeToClipboard();
+@@ -410,10 +411,13 @@ void tst_QWebPage::consoleOutput()
+     QCOMPARE(page.lineNumbers.at(0), 1);
+ }
+ 
+-class TestPage : public QWebPage
+-{
++class TestPage : public QWebPage {
++    Q_OBJECT
+ public:
+-    TestPage(QObject* parent = 0) : QWebPage(parent) {}
++    TestPage(QObject* parent = 0) : QWebPage(parent)
++    {
++        connect(this, SIGNAL(geometryChangeRequested(QRect)), this, SLOT(slotGeometryChangeRequested(QRect)));
++    }
+ 
+     struct Navigation {
+         QPointer<QWebFrame> frame;
+@@ -422,7 +426,8 @@ public:
+     };
+ 
+     QList<Navigation> navigations;
+-    QList<QWebPage*> createdWindows;
++    QList<TestPage*> createdWindows;
++    QRect requestedGeometry;
+ 
+     virtual bool acceptNavigationRequest(QWebFrame* frame, const QNetworkRequest &request, NavigationType type) {
+         Navigation n;
+@@ -434,10 +439,15 @@ public:
+     }
+ 
+     virtual QWebPage* createWindow(WebWindowType) {
+-        QWebPage* page = new TestPage(this);
++        TestPage* page = new TestPage(this);
+         createdWindows.append(page);
+         return page;
+     }
++
++private Q_SLOTS:
++    void slotGeometryChangeRequested(const QRect& geom) {
++        requestedGeometry = geom;
++    }
+ };
+ 
+ void tst_QWebPage::popupFormSubmission()
+@@ -3253,5 +3263,29 @@ void tst_QWebPage::undoActionHaveCustomText()
+     QVERIFY(typingActionText != alignActionText);
+ }
+ 
++void tst_QWebPage::openWindowDefaultSize()
++{
++    TestPage page;
++    page.settings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
++    // Open a default window.
++    page.mainFrame()->evaluateJavaScript("window.open()");
++    // Open a too small window.
++    page.mainFrame()->evaluateJavaScript("window.open('', '', 'width=10,height=10')");
++
++    QTest::qWait(500);
++    // The number of popups created should be two.
++    QVERIFY(page.createdWindows.size() == 2);
++
++    QRect requestedGeometry = page.createdWindows[0]->requestedGeometry;
++    // Check default size has been requested.
++    QVERIFY(requestedGeometry.width() == 0);
++    QVERIFY(requestedGeometry.height() == 0);
++
++    requestedGeometry = page.createdWindows[1]->requestedGeometry;
++    // Check minimum size has been requested.
++    QVERIFY(requestedGeometry.width() == 100);
++    QVERIFY(requestedGeometry.height() == 100);
++}
++
+ QTEST_MAIN(tst_QWebPage)
+ #include "tst_qwebpage.moc"
