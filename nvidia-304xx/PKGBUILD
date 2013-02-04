@@ -14,9 +14,11 @@ url="http://www.nvidia.com/"
 makedepends=('linux-headers' 'linux>=3.7' 'linux<3.8' "nvidia-304xx-utils=${pkgver}")
 license=('custom')
 source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported"
-        'uapi-3.7.patch')
+        'uapi-3.7.patch'
+        'conftest_new.diff')
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-        '42f2ad1cf9b48b1da8ed82200a045a8a')
+         '42f2ad1cf9b48b1da8ed82200a045a8a'
+         'd33b6506540aa3c52272b6b655d52647')
 
     _ARCH='x86_64'
     _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
@@ -26,8 +28,10 @@ md5sums=('62d0cdb856cfae64753c0f3acf729d47'
 build() {
     cd "${srcdir}"
     sh "${_pkg}.run" --extract-only
+    patch -p1 -i "${srcdir}/conftest_new.diff"
     cd "${_pkg}/kernel"
-    patch -Np0 -i "${srcdir}/uapi-3.7.patch"
+    patch -p0 -i "${srcdir}/uapi-3.7.patch"
+    
     make SYSSRC=/lib/modules/"${_kver}/build" module
 }
 
