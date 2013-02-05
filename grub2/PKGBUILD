@@ -11,7 +11,7 @@ if [ "${CARCH}" == 'x86_64' ]; then
 fi
 
 pkgver=2.00
-pkgrel=4
+pkgrel=5
 arch=('x86_64')
 url="http://www.gnu.org/software/grub/"
 license=('GPL3')
@@ -22,10 +22,12 @@ makedepends=('xz' 'bdf-unifont' 'ttf-dejavu' 'python' 'autogen'
 
 source=("ftp://ftp.gnu.org/gnu/grub/grub-${pkgver}.tar.xz"
         'chakra_grub2_fixes.patch'
+        'quote-strings-in-grub.cfg.patch' 
         'grub.default'
         'update-grub')
 md5sums=('a1043102fbc7bcedbf53e7ee3d17ab91'
          'bc191bc9e298380c1d5995c0faafa75a'
+         '3ad276456daa36cf2a1de678827043f3'
          '31e4c7414cef3db3fb26c40ac8da97f2'
          '9910bdfd42fa7d3e21e6961bfcc977f9')
 
@@ -68,6 +70,7 @@ _build_prepare() {
   msg2 "Applying patches..."
     cd "${srcdir}/grub-${pkgver}"
     patch -Np1 -i "${srcdir}/chakra_grub2_fixes.patch" || return 1
+    patch -Np0 -i "${srcdir}/quote-strings-in-grub.cfg.patch" || return 1
   msg2 "Done patching."
 
   msg2 "Cloning the grub-extras repositories..."
