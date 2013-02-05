@@ -6,7 +6,7 @@
 
 pkgname=dkms
 pkgver=2.2.0.3
-pkgrel=11
+pkgrel=12
 pkgdesc='Dynamic Kernel Modules System'
 arch=('x86_64')
 url='http://linux.dell.com/dkms/'
@@ -16,10 +16,12 @@ backup=('etc/dkms/framework.conf')
 source=("http://linux.dell.com/$pkgname/permalink/$pkgname-$pkgver.tar.gz"
         "$pkgname.service"
         "$pkgname.systemd"
+        "$pkgname.default"
         '01-broken-uninstall.patch')
 md5sums=('11a8aaade2ebec2803653837c7593030'
          '02e9744e3fdc3d2f68e46966fb32e260'
-         '51c80e29c0ca600b4737c573d3311dbc'
+         '267632312aa52a190ec0db0758920dd3'
+         '33be2fbf1bcc1b3fb2f38d9e7eaa809d'
          '4e3a580c09b5af8de7ffde0b61bdcfcf')
 
 build() {
@@ -46,5 +48,6 @@ package() {
   # add systemd
   install -D -m 644 $pkgname.service "$pkgdir/usr/lib/systemd/system/$pkgname.service"
   install -D -m 755 $pkgname.systemd "$pkgdir/usr/lib/systemd/scripts/$pkgname"
+  install -D -m 644 $pkgname.default "$pkgdir/etc/default/$pkgname"
 }
 
