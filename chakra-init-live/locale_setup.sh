@@ -25,7 +25,7 @@ get_keyboard() {
   echo $KEYBOARD
 }
 
-get_layout {
+get_layout() {
   local LAYOUT=$(get_bootparam_value layout)
   echo $LAYOUT
 }
