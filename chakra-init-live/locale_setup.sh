@@ -21,7 +21,7 @@ get_country() {
 }
 
 get_keyboard() {
-  local KEYBOARD=$(get_bootparam_value keymap)
+  local KEYBOARD=$(get_bootparam_value keytable)
   echo $KEYBOARD
 }
 
