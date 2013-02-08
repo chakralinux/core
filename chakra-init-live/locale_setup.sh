@@ -41,12 +41,12 @@ set_locale() {
   # good defult settings
   [ -n "$LOCALE" ] || LOCALE="en_US"
   [ -n "$KEYMAP" ] || KEYMAP="us"
-  [ -n "$kBLAYOUT" ] || KBLAYOUT="us"
+  [ -n "$KBLAYOUT" ] || KBLAYOUT="us"
 
-  # comment out all locales which we don't need
-  sed  -i "s/^/#/g" /etc/locale.gen
+  # set vconsole.conf
+  echo "KEYMAP=\"${KEYMAP}\"" >> /etc/vconsole.conf 
 
-  # Generate 10-keyboard.conf
+  # generate 10-keyboard.conf
   mkdir -p /etc/X11/xorg.conf.d
   echo "Section \"InputClass\"" >> /etc/X11/xorg.conf.d/10-keyboard.conf
   echo "    Identifier             \"Keyboard Defaults\"" >> /etc/X11/xorg.conf.d/10-keyboard.conf
@@ -62,6 +62,8 @@ set_locale() {
   echo "LC_MESSAGES=${LOCALE}.UTF-8" >> /etc/locale.conf
 
   # generate LOCALE
+  # comment out all locales which we don't need
+  sed  -i "s/^/#/g" /etc/locale.gen
   local TLANG=${LOCALE%.*} # remove everything after the ., including the dot from LOCALE
   sed -i -r "s/#(.*${TLANG}.*UTF-8)/\1/g" /etc/locale.gen
   # add also American English as safe default
