@@ -55,6 +55,7 @@ set_locale() {
   if [ "$KEYMAP" = "dvorak" ] ; then 
       echo "    Option                 \"XkbVariant\" \"dvorak\"" >> /etc/X11/xorg.conf.d/10-keyboard.conf
   fi
+  echo "EndSection" >> /etc/X11/xorg.conf.d/10-keyboard.conf
 	
   # set systemwide language
   echo "LANG=${LOCALE}.UTF-8" > /etc/locale.conf
