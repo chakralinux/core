@@ -51,7 +51,7 @@ set_locale() {
   echo "Section \"InputClass\"" >> /etc/X11/xorg.conf.d/10-keyboard.conf
   echo "    Identifier             \"Keyboard Defaults\"" >> /etc/X11/xorg.conf.d/10-keyboard.conf
   echo "    MatchIsKeyboard        \"yes\"" >> /etc/X11/xorg.conf.d/10-keyboard.conf	
-  echo "    Option                 \"XkbLayout\" \"${KBLAYOUT}\"" /etc/X11/xorg.conf.d/10-keyboard.conf
+  echo "    Option                 \"XkbLayout\" \"${KBLAYOUT}\"" >> /etc/X11/xorg.conf.d/10-keyboard.conf
   if [ "$KEYMAP" = "dvorak" ] ; then 
       echo "    Option                 \"XkbVariant\" \"dvorak\"" >> /etc/X11/xorg.conf.d/10-keyboard.conf
   fi
@@ -68,4 +68,3 @@ set_locale() {
   sed -i -r "s/#(en_US.*UTF-8)/\1/g" /etc/locale.gen
   locale-gen
 }
-
