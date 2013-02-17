@@ -1,17 +1,16 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=postfix
-pkgver=2.9.4
+pkgver=2.10.0
 pkgrel=1
 pkgdesc='Secure, fast, easy to administer alternative to Sendmail'
 url='http://www.postfix.org/'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('custom')
-depends=('pcre' 'libsasl' 'libmysqlclient' 'postgresql-libs' 'sqlite3' 'libldap' 'db')
+depends=('pcre' 'libsasl' 'libmariadbclient' 'postgresql-libs' 'sqlite3' 'libldap' 'db')
 backup=('etc/postfix/'{access,aliases,canonical,generic,header_checks,main.cf,master.cf,relocated,transport,virtual})
 provides=('smtp-server' 'smtp-forwarder')
 replaces=('postfix-mysql' 'postfix-pgsql')
@@ -20,9 +19,9 @@ install=$pkgname.install
 source=("ftp://ftp.porcupine.org/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz"
         'aliases.patch'
         'postfix.service')
-sha256sums=('58343afcc727594cc1f9a3980562d8199aa55fc2cf2330da6b9ddfbf31502679'
-            'f4c766efc20b4638f9fd72707ca6d4c2628279ebd79f5227276fa4ca6867c336'
-            'f73f0fb12fb46cdc1b7afbfd184e0dcbd63ff6ca91f0d996a40fe184c6ab26cb')
+md5sums=('b2a563b2d5c53462952886e6fc4e4b7b'
+         '9cc2ee3c72e134c2da5a895abaa56f30'
+         '24af169de13c34dac03d787c3e607ec5')
 
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
