@@ -8,7 +8,7 @@
 
 pkgname=glibc
 pkgver=2.15
-pkgrel=3
+pkgrel=4
 _glibcdate=20120419
 pkgdesc="GNU C Library"
 arch=('x86_64')
@@ -292,10 +292,9 @@ package() {
                         usr/lib/getconf/* \
                         usr/sbin/{iconvconfig,nscd}
 
-  strip $STRIP_STATIC usr/lib/*.a \
-                      lib/{{ld,libpthread}-${pkgver},libthread_db-1.0}.so
+  strip $STRIP_STATIC usr/lib/*.a 
 
-  strip $STRIP_SHARED lib/{libanl,libBrokenLocale,libc,libcidn,libcrypt}-${pkgver}.so \
+  strip $STRIP_SHARED lib/{libanl,libBrokenLocale,libcidn,libcrypt}-${pkgver}.so \
                       lib/libnss_{compat,dns,files,hesiod,nis,nisplus}-${pkgver}.so \
                       lib/{libdl,libm,libnsl,libresolv,librt,libutil}-${pkgver}.so \
                       lib/{libmemusage,libpcprofile,libSegFault}.so \
