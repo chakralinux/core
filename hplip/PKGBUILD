@@ -3,9 +3,9 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=hplip
-pkgver=3.12.11
+pkgver=3.13.2
 # incase a or b is used in hplip rls:
-_pkgver=3.12.11
+_pkgver=3.13.2
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('i686' 'x86_64')
@@ -24,7 +24,7 @@ options=('!libtool')
 install=${pkgname}.install
 source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${_pkgver}.tar.gz"
 	"cups-1.6-buildfix.diff")
-sha256sums=('c5b81167b21aa4ee6bdf3f5c120bfa050d0c794608da8bcc32e2580234919ffa'
+sha256sums=('7dee21c30a15729b2107713a1b779ea07982064a38e2d4935e58e6f56d6d3592'
             '9813f754670f9b4a01e6094c673f63ac62421817c7eb463999abf828358e67df')
 
 build() {
@@ -79,6 +79,9 @@ package() {
   # remove config provided by sane and autostart of hp-daemon
   rm -rf "${pkgdir}"/etc/{sane.d,xdg}
   
-  # remove HAL .fdi file because HAL is no longer used
+  # remove HAL .fdi file 
   rm -rf "${pkgdir}"/usr/share/hal
+  
+  # remove rc
+  rm -rf "$pkgdir"/etc/init.d
 }
