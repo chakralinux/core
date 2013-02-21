@@ -1,0 +1,92 @@
+#
+# static Qt package used by akabai
+#
+# maintainer abveritas@chakra-project.org
+
+pkgbase=qt
+pkgname=('qt-static' 'qt-private-headers-static')
+pkgver=4.8.4
+pkgrel=1
+arch=('x86_64')
+url='http://qt.nokia.com/'
+license=('GPL3' 'LGPL')
+makedepends=('glib2' 'dbus')
+options=('!libtool')
+_pkgfqn="qt-everywhere-opensource-src-${pkgver}"
+source=("http://releases.qt-project.org/qt4/source/${_pkgfqn}.tar.gz"
+         'qt_no_debug.patch' 'qlocale.diff')
+md5sums=('89c5ecba180cae74c66260ac732dc5cb'
+         '993d1c443b8b145ecc8ba1fde174a8ff'
+         'dbe1d4ab2ca0205eebf82490abed2934')
+
+build() {
+	cd $srcdir/$_pkgfqn
+
+        # from Fedora, removing "QDBusConnection:..." message for qt apps
+	patch -p1 -i "${srcdir}"/qt_no_debug.patch
+	# Slovak locale issue bug https://bugreports.qt-project.org/browse/QTBUG-28843
+	patch -p1 -i "${srcdir}"/qlocale.diff
+
+        export QT4DIR="${srcdir}"/${_pkgfqn}
+        export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
+
+        sed -i "s|-O2|${CXXFLAGS}|" mkspecs/common/{g++,gcc}-base.conf
+        sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" mkspecs/common/gcc-base-unix.conf
+        sed -i "/^QMAKE_LFLAGS\s/s|+=|+= ${LDFLAGS}|g" mkspecs/common/gcc-base.conf
+
+	./configure -static -confirm-license -opensource \
+		-prefix /usr \
+		-docdir /usr/share/doc/qtstatic \
+		-plugindir /usr/lib/qtstatic/plugins \
+		-importdir /usr/lib/qtstatic/imports \
+		-datadir /usr/share/qtstatic \
+		-translationdir /usr/share/qtstatic/translations \
+		-sysconfdir /etc/xdg \ 
+                \ #now disable everything we don't need, inspiration taken from gentoo's qtcore ebuild
+                -no-accessibility -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon
+ 	        -no-phonon-backend -no-svg -no-webkit -no-script -no-scripttools -no-declarative
+ 	        -system-zlib -no-gif -no-libtiff -no-libpng -no-libmng -no-libjpeg
+ 	        -no-cups -no-gtkstyle -no-nas-sound -no-opengl -no-openvg
+ 	        -no-sm -no-xshape -no-xvideo -no-xsync -no-xinerama -no-xcursor -no-xfixes
+ 	        -no-xrandr -no-xrender -no-mitshm -no-fontconfig -no-freetype -no-xinput -no-xkb 
+                -nomake demos \
+                -nomake examples \
+                -nomake tools \
+                -openssl-linked \
+                -silent \
+                -no-rpath \
+                -optimized-qmake \
+                -reduce-relocations \
+                -dbus-linked \
+                -no-openvg \
+                -xcursor
+         make sub-tools-bootstrap
+         make sub-moc
+         make sub-rcc
+         make sub-corelib
+}
+
+package_qt-static() {
+    pkgdesc='A cross-platform application and UI framework'
+    depends=('glib2' 'dbus')
+    conflicts=('qt-doc' 'qt-demos' 'qt-tools')
+    provides=('qt-tools')
+	
+    cd $srcdir/$_pkgfqn
+	make INSTALL_ROOT=$pkgdir install
+
+	find ${pkgdir}/usr/lib/pkgconfig -type f -name '*.pc' \
+		-exec perl -pi -e "s, -L${srcdir}/?\S+,,g" {} \;
+	# Fix wrong path in prl files
+	find ${pkgdir}/usr/lib -type f -name '*.prl' \
+		-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
+}
+
+package_qt-private-headers-static() {
+    pkgdesc="Qt private headers for development"
+    depends=("qtstatic=${pkgver}")
+
+    install -d ${pkgdir}/usr/include/QtCore
+    install -d ${pkgdir}/usr/src/corelib
+    
+}
