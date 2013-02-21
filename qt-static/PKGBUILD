@@ -1,16 +1,18 @@
 #
 # static Qt package used by akabai
 #
-# maintainer abveritas@chakra-project.org
-
-pkgbase=qt
-pkgname=('qt-static' 'qt-private-headers-static')
+# maintainer 0inkane@googlemail.com 
+pkgname='qt-static' 
 pkgver=4.8.4
 pkgrel=1
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
-makedepends=('glib2' 'dbus')
+pkgdesc='static version of QtCore'
+depends=('glib2' 'dbus' 'zlib')
+conflicts=('qt-doc' 'qt-demos' 'qt-tools')
+provides=('qt-tools')
+makedepends=('glib2' 'dbus' 'zlib' 'mesa')
 options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("http://releases.qt-project.org/qt4/source/${_pkgfqn}.tar.gz"
@@ -34,22 +36,21 @@ build() {
         sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" mkspecs/common/gcc-base-unix.conf
         sed -i "/^QMAKE_LFLAGS\s/s|+=|+= ${LDFLAGS}|g" mkspecs/common/gcc-base.conf
 
+        #disable everything we don't need, inspiration taken from gentoo's qtcore ebuild
 	./configure -static -confirm-license -opensource \
 		-prefix /usr \
 		-docdir /usr/share/doc/qtstatic \
-		-plugindir /usr/lib/qtstatic/plugins \
 		-importdir /usr/lib/qtstatic/imports \
 		-datadir /usr/share/qtstatic \
 		-translationdir /usr/share/qtstatic/translations \
-		-sysconfdir /etc/xdg \ 
-                \ #now disable everything we don't need, inspiration taken from gentoo's qtcore ebuild
-                -no-accessibility -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon
- 	        -no-phonon-backend -no-svg -no-webkit -no-script -no-scripttools -no-declarative
- 	        -system-zlib -no-gif -no-libtiff -no-libpng -no-libmng -no-libjpeg
- 	        -no-cups -no-gtkstyle -no-nas-sound -no-opengl -no-openvg
- 	        -no-sm -no-xshape -no-xvideo -no-xsync -no-xinerama -no-xcursor -no-xfixes
- 	        -no-xrandr -no-xrender -no-mitshm -no-fontconfig -no-freetype -no-xinput -no-xkb 
-                -nomake demos \
+                -headerdir /usr/qtstatic/include \
+                -no-accessibility -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon \
+ 	        -no-phonon-backend -no-svg -no-webkit -no-script -no-scripttools -no-declarative \
+ 	        -system-zlib -no-gif -no-libtiff -no-libpng -no-libmng -no-libjpeg \
+ 	        -no-cups -no-gtkstyle -no-nas-sound -no-opengl -no-openvg \
+ 	        -no-sm -no-xshape -no-xvideo -no-xsync -no-xinerama -no-xcursor -no-xfixes \
+ 	        -no-xrandr -no-xrender -no-mitshm -no-fontconfig -no-freetype -no-xinput -no-xkb \
+               	-nomake demos \
                 -nomake examples \
                 -nomake tools \
                 -openssl-linked \
@@ -59,34 +60,20 @@ build() {
                 -reduce-relocations \
                 -dbus-linked \
                 -no-openvg \
-                -xcursor
+                -no-xcursor
          make sub-tools-bootstrap
          make sub-moc
          make sub-rcc
          make sub-corelib
 }
 
-package_qt-static() {
-    pkgdesc='A cross-platform application and UI framework'
-    depends=('glib2' 'dbus')
-    conflicts=('qt-doc' 'qt-demos' 'qt-tools')
-    provides=('qt-tools')
-	
+package() {
     cd $srcdir/$_pkgfqn
-	make INSTALL_ROOT=$pkgdir install
+    make INSTALL_ROOT=$pkgdir install
 
-	find ${pkgdir}/usr/lib/pkgconfig -type f -name '*.pc' \
-		-exec perl -pi -e "s, -L${srcdir}/?\S+,,g" {} \;
-	# Fix wrong path in prl files
-	find ${pkgdir}/usr/lib -type f -name '*.prl' \
-		-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
-}
-
-package_qt-private-headers-static() {
-    pkgdesc="Qt private headers for development"
-    depends=("qtstatic=${pkgver}")
-
-    install -d ${pkgdir}/usr/include/QtCore
-    install -d ${pkgdir}/usr/src/corelib
-    
+    find ${pkgdir}/usr/lib/pkgconfig -type f -name '*.pc' \
+	-exec perl -pi -e "s, -L${srcdir}/?\S+,,g" {} \;
+    # Fix wrong path in prl files
+    find ${pkgdir}/usr/lib -type f -name '*.prl' \
+	-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
 }
