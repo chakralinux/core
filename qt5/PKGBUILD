@@ -4,10 +4,10 @@
 # maintainer abveritas@chakra-project.org
 
 pkgbase=qt5
-pkgname=('qt5')
+pkgname=('qt5' 'qt5-private-headers')
 pkgver=5.0.1
 _pkgver=5.0.1
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -44,24 +44,36 @@ build() {
         export PATH="$PWD/qtbase/bin:$PWD/qtrepotools/bin:$PATH"
 
 	./configure -confirm-license -opensource \
-		-prefix /opt/qt5 \
+		-prefix /usr \
+                -bindir /usr/lib/qt5/bin \
+                -headerdir /usr/include/qt5 \
+                -archdatadir /usr/lib/qt5 \
+                -docdir /usr/share/doc/qt5 \
+                -plugindir /usr/lib/qt5/plugins \
+                -importdir /usr/lib/qt5/imports \
+                -qmldir /usr/lib/qt5/imports \
+                -datadir /usr/share/qt5 \
+                -testsdir /usr/share/qt5/tests \
+                -translationdir /usr/share/qt5/translations \
+                -sysconfdir /etc/xdg/qt5 \
+                -examplesdir /usr/share/qt5/examples \
 		-system-sqlite \
-                 -openssl-linked \
-                 -nomake demos \
-                 -nomake tests \
-                 -nomake examples \
-                 -nomake docs \
-                 -optimized-qmake \
-                 -reduce-relocations \
-                 -dbus-linked \
-                 -no-openvg \
-                 -no-separate-debug-info \
-                 -no-gtkstyle \
-                 -opengl \
-                 -feature-menu \
-                 -feature-textdate \
-                 -feature-ftp \
-                 -xcursor
+                -openssl-linked \
+                -nomake demos \
+                -nomake tests \
+                -nomake examples \
+                -nomake docs \
+                -optimized-qmake \
+                -reduce-relocations \
+                -dbus-linked \
+                -no-openvg \
+                -no-separate-debug-info \
+                -no-gtkstyle \
+                -opengl \
+                -feature-menu \
+                -feature-textdate \
+                -feature-ftp \
+                -xcursor
 	 make
 	 #./configure -prefix $PWD/qtbase -opensource
          #make module-qtwebkit
@@ -88,26 +100,29 @@ package_qt5() {
     install -d ${pkgdir}/usr/share/applications
     install -m644 ${srcdir}/youtubeview.desktop ${pkgdir}/usr/share/applications/
     install -m644 ${srcdir}/flickrview.desktop ${pkgdir}/usr/share/applications/
-    install -m644 ${srcdir}/browser.desktop ${pkgdir}/usr/share/applications/
-    install -m644 ${srcdir}/fancybrowser.desktop ${pkgdir}/usr/share/applications/
     install -m644 ${srcdir}/qmlviewer.desktop ${pkgdir}/usr/share/applications/
+    
+    mkdir -p ${pkgdir}/usr/bin
+    for i in $(ls ${pkgdir}/usr/lib/qt5/bin); do
+        ln -s /usr/lib/qt5/bin/${i} ${pkgdir}/usr/bin/${i}-qt5
+    done
 }
 
 package_qt5-private-headers() {
     pkgdesc="Qt private headers for development"
     depends=("qt5=${pkgver}")
 
-    install -d ${pkgdir}/opt/include/{QtCore,QtDeclarative,QtGui,QtScript}
-    install -d ${pkgdir}/opt/src/{corelib,declarative,gui,script}
+    install -d ${pkgdir}/usr/include/qt5/{QtCore,QtDeclarative,QtGui,QtScript}
+    install -d ${pkgdir}/usr/src/qt5/{corelib,declarative,gui,script}
     
-    cp -r ${srcdir}/$_pkgfqn/qtbase/include/QtCore/${pkgver}/QtCore/private/ ${pkgdir}/opt/include/QtCore/
-    cp -r ${srcdir}/$_pkgfqn/qtbase/include/QtGui/${pkgver}/QtGui/private/ ${pkgdir}/opt/include/QtGui/
-    cp -r ${srcdir}/$_pkgfqn/qtdeclarative/include/QtQml/${pkgver}/QtQml/private/ ${pkgdir}/opt/include/QtQml/
-    cp -r ${srcdir}/$_pkgfqn/qtscript/include/QtScript/${pkgver}/QtScript/private/ ${pkgdir}/opt/include/QtScript/
+    cp -r ${srcdir}/$_pkgfqn/qtbase/include/QtCore/${pkgver}/QtCore/private/ ${pkgdir}/usr/include/qt5/QtCore/
+    cp -r ${srcdir}/$_pkgfqn/qtbase/include/QtGui/${pkgver}/QtGui/private/ ${pkgdir}/usr/include/qt5/QtGui/
+    cp -r ${srcdir}/$_pkgfqn/qtdeclarative/include/QtQml/${pkgver}/QtQml/private/ ${pkgdir}/usr/include/qt5/QtQml/
+    cp -r ${srcdir}/$_pkgfqn/qtscript/include/QtScript/${pkgver}/QtScript/private/ ${pkgdir}/usr/include/qt5/QtScript/
 
     for i in corelib gui; do
-      cp -r ${srcdir}/$_pkgfqn/qtbase/src/${i} ${pkgdir}/opt/src/
+      cp -r ${srcdir}/$_pkgfqn/qtbase/src/${i} ${pkgdir}/usr/src/qt5/
     done
-    cp -r ${srcdir}/$_pkgfqn/qtscript/src/script ${pkgdir}/opt/src/
-    cp -r ${srcdir}/$_pkgfqn/qtdeclarative/src/qml ${pkgdir}/opt/src/
+    cp -r ${srcdir}/$_pkgfqn/qtscript/src/script ${pkgdir}/usr/src/qt5/
+    cp -r ${srcdir}/$_pkgfqn/qtdeclarative/src/qml ${pkgdir}/usr/src/qt5/
 }
