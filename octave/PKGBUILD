@@ -4,29 +4,23 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=octave
-pkgver=3.6.3
+pkgver=3.6.4
 pkgrel=2
 pkgdesc="A high-level language, primarily intended for numerical computations."
 arch=('x86_64')
 url="http://www.octave.org"
 license=('GPL')
 depends=('fftw' 'pcre' 'curl' 'libx11' 'graphicsmagick' 'glpk' 'hdf5' 'gcc-libs' 'qhull'
-         'arpack' 'suitesparse')
+         'arpack' 'suitesparse' 'gnuplot' 'gperf')
 makedepends=('texlive-core' 'gcc-fortran' 'python2')
-optdepends=('texinfo: for help-support in octave'
-            'gnuplot: alternative plotting')
-source=("ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.bz2"
-        'gethelp.patch')
+optdepends=('texinfo: for help-support in octave')
+source=("ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.bz2")
 options=('!emptydirs')
 install='octave.install'
-md5sums=('29ab7e502e5c963c058906f788670245'
-         'f86f91022d54ed926453b10bc8edd662')
+md5sums=('e0d3e5e3d38a66d3f8593ba065c6e2fd')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-
-  # gentoo.org patch
-  patch -p0 -i "${srcdir}/gethelp.patch"
 
   autoreconf -vfi
 
