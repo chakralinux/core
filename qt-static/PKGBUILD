@@ -4,14 +4,12 @@
 # maintainer 0inkane@googlemail.com 
 pkgname='qt-static' 
 pkgver=4.8.4
-pkgrel=1
+pkgrel=3
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
 pkgdesc='static version of QtCore'
 depends=('glib2' 'dbus' 'zlib')
-conflicts=('qt-doc' 'qt-demos' 'qt-tools')
-provides=('qt-tools')
 makedepends=('glib2' 'dbus' 'zlib' 'mesa')
 options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
@@ -38,11 +36,7 @@ build() {
 
         #disable everything we don't need, inspiration taken from gentoo's qtcore ebuild
 	./configure -static -confirm-license -opensource \
-		-prefix /usr \
-		-docdir /usr/share/doc/qtstatic \
-		-importdir /usr/lib/qtstatic/imports \
-		-datadir /usr/share/qtstatic \
-		-translationdir /usr/share/qtstatic/translations \
+		-prefix /usr/qtstatic \
                 -headerdir /usr/qtstatic/include \
                 -no-accessibility -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon \
  	        -no-phonon-backend -no-svg -no-webkit -no-script -no-scripttools -no-declarative \
@@ -71,9 +65,9 @@ package() {
     cd $srcdir/$_pkgfqn
     make INSTALL_ROOT=$pkgdir install
 
-    find ${pkgdir}/usr/lib/pkgconfig -type f -name '*.pc' \
+    find ${pkgdir}/usr/qtstatic/lib/pkgconfig -type f -name '*.pc' \
 	-exec perl -pi -e "s, -L${srcdir}/?\S+,,g" {} \;
     # Fix wrong path in prl files
-    find ${pkgdir}/usr/lib -type f -name '*.prl' \
+    find ${pkgdir}/usr/qtstatic/lib -type f -name '*.prl' \
 	-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
 }
