@@ -7,7 +7,7 @@ pkgbase=qt5
 pkgname=('qt5' 'qt5-private-headers')
 pkgver=5.0.1
 _pkgver=5.0.1
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -51,7 +51,7 @@ build() {
                 -docdir /usr/share/doc/qt5 \
                 -plugindir /usr/lib/qt5/plugins \
                 -importdir /usr/lib/qt5/imports \
-                -qmldir /usr/lib/qt5/imports \
+                -qmldir /usr/lib/qt5/qml \
                 -datadir /usr/share/qt5 \
                 -testsdir /usr/share/qt5/tests \
                 -translationdir /usr/share/qt5/translations \
@@ -97,10 +97,10 @@ package_qt5() {
     cd $srcdir/$_pkgfqn
 	make INSTALL_ROOT=$pkgdir install
 	
-    #install -d ${pkgdir}/usr/share/applications
-    #install -m644 ${srcdir}/youtubeview.desktop ${pkgdir}/usr/share/applications/
-    #install -m644 ${srcdir}/flickrview.desktop ${pkgdir}/usr/share/applications/
-    #install -m644 ${srcdir}/qmlviewer.desktop ${pkgdir}/usr/share/applications/
+    install -d ${pkgdir}/usr/share/applications
+    install -m644 ${srcdir}/youtubeview.desktop ${pkgdir}/usr/share/applications/
+    install -m644 ${srcdir}/flickrview.desktop ${pkgdir}/usr/share/applications/
+    install -m644 ${srcdir}/qmlviewer.desktop ${pkgdir}/usr/share/applications/
     
     mkdir -p ${pkgdir}/usr/bin
     for i in $(ls ${pkgdir}/usr/lib/qt5/bin); do
