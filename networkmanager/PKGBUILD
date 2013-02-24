@@ -5,8 +5,8 @@
 
 pkgname=networkmanager
 _pkgname=NetworkManager
-pkgver=0.9.6.4
-pkgrel=2
+pkgver=0.9.8.0
+pkgrel=1
 pkgdesc="Network Management daemon"
 arch=('x86_64')
 license=('GPL')
@@ -27,35 +27,24 @@ install=networkmanager.install
 source=("http://ftp.gnome.org/pub/gnome/sources/$_pkgname/${pkgver:0:3}/$_pkgname-$pkgver.tar.xz"
         'NetworkManager.conf' 
         'disable_set_hostname.patch' 
-        'dnsmasq-path.patch'
-        'nm-polkit-permissive.patch' 
-        'repair-signals.patch' 
-        'systemd-sleep.patch')
-sha256sums=('511b411e055d187bc8f26c519fdb3e55e07fc40d4adecbbec623c0249380a7eb'
-            '44b048804c7c0b8b3b0c29b8632b6ad613c397d0a1635ec918e10c0fbcdadf21'
-            '25056837ea92e559f09563ed817e3e0cd9333be861b8914e45f62ceaae2e0460'
-            '65124505048cc8396daf0242c9f5d532fa669b4bbca305998c248ab2329490cb'
-            '25838aaa4f28b5ac54353154c40ec02c2662c70e4df44bb4e000c3a9c5869f31'
-            '6e16254be867654fb89cee87d149896b387800a1e42eb5720d56b2a64b8c344c'
-            'd0891197fdc33389047418b049608e98cee22fb3919a2f52005b074775861626')
+        'dnsmasq-path.patch')
+md5sums=('38d28f6bd9220d85dfff47210706195c'
+         '1653159d6634fb62d3a5c548b7a56151'
+         '6b5415350c04304a28d29294441a07ae'
+         '60fd44b3934587f27e88a59c9e140ba4')
 
 build() {
   cd $_pkgname-$pkgver
 
   patch -p1 -i ../disable_set_hostname.patch
   patch -p1 -i ../dnsmasq-path.patch
-  patch -p1 -i ../nm-polkit-permissive.patch
-  patch -p1 -i ../repair-signals.patch
-  patch -p1 -i ../systemd-sleep.patch
 
-  AUTOPOINT="intltoolize -f -c --automake" autoreconf -fi
   ./configure \
     --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
     --libexecdir=/usr/lib/networkmanager \
     --with-crypto=nss \
-    --with-distro=arch \
     --with-dhclient=/usr/sbin/dhclient \
     --with-dhcpcd=/usr/sbin/dhcpcd \
     --with-iptables=/usr/sbin/iptables \
@@ -65,7 +54,8 @@ build() {
     --with-session-tracking=systemd \
     --disable-static \
     --enable-more-warnings=no \
-    --disable-wimax
+    --disable-wimax \
+    --enable-modify-system 
 
   make
 }

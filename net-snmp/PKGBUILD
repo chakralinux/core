@@ -1,8 +1,12 @@
-# Maintainer: Michael Haesel <michael[dot]haesel[at]gmail[dot]com>
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas[at]chakra-project[dot]org>
+# contributor Michael Haesel <michael[dot]haesel[at]gmail[dot]com>
 
 pkgname=net-snmp
 pkgver=5.7.2
-pkgrel=1
+pkgrel=2
 pkgdesc="A suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6"
 arch=('x86_64')
 url="http://www.net-snmp.org/"
@@ -31,7 +35,6 @@ build() {
   patch -p1 -i "$srcdir/libnl32.patch"
   autoreconf -f -i  
 
-  sed -i -e "s:\(install --basedir=\$\$dir\):\1 --root='${pkgdir}':" Makefile.in
   PYTHONPROG=/usr/bin/python2 ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --mandir=/usr/share/man \
@@ -51,7 +54,7 @@ build() {
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  
+  sed -i -e "s:\(install --basedir=\$\$dir\):\1 --root='${pkgdir}':" Makefile.in
   make DESTDIR="${pkgdir}" INSTALL_PREFIX="${pkgdir}" INSTALLDIRS=vendor install
   
   # install service files
