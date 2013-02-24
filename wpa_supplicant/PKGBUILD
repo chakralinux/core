@@ -4,33 +4,32 @@
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=wpa_supplicant
-pkgver=0.7.3
-pkgrel=5
+pkgver=2.0
+pkgrel=1
 pkgdesc="A utility providing key negotiation for WPA wireless networks"
 arch=('x86_64')
 depends=('openssl' 'dbus-core>=1.2.4' 'readline>=6.0' 'libnl')
-optdepends=('wpa_supplicant_gui: wpa_gui program')
 license=('GPL')
 groups=('base')
 backup=('etc/wpa_supplicant.conf')
 url="http://hostap.epitest.fi/wpa_supplicant"
 source=("http://hostap.epitest.fi/releases/wpa_supplicant-$pkgver.tar.gz"
-        config
-	wpa_supplicant.service)
-sha256sums=('d0cd50caa85346ccc376dcda5ed3c258eef19a93b3cade39d25760118ad59443'
-            '54568aa6912a7e8ee0c28a71a79dd8d5b6f11368ca71733c26e41d1a142587ba'
-            '7473ff4479f7b40e9f1369f1ccbf8f514ae17729be18572801f80d3b4a4df3d0')
+        'config')
+md5sums=('3be2ebfdcced52e00eda0afe2889839d'
+         '4aa1e5accd604091341b989b47fe1076')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}/${pkgname}"
   cp "${srcdir}/config" ./.config
   sed -i 's@/usr/local@$(PREFIX)@g' Makefile
+  
   make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}/${pkgname}"
   make PREFIX=/usr DESTDIR="${pkgdir}" install
+  
   install -m755 -d "${pkgdir}/etc"
   install -m644 wpa_supplicant.conf "${pkgdir}/etc/wpa_supplicant.conf"
   install -d -m755 "${pkgdir}/usr/share/man/man"{5,8}
@@ -44,6 +43,6 @@ package() {
   install -m755 -d "${pkgdir}/etc/dbus-1/system.d"
   install -m644 dbus/dbus-wpa_supplicant.conf "${pkgdir}/etc/dbus-1/system.d/wpa_supplicant.conf"
 
-  # install systemd units
-  install -Dm644 "$srcdir/wpa_supplicant.service" "$pkgdir/usr/lib/systemd/system/wpa_supplicant.service"
+  install -d -m755 "${pkgdir}/usr/lib/systemd/system"
+  install -m644 systemd/*.service "${pkgdir}/usr/lib/systemd/system/"
 }
