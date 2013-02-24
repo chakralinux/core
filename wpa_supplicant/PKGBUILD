@@ -23,7 +23,7 @@ build() {
   cp "${srcdir}/config" ./.config
   sed -i 's@/usr/local@$(PREFIX)@g' Makefile
   
-  make
+  make PREFIX=/usr
 }
 
 package() {
@@ -39,7 +39,7 @@ package() {
 
   install -m755 -d "${pkgdir}/usr/share/dbus-1/system-services"
   install -m644 dbus/{fi.epitest.hostap.WPASupplicant.service,fi.w1.wpa_supplicant1.service} "${pkgdir}/usr/share/dbus-1/system-services/"
-  sed -e 's/sbin/usr\/sbin/' -i "${pkgdir}/usr/share/dbus-1/system-services/"*.service
+
   install -m755 -d "${pkgdir}/etc/dbus-1/system.d"
   install -m644 dbus/dbus-wpa_supplicant.conf "${pkgdir}/etc/dbus-1/system.d/wpa_supplicant.conf"
 
