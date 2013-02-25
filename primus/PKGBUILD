@@ -1,8 +1,10 @@
-# Maintainer:
+# Platform Packages for Chakra
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 # Contributions from AUR: https://aur.archlinux.org/packages/primus-git/
+
 pkgname=primus
 pkgver=20130225
-pkgrel=1
+pkgrel=2
 pkgdesc="Faster OpenGL offloading for Bumblebee (git sources)"
 arch=('x86_64')
 url="https://github.com/amonakov/primus"
@@ -12,7 +14,7 @@ makedepends=('git')
 provides=('primus')
 conflicts=('primus')
 source=("${pkgname}-${pkgver}.tar.xz")
-md5sums=('97895f07136bccf171b1167bd2dcf45b')
+md5sums=('a14c23f09dcb94265ae5e9379b02d064')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -40,6 +42,11 @@ package() {
   install -D "lib/libGL.so.1" "$pkgdir/usr/lib/primus/libGL.so.1"
   sed -e "s#^PRIMUS_libGL=.*#PRIMUS_libGL='/usr/\$LIB/primus'#" primusrun > primusrun.dist
   install -D "primusrun.dist" "$pkgdir/usr/bin/primusrun"
+  
+  install -D "primus.bash-completion" "$pkgdir/etc/bash_completion.d/primusrun"
+  
+  gzip -9 "primusrun.1"
+  install -D "primusrun.1.gz" "$pkgdir/usr/share/man/man1/primusrun.1.gz"
 
   install -D -m644 LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
