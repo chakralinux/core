@@ -1,0 +1,45 @@
+# Maintainer:
+# Contributions from AUR: https://aur.archlinux.org/packages/primus-git/
+pkgname=primus
+pkgver=20130225
+pkgrel=1
+pkgdesc="Faster OpenGL offloading for Bumblebee (git sources)"
+arch=('x86_64')
+url="https://github.com/amonakov/primus"
+license=('custom:ISC')
+depends=('bumblebee' 'mesa' 'nvidia-utils-bumblebee')
+makedepends=('git')
+provides=('primus')
+conflicts=('primus')
+source=("${pkgname}-${pkgver}.tar.xz")
+md5sums=('97895f07136bccf171b1167bd2dcf45b')
+
+# create tarball: source PKGBUILD && mksource
+
+mksource() {
+    if [ "${1}" = "" ] ; then
+        git clone git://github.com/amonakov/primus.git ${pkgname}
+    else
+        git clone -b "${1}" git://github.com/amonakov/primus.git ${pkgname}
+    fi
+    pushd ${pkgname}
+    popd
+    rm ${pkgname}/PKGBUILD
+    tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}
+    md5sum ${pkgname}-${pkgver}.tar.xz
+}
+
+build() {
+  cd "${srcdir}/${pkgname}"
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+
+  install -D "lib/libGL.so.1" "$pkgdir/usr/lib/primus/libGL.so.1"
+  sed -e "s#^PRIMUS_libGL=.*#PRIMUS_libGL='/usr/\$LIB/primus'#" primusrun > primusrun.dist
+  install -D "primusrun.dist" "$pkgdir/usr/bin/primusrun"
+
+  install -D -m644 LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
