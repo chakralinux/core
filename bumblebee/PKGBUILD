@@ -1,33 +1,29 @@
-#
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
-# This script is incomplete and in development.
-# AUR-Maintainer: Samsagax <samsagax@gmail.com>
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# Contributions from AUR: https://aur.archlinux.org/packages/bumblebee/
 
 pkgname=bumblebee
-pkgver=3.0.1
-pkgrel=3
+pkgver=3.1
+pkgrel=1
 pkgdesc="Bumblebee brings Optimus Support for Linux Through VirtualGL. You need to install proper drivers separately. Can be used with Nouveau or Nvidia"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 depends=('virtualgl' 'libbsd' 'glib2')
-optdepends=('xf86-video-nouveau: Nouveau driver' 'nouveau-dri: 3D acceleration features fo Nouveau' 'mesa: 3D acceleration features fo Nouveau'  'bbswitch: switch on/off discrete card' 'nvidia-utils-bumblebee: Nvidia utils not breaking LibGL' 'nvidia: Nvidia kernel driver')
-if [ "$CARCH" = "x86_64" ]; then
-     optdepends[${#optdepends[@]}]='lib32-virtualgl: run 32bit applications with optirun'
-fi
+optdepends=('xf86-video-nouveau: Nouveau driver' 
+            'nouveau-dri: 3D acceleration features fo Nouveau'
+            'mesa: 3D acceleration features fo Nouveau'
+            'bbswitch: switch on/off discrete card' 'nvidia-utils-bumblebee: Nvidia utils not breaking LibGL'
+            'nvidia: Nvidia kernel driver'
+            'lib32-virtualgl: run 32bit applications with optirun'
+            'primus: alternative back-end for optirun')
 url="http://www.Bumblebee-Project.org"
 license=("GPL3")
 install='bumblebee.install'
 provides=('bumblebee')
 backup=('etc/bumblebee/bumblebee.conf'
-    'etc/bumblebee/xorg.conf.nouveau'
-    'etc/bumblebee/xorg.conf.nvidia')
-source=("https://github.com/downloads/Bumblebee-Project/Bumblebee/${pkgname}-${pkgver}.tar.gz"
-        '99-remove-nvidia-dev.rules'
-        'rmmod-remove.patch')
-md5sums=('7b3fd4bfa0d59e877abdb75cbdba30f8'
-         'b2a411f8610107946a9bec3bcb282f7b'
-         'ea2a0a7e973f974cf6e9d54638011565')
+        'etc/bumblebee/xorg.conf.nouveau'
+         'etc/bumblebee/xorg.conf.nvidia')
+source=("http://www.bumblebee-project.org/${pkgname}-${pkgver}.tar.gz")
+md5sums=('de515ef51b1e0714c2f1b2a95f83e77e')
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
@@ -37,20 +33,15 @@ build() {
         CONF_MODPATH_NVIDIA=/usr/lib/nvidia-bumblebee/xorg/,/usr/lib/xorg/modules \
         --prefix=/usr \
         --sysconfdir=/etc
-    #found this on AUR, patch needed for kmod11: https://github.com/Bumblebee-Project/Bumblebee/issues/283
-    patch -p1 -i ${srcdir}/rmmod-remove.patch
     make
 }
 
 package() {
     cd "${srcdir}/${pkgname}-${pkgver}"
     make install DESTDIR="$pkgdir"
-    # Install init script
-    # install -D -m755 "${srcdir}/bumblebeed.in" "${pkgdir}/etc/rc.d/bumblebeed"
+  
     # Install systemd unit
     install -D -m644 "scripts/systemd/bumblebeed.service" "${pkgdir}/usr/lib/systemd/system/bumblebeed.service"
     # Make bash_completion work
     mv -v "${pkgdir}/etc/bash_completion.d/bumblebee" "${pkgdir}/etc/bash_completion.d/optirun"
-    #Install udev rule to prevent GH-#144
-    install -D -m644 "$srcdir/99-remove-nvidia-dev.rules" "${pkgdir}/lib/udev/rules.d/99-remove-nvidia-dev.rules"
    }
