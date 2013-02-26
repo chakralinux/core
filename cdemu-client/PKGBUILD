@@ -5,7 +5,7 @@
 
 pkgname=cdemu-client
 pkgver=2.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Simple command-line client for controlling cdemu-daemon"
 arch=('x86_64')
 url="http://cdemu.sourceforge.net/"
@@ -33,5 +33,6 @@ build() {
 package() {
   cd "$srcdir/$pkgname-$pkgver/build"
   make DESTDIR="$pkgdir" install
+  rm -f "${pkgdir}"/usr/share/applications/cdemu-client.desktop
 }
 
