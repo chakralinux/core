@@ -4,21 +4,21 @@
 pkgname=libbonobo
 _pkgver=2.32
 pkgver="${_pkgver}.1"
-pkgrel=1
+pkgrel=2
 pkgdesc="A set of language and system independant CORBA interfaces for creating reusable components"
-arch=(x86_64)
+arch=('x86_64')
 license=('GPL' 'LGPL')
 depends=('orbit2' 'libxml2' 'dbus-glib' 'glib2')
-makedepends=('intltool' 'pkgconfig' 'flex')
+makedepends=('intltool' 'pkgconfig')
 options=('!libtool')
 backup=('etc/bonobo-activation/bonobo-activation-config.xml')
 replaces=('bonobo-activation')
 url="http://www.gnome.org"
-source=(http://ftp.gnome.org/pub/gnome/sources/libbonobo/${_pkgver}/libbonobo-${pkgver}.tar.bz2
-	bonobo-activation-config.xml)
+source=("http://ftp.gnome.org/pub/gnome/sources/libbonobo/${_pkgver}/libbonobo-${pkgver}.tar.bz2"
+	'bonobo-activation-config.xml')
 install=libbonobo.install
-sha256sums=('9160d4f277646400d3bb6b4fa73636cc6d1a865a32b9d0760e1e9e6ee624976b'
-            '74895825706b60574f6075f1230c9fe3dc5433018c6ac5ac1d87f615bd9d1082')
+md5sums=('27fa902d4fdf6762ee010e7053aaf77b'
+         '6392efaca30a26f826eafc4b8ccbc01f')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
