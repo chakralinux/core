@@ -4,7 +4,7 @@
 
 pkgname=cups-filters
 pkgver=1.0.29
-pkgrel=2
+pkgrel=3
 pkgdesc="OpenPrinting CUPS Filters"
 arch=('x86_64')
 url="http://www.linuxfoundation.org/collaborate/workgroups/openprinting"
@@ -18,12 +18,16 @@ optdepends=('ghostscript: for non-PostScript printers to print with CUPS to conv
 backup=(etc/fonts/conf.d/99pdftoopvp.conf)
 options=(!libtool)
 source=("http://www.openprinting.org/download/cups-filters/$pkgname-$pkgver.tar.gz"
-        'cups-browsed.service')
+        'cups-browsed.service'
+        'poppler_buildfix.diff')
 md5sums=('0640a02a3fb88d3dbdb224e3becd400d'
-         'c1101c052abfd93759d4963f6f6c36f0')
+         'c1101c052abfd93759d4963f6f6c36f0'
+         '8029f71aa240f5ed814bcdc900ec1b27')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
+  patch -p0 -i "${srcdir}"/poppler_buildfix.diff
+  
   ./configure --prefix=/usr  \
     --sysconfdir=/etc \
     --with-rcdir=no \
