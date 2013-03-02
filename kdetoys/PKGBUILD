@@ -11,7 +11,7 @@ pkgname=('kdetoys-amor'
          'kdetoys-kteatime'
          'kdetoys-ktux')
 
-arch=('i686' 'x86_64')
+arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="split package"
@@ -35,7 +35,7 @@ build() {
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
-	make || return 1
+	make 
 }
 
 package_kdetoys-amor() {
@@ -45,25 +45,8 @@ package_kdetoys-amor() {
 	categories=('accessories')
 	install=${pkgbase}.install
 
-	splitdirs="amor doc/amor"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
-
-package_kdetoys-eyesapplet() {
-	pkgdesc="An applet similar to XEyes"
-	conflicts=("kdetoys-common")
-	groups=("kde" "kdetoys" "kde-uninstall")
-	categories=('accessories')
-	install=${pkgbase}.install
-
-	splitdirs="eyesapplet"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
+	cd ${srcdir}/${pkgbase}-${pkgver}/amor
+	make DESTDIR=${pkgdir} install 
 }
 
 package_kdetoys-kteatime() {
@@ -73,11 +56,8 @@ package_kdetoys-kteatime() {
 	categories=('accessories')
 	install=${pkgbase}.install
 
-	splitdirs="kteatime doc/kteatime"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
+	cd ${srcdir}/${pkgbase}-${pkgver}/kteatime
+	make DESTDIR=${pkgdir} install 
 }
 
 package_kdetoys-ktux() {
@@ -87,23 +67,7 @@ package_kdetoys-ktux() {
 	categories=('accessories')
 	install=${pkgbase}.install
 
-	splitdirs="ktux"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
+	cd ${srcdir}/${pkgbase}-${pkgver}/ktux
+	make DESTDIR=${pkgdir} install 
 }
 
-package_kdetoys-kweather() {
-	pkgdesc="Kicker applet that will display the current weather outside"
-	conflicts=("kdetoys-common")
-	groups=("kde" "kdetoys" "kde-uninstall")
-	categories=('accessories')
-	install=${pkgbase}.install
-
-	splitdirs="kweather"
-		for i in ${splitdirs} ; do
-			cd ${srcdir}/${pkgbase}-${pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
-		done
-}
