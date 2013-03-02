@@ -3,7 +3,10 @@ Description=Samba NetBIOS name server
 After=network.target
 
 [Service]
-ExecStart=/usr/sbin/nmbd -F
+Type=forking
+PIDFile=/var/run/samba/nmbd.pid
+ExecStart=/usr/sbin/nmbd -D 
+ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target
