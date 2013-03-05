@@ -21,16 +21,20 @@ md5sums=('8210ea90902c4ec526e1e5f7e719ad57')
 build() {
 	cd $srcdir/$_pkgfqn
 	
+	export QTDIR=/usr
 	Tools/Scripts/build-webkit --qt \
 	                    --qmake=/usr/lib/qt5/bin/qmake \
 	                    --install-libs=/usr/lib/qt5 \
 	                    --release \
-	                    --no-webkit2 
+	                    --no-webkit2 \
+	                    --qmakearg="WEBKIT_CONFIG-=build_test_npapi" \
+	                    --qmakearg="WEBKIT_CONFIG-=build_tests" \
+	                    --qmakearg="WEBKIT_CONFIG-=have_qttestsupport"
 }
 
 package() {
     cd $srcdir/$_pkgfqn
-    make INSTALL_ROOT=$pkgdir install
+    make INSTALL_ROOT="${pkgdir}" -C WebKitBuild/Release install
     
     mkdir -p ${pkgdir}/usr/bin
     for i in $(ls ${pkgdir}/usr/lib/qt5/bin); do
