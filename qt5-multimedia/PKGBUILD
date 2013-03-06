@@ -15,7 +15,7 @@ options=('!libtool')
 groups=('qt5')
 _pkgfqn="qtmultimedia-opensource-src-${_pkgver}"
 source=("http://origin.releases.qt-project.org/qt5/${_pkgver}/submodules_tar/qtmultimedia-opensource-src-${_pkgver}.tar.xz")
-md5sums=('00a577bd88e682d1b4d01d41d1d699cf')
+md5sums=('aee9c86a7ff64dfc905ccaef33f0a967')
 
 build() {
     cd $srcdir/$_pkgfqn
@@ -27,10 +27,5 @@ build() {
 package() {
     cd $srcdir/$_pkgfqn
     make INSTALL_ROOT=$pkgdir install
-    
-    mkdir -p ${pkgdir}/usr/bin
-    for i in $(ls ${pkgdir}/usr/lib/qt5/bin); do
-        ln -s /usr/lib/qt5/bin/${i} ${pkgdir}/usr/bin/${i}-qt5
-    done
 }
 
