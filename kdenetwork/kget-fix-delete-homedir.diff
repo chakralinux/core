@@ -1,0 +1,14 @@
+Index: transfer-plugins/multisegmentkio/transfermultisegkio.cpp
+===================================================================
+--- a/src/kdenetwork-4.10.1/kget/transfer-plugins/multisegmentkio/transfermultisegkio.cpp	(Revision 1342971)
++++ b/src/kdenetwork-4.10.1/kget/transfer-plugins/multisegmentkio/transfermultisegkio.cpp	(Arbeitskopie)
+@@ -166,6 +166,8 @@
+     if (change & Tc_FileName) {
+         QList<KUrl> urls = m_dataSourceFactory->mirrors().keys();
+         QString filename = urls.first().fileName();
++        if (filename.isEmpty())
++            return;
+         foreach (const KUrl url, urls) {
+             if (filename != url.fileName())
+                 return;
+                 
