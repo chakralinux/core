@@ -1,10 +1,7 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: abveritas[at]chakra-project[dot]org>
 
 pkgname=kmod
-pkgver=11
+pkgver=12
 pkgrel=1
 pkgdesc="Linux kernel module handling"
 arch=('x86_64')
@@ -17,7 +14,7 @@ conflicts=('module-init-tools')
 replaces=('module-init-tools')
 source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/$pkgname/$pkgname-$pkgver.tar.xz"
         "depmod-search.conf")
-md5sums=('607e33b0144625c2e5221e5a7df49c7a'
+md5sums=('3d63b146c8ee5a04dfbef4be97f8226b'
          '9ae9acc68ca27134f55a0959073b8e53')
 
 build() {
@@ -30,9 +27,9 @@ build() {
   make
 }
 
-#check() {
-#  make -C "$pkgname-$pkgver" check 
-#}
+check() {
+  make -C "$pkgname-$pkgver" check 
+}
 
 package() {
   make -C "$pkgname-$pkgver" DESTDIR="$pkgdir" install

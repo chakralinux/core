@@ -1,10 +1,8 @@
 #
-# Core Packages for Chakra, part of chakra-project.org
-#
 # maintainer: abveritas@chakra-project.org
 
 pkgname=systemd
-pkgver=197
+pkgver=198
 pkgrel=1
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -38,7 +36,7 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         '99-default.preset'
         '98-chakra.rules'
         'is_bundle')
-md5sums=('56a860dceadfafe59f40141eb5223743'
+md5sums=('26a75e2a310f8c1c1ea9ec26ddb171c5'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          'fb37e34ea006c79be1c54cbb0f803414'
          'df69615503ad293c9ddf9d8b7755282d'
@@ -55,6 +53,7 @@ build() {
   ./configure \
       PYTHON=python2 \
       PYTHON_CONFIG=python2-config \
+      --enable-static \
       --libexecdir=/usr/lib \
       --localstatedir=/var \
       --sysconfdir=/etc \
@@ -74,14 +73,6 @@ package() {
 
   install -dm755 "$pkgdir/bin"
   ln -s ../usr/lib/systemd/systemd "$pkgdir/bin/systemd"
-
-  # move bash-completion and symlink for loginctl
-  install -Dm644 "$pkgdir/etc/bash_completion.d/systemd-bash-completion.sh" \
-    "$pkgdir/usr/share/bash-completion/completions/systemctl"
-  for ctl in {login,journal,timedate,locale,hostname}ctl; do
-    ln -s systemctl "$pkgdir/usr/share/bash-completion/completions/$ctl"
-  done
-  rm -rf "$pkgdir/etc/bash_completion.d"
 
   # Remove rpm dir
   rm -r "$pkgdir/etc/rpm"
