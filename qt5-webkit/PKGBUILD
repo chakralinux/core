@@ -26,14 +26,16 @@ build() {
 	                    --qmake=/usr/lib/qt5/bin/qmake \
 	                    --install-libs=/usr/lib/qt5 \
 	                    --release \
-	                    --no-webkit2 \
 	                    --qmakearg="WEBKIT_CONFIG-=build_test_npapi" \
 	                    --qmakearg="WEBKIT_CONFIG-=build_tests" \
-	                    --qmakearg="WEBKIT_CONFIG-=have_qttestsupport"
+	                    --qmakearg="WEBKIT_CONFIG-=have_qttestsupport" \
+	                    --qmakearg="WEBKIT_CONFIG-=build_minibrowser"
 }
 
 package() {
     cd $srcdir/$_pkgfqn
+    mkdir -p ${pkgdir}/usr/lib/qt5/plugins/webkit
+    mkdir -p ${pkgdir}/usr/lib/qt5/bin
     make INSTALL_ROOT="${pkgdir}" -C WebKitBuild/Release install
     
     mkdir -p ${pkgdir}/usr/bin
