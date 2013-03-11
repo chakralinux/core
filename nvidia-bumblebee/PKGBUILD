@@ -4,9 +4,9 @@
 # Contributions from AUR: https://aur.archlinux.org/packages/nvidia-bumblebee/
 
 pkgname=nvidia-bumblebee
-pkgver=313.18
+pkgver=313.26
 pkgrel=1
-_kernver='3.7.6-1-CHAKRA'
+_kernver='3.7.6-2-CHAKRA'
 _extramodules='extramodules-3.7-CHAKRA' 
 pkgdesc="NVIDIA drivers for linux. Packaged for Bumblebee"
 arch=('x86_64')
@@ -18,15 +18,13 @@ conflicts=('nvidia' 'nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx' 'dkms-nvidia')
 license=('custom')
 install=nvidia.install
 options=(!strip)
-source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run"
-        'conftest_new.diff')
-md5sums=('fa17a260793a38b4b8ae367db2e03b39'
-         'fabd5e3a17e2bf4aef4bf2e25a0e17d4')
+source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
+md5sums=('2d35124fa5a4b009f170fe893b5d07e3')
 
 build() {
     cd "${srcdir}"
     sh "NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run" --extract-only
-    patch -p1 -i "${srcdir}/conftest_new.diff"
+
     cd "NVIDIA-Linux-x86_64-${pkgver}-no-compat32/kernel"
     make SYSSRC=/lib/modules/"${_kernver}/build" module
 }

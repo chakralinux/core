@@ -4,10 +4,10 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=samba
-pkgver=3.6.10
+pkgver=3.6.12
 #In case version contains a or b
-_realver=3.6.10
-pkgrel=2
+_realver=3.6.12
+pkgrel=1
 arch=('x86_64')
 url="http://www.samba.org"
 license=('GPL3')
@@ -24,19 +24,27 @@ install='samba.install'
 source=("http://us1.samba.org/samba/ftp/stable/${pkgname}-${_realver}.tar.gz"
         'samba.logrotate'
         'swat.xinetd'
+        'swat.socket'
+        'swat@.service'
         'samba.pam'
         'smbd.service'
+        'smbd.socket'
+        'smbd@.service'
         'nmbd.service'
         'winbindd.service'
         'samba.conf')
-md5sums=('b5f0560c216122529b1c3b7f41c62567'
+md5sums=('430fd21a1acd26964d3ccf366df8709a'
          '5697da77590ec092cc8a883bae06093c'
          'a4bbfa39fee95bba2e7ad6b535fae7e6'
+         '6db11f3dd2112a4b7a73007b189bef3f'
+         'b0de262f9c62acd162e873658f33d063'
          '96f82c38f3f540b53f3e5144900acf17'
-         '4b9c54d6fed4d0a225a84963516fc46f'
-         '67ce9229c4e343a91d70edba6de29437'
-         '617079917cdc84b450d109557b1fe2e1'
-         '8e7ed39b54968e427f9506e9107bfb45')
+         '4d86a4e3b2ac4b35e12ac667d1d261a7'
+         'a78b9aa93eb14b0ac445897395693225'
+         '4f2a5266f88d016a78014bb02e118c7f'
+         '46bac3375dcf25baea4699226410987a'
+         '03257dd11fc041d59e612c02a54ef4c0'
+         '49abd7b719e3713a3f75a8a50958e381')
 
 build() {
   cd ${srcdir}/${pkgname}-${_realver}/source3
@@ -94,8 +102,10 @@ package() {
   install -d -m 0755 ${pkgdir}/usr/lib/krb5/plugins/libkrb5
   install -m 755 bin/winbind_krb5_locator.so ${pkgdir}/usr/lib/krb5/plugins/libkrb5/winbind_krb5_locator.so
   # systemd files
-  for i in smbd nmbd winbindd; do
-  install -D -m644 ${srcdir}/$i.service ${pkgdir}/usr/lib/systemd/system/$i.service
+  install -d -m755 ${pkgdir}/usr/lib/systemd/system
+  for i in smbd nmbd swat winbindd; do
+    install -m644 ${srcdir}/*.service ${pkgdir}/usr/lib/systemd/system/
+    install -m644 ${srcdir}/*.socket ${pkgdir}/usr/lib/systemd/system/
   done
   # create non-persistent dirs via tmpfiles instead of shipping packaged-in
   install -D -m644 ${srcdir}/samba.conf ${pkgdir}/usr/lib/tmpfiles.d/samba.conf
