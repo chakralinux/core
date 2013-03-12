@@ -51,6 +51,8 @@ build() {
   patch -p1 -i "$srcdir/use-split-usr-path.patch"
 
   ./configure \
+      PYTHON=python2 \
+      PYTHON_CONFIG=python2-config \
       --enable-static \
       --libexecdir=/usr/lib \
       --localstatedir=/var \
@@ -58,7 +60,8 @@ build() {
       --enable-introspection \
       --disable-gtk-doc \
       --disable-audit \
-      --disable-ima 
+      --disable-ima \
+      --with-firmware-path=/usr/lib/firmware/updates:/lib/firmware/updates:/usr/lib/firmware:/lib/firmware
 
   make
 }
