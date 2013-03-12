@@ -1,10 +1,7 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=cmake
-pkgver=2.8.9
+pkgver=2.8.10.2
 pkgrel=1
 pkgdesc="A cross-platform open-source make system"
 arch=('x86_64')
@@ -13,15 +10,11 @@ url="http://www.cmake.org"
 depends=('curl' 'libarchive' 'shared-mime-info')
 makedepends=('qt')
 install=${pkgname}.install
-source=("http://www.cmake.org/files/v2.8/${pkgname}-${pkgver}.tar.gz"
-        'fix-pkg-config.patch')
-md5sums=('801f4c87f8b604f727df5bf1f05a59e7'
-         '1d0e7fddd703a36df30262d7616a59be')
+source=("http://www.cmake.org/files/v2.8/${pkgname}-${pkgver}.tar.gz")
+md5sums=('097278785da7182ec0aea8769d06860c')
 
 build() {
   cd "${srcdir}"/${pkgname}-${pkgver}
-
-  #patch -p1 -i "${srcdir}"/fix-pkg-config.patch
 
   ./bootstrap --prefix=/usr \
     --mandir=/share/man \
