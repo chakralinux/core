@@ -3,7 +3,7 @@
 
 pkgname=systemd
 pkgver=198
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
@@ -35,7 +35,8 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'use-split-usr-path.patch'
         '99-default.preset'
         '98-chakra.rules'
-        'is_bundle')
+        'is_bundle'
+        'libsystemd_login.diff')
 md5sums=('26a75e2a310f8c1c1ea9ec26ddb171c5'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          'fb37e34ea006c79be1c54cbb0f803414'
@@ -43,12 +44,14 @@ md5sums=('26a75e2a310f8c1c1ea9ec26ddb171c5'
          '21572b99173a7cdeaff965e0a5e9182b'
          'a1bf25da736d3719e9720b2e4caea341'
          '40f1d228553f939430e6d8d781f06daf'
-         '05d26a1936bf5b075bedd76952ab1b53')
+         '05d26a1936bf5b075bedd76952ab1b53'
+         '2b574148b3fddad878e55678f70f8d2a')
 
 build() {
   cd "$pkgname-$pkgver"
   
   patch -p1 -i "$srcdir/use-split-usr-path.patch"
+  patch -p1 -i "$srcdir/libsystemd_login.diff"
 
   ./configure \
       PYTHON=python2 \
