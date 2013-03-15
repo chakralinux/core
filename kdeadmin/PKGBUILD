@@ -14,7 +14,7 @@ pkgname=('kdeadmin-kcron'
 
 arch=('x86_64')
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 pkgdesc="split package"
 url="http://www.kde.org/"
 license=('GPL' 'LGPL' 'FDL')
@@ -35,6 +35,9 @@ build() {
 
 	msg "fixing syslog path"
 	patch -p1 -i ${srcdir}/syslog-path.patch
+
+        # Set KUser default starting user to 1000
+        sed -i "s|ID 500 CACHE|ID 1000 CACHE|" kuser/CMakeLists.txt
 	
 	cd ${srcdir}
         rm -rf build
