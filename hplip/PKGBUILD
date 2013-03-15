@@ -3,17 +3,17 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=hplip
-pkgver=3.13.2
+pkgver=3.13.3
 # incase a or b is used in hplip rls:
-_pkgver=3.13.2
+_pkgver=3.13.3
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('i686' 'x86_64')
 url="http://hplipopensource.com"
 license=('GPL')
-makedepends=('pyqt' 'python2-gobject' 'pkgconfig' 'sane' 'rpcbind' 'dbus-python' 'cups')
 depends=('python2' 'ghostscript>=8.64-6' 'foomatic-db' 'foomatic-db-engine'
 	'libcups' 'net-snmp>=5.5' 'libusb-compat')
+makedepends=('pyqt' 'python2-gobject' 'pkgconfig' 'sane' 'rpcbind' 'dbus-python' 'cups')
 optdepends=('cups: for printing support'
             'dbus-python: for dbus support'
             'sane: for scanner support'
@@ -24,8 +24,8 @@ options=('!libtool')
 install=${pkgname}.install
 source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${_pkgver}.tar.gz"
 	"cups-1.6-buildfix.diff")
-sha256sums=('7dee21c30a15729b2107713a1b779ea07982064a38e2d4935e58e6f56d6d3592'
-            '9813f754670f9b4a01e6094c673f63ac62421817c7eb463999abf828358e67df')
+sha1sums=('e571cfac1a30c947b3526de691cbe3cf31590bfb'
+          '7a3b476eb8bcecb4988eadc26924b053a3ed4fbb')
 
 build() {
   cd "${srcdir}/${pkgname}-${_pkgver}"
@@ -84,4 +84,6 @@ package() {
   
   # remove rc
   rm -rf "$pkgdir"/etc/init.d
+  
+  sed -i "s:\$attrs:\$attr:g" $pkgdir/usr/lib/udev/rules.d/56-hpmud_support.rules
 }
