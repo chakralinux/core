@@ -2,7 +2,7 @@
 
 pkgname=elektra
 pkgver=0.7.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Elektra is a universal hierarchical configuration store"
 url="http://www.libelektra.org/"
 license="BSD"
@@ -23,4 +23,6 @@ package() {
   cd ${srcdir}/$pkgname-$pkgver
   
   make DESTDIR=${pkgdir} install
+  # conflict with krb5
+  rm ${pkgdir}/usr/include/kdb.h
 }
