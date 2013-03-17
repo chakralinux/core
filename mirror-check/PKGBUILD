@@ -4,19 +4,20 @@
 # maintainer: abveritas[at]chakra-project[dot]org>
 
 pkgname=mirror-check
-pkgver=0.4
+pkgver=1.0
 pkgrel=1
 pkgdesc="Checks whether the locally used mirror is synced with the main"
 arch=('x86_64')
 url="http://www.chakra-project.org"
 license=('GPL2')
 makedepends=('asciidoc')
-source=('mirror-check')
-md5sums=('65df3a0a6f4cfbdab679f8e82f4cb666')
+source=('mirror-check' 'mirror-check.desktop')
+md5sums=('28197d03788026282f8cb01e6081f713'
+         '5a0a0a1774ecd4808827e4c3cd6eca7c')
 
 package() {
   cd ${srcdir}
 
   install -m 755 -D mirror-check "$pkgdir/usr/bin/mirror-check"
-	
+  install -Dm644 "${srcdir}/mirror-check.desktop" "${pkgdir}/usr/share/applications/mirror-check.desktop"	
 }
