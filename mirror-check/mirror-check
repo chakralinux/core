@@ -18,11 +18,14 @@ function select_dialog() {
    
   for repo in ${_repos[@]}; do
     repostring="${repostring} ${repo} ${repo} on "
-    ((_count++))
   done
    
   _parse=$(kdialog --title "${_title}" --checklist "Repositories being checked:" ${repostring})
   _parse=$(echo ${_parse} | sed 's/"//g') 
+  
+  for repo in $_parse; do
+    ((_count++))
+  done
 }
 
 function get_database() {
