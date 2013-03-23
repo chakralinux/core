@@ -1,30 +1,28 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: abveritas[at]chakra-project[dot]org>
 
 pkgname=gnutls
-pkgver=2.12.7
-pkgrel=2
+pkgver=3.1.9
+pkgrel=1
 pkgdesc="A library which provides a secure layer over a reliable transport layer"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL3' 'LGPL')
 url="http://www.gnu.org/software/gnutls/"
 install=gnutls.install
 options=('libtool')
-depends=('gcc-libs>=4.4.3' 'libtasn1>=2.5' 'readline>=6.0' 'zlib' 'libgcrypt>=1.4.5' 'texinfo' 'nettle')
-source=("ftp://ftp.gnu.org/gnu/gnutls/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('4b48aa3119f549d30d550bf4162c721b')
+depends=('gcc-libs' 'libtasn1>=3.2' 'readline' 'zlib' 'libgcrypt' 'texinfo' 'nettle')
+source=("ftp://ftp.gnutls.org/gcrypt/gnutls/v3.1/${pkgname}-${pkgver}.tar.xz")
+md5sums=('0674032fe6de0d90d08eed81fcac2e1d')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --with-zlib --with-libgcrypt --disable-guile || return 1
-  make || return 1
+  
+  ./configure --prefix=/usr --with-zlib --disable-guile --disable-static
+  make 
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
+  
+  make DESTDIR="${pkgdir}" install 
 }
 
-# vim:set ts=2 sw=2 et:
