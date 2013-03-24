@@ -1,25 +1,39 @@
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: abveritas[at]chakra-project[dot]org>
 
 pkgname=gnupg2
-pkgver=2.0.18
+pkgver=2.0.19
 pkgrel=1
 pkgdesc="GNU Privacy Guard 2 - a PGP replacement tool"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 depends=('libldap' 'curl' 'bzip2' 'zlib' 'libksba' 'libgcrypt'
-	'pth' 'libusb' 'libassuan' 'texinfo' 'readline' 'pinentry' 'dirmngr')
+	'pth' 'libusb-compat' 'libassuan' 'texinfo' 'readline' 'pinentry' 'dirmngr')
 license=('GPL')
 url="http://www.gnupg.org/"
 install=${pkgname}.install
-source=(ftp://ftp.gnupg.org/gcrypt/gnupg/gnupg-$pkgver.tar.bz2)
-md5sums=('2f37e0722666a0fedbe4d9f9227ac4d7')
+source=("ftp://ftp.gnupg.org/gcrypt/gnupg/gnupg-$pkgver.tar.bz2"
+        'valid-keyblock-packet.patch'
+        'protect-tool-env.patch')
+md5sums=('6a8589381ca1b0c1a921e9955f42b016'
+         '3a18a71eac65eabe1e2472639e8b03fc'
+         '7e5167aa042dbe18ab79d8b0df3f3cab')
 
 build() {
   cd ${srcdir}/gnupg-$pkgver
-  ./configure --prefix=/usr --libexecdir=/usr/lib/gnupg2 #$EXTRAOPTS
+  patch -p1 -i ${srcdir}/protect-tool-env.patch 
+  patch -p1 -i ${srcdir}/valid-keyblock-packet.patch
+	
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+	      --libexecdir=/usr/lib/gnupg \
+	      --enable-maintainer-mode \
+	      --enable-symcryptrun \
+	      --enable-gpgtar 
   make
+}
+
+check() {
+	cd "${srcdir}/gnupg-${pkgver}"
+	make check
 }
 
 package() {
@@ -28,5 +42,6 @@ package() {
   # move conflicting files
   mv ${pkgdir}/usr/share/gnupg{,2}
   rm -f ${pkgdir}/usr/share/info/dir
+  rm "${pkgdir}/usr/share/gnupg2/com-certs.pem"
 }
 
