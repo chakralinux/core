@@ -6,7 +6,8 @@
 pkgbase=opencv
 pkgname=('opencv' 'opencv-docs' 'opencv-samples')
 _realname=OpenCV
-pkgver=2.4.3
+pkgver=2.4.4
+_pkgver=2.4.4a
 pkgrel=2
 pkgdesc="Open Source Computer Vision Library"
 arch=('x86_64')
@@ -18,8 +19,8 @@ makedepends=('pkgconfig' 'cmake' 'python-numpy' 'eigen' 'python-sphinx' 'mesa')
 optdepends=('python-numpy: Python 2.x interface'
             'eigen')
 options=('!libtool')
-source=("http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/$pkgver/$_realname-$pkgver.tar.bz2")
-md5sums=('c0a5af4ff9d0d540684c0bf00ef35dbe')
+source=("http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/$pkgver/$_realname-$_pkgver.tar.bz2")
+md5sums=('876dce80ea2648b7e4d4c5a567b4d37b')
 
 _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
             '-D CMAKE_INSTALL_PREFIX=/usr'
@@ -44,7 +45,7 @@ _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
             '-D ENABLE_FAST_MATH=ON')
 
 build() {
-  cd "$srcdir/$_realname-$pkgver"
+  cd "$srcdir/$pkgbase-$pkgver"
  
   mkdir build && cd build
 
@@ -55,12 +56,12 @@ build() {
 package_opencv() {
   install=$pkgname.install
 
-  cd "$srcdir/$_realname-$pkgver/build"
+  cd "$srcdir/$pkgbase-$pkgver/build"
 
   make DESTDIR="$pkgdir" install
 
   # install license file
-  install -Dm644 "$srcdir/$_realname-$pkgver/doc/license.txt" \
+  install -Dm644 "$srcdir/$pkgbase-$pkgver/doc/license.txt" \
     "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 
   cd "$pkgdir/usr/share"

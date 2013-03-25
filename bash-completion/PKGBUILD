@@ -1,14 +1,14 @@
-# Platform packages for Chakra Linux
+# Maintainer: abveritas@chakra-project.org>
 
 pkgname=bash-completion
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Programmable completion for the bash shell"
 arch=('any')
 url="http://bash-completion.alioth.debian.org/"
 license=('GPL')
 depends=('bash')
-source=(http://bash-completion.alioth.debian.org/files/${pkgname}-${pkgver}.tar.bz2)
+source=("http://bash-completion.alioth.debian.org/files/${pkgname}-${pkgver}.tar.bz2")
 md5sums=('0d903f398be8c8f24bc5ffa6f86127f8')
 sha1sums=('3011add35574b4042c04b95fc0fd0f14006adc69')
 
@@ -30,5 +30,7 @@ package() {
   rm -r "${pkgdir}/etc/profile.d"
   # remove Slackware's makepkg completion
   rm "${pkgdir}/usr/share/bash-completion/completions/makepkg"
+  # part of systemd
+  rm "${pkgdir}/usr/share/bash-completion/completions/udevadm"
 }
 

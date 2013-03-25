@@ -1,19 +1,17 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Maintainer: abveritas@chakra-project.org
 
 pkgname=pulseaudio
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=3.0
-pkgrel=3
+pkgrel=5
 arch=('x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
 depends=('dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm'
          'libsamplerate' 'json-c' 'rtkit' 'libltdl' 'speex' 'tdb'
          'fftw' 'orc' 'webrtc-audio-processing' 'systemd>=195' 'sbc')
-makedepends=('attr' 'libltdl' 'avahi' 'bluez' 'intltool' 'jack' 'lirc-utils' 'openssl')
+makedepends=('attr' 'libltdl' 'avahi' 'bluez' 'intltool' 'jack' 'lirc-utils' 'openssl'
+             'libsndfile' 'pkgconfig' 'sh')
 optdepends=('avahi: zeroconf support'
             'bluez: bluetooth support'
             'jack: jack support'
@@ -25,27 +23,27 @@ provides=("libpulse=${pkgver}")
 replaces=('libpulse')
 conflicts=('libpulse')
 options=(!emptydirs !libtool !makeflags)
-source=("http://freedesktop.org/software/${pkgname}/releases/${pkgname}-${pkgver}.tar.xz")
-md5sums=('47fd7eca8479c757822bee68a1feef25')
+#source=("http://freedesktop.org/software/${pkgname}/releases/${pkgname}-${pkgver}.tar.xz")
+source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}.tar.xz")
+md5sums=('10049e1fa0577be38ba04d8bab159fd1')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}"
 
-  ./configure --prefix=/usr \
-              --sysconfdir=/etc \
-              --libexecdir=/usr/lib \
-              --localstatedir=/var \
-              --with-udev-rules-dir=/usr/lib/udev/rules.d \
-              --with-database=tdb \
-              --disable-tcpwrap \
-              --disable-rpath \
-              --disable-default-build-tests
+  ./autogen.sh --prefix=/usr \
+               --sysconfdir=/etc \
+               --libexecdir=/usr/lib \
+               --localstatedir=/var \
+               --with-udev-rules-dir=/usr/lib/udev/rules.d \
+               --with-database=tdb \
+               --disable-rpath \
+               --disable-default-build-tests
 
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}"
   make DESTDIR="${pkgdir}" install
 
   # Disable cork-request module, can result in e.g. media players unpausing
