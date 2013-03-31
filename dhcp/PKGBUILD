@@ -7,9 +7,9 @@ pkgbase=dhcp
 pkgname=('dhcp' 
 	 'dhclient')
 # separate patch levels with a period to maintain proper versioning.
-pkgver=4.2.4.2
-_pkgver=4.2.4-P2
-pkgrel=2
+pkgver=4.2.5
+_pkgver=4.2.5-P1
+pkgrel=1
 arch=('x86_64')
 license=('custom:isc-dhcp')
 url="https://www.isc.org/software/dhcp"
@@ -19,7 +19,7 @@ source=(ftp://ftp.isc.org/isc/${pkgbase}/${_pkgver}/${pkgbase}-${_pkgver}.tar.gz
         dhcpd6.service
         dhcp-4.2.4-P2-missing-ipv6-not-fatal.patch
         dhclient-script-pathFixes.patch)
-md5sums=('fe36056f2d274fa4b82a5422f192e65f'
+md5sums=('f68e3c1f00a9af5742bc5e71d567cf93'
          '8f357e46e1efcbb746f38737a3f977a2'
          '7045e63a5d294c761ce306084eec2c67'
          'a2ebf4460c049cbee3e49cb26a475f68'
@@ -77,17 +77,17 @@ package_dhclient() {
   pkgdesc="dhclient is standalone client from the dhcp package"
   depends=('bash' 'iproute2' 'net-tools')
   
-  cd "${srcdir}/${_pkgname}-${_pkgver}"
-  make -C client DESTDIR="${pkgdir}" install 
+  cd "${srcdir}/${pkgbase}-${_pkgver}"
+  make -C client DESTDIR="${pkgdir}" install
 
-  #move dhclient.conf to dhclient.conf.example
-  mv "${pkgdir}"/etc/dhclient.conf{,.example}
-
-  install -d "${pkgdir}/var/state/dhclient"
+  install -m755 -d "${pkgdir}/usr/share/dhclient"
+  mv "${pkgdir}/etc/dhclient.conf.example" "${pkgdir}/usr/share/dhclient/"
+  
+  install -d "${pkgdir}/var/lib/dhclient"
 
   # install dhclient linux script
-  install -Dm0755 client/scripts/linux "${pkgdir}/sbin/dhclient-script"
+  install -m755 -D client/scripts/linux "${pkgdir}/sbin/dhclient-script"
 
-  # install licenses
-  install -Dm0644 LICENSE "${pkgdir}/usr/share/licenses/dhclient/LICENSE"
+  # install license
+  install -m644 -D LICENSE "${pkgdir}/usr/share/licenses/dhclient/LICENSE"
 }
