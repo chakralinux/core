@@ -59,7 +59,7 @@ package_qscintilla() {
 package_qscintilla-python-common() {
     pkgdesc="Common python qscintilla bindings files shared between the Python2 and Python3 version"
     depends=('qscintilla')
-    conflicts=('qscintilla-python<=2.7')
+    conflicts=('python-qscintilla<=2.7')
 
     cd "${srcdir}/QScintilla-gpl-${pkgver}"/Python
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
@@ -70,9 +70,9 @@ package_qscintilla-python-common() {
 
 package_qscintilla-python2() {
     pkgdesc="Python bindings for QScintilla2 (for Python 2)"
-    conflicts=('qscintilla-python')
-    replaces=('qscintilla2-python')
-    provides=('qscintilla2-python')
+    conflicts=('python-qscintilla')
+    replaces=('python-qscintilla')
+    provides=('python-qscintilla=${pkgver}')
     depends=('qscintilla' 'qscintilla-python-common' 'pyqt4-python2')
 
    cd "${srcdir}/QScintilla-gpl-${pkgver}/Python"
