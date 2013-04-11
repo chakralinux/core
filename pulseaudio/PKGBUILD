@@ -3,7 +3,7 @@
 pkgname=pulseaudio
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=3.0
-pkgrel=5
+pkgrel=6
 arch=('x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
@@ -24,11 +24,17 @@ replaces=('libpulse')
 conflicts=('libpulse')
 options=(!emptydirs !libtool !makeflags)
 #source=("http://freedesktop.org/software/${pkgname}/releases/${pkgname}-${pkgver}.tar.xz")
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}.tar.xz")
-md5sums=('10049e1fa0577be38ba04d8bab159fd1')
+source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}.tar.xz"
+        "mixer.patch")
+md5sums=('10049e1fa0577be38ba04d8bab159fd1'
+         'f4640b454d74e2ebc1e8399e50d62807')
 
 build() {
   cd "${srcdir}/${pkgname}"
+  
+  # Bugfix: mix the right numbers of streams
+  # http://cgit.freedesktop.org/pulseaudio/pulseaudio/commit/?id=179cacfc6620839cc9c4399e3f0a995bc499145f
+  patch -p1 -i "${srcdir}/mixer.patch"
 
   ./autogen.sh --prefix=/usr \
                --sysconfdir=/etc \
@@ -57,5 +63,4 @@ package() {
   rm "${pkgdir}/etc/dbus-1/system.d/pulseaudio-system.conf"
   rm "${pkgdir}/etc/xdg/autostart/pulseaudio.desktop"
   rm "${pkgdir}/etc/xdg/autostart/pulseaudio-kde.desktop"
-  
 }
