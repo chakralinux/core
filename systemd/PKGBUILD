@@ -2,7 +2,7 @@
 # maintainer: abveritas@chakra-project.org
 
 pkgname=systemd
-pkgver=198
+pkgver=201
 pkgrel=2
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -36,22 +36,13 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         '99-default.preset'
         '98-chakra.rules'
         'is_bundle'
+        'logind1.patch'
         'libsystemd_login.diff')
-md5sums=('26a75e2a310f8c1c1ea9ec26ddb171c5'
-         'e99e9189aa2f6084ac28b8ddf605aeb8'
-         'fb37e34ea006c79be1c54cbb0f803414'
-         'df69615503ad293c9ddf9d8b7755282d'
-         '21572b99173a7cdeaff965e0a5e9182b'
-         'a1bf25da736d3719e9720b2e4caea341'
-         '40f1d228553f939430e6d8d781f06daf'
-         '05d26a1936bf5b075bedd76952ab1b53'
-         '2b574148b3fddad878e55678f70f8d2a')
 
 build() {
   cd "$pkgname-$pkgver"
   
   patch -p1 -i "$srcdir/use-split-usr-path.patch"
-  patch -p1 -i "$srcdir/libsystemd_login.diff"
 
   ./configure \
       PYTHON=python2 \
@@ -116,5 +107,13 @@ package() {
   install -dm755 "$pkgdir/var/log/journal"
   sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
 }
-
-
+md5sums=('3e758392ff0e9206b3f7ee252b4a654b'
+         'e99e9189aa2f6084ac28b8ddf605aeb8'
+         'fb37e34ea006c79be1c54cbb0f803414'
+         'df69615503ad293c9ddf9d8b7755282d'
+         '21572b99173a7cdeaff965e0a5e9182b'
+         'a1bf25da736d3719e9720b2e4caea341'
+         '40f1d228553f939430e6d8d781f06daf'
+         '05d26a1936bf5b075bedd76952ab1b53'
+         'e9a7e96d265966d77700f36a6b9aaf8c'
+         '2b574148b3fddad878e55678f70f8d2a')
