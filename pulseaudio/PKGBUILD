@@ -1,27 +1,17 @@
-# Maintainer: abveritas@chakra-project.org
+# Maintainer: Manuel Tortosa
 
-pkgname=pulseaudio
+pkgbase=pulseaudio
+pkgname=(pulseaudio libpulse)
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=3.0
-pkgrel=6
+pkgrel=7
 arch=('x86_64')
 url="http://pulseaudio.org/"
 license=('GPL' 'LGPL')
-depends=('dbus-core' 'xcb-util' 'libasyncns' 'libcap' 'libxtst' 'libsm'
-         'libsamplerate' 'json-c' 'rtkit' 'libltdl' 'speex' 'tdb'
-         'fftw' 'orc' 'webrtc-audio-processing' 'systemd>=195' 'sbc')
 makedepends=('attr' 'libltdl' 'avahi' 'bluez' 'intltool' 'jack' 'lirc-utils' 'openssl'
              'libsndfile' 'pkgconfig' 'sh')
-optdepends=('avahi: zeroconf support'
-            'bluez: bluetooth support'
-            'jack: jack support'
-            'lirc-utils: infra-red support'
-            'openssl: RAOP support')
 backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
 install="pulseaudio.install"
-provides=("libpulse=${pkgver}")
-replaces=('libpulse')
-conflicts=('libpulse')
 options=(!emptydirs !libtool !makeflags)
 #source=("http://freedesktop.org/software/${pkgname}/releases/${pkgname}-${pkgver}.tar.xz")
 source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}.tar.xz"
@@ -30,7 +20,7 @@ md5sums=('10049e1fa0577be38ba04d8bab159fd1'
          'f4640b454d74e2ebc1e8399e50d62807')
 
 build() {
-  cd "${srcdir}/${pkgname}"
+  cd "${srcdir}/${pkgbase}"
   
   # Bugfix: mix the right numbers of streams
   # http://cgit.freedesktop.org/pulseaudio/pulseaudio/commit/?id=179cacfc6620839cc9c4399e3f0a995bc499145f
@@ -48,19 +38,82 @@ build() {
   make
 }
 
-package() {
-  cd "${srcdir}/${pkgname}"
-  make DESTDIR="${pkgdir}" install
+package_pulseaudio() {
+  depends=("libpulse=$pkgver-$pkgrel" rtkit libltdl speex tdb systemd fftw orc
+           libsamplerate webrtc-audio-processing sbc)
+  optdepends=('avahi: zeroconf support'
+              'bluez: bluetooth support'
+              'jack: jack support'
+              'lirc-utils: infra-red support'
+              'openssl: RAOP support'
+              'pyqt: Equalizer GUI (qpaeq)')
+  backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
+  install=pulseaudio.install
+
+  cd $pkgbase
+  make -j1 DESTDIR="$pkgdir" install
+
+  # Disable autospawn by default
+  sed -e '/autospawn/iautospawn=no' \
+      -i "$pkgdir/etc/pulse/client.conf"
+
+  # Speed up pulseaudio shutdown
+  # Lower resample quality, saves CPU
+  sed -e '/exit-idle-time/iexit-idle-time=0' \
+      -e '/resample-method/iresample-method=speex-float-0' \
+      -i "$pkgdir/etc/pulse/daemon.conf"
 
   # Disable cork-request module, can result in e.g. media players unpausing
   # when there's a Skype call incoming
   sed -e 's|/usr/bin/pactl load-module module-x11-cork-request|#&|' \
-      -i "${pkgdir}/usr/bin/start-pulseaudio-x11"
+      -i "$pkgdir/usr/bin/start-pulseaudio-x11"
+
+  # Make ConsoleKit optional
+  sed -e $'/load-module module-console-kit/{i.nofail\n;a.fail\n;}' \
+      -i "$pkgdir/etc/pulse/default.pa"
 
   # Python fix
-  sed -i '1s:python$:&2:' "${pkgdir}/usr/bin/qpaeq"
+  sed -i '1s:python$:&2:' "$pkgdir/usr/bin/qpaeq"
 
-  rm "${pkgdir}/etc/dbus-1/system.d/pulseaudio-system.conf"
-  rm "${pkgdir}/etc/xdg/autostart/pulseaudio.desktop"
-  rm "${pkgdir}/etc/xdg/autostart/pulseaudio-kde.desktop"
+  rm "$pkgdir/etc/dbus-1/system.d/pulseaudio-system.conf"
+
+  # cap is handled in .install
+  chmod 755 "$pkgdir/usr/lib/pulse/proximity-helper"
+
+### Split libpulse
+
+  mkdir -p "$srcdir"/libpulse/{etc/pulse,usr/{bin,lib/pulseaudio,share/man/man{1,5}}}
+
+  mv {"$pkgdir","$srcdir/libpulse"}/etc/pulse/client.conf
+
+  mv "$pkgdir"/usr/bin/pa{cat,ctl,dsp,mon,play,rec,record} \
+     "$srcdir/libpulse/usr/bin"
+
+  mv "$pkgdir"/usr/lib/libpulse{,-simple,-mainloop-glib}.so* \
+     "$srcdir/libpulse/usr/lib"
+
+  mv "$pkgdir"/usr/lib/pulseaudio/libpulsedsp.so \
+     "$pkgdir"/usr/lib/pulseaudio/libpulsecommon-*.so \
+     "$srcdir/libpulse/usr/lib/pulseaudio"
+
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/lib/cmake
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/lib/pkgconfig
+
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/include
+
+  mv "$pkgdir"/usr/share/man/man1/pa{cat,ctl,dsp,play}.1 \
+     "$srcdir/libpulse/usr/share/man/man1"
+
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/share/man/man5/pulse-client.conf.5
+  mv {"$pkgdir","$srcdir/libpulse"}/usr/share/vala
+}
+
+package_libpulse() {
+  pkgdesc="$pkgdesc (client library)"
+  depends=(dbus libasyncns libcap libxtst libsm libsndfile json-c)
+  optdepends=('alsa-plugins: ALSA support'
+              'avahi: zeroconf support')
+  backup=(etc/pulse/client.conf)
+
+  mv "$srcdir"/libpulse/* "$pkgdir"
 }
