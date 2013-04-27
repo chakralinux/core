@@ -1,30 +1,27 @@
-#
 # Platform Packages for Chakra, part of chakra-project.org
 #
 # maintainer abveritas[at]chakra-project[dot]org>
 
-pkgname=pyqt
-pkgver=4.9.6
-pkgrel=2
+pkgbase=pyqt
+# pyqt4 because it now supports Qt5; however nothing uses it at the moment
+pkgname=("pyqt4-common" "pyqt4-python2" "pyqt4-python3")
+pkgver=4.10
+pkgrel=5
 pkgdesc="A set of Python bindings for the Qt toolkit"
 arch=('x86_64')
 url="http://riverbankcomputing.co.uk/software/pyqt/intro"
 license=('GPL')
-depends=('sip' 'qtwebkit' 'dbus-python')
-makedepends=('phonon' 'python-opengl' 'qt-assistant-compat' 'mesa')
-optdepends=('phonon: enable audio and video in PyQt applications'
-        'python-opengl: enable OpenGL 3D graphics in PyQt applications'
-        'qscintilla: QScintilla API'
-        'qt-assistant-compat: add PyQt online help in Qt Assistant')
-provides=('pyqt4')
-replaces=('pyqt4')
-conflicts=('pyqt4')
+makedepends=('phonon' 'python-opengl' 'qt-assistant-compat' 'mesa' 'sip-python2' 
+             'sip-python3' 'qtwebkit' 'dbus-python2' 'dbus-python3'
+            )
 source=("http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-${pkgver}/PyQt-x11-gpl-${pkgver}.tar.gz")
-md5sums=('514e1f9597771dc732ba75ba9fa5c6b6')
+md5sums=('b5953e96d0f82d322d0cba008163321e')
 
 build() {
-  cd ${srcdir}/PyQt-x11-gpl-${pkgver}
+  cp -r ${srcdir}/PyQt-x11-gpl-${pkgver} ${srcdir}/python3-PyQt-x11-gpl-${pkgver}
 
+  cd ${srcdir}/PyQt-x11-gpl-${pkgver}
+  # Python 2 version
   python2 configure.py \
     --confirm-license \
     -v /usr/share/sip \
@@ -34,10 +31,70 @@ build() {
   find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
 
   make
+
+  cd ${srcdir}/python3-PyQt-x11-gpl-${pkgver}
+  # Python 3 version
+  python3 configure.py \
+    --confirm-license \
+    --qsci-api
+
+  find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
+
+  make
 }
 
-package(){
+package_pyqt4-common(){
+  pkgdesc="Parts of PyQt for Qt4 shared by both Python versions"
+  conflicts=("pyqt<4.10")
   cd ${srcdir}/PyQt-x11-gpl-${pkgver}
+
+  make -C pyrcc DESTDIR="${pkgdir}" install
+  make -C pylupdate DESTDIR="${pkgdir}" install
+  install -Dm644 PyQt4.api "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
+}
+
+package_pyqt4-python2() {
+  pkgdesc="A set of Python bindings for the Qt toolkit (Python 2)"
+  depends=("qtwebkit" "sip-python2" "dbus-python2" "pyqt4-common" "python2" "sip-python2")
+  optdepends=('phonon: enable audio and video in PyQt applications'
+              'python-opengl: enable OpenGL 3D graphics in PyQt applications'
+              'qscintilla-python2: QScintilla API'
+              'qt-assistant-compat: add PyQt online help in Qt Assistant')
+  provides=("pyqt=$pkgver")
+  coflicts=("pyqt<4.10")
+  replaces=("pyqt")
+
+  cd "${srcdir}/PyQt-x11-gpl-${pkgver}"
   # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
   make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+
+  # Provided by pyqt4-common
+  rm -f "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
+  rm "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
+}
+
+package_pyqt4-python3() {
+  pkgdesc="A set of Python bindings for the Qt toolkit (Python 3)"
+  depends=("qtwebkit" "sip-python2" "dbus-python2" "pyqt4-common" "python3" "sip-python3")
+  optdepends=('phonon: enable audio and video in PyQt applications'
+              'python-opengl: enable OpenGL 3D graphics in PyQt applications'
+              'qscintilla-python3: QScintilla API'
+              'qt-assistant-compat: add PyQt online help in Qt Assistant')
+  provides=("pyqt=$pkgver")
+  coflicts=("pyqt<4.10")
+  replaces=("pyqt")
+
+  cd "${srcdir}/python3-PyQt-x11-gpl-${pkgver}"
+  # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
+  make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+  # fix conflict with Python 2 version
+  mv "${pkgdir}"/usr/bin/pyuic4 "${pkgdir}"/usr/bin/pyuic4-python3
+ 
+  # Provided by pyqt-common
+  rm -f "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
+  rm -f "${pkgdir}"/usr/lib/qt4/plugins/designer/libpythonplugin.so
+  rm "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
+  rm  "${pkgdir}"/usr/lib/qt/plugins/designer/libpythonplugin.so
 }

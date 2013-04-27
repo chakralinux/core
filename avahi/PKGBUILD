@@ -1,8 +1,11 @@
-# maintainer abveritas@chakra-project.org
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Martín González kote[at]chakra-project[dot]org>
 
 pkgname=avahi
 pkgver=0.6.31
-pkgrel=6
+pkgrel=7
 pkgdesc="A multicast/unicast DNS-SD framework"
 arch=('x86_64')
 url="http://www.avahi.org/"
@@ -12,7 +15,7 @@ optdepends=('qt: qt bindings'
 	    'nss-mdns: NSS support for mDNS'
 	    'dbus-python: avahi-discover'
             'twisted: avahi-bookmarks')
-makedepends=('qt' 'dbus-python' 'gobject-introspection' 'pygtk' 'intltool')
+makedepends=('qt' 'dbus-python' 'gobject-introspection' 'intltool')
 backup=(etc/avahi/avahi-daemon.conf etc/avahi/services/{sftp-,}ssh.service)
 install=avahi.install
 options=('!libtool')
@@ -42,6 +45,7 @@ build() {
     --disable-xmltoman \
     --disable-gtk \
     --disable-gtk3 \
+    --disable-pygtk \
     --enable-compat-libdns_sd \
     --enable-compat-howl \
     --with-distro=archlinux \
@@ -59,7 +63,7 @@ package() {
 	install -D -m 644 ../gnome-nettool.png "${pkgdir}"/usr/share/pixmaps/gnome-nettool.png
 
 	cd "${pkgdir}"
-	sed -i '1c #!/usr/bin/python2' usr/bin/avahi-{bookmarks,discover}
+	sed -i '1c #!/usr/bin/python2' usr/bin/avahi-bookmarks
 	# howl and mdnsresponder compatability
 	(cd usr/include; ln -s avahi-compat-libdns_sd/dns_sd.h dns_sd.h; ln -s avahi-compat-howl howl)
 	(cd usr/lib/pkgconfig; ln -s avahi-compat-howl.pc howl.pc)
