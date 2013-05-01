@@ -6,22 +6,18 @@
 pkgbase=nvidia-304xx-utils
 pkgname=('nvidia-304xx-utils' 'nvidia-304xx-settings')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
-pkgver=304.64
-pkgrel=3
+pkgver=304.88
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
 
-[ "$CARCH" = "x86_64" ] && {
-  ARCH='x86_64'
-  _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-  md5sums=('76007ed4b72afd334e26377b646f5f7e')
-}
-
+ARCH='x86_64'
+_pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
 source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
         'nvidia-restore-settings.desktop')
-md5sums=("${md5sums[@]}"
+md5sums=('35e0c7d30de795cccb6b95bda991fb77'
          '9237516792da7b6df32f8c7e8a98f475')
 
 create_links() {
