@@ -6,22 +6,19 @@
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl' 'nvidia-settings')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
-pkgver=313.26
+pkgver=313.30
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
 
-[ "$CARCH" = "x86_64" ] && {
-  ARCH='x86_64'
-  _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-  md5sums=('2d35124fa5a4b009f170fe893b5d07e3')
-}
+ARCH='x86_64'
+_pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
 
 source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
         'nvidia-restore-settings.desktop')
-md5sums=("${md5sums[@]}"
+md5sums=('e5f147fbcdcad71472b4ddeccf259bd7'
          '9237516792da7b6df32f8c7e8a98f475')
 
 create_links() {
@@ -40,7 +37,6 @@ build() {
 
 package_libcl() {
   pkgdesc="OpenCL library and ICD loader from NVIDIA"
-  pkgver=1.1.9.8
 
   cd "${srcdir}/${_pkg}"
 
@@ -133,5 +129,3 @@ package_nvidia-settings() {
   # are automatically reloaded at each login
   install -D -m644 "${srcdir}/nvidia-restore-settings.desktop" "${pkgdir}/usr/share/autostart/nvidia-restore-settings.desktop"
 }
-
-# vim:set ts=2 sw=2 et:
