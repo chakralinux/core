@@ -4,11 +4,11 @@
                  KCL_DEBUG_ERROR(REMAP_PAGE_RANGE_STR " failed\n");
                  return -EAGAIN;
              }
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
              vma->vm_flags |= VM_SHM | VM_RESERVED; /* Don't swap */
 +#else
 +            vma->vm_flags |= VM_SHM | VM_DONTEXPAND | VM_DONTDUMP; /* Don't swap */
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
              vma->vm_ops = &vm_ops;
  			break;
  
@@ -16,22 +16,22 @@
                  KCL_DEBUG_ERROR(REMAP_PAGE_RANGE_STR " failed\n");
                  return -EAGAIN;
              }
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
              vma->vm_flags |= VM_SHM | VM_RESERVED; /* Don't swap */
 +#else
 +            vma->vm_flags |= VM_SHM | VM_DONTEXPAND | VM_DONTDUMP; /* Don't swap */
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
              vma->vm_ops = &vm_ops;
              }
  			break;
  #endif                    
  
          case __KE_SHM:
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
              vma->vm_flags |= VM_SHM | VM_RESERVED; /* Don't swap */
 +#else
 +            vma->vm_flags |= VM_SHM | VM_DONTEXPAND | VM_DONTDUMP; /* Don't swap */
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
              vma->vm_ops = &vm_shm_ops;
              break;
  
@@ -39,11 +39,11 @@
  
              pages = (vma->vm_end - vma->vm_start) >> PAGE_SHIFT;
  
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
              vma->vm_flags |= VM_RESERVED;
 +#else
 +            vma->vm_flags |= VM_DONTEXPAND | VM_DONTDUMP;
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
  
              //vma->vm_flags |=  VM_SHM | VM_LOCKED; /* DDDDDDDDDDon't swap */
              //vma->vm_mm->locked_vm += pages; /* Kernel tracks aqmount of locked pages */
@@ -51,22 +51,22 @@
  
          case __KE_CTX:
              pages = (vma->vm_end - vma->vm_start) >> PAGE_SHIFT;
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
              vma->vm_flags |= VM_LOCKED | VM_SHM | VM_RESERVED; /* Don't swap */
 +#else
 +            vma->vm_flags |= VM_LOCKED | VM_SHM | VM_DONTEXPAND | VM_DONTDUMP; /* Don't swap */
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
              vma->vm_mm->locked_vm += pages; /* Kernel tracks aqmount of locked pages */
              vma->vm_ops = &vm_ctx_ops;
              break;
  
          case __KE_PCI_BQS:
              pages = (vma->vm_end - vma->vm_start) >> PAGE_SHIFT;
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
              vma->vm_flags |= VM_LOCKED | VM_SHM | VM_RESERVED; /* Don't swap */
 +#else
 +            vma->vm_flags |= VM_LOCKED | VM_SHM | VM_DONTEXPAND | VM_DONTDUMP; /* Don't swap */
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
              vma->vm_mm->locked_vm += pages; /* Kernel tracks aqmount of locked pages */
              vma->vm_ops = &vm_pci_bq_ops;
              break;
@@ -74,17 +74,17 @@
                      return -EAGAIN;
                  }
  #ifdef __x86_64__
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
                  vma->vm_flags |= VM_RESERVED;
  #else
 +                vma->vm_flags |= VM_DONTEXPAND | VM_DONTDUMP;
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
 +#else
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
                  vma->vm_flags |= VM_SHM | VM_RESERVED; /* Don't swap */
 +#else
 +                vma->vm_flags |= VM_SHM | VM_DONTEXPAND | VM_DONTDUMP; /* Don't swap */
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
  #endif
                  vma->vm_ops = &vm_ops;
              }
@@ -92,17 +92,17 @@
                      return -EAGAIN;
                  }
  #ifdef __x86_64__
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
                  vma->vm_flags |= VM_RESERVED;
  #else
 +                vma->vm_flags |= VM_DONTEXPAND | VM_DONTDUMP;
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
 +#else
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
                  vma->vm_flags |= VM_SHM | VM_RESERVED; /* Don't swap */
 +#else
 +                vma->vm_flags |= VM_SHM | VM_DONTEXPAND | VM_DONTDUMP; /* Don't swap */
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
  #endif
                  vma->vm_ops = &vm_agp_bq_ops;
              }
@@ -110,11 +110,11 @@
  #endif /* __AGP__BUILTIN__ */
  
          case __KE_KMAP:
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
  		    vma->vm_flags |= VM_SHM | VM_RESERVED;
 +#else
 +		    vma->vm_flags |= VM_SHM | VM_DONTEXPAND | VM_DONTDUMP;
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
              vma->vm_ops = &vm_kmap_ops;
              if (readonly && (vma->vm_flags & VM_WRITE))
              {
@@ -122,11 +122,11 @@
  #endif            
              // fall through
           case __KE_GART_CACHEABLE:
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
               vma->vm_flags |= VM_RESERVED;
 +#else
 +             vma->vm_flags |= VM_DONTEXPAND | VM_DONTDUMP;
-+#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) */
++#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0) */
               vma->vm_ops = &vm_gart_ops;
               break;
          default:
