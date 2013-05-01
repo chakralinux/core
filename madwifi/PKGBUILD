@@ -6,8 +6,7 @@ _extramodules=extramodules-3.8-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=madwifi
-pkgver=0.9.4.4173
-_ver=0.9.4-r4173-20111008
+pkgver=0.9.4.4182
 pkgrel=14
 pkgdesc="Madwifi drivers for Atheros wireless chipsets"
 arch=('x86_64')
@@ -24,7 +23,7 @@ groups=("linux-modules")
 
 build()
 {
-  cd madwifi-$_ver
+  cd madwifi-$pkgver
 
   # kernel 3.2 abi change
   sed -i -e "s/.ndo_set_multicast_list/.ndo_set_rx_mode/" ath/if_ath.c
@@ -33,12 +32,13 @@ build()
 
   sed -i 's/-Werror//' Makefile.inc
   sed -i 's/\[4-9\]\\\./[0-9]-/' Makefile
+
   make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules
 }
 
 package()
 {
-  cd madwifi-$_ver
+  cd madwifi-$pkgver
   make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules \
        DESTDIR="${pkgdir}" KERNELRELEASE=${_kver} install-modules
   sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" ${startdir}/*.install
