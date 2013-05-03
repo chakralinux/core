@@ -5,7 +5,7 @@
 
 pkgname=libpng12
 _realname=libpng
-pkgver=1.2.43
+pkgver=1.2.50
 pkgrel=1
 pkgdesc="A collection of routines used to create PNG format graphics files"
 arch=('i686' 'x86_64')
@@ -14,9 +14,9 @@ license=('custom')
 depends=('zlib' 'perl')
 options=('!libtool')
 source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-${pkgver}.tar.bz2"
-        "http://littlesvr.ca/apng/diff/libpng-1.2.43-apng.patch")
-md5sums=('976909556e6613804d810405c1f72ce6'
-         '0152337e035e9c767ca92521e3127502')
+        "http://downloads.sourceforge.net/sourceforge/${_realname}-apng/${_realname}-${pkgver}-apng.patch.gz")
+md5sums=('717caa58e9c71a80820eb38c4f4d6ec3'
+         '3d3d078b031b23a9e1d95f9822185740')
 
 
 build() {
@@ -24,7 +24,7 @@ build() {
 
   # Add animated PNG (apng) support
   # see http://hp.vector.co.jp/authors/VA013651/freeSoftware/apng.html
-  patch -Np0 -i "${srcdir}/libpng-1.2.43-apng.patch" || return 1
+  patch -Np1 -i "${srcdir}/libpng-${pkgver}-apng.patch" || return 1
 
   libtoolize --force --copy || return 1
   aclocal || return 1
