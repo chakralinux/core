@@ -6,16 +6,16 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel=3.8
-pkgver=3.8.8
+_basekernel=3.9
+pkgver=3.9.0
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl')
 options=('!strip')
-source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.8.tar.xz"
-        "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
+source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz"
+        #"http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config.x86_64'
         #aufs patches
@@ -26,11 +26,12 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.8.tar.xz"
         'aufs3-kbuild.patch'
         'aufs3.patch'
         'config.aufs'
+        # Fixes
+        alsa-firmware-loading-3.8.8.patch
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch')
-md5sums=('1c738edfc54e7c65faeb90c436104e2f'
-         '08cdcef928c2ca402adf1c444a3c43ac'
+md5sums=('4348c9b6b2eb3144d601e87c19d5d909'
          'b052c16a6f0b1861233166b9d52033d2'
          '52690fe8baa6d6abd858f04c4531d437'
          '94a873436f6c62580ac54c1b9f0e021a'
@@ -39,6 +40,7 @@ md5sums=('1c738edfc54e7c65faeb90c436104e2f'
          'f9d33aeebb5c637eeefc222643632035'
          '5e73a0f39d73095bdff6a9168ecc05cd'
          '52f4a2c7f6277774117c834d949d6b81'
+         'e2ac681ffa439e969b4c3b4616852454'
          'eb14dcfd80c00852ef81ded6e826826a'
          '65cbe8e4c8efaf96dd162102e46ce81d')
 
@@ -46,7 +48,7 @@ build() {
   cd "${srcdir}/linux-${_basekernel}"
 
   # add upstream patch
-  patch -p1 -i "${srcdir}/patch-${pkgver}"
+  # patch -p1 -i "${srcdir}/patch-${pkgver}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -55,6 +57,9 @@ build() {
   # remove this when a Kconfig knob is made available by upstream
   # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
   patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
+
+  # Fix for alsa
+  patch -Np1 -i "${srcdir}/alsa-firmware-loading-3.8.8.patch"
 
   #aufs patches for Live:
   patch -p1 -i "${srcdir}/aufs3.patch"
@@ -106,7 +111,7 @@ package_linux() {
   depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7')
   optdepends=('crda: to set the correct wireless channels of your country')
   provides=('nouveau-drm' 'kernel26' 'acerhk=0.5.35' 'aufs3')
-  conflicts=('kernel26' 'nvidia-96xx=96.43.20-9' 'acerhk')
+  conflicts=('kernel26' 'nvidia-96xx=96.43.20-9' 'acerhk' 'tiacx')
   replaces=('kernel26' 'aufs3' 'nouveau-drm')
   backup=("etc/mkinitcpio.d/${pkgname}.preset")
   install=linux.install
