@@ -4,7 +4,7 @@
 # maintainer abveritas@chakra-project.org
 
 pkgbase=nvidia-304xx-utils
-pkgname=('nvidia-304xx-utils' 'nvidia-304xx-settings')
+pkgname=('nvidia-304xx-utils')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 pkgver=304.88
 pkgrel=1
@@ -15,10 +15,8 @@ options=('!strip')
 
 ARCH='x86_64'
 _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
-source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run"
-        'nvidia-restore-settings.desktop')
-md5sums=('35e0c7d30de795cccb6b95bda991fb77'
-         '9237516792da7b6df32f8c7e8a98f475')
+source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
+md5sums=('35e0c7d30de795cccb6b95bda991fb77')
 
 create_links() {
   # create soname links
@@ -34,7 +32,7 @@ build() {
   sh "${_pkg}.run" --extract-only
 }
 
-package_nvidia-304xx-utils() {
+package() {
   pkgdesc="NVIDIA drivers utilities and libraries."
   depends=('xorg-server' 'libxvmc')
   optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig'
@@ -85,23 +83,3 @@ package_nvidia-304xx-utils() {
   create_links
 }
 
-package_nvidia-304xx-settings() {
-  pkgdesc="Gtk Graphical User Interface for nVidia"
-  depends=('nvidia-304xx-utils' 'gtk2' 'pangox-compat')
-  conflicts=('nvidia-settings')
-
-  cd "${srcdir}/${_pkg}"
-
-
-  install -D -m755 nvidia-settings "${pkgdir}/usr/bin/nvidia-settings"
-  install -D -m644 nvidia-settings.1.gz "${pkgdir}/usr/share/man/man1/nvidia-settings.1.gz"
-  install -D -m644 nvidia-settings.desktop "${pkgdir}/usr/share/applications/nvidia-settings.desktop"
-  install -D -m644 nvidia-settings.png "${pkgdir}/usr/share/pixmaps/nvidia-settings.png"
-  sed -e 's:__UTILS_PATH__:/usr/bin:' -e 's:__PIXMAP_PATH__:/usr/share/pixmaps:' -i "${pkgdir}/usr/share/applications/nvidia-settings.desktop"
-
-  # Install the autostart .desktop file, so that parameters saved through nvidia-settings
-  # are automatically reloaded at each login
-  install -D -m644 "${srcdir}/nvidia-restore-settings.desktop" "${pkgdir}/usr/share/autostart/nvidia-restore-settings.desktop"
-}
-
-# vim:set ts=2 sw=2 et:
