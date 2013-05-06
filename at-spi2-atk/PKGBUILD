@@ -1,17 +1,15 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas@chakra-project.org
-# contributor Ionut Biru <ibiru@archlinux.org>
 
 pkgname=at-spi2-atk
 pkgver=2.6.2
-pkgrel=1
+pkgrel=2
 pkgdesc="A GTK+ module that bridges ATK to D-Bus at-spi"
 arch=('x86_64')
 url="http://www.gnome.org"
 license=('GPL2')
-depends=('at-spi2-core' 'libx11' 'atk' 'dconf')
+depends=('at-spi2-core' 'libx11' 'atk')
 makedepends=('intltool')
 install=at-spi2-atk.install
 options=('!libtool')
@@ -25,7 +23,7 @@ build() {
   autoreconf --force --install
 
   ./configure --prefix=/usr --sysconfdir=/etc \
-    --disable-schemas-compile
+    --disable-schemas-compile 
   make
 }
 
