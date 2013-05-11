@@ -4,19 +4,21 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgname=cx_freeze
+pkgname=python2-cx_freeze
 _tarname=cx_Freeze
-pkgver=4.2.3
+pkgver=4.3.1
 pkgrel=1
 pkgdesc="A set of utilities for freezing Python scripts into executables"
 arch=('i686' 'x86_64')
-url="http://www.python.net/crew/atuining/cx_Freeze/"
+url="http://cx-freeze.sourceforge.net/"
 license=('custom')
 depends=('python2')
-provides=('cxfreeze')
+provides=('cxfreeze' 'cx_freeze')
+replaces=('cx_freeze')
+conflicts=('cx_freeze')
 source=("http://downloads.sourceforge.net/cx-freeze/$_tarname-$pkgver.tar.gz"
         'FreezePython.sh')
-md5sums=('a524cfd23de5d37e0ec9400ba1ccd6ad'
+md5sums=('8ac023e544679d796a66b51e568a9604'
          '5cc60d1644eba12a57c22cc1348a4afd')
 
 package() {
@@ -27,5 +29,4 @@ package() {
   install -d "$pkgdir"/usr/share/cx-freeze/{bases,initscripts}
   install -m755 source/bases/* "$pkgdir/usr/share/cx-freeze/bases"
   install -m644 initscripts/* "$pkgdir/usr/share/cx-freeze/initscripts"
-  install -D -m644 LICENSE.txt "$pkgdir/usr/share/licenses/cx_freeze/COPYING"
 }
