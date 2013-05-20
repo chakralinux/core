@@ -4,7 +4,7 @@
 
 pkgname=pango
 pkgver=1.32.5
-pkgrel=1
+pkgrel=2
 pkgdesc="A library for layout and rendering of text"
 arch=('x86_64')
 license=('LGPL')
@@ -27,4 +27,5 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
+  install -m755 -d "${pkgdir}/etc/pango"
 }
