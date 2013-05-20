@@ -7,7 +7,7 @@ pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
 _basekernel=3.9
-pkgver=3.9.0
+pkgver=3.9.2
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -15,7 +15,7 @@ license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl')
 options=('!strip')
 source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz"
-        #"http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
+        "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config.x86_64'
         #aufs patches
@@ -26,21 +26,19 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         'aufs3-kbuild.patch'
         'aufs3.patch'
         'config.aufs'
-        # Fixes
-        alsa-firmware-loading-3.8.8.patch
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch')
 md5sums=('4348c9b6b2eb3144d601e87c19d5d909'
-         'b052c16a6f0b1861233166b9d52033d2'
-         '52690fe8baa6d6abd858f04c4531d437'
-         '94a873436f6c62580ac54c1b9f0e021a'
-         'a2678afaf5205f24c58affd4b1570503'
-         '7693e0258036ab1c6e6a42d7ee573666'
-         'f9d33aeebb5c637eeefc222643632035'
-         '5e73a0f39d73095bdff6a9168ecc05cd'
+         'adeb2556568f79e827e7a0ce4c483605'
+         '698318024a36e40b4d44eac67c3a7ecd'
+         '89fbb605ef398297b8dc43409c849c92'
+         'd5f57f666f02ca25ba298210e2332ce8'
+         'cf2ad9065886e56698524eab323ac656'
+         '460247f1b4da5dccdaacfa6d161131f0'
+         '498abc1e34df8a7d19e43980c74f2bc2'
+         '3ce07d164880e16ae622d1dadb6e5b7a'
          '52f4a2c7f6277774117c834d949d6b81'
-         'e2ac681ffa439e969b4c3b4616852454'
          'eb14dcfd80c00852ef81ded6e826826a'
          '65cbe8e4c8efaf96dd162102e46ce81d')
 
@@ -48,7 +46,7 @@ build() {
   cd "${srcdir}/linux-${_basekernel}"
 
   # add upstream patch
-  # patch -p1 -i "${srcdir}/patch-${pkgver}"
+  patch -p1 -i "${srcdir}/patch-${pkgver}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -57,9 +55,6 @@ build() {
   # remove this when a Kconfig knob is made available by upstream
   # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
   patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
-
-  # Fix for alsa
-  patch -Np1 -i "${srcdir}/alsa-firmware-loading-3.8.8.patch"
 
   #aufs patches for Live:
   patch -p1 -i "${srcdir}/aufs3.patch"
