@@ -1,28 +1,26 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# maintainer tetris4@gmail.com
+# contributions from: https://www.archlinux.org/packages/community/x86_64/bbswitch/
 
-_extramodules=extramodules-3.7-CHAKRA
+_extramodules=extramodules-3.9-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=bbswitch
-pkgver=0.5
-pkgrel=6
+pkgver=0.6
+pkgrel=1
 pkgdesc="kernel module allowing to switch dedicated graphics card on Optimus laptops"
 arch=('x86_64')
 url=("http://github.com/Bumblebee-Project/bbswitch")
 license=('GPL')
 provides=('bbswitch')
 install=bbswitch.install
-depends=('linux>=3.7' 'linux<3.8')
+depends=('linux>=3.9' 'linux<3.10')
 makedepends=('linux' 'linux-headers')
-source=("https://github.com/downloads/Bumblebee-Project/bbswitch/${pkgname}-${pkgver}.tar.gz")
-md5sums=('5e0e6eb9c5e8c10db56e5b349b43bba7')
+source=("https://github.com/Bumblebee-Project/bbswitch/archive/v${pkgver}.tar.gz")
+md5sums=('c5496e3225c8e70d02a24bfd8a50faf6')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  make
+  make KDIR=/usr/src/linux-${_kver}
 }
 
 package() {
@@ -31,9 +29,9 @@ package() {
 
     # KDIR is necessary even when cleaning
     #make KDIR=/usr/src/linux-${_kver} clean
-    make KDIR=/usr/src/linux-${_kver}
     mkdir -p $pkgdir//lib/modules/${_extramodules}
     install -D -m644 bbswitch.ko $pkgdir/lib/modules/${_extramodules}
     gzip "${pkgdir}/lib/modules/${_extramodules}/bbswitch.ko"
+    #automatically update bbswitch.install
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/bbswitch.install"
 }
