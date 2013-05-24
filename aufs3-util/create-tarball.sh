@@ -1,7 +1,7 @@
 #!/bin/sh
 #AUFS2VERSION=""
 #KERNELVERSION=2.6.35
-GITSNAPSHOT=20120607
+GITSNAPSHOT=20130524
 _aufsver=aufs3.0
 # aufs2 (no -xx) for the latest -rc version.
 rm -Rf aufs-util
