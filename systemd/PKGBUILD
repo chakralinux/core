@@ -33,8 +33,7 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-install-timestamp'
         'use-split-usr-path.patch'
         '99-default.preset'
-        '98-chakra.rules'
-        'is_bundle')
+        '98-chakra.rules')
 md5sums=('a07619bb19f48164fbf0761d12fd39a8'
          '7f39f9fde1ff7b48293ed1e3d0a6c213'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
@@ -42,8 +41,7 @@ md5sums=('a07619bb19f48164fbf0761d12fd39a8'
          'df69615503ad293c9ddf9d8b7755282d'
          '21572b99173a7cdeaff965e0a5e9182b'
          'a1bf25da736d3719e9720b2e4caea341'
-         '40f1d228553f939430e6d8d781f06daf'
-         '05d26a1936bf5b075bedd76952ab1b53')
+         '40f1d228553f939430e6d8d781f06daf')
 
 build() {
   cd "$pkgname-$pkgver"
@@ -111,7 +109,7 @@ package() {
   install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
   #hide bundles in Doplhin places
   install -m644 "$srcdir/98-chakra.rules" "$pkgdir/usr/lib/udev/rules.d/98-chakra.rules"
-  install -m755 "$srcdir/is_bundle" "$pkgdir/usr/lib/udev/is_bundle"
+
   # Make journalctl persistent
   install -dm755 "$pkgdir/var/log/journal"
   sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
