@@ -1,5 +1,5 @@
 pkgname=systemd
-pkgver=202
+pkgver=204
 pkgrel=1
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
@@ -21,12 +21,13 @@ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/systemd/journald.conf
         etc/udev/udev.conf)
 provides=("udev=$pkgver")
-conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
+conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'systemd-units')
 replaces=('udev')
 groups=('base')
 install="systemd.install"
 options=('!libtool')
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
+        'utmp-turn-systemd-update-utmp-shutdown.service-into.patch'
         'initcpio-hook-udev'
         'initcpio-install-udev'
         'initcpio-install-timestamp'
@@ -34,7 +35,8 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         '99-default.preset'
         '98-chakra.rules'
         'is_bundle')
-md5sums=('3136c6912d3ee1f6d4deb16234783731'
+md5sums=('a07619bb19f48164fbf0761d12fd39a8'
+         '7f39f9fde1ff7b48293ed1e3d0a6c213'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          'fb37e34ea006c79be1c54cbb0f803414'
          'df69615503ad293c9ddf9d8b7755282d'
@@ -47,6 +49,9 @@ build() {
   cd "$pkgname-$pkgver"
   
   patch -p1 -i "$srcdir/use-split-usr-path.patch"
+
+  patch -Np1 -i "$srcdir/utmp-turn-systemd-update-utmp-shutdown.service-into.patch"
+  autoreconf
 
   ./configure \
       PYTHON=python2 \
