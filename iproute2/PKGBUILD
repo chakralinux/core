@@ -25,7 +25,7 @@ source=(http://www.kernel.org/pub/linux/utils/net/$pkgname/$pkgname-$pkgver.tar.
 sha1sums=('3f48a6d3019f1766f26cda6c4de5d3858837d92b'
           '35b8cf2dc94b73eccad427235c07596146cd6f6c')
 
-prepare() {
+build() {
   cd $srcdir/$pkgname-$pkgver
 
   # set correct fhs structure
@@ -33,10 +33,6 @@ prepare() {
 
   # do not treat warnings as errors
   sed -i 's/-Werror//' Makefile
-}
-
-build() {
-  cd $srcdir/$pkgname-$pkgver
 
   ./configure
   make
