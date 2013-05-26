@@ -1,8 +1,6 @@
-
-
 pkgname=systemd-units
 pkgver=20120528
-pkgrel=16
+pkgrel=17
 pkgdesc="Chakra GNU/Linux specific Systemd unit files"
 arch=('x86_64')
 url="http://github.com/falconindy/systemd-arch-units"
@@ -10,7 +8,7 @@ license=('MIT')
 depends=('systemd>=44')
 groups=('systemd')
 install=systemd-units.install
-source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
+source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
 md5sums=('1bef86deec263d52032114ee696323b2')
 
 
@@ -62,4 +60,9 @@ package() {
   rm "$pkgdir"/usr/lib/systemd/system/gpsd.service
   rm "$pkgdir"/usr/lib/systemd/system/gpsd.socket
   rm "$pkgdir"/usr/lib/systemd/system/pdnsd.service
+  
+  # iptables
+  rm "$pkgdir"/usr/lib/systemd/scripts/iptables-flush
+  rm "$pkgdir"/usr/lib/systemd/system/iptables.service
+  rm "$pkgdir"/usr/lib/systemd/system/ip6tables.service
 }
