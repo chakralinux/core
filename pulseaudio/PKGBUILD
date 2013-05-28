@@ -4,7 +4,7 @@ pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse)
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=3.99.2
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(GPL LGPL)
@@ -55,8 +55,21 @@ package_pulseaudio() {
   
   # Disable cork-request module, can result in e.g. media players unpausing
   # when there's a Skype call incoming
+  # https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/1004607
   sed -e 's|/usr/bin/pactl load-module module-x11-cork-request|#&|' \
       -i "$pkgdir/usr/bin/start-pulseaudio-x11"
+
+  # PulseAudio is started automatically wit autosawn=yes (default value)
+  sed -e 's|/usr/bin/pulseaudio --start "$@"|#&|' \
+      -i "$pkgdir/usr/bin/start-pulseaudio-x11"
+  sed -e 's|/usr/bin/pulseaudio --start "$@"|#&|' \
+      -i "$pkgdir/usr/bin/start-pulseaudio-kde"
+  
+  # Avoid kde to show the "remove unused sound devices" if bell sound is executed by an application
+  sed -e '27i\    /usr/bin/pactl load-module module-x11-bell "display=$DISPLAY" "sample=bell.ogg" > /dev/null' \
+      -i "$pkgdir/usr/bin/start-pulseaudio-x11"
+  sed -e '29i\    /usr/bin/pactl load-module module-x11-bell "display=$DISPLAY" "sample=bell.ogg" > /dev/null' \
+      -i "$pkgdir/usr/bin/start-pulseaudio-kde"
 
   # Python fix
   sed -i '1s:python$:&2:' "$pkgdir/usr/bin/qpaeq"
@@ -65,7 +78,7 @@ package_pulseaudio() {
   # Speed up pulseaudio shutdown
   # Lower resample quality, saves CPU
   sed -e '/exit-idle-time/iexit-idle-time=0' \
-      -e '/resample-method/iresample-method=speex-float-0' \
+      -e '/resample-method/iresample-method=speex-float-1' \
       -i "$pkgdir/etc/pulse/daemon.conf"
 
   #### default.pa ####
@@ -73,15 +86,6 @@ package_pulseaudio() {
   sed -e 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' \
       -i "${pkgdir}/etc/pulse/default.pa"
   
-  # Enable the pulse support in KDE by default
-  # http://www.freedesktop.org/wiki/Software/PulseAudio/Desktops/KDE/
-  sed -e '$ a\\n### Enable the routing system employed in KDE to work at a lower level.\nload-module module-device-manager do_routing=1' \
-      -i "${pkgdir}/etc/pulse/default.pa"
-  
-  # The modules loaded by this script are integrated in default.pa
-  rm "${pkgdir}/etc/xdg/autostart/pulseaudio.desktop"
-  rm "${pkgdir}/etc/xdg/autostart/pulseaudio-kde.desktop"
-
   # Used only for SystemWide no needed for us
   # http://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/WhatIsWrongWithSystemWide/
   rm "$pkgdir/etc/dbus-1/system.d/pulseaudio-system.conf"
