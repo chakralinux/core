@@ -1,23 +1,17 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgbase=qscintilla
 pkgname=("qscintilla" "qscintilla-python2" "qscintilla-python3" "qscintilla-python-common")
 pkgver=2.7.1
-pkgrel=1
+pkgrel=2
 license=('GPL')
 arch=('x86_64')
 url="http://www.riverbankcomputing.co.uk/software/qscintilla/intro"
 makedepends=("pyqt4-python2" "pyqt4-python3" "chrpath" "sip-python2" "sip-python3")
 source=("http://downloads.sourceforge.net/pyqt/QScintilla-gpl-${pkgver}.tar.gz"
-        "configure.py-objdir-support.diff"
-        "qscintilla-2.7.1-designer.patch"
-       )
+        "configure.py-objdir-support.diff")
 md5sums=('da8939b5679a075e30c6632e54dc5abf'
-         'f80fe4b5d979fc9d0c7c54d156647aa9'
-         'a613e224fb3420f9f6be3a49d24b580c')
+         'f80fe4b5d979fc9d0c7c54d156647aa9')
 
 build() {
     cd $srcdir/QScintilla-gpl-$pkgver
@@ -72,7 +66,7 @@ package_qscintilla-python2() {
     pkgdesc="Python bindings for QScintilla2 (for Python 2)"
     conflicts=('python-qscintilla')
     replaces=('python-qscintilla')
-    provides=('python-qscintilla=${pkgver}')
+    provides=("python-qscintilla=${pkgver}")
     depends=('qscintilla' 'qscintilla-python-common' 'pyqt4-python2')
 
    cd "${srcdir}/QScintilla-gpl-${pkgver}/Python"
