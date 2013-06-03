@@ -1,14 +1,7 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=fontsproto
-pkgver=2.1.1
+pkgver=2.1.2
 pkgrel=1
 pkgdesc="X11 font extension wire protocol"
 arch=(any)
@@ -16,13 +9,17 @@ url="http://xorg.freedesktop.org/"
 license=('custom')
 makedepends=('xorg-util-macros')
 source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('77ab428ad4ad7cf0294a72a2201d665c4edf5fb1')
+sha1sums=('538f0880faa6981cb1a348ced93dc715c42840f7')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr 
+  make
+}
+  
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
