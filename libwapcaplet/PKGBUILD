@@ -1,28 +1,28 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# contributions from Arch: https://www.archlinux.org/packages/community/x86_64/libwapcaplet/
  
 pkgname=libwapcaplet
-pkgver=0.0.2
+pkgver=0.2.0
 pkgrel=1
 pkgdesc="A string internment library with rapid string comparison."
 arch=('i686' 'x86_64')
 url="http://www.netsurf-browser.org/projects/libwapcaplet/"
 license=('MIT')
-source=(http://www.netsurf-browser.org/projects/releases/${pkgname}-${pkgver}-src.tar.gz)
-md5sums=('c73b5ff5fce55819cc698e8cb486d5eb')
+makedepends=('netsurf-buildsystem')
+source=("http://download.netsurf-browser.org/libs/releases/$pkgname-$pkgver-src.tar.gz")
+sha256sums=('5fb49841ba335b0c7a1420d92c3a60480df63696c50353c02724aa8c6b45cb24')
 
 build() {
-	cd ${srcdir}/${pkgname}-${pkgver}
-
-	make || return 1
+  cd "$srcdir/$pkgname-$pkgver"
+  
+  make PREFIX=/usr COMPONENT_TYPE="lib-shared" 
+  make PREFIX=/usr COMPONENT_TYPE="lib-static"
 }
 
 package() {
-	cd ${srcdir}/${pkgname}-${pkgver}
-
-	make PREFIX=/usr DESTDIR=${pkgdir} install || return 1
-	install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
+  cd "$srcdir/$pkgname-$pkgver"
+  
+  make install PREFIX=/usr DESTDIR="$pkgdir" COMPONENT_TYPE="lib-shared" 
+  make install PREFIX=/usr DESTDIR="$pkgdir" COMPONENT_TYPE="lib-static"
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
 }
