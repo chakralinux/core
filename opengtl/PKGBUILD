@@ -1,10 +1,8 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/opengtl/
 
 pkgname=opengtl
-pkgver=0.9.16
+pkgver=0.9.18
 pkgrel=1
 pkgdesc="A set of library for using and integrating transformation algorithms (such as filter or color conversion) in graphics applications"
 url="http://www.opengtl.org"
@@ -13,12 +11,15 @@ license=('GPL')
 depends=('gcc-libs' 'llvm')
 makedepends=('cmake' 'libpng')
 optdepends=('libpng: for using the png extension')
-source=(http://download.opengtl.org/OpenGTL-${pkgver}.tar.bz2)
-sha1sums=('3cfe4a08e5778c13f7e74dfc822adb68f97ad048')
+source=(http://download.opengtl.org/OpenGTL-${pkgver}.tar.bz2
+        opengtl-0.9.18-memcpy.patch)
+sha256sums=('f094b3d2a1a60519975bb3badc05e704f2b93c7a3d2cb753041f2ff27cfcd9f8'
+            '934f2d3b0452b0505d0b4a39f2f9022ea490be12eda77d46caf0d66eabef59f3')
 
 build() {
   cd "${srcdir}"
   mkdir build
+  patch -d OpenGTL-$pkgver -Np1 -i "$srcdir/opengtl-0.9.18-memcpy.patch"
   cd build
   cmake ../OpenGTL-${pkgver} \
                 -DCMAKE_BUILD_TYPE=Release \
