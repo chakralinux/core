@@ -1,0 +1,40 @@
+pkgname='perl-io-socket-inet6'
+pkgver=2.70
+pkgrel=1
+pkgdesc="Object interface for AF_INET|AF_INET6 domain sockets"
+arch=('any')
+license=('PerlArtistic' 'GPL')
+options=('!emptydirs')
+depends=('perl-socket6>=0.12')
+makedepends=()
+url='http://search.cpan.org/dist/IO-Socket-INET6'
+source=("http://search.cpan.org/CPAN/authors/id/S/SH/SHLOMIF/IO-Socket-INET6-$pkgver.tar.gz")
+md5sums=('c443e394ec9d128a3d8dca77f8e14426')
+sha512sums=('2dbbc35de49d1cee1b8f0f50bd4afda57beb066286269beecb1699ddf06a9837f50a989e790c79eba76409d93a8beffdfae3d7b4add30181a973e1a0ee17ef0c')
+_distdir="IO-Socket-INET6-$pkgver"
+
+build() {
+  ( export PERL_MM_USE_DEFAULT=1 PERL5LIB=""                 \
+      PERL_AUTOINSTALL=--skipdeps                            \
+      PERL_MM_OPT="INSTALLDIRS=vendor"     \
+      PERL_MB_OPT="--installdirs vendor" \
+      MODULEBUILDRC=/dev/null
+
+    cd "$_distdir"
+    /usr/bin/perl Makefile.PL
+    make
+  )
+}
+
+check() {
+  cd "$_distdir"
+  ( export PERL_MM_USE_DEFAULT=1 PERL5LIB=""
+    make test
+  )
+}
+
+package() {
+  cd "$_distdir"
+  make DESTDIR="$pkgdir" install
+  find "$pkgdir" -name .packlist -o -name perllocal.pod -delete
+}
