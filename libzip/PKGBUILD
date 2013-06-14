@@ -1,8 +1,9 @@
 #maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+#contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/libzip/
 
 pkgname=libzip
 pkgver=0.11.1
-pkgrel=1
+pkgrel=2
 pkgdesc="A C library for reading, creating, and modifying zip archives"
 url="http://www.nih.at/libzip/index.html"
 license=('GPL2')
@@ -16,8 +17,8 @@ md5sums=('bf50518665f4ebcce623c7dcdc2f422d'
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-
   patch -p1 -i "${srcdir}/fix-headers.patch"
+  autoreconf -i
   ./configure --prefix=/usr
   make 
 }
@@ -25,4 +26,5 @@ build() {
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
   make DESTDIR=${pkgdir} install
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
