@@ -1,0 +1,22 @@
+# Chakra Packages for Chakra, part of chakra-project.org
+# maintainer: Daniele Cocca <jmc@chakra-project.org>
+
+pkgname=chakra-paste
+pkgver=1.2
+pkgrel=1
+depends=('python3' 'python3-requests' 'python3-appdirs')
+pkgdesc="Small Python 3 script to automate the uploading of files to a Sticky Notes pastebin service."
+arch=('any')
+license=('BSD')
+url="http://gitorious.org/chakra-paste"
+source=("${pkgname}-${pkgver}.tar.gz"::"http://gitorious.org/${pkgname}/${pkgname}/archive-tarball/v${pkgver}")
+md5sums=('fffc8fd45d6e460656571182a9a04146')
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgname}"
+
+  install -D -m777 chakra-paste \
+                   "${pkgdir}/usr/bin/chakra-paste"
+}
+
+# vim:set ts=2 sw=2 et:

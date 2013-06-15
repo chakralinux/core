@@ -1,24 +1,20 @@
 #
 # KDE SC Packages for Chakra, part of chakra-project.org
 #
-# maintainer: abveritas[at]chakra-project[dog]org>
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-#
-# package info
-#
 pkgname=kdebindings-pykde4
 _pkgname=pykde4
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="KDE bindings for python"
 url="http://kde.org/"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL')
-depends=('pyqt' 'qscintilla' 'boost-libs' "kdepim-runtime>=${_kdever}")
+depends=('pyqt4-python2' 'qscintilla-python2' 'boost-libs' "kdepim-runtime>=${_kdever}")
 makedepends=('cmake' 'automoc4' 'polkit-qt' 'boost')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
@@ -30,7 +26,7 @@ conflicts=('kdebindings-python')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 build() {
-	cd "${srcdir}"
+	cd "${srcdir}" 
 	
         rm -rf build 
 	mkdir build && cd build

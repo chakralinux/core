@@ -1,8 +1,7 @@
 #
 # KDE SC Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
@@ -10,11 +9,8 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 # original name (used for the source and pkgnames)
 _origname=oxygen-icons
 
-#
-# package info
-#
 pkgname=('oxygen-icons' 'oxygen-icons-svg')
-arch=('any')
+arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="split package"
@@ -24,17 +20,12 @@ license=('GPL' 'LGPL' 'FDL')
 install=oxygen-icons.install
 options=('log')
 
-makedepends=('pkgconfig' 'cmake' 'automoc4')
+makedepends=('pkg-config' 'cmake' 'automoc4')
 
 source=($_mirror/${_origname}-$_kdever.tar.xz)
-
 md5sums=(`grep ${_origname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
 
-#
-# build and install
-#
-build() 
-{
+build() {
 	cd $srcdir/$_origname-$pkgver
 	
 	patch -Np0 -i $startdir/install_svg_icons_too.patch || return 1
@@ -42,11 +33,10 @@ build()
 	cmake . -DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX=${_installprefix}
 
-	make || return 1
+	make
 }
 
-package_oxygen-icons()
-{
+package_oxygen-icons() {
 	pkgdesc="Oxygen (Emot)Icons"
 	groups=("kde" "kde-minimal" "kde-uninstall")
 	
@@ -59,8 +49,7 @@ package_oxygen-icons()
         mv $pkgdir/usr/share/icons/oxygen/scalable $srcdir/svg
 }
 
-package_oxygen-icons-svg()
-{
+package_oxygen-icons-svg() {
 	pkgdesc="Oxygen (Emot)Icons - SVG Sources"
 	groups=("kde-uninstall")
 	depends=("${_origname}")
@@ -69,5 +58,3 @@ package_oxygen-icons-svg()
 	mv $srcdir/svg/scalable $pkgdir/usr/share/icons/oxygen
 	rm -rf $pkgdir/usr/share/icons/oxygen/scalable/apps/clock.svgz
 }
-
-
