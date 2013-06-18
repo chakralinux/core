@@ -1,0 +1,43 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+_pkgname="kompare"
+pkgname="kdesdk-kompare"
+arch=('x86_64')
+pkgver=${_kdever}
+pkgrel=1
+pkgdesc="A KDE visual diff viewer"
+screenshot="http://www.kde.org/images/screenshots/kompare.png"
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+depends=("kde-runtime>=${_kdever}")
+groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+categories=('programming')
+conflicts=('kdesdk-doc')
+install=kdesdk.install
+options=('docs' '!splithdr' 'splitdbg' 'log')
+makedepends=('pkgconfig' 'cmake' 'automoc4' 'docbook-xsl')
+provides="kompare"
+
+source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
+md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
+
+build() {
+  cd ${srcdir}/${_pkgname}-${pkgver}
+
+  msg "starting build ..."
+  cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+          -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+          -DCMAKE_SKIP_RPATH=ON 
+  make 
+}
+
+package() {
+        cd ${srcdir}/${_pkgname}-${pkgver}
+	make DESTDIR=${pkgdir} install
+}
