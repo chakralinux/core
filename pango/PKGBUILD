@@ -1,16 +1,14 @@
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
 
 pkgname=pango
 pkgver=1.32.5
-pkgrel=1
+pkgrel=3
 pkgdesc="A library for layout and rendering of text"
 arch=('x86_64')
 license=('LGPL')
 depends=('cairo' 'libxft' 'libthai' 'harfbuzz')
 makedepends=('gobject-introspection' 'libxt' 'fontconfig')
-options=('!libtool' '!emptydirs')
+options=('!libtool')
 install=pango.install
 source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/1.32/${pkgname}-${pkgver}.tar.xz")
 url="http://www.pango.org/"
@@ -27,4 +25,5 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
+  install -m755 -d "${pkgdir}/etc/pango"
 }

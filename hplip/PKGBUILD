@@ -3,10 +3,8 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=hplip
-pkgver=3.13.3
-# incase a or b is used in hplip rls:
-_pkgver=3.13.3
-pkgrel=2
+pkgver=3.13.5
+pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('i686' 'x86_64')
 url="http://hplipopensource.com"
@@ -21,42 +19,54 @@ optdepends=('cups: for printing support'
             'pyqt: for running hp-toolbox'
             'python2-gobject: for running hp-toolbox')
 options=('!libtool')
-install=${pkgname}.install
-source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${_pkgver}.tar.gz"
-	"cups-1.6-buildfix.diff")
-sha1sums=('e571cfac1a30c947b3526de691cbe3cf31590bfb'
-          '7a3b476eb8bcecb4988eadc26924b053a3ed4fbb')
+install=hplip.install
+source=(http://downloads.sourceforge.net/${pkgname}/$pkgname-$pkgver.tar.gz{,.asc}
+        cups-1.6-buildfix.diff
+        hp-mkuri.patch
+        hplip_typo.patch)
+md5sums=('f0c406f06f191a120f7d283b69ff10e8'
+         'SKIP'
+         'ef64578c6cb3ce252dbdcb0f1c2f4a47'
+         '0bd7779fdbc4d7a9386df04dce2cb8d4'
+         'b3dd33a538ed8a3774f3c22f13e0a549')
 
 build() {
-  cd "${srcdir}/${pkgname}-${_pkgver}"
+ cd "$srcdir/$pkgname-$pkgver"
 
-  # fix build with cups 1.6 - FC hplip-ipp-accessors.patch
-  patch -p1 -i ${srcdir}/cups-1.6-buildfix.diff
+ # fix build with cups 1.6 - FC hplip-ipp-accessors.patch
+ patch -p1 -i "${srcdir}/cups-1.6-buildfix.diff"
+ 
+ # fix linking libnotify, FS#34283
+ patch -Np0 -i ${srcdir}/hp-mkuri.patch
 
-  export PYTHON=python2
-  find . -type f -exec sed -i 's~^#.*env python~#!/usr/bin/env python2~' {} +
-  sed -i '1s|#!/usr/bin/python|#!/usr/bin/python2|' setup.py makeuri.py logcapture.py base/magic.py
-  sed -i '1s|#!/usr/bin/python|#!/usr/bin/python2|' ui/upgradeform.py uninstall.py upgrade.py config_usb_printer.py
-  sed -i 's|python ./print.py|python2 ./print.py|' scan.py
-  sed -i 's|python ./testpage.py|python2 ./testpage.py|' setup.py
-  sed -i 's|python ./setup.py|python2 ./setup.py|' ui4/devmgr5.py ui4/nodevicesdialog.py
-  sed -i 's|python %HOME%|python2 %HOME%|' base/utils.py
-  sed -i 's|python ./plugin.py|python2 ./plugin.py|' base/pkit.py
+ # fix typo preventing FW to load
+ patch -Np0 -i ${srcdir}/hplip_typo.patch
+ 
+ export PYTHON=python2
+ 
+ find . -type f -exec sed -i 's~^#.*env python~#!/usr/bin/env python2~' {} +
+ sed -i '1s|#!/usr/bin/python|#!/usr/bin/python2|' doctor.py setup.py makeuri.py logcapture.py base/magic.py
+ sed -i '1s|#!/usr/bin/python|#!/usr/bin/python2|' ui/upgradeform.py uninstall.py upgrade.py config_usb_printer.py
+ sed -i 's|python ./print.py|python2 ./print.py|' scan.py
+ sed -i 's|python ./testpage.py|python2 ./testpage.py|' setup.py
+ sed -i 's|python ./setup.py|python2 ./setup.py|' ui4/devmgr5.py ui4/nodevicesdialog.py 
+ sed -i 's|python %HOME%|python2 %HOME%|' base/utils.py
+ sed -i 's|python ./plugin.py|python2 ./plugin.py|' base/pkit.py
+ 
+ # Use system foomatic-rip for hpijs driver instead of foomatic-rip-hplip
+ # The hpcups driver does not use foomatic-rip
+	local i
+	for i in ppd/hpijs/*.ppd.gz ; do
+		rm -f ${i}.temp
+		gunzip -c ${i} | sed 's/foomatic-rip-hplip/foomatic-rip/g' | \
+			gzip > ${i}.temp || return 1
+		mv ${i}.temp ${i}
+	done
+   
+ export AUTOMAKE='automake --foreign'
+ autoreconf --force --install
 
-  # from Gentoo
-  # Use system foomatic-rip for hpijs driver instead of foomatic-rip-hplip
-  local i
-  for i in ppd/hpijs/*.ppd.gz ; do
-    rm -f ${i}.temp
-    gunzip -c ${i} | sed 's/foomatic-rip-hplip/foomatic-rip/g' | \
-    gzip > ${i}.temp || return 1
-    mv ${i}.temp ${i}
-  done
-
-  export AUTOMAKE='automake --foreign'
-  autoreconf --force --install
-
-	./configure --prefix=/usr \
+ ./configure --prefix=/usr \
              --enable-qt4 \
              --disable-foomatic-rip-hplip-install \
              --enable-foomatic-ppd-install \
@@ -67,23 +77,24 @@ build() {
              --enable-hpijs-install \
              --enable-foomatic-drv-install \
              --enable-pp-build \
-             --enable-udev-acl-rules
-  make 
+             --enable-udev-acl-rules #--help
+
+ make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${_pkgver}"
-
-  make rulesdir=/usr/lib/udev/rules.d DESTDIR="${pkgdir}/" install
-
+  cd "$srcdir/$pkgname-${pkgver/.a/a}"
+  make rulesdir=/usr/lib/udev/rules.d DESTDIR="$pkgdir/" install
+  
   # remove config provided by sane and autostart of hp-daemon
-  rm -rf "${pkgdir}"/etc/{sane.d,xdg}
+  rm -rf "$pkgdir"/etc/{sane.d,xdg}
   
-  # remove HAL .fdi file 
-  rm -rf "${pkgdir}"/usr/share/hal
-  
-  # remove rc
+  # remove HAL .fdi file because HAL is no longer used
+  rm -rf "$pkgdir"/usr/share/hal
+ 
+  # log dir should not be world writeable
+  chmod 775 "$pkgdir"/var/log/hp{,/tmp}
+ 
+  # remove rc script
   rm -rf "$pkgdir"/etc/init.d
-  
-  sed -i "s:\$attrs:\$attr:g" $pkgdir/usr/lib/udev/rules.d/56-hpmud_support.rules
 }

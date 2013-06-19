@@ -1,31 +1,28 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
 
-_extramodules=extramodules-3.7-CHAKRA
+_extramodules=extramodules-3.9-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=madwifi
-pkgver=0.9.4.4173
-_ver=0.9.4-r4173-20111008
-pkgrel=13
+pkgver=0.9.4.4182
+pkgrel=2
 pkgdesc="Madwifi drivers for Atheros wireless chipsets"
 arch=('x86_64')
 license=('GPL')
 url="http://madwifi-project.org"
-depends=('madwifi-utils' 'linux>=3.7' 'linux<3.8')
-makedepends=('linux-headers' 'sharutils')
+depends=('madwifi-utils' 'linux>=3.9' 'linux<3.10')
+makedepends=('linux-headers' 'sharutils' 'subversion')
 install=madwifi-ng.install
 # subversion source: svn checkout http:/madwifi-project.org/svn/madwifi/trunk madwifi
-source=(http://chakra-linux.org/sources/madwifi/madwifi-${pkgver}.tar.gz)
+source=(http://chakra.sourceforge.net/sources/madwifi/madwifi-${pkgver}.tar.gz)
 	#http://downloads.sourceforge.net/madwifi/madwifi-${pkgver}.tar.gz)
-md5sums=('18cd1c574e0fa66eb4396f92f0700a7e')
+md5sums=('8cc9cb67ec2fd7c4a71b6725a764c171')
 groups=("linux-modules")
 
 build()
 {
-  cd madwifi-$_ver
+  cd madwifi-$pkgver
 
   # kernel 3.2 abi change
   sed -i -e "s/.ndo_set_multicast_list/.ndo_set_rx_mode/" ath/if_ath.c
@@ -34,12 +31,13 @@ build()
 
   sed -i 's/-Werror//' Makefile.inc
   sed -i 's/\[4-9\]\\\./[0-9]-/' Makefile
+
   make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules
 }
 
 package()
 {
-  cd madwifi-$_ver
+  cd madwifi-$pkgver
   make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules \
        DESTDIR="${pkgdir}" KERNELRELEASE=${_kver} install-modules
   sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" ${startdir}/*.install

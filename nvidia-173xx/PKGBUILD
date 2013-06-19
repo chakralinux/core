@@ -1,14 +1,12 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
 
-_extramodules=extramodules-3.7-CHAKRA
+_extramodules=extramodules-3.9-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=(nvidia-173xx chd-nvidia-173xx)
-pkgver=173.14.36
-pkgrel=2
+pkgver=173.14.37
+pkgrel=1
 arch=('x86_64')
 ARCH=x86_64
 url="http://www.nvidia.com/"
@@ -16,7 +14,7 @@ makedepends=('linux-headers')
 license=('custom')
 source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run"
 	"https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
-md5sums=('c341612429c2885980103b40542cb2b2'
+md5sums=('761fec0664e715df35cdb64cd4b087f4'
          '62d0cdb856cfae64753c0f3acf729d47')
 
 build() {
@@ -32,7 +30,7 @@ build() {
 
 package_nvidia-173xx() {
     pkgdesc="Legacy NVIDIA drivers for linux."
-    depends=('linux>=3.7' 'linux<3.8' 'nvidia-173xx-utils')
+    depends=('linux>=3.9' 'linux<3.10' 'nvidia-173xx-utils')
     conflicts=('nvidia-96xx' 'nvidia')
     install=nvidia.install
 

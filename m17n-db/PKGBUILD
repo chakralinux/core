@@ -1,32 +1,25 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=m17n-db
-pkgver=1.6.2
+pkgver=1.6.4
 pkgrel=1
-pkgdesc="A multilingual text processing library (database)"
-arch=('i686' 'x86_64')
-url="http://www.m17n.org/m17n-lib/"
+pkgdesc='Multilingual text processing library (database)'
+url='http://www.nongnu.org/m17n/'
+arch=('x86_64')
 license=('GPL')
 depends=('glibc') # not because of compiling, but because of /usr/share/i18n/charmaps/ files that glibc provides
-source=(http://www.m17n.org/m17n-lib-download/$pkgname-$pkgver.tar.gz)
-sha1sums=('086a8a0b98909dd08bd80b55819d2842052b69bd')
-
+source=("http://download.savannah.gnu.org/releases/m17n/${pkgname}-${pkgver}.tar.gz")
+sha1sums=('756fd10b8d7fe66a14350443f307bcf95347c695')
+ 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
-  ./configure --prefix=/usr
-  make
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	./configure --prefix=/usr
+	make
 }
-
+ 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
-  make DESTDIR=$pkgdir install
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	make DESTDIR="${pkgdir}" install
 }
-
-
+ 

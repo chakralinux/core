@@ -1,18 +1,15 @@
-
-
 pkgname=systemd-units
 pkgver=20120528
-pkgrel=16
+pkgrel=18
 pkgdesc="Chakra GNU/Linux specific Systemd unit files"
 arch=('x86_64')
 url="http://github.com/falconindy/systemd-arch-units"
 license=('MIT')
-depends=('systemd>=44')
+depends=('systemd>=201')
 groups=('systemd')
 install=systemd-units.install
-source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
+source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
 md5sums=('1bef86deec263d52032114ee696323b2')
-
 
 
 package() {
@@ -21,6 +18,7 @@ package() {
   make DESTDIR="$pkgdir" install
 
   sed -i 's/udev-settle/systemd-&/' "$pkgdir"/usr/lib/systemd/system/{lvm,dmraid}.service
+
   rm "$pkgdir"/usr/lib/systemd/system/bluetooth.service
   rm "$pkgdir"/usr/lib/systemd/system/cups.service
   rm "$pkgdir"/usr/lib/systemd/system/ntpd.service
@@ -62,4 +60,10 @@ package() {
   rm "$pkgdir"/usr/lib/systemd/system/gpsd.service
   rm "$pkgdir"/usr/lib/systemd/system/gpsd.socket
   rm "$pkgdir"/usr/lib/systemd/system/pdnsd.service
+  rm "$pkgdir"/usr/lib/systemd/system/fam.service
+  
+  # iptables
+  rm "$pkgdir"/usr/lib/systemd/scripts/iptables-flush
+  rm "$pkgdir"/usr/lib/systemd/system/iptables.service
+  rm "$pkgdir"/usr/lib/systemd/system/ip6tables.service
 }

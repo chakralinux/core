@@ -1,28 +1,27 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
+#maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+#contributions from Arch: https://www.archlinux.org/packages/community/any/quilt/
 pkgname=quilt
-pkgver=0.50
+pkgver=0.60
 pkgrel=1
 pkgdesc='Manage a series of patches by keeping track of the changes each patch makes'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='http://savannah.nongnu.org/projects/quilt'
 license=('GPL2')
 depends=('diffstat' 'gawk' 'patch' 'diffutils' 'gettext')
 source=("http://savannah.nongnu.org/download/quilt/${pkgname}-${pkgver}.tar.gz")
-md5sums=('ff5e1e041363c3af3c8fda4b968c9d1d')
+md5sums=('058a08a9b626bdec9ec8c519dc92158c')
 
 build() {
   cd ${pkgname}-${pkgver}
-  ./configure --prefix=/usr --mandir=/usr/share/man
+  ./configure --prefix=/usr --mandir=/usr/share/man --without-rpmbuild
   make
 }
 
 package() {
   cd ${pkgname}-${pkgver}
   make prefix="$pkgdir/usr" mandir="$pkgdir/usr/share/man" install
+  # move bash completion in right place
+  install -d -m 755 "$pkgdir/usr/share/bash-completion"
+  mv "$pkgdir/etc/bash_completion.d" "$pkgdir/usr/share/bash-completion/completions"
 }
 

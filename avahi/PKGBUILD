@@ -5,7 +5,7 @@
 
 pkgname=avahi
 pkgver=0.6.31
-pkgrel=7
+pkgrel=8
 pkgdesc="A multicast/unicast DNS-SD framework"
 arch=('x86_64')
 url="http://www.avahi.org/"
@@ -67,5 +67,8 @@ package() {
 	# howl and mdnsresponder compatability
 	(cd usr/include; ln -s avahi-compat-libdns_sd/dns_sd.h dns_sd.h; ln -s avahi-compat-howl howl)
 	(cd usr/lib/pkgconfig; ln -s avahi-compat-howl.pc howl.pc)
+
+        # Provided by filesystem
+        rm ${pkgdir}/var -rfv
 }
 
