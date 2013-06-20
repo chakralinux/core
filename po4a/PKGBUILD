@@ -1,33 +1,33 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+#contributions from Debian: http://patch-tracker.debian.org/patch/series/view/po4a/0.42-2/fix-tempfile-usage.patch
 
 pkgname=po4a
-pkgver=0.41
+pkgver=0.44
 pkgrel=1
 pkgdesc="po4a - tools for helping translation of documentation"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL')
 url="http://po4a.alioth.debian.org/"
 depends=('perl' 'gettext')
 makedepends=('docbook-xsl' 'perl-text-wrapi18n' 'perl-module-build' 'perl-locale-gettext' 'perl-term-readkey' 'perl-sgmls')
 options=(!emptydirs)
-source=(https://alioth.debian.org/frs/download.php/3472/${pkgname}-${pkgver}.tar.gz)
-md5sums=('93b3137502a749bdc3a059466f2a19d2')
+source=("https://alioth.debian.org/frs/download.php/3786/${pkgname}-${pkgver}.tar.gz"
+        'fix-tempfile-usage.patch')
+md5sums=('ff7b6859d729a52a57a880d6cf6a7fcf'
+         '59e9a33d9b030bf213d0fcc97e128a5f')
 
 build()
 {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  perl Build.PL installdirs=vendor destdir=${pkgdir} create_packlist=0
+  patch -p1 -i "${srcdir}/fix-tempfile-usage.patch"
+  perl Build.PL installdirs=vendor create_packlist=0
   perl Build
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  perl Build install
+  perl Build destdir=${pkgdir} install
 
 # remove perllocal.pod and .packlist
   find ${pkgdir} -name .packlist -o -name perllocal.pod -delete
