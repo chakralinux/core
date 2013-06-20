@@ -1,32 +1,34 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/ocaml/
 
 pkgname=ocaml	
-pkgver=3.12.1
+pkgver=4.00.1
+_pkgver=4.00
 pkgrel=1
 pkgdesc="A functional language with OO extensions"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('LGPL2' 'custom: QPL-1.0')
 url="http://caml.inria.fr/"
 depends=('gdbm')
-makedepends=('tk' 'ncurses>=5.6-7' 'libx11')
+makedepends=('tk' 'ncurses' 'libx11')
 optdepends=('ncurses: advanced ncurses features' 'tk: advanced tk features')
-source=(http://caml.inria.fr/distrib/ocaml-3.12/$pkgname-$pkgver.tar.gz)
+source=("http://caml.inria.fr/distrib/ocaml-${_pkgver}/$pkgname-$pkgver.tar.gz"
+        'tk8.6-build.patch')
 options=('!makeflags' '!emptydirs')
+md5sums=('91124a8eb12a57f1e56c02fe3db0f9e7'
+         '46185b558c93471b19fd0c6753f90377')
+
 
 build() {
   cd $srcdir/$pkgname-$pkgver
+  # fix https://bugs.archlinux.org/task/33302
+  patch -Np2 -i ../tk8.6-build.patch
+  
   ./configure -prefix /usr 
   make world.opt 
 }
 
-package_ocaml() {
+package() {
   cd ${srcdir}/${pkgbase}-${pkgver}
   make PREFIX=$pkgdir/usr MANDIR=$pkgdir/usr/share/man install 
    
@@ -37,4 +39,3 @@ package_ocaml() {
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
-md5sums=('814a047085f0f901ab7d8e3a4b7a9e65')
