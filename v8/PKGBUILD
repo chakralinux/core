@@ -5,19 +5,30 @@
 
 pkgbase=v8
 pkgname=('v8' 'v8-src')
-pkgver=3.9
-pkgrel=3
+pkgver=3.19.0
+pkgrel=1
 arch=('x86_64')
+depends=('gcc-libs' 'readline')
 url="http://code.google.com/p/v8/"
 license=('BSD')
-makedepends=('python2' 'subversion' 'readline')
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('e8823d3c9ffe5408a52ff0d869b69c70')
+makedepends=('python2' 'subversion')
+source=(http://commondatastorage.googleapis.com/chromium-browser-official/$pkgname-$pkgver.tar.bz2)
+md5sums=('298956dd1b319839c2b16ceff346ba79')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make dependencies
-  make x64.release library=shared console=readline
+  
+  # The world isn't ready for python3
+  export PYTHON=python2
+  find build/ test/ tools/ src/ -type f \
+    -exec sed -e 's_^#!/usr/bin/env python$_&2_' \
+              -e 's_^\(#!/usr/bin/python2\).[45]$_\1_' \
+              -e 's_^#!/usr/bin/python$_&2_' \
+              -e "s_'python'_'python2'_" -i {} \;
+  sed -i 's/python /python2 /' Makefile
+  
+  make x64.release library=shared console=readline werror=no
 }
 
 package_v8() {
@@ -37,7 +48,7 @@ package_v8-src() {
 pkgdesc="V8 is Google's open source JavaScript engine. (Source package)"
 
   install -d "${pkgdir}/usr/src/"
-  tar -Jxf "${srcdir}/${pkgbase}-${pkgver}.tar.xz" \
+  tar -xvjf "${srcdir}/${pkgbase}-${pkgver}.tar.bz2" \
         -C "${pkgdir}/usr/src/" \
       --exclude-vcs
 
