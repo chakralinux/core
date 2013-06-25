@@ -1,0 +1,163 @@
+diff --git a/Source/WTF/wtf/HashMap.h b/Source/WTF/wtf/HashMap.h
+index a51ee85..019666f 100644
+--- a/Source/WTF/wtf/HashMap.h
++++ b/Source/WTF/wtf/HashMap.h
+@@ -136,77 +136,83 @@ namespace WTF {
+     private:
+         AddResult inlineAdd(const KeyType&, MappedPassInReferenceType);
+ 
+-        class HashMapKeysProxy : private HashMap {
++        HashTableType m_impl;
++    };
++
++    template<typename KeyArg, typename MappedArg, typename HashArg = typename DefaultHash<KeyArg>::Hash,
++        typename KeyTraitsArg = HashTraits<KeyArg>, typename MappedTraitsArg = HashTraits<MappedArg> >
++    class HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::HashMapKeysProxy : 
++        private HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg> {
+         public:
+-            typedef typename HashMap::iterator::Keys iterator;
+-            typedef typename HashMap::const_iterator::Keys const_iterator;
+-            
++            typedef typename HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::iterator::Keys iterator;
++            typedef typename HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::const_iterator::Keys const_iterator;
++
+             iterator begin()
+             {
+-                return HashMap::begin().keys();
++                return HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::begin().keys();
+             }
+-            
++
+             iterator end()
+             {
+-                return HashMap::end().keys();
++                return HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::end().keys();
+             }
+ 
+             const_iterator begin() const
+             {
+-                return HashMap::begin().keys();
++                return HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::begin().keys();
+             }
+-            
++
+             const_iterator end() const
+             {
+-                return HashMap::end().keys();
++                return HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::end().keys();
+             }
+ 
+         private:
+-            friend class HashMap;
++            friend class HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>;
+ 
+             // These are intentionally not implemented.
+             HashMapKeysProxy();
+             HashMapKeysProxy(const HashMapKeysProxy&);
+             HashMapKeysProxy& operator=(const HashMapKeysProxy&);
+             ~HashMapKeysProxy();
+-        };
++    };
+ 
+-        class HashMapValuesProxy : private HashMap {
++    template<typename KeyArg, typename MappedArg, typename HashArg = typename DefaultHash<KeyArg>::Hash,
++        typename KeyTraitsArg = HashTraits<KeyArg>, typename MappedTraitsArg = HashTraits<MappedArg> >
++    class HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::HashMapValuesProxy : 
++        private HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg> {
+         public:
+-            typedef typename HashMap::iterator::Values iterator;
+-            typedef typename HashMap::const_iterator::Values const_iterator;
+-            
++            typedef typename HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::iterator::Values iterator;
++            typedef typename HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::const_iterator::Values const_iterator;
++
+             iterator begin()
+             {
+-                return HashMap::begin().values();
++                return HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::begin().values();
+             }
+-            
++
+             iterator end()
+             {
+-                return HashMap::end().values();
++                return HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::end().values();
+             }
+ 
+             const_iterator begin() const
+             {
+-                return HashMap::begin().values();
++                return HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::begin().values();
+             }
+             
+             const_iterator end() const
+             {
+-                return HashMap::end().values();
++                return HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>::end().values();
+             }
+ 
+         private:
+-            friend class HashMap;
++            friend class HashMap<KeyArg, MappedArg, HashArg, KeyTraitsArg, MappedTraitsArg>;
+ 
+             // These are intentionally not implemented.
+             HashMapValuesProxy();
+             HashMapValuesProxy(const HashMapValuesProxy&);
+             HashMapValuesProxy& operator=(const HashMapValuesProxy&);
+             ~HashMapValuesProxy();
+-        };
+-
+-        HashTableType m_impl;
+     };
+ 
+     template<typename KeyTraits, typename MappedTraits> struct HashMapValueTraits : KeyValuePairHashTraits<KeyTraits, MappedTraits> {
+diff --git a/Source/JavaScriptCore/runtime/Executable.cpp b/Source/JavaScriptCore/runtime/Executable.cpp
+index 8b58b62aa3e39a347fae92961af69484de795a07..057bb43c6777bc4b63b23c0cabf32d106ca0243c 100644
+--- a/Source/JavaScriptCore/runtime/Executable.cpp
++++ b/Source/JavaScriptCore/runtime/Executable.cpp
+@@ -523,7 +523,7 @@ JSObject* FunctionExecutable::compileForCallInternal(ExecState* exec, JSScope* s
+     UNUSED_PARAM(bytecodeIndex);
+ #endif
+     ASSERT((jitType == JITCode::bottomTierJIT()) == !m_codeBlockForCall);
+-    JSObject* exception;
++    JSObject* exception = 0;
+     OwnPtr<FunctionCodeBlock> newCodeBlock = produceCodeBlockFor(scope, CodeForCall, exception);
+     if (!newCodeBlock)
+         return exception;
+@@ -559,7 +559,7 @@ JSObject* FunctionExecutable::compileForConstructInternal(ExecState* exec, JSSco
+ #endif
+     
+     ASSERT((jitType == JITCode::bottomTierJIT()) == !m_codeBlockForConstruct);
+-    JSObject* exception;
++    JSObject* exception = 0;
+     OwnPtr<FunctionCodeBlock> newCodeBlock = produceCodeBlockFor(scope, CodeForConstruct, exception);
+     if (!newCodeBlock)
+         return exception;
+--- a/Source/WTF/wtf/Compiler.h  2013-03-14 14:24:37.000000000 +0100
++++ b/Source/WTF/wtf/Compiler.h  2013-06-24 21:23:27.168672521 +0200
+@@ -122,7 +122,11 @@
+ 
+ /* Specific compiler features */
+ #if COMPILER(GCC) && !COMPILER(CLANG)
+-#if GCC_VERSION_AT_LEAST(4, 7, 0) && defined(__cplusplus) && __cplusplus >= 201103L
++
++#if GCC_VERSION_AT_LEAST(4, 8, 0)
++#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
++
++#elif GCC_VERSION_AT_LEAST(4, 7, 0) && defined(__cplusplus) && __cplusplus >= 201103L
+ #define WTF_COMPILER_SUPPORTS_CXX_RVALUE_REFERENCES 1
+ #define WTF_COMPILER_SUPPORTS_CXX_DELETED_FUNCTIONS 1
+ #define WTF_COMPILER_SUPPORTS_CXX_NULLPTR 1
+--- a/Tools/QtTestBrowser/utils.h        2013-03-14 14:24:37.000000000 +0100
++++ b/Tools/QtTestBrowser/utils.h        2013-06-24 22:11:00.636817377 +0200
+@@ -30,6 +30,10 @@
+ 
+ #include <QtCore>
+ 
++#if GCC_VERSION_AT_LEAST(4, 8, 0)
++#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
++#endif
++
+ #ifndef NO_RETURN
+ #if defined(__CC_ARM) || defined(__ARMCC__)
+ #define NO_RETURN __declspec(noreturn)
