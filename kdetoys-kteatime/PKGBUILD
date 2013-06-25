@@ -1,0 +1,41 @@
+#
+# KDE SC Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+_pkgname="kteatime"
+pkgname="kdetoys-kteatime"
+arch=('x86_64')
+pkgver=${_kdever}
+pkgrel=1
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+pkgdesc="System tray applet that makes sure your tea doesn't get too strong"
+conflicts=("kdetoys-common" "kdetoys-doc")
+groups=("kde" "kdetoys" "kde-uninstall")
+categories=('accessories')
+install=kdetoys.install
+options=('docs' '!splithdr' 'splitdbg' 'log')
+makedepends=('pkg-config' 'cmake' 'automoc4' "kde-workspace>=${_kdever}")
+
+source=($_mirror/${_pkgname}-$_kdever.tar.xz)
+md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
+
+build() {
+  cd ${srcdir}/${_pkgname}-${pkgver}
+
+  msg "starting build ..."
+  cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
+          -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+          -DCMAKE_SKIP_RPATH=ON \
+          -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+  make 
+}
+
+package() {
+  cd ${srcdir}/${_pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install 
+}
