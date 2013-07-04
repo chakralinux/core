@@ -1,14 +1,15 @@
 #
 # Apps Packages for Chakra, part of chakra-project.org
 #
-# Maintainer: Adrián Chaves Fernández (Gallaecio) <adriyetichaves gmail.com>
+# Maintainer:  Samir Benmendil <ram-z[at]chakra-project[dot]org>
+# Contributor: Adrián Chaves Fernández (Gallaecio) <adriyetichaves gmail.com>
 # Contributor: Firmicus <firmicus āt gmx dōt net>
 # Contributor: Rémy Oudompheng <remy@archlinux.org>
 
 pkgname=texlive-pstricks
-pkgver=2012.26865
-_pkgver=${pkgver#2012.}
-pkgrel=2
+pkgver=2013.30956
+_pkgver=${pkgver#*.}
+pkgrel=1
 pkgdesc="TeX Live - Additional PSTricks packages."
 license=('GPL3')
 arch=(any)
@@ -18,22 +19,24 @@ url='http://tug.org/texlive/'
 install=texlive.install
 changelog=ChangeLog
 source=("ftp://ftp.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip")
-md5sums=('18c1f8e54233a31f292c4705148afcf7')
+md5sums=('fb5706044b3399dcb6ed09b72175be60')
 
 build() {
-  cd $srcdir
-  for p in *.tar.xz; do
-    bsdtar -xf $p
-  done
-  rm -rf {tlpkg,doc,source} || true
+   cd "$srcdir"
+   for p in *.tar.xz; do
+     bsdtar -xf $p
+   done
+   rm -rf {tlpkg,doc,source}
 }
 
 package() {
+   cd "$srcdir"
+
    install -m755 -d $pkgdir/var/lib/texmf/arch/installedpkgs
    sed -i '/^#/d' CONTENTS
    install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_$_pkgver.pkgs
    install -m755 -d $pkgdir/usr/share
-   wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
+   wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done)
    for dir in $wanteddirs; do
      find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
      find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;

@@ -1,13 +1,15 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Drake Justice <djustice[at]chakra-linux[dot]org>
+# Maintainer:  Samir Benmendil <ram-z[at]chakra-project[dot]org>
+# Contributor: Rémy Oudompheng <remy@archlinux.org
+# Contributor: Phil Miller <philm[at]chakra-project[dog]org>
+# Contributor: Drake Justice <djustice[at]chakra-linux[dot]org>
 
 
 pkgname=texlive-fontsextra
-pkgver=2012.26866
-_revnr=${pkgver#2012.}
+pkgver=2013.30955
+_revnr=${pkgver#*.}
 pkgrel=1
 pkgdesc="TeX Live - all sorts of extra fonts"
 license=('GPL')
@@ -19,15 +21,15 @@ source=("ftp://ftp.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip" "$pkgna
 options=('!emptydirs')
 options=(!strip)
 install=texlive.install
-md5sums=('f75e552c4573ce73d3eee03fffee723f'
-         '4a2f2b3b4527655fb47ab0d59b01bfea')
+md5sums=('9e10d4fb01d87179bfd8e184e1be9dd7'
+         '2135455716c1e7356ce6a9c213827904')
 
 build() {
    cd $srcdir
    for p in *.tar.xz; do
-	   bsdtar -xf $p
+       bsdtar -xf $p
    done
-   rm -rf {tlpkg,doc,source} || true
+   rm -rf {tlpkg,doc,source}
 }
 
 package() {
@@ -38,7 +40,7 @@ package() {
    install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_${_revnr}.pkgs
    install -m644 $pkgname.maps $pkgdir/var/lib/texmf/arch/installedpkgs/
    install -m755 -d $pkgdir/usr/share
-   wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
+   wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done)
    for dir in $wanteddirs; do
      find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
      find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;
@@ -50,9 +52,4 @@ package() {
    if [[ -d $pkgdir/usr/share/texmf-dist/scripts ]]; then
      find $pkgdir/usr/share/texmf-dist/scripts -type f -exec chmod a+x '{}' \;
    fi
-   
-   # remove stuff depending on omega/aleph
-   rm -rf $pkgdir/usr/share/texmf-dist/omega
-   find $pkgdir/ -wholename '*ocherokee*' -delete
-   find $pkgdir/ -wholename '*oinuit*' -delete
 }

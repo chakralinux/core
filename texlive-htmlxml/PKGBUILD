@@ -1,12 +1,14 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
+# Maintainer:  Samir Benmendil <ram-z[at]chakra-project[dot]org>
+# Contributor: Rémy Oudompheng <remy@archlinux.or>
+# Contributor: Giuseppe Calà <jiveaxe@gmail.com>
 
 
 pkgname=texlive-htmlxml
-pkgver=2012.24013
-_revnr=${pkgver#2011.}
+pkgver=2013.29725
+_revnr=${pkgver#*.}
 pkgrel=1
 pkgdesc="TeX Live - Packages to convert LaTeX to XML/HTML, and typeset XML/SGML"
 license=('GPL')
@@ -17,13 +19,14 @@ url='http://tug.org/texlive/'
 source=("ftp://ftp.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip")
 options=('!emptydirs')
 install=texlive.install
-md5sums=('1e468991ffadc7a36f9cc6ed01b83fcb')
+md5sums=('36ae5bd6b8b4efd75f2807459e553e19')
 
 build() {
+   cd "${srcdir}"
    for p in *.tar.xz; do
-	   bsdtar -xf $p
+      bsdtar -xf $p
    done
-   rm -rf {tlpkg,doc,source} || true
+   rm -rf {tlpkg,doc,source}
 }
 
 package() {
