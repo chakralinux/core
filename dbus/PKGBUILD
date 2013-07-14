@@ -1,54 +1,59 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas@chakra-project.org
+# maintainer: inkane@chakra-project.org
+# contributor: abveritas@chakra-project.org
 
 pkgname=dbus
-pkgver=1.6.4
-pkgrel=1
+pkgver=1.6.12
+pkgrel=2
 pkgdesc="Freedesktop.org message bus system"
 url="http://www.freedesktop.org/Software/dbus"
 arch=('i686' 'x86_64')
 license=('GPL' 'custom')
-depends=("dbus-core>=${pkgver}" 'libx11')
+depends=('expat' 'coreutils' 'libx11' 'systemd')
 source=("http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+        "systemd-user-session.patch"
         '30-dbus')
-md5sums=('5ec43dc4554cba638917317b2b4f7640'
-         '9fafe8b28460aeaa6054309ef4c5ed92')
+provides=("dbus-core=${pkgver}")
+conflicts=("dbus-core=${pkgver}")
+replaces=("dbus-core=${pkgver}")
+md5sums=('a70edc50524f258eaf5c9a9994ed8748'
+         'baa6689b6df440d2036edebd40e3c41e'
+         '3314d727fa57fc443fce25b5cbeebbcc')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ECHO="echo" ./configure --prefix=/usr \
-			 --sysconfdir=/etc \
-                          --localstatedir=/var \
-                          --libexecdir=/usr/lib/dbus-1.0 \
-                          --with-dbus-user=81 \
-                          --with-system-pid-file=/var/run/dbus.pid \
-                          --disable-verbose-mode \
-                          --disable-static \
-                          --enable-inotify \
-                          --disable-dnotify \
-                          --disable-tests \
-                          --disable-asserts \
-                          --with-x \
-                          --enable-x11-autolaunch
+  ./configure --prefix=/usr \
+ 		 --sysconfdir=/etc \
+     --localstatedir=/var \
+     --libexecdir=/usr/lib/dbus-1.0 \
+     --with-dbus-user=81 \
+     --with-system-pid-file=/run/dbus/pid \
+     --disable-verbose-mode \
+     --disable-static \
+     --enable-inotify \
+     --disable-dnotify \
+     --disable-tests \
+     --disable-asserts \
+     --with-systemdsystemunitdir=/usr/lib/systemd/system \
+     --enable-systemd
 
-  make -C tools dbus-launch
+  patch -p1 < "$srcdir/systemd-user-session.patch"
+
+  make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  install -m755 -d "${pkgdir}/usr/bin"
-  install -m755 -d "${pkgdir}/usr/share/man/man1"
-  install -m755 tools/dbus-launch "${pkgdir}/usr/bin/"
-  install -m644 doc/dbus-launch.1 "${pkgdir}/usr/share/man/man1/"
+  make DESTDIR="$pkgdir" install
 
-  install -m755 -d "${pkgdir}/etc/X11/xinit/xinitrc.d"
-  install -m755 "${srcdir}/30-dbus" "${pkgdir}/etc/X11/xinit/xinitrc.d/"
+  rm -rf "$pkgdir/var/run"
 
-  install -d -m755 "${pkgdir}/usr/share/licenses/dbus"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/dbus/"
+  install -Dm755 -d "${pkgdir}/etc/X11/xinit/xinitrc.d/30-dbus"
+
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/dbus/COPYING"
 }
 
 # vim:set ts=2 sw=2 et:
