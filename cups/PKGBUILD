@@ -3,13 +3,13 @@
 pkgbase="cups"
 pkgname=('libcups' 'cups')
 pkgver=1.6.2
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 license=('GPL')
 url="http://www.cups.org/"
 makedepends=('libtiff' 'libpng' 'acl' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'cups-filters' 'bc' 'pkg-config'
              'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus-core' 'avahi'  'hicolor-icon-theme' 'systemd' 'colord')
-source=(ftp://ftp.easysw.com/pub/cups/${pkgver}/cups-${pkgver}-source.tar.bz2
+source=(http://www.cups.org/software/${pkgver}/cups-${pkgver}-source.tar.gz
         cups-no-gcrypt.patch
         cups.logrotate cups.pam
 
@@ -28,7 +28,8 @@ source=(ftp://ftp.easysw.com/pub/cups/${pkgver}/cups-${pkgver}-source.tar.bz2
         cups-ricoh-deviceid-oid.patch
         cups-systemd-socket.patch)
 
-md5sums=('13c8b2b2336d42001abe4899766b62dc'
+
+md5sums=('8b8e40560b67e28607b1f04dafd9a94d'
          'cc4101beccb5ed6deb1c92707a575925'
          'f861b18f4446c43918c8643dcbbd7f6d'
          '96f82c38f3f540b53f3e5144900acf17'
@@ -174,4 +175,3 @@ optdepends=('xdg-utils: xdg .desktop file support')
   # Provide native service
   ln -s cups.service "$pkgdir/usr/lib/systemd/system/cupsd.service"
 }
-
