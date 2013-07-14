@@ -1,12 +1,13 @@
+# maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=204
+pkgver=205
 pkgrel=1
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
 depends=('acl' 'bash' 'glibc' 'glib2' 'kmod' 'hwids' 'util-linux' 'kbd' 'kmod' 'libcap' 'libxslt'
-         'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus-core') 
+         'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus') 
 makedepends=('docbook-xsl' 'gobject-introspection' 'gperf' 'intltool')
 optdepends=('python2-gobject3: systemd-analyze'
             'dbus-python: systemd-analyze')
@@ -21,40 +22,30 @@ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/systemd/journald.conf
         etc/udev/udev.conf)
 provides=("udev=$pkgver")
-conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'systemd-units')
+conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
 replaces=('udev')
 groups=('base')
 install="systemd.install"
 options=('!libtool')
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
-        'utmp-turn-systemd-update-utmp-shutdown.service-into.patch'
         'initcpio-hook-udev'
         'initcpio-install-udev'
         'initcpio-install-timestamp'
         'use-split-usr-path.patch'
-        '99-default.preset'
-        '98-chakra.rules')
-md5sums=('a07619bb19f48164fbf0761d12fd39a8'
-         '7f39f9fde1ff7b48293ed1e3d0a6c213'
+        '99-default.preset')
+md5sums=('3afc38170371929cf6ab056bf6a52fc6'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          'fb37e34ea006c79be1c54cbb0f803414'
          'df69615503ad293c9ddf9d8b7755282d'
          '21572b99173a7cdeaff965e0a5e9182b'
-         'a1bf25da736d3719e9720b2e4caea341'
-         '40f1d228553f939430e6d8d781f06daf')
+         'a1bf25da736d3719e9720b2e4caea341')
 
 build() {
   cd "$pkgname-$pkgver"
   
-  patch -p1 -i "$srcdir/use-split-usr-path.patch"
-
-  patch -Np1 -i "$srcdir/utmp-turn-systemd-update-utmp-shutdown.service-into.patch"
-  autoreconf
-
-  ./configure \
+  ./configure  \
       PYTHON=python2 \
       PYTHON_CONFIG=python2-config \
-      --enable-static \
       --libexecdir=/usr/lib \
       --localstatedir=/var \
       --sysconfdir=/etc \
@@ -62,9 +53,10 @@ build() {
       --disable-gtk-doc \
       --disable-audit \
       --disable-ima \
+      --with-sysvinit-path= \
+      --with-sysvrcnd-path= \
       --with-firmware-path=/usr/lib/firmware/updates:/lib/firmware/updates:/usr/lib/firmware:/lib/firmware
-
-  make
+   make
 }
 
 package() {
@@ -74,9 +66,6 @@ package() {
 
   install -dm755 "$pkgdir/bin"
   ln -s ../usr/lib/systemd/systemd "$pkgdir/bin/systemd"
-
-  # Remove rpm dir
-  rm -r "$pkgdir/etc/rpm"
 
   install -dm755 "$pkgdir/sbin"
   for tool in runlevel reboot shutdown poweroff halt telinit; do
@@ -107,10 +96,8 @@ package() {
   
   # Chakra specific .preset
   install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
-  #hide bundles in Doplhin places
-  install -m644 "$srcdir/98-chakra.rules" "$pkgdir/usr/lib/udev/rules.d/98-chakra.rules"
-
   # Make journalctl persistent
   install -dm755 "$pkgdir/var/log/journal"
   sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
 }
+
