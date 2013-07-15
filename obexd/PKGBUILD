@@ -4,7 +4,7 @@
 pkgbase=obexd
 pkgname=('obexd-client' 'obexd-server')
 pkgver=0.48
-pkgrel=1
+pkgrel=2
 url="http://www.bluez.org/"
 arch=('x86_64')
 license=('GPL2')
@@ -14,6 +14,8 @@ md5sums=('835125191ea2ffd1260d374d79d1bacb')
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
+   # the sed line is needed because newer versions of gcc are more strict regarding includes 
+   sed -i 's/#include <string.h>/&\n#include <stdio.h>/' plugins/mas.c
   ./configure --prefix=/usr --libexecdir=/usr/lib/obexd
   make
 }
