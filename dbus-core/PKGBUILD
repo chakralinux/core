@@ -4,8 +4,8 @@
 # maintainer: abveritas@chakra-project.org
 
 pkgname=dbus-core
-pkgver=1.6.4
-pkgrel=3
+pkgver=1.6.12
+pkgrel=1
 pkgdesc="Freedesktop.org message bus system"
 url="http://www.freedesktop.org/Software/dbus"
 arch=(i686 x86_64)
@@ -14,9 +14,11 @@ depends=('expat' 'coreutils' 'filesystem' 'shadow') # shadow for install scriptl
 makedepends=('libx11' 'systemd')
 options=(!libtool)
 install=dbus.install
-source=(http://dbus.freedesktop.org/releases/dbus/dbus-$pkgver.tar.gz{,.asc})
-md5sums=('5ec43dc4554cba638917317b2b4f7640'
-         '3d4482ee39b49da334441c76f83bf1cb')
+source=(http://dbus.freedesktop.org/releases/dbus/dbus-$pkgver.tar.gz
+        "systemd-user-session.patch")
+md5sums=('a70edc50524f258eaf5c9a9994ed8748'
+         'd8a1bd529b3ddca671ee1a695a143db9')
+
 
 build() {
   cd dbus-$pkgver
@@ -24,12 +26,12 @@ build() {
       --libexecdir=/usr/lib/dbus-1.0 --with-dbus-user=81 \
       --with-system-pid-file=/run/dbus/pid \
       --with-system-socket=/run/dbus/system_bus_socket \
-      --with-console-auth-dir=/run/console/ \
       --enable-inotify --disable-dnotify \
       --disable-verbose-mode --disable-static \
       --disable-tests --disable-asserts \
       --with-systemdsystemunitdir=/usr/lib/systemd/system \
       --enable-systemd
+  patch -p1 < "$srcdir/systemd-user-session.patch"
   make
 }
 
@@ -40,9 +42,6 @@ package(){
   rm -f "$pkgdir/usr/bin/dbus-launch"
   rm -f "$pkgdir/usr/share/man/man1/dbus-launch.1"
   rm -rf "$pkgdir/var/run"
-
-  #install -m755 -d "$pkgdir/etc/rc.d"
-  #install -m755 ../dbus "$pkgdir/etc/rc.d/"
 
   #Fix configuration file
   sed -i -e 's|<user>81</user>|<user>dbus</user>|' "$pkgdir/etc/dbus-1/system.conf"
