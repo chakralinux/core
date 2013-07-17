@@ -1,13 +1,13 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=205
-pkgrel=1
+pkgver=201
+pkgrel=5
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
 depends=('acl' 'bash' 'glibc' 'glib2' 'kmod' 'hwids' 'util-linux' 'kbd' 'kmod' 'libcap' 'libxslt'
-         'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus') 
+         'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus-core') 
 makedepends=('docbook-xsl' 'gobject-introspection' 'gperf' 'intltool')
 optdepends=('python2-gobject3: systemd-analyze'
             'dbus-python: systemd-analyze')
@@ -29,19 +29,22 @@ install="systemd.install"
 options=('!libtool')
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-hook-udev'
+        'use-split-usr-path.patch'
         'initcpio-install-udev'
         'initcpio-install-timestamp'
-        'use-split-usr-path.patch'
         '99-default.preset')
-md5sums=('3afc38170371929cf6ab056bf6a52fc6'
+md5sums=('3e758392ff0e9206b3f7ee252b4a654b'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
+         '21572b99173a7cdeaff965e0a5e9182b'
          'fb37e34ea006c79be1c54cbb0f803414'
          'df69615503ad293c9ddf9d8b7755282d'
-         '21572b99173a7cdeaff965e0a5e9182b'
          'a1bf25da736d3719e9720b2e4caea341')
 
 build() {
+  
   cd "$pkgname-$pkgver"
+  patch -p1 -i "$srcdir/use-split-usr-path.patch"
+  autoreconf
   
   ./configure  \
       PYTHON=python2 \
@@ -100,4 +103,3 @@ package() {
   install -dm755 "$pkgdir/var/log/journal"
   sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
 }
-
