@@ -4,7 +4,7 @@
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'libcl')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
-pkgver=313.30
+pkgver=319.32
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
@@ -15,7 +15,7 @@ ARCH='x86_64'
 _pkg="NVIDIA-Linux-${ARCH}-${pkgver}-no-compat32"
 
 source=("ftp://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/${_pkg}.run")
-md5sums=('e5f147fbcdcad71472b4ddeccf259bd7')
+md5sums=('d181d856768868823df3bda4607a5315')
 
 create_links() {
   # create soname links
@@ -61,7 +61,7 @@ package_nvidia-utils() {
   depends=('xorg-server' 'libxvmc')
   optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig'
               'opencl-nvidia: OpenCL support'
-	      'nvidia-settings: Gtk GUI')
+              'nvidia-settings: Gtk GUI')
   conflicts=('libgl')
   provides=('libgl')
 
@@ -86,8 +86,8 @@ package_nvidia-utils() {
   # CUDA
   install -D -m755 "libcuda.so.${pkgver}" "${pkgdir}/usr/lib/libcuda.so.${pkgver}"
   install -D -m755 "libnvcuvid.so.${pkgver}" "${pkgdir}/usr/lib/libnvcuvid.so.${pkgver}"
-  install -D -m755 nvidia-cuda-proxy-server "${pkgdir}/usr/bin/nvidia-cuda-proxy-server"
-  install -D -m644 nvidia-cuda-proxy-control.1.gz "${pkgdir}/usr/share/man/man1/nvidia-cuda-proxy-control.1.gz"
+  #install -D -m755 nvidia-cuda-proxy-server "${pkgdir}/usr/bin/nvidia-cuda-proxy-server"
+  #install -D -m644 nvidia-cuda-proxy-control.1.gz "${pkgdir}/usr/share/man/man1/nvidia-cuda-proxy-control.1.gz"
   # DEBUG
   install -D -m755 nvidia-debugdump "${pkgdir}/usr/bin/nvidia-debugdump"
   # nvidia-xconfig
