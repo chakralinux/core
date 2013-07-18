@@ -5,8 +5,8 @@
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=nfs-utils
-pkgver=1.2.6
-pkgrel=3
+pkgver=1.2.8
+pkgrel=1
 pkgdesc="Support programs for Network File Systems"
 arch=('x86_64')
 url='http://nfs.sourceforge.net'
@@ -14,13 +14,12 @@ license=('GPL')
 backup=(etc/{exports,idmapd.conf,nfsmount.conf} etc/conf.d/{nfs-common.conf,nfs-server.conf})
 depends=('glibc' 'e2fsprogs' 'rpcbind' 'libtirpc>=0.2.1' 'librpcsecgss>=0.19-2' 'nfsidmap'
          'libevent>=2.0.10' 'libgssglue' 'device-mapper')
-makedepends=('pkg-config' 'autoconf' 'automake' 'keyutils')
+makedepends=('pkg-config' 'autoconf' 'automake' 'keyutils' 'sqlite3')
 source=("http://downloads.sourceforge.net/project/nfs/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.bz2"
 	'exports'
 	'idmapd.conf'
 	'start-statd.patch'
 	'nfs-utils-1.1.4-mtab-sym.patch'
-	'nfs-utils-1.1.4-no-exec.patch'
 	'nfs-common.conf'
 	'nfs-server.conf'
 	'rpc-gssd.service'
@@ -33,12 +32,11 @@ source=("http://downloads.sourceforge.net/project/nfs/${pkgname}/${pkgver}/${pkg
 	'proc-fs-nfsd.mount'
 	'blkmapd.service'
 	'nfs-utils.conf')
-md5sums=('8be543ca270c2234ff18f8c8d35e0d37'
+md5sums=('6e7d97de51e428a0b8698c16ca23db77'
          'ff585faf410a62c4333a027c50b56bae'
          'eb4f4027fab6fc1201f1ca04f5954c76'
          'e9144277a89a620d9bc80413158a7d27'
          '7674106eaaa4c149bccd4f05fe3604e9'
-         '4f4827dfc93008dfadd0a530ad0872b2'
          'f73f197a16b02c3e248488ec35c4cf43'
          '2bf71def3263325643a09458635520f0'
          '3694619813cebc5b4502b58f1992b442'
@@ -55,13 +53,16 @@ md5sums=('8be543ca270c2234ff18f8c8d35e0d37'
 build() {
   cd $srcdir/${pkgname}-${pkgver}
   patch -p1 -i ../nfs-utils-1.1.4-mtab-sym.patch
-  # Chakra specific patch
+  # Chakra (?) specific patch, according to Arch fixes /usr/bin in start-statd shell script
+  # our patch adds a few more lines
   patch -p0 -i $srcdir/start-statd.patch
 
   ./configure --prefix=/usr --enable-nfsv4 --enable-nfsv41 --enable-gss \
               --without-tcp-wrappers --with-statedir=/var/lib/nfs \
               --enable-ipv6 --sysconfdir=/etc \
-	      --enable-libmount-mount --enable-mountconfig
+	      --enable-libmount-mount --enable-mountconfig \
+              --with-gssglue \
+              --enable-mountconfig
 
   make 
 }
