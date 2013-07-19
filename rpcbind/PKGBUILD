@@ -6,7 +6,7 @@
 
 pkgname=rpcbind
 pkgver=0.2.0
-pkgrel=6
+pkgrel=7
 pkgdesc="portmap replacement which supports RPC over various protocols"
 arch=('x86_64')
 depends=('bash' 'glibc' 'libtirpc')
@@ -24,7 +24,7 @@ build() {
   
   patch -p1 -i ../rpcbind-sunrpc.patch
   
-  ./configure --prefix=/usr
+  ./configure --prefix=/usr --enable-warmstarts --with-statedir=/run
   make 
 }
 package() {
