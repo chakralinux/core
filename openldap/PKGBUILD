@@ -1,20 +1,26 @@
 #
 # Core packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
+# maintainer inkane@chakra-project.org
+# contributor abveritas[at]chakra-project[dot]org>
 
 pkgbase=openldap
 pkgname=('libldap' 'openldap')
-pkgver=2.4.33
-pkgrel=2
+pkgver=2.4.35
+pkgrel=1
 arch=('x86_64')
 url="http://www.openldap.org/"
 license=('custom')
+depends=('db')
 makedepends=('libltdl' 'libsasl' 'e2fsprogs' 'util-linux' 'groff')
 options=('!makeflags')
 source=("ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/${pkgbase}-${pkgver}.tgz"
+        "symbol_versions.patch"
+        "openldap-nssov.patch"
         'slapd.default' 'slapd.service' 'slapd.tmpfiles' 'ntlm.patch')
-md5sums=('5adae44897647c15ce5abbff313bc85a'
+md5sums=('cd75d82ca89fb0280cba66ca6bd97448'
+         '4f2117eb1975ea52a5a4cfcfda804d95'
+         '2f0dfe1f114275d3b8b2e9d88edfa7b0'
          '6be69f6b7e522cb64cce8703da81ed32'
          'cbe2bd85be8d98851f640d20930ca9ea'
          '13e622d1b6ce9ecc1c5c429b724c0cc2'
@@ -22,7 +28,17 @@ md5sums=('5adae44897647c15ce5abbff313bc85a'
 
 build() {
   cd "${srcdir}"/${pkgbase}-${pkgver}
+  # From LFS: 
+  # Without the following patch, the Evolution Exchange addressbook integration uses simple 
+  # binds with cleartext password
+  # This is not that critical, as we don't provide the evolution server in our servers,
+  # but it's in CCR, therefore this should be included
   patch -p1 -i "${srcdir}"/ntlm.patch
+  # Patch from arch
+  patch -p0 -i "${srcdir}"/openldap-nssov.patch
+  # Patch from debian/LFS. Results in proper symbol versioning
+  # patch -Np1 -i "${srcdir}"/symbol_versions.patch
+
 
   sed -i 's|-m 644 $(LIBRARY)|-m 755 $(LIBRARY)|' libraries/{liblber,libldap,libldap_r}/Makefile.in
   sed -i 's|#define LDAPI_SOCK LDAP_RUNDIR LDAP_DIRSEP "run" LDAP_DIRSEP "ldapi"|#define LDAPI_SOCK LDAP_DIRSEP "run" LDAP_DIRSEP "openldap" LDAP_DIRSEP "ldapi"|' include/ldap_defaults.h
