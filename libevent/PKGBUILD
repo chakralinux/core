@@ -1,11 +1,12 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
+# maintainer <inkane@chakra-project.org>
+# contributor <abveritas[at]chakra-project[dot]org>
 
 pkgname=libevent
 pkgver=2.0.21
-pkgrel=2
+pkgrel=3
 pkgdesc="An event notification library"
 license=('GPL2')
 arch=('x86_64')
@@ -24,7 +25,9 @@ build() {
 
 check() {
   cd "${srcdir}/${pkgname}-${pkgver}-stable"
-  make check || true 
+  # does not work as of 20.07.2013 because of
+  # https://github.com/libevent/libevent/issues/38
+  #make check
 }
 
 package() {
