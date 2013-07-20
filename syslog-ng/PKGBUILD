@@ -1,17 +1,18 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
+# maintainer <inkane@chakra-project.org>
+# contributor <abveritas[at]chakra-project[dot]org>
 
 
 pkgname=syslog-ng
-pkgver=3.3.7
+pkgver=3.4.2
 pkgrel=1
 pkgdesc="Next-generation syslogd with advanced networking and filtering capabilities"
 arch=('x86_64')
 license=('GPL2')
 url="http://www.balabit.com/network-security/syslog-ng/"
-depends=('glib2' 'eventlog' 'openssl' 'libcap' 'awk' 'systemd')
+depends=('glib2' 'eventlog' 'openssl' 'libcap' 'awk' 'systemd' 'python2')
 makedepends=('flex' 'pkg-config')
 optdepends=('logrotate: for rotating log files')
 provides=('logger')
@@ -22,7 +23,7 @@ source=("http://www.balabit.com/downloads/files/syslog-ng/sources/$pkgver/source
         'syslog-ng.conf'
         'syslog-ng.conf.d'
         'syslog-ng.logrotate')
-sha1sums=('06f09057c3dfb84eba381e0141f92565673ec0c8'
+sha1sums=('96474f955fb51d4f31ce1154c84b0cb48c8748d2'
           '98074e0facfc6ef036202662cc86d04b38a2c142'
           'eb2aa25737e0cb9453c7b058f0e2dcf16abf21cd'
           '949128fe3d7f77a7aab99048061f885bc758000c')
@@ -38,6 +39,7 @@ build() {
     --datadir=/usr/share/syslog-ng \
     --with-pidfile-dir=/run \
     --disable-spoof-source \
+    --enable-ipv6 \
     --enable-systemd \
     --with-systemdsystemunitdir=/usr/lib/systemd/system
 
