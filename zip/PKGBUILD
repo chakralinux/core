@@ -6,7 +6,7 @@
 
 pkgname=zip
 pkgver=3.0
-pkgrel=3
+pkgrel=4
 pkgdesc="Creates PKZIP-compatible .zip files"
 arch=(i686 x86_64)
 url="http://www.info-zip.org/pub/infozip/Zip.html"
@@ -18,8 +18,8 @@ source=(ftp://ftp.info-zip.org/pub/infozip/src/zip30.zip)
 md5sums=('e88492c8abd68fa9cfba72bc08757dba')
 
 build() {
-   cd $startdir/src/${pkgname}30
+   cd $srcdir/${pkgname}30
    make -f unix/Makefile LOCAL_ZIP="$CFLAGS" prefix=/usr generic_gcc || return 1
-   make -f unix/Makefile INSTALL=`which install` prefix=$startdir/pkg/usr MANDIR=$startdir/pkg/usr/share/man/man1 install
-   install -D -m644 LICENSE $startdir/pkg/usr/share/licenses/$pkgname/LICENSE.txt
+   make -f unix/Makefile INSTALL=`which install` prefix=$pkgdir/usr MANDIR=$pkgdir/usr/share/man/man1 install
+   install -D -m644 LICENSE $pkgdir/usr/share/licenses/$pkgname/LICENSE.txt
 }
