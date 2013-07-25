@@ -6,7 +6,7 @@
 
 pkgname=tar
 pkgver=1.26
-pkgrel=2
+pkgrel=3
 pkgdesc="Utility used to store, backup, and transport files"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/tar/tar.html"
@@ -21,6 +21,10 @@ md5sums=('2cee42a2ff4f1cd4f9298eeeb2264519'
 
 build() {
   cd ${srcdir}/$pkgname-$pkgver
+
+  # fix build failure with glibc-2.16
+  sed -i -e '/gets is a/d' gnu/stdio.in.h
+
   ./configure --prefix=/usr --libexecdir=/usr/lib/tar --bindir=/bin
   make || return 1
 }
