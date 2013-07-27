@@ -5,7 +5,7 @@
 
 pkgname=libgdiplus
 pkgver=2.10
-pkgrel=3
+pkgrel=4
 pkgdesc="An Open Source Implementation of the GDI+ API"
 arch=('x86_64')
 license=('MPL' 'LGPL')
@@ -18,10 +18,15 @@ source=("http://download.mono-project.com/sources/${pkgname}/${pkgname}-${pkgver
 md5sums=('451966e8f637e3a1f02d1d30f900255d'
          'a2d143676bbaceeb88b4c34069e93986')
 
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  patch -p0 -i "${srcdir}/libpng15.patch"
+}
+
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   
-  patch -p0 -i "${srcdir}/libpng15.patch"
   ./configure --prefix=/usr --with-cairo=system
   make 
 }

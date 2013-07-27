@@ -3,8 +3,8 @@
 #                         Tom K <tom@archlinux.org>
 
 pkgname=rrdtool
-pkgver=1.4.7
-pkgrel=2
+pkgver=1.4.8
+pkgrel=1
 pkgdesc="Data logging and graphing application"
 arch=('x86_64')
 url="http://www.rrdtool.org"
@@ -16,25 +16,39 @@ optdepends=('tcl: to use corresponding binding' \
             'ruby: to use corresponding binding' \
             'lua: to use corresponding binding')
 options=('!libtool' '!emptydirs' '!makeflags')
-source=("http://oss.oetiker.ch/rrdtool/pub/rrdtool-${pkgver}.tar.gz")
-sha1sums=('faab7df7696b69f85d6f89dd9708d7cf0c9a273b')
+source=("http://oss.oetiker.ch/rrdtool/pub/rrdtool-${pkgver}.tar.gz"
+	"rrdtool-pangofont.patch")
+sha1sums=('56d68857f39e70bfa32360947614d8220702ed02'
+          '8c600285bdab7776c1d5301df7cf486d69eae048')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  # fix FS#28521 make ruby install to vendor_ruby instead of site_ruby
+  sed -e 's/$(RUBY) extconf.rb/& --vendor/' -i bindings/Makefile.in
+  patch -p1 -i ../rrdtool-pangofont.patch
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
-  # make ruby install to vendor_ruby instead of site_ruby (reported: https://bugs.archlinux.org/task/28521)
-  sed -e 's/$(RUBY) extconf.rb/& --vendor/' -i bindings/Makefile.in
-
-  ./configure --prefix=/usr --localstatedir=/var --disable-rpath --enable-perl \
-    --enable-perl-site-install --with-perl-options='INSTALLDIRS=vendor' \
-    --enable-ruby --enable-ruby-site-install --enable-python \
-    --enable-lua --enable-lua-site-install \
-    --enable-tcl --disable-libwrap
-  make
+  autoconf
+  ./configure --prefix=/usr \
+    --localstatedir=/var \
+    --disable-rpath \
+    --enable-perl \
+    --enable-perl-site-install \
+    --with-perl-options='INSTALLDIRS=vendor' \
+    --enable-ruby \
+    --enable-ruby-site-install \
+    --enable-python \
+    --enable-lua \
+    --enable-lua-site-install \
+    --enable-tcl \
+    --disable-libwrap
+  make LIBS+="-lglib-2.0"
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" includedir=/usr/include install
   install -D -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }

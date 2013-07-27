@@ -1,0 +1,14 @@
+diff -ur vlc-2.0.7/modules/codec/avcodec/vaapi.c vlc-2.0.7.new/modules/codec/avcodec/vaapi.c
+--- vlc-2.0.7/modules/codec/avcodec/vaapi.c	2013-07-25 15:32:17.607393959 +0000
++++ vlc-2.0.7.new/modules/codec/avcodec/vaapi.c	2013-07-25 15:36:25.620339773 +0000
+@@ -37,6 +37,10 @@
+ 
+ #include "avcodec.h"
+ #include "va.h"
++#include "va/va_version.h"
++#if VA_CHECK_VERSION(0,34,0)
++#include "va/va_compat.h"
++#endif
+ #include "copy.h"
+ 
+ #ifdef HAVE_AVCODEC_VAAPI

@@ -5,28 +5,20 @@
 
 pkgname=linphone
 pkgver=3.5.2
-pkgrel=1
+pkgrel=2
 pkgdesc="A Voice-over-IP phone. CLI version only."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.linphone.org/index.php/eng"
 license=('GPL')
-depends=('alsa-lib' 'ffmpeg' 'libexosip2' 'speex' 'libv4l' 'v4l-utils' 'libpulse' 'libxv')
+depends=('alsa-lib' 'ffmpeg' 'libexosip2' 'speex' 'libv4l' 'v4l-utils' 'libpulse' 'libxv' 'mediastreamer' 'ortp')
 makedepends=('pkgconfig' 'perlxml' 'intltool')
 optdepends=('pulseaudio')
-conflicts=(ortp)
-provides=(ortp)
 options=('!libtool' '!emptydirs')
-source=("http://download-mirror.savannah.gnu.org/releases/${pkgname}/${pkgver:0:3}.x/sources/${pkgname}-${pkgver}.tar.gz"
-        "ffmpeg-0.11.patch")
-sha256sums=('da37d5e539e3f8aaa44039aa52ed032ef372e7481d1b3ce68317bf79aa8a6020'
-            'fff926ffb36fb0106e98cb4f00a28f87d3c539f426df6ee2879565977b4c7d4d')
+source=("http://download-mirror.savannah.gnu.org/releases/${pkgname}/${pkgver:0:3}.x/sources/${pkgname}-${pkgver}.tar.gz")
+sha256sums=('da37d5e539e3f8aaa44039aa52ed032ef372e7481d1b3ce68317bf79aa8a6020')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
-  # ffmpeg-0.11 patch
-  msg2 "Applying ffmpeg patch"
-  patch -p1 -i "${srcdir}/ffmpeg-0.11.patch"
 
   export PKG_CONFIG=/usr/bin/pkg-config
   ./configure --prefix=/usr \
@@ -38,7 +30,9 @@ build() {
               --enable-pulseaudio \
               --disable-artsc \
               --disable-strict \
-              --libexecdir=/usr/lib/${pkgname}
+              --libexecdir=/usr/lib/${pkgname} \
+	      --enable-external-mediastreamer \
+              --enable-external-ortp 
   make
 }
 

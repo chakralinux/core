@@ -1,7 +1,7 @@
 # maintainer abveritas@chakra-project.org
  
 pkgname=mplayer2
-pkgver=20130320
+pkgver=20130428
 pkgrel=1
 pkgdesc="A movie player"
 arch=('x86_64')
@@ -13,32 +13,30 @@ depends=('desktop-file-utils' 'ttf-dejavu' 'enca' 'libxss' 'a52dec' 'libvpx' 'li
          'libmad' 'sdl' 'libtheora' 'libcaca' 'libxxf86dga' 'fribidi' 'libjpeg-turbo'
          'faac' 'faad2' 'libxvmc' 'schroedinger' 'mpg123' 'libass' 'libxxf86vm' 'libbluray'
          'ffmpeg' 'libbs2b' 'directfb' 'nas')    
-makedepends=('live-media' 'mesa' 'unzip' 'yasm' 'python3' 'docutils')
+makedepends=('mesa' 'libgl' 'unzip' 'yasm' 'python3' 'docutils' 'git')
 categories=('multimedia')
 backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
-provides=('mplayer=99999')
+provides=('mplayer')
 conflicts=('mplayer')
-source=("http://chakra.sourceforge.net/sources/mplayer2/mplayer2-$pkgver.tar.xz")
-sha1sums=('705a9aa1ccde603071ea6cf12c4469d86cffb160')
+install=$pkgname.install
+source=(git://git.mplayer2.org/mplayer2.git
+        0001-demux_gif-declare-missing-PrintGifError.patch)
+sha1sums=('SKIP'
+          '02a18919668d1af8ef949215b8bbaa52c27147a4')
 
-# create tarball: source PKGBUILD && mksource
+pkgver() {
+  cd $pkgname
+  git log -1 --format="%cd" --date=short | sed 's|-||g'
+}
 
-mksource() {
-  echo "checkout ${pkgname}"
-  git clone git://git.${pkgname}.org/${pkgname}.git
-  echo "clean checkout"
-  rm -vRf mplayer2/.git
-  pushd mplayer2
-  popd
-  echo "pack checkout"
-  tar -cvJf ${pkgname}-${pkgver}.tar.xz mplayer2/*
-  echo -n "sha1sum: "
-  sha1sum ${pkgname}-${pkgver}.tar.xz
+prepare() {
+  cd $pkgname
+  sed 's/gmplayer/mplayer/g' -i etc/mplayer.desktop
+#  patch -p1 -i "$srcdir"/0001-demux_gif-declare-missing-PrintGifError.patch
 }
 
 build() {
-
-  cd "${srcdir}/${pkgname}"
+  cd ${pkgname}
 
   ./configure --prefix=/usr \
               --enable-runtime-cpudetection \
@@ -46,8 +44,7 @@ build() {
               --disable-openal \
               --disable-libdv \
               --disable-musepack \
-              --language=all \
-              --enable-translation \
+              --enable-translation --language=all \
               --confdir=/etc/mplayer
   make
 }
@@ -59,6 +56,8 @@ package() {
   install -Dm644 etc/{codecs.conf,input.conf,example.conf} "${pkgdir}/etc/mplayer"
   install -dm755 "${pkgdir}/usr/share/mplayer"
   ln -s /usr/share/fonts/TTF/DejaVuSans.ttf "${pkgdir}/usr/share/mplayer/subfont.ttf"
+
+  install -Dm644 etc/mplayer.desktop "$pkgdir"/usr/share/applications/mplayer.desktop
 }
 
 # vim:set ts=2 sw=2 et:

@@ -4,28 +4,34 @@
 pkgname=hugin-tools
 _pkgname=hugin
 pkgver=2012.0.0
-pkgrel=4
+pkgrel=5
 pkgdesc="Hugin libs and tools to be used by Kipi-plugins"
 arch=('x86_64')
 url="http://hugin.sourceforge.net/"
 license=('LGPL')
 depends=('boost-libs' 'enblend-enfuse' 'exiv2' 'openexr' 'libpano13>=2.9.18'
-         'lapack' 'desktop-file-utils' 'icu' 'libxt' 'lensfun')
+         'lapack' 'desktop-file-utils' 'icu' 'libxt' 'lensfun' 'libpng' 'libxrandr')
 makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap')
 conflict=('hugin')
 provides=('hugin')
 source=("http://downloads.sourceforge.net/${_pkgname}/${_pkgname}-${pkgver}.tar.bz2")
-md5sums=('6a4fb2585eb3539ba6769cf4557f6e88')
+sha1sums=('53f97d030716e66dc5a49c7e786686a9d5262b8d')
+
+prepare() {
+  cd "${srcdir}/${_pkgname}-${pkgver}"
+  sed 's/Luk.... Jirkovsk../Lukas Jirkovsky/g' -i doc/deghosting_mask.pod
+  # pod2man limitation (makepkg uses LC_ALL=C and Unicode chars take two bytes)
+}
 
 build() {
   cd "${srcdir}"
 
-  mkdir build 
+  mkdir -p build 
   cd build
 
   # this makes possible to compile all the hugin tools without GUis
   sed -i -e "s~FIND_PACKAGE(wxWidgets REQUIRED)~~g" ${srcdir}/${_pkgname}-${pkgver}/CMakeLists.txt
-  mkdir ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
+  mkdir -p ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
   cp ${srcdir}/${_pkgname}-${pkgver}/src/hugin1/PT/*.h ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
 
   cmake "${srcdir}/${_pkgname}-${pkgver}" \

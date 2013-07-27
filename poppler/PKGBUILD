@@ -6,10 +6,10 @@
 pkgbase=poppler
 pkgname=('poppler' 'poppler-glib' 'poppler-qt')
 pkgver=0.22.0
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 license=('GPL')
-makedepends=('libjpeg-turbo' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'qt' 'pkgconfig' 'lcms')
+makedepends=('libjpeg-turbo' 'libpng' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'qt' 'pkgconfig' 'lcms')
 options=('!libtool')
 url="http://poppler.freedesktop.org/"
 source=("http://poppler.freedesktop.org/${pkgname}-${pkgver}.tar.gz")
@@ -33,7 +33,7 @@ build() {
 
 package_poppler() {
   pkgdesc="PDF rendering library based on xpdf 3.0"
-  depends=('libjpeg' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'lcms' 'poppler-data')
+  depends=('libjpeg' 'libpng' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'lcms' 'poppler-data')
   conflicts=("poppler-qt3<${pkgver}")
 
   cd "${srcdir}/${pkgbase}-${pkgver}"

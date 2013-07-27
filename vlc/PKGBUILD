@@ -2,49 +2,72 @@
 
 pkgname=vlc
 pkgver=2.0.7
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
 pkgdesc=('A multimedia player and framework that plays most multimedia files as well as DVD, Audio CD, VCD, and various streaming protocols')
 license=('GPL')
-depends=('a52dec' 'fluidsynth' 'libmtp' 'libdvbpsi' 'libxpm' 'libcdio'
-         'libdca' 'qt' 'libproxy' 'sdl_image' 'libdvdnav' 'mesa'
-         'lua' 'v4l-utils' 'libcddb' 'smbclient' 'libmatroska' 'zvbi'
-         'taglib' 'sysfsutils' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp'
-         'libshout' 'libmad' 'fribidi' 'libmpeg2' 'libmodplug' 'opus'
-         'ttf-freefont' 'libxv' 'libass' 'xdg-utils' 'desktop-file-utils' 'xcb-util-keysyms')
-makedepends=('avahi' 'pkgconfig' 'live-media' 'libnotify' 'libbluray'
-             'flac' 'libtheora' 'alsa-lib' 'jack' 'kdelibs' 'systemd'
-             'libraw1394' 'libdc1394' 'libavc1394' 'libva' 'pulseaudio'
-             'lirc-utils' 'gnutls' 'libcaca' 'librsvg' 'oss')
-optdepends=('avahi: for service discovery using bonjour protocol'
-            'libnotify: for notification plugin'
-            'ncurses: for ncurses interface support'
-            'libdvdcss: for decoding encrypted DVDs'
-            'lirc-utils: for lirc plugin'
+depends=('a52dec' 'fluidsynth' 'libdvbpsi' 'libxpm' 'libdca' 'qt' 'libproxy' 
+         'sdl_image' 'libdvdnav' 'lua' 'libmatroska' 
+         'zvbi' 'taglib' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp' 
+         'libshout' 'libmad' 'libmpeg2' 'xcb-util-keysyms')
+makedepends=('live-media' 'libnotify' 'libbluray' 'flac' 'kdelibs'
+             'libdc1394' 'libavc1394' 'lirc-utils' 'libcaca' 'oss' 
+             'librsvg' 'portaudio' 'oss' 'libgme' 'aalib' 'libmtp'
+             'vcdimager' 'opus' 'libssh2' 'mesa')
+optdepends=('aalib: for ASCII art plugin'
+            'avahi: for service discovery using bonjour protocol'
+            'flac: for Free Lossless Audio Codec plugin'
+            'kdelibs: KDE Solid hardware integration'
             'libavc1394: for devices using the 1394ta AV/C'
+            'libbluray: for Blu-Ray support'
+            'libcaca: for colored ASCII art video output'
+            'libcdio: for audio CD playback support'
             'libdc1394: for IEEE 1394 plugin'
-            'pulseaudio: PulseAudio support'
-            'vdpau-video: vdpau back-end for nvidia'
-            'libva-driver-intel: back-end for intel cards'
-            'libbluray: for Blu-Ray disks'
-            'oss: for oss sound support')
+            'libdvdcss: for decoding encrypted DVDs'
+            'libgme: for libgme plugin'
+            'libmtp: for MTP devices support'
+            'libnotify: for notification plugin'
+            'librsvg: for SVG plugin'
+            'libssh2: for sftp support'
+            'libva-intel-driver: back-end for intel cards'
+            'libva-vdpau-driver: vdpau back-end for nvidia'
+            'lirc-utils: for lirc plugin'
+            'ncurses: for ncurses interface support'
+            'opus: for opus support'
+            'oss: for OSS audio support'
+            'portaudio: for portaudio support'
+            'smbclient: for SMB access plugin'
+            'ttf-dejavu: for subtitle font'
+            'ttf-freefont: for subtitle font '
+            'vcdimager: navigate VCD with libvcdinfo')
 conflicts=('vlc-plugin')
 replaces=('vlc-plugin')
-backup=('usr/share/vlc/http/.hosts'
-        'usr/share/vlc/http/dialogs/.hosts'
-        'usr/share/vlc/lua/http/.hosts'
+backup=('usr/share/vlc/lua/http/.hosts'
         'usr/share/vlc/lua/http/dialogs/.hosts')
 categories=('multimedia')
-options=('!libtool')
+options=('!libtool' '!emptydirs')
 install="vlc.install"
-source=("http://download.videolan.org/pub/videolan/$pkgname/$pkgver/$pkgname-$pkgver.tar.xz")
-sha1sums=('d3dc6605cc296806ada16b5f9b819705c9cc1319')
+source=("http://download.videolan.org/pub/videolan/$pkgname/$pkgver/$pkgname-$pkgver.tar.xz"
+        "libva12.patch")
+sha1sums=('d3dc6605cc296806ada16b5f9b819705c9cc1319'
+          'e67786202ef6b940c5d2690d4c5520a97401a611')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  patch -p1 < "$srcdir"/libva12.patch
+
+  sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
+
+  # fix for flac-1.3.0
+  #sed -i -e 's:stream_decoder.h:FLAC/stream_decoder.h:' modules/codec/flac.c
+  #sed -i -e 's:stream_encoder.h:FLAC/stream_encoder.h:' modules/codec/flac.c
+}
+
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
-  sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
 
   ./configure --prefix=/usr \
               --sysconfdir=/etc \
@@ -55,11 +78,14 @@ build() {
               --enable-nls \
               --enable-lirc \
               --enable-pvr \
-              --enable-upnp \
+              --enable-ncurses \
               --enable-realrtsp \
+              --enable-aa \
+              --enable-vcdx \
+              --enable-upnp \
               --enable-bluray \
               --enable-opus \
-              --enable-ncurses
+              --enable-sftp
   make
 }
 
