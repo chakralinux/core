@@ -1,16 +1,19 @@
 # Platform Packages for Chakra
 
-pkgname=libva-driver-intel
-pkgver=1.0.15
-pkgrel=2
+pkgname=libva-intel-driver
+pkgver=1.2.0
+pkgrel=1
 pkgdesc="VA-API implementation for Intel G45 chipsets and Intel HD Graphics for Intel Core processor family."
 arch=('i686' 'x86_64')
 url="http://freedesktop.org/wiki/Software/vaapi"
 license=('MIT')
 depends=('libva')
+replaces=('libva-driver-intel')
+conflicts=('libva-driver-intel')
+provides=('libva-driver-intel')
 options=('!libtool')
 source=(http://cgit.freedesktop.org/vaapi/intel-driver/snapshot/intel-driver-${pkgver}.tar.bz2)
-md5sums=('9dbd642f18993335146480a3a2987874')
+md5sums=('3f501572581393f0a842c38104236ede')
 
 build() {
 	cd ${srcdir}/intel-driver-${pkgver}

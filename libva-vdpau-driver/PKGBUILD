@@ -3,8 +3,8 @@
 #
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-pkgname=vdpau-video
-pkgver=0.7.3
+pkgname=libva-vdpau-driver
+pkgver=0.7.4
 pkgrel=1
 pkgdesc="VDPAU backend for VA API"
 arch=('i686' 'x86_64')
@@ -12,14 +12,19 @@ url="http://www.splitted-desktop.com/~gbeauchesne/vdpau-video/"
 license=('GPL')
 depends=('libva' 'libvdpau')
 makedepends=('mesa')
+conflicts=('vdpau-video')
+replaces=('vdpau-video')
+provides=('vdpau-video')
 options=('!libtool')
-source=(http://www.splitted-desktop.com/~gbeauchesne/vdpau-video/${pkgname}-${pkgver}.tar.gz)
-md5sums=('18870e007ecdc50a528861fa55556364')
+source=(http://www.freedesktop.org/software/vaapi/releases/$pkgname/$pkgname-$pkgver.tar.bz2)
+md5sums=('5ec6d452d2dd307434ea3d32da49c3e5')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -p1 < $srcdir/../compile.patch
+  patch -p1 < $srcdir/../compile2.patch
   autoreconf -fi
-  ./configure --prefix=/usr --enable-glx
+  ./configure --prefix=/usr
   make
   make DESTDIR="${pkgdir}" install
 }
