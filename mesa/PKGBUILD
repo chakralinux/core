@@ -6,7 +6,7 @@
 pkgbase=mesa
 pkgname=('mesa' 'libgl' 'libglapi')
 pkgver=9.1.5
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 makedepends=('glproto>=1.4.14' 'libdrm>=2.4.38' 'libxxf86vm>=1.1.1' 'libxdamage>=1.1.3' 'expat>=2.0.1' 'libx11>=1.4.3' 'libxt>=1.1.1' 
              'gcc-libs' 'dri2proto>=2.6' 'python2' 'libxml2' 'imake' 'llvm' 'systemd' 'libvdpau')
@@ -53,8 +53,8 @@ package_libgl() {
   install -m755 -d "${pkgdir}/usr/lib"
   install -m755 -d "${pkgdir}/usr/lib/xorg/modules/extensions"
 
-  install -m644 lib/libGL.so* "${pkgdir}/usr/lib/"
-  install -m644 lib/libdricore${pkgver}.so* "${pkgdir}/usr/lib/"
+  cp -dp --no-preserve=ownership lib/libGL.so* "${pkgdir}/usr/lib/"
+  cp -dp --no-preserve=ownership lib/libdricore${pkgver}.so* "${pkgdir}/usr/lib/"
 
   cd src/mesa/drivers/dri
   make -C ${srcdir}/?esa-*/src/gallium/targets/dri-swrast DESTDIR="${pkgdir}" install
@@ -75,7 +75,7 @@ package_libglapi() {
 
   cd ${srcdir}/?esa-*   
   install -m755 -d "${pkgdir}/usr/lib"
-  install -m644 lib/libglapi.so* "${pkgdir}/usr/lib/"
+  cp -dp --no-preserve=ownership lib/libglapi.so* "${pkgdir}/usr/lib/"
 
   install -m755 -d "${pkgdir}/usr/share/licenses/libglapi"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/libglapi/"
