@@ -4,7 +4,7 @@
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=vigra
-pkgver=1.8.0
+pkgver=1.9.0
 pkgrel=1
 pkgdesc="Computer vision library"
 arch=('x86_64')
@@ -15,14 +15,11 @@ makedepends=('cmake' 'python2-nose' 'doxygen' 'python-sphinx' 'boost' 'python-nu
 optdepends=('python2: for python bindings'
             'boost-libs: for python bindings')
 options=('!libtool')
-source=("http://kogs-www.informatik.uni-hamburg.de/~koethe/vigra/${pkgname}-${pkgver}-src.tar.gz"
-        'vigra-1.7.1.gcc460.patch')
-md5sums=('15c5544448e529ee60020758ab6be264'
-         '25ef8bc26bc38ee67e5b512d2acd0166')
+source=("http://kogs-www.informatik.uni-hamburg.de/~koethe/vigra/${pkgname}-${pkgver}-src.tar.gz")
+sha1sums=('6e4981f4ce75932ec62df6523f577c327f885ba0')
 
 build() {
   cd "${srcdir}"/${pkgname}-${pkgver}
-  patch -p1 -i ${srcdir}/vigra-1.7.1.gcc460.patch
   
   cmake -DCMAKE_INSTALL_PREFIX=/usr \
       -DPYTHON_EXECUTABLE=/usr/bin/python2 \

@@ -36,7 +36,7 @@ package() {
    sed -i '/^#/d' CONTENTS
    install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_$_pkgver.pkgs
    install -m755 -d $pkgdir/usr/share
-   wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done)
+   wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
    for dir in $wanteddirs; do
      find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
      find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;

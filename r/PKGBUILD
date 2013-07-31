@@ -4,28 +4,39 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=r
-pkgver=2.15.2
-pkgrel=2
+pkgver=3.0.1
+pkgrel=1
 pkgdesc="Language and environment for statistical computing and graphics"
 arch=('x86_64')
 license=('GPL')
 url=('http://www.r-project.org/')
 depends=('atlas-lapack' 'bzip2'  'libpng' 'libjpeg' 'libtiff'
          'ncurses' 'pcre' 'readline' 'zlib' 'perl' 'gcc-libs'
-         'tk' 'libxt' 'libxmu' 'pango' 'xz')
-makedepends=('openjdk' 'gcc-fortran')
-backup=('etc/R/Makeconf' 'etc/R/Renviron' 'etc/R/ldpaths' 'etc/R/repositories')
-options=('!makeflags')
-source=("http://cran.r-project.org/src/base/R-2/R-${pkgver}.tar.gz"
+         'libxt' 'libxmu' 'pango' 'xz' 'desktop-file-utils')
+makedepends=('openjdk' 'gcc-fortran' 'tk')
+backup=('etc/R/Makeconf' 'etc/R/Renviron' 'etc/R/ldpaths' 'etc/R/repositories' 'etc/R/javaconf')
+options=('!makeflags' '!emptydirs')
+source=("http://cran.r-project.org/src/base/R-${pkgver%%.*}/R-${pkgver}.tar.gz"
 	'r.desktop'
-	'r.png')
-sha1sums=('c80da687d66ee88d1e34fc1ae5c1bd525f9513dd'
-          'bcc0320d7cc49d56408edc756b50a0f9ba98fe43'
-          'a69a07ec363440efc18ce0a7f2af103375dea978')
+	'r.png'
+	'R.conf')
+sha1sums=('5cc65476837926fdf04105954ea94efa53ac85ce'
+          '13aa29219bcaa102e575de8c1c8e0833d233e836'
+          'a69a07ec363440efc18ce0a7f2af103375dea978'
+          '43668da6cfd1b4455a99f23e79e2059294dddac9')
+
+prepare() {
+   cd R-${pkgver}
+
+# set texmf dir correctly in makefile
+   sed -i 's|$(rsharedir)/texmf|${datarootdir}/texmf|' share/Makefile.in
+# fix for texinfo 5.X
+#   sed -i 's|test ${makeinfo_version_min} -lt 7|test ${makeinfo_version_min} -lt 0|' configure
+}
 
 build() {
-   cd "${srcdir}/R-${pkgver}"
-   sed -i 's|#define NeedFunctionPrototypes 0|#define NeedFunctionPrototypes 1|g' src/modules/X11/dataentry.c
+   cd R-${pkgver}
+
    ./configure  --prefix=/usr \
 		--libdir=/usr/lib \
 		--sysconfdir=/etc/R \
@@ -40,11 +51,17 @@ build() {
                 F77=gfortran \
 		LIBnn=lib
    make
+
+   cd src/nmath/standalone
+   make shared
 }
 
 package() {
-   cd "${srcdir}/R-${pkgver}"
-   make -j1 DESTDIR="${pkgdir}" install
+   cd R-${pkgver}
+   make DESTDIR="${pkgdir}" install
+
+   cd src/nmath/standalone
+   make DESTDIR="${pkgdir}" install
 
    #  Fixup R wrapper scripts.
    sed -i "s|${pkgdir} ||" "${pkgdir}/usr/bin/R"
@@ -65,4 +82,7 @@ package() {
     mv -f ${i} "${pkgdir}/etc/R"
     ln -s /etc/R/${i} ${i}
   done
+
+  # Install ld.so.conf.d file to ensure other applications access the shared lib
+  install -Dm644 "${srcdir}/R.conf" "${pkgdir}/etc/ld.so.conf.d/R.conf"
 }

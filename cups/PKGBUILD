@@ -2,75 +2,96 @@
 
 pkgbase="cups"
 pkgname=('libcups' 'cups')
-pkgver=1.6.2
-pkgrel=5
+pkgver=1.6.3
+pkgrel=2
 arch=('x86_64')
 license=('GPL')
 url="http://www.cups.org/"
-makedepends=('libtiff' 'libpng' 'acl' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'cups-filters' 'bc' 'pkg-config'
-             'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus-core' 'avahi'  'hicolor-icon-theme' 'systemd' 'colord')
+makedepends=('libtiff' 'libpng' 'acl' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3' 'cups-filters' 'bc'
+             'colord' 'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus-core' 'avahi'  'hicolor-icon-theme' 'systemd')
 source=(http://www.cups.org/software/${pkgver}/cups-${pkgver}-source.tar.gz
-        cups-no-gcrypt.patch
         cups.logrotate cups.pam
-
-        # Fedora patches
-        cups-no-gzip-man.patch
-        cups-dbus-utf8.patch
+        # improve build and linking
         cups-no-export-ssllibs.patch
-        cups-direct-usb.patch
-        cups-eggcups.patch
-        cups-driverd-timeout.patch
+        cups-no-gcrypt.patch
+        cups-no-gzip-man.patch
+        # FC
+        cups-systemd-socket.patch
+        cups-dbus-utf8.patch
         cups-res_init.patch
-        cups-uri-compat.patch
-        cups-0755.patch
-        cups-hp-deviceid-oid.patch
-        cups-dnssd-deviceid.patch
-        cups-ricoh-deviceid-oid.patch
-        cups-systemd-socket.patch)
-
-
-md5sums=('8b8e40560b67e28607b1f04dafd9a94d'
-         'cc4101beccb5ed6deb1c92707a575925'
+        cups-avahi-address.patch
+        cups-enum-all.patch
+        # Gentoo
+        cups-1.6.0-fix-install-perms.patch
+        cups-1.6.2-statedir.patch
+        # Debian
+        cupsd-no-crash-on-avahi-threaded-poll-shutdown.patch
+        get-ppd-file-for-statically-configured-ipp-shared-queues.patch
+        ppd-poll-with-client-conf.patch)
+md5sums=('3c50d396fef2ba721224fe65880fe3c3'
          'f861b18f4446c43918c8643dcbbd7f6d'
          '96f82c38f3f540b53f3e5144900acf17'
-         '90c30380d4c8cd48a908cfdadae1ea24'
-         'dd97f8282cbfbab11b2dbec681d29ccb'
          '9b8467a1e51d360096b70e2c3c081e6c'
-         '0f914ce1caab109a2ca00d407680a509'
-         '393d03e82a2bc19a8c1c51efef46354f'
-         '34627148dca8ca15882801e456c6b28d'
+         'cc4101beccb5ed6deb1c92707a575925'
+         '90c30380d4c8cd48a908cfdadae1ea24'
+         'b4868b83f7f2d6ec24a1be76509379f0'
+         'dd97f8282cbfbab11b2dbec681d29ccb'
          '8fe27d4248cacbc02824e7937cab4088'
-         '2c70e9b8ddc2f53fd93d9d5631b21b4a'
-         'a800699f5c2617454c89bd734a9bcbd0'
-         '87b959b630c1338c880950007dae654e'
-         'c933cb00a9b9cddde40ce095b3ad48a5'
-         '0f2c7ca20285883834b53b2e38f34edc'
-         'b4868b83f7f2d6ec24a1be76509379f0')
+         'df0c367c0022e3c7d8e01827e8a6c5e7'
+         'f30c2a161caaf27854581507cde8cac6'
+         '5117f65342fcc69c6a506529e4daca9e'
+         '9247e218eea94ebda0aebc8ee0e77db8'
+         'cb58bf4e0b80eaee383712e5c84a1ab4'
+         'b578bcd17949a7203237ba1e31f78ef9'
+         '0becd6ab8782b97f19a02c1dc174c75e')
 
-build() {
-  cd ${srcdir}/${pkgbase}-${pkgver}
-
-  # Chakra patches
-  patch -p1 -i ${srcdir}/cups-no-gcrypt.patch
- 
-  # Fedora patches
-  patch -p1 -i ${srcdir}/cups-no-gzip-man.patch
-  patch -p1 -i ${srcdir}/cups-dbus-utf8.patch
-  patch -p1 -i ${srcdir}/cups-no-export-ssllibs.patch
-  patch -p1 -i ${srcdir}/cups-direct-usb.patch
-  patch -p1 -i ${srcdir}/cups-uri-compat.patch
-  patch -p1 -i ${srcdir}/cups-eggcups.patch
-  patch -p1 -i ${srcdir}/cups-driverd-timeout.patch
-  patch -p1 -i ${srcdir}/cups-res_init.patch
-  patch -p1 -i ${srcdir}/cups-0755.patch
-  patch -p1 -i ${srcdir}/cups-hp-deviceid-oid.patch
-  patch -p1 -i ${srcdir}/cups-dnssd-deviceid.patch
-  patch -p1 -i ${srcdir}/cups-ricoh-deviceid-oid.patch
+prepare() {
+  cd ${pkgbase}-${pkgver}
+	
+  # add systemd socket support - Fedora patch, also used in Gentoo
+  # modified now to the changes done by Gentoo in their svn ebuild
+  # http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-print/cups/files/cups-1.5.0-systemd-socket.patch?revision=1.1
   patch -p1 -i ${srcdir}/cups-systemd-socket.patch
 
+  # Do not export SSL libs in cups-config
+  patch -p1 -i "${srcdir}/cups-no-export-ssllibs.patch"
+
+  patch -p1 -i "${srcdir}/cups-no-gcrypt.patch"
+
+  # don't zip man pages in make install, let makepkg do that / Fedora
+  patch -p1 -i ${srcdir}/cups-no-gzip-man.patch
+
+
+  # various bugfixes (upstream reports/SVN or Fedora/Debian
+
+  # Ensure attributes are valid UTF-8 in dbus notifier
+  patch -p1 -i ${srcdir}/cups-dbus-utf8.patch
+
+  # Fixed crash which sometimes happens on shutdown of the CUPS daemon, caused by a wrong shutdown sequence for shutting down the Avahi threaded poll.
+  patch -p1 -i ${srcdir}/cupsd-no-crash-on-avahi-threaded-poll-shutdown.patch
+  # Applications could not get the PPD file for statically-configured IPP-shared print queues
+  patch -p1 -i ${srcdir}/get-ppd-file-for-statically-configured-ipp-shared-queues.patch
+  # If an external server is used via client.conf and the DNS is inconsistent (ex: DNS gives "noname" for many IPs, reverse DNS gives one of these IPs
+  # for "noname") local PPDs can get polled for print queues instead of the PPDs of the external server Bug: http://www.cups.org/str.php?L2763
+  patch -p1 -i ${srcdir}/ppd-poll-with-client-conf.patch
+  # fix permissions on some files - alternative: cups-0755.patch by FC
+  patch -Np0 -i ${srcdir}/cups-1.6.0-fix-install-perms.patch
+  # move /var/run -> /run for pid file
+  patch -p1 -i ${srcdir}/cups-1.6.2-statedir.patch
+  # Re-initialise the resolver on failure in httpAddrGetList() 
+  patch -p1 -i ${srcdir}/cups-res_init.patch
+  # Use IP address when resolving DNSSD URIs
+  patch -p1 -i ${srcdir}/cups-avahi-address.patch
+  # Return from cupsEnumDests() once all records have been returned.
+  patch -p1 -i ${srcdir}/cups-enum-all.patch
+  
   # Rebuild configure script for not zipping man-pages.
   aclocal -I config-scripts
   autoconf -I config-scripts
+}
+
+build() {
+  cd ${srcdir}/${pkgbase}-${pkgver}
 
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
      --libdir=/usr/lib \
@@ -106,7 +127,6 @@ backup=(etc/cups/client.conf)
   
   # install client.conf man page and config file
   install -dm755 ${pkgdir}/usr/share/man/man5
-  #install -Dm644  ${srcdir}/${pkgbase}-${pkgver}/man/client.conf.5.gz ${pkgdir}/usr/share/man/man5/
   install -Dm644  ${srcdir}/${pkgbase}-${pkgver}/man/client.conf.5 ${pkgdir}/usr/share/man/man5/
   install -dm755 ${pkgdir}/etc/cups
   touch ${pkgdir}/etc/cups/client.conf
@@ -169,7 +189,7 @@ optdepends=('xdg-utils: xdg .desktop file support')
   # remove files now part of cups-filters
   rm -v ${pkgdir}/usr/share/cups/banners/*
   rm -v ${pkgdir}/usr/share/cups/data/testprint
-  # comment out all conversion rules which use any of the removed filters
+  # comment out all conversion rules which use any of the removed filters
   perl -p -i -e 's:^(.*\s+bannertops\s*)$:#\1:' /usr/share/cups/mime/mime.convs
 
   # Provide native service

@@ -1,8 +1,8 @@
 # Platform Packages for Chakra, part of chakra-project.org
 
 pkgname=pango
-pkgver=1.32.5
-pkgrel=3
+pkgver=1.35.0
+pkgrel=1
 pkgdesc="A library for layout and rendering of text"
 arch=('x86_64')
 license=('LGPL')
@@ -10,20 +10,22 @@ depends=('cairo' 'libxft' 'libthai' 'harfbuzz')
 makedepends=('gobject-introspection' 'libxt' 'fontconfig')
 options=('!libtool')
 install=pango.install
-source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/1.32/${pkgname}-${pkgver}.tar.xz")
+source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
 url="http://www.pango.org/"
-md5sums=('8e846804d6e219bc795a26a4a39b5bfd')
+sha256sums=('c21f7277b5c088f334748b38f2c3abd6399024d653ab7663f567234acbdc7f92')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr --sysconfdir=/etc \
-      --localstatedir=/var --with-included-modules=basic-fc
+  ./configure --prefix=/usr \
+	--sysconfdir=/etc \
+      	--localstatedir=/var \
+	--with-included-modules=basic-fc
   make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  install -m755 -d "${pkgdir}/etc/pango"
+  #install -m755 -d "${pkgdir}/etc/pango"
 }

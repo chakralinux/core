@@ -29,42 +29,25 @@ md5sums=('1864987bdbb2f58f8ae8b350dfdbe133'
          'b9fb6b953cec428d59c026b1ef370e86'
          '742bfebaebc44c26f6cabe654f702cc8')
 
-# source PKGBUILD && _create-kdeqt-patch
-_create-kdeqt-patch() {
-          #Create patches
-	  echo "creating kde-qt patches"
-	  local codir=$(mktemp -d)
-	  mkdir -p "${codir}/kde-qt"
-	  git clone git://gitorious.org/+kde-developers/qt/kde-qt.git "${codir}/kde-qt"
-	  pushd "${codir}/kde-qt"
-	  git checkout --track -b ${pkgver}-patched origin/${pkgver}-patched
-	  local kdeqtver=$(git --no-pager show --format='%H' "${pkgver}-patched" | head -1)
-	  git diff "v${pkgver}..${pkgver}-patched" | gzip > "${codir}/kde-qt-${kdeqtver}.patch.gz"
-          popd
-          mv "${codir}/kde-qt-${kdeqtver}.patch.gz" .
-	  rm -rf "${codir}"
-	  md5sum kde-qt-${kdeqtver}.patch.gz
-	  echo "change kdeqtver to $kdeqtver"
-}
-
-build() {
-	cd $srcdir/$_pkgfqn
-#       if [ -n "${kdeqtver}" ]; then
-#	  msg "applying kde-qt patches"
-#	  patch -p1 -i $srcdir/kde-qt-${kdeqtver}.patch || return 1
-#	  # editing qt.install
-#	  sed -i -e 's/^.*kde-qt .*/        echo "   kde-qt '${kdeqtver}'"/' $startdir/qt.install
-#	fi
+prepare() {
+	cd ${_pkgfqn}
 
         # from Fedora, removing "QDBusConnection:..." message for qt apps
 	patch -p1 -i "${srcdir}"/qt_no_debug.patch
 
-        export QT4DIR="${srcdir}"/${_pkgfqn}
-        export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
+	patch -p1 -i "${srcdir}"/improve-cups-support.patch
 
         sed -i "s|-O2|${CXXFLAGS}|" mkspecs/common/{g++,gcc}-base.conf
         sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" mkspecs/common/gcc-base-unix.conf
         sed -i "/^QMAKE_LFLAGS\s/s|+=|+= ${LDFLAGS}|g" mkspecs/common/gcc-base.conf
+}
+
+build() {
+	cd $srcdir/$_pkgfqn
+
+        export QT4DIR="${srcdir}"/${_pkgfqn}
+        export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
+
 
 	./configure -confirm-license -opensource \
                 -debug \
@@ -113,28 +96,28 @@ package_qt() {
     install='qt.install'
 	
     cd $srcdir/$_pkgfqn
-	make INSTALL_ROOT=$pkgdir install
-
-	# install missing icons and desktop files
-	for icon in tools/linguist/linguist/images/icons/linguist-*-32.png ; do
-		size=$(echo $(basename ${icon}) | cut -d- -f2)
-		install -p -D -m644 ${icon} ${pkgdir}/usr/share/icons/hicolor/${size}x${size}/apps/linguist.png
-	done
-	install -p -D -m644 src/gui/dialogs/images/qtlogo-64.png ${pkgdir}/usr/share/icons/hicolor/64x64/apps/qtlogo.png
-	install -p -D -m644 tools/assistant/tools/assistant/images/assistant.png ${pkgdir}/usr/share/icons/hicolor/32x32/apps/assistant.png
-	install -p -D -m644 tools/designer/src/designer/images/designer.png ${pkgdir}/usr/share/icons/hicolor/128x128/apps/designer.png
-	install -d ${pkgdir}/usr/share/applications
-	install -m644 ${srcdir}/{linguist,designer,assistant,qtconfig}.desktop ${pkgdir}/usr/share/applications/
-
-	# install license addition
-	install -D -m644 LGPL_EXCEPTION.txt ${pkgdir}/usr/share/licenses/qt/LGPL_EXCEPTION.txt
-
-	# Fix wrong path in pkgconfig files
-	find ${pkgdir}/usr/lib/pkgconfig -type f -name '*.pc' \
-		-exec perl -pi -e "s, -L${srcdir}/?\S+,,g" {} \;
-	# Fix wrong path in prl files
-	find ${pkgdir}/usr/lib -type f -name '*.prl' \
-		-exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
+    make INSTALL_ROOT=$pkgdir install
+   
+    # install missing icons and desktop files
+    for icon in tools/linguist/linguist/images/icons/linguist-*-32.png ; do
+        size=$(echo $(basename ${icon}) | cut -d- -f2)
+        install -p -D -m644 ${icon} ${pkgdir}/usr/share/icons/hicolor/${size}x${size}/apps/linguist.png
+    done
+    install -p -D -m644 src/gui/dialogs/images/qtlogo-64.png ${pkgdir}/usr/share/icons/hicolor/64x64/apps/qtlogo.png
+    install -p -D -m644 tools/assistant/tools/assistant/images/assistant.png ${pkgdir}/usr/share/icons/hicolor/32x32/apps/assistant.png
+    install -p -D -m644 tools/designer/src/designer/images/designer.png ${pkgdir}/usr/share/icons/hicolor/128x128/apps/designer.png
+    install -d ${pkgdir}/usr/share/applications
+    install -m644 ${srcdir}/{linguist,designer,assistant,qtconfig}.desktop ${pkgdir}/usr/share/applications/
+    
+    # install license addition
+    install -D -m644 LGPL_EXCEPTION.txt ${pkgdir}/usr/share/licenses/qt/LGPL_EXCEPTION.txt
+    
+    # Fix wrong path in pkgconfig files
+    find ${pkgdir}/usr/lib/pkgconfig -type f -name '*.pc' \
+        -exec perl -pi -e "s, -L${srcdir}/?\S+,,g" {} \;
+    # Fix wrong path in prl files
+    find ${pkgdir}/usr/lib -type f -name '*.prl' \
+        -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
 }
 
 package_qt-private-headers() {

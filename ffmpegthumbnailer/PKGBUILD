@@ -2,25 +2,37 @@
 
 pkgname=ffmpegthumbnailer
 pkgver=2.0.8
-pkgrel=5
+pkgrel=6
 pkgdesc="Lightweight video thumbnailer that can be used by file managers."
 url="http://code.google.com/p/ffmpegthumbnailer/"
 license=('GPL2')
 arch=('x86_64')
 depends=('ffmpeg' 'libjpeg-turbo' 'libpng')
-source=("http://ffmpegthumbnailer.googlecode.com/files/$pkgname-$pkgver.tar.gz")
+source=("http://ffmpegthumbnailer.googlecode.com/files/$pkgname-$pkgver.tar.gz"
+	"ffmpegthumbnailer-2.0.8-memcpy.patch")
 options=(!libtool)
-sha1sums=('2c54ca16efd953f46547e22799cfc40bd9c24533')
+sha1sums=('2c54ca16efd953f46547e22799cfc40bd9c24533'
+          'c23ef173f98c928fcacacd6e6060dab2e56f1239')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+
+  patch -p0 < "$srcdir"/ffmpegthumbnailer-2.0.8-memcpy.patch
+}
 
 build() {
-	cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
-	./configure --prefix=/usr
-	make 
+  ./configure --prefix=/usr \
+    --enable-gio \
+    --enable-thumbnailer
+
+  make 
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
+
   make DESTDIR="${pkgdir}" install
 }
 

@@ -4,7 +4,7 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=imagemagick
-pkgver=6.8.0.3
+pkgver=6.8.6.4
 pkgrel=1
 pkgdesc="An image viewing/manipulation program"
 arch=('x86_64')
@@ -17,22 +17,41 @@ optdepends=('ghostscript: for Ghostscript support'
             'openexr: for OpenEXR support'  
             'jasper: for JPEG-2000 support')
 options=('!makeflags' '!docs')
-source=("http://sourceforge.net/projects/imagemagick/files/6.8.0-sources/ImageMagick-6.8.0-3.tar.xz"
+source=("ftp://ftp.sunet.se/pub/multimedia/graphics/ImageMagick/ImageMagick-${pkgver%.*}-${pkgver##*.}.tar.xz"
 	'perlmagick.rpath.patch')
-md5sums=('3b985a05f95768767649820ab21e2060'
-	 'ff9974decbfe9846f8e347239d87e4eb')
+sha1sums=('ab62d1777ef3ae18820bdb9f757ac65f9d2f944d'
+          '23405f80904b1de94ebd7bd6fe2a332471b8c283')
+
+prepare() {
+	cd ImageMagick-${pkgver%.*}-${pkgver##*.}
+	sed '/AC_PATH_XTRA/d' -i configure.ac
+	autoreconf --force --install
+	patch -p0 -i "${srcdir}/perlmagick.rpath.patch"
+}
 
 build() {
 	cd ${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}
 
-	patch -p0 -i "${srcdir}/perlmagick.rpath.patch" 
-
-	./configure --prefix=/usr --with-modules --disable-static \
-	    --enable-openmp --with-x --with-wmf --with-openexr --with-xml \
-	    --with-gslib --with-gs-font-dir=/usr/share/fonts/Type1 \
-	    --with-perl --with-perl-options="INSTALLDIRS=vendor" \
-	    --without-gvc --without-djvu --without-autotrace --with-jp2 \
-	    --without-jbig --without-fpx --without-dps --without-fftw 
+	./configure --prefix=/usr \
+		--with-modules \
+		--disable-static \
+	    	--enable-openmp \
+		--with-x \
+		--with-wmf \
+		--with-openexr \
+		--with-xml \
+	    	--with-gslib \
+		--with-gs-font-dir=/usr/share/fonts/Type1 \
+	    	--with-perl \
+		--with-perl-options="INSTALLDIRS=vendor" \
+	    	--without-gvc \
+		--without-djvu \
+		--without-autotrace \
+		--with-jp2 \
+	    	--without-jbig \
+		--without-fpx \
+		--without-dps \
+		--without-fftw 
 	make 
 }
 
@@ -45,6 +64,5 @@ package() {
 	install -Dm644 NOTICE ${pkgdir}/usr/share/licenses/${pkgname}/NOTICE 
 
 	#Cleaning
-	find ${pkgdir} -name '*.bs' -exec rm {} \; 
 	rm -f ${pkgdir}/usr/lib/*.la 
 }
