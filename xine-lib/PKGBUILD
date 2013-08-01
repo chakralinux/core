@@ -1,8 +1,8 @@
 # Maintainer: abveritas@chakra-project.org
 
 pkgname=xine-lib
-pkgver=1.2.2
-pkgrel=5
+pkgver=1.2.3
+pkgrel=1
 pkgdesc="A multimedia playback engine"
 arch=('x86_64')
 url="http://www.xine-project.org"
@@ -28,10 +28,13 @@ optdepends=('imagemagick: for using the imagemagick plugin' \
             'libbluray: for using the bluray plugin' \
             'libvdpau: for using the VDPAU plugin')
 options=('!libtool')
-source=("http://downloads.sourceforge.net/sourceforge/xine/${pkgname}-${pkgver}.tar.xz")
-sha1sums=('a349cbb0b72256bb262377796a022dcf63829b4c')
+source=("http://downloads.sourceforge.net/sourceforge/xine/${pkgname}-${pkgver}.tar.xz"
+        "accel_vaapi.h")
+sha1sums=('6f9ef4ba75688659052d21448d46527db2b77e57'
+          '08ed9947ef919c71c87151baa8fc0ce7d8f72050')
 
 build() {
+  cp ${srcdir}/accel_vaapi.h ${pkgname}-${pkgver}/src/xine-engine/
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr \
               --with-wavpack \
@@ -45,4 +48,3 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 }
-
