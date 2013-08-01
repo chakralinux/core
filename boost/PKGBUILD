@@ -9,15 +9,17 @@ pkgbase=boost
 pkgname=('boost-libs' 'boost')
 pkgver=1.52.0
 _boostver=${pkgver//./_}
-pkgrel=2
+pkgrel=3
 pkgdesc="Free peer-reviewed portable C++ source libraries"
 arch=('x86_64')
 url="http://www.boost.org/"
 license=('custom')
 makedepends=('icu' 'python2' 'python3' 'bzip2' 'zlib' 'openmpi') 
-source=("http://downloads.sourceforge.net/${pkgbase}/${pkgbase}_${_boostver}.tar.gz")
+source=("http://downloads.sourceforge.net/${pkgbase}/${pkgbase}_${_boostver}.tar.gz"
+	'boost_locale_utf.patch')
 license=('custom')
-md5sums=('f62451fa646ca392b0fbc08beb23ad12')
+md5sums=('f62451fa646ca392b0fbc08beb23ad12'
+	 '865da59ee8862de12642278ef642794d')
 
 _stagedir="${srcdir}/stagedir"
 
@@ -29,6 +31,9 @@ build() {
   echo "using mpi ;" >> build/v2/user-config.jam
 
   cd "${srcdir}"/${pkgbase}_${_boostver}
+  
+  # security patch https://svn.boost.org/trac/boost/ticket/7743
+  patch -Np0 -i ../boost_locale_utf.patch
 
   # build bjam
   cd "${srcdir}/${pkgbase}_${_boostver}/tools/build/v2/engine"
