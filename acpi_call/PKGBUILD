@@ -1,29 +1,29 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 
-_kver="3.9.2-1-CHAKRA"
+_kver="3.10.4-1-CHAKRA"
 
 pkgname=acpi_call
 _pkgname=acpi_call
-pkgver=1.0.0
-pkgrel=6
+pkgver=1.1.0
+pkgrel=1
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('x86_64')
 url=("http://github.com/mkottman/acpi_call")
 license=('GPL')
-depends=('linux>=3.9' 'linux<3.10' 'linux-headers')
+depends=('linux>=3.10' 'linux<3.11' 'linux-headers')
 makedepends=('git')
 provides=('acpi-call')
 replaces=('acpi-call')
 conflicts=('acpi-call')
 install=acpi_call.install
 source=("https://github.com/mkottman/acpi_call/archive/v${pkgver}.tar.gz")
-md5sums=('3c71239792ddd725d13f7c8d168b4ecf')
+md5sums=('f69d40e130b0e5ed17ce8adb19e6dda1')
 
 build() {
   cd ${srcdir}/$_pkgname-${pkgver}
 
-  make
+  make KVERSION=${_kver}
 }
 package() {
   cd ${srcdir}/$_pkgname-${pkgver}
