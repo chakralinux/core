@@ -1,16 +1,16 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 
-_kernver="3.9.2-1-CHAKRA"
+_kernver="3.10.4-1-CHAKRA"
 
 pkgname=(catalyst chd-catalyst)
 pkgver=13.4
-pkgrel=2
+pkgrel=3
 _amdver=12.104
 arch=('x86_64')
 url="http://www.amd.com/us/Pages/AMDHomePage.aspx"
 license=('custom')
-makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers' 'linux>=3.9' 'linux<=3.10' "catalyst-utils=${pkgver}")
+makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers' 'linux>=3.10' 'linux<=3.11' "catalyst-utils=${pkgver}")
 
 source=(http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-x86.x86_64.zip
         ati_make.sh
@@ -62,7 +62,7 @@ build() {
 package_catalyst() {
     pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
     screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
-    depends=('linux>=3.9' 'linux<3.10' 'catalyst-utils')
+    depends=('linux>=3.10' 'linux<3.11' 'catalyst-utils')
     conflicts=('nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'catalyst-legacy')
     install=catalyst.install
 
