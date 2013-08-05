@@ -32,10 +32,10 @@ build() {
   [ "${CARCH}" == "i686" ] && export ARCH=i386
 
   export KERNELPATH=/lib/modules/${_kernver}/build
-  #cd $startdir/src/madwifi-$pkgver
-  cd $startdir/src/madwifi-$_ver
+  #cd ${srcdir}/madwifi-$pkgver
+  cd ${srcdir}/madwifi-$_ver
   make tools|| return 1
-  make DESTDIR=$startdir/pkg \
+  make DESTDIR=${pkgdir} \
        BINDIR=/usr/bin \
        MANDIR=/usr/share/man \
        install-tools

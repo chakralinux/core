@@ -22,13 +22,13 @@ build() {
   [ -z "${JAVA_HOME}" ] && . /etc/profile.d/openjdk6.sh
   [ -z "${ANT_HOME}" ] && . /etc/profile.d/apache-ant.sh
 
-  cd ${startdir}/src/hsqldb/build
+  cd ${srcdir}/hsqldb/build
 
   ant jar || return 1
 
-  mkdir -p ${startdir}/pkg/usr/share/java
-  install -m644 ${startdir}/src/hsqldb/lib/hsqldb.jar ${startdir}/pkg/usr/share/java/
+  mkdir -p ${pkgdir}/usr/share/java
+  install -m644 ${srcdir}/hsqldb/lib/hsqldb.jar ${pkgdir}/usr/share/java/
 
-  mkdir -p ${startdir}/pkg/usr/share/licenses/${pkgname}
-  install -m644 ${startdir}/src/hsqldb/doc/hsqldb_lic.txt ${startdir}/pkg/usr/share/licenses/${pkgname}/
+  mkdir -p ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m644 ${srcdir}/hsqldb/doc/hsqldb_lic.txt ${pkgdir}/usr/share/licenses/${pkgname}/
 }

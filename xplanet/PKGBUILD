@@ -15,14 +15,14 @@ source=("http://downloads.sourceforge.net/project/xplanet/xplanet/$pkgver/xplane
 md5sums=('41f7db2ccd1d8b4b989cacaf9adfe692')
 
 build() {
-  cd "$startdir/src/$pkgname-$pkgver"
+  cd "${srcdir}/$pkgname-$pkgver"
 
   ./configure --prefix=/usr --with-freetype
   make
 }
 
 package() {
-  cd "$startdir/src/$pkgname-$pkgver"
+  cd "${srcdir}/$pkgname-$pkgver"
   
-  make prefix=$startdir/pkg/usr install
+  make prefix=${pkgdir}/usr install
 }

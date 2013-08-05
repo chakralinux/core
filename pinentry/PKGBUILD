@@ -14,7 +14,7 @@ source=(ftp://ftp.gnupg.org/gcrypt/$pkgname/$pkgname-$pkgver.tar.bz2)
 md5sums=('2ae681cbca0d9fb774b2c90b11ebf56c')
 
 build() {
-  cd $startdir/src/$pkgname-$pkgver
+  cd ${srcdir}/$pkgname-$pkgver
   [ "$QTDIR" = "" ] # && source /etc/profile.d/qt3.sh
   for file in qt4/*.moc; do
        /usr/bin/moc ${file/.moc/.h} > ${file}
@@ -30,7 +30,7 @@ build() {
 }
 
 package() {
-  cd $startdir/src/$pkgname-$pkgver
+  cd ${srcdir}/$pkgname-$pkgver
   make DESTDIR=${pkgdir} install 
   rm ${pkgdir}/usr/share/info/dir
   rm ${pkgdir}/usr/bin/pinentry

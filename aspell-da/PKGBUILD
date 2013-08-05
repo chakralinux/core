@@ -17,15 +17,15 @@ md5sums=('128d8a58de5f6edfcedccc565f73dcc6')
 
 
 build() {
-  cd $startdir/src/new_$pkgname-$pkgver
+  cd ${srcdir}/new_$pkgname-$pkgver
   
   ./configure
   make 
 }
  
 package() {
-  cd $startdir/src/new_$pkgname-$pkgver
+  cd ${srcdir}/new_$pkgname-$pkgver
   
-  mkdir -p $startdir/pkg/usr/lib/aspell
-  make DESTDIR=$startdir/pkg install
+  mkdir -p ${pkgdir}/usr/lib/aspell
+  make DESTDIR=${pkgdir} install
 }

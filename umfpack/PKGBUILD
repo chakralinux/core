@@ -37,22 +37,22 @@ md5sums=('19f5d8b4231ec9114718641ce51cce6e'
 build() {
   cd "$srcdir/UMFPACK"
   cp -rf "$srcdir/UFconfig/xerbla" .
-  cp -L ../UFconfig.mk $startdir/src/UFconfig
+  cp -L ../UFconfig.mk ${srcdir}/UFconfig
   [ $CARCH == "x86_64" ] && sed -i 's#CFLAGS = -O3 -fexceptions#CFLAGS = -O3 -fexceptions -fPIC#' $srcdir/UFconfig/UFconfig.mk
   make library || return 1
   install -d "$pkgdir/usr/lib" "$pkgdir/usr/include"
 
   install -D -m644 Lib/libumfpack.a "$pkgdir/usr/lib/libumfpack.a"
-  cp $startdir/src/UMFPACK/Include/*.h $startdir/pkg/usr/include
+  cp ${srcdir}/UMFPACK/Include/*.h ${pkgdir}/usr/include
 
   install -D -m644 "$srcdir/AMD/Lib/libamd.a" "$pkgdir/usr/lib/libamd.a"
-  cp $startdir/src/AMD/Include/*.h $startdir/pkg/usr/include
+  cp ${srcdir}/AMD/Include/*.h ${pkgdir}/usr/include
 
   install -m644 "$srcdir/UFconfig/UFconfig.h" "$pkgdir/usr/include" || return 1
 
   # Fix permissions
-  cd $startdir/pkg/usr/include
+  cd ${pkgdir}/usr/include
   chmod oug+r *
-  cd $startdir/pkg/usr/lib
+  cd ${pkgdir}/usr/lib
   chmod oug+r *
 }
