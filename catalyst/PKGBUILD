@@ -1,7 +1,7 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 
-_kernver="3.10.4-1-CHAKRA"
+_kernver="3.10.5-1-CHAKRA"
 
 pkgname=(catalyst chd-catalyst)
 pkgver=13.4
@@ -14,16 +14,25 @@ makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers' 'linux>=3.10' 'linux<
 
 source=(http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-x86.x86_64.zip
         ati_make.sh
-        makefile_compat.patch
+	makefile_compat.patch
+	gentoo_linux-3.10-proc.diff
+	kolasa_fglrx_fixing_ttys.patch
+	lano1106_fglrx_intel_iommu.patch
+	lano1106_kcl_agp_13_4.patch
 	fglrx_supported
 	switchlibglx
 	switchlibGL)
 md5sums=('558bd1b31173b06b25da647a7112e734'
          '660396540b0ceaff71d6155c986734de'
          '3e1b82bd69774ea808da69c983d6a43b'
+         '5872d95907a93ada44982e355e91e59d'
+         '5f28dfc4c9fdb0fbfed69c8cb38659dd'
+         '5184b94a2a40216a67996999481dd9ee'
+         'c5156eddf81c8a1719b160d05a2e8d67'
          '8bd182de340d6ed8b2dfcedfd3e5a389'
          '99032d919ede27884b5c3e87ab110a96'
          '99032d919ede27884b5c3e87ab110a96')
+
 
 build() {
 
@@ -46,6 +55,10 @@ build() {
     # makefile patch to choose arch_compat_alloc_user_space or older compat_alloc_user_space
     # works only in combination with ati_make.sh script
     patch -p1 -i ../makefile_compat.patch 
+    patch -Np0 -i ../gentoo_linux-3.10-proc.diff
+    patch -Np1 -i ../kolasa_fglrx_fixing_ttys.patch
+    patch -Np1 -i ../lano1106_fglrx_intel_iommu.patch
+    patch -Np1 -i ../lano1106_kcl_agp_13_4.patch
     
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
     cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a" . 
