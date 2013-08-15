@@ -3,41 +3,47 @@
 
 _extramodules=extramodules-3.10-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
+_rootOfSourceTree=/usr/src/linux-3.10.5-1-CHAKRA  # TODO: make this easier to upgrade
 
 pkgname=ndiswrapper
 pkgver=1.58
-pkgrel=3
+pkgrel=4
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
 url="http://ndiswrapper.sourceforge.net"
 install="ndiswrapper.install"
 depends=('linux>=3.10' 'linux<3.11')
+makedepends=( 'linux-headers')
 provides=("ndiswrapper-utils=$pkgver")
 replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
-        ndiswrapper-1.58-add_taint.patch)
+        kernel-3.10.patch)
 sha1sums=('a256812b3136648ed93e04146d2276a3ca70957c'
-          'f2c8bd7553f87a647b2e221b01fbd5d0d07eff8c')
+          'e3997fdd0febd81b6f52b400fafcfe0fe091a236')
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+  patch -p1 -i "$srcdir/kernel-3.10.patch"
+}
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
-
-  # https://bugs.gentoo.org/show_bug.cgi?id=467956 3.9 kernels
-  patch -Np1 -i "$srcdir/ndiswrapper-1.58-add_taint.patch"
-
+  
   sed -i "/modinfo/s/s/usr\//" driver/Makefile
   sed -i "s|/include/linux/version.h|/include/generated/uapi/linux/version.h|g" driver/Makefile
-  
-  make KVERS=$_kver
+
+
+  make -C driver KVERS_UNAME=${_kver}
+  make -C utils
 }
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
 
-  make INST_DIR="lib/modules/$_extramodules" \
+  make KBUILD=${_rootOfSourceTree} INST_DIR="lib/modules/$_extramodules" \
     KVERS=$_kver DESTDIR="$pkgdir/" install
 
   gzip "$pkgdir/lib/modules/$_extramodules/$pkgname.ko"
