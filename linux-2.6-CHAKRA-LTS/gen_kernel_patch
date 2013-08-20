@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cat_patch() {
-  file=${startdir}/src/$(basename ${1})
+  file=${srcdir}/$(basename ${1})
   ftype=$(file -bizL "${file}")
   case "$ftype" in
     *application/x-gzip*)
@@ -19,10 +19,10 @@ get_file() {
   if [ "${file}" != "${1}" ]; then
     cd ${SRCDEST}
     [ ! -f ${file} ] && wget -c ${1}
-    cd ${startdir}/src
+    cd ${srcdir}
     ln -s ../../_sources/${file} .
   else
-    cd ${startdir}/src
+    cd ${srcdir}
     ln -s ../patches/${file} .
   fi
   cd ${OPWD}
@@ -34,8 +34,8 @@ source PATCHCFG
 export SRCNAME
 
 export startdir=${PWD}
-mkdir ${startdir}/src
-cd ${startdir}/src
+mkdir ${srcdir}
+cd ${srcdir}
 
 get_file ${SRC}
 bsdtar -xf $(basename ${SRC})
@@ -55,7 +55,7 @@ post_apply
 
 rm -v $(find . -type f -name '*.orig')
 
-cd ${startdir}/src
+cd ${srcdir}
 diff -Nur ${SRCORIG} ${SRCNAME} > $startdir/${PATCHNAME}
 bzip2 --best $startdir/${PATCHNAME}
 md5sum $startdir/${PATCHNAME}.bz2

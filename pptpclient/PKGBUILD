@@ -13,9 +13,9 @@ md5sums=('4c3d19286a37459a632c7128c92a9857')
 arch=(i686 x86_64)
  
 build() { 
-  cd $startdir/src/pptp-$pkgver
+  cd ${srcdir}/pptp-$pkgver
   sed -i '/CFLAGS/d' Makefile
   sed -i 's|\/bin\/ip|\/usr\/sbin\/ip|g' routing.c 
   make || return 1
-  make DESTDIR=$startdir/pkg install
+  make DESTDIR=${pkgdir} install
 }
