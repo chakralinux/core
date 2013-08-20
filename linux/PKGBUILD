@@ -6,13 +6,13 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel=3.9
-pkgver=3.9.2
-pkgrel=1
+_basekernel=3.10
+pkgver=3.10.4
+pkgrel=3
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
-makedepends=('xmlto' 'docbook-xsl')
+makedepends=('xmlto' 'docbook-xsl' 'bc')
 options=('!strip')
 source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
@@ -29,21 +29,24 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch')
-md5sums=('4348c9b6b2eb3144d601e87c19d5d909'
-         'adeb2556568f79e827e7a0ce4c483605'
-         '698318024a36e40b4d44eac67c3a7ecd'
-         '89fbb605ef398297b8dc43409c849c92'
-         'd5f57f666f02ca25ba298210e2332ce8'
-         'cf2ad9065886e56698524eab323ac656'
-         '460247f1b4da5dccdaacfa6d161131f0'
-         '498abc1e34df8a7d19e43980c74f2bc2'
-         '3ce07d164880e16ae622d1dadb6e5b7a'
-         '52f4a2c7f6277774117c834d949d6b81'
-         'eb14dcfd80c00852ef81ded6e826826a'
-         '65cbe8e4c8efaf96dd162102e46ce81d')
+sha256sums=('df27fa92d27a9c410bfe6c4a89f141638500d7eadcca5cce578954efc2ad3544'
+            'd8ef39930663cc916e57e06b308a1654f2a03903a3c5a0d3a5503c6d58e2b2b8'
+            '0f392605205d2b2083801a7b88cdff389e5d742a3a98ac71a23890328d81237b'
+            '9b7b9f14818590e3661ca6b69e6e218fff2c796b1f10db667af80b53129c8882'
+            'bd56283210474d62be22a429c8401a9b45501c6a182391d05290554c23283296'
+            'ce5b05e6c31480068862cc2c4fca108e7dc28b0c06cf63a02929b0f6ce1b5a01'
+            'bd36b225c2e60f00f4bd88a0b7f1633e4737e19a06c1cd836d7c00a6ba403934'
+            '3ef474c102a1fcc596d92c5d370c60845c789012efd41b4961b557ec3d6a88b1'
+            '8a659bb6ad5aaf1f009da585b91b1ecf83e6fb960326bef8cef8cf93cb8a4ca9'
+            'b1b1cf291bd68270b700eb21f19f7b052116d07dde492761227cd94bb775910c'
+            'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
+            '2fc60ad91d7afe5b1e7c7a0cac7555a2dddf2b9fc1f7a044e211904991e10e83')
 
 build() {
   cd "${srcdir}/linux-${_basekernel}"
+
+  # initial cleanup
+  make mrproper
 
   # add upstream patch
   patch -p1 -i "${srcdir}/patch-${pkgver}"
@@ -57,9 +60,10 @@ build() {
   patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
 
   #aufs patches for Live:
+  msg "starting aufs patches"
   patch -p1 -i "${srcdir}/aufs3.patch"
-  patch -p1 -i "${srcdir}/aufs3-base.patch"
   patch -p1 -i "${srcdir}/aufs3-kbuild.patch"
+  patch -p1 -i "${srcdir}/aufs3-base.patch"
   patch -p1 -i "${srcdir}/aufs3-loopback.patch"
   patch -p1 -i "${srcdir}/aufs3-proc_map.patch"
   patch -p1 -i "${srcdir}/aufs3-standalone.patch"
