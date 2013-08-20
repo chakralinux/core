@@ -1,20 +1,22 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 
-_extramodules=extramodules-3.9-CHAKRA
+_extramodules=extramodules-3.10-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=(nvidia-173xx chd-nvidia-173xx)
 pkgver=173.14.37
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 ARCH=x86_64
 url="http://www.nvidia.com/"
 makedepends=('linux-headers')
 license=('custom')
 source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run"
+        "nvidia-linux-3.10.patch"
 	"https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
 md5sums=('761fec0664e715df35cdb64cd4b087f4'
+         'c104147d9541a43d74729c181c0a1899'
          '62d0cdb856cfae64753c0f3acf729d47')
 
 build() {
@@ -24,13 +26,14 @@ build() {
     cd NVIDIA-Linux-$ARCH-${pkgver}-pkg0
 
     cd usr/src/nv/
+    patch -p1 -i ${srcdir}/nvidia-linux-3.10.patch
     ln -s Makefile.kbuild Makefile
     make SYSSRC=/lib/modules/${_kver}/build/ module
 }
 
 package_nvidia-173xx() {
     pkgdesc="Legacy NVIDIA drivers for linux."
-    depends=('linux>=3.9' 'linux<3.10' 'nvidia-173xx-utils')
+    depends=('linux>=3.10' 'linux<3.11' 'nvidia-173xx-utils')
     conflicts=('nvidia-96xx' 'nvidia')
     install=nvidia.install
 

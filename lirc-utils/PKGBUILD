@@ -5,14 +5,15 @@
 
 pkgname=lirc-utils
 pkgver=0.9.0
-pkgrel=13
+pkgrel=14
+_extramodules=extramodules-3.10-CHAKRA
 pkgdesc="Linux Infrared Remote Control utils"
 arch=('x86_64')
 url="http://www.lirc.org/"
 license=('GPL')
-_kernver='3.7.6-2'
+_kernver="$(cat /lib/modules/${_extramodules}/version)"
 depends=('alsa-lib' 'libx11' 'libftdi' 'linux')
-makedepends=('help2man' 'linux-headers>=3.9' 'linux-headers<3.10' 'python2')
+makedepends=('help2man' 'linux-headers>=3.10' 'linux-headers<3.11' 'python2')
 optdepends=('python2: pronto2lirc utility')
 replaces=('lirc+pctv')
 backup=('etc/conf.d/lircd.conf' 'etc/conf.d/irexec.conf')
@@ -43,17 +44,23 @@ md5sums=('b232aef26f23fe33ea8305d276637086'
 build() {
         # configure
         cd "${srcdir}/lirc-$pkgver" 
-        patch -p1 -i "${srcdir}/lirc_wpc8769l.patch"
-        patch -p1 -i "${srcdir}/lircd-handle-large-config.patch"
-        patch -p1 -i "${srcdir}/lirc_atiusb-kfifo.patch"
-        patch -p1 -i "${srcdir}/kernel-2.6.39.patch"
-        patch -p1 -i "${srcdir}/linux-3.8.patch"
+        patch -Np1 -i "${srcdir}/lirc_wpc8769l.patch"
+	patch -Np1 -i "${srcdir}/lircd-handle-large-config.patch"
+	patch -Np1 -i "${srcdir}/lirc_atiusb-kfifo.patch"
+	patch -Np1 -i "${srcdir}/kernel-2.6.39.patch"
+	patch -Np1 -i "${srcdir}/linux-3.8.patch"
 
-      # Disabling lirc_gpio driver as it does no longer work Kernel 2.6.22+
-	sed -i -e "s:lirc_gpio\.o::" drivers/lirc_gpio/Makefile.am 
+	sed -i '/AC_PATH_XTRA/d' configure.ac
+	sed -e 's/@X_CFLAGS@//g' \
+         -e 's/@X_LIBS@//g' \
+         -e 's/@X_PRE_LIBS@//g' \
+         -e 's/@X_EXTRA_LIBS@//g' -i Makefile.am tools/Makefile.am
 
-	autoreconf 
+        # fix for new automake #33497
+	sed -i 's/AM_CONFIG_HEADER/AC_CONFIG_HEADER/' configure.ac
+
 	libtoolize 
+	autoreconf 
 
 	./configure --enable-sandboxed --prefix=/usr \
 	--with-driver=all --with-kerneldir=/usr/src/linux-${_kernver} \

@@ -1,21 +1,22 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 
-_extramodules=extramodules-3.9-CHAKRA
+_extramodules=extramodules-3.10-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=madwifi
 pkgver=0.9.4.4182
-pkgrel=2
+pkgrel=3
 pkgdesc="Madwifi drivers for Atheros wireless chipsets"
 arch=('x86_64')
 license=('GPL')
 url="http://madwifi-project.org"
-depends=('madwifi-utils' 'linux>=3.9' 'linux<3.10')
+depends=('madwifi-utils' 'linux>=3.10' 'linux<3.11')
 makedepends=('linux-headers' 'sharutils' 'subversion')
 install=madwifi-ng.install
 # subversion source: svn checkout http:/madwifi-project.org/svn/madwifi/trunk madwifi
-source=(http://chakra.sourceforge.net/sources/madwifi/madwifi-${pkgver}.tar.gz)
+source=(http://snapshots.madwifi-project.org/madwifi-trunk-current.tar.gz)
+#http://chakra.sourceforge.net/sources/madwifi/madwifi-${pkgver}.tar.gz)
 	#http://downloads.sourceforge.net/madwifi/madwifi-${pkgver}.tar.gz)
 md5sums=('8cc9cb67ec2fd7c4a71b6725a764c171')
 groups=("linux-modules")
@@ -47,3 +48,4 @@ package()
   find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
 }
 
+md5sums=('dd49555653aa0e5ff356c89d9bb6afd7')
