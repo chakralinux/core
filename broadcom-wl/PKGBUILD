@@ -2,12 +2,12 @@
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 
-_extramodules=extramodules-3.9-CHAKRA
+_extramodules=extramodules-3.10-CHAKRA
 _kernver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=broadcom-wl
 pkgver=5.100.82.112
-pkgrel=18
+pkgrel=19
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 arch=('i686' 'x86_64')
@@ -15,18 +15,17 @@ license=('custom')
 depends=('linux')
 makedepends=('linux-headers')
 
-[[ $CARCH = x86_64 ]] && ARCH=x86_64 || ARCH=x86_32
+ARCH=x86_64
 source=("http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz"
         'modprobe.d'
         'license.patch'
         'user-ioctl.patch'
         'linux-recent.patch')
-sha1sums=('01aa32f9e85621253a3f15cf4361bb80d41da3e8'
+sha1sums=('5bd78c20324e6a4aa9f3fafdc6f0155e884d5131'
           '89bf92286ede30dd85304c6c4e42e89cfdc0f60a'
           'ea7b67982ddc0f56fd3becb9914fd4458fe7d373'
           'a41f11ffc18dbb126176259e02dd93b6ade04a10'
-          '64f99cde29168e7bd8508af30702c68f907556d9')
-[[ $CARCH = x86_64 ]] && sha1sums[0]='5bd78c20324e6a4aa9f3fafdc6f0155e884d5131'
+          'e03eb9f4a85b9c5375dd3ed7f105af5471f19473')
 
 backup=('etc/modprobe.d/broadcom-wl.conf')
 install=install
@@ -35,7 +34,7 @@ build() {
 	cd "${srcdir}"
 
 	patch -p1 -i linux-recent.patch
-	patch -p1 -i user-ioctl.patch
+	#patch -p1 -i user-ioctl.patch
 	patch -p1 -i license.patch
 
 	make -C /lib/modules/"${_kernver}"/build M=`pwd`
