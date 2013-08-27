@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
 pkgver=204
-pkgrel=1
+pkgrel=2
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -31,13 +31,13 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-hook-udev'
         'use-split-usr-path.patch'
         'initcpio-install-udev'
-        'initcpio-install-timestamp'
+        'initcpio-install-systemd'
         '99-default.preset')
 md5sums=('a07619bb19f48164fbf0761d12fd39a8'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          '21572b99173a7cdeaff965e0a5e9182b'
          'fb37e34ea006c79be1c54cbb0f803414'
-         'df69615503ad293c9ddf9d8b7755282d'
+         '9027b31a875e74a45623954b3b23d09f'
          'a1bf25da736d3719e9720b2e4caea341')
 
 build() {
@@ -95,7 +95,7 @@ package() {
   # add mkinitcpio hooks
   install -Dm644 "$srcdir/initcpio-install-udev" "$pkgdir/usr/lib/initcpio/install/udev"
   install -Dm644 "$srcdir/initcpio-hook-udev" "$pkgdir/usr/lib/initcpio/hooks/udev"
-  install -Dm644 "$srcdir/initcpio-install-timestamp" "$pkgdir/usr/lib/initcpio/install/timestamp"
+  install -Dm644 "$srcdir/initcpio-install-systemd" "$pkgdir/usr/lib/initcpio/install/systemd"
   
   # Chakra specific .preset
   install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
