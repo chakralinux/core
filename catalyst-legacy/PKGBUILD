@@ -1,11 +1,11 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 
-_kernver="3.9.2-1-CHAKRA"
+_kernver="3.10.5-1-CHAKRA"
 
 pkgname=('catalyst-legacy' 'chd-catalyst-legacy')
 pkgver=13.1
-pkgrel=6
+pkgrel=7
 arch=('x86_64')
 url="http://www.ati.amd.com"
 license=('custom')
@@ -17,14 +17,16 @@ source=("http://www2.ati.com/drivers/legacy/amd-driver-installer-catalyst-${pkgv
 	'fglrx_supported'
 	'3.5-do_mmap.patch'
 	'arch-fglrx-3.8.patch'
-        'kcl_acpi.patch')
+        'kcl_acpi.patch'
+        'gentoo_linux-3.10-proc.diff')
 md5sums=('c07fd1332abe4c742a9a0d0e0d0a90de'
          '660396540b0ceaff71d6155c986734de'
          '3e1b82bd69774ea808da69c983d6a43b'
          '9adef6e20662d5e486e15bc5ec40751f'
          '83b8d2063458cc9e8b6679567b280e36'
          'cff482b58c9090a66cb82159a2170654'
-         'cbb8c2f388a8ad617656c412e3a6690f')
+         'cbb8c2f388a8ad617656c412e3a6690f'
+         '5872d95907a93ada44982e355e91e59d')
 
 build() {
 
@@ -51,6 +53,9 @@ build() {
     patch -p1 -i ../3.5-do_mmap.patch
     patch -p1 -i ../arch-fglrx-3.8.patch
     patch -p0 -i ../kcl_acpi.patch
+    
+    patch -Np0 -i ../gentoo_linux-3.10-proc.diff
+
 
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
     cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a" . 
@@ -67,7 +72,7 @@ build() {
 package_catalyst-legacy() {
     pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
     screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
-    depends=('linux>=3.9' 'linux<3.10' 'catalyst-legacy-utils')
+    depends=('linux>=3.10' 'linux<3.11' 'catalyst-legacy-utils')
     conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'catalyst')
     install=catalyst.install
 
