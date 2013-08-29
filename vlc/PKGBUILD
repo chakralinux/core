@@ -1,7 +1,8 @@
-# Maintainer: abveritas@chakra-project.org
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# Contributions from ArchLinux: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/vlc
 
 pkgname=vlc
-pkgver=2.0.7
+pkgver=2.0.8
 pkgrel=2
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
@@ -49,20 +50,20 @@ categories=('multimedia')
 options=('!libtool' '!emptydirs')
 install="vlc.install"
 source=("http://download.videolan.org/pub/videolan/$pkgname/$pkgver/$pkgname-$pkgver.tar.xz"
-        "libva12.patch")
-sha1sums=('d3dc6605cc296806ada16b5f9b819705c9cc1319'
-          'e67786202ef6b940c5d2690d4c5520a97401a611')
+        "libva12.patch"
+        "fix-live555-breakage.patch")
+sha1sums=('8937ed30412bef49db77d2187a9e4734866f8ab7'
+          'e67786202ef6b940c5d2690d4c5520a97401a611'
+          '9660ad86dbaf438c1dd9b7370463b04a947b619f')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   patch -p1 < "$srcdir"/libva12.patch
+  patch -Np1 -i ../fix-live555-breakage.patch
 
   sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
-
-  # fix for flac-1.3.0
-  #sed -i -e 's:stream_decoder.h:FLAC/stream_decoder.h:' modules/codec/flac.c
-  #sed -i -e 's:stream_encoder.h:FLAC/stream_encoder.h:' modules/codec/flac.c
+  sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
 }
 
 
