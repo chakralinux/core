@@ -5,29 +5,25 @@ _extramodules=extramodules-3.10-CHAKRA
 _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=('nvidia' 'chd-nvidia')
-pkgver=319.32
-pkgrel=4
+pkgver=319.49
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=('linux-headers' 'linux>=3.10' 'linux<3.11' "nvidia-utils=${pkgver}")
 license=('custom')
-source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported"
-        'nvidia-linux-3.10.patch')
+source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
 
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '8323dcba90576dcae67c42d6ea94704e'
-         'd181d856768868823df3bda4607a5315')
+         'd9d7ead9c472e2b1b18679700feeaadf')
 
 build() {
     cd "${srcdir}"
     sh "${_pkg}.run" --extract-only
 
     cd "${_pkg}/kernel"
-    patch -Np3 -i ${srcdir}/nvidia-linux-3.10.patch
     make SYSSRC=/lib/modules/"${_kver}/build" module
 }
 
