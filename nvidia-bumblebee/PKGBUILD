@@ -7,8 +7,8 @@ _extramodules=extramodules-3.10-CHAKRA
 _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=nvidia-bumblebee
-pkgver=319.32
-pkgrel=6
+pkgver=319.49
+pkgrel=1
 _extramodules='extramodules-3.10-CHAKRA' 
 pkgdesc="NVIDIA drivers for linux. Packaged for Bumblebee"
 arch=('x86_64')
@@ -23,17 +23,14 @@ options=(!strip)
 
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
-source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run"
-'nvidia-linux-3.10.patch')
-md5sums=('d181d856768868823df3bda4607a5315'
-	 '8323dcba90576dcae67c42d6ea94704e')
+source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
+md5sums=('d9d7ead9c472e2b1b18679700feeaadf')
 
 build() {
     cd "${srcdir}"
     sh "${_pkg}.run" --extract-only
 
     cd "${_pkg}/kernel"
-    patch -Np3 -i ${srcdir}/nvidia-linux-3.10.patch
     make SYSSRC=/lib/modules/"${_kver}/build" module
 }
  
