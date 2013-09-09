@@ -4,7 +4,7 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=v4l-utils
-pkgver=0.8.8
+pkgver=0.9.5
 pkgrel=1
 pkgdesc="Userspace tools and conversion library for Video 4 Linux"
 arch=('i686' 'x86_64')
@@ -17,20 +17,17 @@ makedepends=('qt')
 optdepends=('qt')
 depends=('glibc' 'gcc-libs' 'sysfsutils' 'libjpeg-turbo')
 source=(http://linuxtv.org/downloads/v4l-utils/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('5fa4c6f4b6f5410de57271a03cc9a15f15195ef3fc05a8e42ecf507d6d70a87f')
+sha256sums=('6c9f1be981d5763069e0969ebe426c39da5a7d738865367e390e3b486f1b502c')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  sed -i 's|CFLAGS :=|CFLAGS ?=|' Make.rules
-
-  make PREFIX="/usr"
+  ./configure --prefix=/usr --sysconfdir=/etc
+  make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make install PREFIX="/usr" DESTDIR="${pkgdir}/"
-  rm -f "${pkgdir}/usr/bin/ivtv-ctl"
-  mv "${pkgdir}/lib/udev" "${pkgdir}/usr/lib/"
-  rm -rf "${pkgdir}/lib"
+  MAKEFLAGS="-j1" make install DESTDIR="${pkgdir}/"
+  rm "${pkgdir}/usr/bin/ivtv-ctl"
 }
