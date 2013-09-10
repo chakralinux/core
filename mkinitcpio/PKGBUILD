@@ -5,7 +5,7 @@
 
 pkgname=mkinitcpio
 pkgver=0.15.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Modular initramfs image creation utility"
 arch=('x86_64')
 url="http://www.archlinux.org/"
@@ -24,5 +24,6 @@ sha256sums=('2a00421c5ce4abfcc971c71a6efd22f6bbaf0e541f9a93410f35e864c818c3db'
             'SKIP')
 
 package() {
+   sed -i 's/^HOOKS.*$/HOOKS="base systemd autodetect modconf block keymap resume filesystems keyboard"/g' ${srcdir}/${pkgname}-${pkgver}/mkinitcpio.conf
    make -C "$pkgname-$pkgver" DESTDIR="$pkgdir" install
 }
