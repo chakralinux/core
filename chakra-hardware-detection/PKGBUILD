@@ -4,31 +4,33 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=chakra-hardware-detection
-pkgver=20130910
+pkgver=20130911
 pkgrel=1
+branch="master"
 pkgdesc="Hardware detection scripts for Chakra"
 arch=('any')
 url="http://www.chakra-project.org"
 depends=('bc' 'util-linux' 'chd-nvidia' 'chd-nvidia-304xx'  'chd-nvidia-173xx'
          'chd-catalyst' 'chd-catalyst-legacy' 'dmidecode') 
 license=('GPL')
-source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=('760ade90aa97224771cd685c3c17ed3edfde81d6e02c0f8b7e61d0a5bd11dafb')
+source=("${pkgname}-${pkgver}.tar.gz"::"http://gitorious.org/chakra/chakra-hardware-detection/archive-tarball/${branch}")
+md5sums=('5dce33c93e1cfcbcfc2fc6573da7a8f3')
 
 # create tarball: source PKGBUILD && mksource
 
 mksource() {
-	  rm -vRf ${pkgname}-${pkgver}
-	  git clone git://gitorious.org/chakra/${pkgname}.git ${pkgname}-${pkgver}
-	  rm -vRf ${pkgname}-${pkgver}/.git*
-	  pushd ${pkgname}-${pkgver}
-	  popd
-	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}-${pkgver}/*
-	  sha256sum ${pkgname}-${pkgver}.tar.xz
+	if [ "${1}" == "" ] ; then
+	  git clone git://gitorious.org//chakra/${pkgname}.git ${pkgname}-${pkgver}
+	else
+	  git clone -b "${1}" git://gitorious.org//chakra/${pkgname}.git ${pkgname}-${pkgver}
+	fi
+	pushd ${pkgname}-${pkgver}
+	popd
+	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}-${pkgver}/*
+	md5sum ${pkgname}-${pkgver}.tar.xz
 }
-
 package(){
-	cd "${srcdir}/${pkgname}-${pkgver}"
+	cd "${srcdir}/chakra-${pkgname}"
 
 	make install DESTDIR="${pkgdir}"
 }
