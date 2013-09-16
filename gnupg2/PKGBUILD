@@ -1,7 +1,7 @@
 # Maintainer: abveritas[at]chakra-project[dot]org>
 
 pkgname=gnupg2
-pkgver=2.0.20
+pkgver=2.0.21
 pkgrel=1
 pkgdesc="GNU Privacy Guard 2 - a PGP replacement tool"
 arch=('x86_64')
@@ -11,16 +11,13 @@ license=('GPL')
 url="http://www.gnupg.org/"
 install=${pkgname}.install
 source=("ftp://ftp.gnupg.org/gcrypt/gnupg/gnupg-$pkgver.tar.bz2"
-        'valid-keyblock-packet.patch'
         'protect-tool-env.patch')
-md5sums=('9d18ee71bb0b10d40d1c8a393bdd7a89'
-         '3a18a71eac65eabe1e2472639e8b03fc'
+md5sums=('48c05f5dfe97cf21ae0ced811aaad750'
          '7e5167aa042dbe18ab79d8b0df3f3cab')
 
 build() {
   cd ${srcdir}/gnupg-$pkgver
   patch -p1 -i ${srcdir}/protect-tool-env.patch 
-  #patch -p1 -i ${srcdir}/valid-keyblock-packet.patch
 	
   ./configure --prefix=/usr \
               --sysconfdir=/etc \
