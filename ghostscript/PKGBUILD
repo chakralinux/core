@@ -5,7 +5,7 @@
 
 pkgname=ghostscript
 pkgver=9.07
-pkgrel=2
+pkgrel=3
 pkgdesc="An interpreter for the PostScript language"
 arch=('x86_64')
 license=('GPL3' 'custom')
@@ -63,6 +63,9 @@ package() {
 
   # remove unwanted localized man-pages
   rm -rf $pkgdir/usr/share/man/[^man1]*
+
+  # remove filters that are now maintained in cups-filter
+  rm -rf "$pkgdir"/usr/lib/cups/filter/{gstopxl,gstoraster}
 
   # install IJS
   cd ${srcdir}/ghostscript-${pkgver}/ijs
