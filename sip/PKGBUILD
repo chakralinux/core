@@ -1,62 +1,66 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of www.chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: A Boersma (abveritas) <abveritas@chakra-project.org>
 
 pkgbase=sip
-pkgname=("sip-common" "sip-python2" "sip-python3")
-pkgver=4.14.5
-pkgrel=2
-pkgdesc="A tool that makes it easy to create Python bindings for C and C++ libraries"
+pkgname=('sip' 'sip-python2' 'sip-python3')
+pkgver=4.15.2
+pkgrel=1
+pkgdesc="A tool to create Python bindings for C and C++ libraries"
 arch=('x86_64')
 url="http://www.riverbankcomputing.com/software/sip/"
 license=('custom:"sip"')
-makedepends=('python2' 'python3' 'gcc-libs')
-source=("http://sourceforge.net/projects/pyqt/files/sip/sip-${pkgver}/${pkgbase}-${pkgver}.tar.gz")
-md5sums=('51757771c204e9fbad359f372a0b8256')
+makedepends=('python2' 'python3')
+source=("http://downloads.sourceforge.net/pyqt/${pkgbase}-${pkgver}.tar.gz")
+sha1sums=('b1602e8b18bd47c2057117210db3648c7d0c106a')
 
 build() {
-  cp -r ${pkgbase}-${pkgver} python3-${pkgbase}-${pkgver}
+  cp -r ${pkgbase}-${pkgver} python2-${pkgbase}-${pkgver}
 
+  # Python 3 version
   cd ${srcdir}/${pkgbase}-${pkgver}
-  python2 configure.py
+  python2 configure.py CFLAGS="${CFLAGS}" LFLAGS="${LDFLAGS}"
   make
 
-  cd ${srcdir}/python3-${pkgbase}-${pkgver}
-  python3 configure.py
+  # Python 2 version
+  cd ${srcdir}/python2-${pkgbase}-${pkgver}
+  python3 configure.py CFLAGS="${CFLAGS}" LFLAGS="${LDFLAGS}"
   make
 }
 
-package_sip-common() {
-  pkgdesc=("A tool to create Python bindings for C andC++ (common parts)")
-  depends=("gcc-libs")
-  conflicts=("sip<4.14.5")
+package_sip() {
+  pkgdesc=("A tool to create Python bindings for C and C++")
+  depends=('glibc')
+  replaces=('sip-common')
+
   cd ${srcdir}/${pkgbase}-${pkgver}
-  make DESTDIR=${pkgdir} install 
+  make DESTDIR=${pkgdir} install -C sipgen
 
   install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
-  # remove python specific part
-  rm -rf ${pkgdir}/usr/lib
-  rm -rf ${pkgdir}/usr/include
-}
-
-package_sip-python2() {
-  pkgdesc=("A tool to create Python bindings for C andC++ (Python 2)")
-  conflicts=("sip<=4.14.5")
-  provides=("sip=${pkgver}")
-  replaces=("sip")
-  depends=("python2" "sip-common")
-
-  cd ${srcdir}/${pkgbase}-${pkgver}
-  make DESTDIR=${pkgdir} install
-  rm -rf ${pkgdir}/usr/bin
 }
 
 package_sip-python3() {
-  pkgdesc=("A tool to create Python bindings for C andC++ (Python 3)")
-  depends=("python3" "sip-common")
+  pkgdesc=("Python 3 SIP bindings for C and C++ libraries")
+  depends=('python3' 'sip')
 
-  cd ${srcdir}/python3-${pkgbase}-${pkgver}
-  make DESTDIR=${pkgdir} install
-  rm -rf ${pkgdir}/usr/bin
+  cd ${srcdir}/${pkgbase}-${pkgver}
+  make DESTDIR=${pkgdir} install -C siplib
+
+  install -Dm644 sipconfig.py "${pkgdir}"/usr/lib/python3.3/site-packages/sipconfig.py
+  install -Dm644 sipdistutils.py "${pkgdir}"/usr/lib/python3.3/site-packages/sipdistutils.py
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
+
+package_sip-python2() {
+  pkgdesc=("Python 2 SIP bindings for C and C++ libraries")
+  depends=('python2' 'sip')
+
+  cd ${srcdir}/python2-${pkgbase}-${pkgver}
+  make DESTDIR=${pkgdir} install -C siplib
+
+  install -Dm644 sipconfig.py "${pkgdir}"/usr/lib/python2.7/site-packages/sipconfig.py
+  install -Dm644 sipdistutils.py "${pkgdir}"/usr/lib/python2.7/site-packages/sipdistutils.py
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
