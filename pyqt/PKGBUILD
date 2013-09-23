@@ -1,100 +1,174 @@
-# Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
+# Platform Packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: A Boersma (abveritas) <abveritas@chakra-project.org>
+#               F Kosmale (Inkane) <inkane@chakra-project.org>
+#               A Scarpino (ascarpino) <andrea@archlinux.org>
+#               D S de Andrade (dsa) <douglas@archlinux.org>
+#               riai <riai@bigfoot.com>
+#               Ben <ben@benmazer.net>
+#               Gerardo
+# NOTE: PyQt5 supports Qt v5. PyQt4 supports Qt v4 and will build against Qt v5.
 
 pkgbase=pyqt
-# pyqt4 because it now supports Qt5; however nothing uses it at the moment
-pkgname=("pyqt4-common" "pyqt4-python2" "pyqt4-python3")
-pkgver=4.10
-pkgrel=7
+pkgname=('pyqt4-common' 'pyqt4-python2' 'pyqt4-python3')
+pkgver=4.10.3
+pkgrel=1
 pkgdesc="A set of Python bindings for the Qt toolkit"
 arch=('x86_64')
-url="http://riverbankcomputing.co.uk/software/pyqt/intro"
+url='http://riverbankcomputing.co.uk/software/pyqt/intro'
 license=('GPL')
-makedepends=('phonon' 'python-opengl' 'qt-assistant-compat' 'mesa' 'sip-python2' 
-             'sip-python3' 'qtwebkit' 'dbus-python2' 'dbus-python3'
-            )
+makedepends=('dbus-python2'
+             'dbus-python3'
+             'mesa'
+             'phonon'
+             'python-opengl'
+             'qt-assistant-compat'
+             'qtwebkit'
+             'sip-python2>=4.15' 
+             'sip-python3>=4.15')
 source=("http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-${pkgver}/PyQt-x11-gpl-${pkgver}.tar.gz")
-md5sums=('b5953e96d0f82d322d0cba008163321e')
+sha1sums=('2866ea9bdb1c30337fb326ca3442c61e3c3e3396')
 
 build() {
-  cp -r ${srcdir}/PyQt-x11-gpl-${pkgver} ${srcdir}/python3-PyQt-x11-gpl-${pkgver}
+    cp -r ${srcdir}/PyQt-x11-gpl-${pkgver} ${srcdir}/python2-PyQt-x11-gpl-${pkgver}
 
-  cd ${srcdir}/PyQt-x11-gpl-${pkgver}
-  # Python 2 version
-  python2 configure.py \
-    --confirm-license \
-    -v /usr/share/sip \
-    --qsci-api
+    msg "Configuring the Python 3 version"
+    cd ${srcdir}/PyQt-x11-gpl-${pkgver}
+    # Python 3 version
+    python3 configure.py \
+        --confirm-license \
+        --qsci-api \
+        --verbose \
+        --enable QtAssistant \
+        --enable QtCore \
+        --enable QtDBus \
+        --enable QtDeclarative \
+        --enable QtDesigner \
+        --enable QtGui \
+        --enable QtHelp \
+        --enable QtMultimedia \
+        --enable QtNetwork \
+        --enable QtOpenGL \
+        --enable QtScript \
+        --enable QtScriptTools \
+        --enable QtSql \
+        --enable QtSvg \
+        --enable QtTest \
+        --enable QtWebkit \
+        --enable QtXml \
+        --enable QtXmlPatterns \
+        --enable dbus \
+        --enable phonon
 
-  # Thanks Gerardo for the rpath fix
-  find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
+    find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
 
-  make
+    msg "Making the Python 3 version"
+    make
 
-  cd ${srcdir}/python3-PyQt-x11-gpl-${pkgver}
-  # Python 3 version
-  python3 configure.py \
-    --confirm-license \
-    --qsci-api
+    msg "Building the Python 2 version"
+    cd ${srcdir}/python2-PyQt-x11-gpl-${pkgver}
+    # Python 2 version
+    python2 configure.py \
+        --confirm-license \
+        -v /usr/share/sip \
+        --qsci-api \
+        --verbose \
+        --enable QtAssistant \
+        --enable QtCore \
+        --enable QtDBus \
+        --enable QtDeclarative \
+        --enable QtDesigner \
+        --enable QtGui \
+        --enable QtHelp \
+        --enable QtMultimedia \
+        --enable QtNetwork \
+        --enable QtOpenGL \
+        --enable QtScript \
+        --enable QtScriptTools \
+        --enable QtSql \
+        --enable QtSvg \
+        --enable QtTest \
+        --enable QtWebkit \
+        --enable QtXml \
+        --enable QtXmlPatterns \
+        --enable dbus \
+        --enable phonon
 
-  find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
+    find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
 
-  make
+    msg "Making the Python 2 version"
+    make
 }
 
 package_pyqt4-common(){
-  pkgdesc="Parts of PyQt for Qt4 shared by both Python versions"
-  conflicts=("pyqt<4.10")
-  cd ${srcdir}/PyQt-x11-gpl-${pkgver}
+    pkgdesc="Parts of PyQt for Qt4 shared between pyqt4-python3 and pyqt4-python2"
+    depends=('qt')
+    conflicts=('pyqt<4.10')
 
-  make -C pyrcc DESTDIR="${pkgdir}" install
-  make -C pylupdate DESTDIR="${pkgdir}" install
-  install -Dm644 PyQt4.api "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
-}
+    msg "Packaging pyqt4-common"
+    cd ${srcdir}/PyQt-x11-gpl-${pkgver}
 
-package_pyqt4-python2() {
-  pkgdesc="A set of Python bindings for the Qt toolkit (Python 2)"
-  depends=("qtwebkit" "sip-python2" "dbus-python2" "pyqt4-common" "python2" "sip-python2")
-  optdepends=('phonon: enable audio and video in PyQt applications'
-              'python-opengl: enable OpenGL 3D graphics in PyQt applications'
-              'qscintilla-python2: QScintilla API'
-              'qt-assistant-compat: add PyQt online help in Qt Assistant')
-  provides=("pyqt=$pkgver")
-  coflicts=("pyqt<4.10")
-  replaces=("pyqt")
-
-  cd "${srcdir}/PyQt-x11-gpl-${pkgver}"
-  # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
-  make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
-
-
-  # Provided by pyqt4-common
-  rm -f "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
-  rm "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
+    make -C pyrcc DESTDIR="${pkgdir}" install
+    make -C pylupdate DESTDIR="${pkgdir}" install
+    install -Dm644 PyQt4.api "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
 }
 
 package_pyqt4-python3() {
-  pkgdesc="A set of Python bindings for the Qt toolkit (Python 3)"
-  depends=("qtwebkit" "sip-python2" "dbus-python2" "pyqt4-common" "python3" "sip-python3")
-  optdepends=('phonon: enable audio and video in PyQt applications'
-              'python-opengl: enable OpenGL 3D graphics in PyQt applications'
-              'qscintilla-python3: QScintilla API'
-              'qt-assistant-compat: add PyQt online help in Qt Assistant')
-  provides=("pyqt=$pkgver")
-  coflicts=("pyqt<4.10")
-  replaces=("pyqt")
+    pkgdesc="A set of Python 3 bindings for the Qt toolkit"
+    depends=('dbus-python3'
+             'pyqt4-common'
+             'python3'
+             'qtwebkit'
+             'sip-python3')
+    optdepends=('phonon: enable audio and video in PyQt applications'
+                'python-opengl: enable OpenGL 3D graphics in PyQt applications'
+                'qscintilla-python3: QScintilla API'
+                'qt-assistant-compat: add PyQt online help in Qt Assistant')
+    provides=('pyqt=$pkgver')
+    conflicts=('pyqt')
+    replaces=('pyqt')
 
-  cd "${srcdir}/python3-PyQt-x11-gpl-${pkgver}"
-  # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
-  make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+    msg "Packaging pyqt4-python3"
+    cd "${srcdir}/PyQt-x11-gpl-${pkgver}"
 
-  # fix conflict with Python 2 version
-  mv "${pkgdir}"/usr/bin/pyuic4 "${pkgdir}"/usr/bin/pyuic4-python3
- 
-  # Provided by pyqt-common
-  rm -f "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
-  rm -f "${pkgdir}"/usr/lib/qt4/plugins/designer/libpythonplugin.so
-  rm "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
-  rm  "${pkgdir}"/usr/lib/qt/plugins/designer/libpythonplugin.so
+    # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+    # Provided by pyqt-common
+    rm "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
+    rm -r "${pkgdir}"/usr/share/qt
+}
+
+package_pyqt4-python2() {
+    pkgdesc="A set of Python 2 bindings for the Qt toolkit"
+    depends=('dbus-python2'
+             'pyqt4-common'
+             'python2'
+             'qtwebkit'
+             'sip-python2')
+    optdepends=('phonon: enable audio and video in PyQt applications'
+                'python-opengl: enable OpenGL 3D graphics in PyQt applications'
+                'qscintilla-python2: QScintilla API'
+                'qt-assistant-compat: add PyQt online help in Qt Assistant')
+    provides=('pyqt=$pkgver')
+    conflicts=('pyqt')
+    replaces=('pyqt')
+
+    msg "Packaging pyqt4-python2"
+    cd "${srcdir}/python2-PyQt-x11-gpl-${pkgver}"
+
+    # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+    #  Fix naming conflict with pyqt4-python3
+    mv "${pkgdir}"/usr/bin/{,python2-}pyuic4
+
+    # Provided by pyqt4-common
+    rm "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
+    rm -r "${pkgdir}"/usr/share/qt
+
+    # Provided by pyqt4-python3
+    rm -r "${pkgdir}"/usr/lib/qt
 }
