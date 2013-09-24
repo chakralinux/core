@@ -1,0 +1,35 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# Maintainer: FranzMari <franzmari[at]chakra-project[dot]it>
+
+pkgname=kdeplasma-applets-plasma-nm
+_pkgname=plasma-nm
+pkgver=0.9.3.0
+pkgrel=1
+pkgdesc='Plasma applet written in QML for managing network connections'
+arch=('x86_64')
+url='https://projects.kde.org/projects/playground/network/plasma-nm'
+license=('GPL2')
+depends=('kdebase-workspace' 'libnm-qt' 'openconnect')
+makedepends=('cmake' 'automoc4')
+conflicts=('kdeplasma-applets-plasma-nm-git')
+screenshot="http://grulja.files.wordpress.com/2013/06/nm1.png?w=268&h=300"
+source="http://download.kde.org/unstable/${_pkgname}/${_pkgname}-${pkgver}.tar.xz"
+md5sums=('cdc781eb6f62ebddbe4fafb444f72d9b')
+ 
+build() {
+  cd $srcdir/${_pkgname}-${pkgver}
+  mkdir build
+  cd build
+  cmake .. \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  make
+}
+ 
+package() {
+  cd $srcdir/${_pkgname}-${pkgver}
+  cd build
+  make DESTDIR="${pkgdir}" install
+} 
