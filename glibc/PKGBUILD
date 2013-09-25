@@ -1,63 +1,76 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=glibc
-pkgver=2.17
-pkgrel=4
+pkgver=2.18
+pkgrel=2
 pkgdesc="GNU C Library"
 arch=('x86_64')
 url="http://www.gnu.org/software/libc"
 license=('GPL' 'LGPL')
 groups=('base')
-depends=('linux-api-headers>=3.7' 'tzdata')
-makedepends=('gcc>=4.7')
+depends=('linux-api-headers>=3.10' 'tzdata')
+makedepends=('gcc>=4.8')
 backup=(etc/gai.conf
         etc/locale.gen
         etc/nscd.conf)
 options=('!strip')
 install=glibc.install
 source=(http://ftp.gnu.org/gnu/libc/${pkgname}-${pkgver}.tar.xz{,.sig}
-        glibc-2.17-sync-with-linux37.patch
-        glibc-2.17-getaddrinfo-stack-overflow.patch
-        glibc-2.17-regexp-matcher-overrun.patch
+        glibc-2.18-readdir_r-CVE-2013-4237.patch
+	glibc-2.18-malloc-corrupt-CVE-2013-4332.patch
+	glibc-2.18-strcoll-CVE-2012-4412+4424.patch
+	glibc-2.18-ptr-mangle-CVE-2013-4788.patch
+        glibc-2.18-strstr-hackfix.patch
         nscd.service
         nscd.tmpfiles
         locale.gen.txt
-        locale-gen
+        locale-gen  # parallel version, see https://bugs.archlinux.org/task/36955
         locale.patch
         glibc.conf)
+sha1sums=('1f0e4e7ba5fe1f45ffd0548b6c36caef0bc7e51f'
+          'SKIP'
+          '7ecd9abb03495a620f0e4a2d45a6046310649fde'
+          'd3dd647f2f292c44f31311ea3cf9e39db7ba798e'
+          '04f38fe8508e2541c9d946a9d788c60f160c1cc0'
+          'f0117b071f5f24c2522231aa9452342bea0d0c3f'
+          'f928cedf0fb3d2bf046975680c637d6b09ad93cf'
+          '18406ad58e562a85a13b3cebe938841cf5d624ff'
+          '1a9eb962463409159792a1a2d768524f37ce2e7b'
+          '61f72da0b1f44af013c8a6873a298c2b6efb3f3d'
+          'b8a9e83a5c0d22066a7923f07d02c88484d438ba'
+          '46afb75ca2197d84d6e8cc426389a1e7d8aca479'
+          'b335a2526d631aaed53d3a88cc3904a51fccd1a4')
 
-md5sums=('87bf675c8ee523ebda4803e8e1cec638'
-         'SKIP'
-         'fb99380d94598cc76d793deebf630022'
-         '56d5f2c09503a348281a20ae404b7de3'
-         '200acc05961b084ee00dde919e64f82d'
-         'c1e07c0bec0fe89791bfd9d13fc85edf'
-         'bccbe5619e75cf1d97312ec3681c605c'
-         '07ac979b6ab5eeb778d55f041529d623'
-         '476e9113489f93b348b21e144b6a8fcf'
-         'a9e0575f8cb7892c0a15b088139abf37'
-         '8b3298de2392a10905a64ceccf56d2c1')
-
-
-build() {
+prepare() {
   cd ${srcdir}/${pkgname}-${pkgver}
+  
+  # upstream commit 91ce4085
+  patch -p1 -i $srcdir/glibc-2.18-readdir_r-CVE-2013-4237.patch
 
-  # combination of upstream commits 318cd0b, b540704 and fc1abbe
-  patch -p1 -i ${srcdir}/glibc-2.17-sync-with-linux37.patch
+  # upstream commits 1159a193, 55e17aad and b73ed247
+  patch -p1 -i $srcdir/glibc-2.18-malloc-corrupt-CVE-2013-4332.patch
 
-  # CVE-2013-1914 - upstream commit 1cef1b19
-  patch -p1 -i ${srcdir}/glibc-2.17-getaddrinfo-stack-overflow.patch
+  # upstream commits 1326ba1a, 141f3a77 and 303e567a
+  # https://sourceware.org/ml/libc-alpha/2013-08/msg00394.html
+  # https://sourceware.org/ml/libc-alpha/2013-08/msg00462.html
+  patch -p1 -i $srcdir/glibc-2.18-strcoll-CVE-2012-4412+4424.patch
 
-  # CVE-2013-0242 - upstream commit a445af0b
-  patch -p1 -i ${srcdir}/glibc-2.17-regexp-matcher-overrun.patch
+  # upstream commits c61b4d41 and 0b1f8e35
+  patch -p1 -i $srcdir/glibc-2.18-ptr-mangle-CVE-2013-4788.patch
+
+  # hack fix for strstr issues on x86
+  patch -p1 -i $srcdir/glibc-2.18-strstr-hackfix.patch
 
   # patch regarding locale generation, severly affects ISO creation
   # origin: http://comments.gmane.org/gmane.comp.lib.glibc.alpha/31543
   patch -p1 -u -i ${srcdir}/locale.patch
-  
-  cd ${srcdir}
-  mkdir glibc-build
-  cd glibc-build
+
+  mkdir ${srcdir}/glibc-build
+}
+
+
+build() {
+  cd ${srcdir}/glibc-build
 
   echo "slibdir=/lib" >> configparms
   
@@ -73,6 +86,7 @@ build() {
       --enable-kernel=2.6.32 \
       --enable-bind-now --disable-profile \
       --enable-stackguard-randomization \
+      --enable-lock-elision \
       --enable-multi-arch
 
   # build libraries with hardening disabled
@@ -146,7 +160,7 @@ package() {
                       lib/libnss_{compat,dns,files,hesiod,nis,nisplus}-${pkgver}.so \
                       lib/{libdl,libm,libnsl,libresolv,librt,libutil}-${pkgver}.so \
                       lib/{libmemusage,libpcprofile,libSegFault}.so \
-                      usr/lib/{pt_chown,{audit,gconv}/*.so}
+                      usr/lib/{audit,gconv}/*.so
 
   # Add /usr/lib32 to the default library search path
   install -Dm644 "$srcdir/glibc.conf" "$pkgdir/etc/ld.so.conf.d/glibc.conf"
