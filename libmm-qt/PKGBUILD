@@ -1,0 +1,34 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# Maintainer: FranzMari <franzmari[at]chakra-project[dot]it>
+
+pkgname=libmm-qt
+pkgver=0.5.1
+pkgrel=1
+pkgdesc='Qt-only wrapper for ModemManager DBus API'
+arch=('x86_64')
+url='https://projects.kde.org/projects/extragear/libs/libmm-qt'
+license=('LGPL')
+depends=('qt')
+makedepends=('cmake')
+conflicts=('libmm-qt-git')
+source="http://download.kde.org/unstable/modemmanager-qt/${pkgver}/src/${pkgname}-${pkgver}.tar.xz"
+md5sums=('97a61c398426ea596564d1c876025d93')
+ 
+build() {
+  cd $srcdir/${pkgname}-${pkgver}
+  mkdir build
+  cd build
+  cmake .. \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  make
+}
+ 
+package() {
+  cd $srcdir/${pkgname}-${pkgver}
+  cd build
+  make DESTDIR="${pkgdir}" install
+} 
+
