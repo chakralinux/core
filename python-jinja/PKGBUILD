@@ -1,26 +1,58 @@
-# Moved from CCR - PKGBUILD by Renan Biegelmeyer (RenanBS) <renan.biegel[at]gmail[.dot]com>
+#
+# Platform packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Renan Biegelmeyer (RenanBS) <renan.biegel@gmail.com>
+#               Archlinux
 
-pkgname=python2-jinja
-pkgver=2.6
+pkgbase=python-jinja
+pkgname=('python3-jinja' 'python2-jinja')
+pkgver=2.7.1
 pkgrel=1
 pkgdesc="A simple pythonic template language written in Python"
 arch=('any')
-url="http://jinja.pocoo.org/2/"
+url="http://jinja.pocoo.org"
 license=('BSD')
-depends=('python-markupsafe' 'setuptools' )
-makedepends=('python')
-replaces=('python-jinja')
-provides=('python-jinja')
-conflicts=('python-jinja')
-source=(http://pypi.python.org/packages/source/J/Jinja2/Jinja2-$pkgver.tar.gz)
-md5sums=('1c49a8825c993bfdcf55bb36897d28a2')
+makedepends=('python3-distribute'
+             'python2-distribute'
+             'python3-markupsafe'
+             'python2-markupsafe')
+source=(http://pypi.python.org/packages/source/J/Jinja2/Jinja2-$pkgver.tar.gz
+        Fix-PrefixLoader-does-not-pass-globals-to-load.patch)
+sha512sums=('c5d4262f6dfec77c74496f0b3afd88a37fc0573133810cfdc29fadbd9d02bb7af10b2a3ddf3075f8b682629cd41a949dcbccb293b84b0aeff9090b0aa9669e02'
+            '66f9c29b6c49dbee70121a8671fd683b039a37d9c903edef27b9eee2d8e27c3b6a1bf087ccb45b2e78ac83194f9781e5f1814f9b10d50005b5e646a025789c21')
 
-build() 
-{
-  cd "$srcdir/Jinja2-$pkgver"
+build() {
+    cd "${srcdir}/Jinja2-$pkgver"
 
-  python2 setup.py install --root="$pkgdir" -O1
+    # https://github.com/mitsuhiko/jinja2/issues/225
+    patch -Np1 -i "$srcdir/Fix-PrefixLoader-does-not-pass-globals-to-load.patch"
 
-  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    cd "${srcdir}"
+    rm -rf python{2,3}-build
+    for builddir in python{2,3}-build; do
+        cp -r Jinja2-$pkgver $builddir
+        pushd $builddir
+        ${builddir%-build} setup.py build
+        popd
+    done
 }
 
+package_python3-jinja() {
+    depends=('python3-setuptools' 'python3-markupsafe')
+
+    cd "${srcdir}/python3-build"
+    python3 setup.py install --root="$pkgdir" -O1
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
+
+package_python2-jinja() {
+    depends=('python2-setuptools' 'python2-markupsafe')
+    replaces=('python-jinja')
+    provides=('python-jinja')
+    conflicts=('python-jinja')
+
+    cd "${srcdir}/python2-build"
+    python2 setup.py install --root="$pkgdir" -O1
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
