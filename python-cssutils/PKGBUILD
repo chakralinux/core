@@ -1,24 +1,64 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Platform packages for Chakra, part of www.chakra-project.org
 #
-# contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Giuseppe Calà <jiveaxe@gmail.com>
+#               Archlinux packagers
 
-pkgname=python-cssutils
-pkgver=0.9.9
+pkgbase=python-cssutils
+pkgname=('python3-cssutils' 'python2-cssutils')
+pkgver=0.9.10
 pkgrel=1
-pkgdesc="A CSS Cascading Style Sheets library for Python"
+pkgdesc="A CSS (Cascading Style Sheets) library for Python"
 arch=('any')
 url="http://code.google.com/p/cssutils/"
 license=('LGPL3')
-conflicts=('python-cssutils-beta')
-provides=('python-cssutils-beta')
-replaces=('python-cssutils-beta')
-depends=('python2')
-makedepends=('python-distribute')
+makedepends=('python3-distribute' 'python2-distribute')
 source=(http://pypi.python.org/packages/source/c/cssutils/cssutils-${pkgver}.zip)
-md5sums=('5f8ea824cc0e0518b574da20e895be08')
+sha512sums=('09f6ab240822aa1c74a30875c49c91282f9c865780b99af0e23950d1dd7b0737c7ddf98b18ecf2eb05ddd6d7261679e26d75aa906a586488c76b997e5178c3ab')
 
 build() {
-  cd "$srcdir/cssutils-$pkgver"
-  python2 setup.py install --root="$pkgdir" --optimize=1
+    cd "${srcdir}"
+    cp -a cssutils-${pkgver} cssutils-python2-${pkgver}
 }
+
+package_python3-cssutils() {
+    depends=('python3')
+
+    cd "${srcdir}/cssutils-$pkgver"
+    python3 setup.py install --root="$pkgdir" --optimize=1
+    
+    # Don't install tests (FS#27567)
+    rm -rf "${pkgdir}/usr/lib/python3.3/site-packages/tests"
+
+    # Use #!/usr/bin/python3 
+    cd "${pkgdir}/usr/lib/python3.3/site-packages/cssutils"
+    find . -maxdepth 2 -mindepth 1 -type f -iname '*.py' -exec sed -i 's/env python/python3/' '{}' \;
+}
+
+package_python2-cssutils() {
+    conflicts=('python-cssutils-beta' 'python-cssutils')
+    provides=('python-cssutils-beta' 'python-cssutils')
+    replaces=('python-cssutils-beta' 'python-cssutils')
+    depends=('python2')
+
+    cd "${srcdir}/cssutils-python2-$pkgver"
+    python2 setup.py install --root="$pkgdir" --optimize=1
+    
+    # Don't install tests (FS#27567)
+    rm -rf "${pkgdir}/usr/lib/python2.7/site-packages/tests"
+
+    # Use #!/usr/bin/python2 
+    sed -i -e "s:#!/usr/bin/env python:#!/usr/bin/env python2:g" \
+             $(find "${pkgdir}" -name '*.py')
+
+    # Avoid a conflict: only keep the Python 3 executables.
+    rm -rf "${pkgdir}/usr/bin"
+}
+
+#check() {
+#  cd "${srcdir}/cssutils-${pkgver}"
+#  # Currently broken..
+##  python3 setup.py test
+##  python2 setup.py test
+#}
