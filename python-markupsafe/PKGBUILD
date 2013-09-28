@@ -1,25 +1,54 @@
-# Moved from CCR - PKGBUILD by Renan Biegelmeyer (RenanBS) <renan.biegel[at]gmail[.dot]com
+#
+# Platform packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Renan Biegelmeyer (RenanBS) <renan.biegel@gmail.com>
+#               Archlinux
 
-
-pkgname=python2-markupsafe
-pkgver=0.15
+pkgbase=python-markupsafe
+pkgname=('python3-markupsafe' 'python2-markupsafe')
+pkgver=0.18
 pkgrel=1
-pkgdesc="Implements a XML/HTML/XHTML Markup safe string for Python"
+pkgdesc="Implements an XML/HTML/XHTML Markup safe string for Python"
 arch=('i686' 'x86_64')
 url="http://pypi.python.org/pypi/MarkupSafe"
 license=('custom')
-depends=('python')
-makedepends=('setuptools')
-replaces=('python-markupsafe')
-provides=('python-markupsafe')
-conflicts=('python-markupsafe')
+makedepends=('python3-distribute' 'python2-distribute')
 source=(http://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-${pkgver}.tar.gz)
-md5sums=('4e7c4d965fe5e033fa2d7bb7746bb186')
+sha512sums=('0438ddf0fdab465c40d9afba8c14ad346be0868df654c11130d05e329992d456a9bc278551970cbd09244a29c77213885d0c363c951b0cfd4d9aa95b248ecff5')
 
-build() 
-{
-  cd ${srcdir}/MarkupSafe-${pkgver}
-  python setup.py install --root=${pkgdir} --optimize=1
+build() {
+  cp -r MarkupSafe-${pkgver} python2-MarkupSafe-${pkgver}
+  cd "${srcdir}/MarkupSafe-${pkgver}"
+  python3 setup.py build
 
-  install -D -m644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  cd "${srcdir}/python2-MarkupSafe-${pkgver}"
+  python2 setup.py build
+}
+
+check() {
+  cd "${srcdir}/MarkupSafe-${pkgver}"
+  python3 setup.py test
+
+  cd "${srcdir}/python2-MarkupSafe-${pkgver}"
+  python2 setup.py test
+}
+
+package_python3-markupsafe() {
+    depends=('python3')
+
+    cd MarkupSafe-${pkgver}
+    python3 setup.py install --root="${pkgdir}" --optimize=1
+    install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
+
+package_python2-markupsafe() {
+    depends=('python2')
+    replaces=('python-markupsafe')
+    provides=('python-markupsafe')
+    conflicts=('python-markupsafe')
+
+    cd python2-MarkupSafe-${pkgver}
+    python2 setup.py install --root="${pkgdir}" --optimize=1
+    install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
