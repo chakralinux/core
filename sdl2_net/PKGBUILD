@@ -1,0 +1,40 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+pkgname=sdl2_net
+pkgver=249
+pkgrel=1
+pkgdesc="A small sample cross-platform networking library (Version 2)"
+arch=('i686' 'x86_64')
+url="http://www.libsdl.org"
+license=('MIT')
+depends=(sdl2)
+makedepends=(mercurial)
+options=(!libtool)
+source=("sdl2_net::hg+http://hg.libsdl.org/SDL_net#revision=$pkgver"
+        "FindSDL2_net.cmake")
+md5sums=('SKIP'
+         '5ae698801dcc637fb25c01fefb53ca5f')
+
+build() {
+  cd "${srcdir}/sdl2_net/"
+  
+  # sdl2_net requires automake 1.13 but it compiles fine with current version (1.11) in [core]
+  sed -i 's/1.13/1.11/g' ./configure
+  
+  ./autogen.sh
+  ./configure --disable-static --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/sdl2_net/"
+  make DESTDIR="${pkgdir}/" install
+  install -Dm644 COPYING.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  
+  # we can remove the following when provided directly by cmake
+  install -Dm644 $srcdir/FindSDL2_net.cmake ${pkgdir}/usr/share/cmake-2.8/Modules/FindSDL2_net.cmake
+}
+
