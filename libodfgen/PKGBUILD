@@ -1,0 +1,24 @@
+# Maintainer: Fabian Kosmale <0inkane@googlemail.com>
+pkgname=libodfgen
+pkgver=0.0.2
+pkgrel=1
+pkgdesc="Library to extract valid data from within an Excel (.xls) spreadsheet."
+arch=('i686' 'x86_64')
+url="https://www.gaia-gis.it/fossil/freexl/index"
+depends=("libwpd" "libwpg")
+makedepends=("boost-libs")
+license=('LGPL 2.1')
+source=(http://prdownloads.sourceforge.net/libwpd/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('8473296c671b6e3dd8197f4145e0854b')
+
+build() {
+    cd "$srcdir/${pkgname}-$pkgver"
+    ./configure --prefix=/usr
+    make
+}
+
+package() {
+    cd "$srcdir/${pkgname}-$pkgver"
+    make DESTDIR="$pkgdir/" install
+}
+
