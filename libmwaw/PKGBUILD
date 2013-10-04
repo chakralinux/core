@@ -1,0 +1,21 @@
+# Maintainer: Fabian Kosmale <inkane@chakra-project.org>
+pkgname=libmwaw
+pkgver=0.1.11
+pkgrel=1
+pkgdesc="Library to extract valid data from within an Excel (.xls) spreadsheet."
+arch=('i686' 'x86_64')
+depends=("libwpd")
+license=('LGPLv2')
+source=(http://downloads.sourceforge.net/libmwaw/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('828dd03510791fbe037081a2b4a1a8ff')
+
+build() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    ./configure --prefix=/usr
+    make
+}
+
+package() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    make DESTDIR="$pkgdir/" install
+}
