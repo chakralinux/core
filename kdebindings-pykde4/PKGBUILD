@@ -6,16 +6,16 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgname=kdebindings-pykde4
+pkgname=("kdebindings-pykde4-common"  "kdebindings-pykde4-python2"  "kdebindings-pykde4-python3")
 _pkgname=pykde4
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 pkgdesc="KDE bindings for python"
 url="http://kde.org/"
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL')
 depends=('pyqt4-python2' 'qscintilla-python2' 'boost-libs' "kdepim-runtime>=${_kdever}")
-makedepends=('cmake' 'automoc4' 'polkit-qt' 'boost')
+makedepends=('cmake' 'automoc4' 'polkit-qt' 'boost' 'python2-sip' 'python3-sip' 'pyqt4-python2' 'pyqt4-python3' 'python-sip-common')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha1sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`)
   
@@ -25,22 +25,67 @@ replaces=('kdebindings-python')
 conflicts=('kdebindings-python')
 options=('docs' '!header' 'debug' 'log')
 
-build() {
+prepare() {
 	cd "${srcdir}" 
-	
-	mkdir -p build && cd build
-	
-	cmake ../pykde4-${pkgver} \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_INSTALL_PREFIX=/usr \
-		-DPYTHON_EXECUTABLE=/usr/bin/python2 
-	make
+	rm -rf build-python2 build-python3
+	mkdir -p build-python2 build-python3
 }
 
-package() {
-	cd "${srcdir}"/build
-	make DESTDIR="${pkgdir}" install
+build() {
+  export PYTHONDONTWRITEBYTECODE="TRUE"
 
-	# Use the python2 executable
-	find "${pkgdir}" -name '*.py' | xargs sed -i 's|#!/usr/bin/env python|#!/usr/bin/env python2|'
+  cd ${srcdir}/build-python2
+  cmake ../pykde4-${pkgver} \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DPYTHON_EXECUTABLE=/usr/bin/python2 \
+    -DPYKDEUIC4_ALTINSTALL=TRUE
+  make
+
+  cd ${srcdir}/build-python3
+  cmake ../pykde4-${pkgver} \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
+    -DPYTHON_LIBRARY=/usr/lib/libpython3.3m.so.1.0 \
+    -DPYKDEUIC4_ALTINSTALL=TRUE
+  make
 }
+
+package_kdebindings-pykde4-python3() {
+  pkgdesc="A set of Python 3.x bindings for KDE"
+  depends=('pyqt4-python3' 'qscintilla-python3' 'boost-libs' "kdepim-runtime>=${_kdever}" "kdebindings-pykde4-common")
+
+  cd "${srcdir}"/build-python3
+  make DESTDIR="${pkgdir}" install
+  
+  # Provided by common
+  rm -r "${pkgdir}"/usr/share/apps/pykde4/examples
+  rm -r "${pkgdir}"/usr/share/sip/PyKDE4
+}
+
+package_kdebindings-pykde4-python2() {
+  pkgdesc="A set of Python 2.x bindings for KDE"
+  depends=('pyqt4-python2' 'qscintilla-python2' 'boost-libs' "kdepim-runtime>=${_kdever}" "kdebindings-pykde4-common")
+  conflicts=('kdebindings-pykde<4.11.2')
+  provides=('kdebindings-pykde=${pgver}')
+  replaces=('kdebindings-pykde')
+ 
+  cd "${srcdir}"/build-python2
+  make DESTDIR="${pkgdir}" install
+
+  # Provided by common
+  rm -r "${pkgdir}"/usr/share/apps/pykde4/examples
+  rm -r "${pkgdir}"/usr/share/sip/PyKDE4
+}
+
+package_kdebindings-pykde4-common() {
+  pkgdesc="Common files shared between python2 and python3 kdebindings-pykde"
+  conflicts=('kdebindings-pykde<4.11.2')
+
+  cd ${srcdir}/build-python2
+  make DESTDIR="${pkgdir}" install
+
+  rm -r "${pkgdir}"/usr/{bin,lib}
+}
+
