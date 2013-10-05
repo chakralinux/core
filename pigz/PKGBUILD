@@ -1,0 +1,28 @@
+# Maintainer: AlmAck
+# Contributor: george <rpubaddr0 {at} gmail [dot] com>
+
+pkgname=pigz
+pkgver=2.3
+pkgrel=1
+pkgdesc='Parallel implementation of the gzip file compressor.'
+arch=('x86_64')
+url='http://www.zlib.net/pigz/'
+license=('GPL')
+depends=('zlib')
+source=("http://www.zlib.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('042e3322534f2c3d761736350cac303f')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  sed -i s/"CFLAGS=".*/"CFLAGS=${CFLAGS}"/g Makefile
+  sed -i 's/$(CC)\(.*\)$/$(CC)\1 -lm/g' Makefile
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  install -Dm755 pigz "${pkgdir}/usr/bin/pigz"
+  ln -s /usr/bin/pigz "${pkgdir}/usr/bin/unpigz"
+  install -Dm644 pigz.1 "${pkgdir}/usr/share/man/man1/pigz.1"
+  install -Dm644 pigz.pdf "${pkgdir}/usr/share/doc/pigz/pigz.pdf"
+}
