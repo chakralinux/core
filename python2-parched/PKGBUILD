@@ -1,0 +1,23 @@
+# Maintainer: Radu Andries <admiral0@tuxfamily.org>
+
+pkgname=python2-parched
+pkgver=20091016
+pkgrel=2
+pkgdesc="A Pacman package and PKGBUILD parser module"
+arch=('any')
+url="http://github.com/sebnow/parched"
+license=('MIT')
+depends=('python2')
+makedpends=('python2-distribute')
+source=("parched-20091016.tar.gz") #TODO
+md5sums=('c3485c9b63a22a734e698b46fb61eef9')
+
+
+build() {
+    cd $srcdir/parched
+        python setup.py build || return 1
+}
+package() {
+    cd $srcdir/parched
+        python setup.py install --root=$pkgdir --optimize=1 || return 1
+}
