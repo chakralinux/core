@@ -5,9 +5,9 @@
 # Contributors: A Boersma (abveritas) <abveritas@chakra-project.org>
 
 pkgbase=sip
-pkgname=('sip-common' 'sip-python2' 'sip-python3')
+pkgname=('python-sip-common' 'python2-sip' 'python3-sip')
 pkgver=4.15.2
-pkgrel=1
+pkgrel=2
 pkgdesc="A tool for creating Python bindings for C and C++ libraries"
 arch=('x86_64')
 url="http://www.riverbankcomputing.com/software/sip/"
@@ -34,34 +34,40 @@ build() {
     make
 }
 
-package_sip-common() {
+package_python-sip-common() {
     pkgdesc=("A tool for creating Python bindings for C and C++ libraries")
     depends=('glibc')
+    conflicts=('sip-common')
+    replaces=('sip-common')
 
     cd ${srcdir}/${pkgbase}-${pkgver}
-    msg "Packaging sip-common"
+    msg "Packaging python-sip-common"
     make DESTDIR=${pkgdir} install -C sipgen
     install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }
 
-package_sip-python3() {
+package_python3-sip() {
     pkgdesc=("Python 3 SIP bindings for C and C++ libraries")
-    depends=('python3' 'sip-common')
+    depends=('python3' 'python-sip-common')
+    conflicts=('sip-python3')
+    replaces=('sip-python3')
 
     cd ${srcdir}/${pkgbase}-${pkgver}
-    msg "Packaging sip-python3"
+    msg "Packaging python3-sip"
     make DESTDIR=${pkgdir} install -C siplib
     install -Dm644 sipconfig.py "${pkgdir}"/usr/lib/python3.3/site-packages/sipconfig.py
     install -Dm644 sipdistutils.py "${pkgdir}"/usr/lib/python3.3/site-packages/sipdistutils.py
     install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
 
-package_sip-python2() {
+package_python2-sip() {
     pkgdesc=("Python 2 SIP bindings for C and C++ libraries")
-    depends=('python2' 'sip-common')
+    depends=('python2' 'python-sip-common')
+    conflicts=('sip-python2')
+    replaces=('sip-python2')
 
     cd ${srcdir}/python2-${pkgbase}-${pkgver}
-    msg "Packaging sip-python2"
+    msg "Packaging python2-sip"
     make DESTDIR=${pkgdir} install -C siplib
     install -Dm644 sipconfig.py "${pkgdir}"/usr/lib/python2.7/site-packages/sipconfig.py
     install -Dm644 sipdistutils.py "${pkgdir}"/usr/lib/python2.7/site-packages/sipdistutils.py
