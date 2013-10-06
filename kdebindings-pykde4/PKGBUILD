@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=("kdebindings-pykde4-common"  "kdebindings-pykde4-python2"  "kdebindings-pykde4-python3")
 _pkgname=pykde4
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=4
 pkgdesc="KDE bindings for python"
 url="http://kde.org/"
 arch=('x86_64')
@@ -67,9 +67,9 @@ package_kdebindings-pykde4-python3() {
 package_kdebindings-pykde4-python2() {
   pkgdesc="A set of Python 2.x bindings for KDE"
   depends=('pyqt4-python2' 'qscintilla-python2' 'boost-libs' "kdepim-runtime>=${_kdever}" "kdebindings-pykde4-common")
-  conflicts=('kdebindings-pykde<4.11.2')
-  provides=('kdebindings-pykde=${pgver}')
-  replaces=('kdebindings-pykde')
+  conflicts=('kdebindings-pykde4<4.11.2')
+  provides=('kdebindings-pykde4=${pgver}')
+  replaces=('kdebindings-pykde4')
  
   cd "${srcdir}"/build-python2
   make DESTDIR="${pkgdir}" install
