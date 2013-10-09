@@ -2,7 +2,7 @@
 
 pkgname=cmake
 pkgver=2.8.10.2
-pkgrel=2
+pkgrel=3
 pkgdesc="A cross-platform open-source make system"
 arch=('x86_64')
 license=('custom')
@@ -10,11 +10,16 @@ url="http://www.cmake.org"
 depends=('curl' 'libarchive>=2.3.1' 'shared-mime-info')
 makedepends=('qt')
 install=${pkgname}.install
-source=("http://www.cmake.org/files/v2.8/${pkgname}-${pkgver}.tar.gz")
-md5sums=('097278785da7182ec0aea8769d06860c')
+source=("http://www.cmake.org/files/v2.8/${pkgname}-${pkgver}.tar.gz"
+        "add_extra_prefix_to_find_paths.patch")
+md5sums=('097278785da7182ec0aea8769d06860c'
+         '1e6575c3c54ecbbbccd64dd94a4192df')
 
 build() {
   cd "${srcdir}"/${pkgname}-${pkgver}
+  
+  # add /extra prefix to find paths
+  patch -Np1 -i ../add_extra_prefix_to_find_paths.patch
 
   ./bootstrap --prefix=/usr \
     --mandir=/share/man \
