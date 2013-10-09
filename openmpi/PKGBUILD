@@ -2,7 +2,7 @@
 
 pkgname=openmpi
 pkgver=1.7.2
-pkgrel=1
+pkgrel=2
 pkgdesc="High performance message passing library (MPI)"
 arch=('i686' 'x86_64')
 url="http://www.open-mpi.org"
@@ -58,6 +58,9 @@ package() {
 
    # Remove dangling symlink
    rm "${pkgdir}"/usr/share/man/man1/orteCC.1
+
+   # TODO: the safety of this is uncertain
+   rm -rf "${pkgdir}"/usr/include/event2
 
    install -d -m 755 "${pkgdir}"/etc/ld.so.conf.d
    echo "/usr/lib/${pkgname}" > "${pkgdir}"/etc/ld.so.conf.d/${pkgname}.conf
