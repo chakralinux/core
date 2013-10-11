@@ -14,7 +14,7 @@
 pkgbase=pyqt
 pkgname=('python-pyqt4-common' 'python2-pyqt4' 'python3-pyqt4')
 pkgver=4.10.3
-pkgrel=4
+pkgrel=5
 pkgdesc="A set of Python bindings for the Qt toolkit"
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
@@ -101,8 +101,8 @@ build() {
 package_python-pyqt4-common() {
     pkgdesc="Parts of PyQt for Qt4 shared between python3-pyqt4 and python2-pyqt4"
     depends=('qt')
-    conflicts=('pyqt-common')
-    replaces=('pyqt-common')
+    conflicts=('pyqt4-common' 'pyqt-common')
+    replaces=('pyqt4-common' 'pyqt-common')
 
     cd ${srcdir}/PyQt-x11-gpl-${pkgver}
     msg "Packaging python-pyqt4-common"
@@ -122,8 +122,8 @@ package_python3-pyqt4() {
                 'python-opengl: enable OpenGL 3D graphics in PyQt applications'
                 'qscintilla-python3: QScintilla API'
                 'qt-assistant-compat: add PyQt online help in Qt Assistant')
-    conflicts=('pyqt')
-    replaces=('pyqt')
+    conflicts=('pyqt4-python3' 'pyqt')
+    replaces=('pyqt4-python3' 'pyqt')
     provides=('pyqt=${pkgver}')
 
     cd "${srcdir}/PyQt-x11-gpl-${pkgver}"
@@ -148,8 +148,8 @@ package_python2-pyqt4() {
                 'python-opengl: enable OpenGL 3D graphics in PyQt applications'
                 'qscintilla-python2: QScintilla API'
                 'qt-assistant-compat: add PyQt online help in Qt Assistant')
-    conflicts=('pyqt-python2')
-    replaces=('pyqt-python2')
+    conflicts=('pyqt4-python2' 'pyqt-python2')
+    replaces=('pyqt4-python2' 'pyqt-python2')
     provides=('pyqt-python2=${pkgver}')
 
     cd "${srcdir}/python2-PyQt-x11-gpl-${pkgver}"
