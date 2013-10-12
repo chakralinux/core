@@ -13,7 +13,7 @@ pkgname=('kdebindings-python-common'
 	 'kdebindings-python2'
          'kdebindings-python3')
 pkgver=${_kdever}
-pkgrel=7
+pkgrel=9
 url="https://projects.kde.org/projects/kde/kdebindings/pykde4"
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL')
@@ -67,7 +67,11 @@ build() {
 
 package_kdebindings-python3() {
   pkgdesc="A set of Python 3.x bindings for KDE"
-  depends=('python3-pyqt4>=4.10.3-5' 'qscintilla-python3' 'boost-libs' "kdepim-runtime>=${_kdever}" "kdebindings-pykde4-common")
+  depends=('python3-pyqt4>=4.10.3-5'
+           'qscintilla-python3'
+           'boost-libs'
+           "kdepim-runtime>=${_kdever}"
+           "kdebindings-python-common")
 
   cd "${srcdir}"/build-python3
   make DESTDIR="${pkgdir}" install
@@ -79,9 +83,13 @@ package_kdebindings-python3() {
 
 package_kdebindings-python2() {
   pkgdesc="A set of Python 2.x bindings for KDE"
-  depends=('python2-pyqt4>=4.10.3-5' 'qscintilla-python2' 'boost-libs' "kdepim-runtime>=${_kdever}" "kdebindings-pykde4-common")
+  depends=('python2-pyqt4>=4.10.3-5'
+           'qscintilla-python2'
+           'boost-libs'
+           "kdepim-runtime>=${_kdever}"
+           "kdebindings-python-common")
   conflicts=('kdebindings-pykde4<4.11.2')
-  provides=('kdebindings-pykde4=${pkgver}')
+  provides=("kdebindings-pykde4=${pkgver}")
   replaces=('kdebindings-pykde4')
  
   cd "${srcdir}"/build-python2
