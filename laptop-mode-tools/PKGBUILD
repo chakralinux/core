@@ -1,17 +1,18 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
 # maintainer abveritas@chakra-project.org
 
 pkgname=laptop-mode-tools
-pkgver=1.61
+pkgver=1.64
 pkgrel=1
 pkgdesc="Laptop mode is a kernel mode that allows you to extend the battery life of your laptop"
-arch=('any')
+arch=('x86_64')
 url="http://www.samwel.tk/laptop_mode/"
 license=('GPL')
-depends=('bash' 'hdparm')
-optdepends=('acpid: for ACPI support')
+depends=('bash')
+optdepends=('acpid: for ACPI support'
+            'hdparm: hard disk power management'
+            'sdparm: SCSI disk power management'
+            'ethtool: ethernet support'
+            'wireless_tools: WiFi support')
 backup=(etc/laptop-mode/conf.d/ac97-powersave.conf
         etc/laptop-mode/conf.d/auto-hibernate.conf
         etc/laptop-mode/conf.d/battery-level-polling.conf
@@ -26,6 +27,9 @@ backup=(etc/laptop-mode/conf.d/ac97-powersave.conf
         etc/laptop-mode/conf.d/intel-hda-powersave.conf
         etc/laptop-mode/conf.d/intel-sata-powermgmt.conf
         etc/laptop-mode/conf.d/lcd-brightness.conf
+        etc/laptop-mode/conf.d/nmi-watchdog.conf
+        etc/laptop-mode/conf.d/pcie-aspm.conf
+        etc/laptop-mode/conf.d/runtime-pm.conf
         etc/laptop-mode/conf.d/sched-mc-power-savings.conf
         etc/laptop-mode/conf.d/sched-smt-power-savings.conf
         etc/laptop-mode/conf.d/start-stop-programs.conf
@@ -37,25 +41,15 @@ backup=(etc/laptop-mode/conf.d/ac97-powersave.conf
         etc/laptop-mode/conf.d/wireless-power.conf
         etc/laptop-mode/laptop-mode.conf
         etc/laptop-mode/lm-profiler.conf)
-source=("http://www.samwel.tk/laptop_mode/tools/downloads/${pkgname}_${pkgver}.tar.gz"
-        laptop-mode laptop-mode-tools.service)
-md5sums=('6685af5dbb34c3d51ca27933b58f484e'
-         'bae8d721e660fe420c9769a6db6856af'
-         '585cc7f8b0961cfcb3fa2c08590f82dd')
+install=laptop-mode.install
+source=("http://www.samwel.tk/laptop_mode/tools/downloads/${pkgname}_${pkgver}.tar.gz")
+md5sums=('d3bc81f0eac6315e5653cd4f8965d844')
 
 build() {
   cd "$srcdir/${pkgname}_$pkgver"
-  sed -i 's@/lib/udev/@@g' etc/rules/99-laptop-mode.rules
-  sed -ri 's@(lib|etc)/udev@usr/lib/udev@g' install.sh
 }
 
 package() {
   cd "$srcdir/${pkgname}_$pkgver"
   make DESTDIR="$pkgdir" INIT_D=none MAN_D=/usr/share/man install
-
-  install -D -m755 "$srcdir/laptop-mode" "$pkgdir/etc/rc.d/laptop-mode"
-  install -D -m644 "$srcdir/laptop-mode-tools.service" \
-                   "$pkgdir/usr/lib/systemd/system/laptop-mode-tools.service"
 }
-
-# vim:set ts=2 sw=2 et:
