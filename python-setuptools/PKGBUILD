@@ -7,7 +7,7 @@
 pkgbase=python-setuptools
 pkgname=('python3-setuptools' 'python2-setuptools')
 pkgver=1.1.6
-pkgrel=1
+pkgrel=2
 pkgdesc="Easily download, build, install, upgrade, and uninstall Python packages"
 arch=('any')
 license=('PSF')
@@ -54,6 +54,7 @@ build() {
 package_python3-setuptools() {
    depends=('python3>=3.3')
    provides=('python3-distribute')
+   conflicts=('python3-distribute')
    replaces=('python3-distribute')
  
    cd "${srcdir}/setuptools-${pkgver}"
@@ -63,6 +64,7 @@ package_python3-setuptools() {
 package_python2-setuptools() {
    depends=('python2>=2.7')
    provides=('python2-distribute')
+   conflicts=('python2-distribute')
    replaces=('python2-distribute')
  
    cd "${srcdir}/setuptools-${pkgver}-python2"
