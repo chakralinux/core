@@ -31,20 +31,24 @@ build() {
 
 check() {
     cd $pkgbase-$pkgver
-    # we need utf locale to valid utf8 tests
+    
+    # UTF8 locale needed for valid UTF8 tests
     export LANG=en_US.UTF-8
+    
     # Disable python3 check
-    #msg2 'python checks'
-    #PYTHONPATH="$PWD/build/python/" python3 test3/alltests.py
-    msg2 'python2 checks'
+    #msg2 'Python 3 checks'
+    #PYTHONPATH="$PWD/build/python3/" python3 test3/alltests.py
+    
+    msg2 'Python 2 checks'
     PYTHONPATH="$PWD/build/python2/" python2 test/alltests.py
 }
 
 package_python3-docutils() {
     depends=('python3')
+    conflicts=('docutils')
 
     cd $pkgbase-$pkgver
-    python setup.py build --build-lib=build/python \
+    python3 setup.py build --build-lib=build/python3 \
         install --root="$pkgdir" --optimize=1
 
     # Symlink without .py
@@ -59,7 +63,8 @@ package_python3-docutils() {
 
 package_python2-docutils() {
     depends=('python2')
-    provides=("docutils=$pkgver")
+    #provides=("docutils=$pkgver")
+    conflicts=('docutils')
     replaces=('docutils')
     install=python2-docutils.install
 
