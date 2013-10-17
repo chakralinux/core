@@ -1,0 +1,73 @@
+#
+# Platform Packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: F Kosmale (Inkane) <inkane@chakra-project.org>
+#               A Boersma (abveritas) <abveritas@chakra-project.org>
+#               J de Groot <jgc@archlinux.org>
+
+pkgbase=dbus-python
+pkgname=("python-dbus-common" "python2-dbus" "python3-dbus" )
+pkgver=1.2.0
+pkgrel=2
+arch=('i686' 'x86_64')
+license=('GPL' 'LGPL')
+url="http://www.freedesktop.org/wiki/Software/DBusBindings"
+makedepends=('pkg-config' 'python2-docutils' 'dbus-glib' 'python2' 'python3')
+options=('!libtool')
+source=(http://dbus.freedesktop.org/releases/${pkgbase}/${pkgbase}-${pkgver}.tar.gz)
+sha512sums=('013b23e08fa1ed43f53a756587fefbc9770f7c51e93510e555acbd77230b7200693419bba9a69680d790bbaf123f4a195afa38b3eee1143da950fee0b5130bce')
+
+build() {
+  cd "${srcdir}"
+  mkdir build_python2 build_python3
+  cd "${srcdir}"/build_python2
+  PYTHON=python2 ../${pkgbase}-${pkgver}/configure --prefix=/usr
+
+  cd "${srcdir}"/build_python3
+  PYTHON=python3 ../${pkgbase}-${pkgver}/configure --prefix=/usr
+  make
+}
+
+package_python-dbus-common() {
+  pkgdesc="D-Bus bindings for Python, shared between versions"
+  conflicts=("dbus-python" 'dbus-python-common')
+  replaces=('dbus-python-common')
+
+  cd "${srcdir}/build_python2"
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/usr/lib/python*  # remove everything specific to a concrete Python version
+}
+
+package_python2-dbus() {
+  pkgdesc=("D-Bus bindings for Python 2")
+  depends=("python-dbus-common" "python2" "dbus-glib" "dbus" "dbus-core")
+  optdepends=('dbus-glib: glib mainloop support')
+  provides=("dbus-python")
+  replaces=("dbus-python" 'dbus-python2')
+  conflicts=("dbus-python=${pkgver}" 'dbus-python2')
+  
+  cd "${srcdir}/build_python2"
+  make DESTDIR="${pkgdir}" install
+
+  # remove everything provided by python-dbus-common
+  rm -rf "${pkgdir}/usr/share"
+  rm -rf "${pkgdir}/usr/include"
+  rm -rf "${pkgdir}/usr/lib/pkgconfig"
+}
+
+package_python3-dbus() {
+  pkgdesc=("D-Bus bindings for Python 3")
+  depends=("python-dbus-common" "python3" "dbus-glib" "dbus" "dbus-core")
+  optdepends=('dbus-glib: glib mainloop support')
+  replaces=('dbus-python3')
+  conflicts=('dbus-python3')
+
+  cd "${srcdir}/build_python3"
+  make DESTDIR="${pkgdir}" install
+
+  # remove everything provided by python-dbus-common
+  rm -rf "${pkgdir}/usr/share"
+  rm -rf "${pkgdir}/usr/include"
+  rm -rf "${pkgdir}/usr/lib/pkgconfig"
+}
