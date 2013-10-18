@@ -14,7 +14,7 @@
 pkgbase=pyqt
 pkgname=('python-pyqt4-common' 'python2-pyqt4' 'python3-pyqt4')
 pkgver=4.10.3
-pkgrel=7
+pkgrel=10
 pkgdesc="A set of Python bindings for the Qt toolkit"
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
@@ -29,7 +29,7 @@ makedepends=('dbus-python2'
              'python2-sip>=4.15' 
              'python3-sip>=4.15')
 source=("http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-${pkgver}/PyQt-x11-gpl-${pkgver}.tar.gz")
-sha1sums=('2866ea9bdb1c30337fb326ca3442c61e3c3e3396')
+sha512sums=('4edd3539e1855bc3358dcba866433e53d4b9444b867c14cc27115cf5a6c123b0af3bb0bae3085f6d71a31f0b6716da40809ac4ffcaaff415673ed7462f1a0420')
 
 build() {
     cp -r ${srcdir}/PyQt-x11-gpl-${pkgver} ${srcdir}/python2-PyQt-x11-gpl-${pkgver}
@@ -132,6 +132,9 @@ package_python3-pyqt4() {
     # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
 
+    #  Fix naming conflict with pyqt4-python2
+    mv "${pkgdir}"/usr/bin/pyuic4{,-3.3}
+
     # Provided by python-pyqt4-common
     rm "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
     rm -r "${pkgdir}"/usr/share/qt
@@ -159,7 +162,10 @@ package_python2-pyqt4() {
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
 
     #  Fix naming conflict with pyqt4-python3
-    mv "${pkgdir}"/usr/bin/{,python2-}pyuic4
+    mv "${pkgdir}"/usr/bin/pyuic4{,-2.7}
+
+    # Default /usr/bin/pyuic4
+    ln -s /usr/bin/pyuic4-2.7 "${pkgdir}"/usr/bin/pyuic4
 
     # Provided by python-pyqt4-common
     rm "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
