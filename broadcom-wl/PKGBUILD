@@ -1,47 +1,45 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
+#maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 _extramodules=extramodules-3.10-CHAKRA
 _kernver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=broadcom-wl
-pkgver=5.100.82.112
-pkgrel=20
+pkgver=6.30.223.141
+pkgrel=1
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('custom')
 depends=('linux')
 makedepends=('linux-headers')
-
-ARCH=x86_64
-source=("http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" #"http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
+arch=x86_64
+source=("http://www.broadcom.com/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz"
+         #"http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" "http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
         'modprobe.d'
         'license.patch'
-        'user-ioctl.patch'
+       # 'user-ioctl.patch'
         'linux-recent.patch')
-sha1sums=('e51da1ca8f7b200f0760eafe321f710e1805d7e0'
-          '89bf92286ede30dd85304c6c4e42e89cfdc0f60a'
-          'ea7b67982ddc0f56fd3becb9914fd4458fe7d373'
-          'a41f11ffc18dbb126176259e02dd93b6ade04a10'
-          'e03eb9f4a85b9c5375dd3ed7f105af5471f19473')
+sha1sums=('3a2453c71a07030f41a8fc613c87badf8452848c'
+          '8f5234da6769784b3331d2fefac4a38b20b5723f'
+          '81c05d48b234d56ad2e18eaee5ce89b79550ef20'
+        #  'a41f11ffc18dbb126176259e02dd93b6ade04a10'
+          '0d59426647fffe5b8c3835c7c6198ee4074ef1db')
 
 backup=('etc/modprobe.d/broadcom-wl.conf')
 install=install
 
 build() {
-	cd "${srcdir}/broadcom-sta-${pkgver}/amd64"
+	cd "${srcdir}"
 
-	patch -p1 -i ${srcdir}/linux-recent.patch
+	patch -p1 -i linux-recent.patch
 	#patch -p1 -i user-ioctl.patch
-	patch -p1 -i ${srcdir}/license.patch
+	patch -p1 -i license.patch
 
 	make -C /lib/modules/"${_kernver}"/build M=`pwd`
 }
 
 package() {
-	cd "${srcdir}/broadcom-sta-${pkgver}/amd64"
+	cd "${srcdir}"
 
 	install -D -m 755 wl.ko "${pkgdir}/lib/modules/${_extramodules}/wl.ko"
 	gzip "${pkgdir}/lib/modules/${_extramodules}/wl.ko"
