@@ -1,7 +1,7 @@
 # Platform Packages for Chakra, part of chakra-project.org
 
 pkgname=pango
-pkgver=1.35.0
+pkgver=1.35.3
 pkgrel=1
 pkgdesc="A library for layout and rendering of text"
 arch=('x86_64')
@@ -12,7 +12,7 @@ options=('!libtool')
 install=pango.install
 source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
 url="http://www.pango.org/"
-sha256sums=('c21f7277b5c088f334748b38f2c3abd6399024d653ab7663f567234acbdc7f92')
+sha256sums=('82c9f0d047714f2aaf0284bbc55c2a76d9d11ee309036c35c7377b0daad6d3bf')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -27,5 +27,5 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  #install -m755 -d "${pkgdir}/etc/pango"
+  install -m755 -d "${pkgdir}/etc/pango"
 }
