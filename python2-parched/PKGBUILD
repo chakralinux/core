@@ -2,22 +2,22 @@
 
 pkgname=python2-parched
 pkgver=20091016
-pkgrel=2
+pkgrel=3
 pkgdesc="A Pacman package and PKGBUILD parser module"
 arch=('any')
 url="http://github.com/sebnow/parched"
 license=('MIT')
 depends=('python2')
 makedpends=('python2-distribute')
-source=("parched-20091016.tar.gz") #TODO
-md5sums=('c3485c9b63a22a734e698b46fb61eef9')
+source=("parched-${pkgver}::https://github.com/sebnow/parched/archive/master.zip")
+md5sums=('328aba1706733ae01f0e67e281430831')
 
 
 build() {
-    cd $srcdir/parched
+    cd $srcdir/parched-master
         python setup.py build || return 1
 }
 package() {
-    cd $srcdir/parched
+    cd $srcdir/parched-master
         python setup.py install --root=$pkgdir --optimize=1 || return 1
 }
