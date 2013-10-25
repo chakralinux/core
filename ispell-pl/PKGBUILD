@@ -1,24 +1,23 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer : Mateusz Krawczuk <willingmagic[at]gmail[dot]com>
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=ispell-pl
-pkgver=20111104
+pkgver=20131025
 pkgrel=1
 pkgdesc="Polish dictionary for ispell"
 url="http://www.sjp.pl/"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL')
 depends=('ispell')
 source=(http://sjp.pl/slownik/ort/sjp-${pkgname}-${pkgver}-src.tar.bz2)
-md5sums=('c84ee2fac608331e686bff5042afcd4f')
+md5sums=('e40f1dbf9411692c7a7c54f6f6e540ca')
 
 build() {
   cd ${srcdir}/sjp-${pkgname}-${pkgver}
   ./build polish.all
+}
+
+package() {
+  cd ${srcdir}/sjp-${pkgname}-${pkgver}
   mkdir -p ${pkgdir}/usr/lib/ispell
   install -Dm 644 polish.aff ${pkgdir}/usr/lib/ispell/  
   install -Dm 644 polish.hash ${pkgdir}/usr/lib/ispell/
