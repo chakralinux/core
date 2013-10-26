@@ -1,45 +1,43 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# Maintainer (x86_64): Daniele Cocca <jmc@chakra-project.org>
-#
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/btrfs-progs
 
 pkgname=btrfs-progs
-pkgver=0.19.20120211
+pkgver=0.19.20131027
 pkgrel=1
 pkgdesc="Btrfs filesystem utilities."
 license=('GPL2')
-arch=('i686' 'x86_64')
-depends=('glibc' 'e2fsprogs')
+arch=('x86_64')
+depends=('glibc' 'e2fsprogs' 'lzo2')
+makedepends=('git')
 url="http://btrfs.wiki.kernel.org/"
-replaces=('btrfs-progs-git')
-conflicts=('btrfs-progs-git')
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-md5sums=("a577661d4ffbc96e615f0d80bb7a3b41")
-
-# create tarball: source PKGBUILD && mksource
-
-mksource() {
-	  rm -vRf ${pkgname}-${pkgver}
-	  git clone git://git.kernel.org/pub/scm/linux/kernel/git/mason/btrfs-progs.git ${pkgname}-${pkgver}
-	  rm -vRf ${pkgname}-${pkgver}/.git
-	  pushd ${pkgname}-${pkgver}
-	  popd
-	  tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}-${pkgver}/*
-	  md5sum ${pkgname}-${pkgver}.tar.xz
-}
+options=(!staticlibs)
+#git commit was chosen from here: http://git.kernel.org/cgit/linux/kernel/git/mason/btrfs-progs.git/
+source=("git://git.kernel.org/pub/scm/linux/kernel/git/mason/${pkgname}.git#commit=d1570a06184ed3748536a67693ef5cfd954d4032"
+        'initcpio-install-btrfs'
+	'initcpio-hook-btrfs')
+md5sums=('SKIP'
+         'c6dca7145b3cd80bee0d2b665d8259e8'
+         '85ff8daca50a5ba3dff3c3e641d38b1e')
 
 build() {
-   cd $srcdir/${pkgname}-${pkgver}
-   make CFLAGS="$CFLAGS" all convert
+   cd $pkgname
+   make CFLAGS="$CFLAGS"
+   make CFLAGS="$CFLAGS" btrfs-select-super
 }
 
 package() {
-   cd $srcdir/${pkgname}-${pkgver}
+   cd $pkgname
+
    make prefix=$pkgdir/usr install
+   install -Dm755 btrfs-select-super $pkgdir/usr/bin
+
    # fix manpage
    mkdir -p $pkgdir/usr/share/
    mv $pkgdir/usr/man $pkgdir/usr/share/man
-   mkdir -p ${pkgdir}/sbin
-   ln -sf /usr/bin/btrfs ${pkgdir}/sbin/btrfs
+
+   # install mkinitcpio hooks
+   install -Dm644 "$srcdir/initcpio-install-btrfs" \
+     "$pkgdir/usr/lib/initcpio/install/btrfs"
+   install -Dm644 "$srcdir/initcpio-hook-btrfs" \
+     "$pkgdir/usr/lib/initcpio/hooks/btrfs"
 }
