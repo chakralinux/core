@@ -5,20 +5,25 @@
 
 pkgname=junit
 pkgver=4.11
-pkgrel=1
+pkgrel=2
 pkgdesc="Automated testing framework for Java"
 arch=('any')
 url="http://www.junit.org/"
 license=('CPL')
 depends=('java-runtime')
 makedepends=('apache-ant')
-source=(https://github.com/junit-team/junit/archive/r${pkgver}.tar.gz)
-md5sums=('bf62095e510f50baf0962af329438647')
+source=(https://github.com/junit-team/junit/archive/r${pkgver}.tar.gz
+        Manifest.txt)
+md5sums=('bf62095e510f50baf0962af329438647'
+         '165500a4fcda0cdd6cff5256301d3702')
 
 build() {
   cd ${srcdir}/${pkgname}-r${pkgver}
 
-  ant dist
+  ant dist -Dversion-status=''
+  
+  # FS#34273
+  jar ufm ${pkgname}${pkgver}/${pkgname}-dep-${pkgver}.jar ${srcdir}/Manifest.txt
 }
 
 check() {
@@ -28,14 +33,13 @@ check() {
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-r${pkgver}/${pkgname}${pkgver}-SNAPSHOT
+  cd ${srcdir}/${pkgname}-r${pkgver}/${pkgname}${pkgver}
 
   install -dm755 ${pkgdir}/usr/share/java/${pkgname}
   install -m644 \
-    ${pkgname}-${pkgver}-SNAPSHOT.jar \
-    ${pkgname}-dep-${pkgver}-SNAPSHOT.jar \
+    ${pkgname}-${pkgver}.jar \
+    ${pkgname}-dep-${pkgver}.jar \
     ${pkgdir}/usr/share/java/${pkgname}
-  ln -s ${pkgname}-${pkgver}-SNAPSHOT.jar ${pkgdir}/usr/share/java/${pkgname}.jar
-  ln -s ${pkgname}-dep-${pkgver}-SNAPSHOT.jar ${pkgdir}/usr/share/java/${pkgname}-dep.jar
+  ln -s ${pkgname}-${pkgver}.jar ${pkgdir}/usr/share/java/${pkgname}.jar
+  ln -s ${pkgname}-dep-${pkgver}.jar ${pkgdir}/usr/share/java/${pkgname}-dep.jar
 }
-
