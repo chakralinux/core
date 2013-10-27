@@ -1,11 +1,8 @@
-#
-# Chakra Packages, part of chakra-project.org
-#
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=junit
 pkgver=4.11
-pkgrel=2
+pkgrel=3
 pkgdesc="Automated testing framework for Java"
 arch=('any')
 url="http://www.junit.org/"
@@ -33,13 +30,7 @@ check() {
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-r${pkgver}/${pkgname}${pkgver}
-
-  install -dm755 ${pkgdir}/usr/share/java/${pkgname}
-  install -m644 \
-    ${pkgname}-${pkgver}.jar \
-    ${pkgname}-dep-${pkgver}.jar \
-    ${pkgdir}/usr/share/java/${pkgname}
+  install -Dm644 ${srcdir}/${pkgname}-r${pkgver}/${pkgname}${pkgver}/${pkgname}-dep-${pkgver}.jar \
+                 ${pkgdir}/usr/share/java/${pkgname}-${pkgver}.jar
   ln -s ${pkgname}-${pkgver}.jar ${pkgdir}/usr/share/java/${pkgname}.jar
-  ln -s ${pkgname}-dep-${pkgver}.jar ${pkgdir}/usr/share/java/${pkgname}-dep.jar
 }
