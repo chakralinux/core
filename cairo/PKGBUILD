@@ -4,7 +4,8 @@
 
 pkgname=cairo
 pkgver=1.12.14
-pkgrel=2
+pkgrel=3
+_ubuntu_diff_version=${pkgver}-0ubuntu1
 pkgdesc="Cairo vector graphics library"
 arch=('x86_64')
 license=('LGPL' 'MPL')
@@ -15,12 +16,19 @@ provides=('cairo-xcb')
 rpelaces=('cairo-xcb')
 options=('!libtool')
 source=("http://cairographics.org/releases/${pkgname}-${pkgver}.tar.xz"
-	"libpng16.patch")
+        "http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_${_ubuntu_diff_version}.debian.tar.gz"
+        "libpng16.patch")
 sha1sums=('9106ab09b2e7b9f90521b18dd4a7e9577eba6c15'
+          'c4c89d212f1e3a131ea4e228562c91a0a632118f'
           'c9911f185637d266ce1d2985bd6fb7d0df3d75b2')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  # apply ubuntu patches
+  for _f in $(cat "$srcdir/debian/patches/series" | grep -v '#') ; do    
+    patch -Np1 -i "$srcdir/debian/patches/$_f"
+  done
 
   patch -p1 < ../libpng16.patch
 }
@@ -29,17 +37,16 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   ./configure --prefix=/usr \
-	--sysconfdir=/etc \
-	--localstatedir=/var \
-	--disable-static \
-	--enable-tee \
-	--enable-gl \
-	--enable-egl \
-	--enable-svg \
-	--enable-ps \
-	--enable-pdf \
-	--enable-gobject
-
+              --sysconfdir=/etc \
+              --localstatedir=/var \
+              --disable-static \
+              --enable-tee \
+              --enable-gl \
+              --enable-egl \
+              --enable-svg \
+              --enable-ps \
+              --enable-pdf \
+              --enable-gobject
   make
 }
 
