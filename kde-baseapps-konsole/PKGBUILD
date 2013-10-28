@@ -9,7 +9,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname=kde-baseapps-konsole
 _pkgname=konsole
 pkgver=${_kdever}
-pkgrel=1
+pkgrel=2
 pkgdesc="KDE Terminal"
 url='http://kde.org/applications/system/konsole/'
 screenshot="http://userbase.kde.org/images.userbase/6/64/Konsole-KDE4.png"
@@ -25,9 +25,9 @@ categories=('system')
 options=('docs' '!splithdr' 'splitdbg' 'log')
 
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz"
-	"Shell_new.diff")
+        "Shell_new.diff")
 md5sums=(`grep ${_pkgname}-$_kdever.tar.xz ../kde-sc.md5 | cut -d" " -f1`
-	 '56a4c03c72b14ffab92dd38f0e9e4a08')
+         '5d99cb37702c442ee9c9beaeaa733de0')
 
 build() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
@@ -36,13 +36,12 @@ build() {
 
 	msg "starting build ..."
 	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' 
+            -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+            -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' 
 	make
 }
 
 package() {
 	cd ${srcdir}/${_pkgname}-${pkgver}
 	make DESTDIR="${pkgdir}" install
-
 }
