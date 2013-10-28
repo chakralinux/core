@@ -2,8 +2,8 @@
 # contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/ocaml/
 
 pkgname=ocaml	
-pkgver=4.00.1
-_pkgver=4.00
+pkgver=4.01.0
+_pkgver=4.01
 pkgrel=1
 pkgdesc="A functional language with OO extensions"
 arch=('x86_64')
@@ -12,19 +12,13 @@ url="http://caml.inria.fr/"
 depends=('gdbm')
 makedepends=('tk' 'ncurses' 'libx11')
 optdepends=('ncurses: advanced ncurses features' 'tk: advanced tk features')
-source=("http://caml.inria.fr/distrib/ocaml-${_pkgver}/$pkgname-$pkgver.tar.gz"
-        'tk8.6-build.patch')
+source=("http://caml.inria.fr/distrib/ocaml-${_pkgver}/$pkgname-$pkgver.tar.gz")
 options=('!makeflags' '!emptydirs')
-md5sums=('91124a8eb12a57f1e56c02fe3db0f9e7'
-         '46185b558c93471b19fd0c6753f90377')
-
+md5sums=('04dfdd7da189462a4f10ec6530359cef')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  # fix https://bugs.archlinux.org/task/33302
-  patch -Np2 -i ../tk8.6-build.patch
-  
-  ./configure -prefix /usr 
+  ./configure -prefix /usr -x11include
   make world.opt 
 }
 
