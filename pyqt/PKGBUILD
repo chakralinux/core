@@ -12,9 +12,9 @@
 # NOTE: PyQt5 supports Qt v5. PyQt4 supports Qt v4 and will build against Qt v5.
 
 pkgbase=pyqt
-pkgname=('pyqt4-common' 'pyqt4-python2' 'pyqt4-python3')
+pkgname=('python-pyqt4-common' 'python2-pyqt4' 'python3-pyqt4')
 pkgver=4.10.3
-pkgrel=4
+pkgrel=7
 pkgdesc="A set of Python bindings for the Qt toolkit"
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
@@ -98,24 +98,23 @@ build() {
     make
 }
 
-package_pyqt4-common() {
-    pkgdesc="Parts of PyQt for Qt4 shared between pyqt4-python3 and pyqt4-python2"
+package_python-pyqt4-common() {
+    pkgdesc="Parts of PyQt for Qt4 shared between python3-pyqt4 and python2-pyqt4"
     depends=('qt')
-    provides=('pyqt-common=$pkgver')
-    conflicts=('pyqt-common<${pkgver}')
-    replaces=('pyqt-common<${pkgver}')
+    conflicts=('pyqt4-common' 'pyqt-common')
+    replaces=('pyqt4-common' 'pyqt-common')
 
     cd ${srcdir}/PyQt-x11-gpl-${pkgver}
-    msg "Packaging pyqt4-common"
+    msg "Packaging python-pyqt4-common"
     make -C pyrcc DESTDIR="${pkgdir}" install
     make -C pylupdate DESTDIR="${pkgdir}" install
     install -Dm644 PyQt4.api "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
 }
 
-package_pyqt4-python3() {
+package_python3-pyqt4() {
     pkgdesc="A set of Python 3 bindings for the Qt toolkit"
     depends=('dbus-python3'
-             'pyqt4-common'
+             'python-pyqt4-common'
              'python3'
              'qtwebkit'
              'python3-sip>=4.15')
@@ -123,24 +122,25 @@ package_pyqt4-python3() {
                 'python-opengl: enable OpenGL 3D graphics in PyQt applications'
                 'qscintilla-python3: QScintilla API'
                 'qt-assistant-compat: add PyQt online help in Qt Assistant')
-    conflicts=('pyqt<${pkgver}')
-    replaces=('pyqt<${pkgver}')
+    conflicts=('pyqt4-python3' 'pyqt')
+    replaces=('pyqt4-python3' 'pyqt')
+    provides=("pyqt=${pkgver}")
 
     cd "${srcdir}/PyQt-x11-gpl-${pkgver}"
-    msg "Packaging pyqt4-python3"
+    msg "Packaging python3-pyqt4"
 
     # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
 
-    # Provided by pyqt-common
+    # Provided by python-pyqt4-common
     rm "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
     rm -r "${pkgdir}"/usr/share/qt
 }
 
-package_pyqt4-python2() {
+package_python2-pyqt4() {
     pkgdesc="A set of Python 2 bindings for the Qt toolkit"
     depends=('dbus-python2'
-             'pyqt4-common'
+             'python-pyqt4-common'
              'python2'
              'qtwebkit'
              'python2-sip>=4.15')
@@ -148,9 +148,9 @@ package_pyqt4-python2() {
                 'python-opengl: enable OpenGL 3D graphics in PyQt applications'
                 'qscintilla-python2: QScintilla API'
                 'qt-assistant-compat: add PyQt online help in Qt Assistant')
-    provides=('pyqt-python2=$pkgver' 'pyqt')
-    conflicts=('pyqt-python2<${pkgver}')
-    replaces=('pyqt-python2<${pkgver}')
+    conflicts=('pyqt4-python2' 'pyqt-python2')
+    replaces=('pyqt4-python2' 'pyqt-python2')
+    provides=("pyqt4-python2=${pkgver}")
 
     cd "${srcdir}/python2-PyQt-x11-gpl-${pkgver}"
     msg "Packaging pyqt4-python2"
@@ -161,10 +161,10 @@ package_pyqt4-python2() {
     #  Fix naming conflict with pyqt4-python3
     mv "${pkgdir}"/usr/bin/{,python2-}pyuic4
 
-    # Provided by pyqt4-common
+    # Provided by python-pyqt4-common
     rm "${pkgdir}"/usr/bin/{pylupdate4,pyrcc4}
     rm -r "${pkgdir}"/usr/share/qt
 
-    # Provided by pyqt4-python3
+    # Provided by python3-pyqt4
     rm -r "${pkgdir}"/usr/lib/qt
 }

@@ -1,0 +1,8 @@
+post_install() {
+        echo "Adding kinky group"
+        getent group kinky > /dev/null || groupadd -f -g 135 -r kinky
+}
+
+post_remove() {
+        groupdel kinky
+}

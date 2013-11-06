@@ -1,25 +1,30 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Andrei Nistor <coder[dot]tux[at]ceata[dot]org>
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=facile
 pkgver=1.1
-pkgrel=13
+pkgrel=14
 pkgdesc="A Functional Constraint Library"
-arch=(i686 x86_64)
+arch=('x86_64')
 url="http://www.recherche.enac.fr/opti/facile/"
 license="LGPL"
 makedepends=('ocaml')
 depends=()
-source=(http://www.recherche.enac.fr/opti/facile/distrib/$pkgname-$pkgver.tar.gz)
-md5sums=('ab673e1fc0859a42bcb639a02c2d7e9e')
+source=("http://www.recherche.enac.fr/opti/facile/distrib/$pkgname-$pkgver.tar.gz"
+        'ocaml4-fix.patch')
+md5sums=('ab673e1fc0859a42bcb639a02c2d7e9e'
+         '85fe830895f2059bbbf88895c98877f8')
 
 build() {
   cd ${srcdir}/$pkgname-$pkgver
+  #fix ocaml4 issues when compiling kdeedu-kalzium: https://groups.google.com/forum/#!topic/chakra-devel/hf582tdtVuA
+  patch -Np1 -i ../ocaml4-fix.patch
+  
   ./configure
-  make || return 1
+  make
+}
+
+package() {
+  cd ${srcdir}/$pkgname-$pkgver
   mkdir -p ${pkgdir}/usr/lib/ocaml/facile
   cd src
   install -D -m 644 facile.cmxa facile.cmi facile.cma facile.a ${pkgdir}/usr/lib/ocaml/facile

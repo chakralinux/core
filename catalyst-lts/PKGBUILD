@@ -1,31 +1,40 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
 
-_kernver="3.0.62-1-lts"
+_kernver="3.2.51-1-lts"
 
 pkgname=catalyst-lts
-pkgver=13.1
-pkgrel=2
-_amdver=9.01
+pkgver=13.4
+pkgrel=1
+_amdver=12.104
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
 arch=('x86_64')
 url="http://www.ati.amd.com"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 license=('custom')
-depends=('linux-lts>=3.0' 'linux-lts<3.3' 'catalyst-utils')
+depends=('linux-lts>=3.2' 'linux-lts<3.4' 'catalyst-utils')
 makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-lts-headers')
 conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd')
 install=catalyst.install
 
-source=(http://www2.ati.com/drivers/linux/amd-driver-installer-catalyst-${pkgver}-linux-x86.x86_64.zip
+source=(http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-x86.x86_64.zip
         ati_make.sh
-        makefile_compat.patch)
+        makefile_compat.patch
+        kolasa_fglrx_fixing_ttys.patch
+        lano1106_fglrx_intel_iommu.patch
+        lano1106_kcl_agp_13_4.patch
+        switchlibglx
+        switchlibGL)
 
-md5sums=('b5d9de9b000448dcc2a9eb74a889116d'
+md5sums=('558bd1b31173b06b25da647a7112e734'
          '660396540b0ceaff71d6155c986734de'
-         '3e1b82bd69774ea808da69c983d6a43b')
+         '3e1b82bd69774ea808da69c983d6a43b'
+         '5f28dfc4c9fdb0fbfed69c8cb38659dd'
+         '5184b94a2a40216a67996999481dd9ee'
+         'c5156eddf81c8a1719b160d05a2e8d67'
+         '99032d919ede27884b5c3e87ab110a96'
+         '99032d919ede27884b5c3e87ab110a96')
 
 build() {
 
@@ -36,10 +45,10 @@ build() {
 
 
     msg "Unpacking archive ..."
-    /bin/sh ./amd-driver-installer-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
-
-	BUILDARCH=x86_64
-	_archdir=x86_64
+    /bin/sh ./amd-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
+    
+    BUILDARCH=x86_64
+    _archdir=x86_64
 
     cd "${srcdir}/archive_files/"
 
@@ -47,18 +56,21 @@ build() {
     msg "Applying patch(es) ..."
     # makefile patch to choose arch_compat_alloc_user_space or older compat_alloc_user_space
     # works only in combination with ati_make.sh script
-    patch -p1 -i ../makefile_compat.patch || return 1
+    patch -p1 -i ../makefile_compat.patch
+    patch -Np1 -i ../kolasa_fglrx_fixing_ttys.patch
+    patch -Np1 -i ../lano1106_fglrx_intel_iommu.patch
+    patch -Np1 -i ../lano1106_kcl_agp_13_4.patch
 
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
-    cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a" . || return 1
-    cp 2.6.x/Makefile . || return 1
+    cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a" .
+    cp 2.6.x/Makefile .
 
 
     msg "Compiling fglrx module ..."
     # Compile module using _ati_check variables
     make -C /lib/modules/${_kernver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} \
     MODFLAGS="-DMODULE -DATI -DFGL -DPAGE_ATTR_FIX=$PAGE_ATTR_FIX -DCOMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE $def_smp $def_modversions" \
-    PAGE_ATTR_FIX=$PAGE_ATTR_FIX COMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE modules || return 1
+    PAGE_ATTR_FIX=$PAGE_ATTR_FIX COMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE modules
 }
 
 package() {
@@ -79,14 +91,19 @@ package() {
 
 
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
-    install -m755 -d "${pkgdir}/lib/modules/${_destidir}/" || return 1
-    install -m644 fglrx.ko "${pkgdir}/lib/modules/${_destidir}/" || return 1
+    install -m755 -d "${pkgdir}/lib/modules/${_destidir}/"
+    install -m644 fglrx.ko "${pkgdir}/lib/modules/${_destidir}/"
     find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
     sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/catalyst.install
 
     # License
     install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-    install -m644 "${srcdir}/archive_files/LICENSE.TXT" "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+    install -m644 "${srcdir}/archive_files/LICENSE.TXT" "${pkgdir}/usr/share/licenses/${pkgname}/"
+            
+    # Switcheroo files
+    install -m755 -d "${pkgdir}/usr/lib/fglrx"
+    install -m644 "${srcdir}/switchlibglx" "${pkgdir}/usr/lib/fglrx/"
+    install -m644 "${srcdir}/switchlibGL" "${pkgdir}/usr/lib/fglrx/"
 
     sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/*.install
 }

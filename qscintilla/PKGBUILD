@@ -1,17 +1,24 @@
-# maintainer abveritas[at]chakra-project[dot]org>
+#
+# Platform Packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer: H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: A Boersma (abveritas) <abveritas@chakra-project.org>
 
 pkgbase=qscintilla
-pkgname=("qscintilla" "qscintilla-python2" "qscintilla-python3" "qscintilla-python-common")
-pkgver=2.7.1
-pkgrel=2
+pkgname=('qscintilla'
+         'qscintilla-python2'
+         'qscintilla-python3'
+         'qscintilla-python-common')
+pkgver=2.7.2
+pkgrel=1
 license=('GPL')
 arch=('x86_64')
 url="http://www.riverbankcomputing.co.uk/software/qscintilla/intro"
-makedepends=("pyqt4-python2" "pyqt4-python3" "chrpath" "sip-python2" "sip-python3")
+makedepends=("python2-pyqt4" "python3-pyqt4" "chrpath" "python2-sip" "python3-sip")
 source=("http://downloads.sourceforge.net/pyqt/QScintilla-gpl-${pkgver}.tar.gz"
         "configure.py-objdir-support.diff")
-md5sums=('da8939b5679a075e30c6632e54dc5abf'
-         'f80fe4b5d979fc9d0c7c54d156647aa9')
+sha512sums=('d3ca9d75687687210ca6ae3599fd44bfbbad8c99d6d38aaf1c92c83250dc0c5af1c713bdd74d077d0fb9ba1eccbd5e2910eef855d3656392c33c4832d46ff7fb'
+            'e0a7d3348a25200ee40b2e08333e898da1a796d20ac0215c32be23faf84d74dbba3d2893c2b621cdf6508923697db561d22ed6f870769463df46e228c419c6dd')
 
 build() {
     cd $srcdir/QScintilla-gpl-$pkgver
@@ -67,7 +74,7 @@ package_qscintilla-python2() {
     conflicts=('python-qscintilla')
     replaces=('python-qscintilla')
     provides=("python-qscintilla=${pkgver}")
-    depends=('qscintilla' 'qscintilla-python-common' 'pyqt4-python2')
+    depends=('qscintilla' 'qscintilla-python-common' 'python2-pyqt4')
 
    cd "${srcdir}/QScintilla-gpl-${pkgver}/Python"
    install -Dm755 Qsci.so \
@@ -76,7 +83,7 @@ package_qscintilla-python2() {
 
 package_qscintilla-python3() {
     pkgdesc="Python bindings for QScintilla2 (for Python 3)"
-    depends=('qscintilla' 'qscintilla-python-common' 'pyqt4-python3')
+    depends=('qscintilla' 'qscintilla-python-common' 'python3-pyqt4')
 
    cd "${srcdir}/QScintilla-gpl-${pkgver}/Python3"
    install -Dm755 Qsci.so \

@@ -1,4 +1,5 @@
-EXTRAMODULES='extramodules-3.9-CHAKRA'
+kerver="$(pacman -Q linux | awk '{print $2}' | cut -d - -f1 | cut -d . -f1,2)"
+EXTRAMODULES="extramodules-${kerver}-CHAKRA"
 
 post_install() {
   systemd-tmpfiles --create lirc.conf

@@ -6,7 +6,8 @@
 
 pkgname=libxft
 pkgver=2.2.0
-pkgrel=1
+_ubuntu_diff_version=${pkgver}-3ubuntu2
+pkgrel=3
 pkgdesc="FreeType-based font drawing library for X"
 arch=('i686' 'x86_64')
 license=('custom')
@@ -14,15 +15,32 @@ url="http://xorg.freedesktop.org/"
 depends=('fontconfig' 'libxrender')
 makedepends=('pkgconfig')
 options=('!libtool')
-source=(${url}/releases/individual/lib/libXft-${pkgver}.tar.bz2)
-sha1sums=('ed29784259f4e26df78141035560ae8a7c62e83f')
+provides=('libxft-ubuntu')
+conflicts=('libxft-ubuntu')
+replaces=('libxft-ubuntu')
+source=(${url}/releases/individual/lib/libXft-${pkgver}.tar.bz2
+        "http://archive.ubuntu.com/ubuntu/pool/main/x/xft/xft_${_ubuntu_diff_version}.diff.gz")
+sha1sums=('ed29784259f4e26df78141035560ae8a7c62e83f'
+          '8fc08b46e8221a58a2b307023cdba69f310d33f0')
 
 build() {
   cd "${srcdir}/libXft-${pkgver}"
-  ./configure --prefix=/usr --sysconfdir=/etc --disable-static
+
+  # apply ubuntu patches
+  patch -Np1 -i ../xft_${_ubuntu_diff_version}.diff
+  for _f in $(cat "$srcdir/libXft-${pkgver}/debian/patches/series" | grep -v '#') ; do    
+    patch -Np1 -i "$srcdir/libXft-${pkgver}/debian/patches/$_f"
+  done
+  
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --disable-static
   make
+}
+
+package() {
+  cd "${srcdir}/libXft-${pkgver}"
   make DESTDIR="${pkgdir}" install
   install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
-
 }

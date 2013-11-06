@@ -4,29 +4,29 @@
 # maintainer abveritas@chakra-project.org
 
 # Find the kernel name inside the chroot
-_extramodules=extramodules-3.0-lts
-_kver="$(cat /lib/modules/${_extramodules}/version)"
+_extramodules=extramodules-3.2-CHAKRA-LTS
+_kver="3.2.51-1-lts"
 
 pkgname=madwifi-lts
-pkgver=0.9.4.4173
-_ver=0.9.4-r4173-20111008
+pkgver=0.9.4.4181
+_ver=r4181-20130909
 pkgrel=7
 pkgdesc="Madwifi drivers for Atheros wireless chipsets"
 arch=('x86_64')
 license=('GPL')
 url="http://madwifi-project.org"
-depends=('madwifi-utils' 'linux-lts>=3.0' 'linux-lts<3.1')
+depends=('madwifi-utils' 'linux-lts>=3.2' 'linux-lts<3.4')
 makedepends=('linux-lts-headers' 'sharutils')
 install=madwifi-ng.install
 # subversion source: svn checkout http:/madwifi-project.org/svn/madwifi/trunk madwifi
-source=(http://chakra-linux.org/sources/madwifi/madwifi-${pkgver}.tar.gz)
+source=(http://snapshots.madwifi-project.org/madwifi-trunk-current.tar.gz)
 	#http://downloads.sourceforge.net/madwifi/madwifi-${pkgver}.tar.gz)
-md5sums=('18cd1c574e0fa66eb4396f92f0700a7e')
+md5sums=('6505f0a18a3115915daf4dba9ddba4fc')
 groups=("linux-lts-modules")
 
 build()
 {
-  cd madwifi-$_ver
+  cd madwifi-trunk-$_ver
 
   # kernel 3.2 abi change
   sed -i -e "s/.ndo_set_multicast_list/.ndo_set_rx_mode/" ath/if_ath.c
@@ -40,7 +40,7 @@ build()
 
 package()
 {
-  cd madwifi-$_ver
+  cd madwifi-trunk-$_ver
   make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules \
        DESTDIR="${pkgdir}" KERNELRELEASE=${_kver} install-modules
   sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" ${startdir}/*.install
