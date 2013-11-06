@@ -5,20 +5,19 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=openexr
-pkgver=1.7.0
+pkgver=2.0.1
 pkgrel=1
 depends=('zlib' 'ilmbase')
 pkgdesc="openexr library for EXR images"
 arch=(i686 x86_64)
 options=('!libtool')
 license=('custom')
-source=("http://download.savannah.nongnu.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz" 'gcc43.patch')
+source=("http://download.savannah.nongnu.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('4387e6050d2faa65dd5215618ff2ddce')
 url="http://www.openexr.org"
-md5sums=('27113284f7d26a58f853c346e0851d7a' 'd91fae759053a70bcedcf02eb33ca4a2')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -p0 -i ${srcdir}/gcc43.patch
   ./configure --prefix=/usr
   make
 }
@@ -28,3 +27,4 @@ package() {
   make DESTDIR="${pkgdir}" install
   install -D -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
+
