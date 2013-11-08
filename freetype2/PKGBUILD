@@ -4,7 +4,8 @@
 
 pkgname=freetype2
 pkgver=2.4.11
-pkgrel=1
+pkgrel=3
+_ubuntu_diff_version=${pkgver}-0ubuntu1
 pkgdesc="TrueType font rendering library"
 arch=('x86_64')
 license=('GPL')
@@ -12,17 +13,23 @@ url="http://freetype.sourceforge.net"
 depends=('zlib' 'sh' 'bzip2')
 options=('!libtool')
 source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2"
-        'freetype-2.3.0-enable-spr.patch'
-        'freetype-2.2.1-enable-valid.patch')
+        "http://archive.ubuntu.com/ubuntu/pool/main/f/freetype/freetype_${_ubuntu_diff_version}.diff.gz")
+
 md5sums=('b93435488942486c8d0ca22e8f768034'
-         '816dc8619a6904a7385769433c0a8653'
-         '214119610444c9b02766ccee5e220680')
+         'd31b655036ff49d814fdad1ca981edf9')
+provides=('freetype2-ubuntu')
+conflicts=('freetype2-ubuntu')
+replaces=('freetype2-ubuntu')
 
 build() {
   cd "${srcdir}/freetype-${pkgver}"
-
-  patch -p1 -i "${srcdir}/freetype-2.3.0-enable-spr.patch"
-  patch -p1 -i "${srcdir}/freetype-2.2.1-enable-valid.patch"
+  
+  # apply ubuntu patches
+  patch -Np1 -i ../freetype_${_ubuntu_diff_version}.diff
+  patch -p0 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/freetype-2.1.7-backwards.compat.patch"
+  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/enable-subpixel-rendering.patch"
+  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/enable-gxvalid-otvalid.patch"
+  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/revert_scalable_fonts_metric.patch"
 
   ./configure --prefix=/usr
   make
