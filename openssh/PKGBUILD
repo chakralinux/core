@@ -6,7 +6,7 @@
 
 pkgname=openssh
 pkgver=6.2p2
-pkgrel=1
+pkgrel=2
 pkgdesc='Free version of the SSH connectivity tools'
 arch=('x86_64')
 license=('custom:BSD')
@@ -19,14 +19,23 @@ source=("ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${pkgname}-${pkgver}
 	'sshdgenkeys.service'
 	'sshd.service'
 	'sshd@.service'
-	'sshd.socket')
+	'sshd.socket'
+	'mem_corrupt.patch'
+)
 md5sums=('be46174dcbb77ebb4ea88ef140685de1'
          'e2cea70ac13af7e63d40eb04415eacd5'
          '2fd20d311d2afbfc6e576883224d8c97'
          'bc3e6736086598ebb648c4d960c59d44'
          '4bbc5818d93a2ad336d7191ed35c69f7'
          'fdc4a47b4b8d0f0e2c395c9edcee8c14'
-         '76f52c66fb3193f301fe0a666e047ab1')
+         '76f52c66fb3193f301fe0a666e047ab1'
+         'e83b3676ea1279cae35a6c78084bfb0d')
+
+prepare() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	# see http://www.openssh.com/txt/gcmrekey.adv
+	patch -Np0 < ${srcdir}/mem_corrupt.patch
+}
 
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
