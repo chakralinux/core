@@ -1,30 +1,44 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer : abveritas[at]chakra-project[dog]org>
-# maintainer : Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Phil Miller <philm@chakra-project.org>
+#               Manuel Tortosa <manutortosa@chakra-project.org>
+#               Angel Velasquez <angvp@archlinux.org> 
+#               Aaron Griffin <aaron@archlinux.org>
+#               Daniel J Griffiths <ghost1227@archlinux.us>
+#               A Boersma <abveritas@chakra-project.org>
 
-pkgname=python-pysqlite
+pkgname=python2-pysqlite
 pkgver=2.6.3
-pkgrel=2
+pkgrel=3
 pkgdesc="A Python DB-API 2.0 interface for the SQLite embedded relational database engine"
 license=('custom')
 arch=('i686' 'x86_64')
 url="http://code.google.com/p/pysqlite/"
 depends=('python2' 'sqlite3')
 replaces=('pysqlite2')
-source=(http://pysqlite.googlecode.com/files/pysqlite-${pkgver}.tar.gz \
-        setup.cfg)
-md5sums=('711afa1062a1d2c4a67acdf02a33d86e'
-	 '86dd356c65afd14a22f2f8f64a26441e')
+source=("https://pypi.python.org/packages/source/p/pysqlite/pysqlite-$pkgver.tar.gz" \
+        "setup.cfg")
+sha512sums=('1b8ce3b5300c1d8568ef59d4967ccd06c5e80ea45c2ffdb9d6744712f12b0b2649ade646f926562bf59b660d6d56bfc478780f22577c96cb758f1de7259570a2'
+            '4c765bacbc722390b76e0550da5938c7d531ede107074389b388b7033f49ca24a79c7a9f6fb1a417331040779063d9a7d75e306187f8614e4359661823df212f')
+
+check() {
+    cd "${srcdir}"/pysqlite-${pkgver}/build/lib.*/
+    python2 -c "from pysqlite2 import test; test.test()"
+}
+
 build() {
-	cd ${srcdir}/pysqlite-${pkgver}
-	cp ${srcdir}/setup.cfg .
-	python2 setup.py install --root=${pkgdir}
+    cd "${srcdir}/pysqlite-${pkgver}"
+    cp "${srcdir}/setup.cfg" .
+    #python2 setup.py install --prefix="/usr" --root="${pkgdir}" --optimize=1
+    python2 setup.py build
 }
 
 package() {
-	cd ${srcdir}/pysqlite-${pkgver}
-	install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
-	rm -r ${pkgdir}/usr/pysqlite2-doc
+    cd "${srcdir}/pysqlite-${pkgver}"
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    rm -r "${pkgdir}/usr/pysqlite2-doc"
+
+    sed -i -e "s|#![ ]*/usr/bin/python$|#!/usr/bin/python2|" \
+           -e "s|#![ ]*/usr/bin/env python$|#!/usr/bin/env python2|" \
+           -e "s|#![ ]*/bin/env python$|#!/usr/bin/env python2|" \
+               $(find ${pkgdir} -name '*.py')
 }
