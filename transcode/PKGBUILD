@@ -1,32 +1,58 @@
-# Maintainer: abveritas@chakra-project.org
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/transcode
 
 pkgname=transcode
 _sripver=0.3-4
 pkgver=1.1.7
-pkgrel=12
+pkgrel=13
 pkgdesc="A video/DVD ripper and encoder for the terminal/console"
 arch=('x86_64')
 url="http://tcforge.berlios.de/"
 license=('GPL')
 depends=('gawk' 'imagemagick' 'lzo2' 'libdvdread' 'ffmpeg' 'mjpegtools'
-	 'libmpeg2' 'libxaw' 'libxml2' 'libxv' 'a52dec')
+	 'libmpeg2' 'libxaw' 'libxml2' 'libxv' 'a52dec' 'faac')
 makedepends=('nasm')
 options=('!libtool')
 source=("https://bitbucket.org/france/transcode-tcforge/downloads/${pkgname}-${pkgver}.tar.bz2"
 	"http://downloads.sourceforge.net/sourceforge/subtitleripper/subtitleripper-${_sripver}.tgz"
         'subtitleripper-0.3.4-linkingorder.patch' 'subtitleripper-0.3.4-respect-ldflags.patch'
-        'ffmpeg-0.11.patch')
-sha1sums=('e35df68b960eb56ef0a59a4cdbed1491be56aee6'
-          'd93ff3578dd5f722c8f4ef16bc0903eec5781a0d'
-          'fa05aa1770d9350d90b7cf315aa7c4a1fd921ac7'
-          '591943a33235342a66c3df0625a164a1479c09ae'
-          '3d2dcdc23f14938e87d14cfc03000bb3b649b85e')
+        'ffmpeg-0.11.patch' 'ffmpeg.patch' 'ffmpeg2.patch' 'ffmpeg-0.10.patch' 'libav-9.patch' 'preset-free.patch' 'preset-force.patch' 'srip-linkingorder.patch' 'srip-respectldflags.patch')
+md5sums=('9bb25a796a8591fb764de46ee87ce505'
+         'c0bd49a88f667c68c4430ad25bbed510'
+         'a8d4d78e3311f576c7da27f2657358fd'
+         'f9b367044568d0ef4612770969c93e14'
+         'ab9ed9edd6c47f7a155a42a8f9b2ff7e'
+         'c1539fd2b204b3f4034a2e73bad7f8ed'
+         '951bff4b2dda3c8a5caf24e63c70c1aa'
+         '40cfd003ed6b7f38238fa6bb28619b94'
+         '8bf570239d9aad287f3254d350e1f98a'
+         '5fd43f03549c97651dcc38a6f504de1e'
+         '8b12ee0b580b1cc0701230d00c4d5553'
+         '26d0abf7d62f437d2266ff522acbf1bb'
+         '99e1cebdfe7b983989a29a90c3452b8b')
 
-build() {
+prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
+  patch -p0 -i "${srcdir}/ffmpeg.patch"
+  patch -p0 -i "${srcdir}/ffmpeg-0.10.patch"
   patch -p1 -i "${srcdir}/ffmpeg-0.11.patch"
+  patch -p1 -i "${srcdir}/preset-free.patch"
+  patch -p0 -i "${srcdir}/libav-9.patch"
+  patch -p1 -i "${srcdir}/preset-force.patch"
+  patch -p1 -i "${srcdir}/ffmpeg2.patch"
   
+  cd ../subtitleripper
+  patch -p1 -i "${srcdir}/srip-linkingorder.patch"
+  patch -p1 -i "${srcdir}/srip-respectldflags.patch"
+  sed -e 's|^\(.*lppm.*\)$|#\1|' \
+      -e 's|^\(.*D_HAVE_LIB_PPM.*\)$|#\1|' \
+      -e 's/DEFINES :=/DEFINES = -DHAVE_GETLINE/' \
+      -i Makefile
+}
+
+build() {
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr \
     --disable-sse --disable-sse2 --disable-altivec --enable-mmx \
     --enable-lame --enable-ogg --enable-vorbis --enable-theora \
@@ -36,13 +62,7 @@ build() {
     --enable-xvid --enable-x264 --enable-alsa --enable-libmpeg2 --enable-libmpeg2convert
   make
 
-  cd "${srcdir}/subtitleripper"
-  patch -p1 -i "${srcdir}/subtitleripper-0.3.4-linkingorder.patch"
-  patch -p1 -i "${srcdir}/subtitleripper-0.3.4-respect-ldflags.patch"
-  sed -e 's|^\(.*lppm.*\)$|#\1|' \
-      -e 's|^\(.*D_HAVE_LIB_PPM.*\)$|#\1|' \
-      -e 's/DEFINES :=/DEFINES = -DHAVE_GETLINE/' \
-      -i Makefile
+  cd ../subtitleripper
   make
 }
 
