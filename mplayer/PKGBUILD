@@ -1,8 +1,8 @@
 # Maintainer: abveritas@chakra-project.org
 
 pkgname=mplayer
-pkgver=36027
-pkgrel=4
+pkgver=36505
+pkgrel=1
 pkgdesc="Multimedia player."
 arch=('x86_64')
 depends=('a52dec' 'aalib' 'alsa-lib' 'bzip2' 'cdparanoia' 'directfb' 'enca' 'faac' 'faad2'
@@ -24,38 +24,24 @@ conflicts=('mencoder')
 replaces=('mencoder')
 backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
 install=mplayer.install
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz"
+source=("${pkgname}::svn://svn.mplayerhq.hu/mplayer/trunk#revision=${pkgver}"
+        "http://ffmpeg.org/releases/ffmpeg-2.1.tar.bz2"
         "mplayer.desktop"
         "mplayer.png")
-md5sums=('6975879f5e19e082421751ec872b116f'
+md5sums=('SKIP'
+         '4ec1cedd4c7753512462f70b347c338a'
          'c0d6ef795cf6de48e3b87ff7c23f0319'
          'd00874ccc644b7f43d6ef1c942fcef28')
 
-# create tarball: source PKGBUILD && mksource
-
-mksource() {
-    rm -vRf ${pkgname}
-    echo "checkout mplayer"
-    _pkgver=`svn info svn://svn.mplayerhq.hu/mplayer/trunk | grep Revision: | cut -d' ' -f2`
-    svn co svn://svn.mplayerhq.hu/mplayer/trunk --config-dir ./ ${pkgname} || return 1
+prepare() {
     cd ${pkgname}
-    echo "checkout ffmpeg"
-    git clone git://git.videolan.org/ffmpeg.git ffmpeg
-    echo "clean checkout"
-    rm -vRf ffmpeg/.git
-    find . -name ".svn" -exec rm -rf {} \;
-    cd ..
-    pushd ${pkgname}
-    popd
-    echo "pack checkout"
-    tar -cvJf ${pkgname}-${_pkgver}.tar.xz ${pkgname}/*
-    md5sum ${pkgname}-${_pkgver}.tar.xz
-    echo "change pkgver to ${_pkgver}"
+
+    mv ../ffmpeg-2.1 ffmpeg
 }
 
 build() {
     cd ${srcdir}/${pkgname}
-    
+
     # Custom CFLAGS break the mplayer build
     unset CFLAGS LDFLAGS
 
