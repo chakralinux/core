@@ -6,9 +6,9 @@
 pkgbase=mplayer
 pkgname=('mplayer' 'mencoder')
 pkgver=36505
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
-makedepends=('libxxf86dga' 'libxxf86vm' 'libmad' 'libxinerama' 'sdl' 'lame' 'libtheora'
+makedepends=('svn' 'libxxf86dga' 'libxxf86vm' 'libmad' 'libxinerama' 'sdl' 'lame' 'libtheora'
              'xvidcore' 'libmng' 'libxss' 'libgl' 'smbclient' 'aalib' 'jack' 'libcaca'
              'x264' 'faac' 'faad2' 'lirc-utils'  'libxvmc' 'enca' 'libvdpau' 'opencore-amr'
              'libdca' 'a52dec' 'schroedinger' 'libvpx' 'libpulse' 'fribidi' 'unzip' 'mesa'
@@ -82,8 +82,8 @@ package_mencoder() {
            'opencore-amr' 'libmad' 'libtheora' 'fribidi' 'libjpeg' 'faac' 'faad2'
            'schroedinger' 'mpg123' 'libass' 'libbluray' 'libcdio'
            'libvorbis' 'opus')
-
-  cd $pkgbase-$pkgver
+           
+  cd $pkgbase
   make DESTDIR="$pkgdir" install-mencoder install-mencoder-man
   find "$pkgdir/usr/share/man" -name mplayer.1 -exec rename mplayer.1 mencoder.1 {} +
 }
