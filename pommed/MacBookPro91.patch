@@ -1,0 +1,98 @@
+Description: Add support for MacBookPro9,1
+Author: Thibaut Paumard <thibaut@debian.org>
+Bug-Debian: http://bugs.debian.org/708150
+
+Index: pommed-1.39~dfsg/pommed/kbd_backlight.h
+===================================================================
+--- pommed-1.39~dfsg.orig/pommed/kbd_backlight.h	2011-06-02 11:24:05.000000000 +0200
++++ pommed-1.39~dfsg/pommed/kbd_backlight.h	2013-05-14 15:18:05.383943565 +0200
+@@ -71,6 +71,7 @@
+ 	  || (mops->type == MACHINE_MACBOOKPRO_6)
+ 	  || (mops->type == MACHINE_MACBOOKPRO_7)
+ 	  || (mops->type == MACHINE_MACBOOKPRO_8)
++	  || (mops->type == MACHINE_MACBOOKPRO_9)
+ 	  || (mops->type == MACHINE_MACBOOK_5)
+ 	  || (mops->type == MACHINE_MACBOOKAIR_1)
+ 	  || (mops->type == MACHINE_MACBOOKAIR_2));
+Index: pommed-1.39~dfsg/pommed/pommed.c
+===================================================================
+--- pommed-1.39~dfsg.orig/pommed/pommed.c	2011-06-02 11:24:05.000000000 +0200
++++ pommed-1.39~dfsg/pommed/pommed.c	2013-05-14 15:21:20.179941376 +0200
+@@ -315,6 +315,16 @@
+     /* .evdev_identify = evdev_is_wellspring5, */
+   },
+ 
++  {  /* MacBookPro9,2 (13", June 2013)
++      * MacBookPro9,1 (15", June 2013)
++      */
++    .type = MACHINE_MACBOOKPRO_9,
++    .lcd_backlight_probe = mbp_sysfs_backlight_probe,
++    .lcd_backlight_step = sysfs_backlight_step,
++    .lcd_backlight_toggle = sysfs_backlight_toggle,
++    /* .evdev_identify = evdev_is_wellspring5, */
++  },
++
+   /* MacBook machines */
+ 
+   {  /* MacBook1,1 (Core Duo) */
+@@ -756,6 +766,12 @@
+ 	   || (strcmp(buf, "MacBookPro8,2") == 0)
+ 	   || (strcmp(buf, "MacBookPro8,3") == 0))
+     ret = MACHINE_MACBOOKPRO_8;
++  /* MacBook Pro 13" (June 2012)
++   * MacBook Pro 15" (June 2012)
++   */
++  else if ((strcmp(buf, "MacBookPro9,1") == 0)
++	   || (strcmp(buf, "MacBookPro9,2") == 0))
++    ret = MACHINE_MACBOOKPRO_9;
+   /* Core Duo MacBook (May 2006) */
+   else if (strcmp(buf, "MacBook1,1") == 0)
+     ret = MACHINE_MACBOOK_1;
+Index: pommed-1.39~dfsg/pommed/pommed.h
+===================================================================
+--- pommed-1.39~dfsg.orig/pommed/pommed.h	2011-06-02 11:24:05.000000000 +0200
++++ pommed-1.39~dfsg/pommed/pommed.h	2013-05-14 15:19:09.991942839 +0200
+@@ -38,6 +38,7 @@
+     MACHINE_MACBOOKPRO_6,
+     MACHINE_MACBOOKPRO_7,
+     MACHINE_MACBOOKPRO_8,
++    MACHINE_MACBOOKPRO_9,
+ 
+     MACHINE_MACBOOK_1,
+     MACHINE_MACBOOK_2,
+Index: pommed-1.39~dfsg/pommed/sysfs_backlight.c
+===================================================================
+--- pommed-1.39~dfsg.orig/pommed/sysfs_backlight.c	2011-06-02 11:24:05.000000000 +0200
++++ pommed-1.39~dfsg/pommed/sysfs_backlight.c	2013-05-14 17:01:58.879873506 +0200
+@@ -44,6 +44,7 @@
+ #else
+   SYSFS_DRIVER_MBP,
+   SYSFS_DRIVER_APPLE,
++  SYSFS_DRIVER_GMUX,
+   SYSFS_DRIVER_NVIDIA,
+   SYSFS_DRIVER_NOUVEAU,
+   SYSFS_DRIVER_ACPI,
+@@ -67,6 +68,7 @@
+ #else
+     "/sys/class/backlight/mbp_backlight/actual_brightness",
+     "/sys/class/backlight/apple_backlight/actual_brightness",
++    "/sys/class/backlight/gmux_backlight/actual_brightness",
+     "/sys/class/backlight/nvidia_backlight/actual_brightness",
+     "/sys/class/backlight/nv_backlight/actual_brightness",
+     "/sys/class/backlight/acpi_video0/actual_brightness",
+@@ -85,6 +87,7 @@
+ #else
+     "/sys/class/backlight/mbp_backlight/brightness",
+     "/sys/class/backlight/apple_backlight/brightness",
++    "/sys/class/backlight/gmux_backlight/brightness",
+     "/sys/class/backlight/nvidia_backlight/brightness",
+     "/sys/class/backlight/nv_backlight/brightness",
+     "/sys/class/backlight/acpi_video0/brightness",
+@@ -103,6 +106,7 @@
+ #else
+     "/sys/class/backlight/mbp_backlight/max_brightness",
+     "/sys/class/backlight/apple_backlight/max_brightness",
++    "/sys/class/backlight/gmux_backlight/max_brightness",
+     "/sys/class/backlight/nvidia_backlight/max_brightness",
+     "/sys/class/backlight/nv_backlight/max_brightness",
+     "/sys/class/backlight/acpi_video0/max_brightness",

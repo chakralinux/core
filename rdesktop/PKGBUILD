@@ -1,30 +1,63 @@
-# Maintainer: abveritas@chakra-project.org
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# Arch Maintainer:
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+# Contributor: Dan McGee <dan@archlinux.org>
+#
+# Contributor: abveritas@chakra-project.org
+# Maintainer: BrLi <rainman59118[at]gmail.com>
 
 pkgname=rdesktop
-pkgver=1.7.1
-pkgrel=9
-depends=('libx11' 'openssl' 'libao' 'libsamplerate')
-pkgdesc="Is used to connect to windows terminal servers"
+pkgver=1.8.0
+pkgrel=1
+depends=('libx11' 'openssl' 'libao' 'libsamplerate' 'libxrandr' 'pcsclite')
+pkgdesc="An open source client for Windows Remote Desktop Services"
 url="http://www.rdesktop.org/"
-license=('GPL')
+license=('GPLv3')
 arch=('x86_64')
-source=("http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.gz"
-	'rdesktop-send_physical_buttons.diff' 'rdesktop-libao.patch')
-md5sums=('c4b39115951c4a6d74f511c99b18fcf9'
-         '880d3aeac67b901e6bf44d1323374768'
-         'bd2c9bc68bddcc2652c668753d787df7')
+source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+        'rdesktop-send_physical_buttons.diff'
+        'rdesktop-libao.patch'
+        'rdesktop-tcp.patch'
+	'rdesktop-r1729.patch'
+	'rdesktop-r1731.patch'
+	'rdesktop-r1732.patch')
+sha1sums=('2d39a41d29ad1ad2509d1e343a2817a3c7d666de'
+          '809a9dc11ad4f704f79fc4bc2a70b76a4f42596d'
+          '68a48061e5ed76150c1444891a192f7884fd056e'
+          'a14793c72194bed74725bcf75fdb8b93c7577399'
+          '972d6ec59cf140383880464e3ef43e03969f3bfe'
+          '9a417aba27ded0ab595cbb07fccd452bdc0af20c'
+          '1bc92e04058a2f5c02f42a5c97da7ee672a71698')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+
+  # FS#15113
+  patch -i "${srcdir}/rdesktop-send_physical_buttons.diff"
+
+  # Fix libao segfault, from Fedora
+  patch -i "${srcdir}/rdesktop-libao.patch"
+
+  # FS#36488
+  patch -i "${srcdir}/rdesktop-tcp.patch"
+  patch -i "${srcdir}/rdesktop-r1731.patch"
+  patch -i "${srcdir}/rdesktop-r1732.patch"
+
+  # FS#36505
+  patch -i "${srcdir}/rdesktop-r1729.patch"
+}
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-
-  patch -i ${srcdir}/rdesktop-send_physical_buttons.diff
-  patch -i ${srcdir}/rdesktop-libao.patch
-
-  ./configure --prefix=/usr
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr \
+    --enable-smartcard \
+    --with-ipv6
   make
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
 }

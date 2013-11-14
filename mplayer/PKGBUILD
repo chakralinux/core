@@ -1,61 +1,41 @@
+#
+# Platform packages of Chakra Project, part of chakra-project.org
+#
 # Maintainer: abveritas@chakra-project.org
 
-pkgname=mplayer
-pkgver=36027
-pkgrel=4
-pkgdesc="Multimedia player."
+pkgbase=mplayer
+pkgname=('mplayer' 'mencoder')
+pkgver=36505
+pkgrel=2
 arch=('x86_64')
-depends=('a52dec' 'aalib' 'alsa-lib' 'bzip2' 'cdparanoia' 'directfb' 'enca' 'faac' 'faad2'
-         'fontconfig' 'freetype2' 'fribidi' 'gcc-libs' 'giflib' 'glibc' 'gsm' 'jack' 'ladspa' 'lame'
-         'libass' 'libbluray' 'libbs2b' 'libcaca' 'libcdio' 'libdca' 'libdv' 'libdvdnav'
-         'libdvdread' 'libgl' 'libjpeg' 'libmad' 'libmng' 'libmpeg2' 'libogg' 'libpng'
-         'pulseaudio' 'libtheora' 'libvdpau' 'libvpx' 'libx11' 'libxext' 'libxinerama'
-         'libxss' 'libxv' 'libxxf86dga' 'libxxf86vm' 'lirc-utils' 'live-media>=2010.01.13'
-         'lzo2' 'mpg123' 'nas' 'ncurses' 'openal' 'opencore-amr' 'openjpeg' 'orc' 'rtmpdump'
-         'schroedinger' 'sdl' 'samba' 'speex' 'toolame' 'ttf-dejavu' 'vstream-client'
-         'x264' 'xvidcore' 'zlib')
-makedepends=('live-media>=2010.01.13' 'mesa' 'unzip' 'yasm')
+makedepends=('svn' 'libxxf86dga' 'libxxf86vm' 'libmad' 'libxinerama' 'sdl' 'lame' 'libtheora'
+             'xvidcore' 'libmng' 'libxss' 'libgl' 'smbclient' 'aalib' 'jack' 'libcaca'
+             'x264' 'faac' 'faad2' 'lirc-utils'  'libxvmc' 'enca' 'libvdpau' 'opencore-amr'
+             'libdca' 'a52dec' 'schroedinger' 'libvpx' 'libpulse' 'fribidi' 'unzip' 'mesa'
+             'live-media' 'yasm' 'git' 'fontconfig' 'mpg123' 'ladspa' 'libass' 'libbluray'
+             'libcdio' 'opus')
 license=('GPL2')
 url="http://www.mplayerhq.hu/"
 categories=('multimedia')
 screenshot=("http://www.mplayerhq.hu/images/screenshots/gui-preview-01.jpg")
-provides=('mencoder')
-conflicts=('mencoder')
-replaces=('mencoder')
-backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
 install=mplayer.install
-source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz"
+source=("${pkgname}::svn://svn.mplayerhq.hu/mplayer/trunk#revision=${pkgver}"
+        "http://ffmpeg.org/releases/ffmpeg-2.1.tar.bz2"
         "mplayer.desktop"
         "mplayer.png")
-md5sums=('6975879f5e19e082421751ec872b116f'
+md5sums=('SKIP'
+         '4ec1cedd4c7753512462f70b347c338a'
          'c0d6ef795cf6de48e3b87ff7c23f0319'
          'd00874ccc644b7f43d6ef1c942fcef28')
 
-# create tarball: source PKGBUILD && mksource
-
-mksource() {
-    rm -vRf ${pkgname}
-    echo "checkout mplayer"
-    _pkgver=`svn info svn://svn.mplayerhq.hu/mplayer/trunk | grep Revision: | cut -d' ' -f2`
-    svn co svn://svn.mplayerhq.hu/mplayer/trunk --config-dir ./ ${pkgname} || return 1
+prepare() {
     cd ${pkgname}
-    echo "checkout ffmpeg"
-    git clone git://git.videolan.org/ffmpeg.git ffmpeg
-    echo "clean checkout"
-    rm -vRf ffmpeg/.git
-    find . -name ".svn" -exec rm -rf {} \;
-    cd ..
-    pushd ${pkgname}
-    popd
-    echo "pack checkout"
-    tar -cvJf ${pkgname}-${_pkgver}.tar.xz ${pkgname}/*
-    md5sum ${pkgname}-${_pkgver}.tar.xz
-    echo "change pkgver to ${_pkgver}"
+    mv ../ffmpeg-2.1 ffmpeg
 }
 
 build() {
     cd ${srcdir}/${pkgname}
-    
+
     # Custom CFLAGS break the mplayer build
     unset CFLAGS LDFLAGS
 
@@ -69,18 +49,41 @@ build() {
     make
 }
 
-package() {
-  cd ${srcdir}/${pkgname}               
-  
-  make DESTDIR=${pkgdir} install
-  
-  install -Dm644 etc/{codecs.conf,input.conf,example.conf} ${pkgdir}/etc/mplayer/               
-  
-  install -dm755 ${pkgdir}/usr/share/mplayer/           
-  ln -s /usr/share/fonts/TTF/DejaVuSans.ttf ${pkgdir}/usr/share/mplayer/subfont.ttf             
-  rm -rf ${pkgdir}/usr/share/mplayer/font               
-  
+package_mplayer() {
+  pkgdesc="A movie player for linux"
+  install=mplayer.install
+  backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
+  depends=('desktop-file-utils' 'ttf-dejavu' 'enca' 'libxss' 'a52dec' 'libvpx'
+           'lirc-utils' 'x264' 'libmng' 'libdca' 'aalib' 'lame' 'fontconfig'
+           'libgl' 'libxinerama' 'libvdpau' 'libpulse' 'smbclient' 'xvidcore'
+           'opencore-amr' 'jack' 'libmad' 'sdl' 'libtheora' 'libcaca' 'libxxf86dga'
+           'fribidi' 'libjpeg' 'faac' 'faad2' 'libxvmc' 'schroedinger' 'mpg123'
+           'libass' 'libxxf86vm' 'libbluray' 'libcdio' 'opus')
+
+  cd ${srcdir}/${pkgname}
+
+  make DESTDIR=${pkgdir} install-mplayer install-mplayer-man
+
+  install -Dm644 etc/{codecs.conf,input.conf,example.conf} ${pkgdir}/etc/mplayer/
+
+  install -dm755 ${pkgdir}/usr/share/mplayer/
+  ln -s /usr/share/fonts/TTF/DejaVuSans.ttf ${pkgdir}/usr/share/mplayer/subfont.ttf
+  rm -rf ${pkgdir}/usr/share/mplayer/font
+
   # Desktop Integration.
-  install -Dm644 ${srcdir}/mplayer.desktop ${pkgdir}/usr/share/applications/mplayer.desktop             
+  install -Dm644 ${srcdir}/mplayer.desktop ${pkgdir}/usr/share/applications/mplayer.desktop
   install -Dm644 ${srcdir}/mplayer.png ${pkgdir}/usr/share/pixmaps/mplayer.png
+}
+
+package_mencoder() {
+  pkgdesc="Free command line video decoding, encoding and filtering tool"
+  depends=('enca' 'a52dec' 'libvpx' 'x264' 'libmng' 'libdca' 'bzip2' 'lame'
+           'alsa-lib' 'fontconfig' 'giflib' 'libpng' 'smbclient' 'xvidcore'
+           'opencore-amr' 'libmad' 'libtheora' 'fribidi' 'libjpeg' 'faac' 'faad2'
+           'schroedinger' 'mpg123' 'libass' 'libbluray' 'libcdio'
+           'libvorbis' 'opus')
+           
+  cd $pkgbase
+  make DESTDIR="$pkgdir" install-mencoder install-mencoder-man
+  find "$pkgdir/usr/share/man" -name mplayer.1 -exec rename mplayer.1 mencoder.1 {} +
 }

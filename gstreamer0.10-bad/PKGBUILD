@@ -1,9 +1,12 @@
-# maintainer abveritas@chakra-project.org
+#
+# Packages of Chakra, part of chakra-project.org
+#
+# Contributor:abveritas@chakra-project.org
 
 pkgbase=gstreamer0.10-bad
 pkgname=('gstreamer0.10-bad' 'gstreamer0.10-bad-plugins')
 pkgver=0.10.23
-pkgrel=11
+pkgrel=12
 arch=('x86_64')
 license=('LGPL' 'GPL')
 makedepends=('pkgconfig' 'gstreamer0.10-base>=0.10.36' 'xvidcore' 'libdca' 'bzip2' 'libdc1394' 
@@ -18,10 +21,15 @@ md5sums=('e4822fa2cc933768e2998311a1565979')
 build() {
   cd "${srcdir}/gst-plugins-bad-${pkgver}"
 
-  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
-    --disable-static --enable-experimental --disable-celt --disable-rsvg \
-    --with-package-name="GStreamer Bad Plugins (Chakra GNU/Linux)" \
-    --with-package-origin="http://www.chakra-project.org/" 
+  ./configure --prefix=/usr \
+	      --sysconfdir=/etc \
+	      --localstatedir=/var \
+              --disable-static \
+	      --enable-experimental \
+              --disable-celt \
+              --disable-rsvg \
+              --with-package-name="GStreamer Bad Plugins (Chakra GNU/Linux)" \
+              --with-package-origin="http://www.chakra-project.org/" 
 
   make 
   sed -e 's/gst sys ext/gst/' -i Makefile 
@@ -39,8 +47,12 @@ package_gstreamer0.10-bad() {
 
 package_gstreamer0.10-bad-plugins() {
   pkgdesc="GStreamer Multimedia Framework Bad Plugins (gst-plugins-bad)"
-  depends=("gstreamer0.10-bad=${pkgver}" 'xvidcore' 'libdca' 'bzip2' 'libdc1394' 'neon' 'faac' 'libmusicbrainz' 'faad2' 'libmms' 'libcdaudio' 'libmpcdec' 'mjpegtools' 
-'libdvdnav' 'libmodplug' 'jasper' 'liblrdf' 'libofa' 'libvdpau' 'soundtouch' 'libass' 'schroedinger' 'libvpx' 'gsm' 'rtmpdump' 'libgme' 'libsndfile' 'opus')
+  depends=("gstreamer0.10-bad=${pkgver}" 
+	  'xvidcore' 'libdca' 'bzip2' 'libdc1394' 'neon' 'faac' 
+          'libmusicbrainz' 'faad2' 'libmms' 'libcdaudio' 'libmpcdec' 'mjpegtools' 
+          'libdvdnav' 'libmodplug' 'jasper' 'liblrdf' 'libofa' 'libvdpau' 
+	  'soundtouch' 'libass' 'schroedinger' 'libvpx' 'gsm' 'rtmpdump' 
+          'libgme' 'libsndfile' 'opus')
   groups=('gstreamer0.10-plugins')
 
   cd "${srcdir}/gst-plugins-bad-${pkgver}"

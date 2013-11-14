@@ -1,26 +1,28 @@
-# maintainer abveritas@chakra-project.org
- 
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Contributor: Samir Benmendil <ram-z[at]chakra-project[dot]org>
+
 pkgname=mplayer2
 pkgver=20130428
-pkgrel=2
+_commit=6c87a98
+pkgrel=3
 pkgdesc="A movie player"
 arch=('x86_64')
 license=('GPL')
 url="http://www.mplayer2.org/"
 depends=('desktop-file-utils' 'ttf-dejavu' 'enca' 'libxss' 'a52dec' 'libvpx' 'lirc-utils'
          'x264' 'libmng' 'libdca' 'aalib' 'lame' 'fontconfig'  'libgl' 'libxinerama'
-         'libvdpau' 'pulseaudio' 'samba' 'xvidcore' 'opencore-amr' 'jack' 'cdparanoia'
+         'libvdpau' 'pulseaudio' 'smbclient' 'xvidcore' 'opencore-amr' 'jack' 'cdparanoia'
          'libmad' 'sdl' 'libtheora' 'libcaca' 'libxxf86dga' 'fribidi' 'libjpeg-turbo'
          'faac' 'faad2' 'libxvmc' 'schroedinger' 'mpg123' 'libass' 'libxxf86vm' 'libbluray'
          'ffmpeg' 'libbs2b' 'directfb' 'nas')    
-makedepends=('mesa' 'libgl' 'unzip' 'yasm' 'python3' 'docutils' 'git')
+makedepends=('mesa' 'libgl' 'unzip' 'yasm' 'python3' 'python3-docutils' 'git')
 categories=('multimedia')
 backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
 provides=('mplayer')
 conflicts=('mplayer')
 install=$pkgname.install
-source=(git://git.mplayer2.org/mplayer2.git
-        0001-demux_gif-declare-missing-PrintGifError.patch)
+source=("git://git.mplayer2.org/mplayer2.git#commit=${_commit}"
+        "0001-demux_gif-declare-missing-PrintGifError.patch")
 sha1sums=('SKIP'
           '02a18919668d1af8ef949215b8bbaa52c27147a4')
 

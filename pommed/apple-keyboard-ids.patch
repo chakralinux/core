@@ -1,0 +1,182 @@
+Description: Add product IDs for new Apple keyboards
+Author: Thibaut Paumard <thibaut@debian.org>
+Origin: vendor
+Last-Update: 2013-07-19
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/pommed/evdev.c
++++ b/pommed/evdev.c
+@@ -686,6 +686,134 @@
+   return 0;
+ }
+ 
++/* MacBookPro9,1 (15" June 2012)
++ * MacBookPro9,2 (13" June 2012)
++ */
++static int
++evdev_is_wellspring5a(unsigned short *id)
++{
++  unsigned short product = id[ID_PRODUCT];
++
++  if (id[ID_BUS] != BUS_USB)
++    return 0;
++
++  if (id[ID_VENDOR] != USB_VENDOR_ID_APPLE)
++    return 0;
++
++  if ((product == USB_PRODUCT_ID_WELLSPRING5A_ANSI)
++      || (product == USB_PRODUCT_ID_WELLSPRING5A_ISO)
++      || (product == USB_PRODUCT_ID_WELLSPRING5A_JIS))
++    {
++      logdebug(" -> WellSpring VA USB assembly\n");
++
++      kbd_set_fnmode();
++
++      return 1;
++    }
++
++  return 0;
++}
++
++static int
++evdev_is_wellspring6(unsigned short *id)
++{
++  unsigned short product = id[ID_PRODUCT];
++
++  if (id[ID_BUS] != BUS_USB)
++    return 0;
++
++  if (id[ID_VENDOR] != USB_VENDOR_ID_APPLE)
++    return 0;
++
++  if ((product == USB_PRODUCT_ID_WELLSPRING6_ANSI)
++      || (product == USB_PRODUCT_ID_WELLSPRING6_ISO)
++      || (product == USB_PRODUCT_ID_WELLSPRING6_JIS))
++    {
++      logdebug(" -> WellSpring VI USB assembly\n");
++
++      kbd_set_fnmode();
++
++      return 1;
++    }
++
++  return 0;
++}
++
++static int
++evdev_is_wellspring6a(unsigned short *id)
++{
++  unsigned short product = id[ID_PRODUCT];
++
++  if (id[ID_BUS] != BUS_USB)
++    return 0;
++
++  if (id[ID_VENDOR] != USB_VENDOR_ID_APPLE)
++    return 0;
++
++  if ((product == USB_PRODUCT_ID_WELLSPRING6A_ANSI)
++      || (product == USB_PRODUCT_ID_WELLSPRING6A_ISO)
++      || (product == USB_PRODUCT_ID_WELLSPRING6A_JIS))
++    {
++      logdebug(" -> WellSpring VIA USB assembly\n");
++
++      kbd_set_fnmode();
++
++      return 1;
++    }
++
++  return 0;
++}
++
++static int
++evdev_is_wellspring7(unsigned short *id)
++{
++  unsigned short product = id[ID_PRODUCT];
++
++  if (id[ID_BUS] != BUS_USB)
++    return 0;
++
++  if (id[ID_VENDOR] != USB_VENDOR_ID_APPLE)
++    return 0;
++
++  if ((product == USB_PRODUCT_ID_WELLSPRING7_ANSI)
++      || (product == USB_PRODUCT_ID_WELLSPRING7_ISO)
++      || (product == USB_PRODUCT_ID_WELLSPRING7_JIS))
++    {
++      logdebug(" -> WellSpring VII USB assembly\n");
++
++      kbd_set_fnmode();
++
++      return 1;
++    }
++
++  return 0;
++}
++
++static int
++evdev_is_wellspring7a(unsigned short *id)
++{
++  unsigned short product = id[ID_PRODUCT];
++
++  if (id[ID_BUS] != BUS_USB)
++    return 0;
++
++  if (id[ID_VENDOR] != USB_VENDOR_ID_APPLE)
++    return 0;
++
++  if ((product == USB_PRODUCT_ID_WELLSPRING7A_ANSI)
++      || (product == USB_PRODUCT_ID_WELLSPRING7A_ISO)
++      || (product == USB_PRODUCT_ID_WELLSPRING7A_JIS))
++    {
++      logdebug(" -> WellSpring VIIA USB assembly\n");
++
++      kbd_set_fnmode();
++
++      return 1;
++    }
++
++  return 0;
++}
++
+ /* Any internal keyboard */
+ static int
+ evdev_is_internal(unsigned short *id)
+@@ -698,7 +826,12 @@
+ 	  || evdev_is_wellspring3(id)
+ 	  || evdev_is_wellspring4(id)
+ 	  || evdev_is_wellspring4a(id)
+-	  || evdev_is_wellspring5(id));
++	  || evdev_is_wellspring5(id)
++	  || evdev_is_wellspring5a(id)
++	  || evdev_is_wellspring6(id)
++	  || evdev_is_wellspring6a(id)
++	  || evdev_is_wellspring7(id)
++	  || evdev_is_wellspring7a(id));
+ }
+ 
+ 
+--- a/pommed/evdev.h
++++ b/pommed/evdev.h
+@@ -78,6 +78,22 @@
+ #define USB_PRODUCT_ID_WELLSPRING5_ISO    0x0246
+ #define USB_PRODUCT_ID_WELLSPRING5_JIS    0x0247
+ 
++/* Apple WellSpring VA to VII keyboard + trackpad */
++#define USB_PRODUCT_ID_WELLSPRING5A_ANSI   0x0252
++#define USB_PRODUCT_ID_WELLSPRING5A_ISO    0x0253
++#define USB_PRODUCT_ID_WELLSPRING5A_JIS    0x0254
++#define USB_PRODUCT_ID_WELLSPRING7A_ANSI   0x0259
++#define USB_PRODUCT_ID_WELLSPRING7A_ISO    0x025a
++#define USB_PRODUCT_ID_WELLSPRING7A_JIS    0x025b
++#define USB_PRODUCT_ID_WELLSPRING6A_ANSI   0x0249
++#define USB_PRODUCT_ID_WELLSPRING6A_ISO    0x024a
++#define USB_PRODUCT_ID_WELLSPRING6A_JIS    0x024b
++#define USB_PRODUCT_ID_WELLSPRING6_ANSI    0x024c
++#define USB_PRODUCT_ID_WELLSPRING6_ISO     0x024d
++#define USB_PRODUCT_ID_WELLSPRING6_JIS     0x024e
++#define USB_PRODUCT_ID_WELLSPRING7_ANSI    0x0262
++#define USB_PRODUCT_ID_WELLSPRING7_ISO     0x0263
++#define USB_PRODUCT_ID_WELLSPRING7_JIS     0x0264
+ 
+ /* Apple external USB keyboard, white */
+ #define USB_PRODUCT_ID_APPLE_EXTKBD_WHITE   0x020c

@@ -1,0 +1,38 @@
+# Maintainer: Martín Cigorraga <{name}{surname}@gmail.com>
+# Contributions from Arch Linux: https://www.archlinux.org/packages/extra/x86_64/ldb/
+
+pkgname=ldb
+pkgver=1.1.16
+pkgrel=1
+pkgdesc="A schema-less, ldap like, API and database"
+arch=('x86_64')
+url="http://ldb.samba.org/"
+license=('GPL3')
+depends=('talloc' 'tevent' 'tdb' 'popt')
+makedepends=('python2')
+optdepends=('python2: for python bindings')
+source=(http://samba.org/ftp/${pkgname}/${pkgname}-${pkgver}.tar.gz)
+md5sums=('60865c0b5704469ee2e59703087c8ec8')
+
+build() {
+	cd ${srcdir}/${pkgname}-${pkgver}
+
+	# change to use python2
+	sed -i -e "s|/usr/bin/env python$|/usr/bin/env python2|" buildtools/bin/waf
+	export PYTHON=/usr/bin/python2
+
+	./configure --prefix=/usr \
+		--disable-rpath \
+		--disable-rpath-install \
+		--bundled-libraries=NONE \
+		--builtin-libraries=replace \
+                --with-modulesdir=/usr/lib/ldb/modules \
+                --with-privatelibdir=/usr/lib/ldb
+	make
+}
+
+package() {
+	cd ${srcdir}/${pkgname}-${pkgver}
+
+	make DESTDIR=${pkgdir}/ install
+}

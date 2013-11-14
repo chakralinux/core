@@ -1,0 +1,12 @@
+diff -Naur iniparser/src/iniparser.c iniparser.fixed/src/iniparser.c
+--- iniparser/src/iniparser.c	2012-04-08 14:44:57.000000000 +0000
++++ iniparser.fixed/src/iniparser.c	2013-03-13 06:08:21.341713753 +0000
+@@ -666,7 +666,7 @@
+         if (len==0)
+             continue;
+         /* Safety check against buffer overflows */
+-        if (line[len]!='\n') {
++        if (line[len]!='\n' && !feof(in)) {
+             fprintf(stderr,
+                     "iniparser: input line too long in %s (%d)\n",
+                     ininame,

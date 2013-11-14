@@ -1,15 +1,16 @@
-# maintainer abveritas@chakra-project.org
+# Platform Packages for Chakra, part of chakra-project.org
+# Contributor: abveritas@chakra-project.org
+# Maintainer: BrLi <rainman59118[at]gmail.com>
 
 pkgname=cdemu-client
 pkgver=2.1.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Simple command-line client for controlling cdemu-daemon"
 arch=('x86_64')
-url="http://cdemu.sourceforge.net/"
+url=("http://cdemu.sourceforge.net/")
 license=('GPL')
 depends=('python2' 'dbus-python' 'cdemu-daemon')
 makedepends=('intltool' 'cmake')
-conflicts=('cdemu')
 source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2")
 md5sums=('e3062659481b804d12fac58ad64316a0')
 
@@ -32,4 +33,3 @@ package() {
   make DESTDIR="$pkgdir" install
   rm -f "${pkgdir}"/usr/share/applications/cdemu-client.desktop
 }
-

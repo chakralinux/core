@@ -1,0 +1,33 @@
+# Maintainer: Martín Cigorraga <{name}{surname}@gmail.com>
+# Contributions from Arch Linux: https://www.archlinux.org/packages/extra/x86_64/tevent/
+
+pkgname=tevent
+pkgver=0.9.18
+pkgrel=1
+pkgdesc="An event system based on the talloc memory management library"
+arch=('x86_64')
+url="https://tevent.samba.org/"
+source=("http://samba.org/ftp/tevent/${pkgname}-${pkgver}.tar.gz")
+license=('GPL3')
+depends=('talloc')
+makedepends=('python2')
+optdepends=('python2: for python bindings')
+md5sums=('952535f0bcf002eee5a8db68deb6374b')
+
+build() {
+	cd ${srcdir}/${pkgname}-${pkgver}
+
+	# change to use python2
+	sed -i -e "s|/usr/bin/env python$|/usr/bin/env python2|" buildtools/bin/waf
+	export PYTHON=/usr/bin/python2
+
+	./configure --prefix=/usr
+	make
+}
+
+package() {
+	cd ${srcdir}/${pkgname}-${pkgver}
+	
+	
+	make DESTDIR=${pkgdir}/ install
+}

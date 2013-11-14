@@ -2,23 +2,29 @@
 
 pkgname=telepathy-qt
 pkgver=0.9.3
-pkgrel=5
+pkgrel=6
 pkgdesc="A library for Qt-based Telepathy clients."
 arch=('x86_64')
 url="http://telepathy.freedesktop.org"
 groups=('telepathy')
 license=('LGPL')
 options=('!libtool')
-depends=('qt' 'telepathy-farstream' 'dbus-python')
+depends=('qt' 'telepathy-farstream' 'python2-dbus')
 makedepends=('libxslt' 'python2' 'cmake' 'doxygen')
 conflicts=('telepathy-qt4')
 provides=('telepathy-qt4')
-source=("http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('94ac93aedf5f6fff49837bc8368e5a37')
+source=("http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz"
+        "avatar.patch::http://cgit.freedesktop.org/telepathy/telepathy-qt/patch/?id=8da9f7069929893bcee64dab22101134752fe618")
+md5sums=('94ac93aedf5f6fff49837bc8368e5a37'
+         'f469dc15bffa8ac00ccdb523c8788e06')
 
 build() {
     cd "${srcdir}"
 
+    cd "${pkgname}-${pkgver}"
+    patch -i ../avatar.patch -p1 || return 1
+
+    cd "${srcdir}"
     mkdir build
     cd build
     cmake ../${pkgname}-${pkgver} \

@@ -1,13 +1,13 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas@chakra-project.org
+# maintainer franzmari@chakra-project.it
 
 pkgbase=opencv
 pkgname=('opencv' 'opencv-samples')
 _realname=OpenCV
-pkgver=2.4.6.1
-pkgrel=3
+pkgver=2.4.7
+pkgrel=1
 pkgdesc="Open Source Computer Vision Library"
 arch=('x86_64')
 license=('BSD')
@@ -19,12 +19,10 @@ optdepends=('python-numpy: Python 2.x interface'
             'eigen')
 source=("http://downloads.sourceforge.net/opencvlibrary/$pkgname-$pkgver.tar.gz"
         'pkgconfig.patch'
-        'fsh.patch'
-        'cldetect.patch')
-sha1sums=('e015bd67218844b38daf3cea8aab505b592a66c0'
-          '709a2fac455a00e0e8956ec8c8f109be88a083ff'
-          '8d8c2ebccd8199fee2cf21b8dbbaadcc0a9f8bad'
-          '5401c607287c10835fc95f490c294d4706399436')
+        'fsh.patch')
+sha1sums=('67ec788943894d4be3dff6efd7720591108feb29'
+          'c5202144d24671cbee411207d65b4ea05747b0f4'
+          'e39a8f3f39298b2dcca604af95dee3e13689a55a')
 
 _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
             '-D CMAKE_INSTALL_PREFIX=/usr'
@@ -43,11 +41,6 @@ _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
 prepare() {
   cd "$srcdir/$pkgname-$pkgver"
 
-  # fix missing opencl module
-  # see https://bugs.archlinux.org/task/36076
-  # and http://code.opencv.org/issues/3140
-  patch -Np1 -i "$srcdir/cldetect.patch"
-
   # fix pkg-config mess
   # see https://bugs.archlinux.org/task/32430
   # and http://code.opencv.org/issues/1925
@@ -57,9 +50,6 @@ prepare() {
   # see http://code.opencv.org/issues/2512
   patch -Np1 -i "$srcdir/fsh.patch"
 
-  # no longer including docs, see https://bugs.archlinux.org/task/34185
-  # python2 compatibility for generating (html) docs
-  #sed -i 's/sphinx-build/sphinx-build2/' cmake/OpenCVDetectPython.cmake
 }
 
 build() {

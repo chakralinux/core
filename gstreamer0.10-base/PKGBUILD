@@ -1,13 +1,16 @@
+#
+# Platform packages of Chakra Project, part of chakra-project.org
+#
 # maintainer abveritas@chakra-project.org
 
 pkgbase=('gstreamer0.10-base')
 pkgname=('gstreamer0.10-base' 'gstreamer0.10-base-plugins')
 pkgver=0.10.36
-pkgrel=6
+pkgrel=7
 arch=('x86_64')
 license=('LGPL')
 makedepends=('pkgconfig' "gstreamer0.10>=${pkgver}" 'orc' 'libxv' 'alsa-lib' 'cdparanoia'
-             'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection')
+             'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection' 'v4l-utils')
 options=(!libtool !emptydirs)
 url="http://gstreamer.freedesktop.org/"
 source=(${url}/src/gst-plugins-base/gst-plugins-base-${pkgver}.tar.xz)
@@ -36,7 +39,7 @@ package_gstreamer0.10-base() {
 
 package_gstreamer0.10-base-plugins() {
   pkgdesc="GStreamer Multimedia Framework Base Plugins (gst-plugins-base)"
-  depends=("gstreamer0.10-base=${pkgver}" 'alsa-lib' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango')
+  depends=("gstreamer0.10-base=${pkgver}" 'alsa-lib' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango' 'v4l-utils')
   groups=('gstreamer0.10-plugins')
 
   cd "${srcdir}/gst-plugins-base-${pkgver}"
