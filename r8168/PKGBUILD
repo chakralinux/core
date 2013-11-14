@@ -5,12 +5,12 @@
 
 pkgname=r8168
 pkgver=8.036.00
-pkgrel=2
+pkgrel=3
 pkgdesc="A kernel module for Realtek 8168 network cards"
 url="http://www.realtek.com.tw"
 license=("GPL")
 arch=('x86_64')
-depends=('glibc' 'linux>=3.10' 'linux<3.11')
+depends=('glibc' 'linux>=3.12' 'linux<3.13')
 makedepends=('linux-headers')
 source=("http://r8168.googlecode.com/files/$pkgname-$pkgver.tar.bz2"
 	'linux-3.10.patch')
@@ -18,7 +18,7 @@ md5sums=('a9a5b238f59cc30eefa5917d7f6b728e'
          '8790fa9f6ec1a4d51aec3dd5750e342b')
 install=$pkgname.install
 
-_extramodules=extramodules-3.10-CHAKRA
+_extramodules=extramodules-3.12-CHAKRA
 _kernver="$(cat /lib/modules/$_extramodules/version || true)"
 
 build() {
