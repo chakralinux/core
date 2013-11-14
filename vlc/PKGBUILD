@@ -1,9 +1,12 @@
+#
+# Platform packages of Chakra, part of chakra-project.org
+#
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 # Contributions from ArchLinux: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/vlc
 
 pkgname=vlc
-pkgver=2.0.8.a
-pkgrel=2
+pkgver=2.1.1
+pkgrel=1
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
 pkgdesc=('A multimedia player and framework that plays most multimedia files as well as DVD, Audio CD, VCD, and various streaming protocols')
@@ -13,8 +16,8 @@ depends=('a52dec' 'fluidsynth' 'libdvbpsi' 'libxpm' 'libdca' 'qt' 'libproxy'
          'zvbi' 'taglib' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp' 
          'libshout' 'libmad' 'libmpeg2' 'xcb-util-keysyms')
 makedepends=('live-media' 'libnotify' 'libbluray' 'flac' 'kdelibs'
-             'libdc1394' 'libavc1394' 'lirc-utils' 'libcaca' 'oss' 
-             'librsvg' 'portaudio' 'oss' 'libgme' 'aalib' 'libmtp'
+             'libdc1394' 'libavc1394' 'lirc-utils' 'libcaca' 
+             'librsvg' 'portaudio' 'libgme' 'aalib' 'libmtp'
              'vcdimager' 'opus' 'libssh2' 'mesa')
 optdepends=('aalib: for ASCII art plugin'
             'avahi: for service discovery using bonjour protocol'
@@ -36,31 +39,21 @@ optdepends=('aalib: for ASCII art plugin'
             'lirc-utils: for lirc plugin'
             'ncurses: for ncurses interface support'
             'opus: for opus support'
-            'oss: for OSS audio support'
             'portaudio: for portaudio support'
             'samba: for SMB access plugin'
             'ttf-dejavu: for subtitle font'
             'ttf-freefont: for subtitle font '
             'vcdimager: navigate VCD with libvcdinfo')
-conflicts=('vlc-plugin')
-replaces=('vlc-plugin')
 backup=('usr/share/vlc/lua/http/.hosts'
         'usr/share/vlc/lua/http/dialogs/.hosts')
 categories=('multimedia')
 options=('!libtool' '!emptydirs')
 install="vlc.install"
-source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver/.a}/${pkgname}-${pkgver/.a/a}.tar.xz"
-        "libva12.patch"
-        "fix-live555-breakage.patch")
-sha1sums=('dce3d05498c68c5aa86b6ed5db37f213a4bdd61c'
-          'e67786202ef6b940c5d2690d4c5520a97401a611'
-          '9660ad86dbaf438c1dd9b7370463b04a947b619f')
+source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver/.a}/${pkgname}-${pkgver/.a/a}.tar.xz")
+sha1sums=('d23823b98d4130d6668bde18715a99269d6ab3cd')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver/.a}"
-
-  patch -p1 < "$srcdir"/libva12.patch
-  patch -Np1 -i ../fix-live555-breakage.patch
 
   sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
   sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
@@ -74,7 +67,6 @@ build() {
               --sysconfdir=/etc \
               --disable-rpath \
               --enable-faad \
-              --enable-oss \
               --enable-dbus-control \
               --enable-nls \
               --enable-lirc \
@@ -98,6 +90,5 @@ package() {
   for res in 16 32 48 128; do
     install -D -m644 "${srcdir}/vlc-${pkgver/.a}/share/icons/${res}x${res}/vlc.png" \
         "${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png"
-  done
-  
+  done 
 }
