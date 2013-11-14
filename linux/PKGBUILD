@@ -29,6 +29,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch')
+
 sha256sums=('2e120ec7fde19fa51dc6b6cc11c81860a0775defcad5a5bf910ed9a50e845a02'
             '50e2e8067fe01674909f114a5b66b683da35eb7862908e3c0b8b71dc58d3b5f0'
             'c5b5405252250cac6085bddb13f0a2a6007d14d627ebc1f5fed79f9e91e78602'
@@ -37,7 +38,7 @@ sha256sums=('2e120ec7fde19fa51dc6b6cc11c81860a0775defcad5a5bf910ed9a50e845a02'
             '62815bffbd29d5f2bdcda387788d2fcdf62cd61e51105ce41a63b70fc14bda68'
             '70dae64d63589f2fe6203cc0721247bbbf3e95780c87176583d12b74e597450d'
             '09a38d3864987f930947c3b0c67bc3644c6cce86f098fa956dc787bf1f7a81df'
-            '8a659bb6ad5aaf1f009da585b91b1ecf83e6fb960326bef8cef8cf93cb8a4ca9'
+            'c4bc9e482581b2e58bb69a11e42636b5b75f0fa5bf0eb20a034594ec8f40f2d6'
             'b1b1cf291bd68270b700eb21f19f7b052116d07dde492761227cd94bb775910c'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182')
@@ -272,9 +273,6 @@ package_linux-headers() {
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/mm"
   cp fs/xfs/xfs_sb.h "${pkgdir}/usr/src/linux-${_kernver}/fs/xfs/xfs_sb.h"
 
-  #aufs3-util need
-  sed -i "s:__user::g" "${pkgdir}/usr/src/linux-${_kernver}/include/linux/aufs_type.h"
-
   # copy in Kconfig files
   for i in `find . -name "Kconfig*"`; do
     mkdir -p "${pkgdir}"/usr/src/linux-${_kernver}/`echo ${i} | sed 's|/Kconfig.*||'`
@@ -316,4 +314,3 @@ package_linux-docs() {
   # remove a file already in linux package
   rm -f "${pkgdir}/usr/src/linux-${_kernver}/Documentation/DocBook/Makefile"
 }
-
