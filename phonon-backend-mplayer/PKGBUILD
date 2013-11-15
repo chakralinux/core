@@ -1,9 +1,10 @@
-# Maintainer: abveritas@chakra-project.org
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# contributor: abveritas@chakra-project.org
 
 pkgname=('phonon-backend-mplayer')
 _pkgname=('phonon-mplayer')
 pkgver=20120212
-pkgrel=10
+pkgrel=11
 pkgdesc='Phonon MPlayer backend'
 arch=('x86_64')
 url='http://phonon.kde.org'
@@ -14,9 +15,11 @@ groups=("kde-complete" "kde-uninstall")
 conflicts=("phonon-mplayer-svn" 'phonon-mplayer')
 replaces=("phonon-mplayer-svn" 'phonon-mplayer')
 source=("http://chakra.sourceforge.net/sources/${pkgname}/${pkgname}-${pkgver}.tar.xz"
-        "find-config.patch")
+        "find-config.patch"
+        'fixqtdefinitions.patch')
 md5sums=('3e4334033ff7930a9b2a55a8b46fc9db'
-         '55a20d7146371fbf1f1139a2ed874604')
+         '55a20d7146371fbf1f1139a2ed874604'
+         'ab4c216d2b66e6763dd90a7160fbaf65')
 
 # create tarball: source PKGBUILD && mksource
 
@@ -33,7 +36,7 @@ mksource() {
 build() {
 	cd "$srcdir/${pkgname}-${pkgver}"
 	patch -Np1 -i ${srcdir}/find-config.patch
-
+        patch -p0 -i  ${srcdir}/fixqtdefinitions.patch
 	msg "Starting make..."
 
 	# Config
