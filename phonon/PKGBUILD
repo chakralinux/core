@@ -1,9 +1,9 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
-# Contributor: abveritas@chakra-project.org
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/phonon
 
 pkgname=phonon
 pkgver=4.7.0
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://phonon.kde.org"
 license=('LGPL')
@@ -21,8 +21,8 @@ build() {
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_SKIP_RPATH=ON \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DPHONON_QT_MKSPECS_INSTALL_DIR=/usr/share/qt/mkspecs/modules \
-    -DPHONON_QT_PLUGIN_INSTALL_DIR=/usr/lib/qt/plugins/designer
+    -DPHONON_INSTALL_QT_EXTENSIONS_INTO_SYSTEM_QT=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib
   make
 }
 
