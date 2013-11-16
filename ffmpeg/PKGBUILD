@@ -1,15 +1,20 @@
+#
+# Platform packages of Chakra, part of chakra-project.org
+#
 # Maintainer abveritas@chakra-project.org
 
 pkgname=ffmpeg
 pkgver=2.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('x86_64')
 url="http://ffmpeg.org/"
 license=('GPL')
 depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'celt'
          'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx>=1.1.0'
-         'libva' 'openjpeg' 'rtmpdump' 'speex' 'gsm' 'pulseaudio' 'v4l-utils')
+         'libva' 'openjpeg' 'rtmpdump' 'speex' 'gsm' 'pulseaudio' 'v4l-utils' 'libass' 
+         'libbluray' 'fontconfig' 'freetype2' 'libdc1394' 'libavc1394' 'libavc1394' 'libcaca'
+	 'openal')
 makedepends=('yasm')
 source=("http://${pkgname}.org/releases/${pkgname}-${pkgver}.tar.bz2")
 md5sums=('4ec1cedd4c7753512462f70b347c338a')
@@ -18,6 +23,13 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   ./configure --prefix=/usr \
+ 	      --enable-bzlib \
+	      --enable-dxva2 \
+	      --enable-fontconfig \
+              --enable-libass \
+	      --enable-libbluray \
+ 	      --enable-libcaca \
+	      --enable-libdc1394 \
               --enable-libmp3lame \
               --enable-libvorbis \
               --enable-libxvid \
@@ -36,11 +48,15 @@ build() {
               --enable-libpulse \
               --enable-gpl \
               --enable-version3 \
+	      --enable-vaapi \
+	      --enable-vda \
+	      --enable-vdpau \
               --enable-runtime-cpudetect \
               --enable-libspeex \
               --enable-libv4l2 \
               --enable-libcelt \
               --enable-avresample \
+	      --enable-openal \
               --disable-debug \
               --disable-static
 
