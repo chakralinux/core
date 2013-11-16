@@ -6,7 +6,7 @@
 
 pkgname=fontconfig
 pkgver=2.10.93
-pkgrel=4
+pkgrel=5
 _ubuntu_diff_version=${pkgver}-0ubuntu1
 pkgdesc="A library for configuring and customizing font access"
 arch=('x86_64')
@@ -47,7 +47,6 @@ backup=(etc/fonts/conf.d/10-antialias.conf
         etc/fonts/conf.d/65-khmer.conf
         etc/fonts/conf.d/65-nonlatin.conf
         etc/fonts/conf.d/69-unifont.conf
-        etc/fonts/conf.d/70-no-bitmaps.conf
         etc/fonts/conf.d/80-delicious.conf
         etc/fonts/conf.d/90-synthetic.conf
 )
@@ -105,5 +104,8 @@ package() {
   # Install license
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}"
+  
+  # disable 70-no-bitmaps.conf
+  rm "$pkgdir/etc/fonts/conf.d/70-no-bitmaps.conf"
 }
 
