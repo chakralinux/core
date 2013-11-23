@@ -1,12 +1,14 @@
-# $Id: PKGBUILD 59900 2009-11-29 16:03:59Z jgc $
-# Maintainer: damir <damir@archlinux.org>
+#
+# Platform packages for Chakra, part of chakra-project.org
+# 
 # Contributor: damir <damir@archlinux.org>
+# Maintainer: Bruce Liu <rainman59118 AT Gmail.com>
 
 pkgname=libcdio
-pkgver=0.83
+pkgver=0.90
 pkgrel=1
 pkgdesc="GNU Compact Disc Input and Control Library"
-arch=("i686" "x86_64")
+arch=("x86_64")
 license=('GPL3')
 url="http://www.gnu.org/software/libcdio/"
 depends=('gcc-libs>=4.4.2' 'libcddb' 'ncurses')
@@ -15,8 +17,8 @@ install=libcdio.install
 source=(http://ftp.gnu.org/gnu/libcdio/${pkgname}-${pkgver}.tar.gz)
 source=("http://ftp.gnu.org/gnu/libcdio/${pkgname}-${pkgver}.tar.gz"
         "libcdio-0.83-linking.patch")
-md5sums=('b9e0f1bccb142e697cd834fe56b6e6fb'
-         '8ff23299effd635725fd070d03aac9cf')
+md5sums=('1b245b023fb03a58d030fd2800db3247'
+         '2826f89c78f09b0c0cbaeb47d507a55e')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -34,7 +36,8 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   
-  make -j1 DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" install
   sed -i "/LIBCDIO_SOURCE_PATH/s|.*|/* #undef LIBCDIO_SOURCE_PATH */|" \
     "${pkgdir}/usr/include/cdio/cdio_config.h"
 }
+
