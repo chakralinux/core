@@ -1,17 +1,10 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xorg-utils
 pkgver=7.6
-pkgrel=4
+pkgrel=5
 pkgdesc="Collection of client utilities used to query the X server"
-arch=(i686 x86_64)
+arch=(x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('libxxf86dga' 'libxi' 'libxxf86misc' 'libxtst' 'libxinerama' 'libxv'
@@ -58,13 +51,13 @@ build() {
   for i in *; do
     if [ -d "${i}" ]; then
       pushd "${i}"
-      ./configure --prefix=/usr --mandir=/usr/share/man || return 1
-      make || return 1
-      make DESTDIR="${pkgdir}" install || return 1
-      install -D -m644 COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE.${i%-*} || return 1
+      ./configure --prefix=/usr --mandir=/usr/share/man
+      make
+      make DESTDIR="${pkgdir}" install
+      install -D -m644 COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE.${i%-*}
       popd
     fi
   done
 # Replacing stub license files
-  install -D -m644 "${srcdir}"/LICENSE.* "${pkgdir}/usr/share/licenses/${pkgname}/"  || return 1
+  install -D -m644 "${srcdir}"/LICENSE.* "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
