@@ -1,19 +1,19 @@
 #
-# QT Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakra-project.org
 #
-# Maintainer: Daniele Cocca <jmc@chakra-project.org>
 
 pkgbase=v8
 pkgname=('v8' 'v8-src')
-pkgver=3.19.0
+pkgver=3.23.10
 pkgrel=1
 arch=('x86_64')
 depends=('gcc-libs' 'readline')
 url="http://code.google.com/p/v8/"
 license=('BSD')
 makedepends=('python2' 'subversion')
-source=(http://commondatastorage.googleapis.com/chromium-browser-official/$pkgname-$pkgver.tar.bz2)
-md5sums=('298956dd1b319839c2b16ceff346ba79')
+source=(https://github.com/$pkgname/$pkgname/archive/$pkgver.tar.gz)
+# http://commondatastorage.googleapis.com/chromium-browser-official/$pkgname-$pkgver.tar.bz2
+md5sums=('fdfa5406bcaeec9c978acd9ad99c18ef')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -48,7 +48,7 @@ package_v8-src() {
 pkgdesc="V8 is Google's open source JavaScript engine. (Source package)"
 
   install -d "${pkgdir}/usr/src/"
-  tar -xvjf "${srcdir}/${pkgbase}-${pkgver}.tar.bz2" \
+  tar -zxvf "${srcdir}/${pkgver}.tar.gz" \
         -C "${pkgdir}/usr/src/" \
       --exclude-vcs
 
