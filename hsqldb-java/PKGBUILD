@@ -1,34 +1,38 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
+pkgbase=hsqldb
 pkgname=hsqldb-java
-pkgver=1.8.0.10
+pkgver=2.3.1
 pkgrel=1
 pkgdesc="HSQLDB Java libraries"
 arch=('any')
 license=('custom')
-makedepends=('openjdk6' 'unzip' 'apache-ant')
-source=(http://downloads.sourceforge.net/sourceforge/hsqldb/hsqldb_${pkgver//./_}.zip)
+makedepends=('openjdk' 'unzip' 'apache-ant')
+source=("http://downloads.sourceforge.net/project/hsqldb/hsqldb/hsqldb_2_3/hsqldb-${pkgver}.zip")
 url="http://hsqldb.org/"
-md5sums=('17410483b5b5f267aa18b7e00b65e6e0')
-
-# we are forced to downgrad because OOo doesn't work with anything more recent
-options=('force')
+md5sums=('9c1c022a887c9db0d6fd4624e80dc1f1')
 
 build() {
-  [ -z "${JAVA_HOME}" ] && . /etc/profile.d/openjdk6.sh
+  [ -z "${JAVA_HOME}" ] && . /etc/profile.d/openjdk.sh
   [ -z "${ANT_HOME}" ] && . /etc/profile.d/apache-ant.sh
 
-  cd ${srcdir}/hsqldb/build
+  cd "${srcdir}/${pkgbase}-${pkgver}/hsqldb/build"
 
-  ant jar || return 1
+  ant hsqldb
+}
 
-  mkdir -p ${pkgdir}/usr/share/java
-  install -m644 ${srcdir}/hsqldb/lib/hsqldb.jar ${pkgdir}/usr/share/java/
+package() {
+  cd "${srcdir}/${pkgbase}-${pkgver}/hsqldb/build"
+  
+  mkdir -p "${pkgdir}/usr/share/java"
+  install -m644 \
+          "${srcdir}/hsqldb-${pkgver}/hsqldb/lib/"{hsqldb,sqltool}.jar \
+          "${pkgdir}/usr/share/java/"
 
-  mkdir -p ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m644 ${srcdir}/hsqldb/doc/hsqldb_lic.txt ${pkgdir}/usr/share/licenses/${pkgname}/
+  mkdir -p "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 \
+          "${srcdir}/hsqldb-${pkgver}/hsqldb/doc/hsqldb_lic.txt" \
+          "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
