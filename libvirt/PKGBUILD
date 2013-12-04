@@ -2,7 +2,7 @@
 # contributor abveritas@chakra-project.org
 
 pkgname=libvirt
-pkgver=1.1.0
+pkgver=1.2.0
 pkgrel=1
 pkgdesc="API for controlling virtualization engines (openvz,kvm,qemu,virtualbox,xen,etc)"
 arch=('x86_64')
@@ -29,17 +29,14 @@ source=("http://libvirt.org/sources/$pkgname-$pkgver.tar.gz"
 	'libvirtd.conf.d'
 	'libvirtd-guests.conf.d'
 	'libvirt.tmpfiles.d' 
-        'storage-fix.patch')
-md5sums=('f980a84719033e9efca01048da505dfb'
+        )
+md5sums=('f74f78059def4e68d69b975ad6e6c3e2'
          '3ed0e24f5b5e25bf553f5427d64915e6'
          'bc2971dacdbac967fc3474e50affc345'
-         '8d98e62915785686b0b6c8c070628392'
-         '321f03bd626d2d24e816d5298c3bc3fe')
+         '8d98e62915785686b0b6c8c070628392')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
-
-  patch -p1 <$srcdir/storage-fix.patch
 
   export LDFLAGS=-lX11
   export RADVD=/usr/bin/radvd
@@ -74,3 +71,4 @@ package() {
 	"$pkgdir"/lib \
 	"$pkgdir"/etc/sysctl.d
 }
+
