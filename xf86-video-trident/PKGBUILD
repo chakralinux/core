@@ -4,19 +4,25 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-trident
-pkgver=1.3.5
-pkgrel=2
+pkgver=1.3.6
+pkgrel=1
 pkgdesc="X.org Trident video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'xf86dgaproto')
+makedepends=('xorg-server' 'xf86dgaproto' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.12.3')
 groups=('xorg-video-drivers')
 options=(!libtool)
-source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-sha1sums=('d4ef8112eeabb7a7e31e287172425e3540bb34fd')
+source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2" "git-fixes.patch")
+sha1sums=('9af5d275e6f4247cde19765178c3a797b4a7351d'
+          'd187c12e24a736a782bc4272710a93da14ebe30f')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 < ${srcdir}/git-fixes.patch 
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
