@@ -4,24 +4,37 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-sis
-pkgver=0.10.4
+pkgver=0.10.7
 pkgrel=1
 pkgdesc="X.org SiS video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'xf86dgaproto' 'libdrm')
+makedepends=('xorg-server' 'xf86dgaproto' 'libdrm' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.12.3')
 options=('!libtool')
 groups=('xorg-video-drivers')
-source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-sha1sums=('e17fabf160939cef3128f4b10f70fd5f9b0e6442')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
+        0001-Disable-UploadToScreen-and-DownloadFromScreen.patch
+        git-fixes.patch
+        Xi.patch)
+sha1sums=('8f8cd88fe7d3a85f6bf2b12a34fd55db35f186d7'
+          'a99b417dd81f7dae7a013723872332402afc7fa2'
+          'f370033a699eaf5d0b13e6e27146450218d7069a'
+          '7a2cf4cdb24667f7703c6894dccd6e0e10a91cae')
+
+prepare() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    patch -Np1 -i "${srcdir}/0001-Disable-UploadToScreen-and-DownloadFromScreen.patch"
+    patch -Np1 -i ${srcdir}/git-fixes.patch
+    patch -Np1 -i ${srcdir}/Xi.patch
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr --disable-dri
+  ./configure --prefix=/usr 
   make
 }
 
