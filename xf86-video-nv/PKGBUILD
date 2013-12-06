@@ -4,19 +4,25 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-nv
-pkgver=2.1.18
-pkgrel=8
+pkgver=2.1.20
+pkgrel=1
 pkgdesc="X.org nv video driver"
 arch=('i686' 'x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('glibc')
-makedepends=('pkgconfig' 'xorg-server>=1.12.3')
+makedepends=('xf86driproto' 'resourceproto' 'scrnsaverproto' 'pkgconfig' 'xorg-server>=1.12.3')
 conflicts=('xorg-server<1.12.3')
 options=('!libtool')
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('d35b2fa5a26a507a9cc95b69243d9fd0c0f32aa2')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 "git-fixes.patch")
+sha1sums=('42b129be471d16444c5a7b443491e8d9e3e5df1a'
+          '7db44033619e8907e89fe06c9de1d81721eb71f3')
+
+prepare() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    patch -Np1 -i ${srcdir}/git-fixes.patch
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
