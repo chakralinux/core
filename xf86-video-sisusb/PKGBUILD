@@ -4,19 +4,25 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-sisusb
-pkgver=0.9.5
+pkgver=0.9.6
 pkgrel=1
 pkgdesc="X.org SiS USB video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server')
+makedepends=('xorg-server' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.12.3')
 groups=('xorg-video-drivers')
 options=('!libtool')
-source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-sha1sums=('7b5ad3bf7d19557120f2b842f9d0d0e16e00f7e6')
+source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2" "git-fixes.patch")
+sha1sums=('acb96457a0f3f5631129841cb4477d61fd2707dd'
+          '6516bba2443ad24ef7a10f16fa43e23ece6fb87e')
+
+prepare() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    patch -Np1 -i ${srcdir}/git-fixes.patch
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
