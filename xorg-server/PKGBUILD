@@ -4,8 +4,8 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xorg-server
-pkgver=1.12.3
-pkgrel=3
+pkgver=1.14.4
+pkgrel=1
 pkgdesc="X.Org X servers"
 arch=('i686' 'x86_64')
 license=('custom')
@@ -22,32 +22,56 @@ backup=('etc/X11/xorg.conf.d/10-evdev.conf' 'etc/X11/xorg.conf.d/10-quirks.conf'
 options=('!libtool')
 provides=('x-server')
 groups=('xorg')
-source=("${url}/releases/individual/xserver/${pkgname}-${pkgver}.tar.bz2"
-        'autoconfig-nvidia.patch'
-        'xvfb-run'
-        'xvfb-run.1'
-        '10-quirks.conf'
-        'autoconfig-sis.patch')
-sha1sums=('f3f3d59f3c5e15459152987ffc644f06a0d1374f'
-          '746f0204050ceca7caa111b52a87336b7356dcd2'
+source=(${url}/releases/individual/xserver/${pkgname}-${pkgver}.tar.bz2
+        autoconfig-nvidia.patch
+        autoconfig-sis.patch
+        xserver-1.6.0-less-acpi-brokenness.patch
+        xephyr-glx.patch
+        xvfb-run
+        xvfb-run.1
+        10-quirks.conf
+        fb-rename-wfbDestroyGlyphCache.patch)
+
+sha1sums=('5ee112b52f0cec043aa68bd909457b2ea2a11380'
+          '9b85655d11f5f39c28757b1fc9dede2980d5275b'
+          '175de5630b43dbc97778adfba5563b7fdd77f11f'
+          '2f7778b5a20a9e8160195469c24be2213bed0cad'
+          '8b91a8137850d6a26f7fbdc5f7b10a6af784846e'
           'c94f742d3f9cabf958ae58e4015d9dd185aabedc'
           '6838fc00ef4618c924a77e0fb03c05346080908a'
           '993798f3d22ad672d769dae5f48d1fa068d5578f'
-          '175de5630b43dbc97778adfba5563b7fdd77f11f')
+          '07a1597ccc8b3f7194d2eeb1efd81bb32ab74107')
+
+prepare() {
+ cd "${pkgbase}-${pkgver}"
+  # Use nouveau/nv/nvidia drivers for nvidia devices
+  patch -Np1 -i ../autoconfig-nvidia.patch
+
+  # Use unofficial imedia SiS driver for supported SiS devices
+  patch -Np0 -i ../autoconfig-sis.patch
+
+  # https://bugs.freedesktop.org/show_bug.cgi?id=59825 - fixes crash with vboxvideo
+#  patch -Np1 -i ../bug59825.patch
+
+  # From Fedora. Do not build acpid code, it is buggy and we do not need it
+  patch --ignore-whitespace -Np1 -i ../xserver-1.6.0-less-acpi-brokenness.patch
+
+  # Add GLX support for Xephyr - https://bugs.freedesktop.org/show_bug.cgi?id=62346
+  patch -Np0 -i ../xephyr-glx.patch
+
+  # http://cgit.freedesktop.org/xorg/xserver/commit/fb/wfbrename.h?id=5047810a4c20fab444b8c6eb146c55dcdb0d4219
+  patch -Np1 -i ../fb-rename-wfbDestroyGlyphCache.patch
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  # Use nouveau/nv/nvidia drivers for nvidia devices
-  patch -p1 -i "${srcdir}/autoconfig-nvidia.patch"
-  
-  # Use unofficial imedia SiS driver for supported SiS devices
-  patch -p0 -i "${srcdir}/autoconfig-sis.patch"
 
   autoreconf -fiv
   ./configure --prefix=/usr \
       --enable-ipv6 \
       --enable-dri \
+      --enable-dri2 \
       --enable-dmx \
       --enable-xvfb \
       --enable-xnest \
