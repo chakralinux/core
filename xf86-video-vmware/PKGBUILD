@@ -5,16 +5,16 @@
 
 pkgname=xf86-video-vmware
 pkgver=13.0.1
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org vmware video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('libdrm' 'svga-dri' 'llvm')
-makedepends=('xorg-server'  'libx11' 'libxext')
+makedepends=('xorg-server'  'libx11' 'libxext' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.12.3')
 groups=('xorg-video-drivers')
-options=('!libtool' '!emptydirs')
+options=('!emptydirs')
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
 md5sums=('b08e0195ebf3f88a82129322cb93da08')
 
@@ -32,3 +32,4 @@ package() {
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
+
