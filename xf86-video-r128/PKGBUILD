@@ -4,24 +4,24 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-r128
-pkgver=6.8.3
+pkgver=6.9.2
 pkgrel=1
 pkgdesc="X.org ati Rage128 video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server>=1.12.3')
+makedepends=('xorg-server>=1.12.3' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.12.3')
 groups=('xorg-video-drivers')
 options=('!libtool')
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('34540f6f8214eda9370dc9d35394ac2c')
+md5sums=('2e906d856a1c477bde000254b142445c')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr  --disable-dri
+  ./configure --prefix=/usr  
   make 
 }
 
