@@ -1,10 +1,9 @@
 #
 # Core packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=ca-certificates
-pkgver=20130610
+pkgver=20130906
 pkgrel=1
 pkgdesc='Common CA certificates'
 arch=('any')
@@ -13,20 +12,24 @@ license=('MPL' 'GPL')
 source=("http://ftp.debian.org/debian/pool/main/c/${pkgname}/${pkgname}_${pkgver}.tar.gz")
 depends=('bash' 'run-parts' 'openssl' 'findutils' 'coreutils' 'sed')
 makedepends=('ruby' 'python2')
-install=ca-certificates.install
+install='ca-certificates.install'
 backup=('etc/ca-certificates.conf')
-md5sums=('ca34fb3a5bfb3264062d592c69f1dec6')
+md5sums=('67d42b6be21c616a8b7d3d85d95ae912')
 
-build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+prepare() {
+  cd ${srcdir}/${pkgname}
 
   sed 's|/usr/bin/python|/usr/bin/python2|g' -i mozilla/certdata2pem.py
   sed 's|python|python2|g' -i mozilla/Makefile
+}
+
+build() {
+  cd ${srcdir}/${pkgname}
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${srcdir}/${pkgname}
 
   install -d -m755 "${pkgdir}"/{etc/ca-certificates/update.d,usr/{sbin,share/ca-certificates},etc/ssl/certs}
   make install DESTDIR="${pkgdir}"
