@@ -4,19 +4,25 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-s3
-pkgver=0.6.4
-pkgrel=2
+pkgver=0.6.5
+pkgrel=1
 pkgdesc="X.org S3 video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('pkgconfig' 'xorg-server>=1.12.3')
+makedepends=('pkgconfig' 'xorg-server>=1.12.3' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.10.1')
 options=('!libtool')
 groups=('xorg-video-drivers')
-source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('c8d27317de8f38be0548c25634e89350')
+source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2" "mibstore.patch")
+md5sums=('37248d5c5a04d7f91c6f634cc592b304'
+         '46d0949deba4b393e34693f67eff7a93')
+
+prepare(){
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i ${srcdir}/mibstore.patch
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
