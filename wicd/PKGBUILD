@@ -4,36 +4,50 @@
 
 pkgname=wicd
 pkgver=1.7.2.4
-pkgrel=6
+pkgrel=7
 pkgdesc="New and alternative wireless/wired network management utility"
 arch=('x86_64')
 url="http://wicd.sourceforge.net/"
 license=('GPL2')
-depends=('python2' 'dbus-python' 'dhcpcd' 'wpa_supplicant' 'wireless_tools' 'python-babel'
+depends=('python2' 'dhcpcd' 'wpa_supplicant' 'wireless_tools' 'python-babel'
            'net-tools' 'ethtool' 'shared-mime-info' 'python2-urwid' 'python2-gobject' 
-           'dbus-python2' 'gettext')
-optdepends=('python-wpactrl:	needed if you want to use the new experimental ioctrl backend'
-	    'python-iwscan:	needed if you want to use the new experimental ioctrl backend'
-	    'wicd-client-kde:	needed if you want to use kde ui')
+           'python2-dbus' 'gettext')
+optdepends=('python-wpactrl:    needed if you want to use the new experimental ioctrl backend'
+            'python-iwscan:     needed if you want to use the new experimental ioctrl backend'
+            'wicd-client-kde:   needed if you want to use kde ui')
 conflicts=('wicd-svn')
 install=wicd.install
 source=(https://launchpad.net/wicd/1.7/$pkgver/+download/$pkgname-$pkgver.tar.gz     
         wicd.desktop
-        dbus_string_fix.patch)
+        dbus_string_fix.patch
+        http://bazaar.launchpad.net/~wicd-devel/wicd/experimental/diff/831
+        http://bazaar.launchpad.net/~wicd-devel/wicd/experimental/diff/835)
 categories=('network')
 options=('emptydirs')
 backup=('etc/wicd/encryption/templates/active')
 md5sums=('c2435ddfdef0b9898852d72a85a45f0f'
          '326df163a5732d38741371baa4fce9e5'
-         '1d28a46ef05a972cd5a69530f5b53856')
+         '744b3c12fe901ed435351e884dc8cb1d'
+         '0d2355bc2eb7234a537f42f1773edfe0'
+         '1630d7fe8f09911302d33b26286ff9b8')
 
-build() {
-  cd $srcdir/$pkgname-$pkgver
-
-  patch -p0 < $srcdir/dbus_string_fix.patch
+prepare() {
+  cd $pkgbase-$pkgver
 
   find . -type f -exec sed -i 's@#!/usr.*python@#!/usr/bin/python2@' {} \;
   export PYTHON=python2
+  
+  sed -i 's|/usr/sbin/|/usr/bin/|' other/wicd.service
+
+  patch -p0 < "$srcdir/dbus_string_fix.patch"
+  
+  # Fix problem with new urwid FS#33378 LP#1075399
+  patch -Np0 -i "$srcdir/831"
+  patch -Np0 -i "$srcdir/835"
+}
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
 
   python2 setup.py configure --no-install-init \
                              --resume=/usr/share/wicd/scripts/ \
@@ -41,7 +55,8 @@ build() {
                              --verbose \
                              --python=/usr/bin/python2 \
                              --lib=/usr/lib \
-			    --systemd=/usr/lib/systemd/system
+                             --sbin=/usr/bin \
+                             --systemd=/usr/lib/systemd/system
 
   mkdir -p translations/ast/LC_MESSAGES
   msgfmt po/ast.po -o translations/ast/LC_MESSAGES/wicd.mo
