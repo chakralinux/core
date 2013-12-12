@@ -3,20 +3,25 @@
 
 pkgname=phonon
 pkgver=4.7.1
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://phonon.kde.org"
 license=('LGPL')
 pkgdesc="The multimedia framework for KDE4"
 depends=('pulseaudio' 'libqzeitgeist' 'qtwebkit')
 makedepends=('cmake' 'automoc4')
-source=("http://download.kde.org/stable/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=('4ff7802deeac1557166591deb9fc2bfdfcaacdeb5389d07f08255365fb91b75d')
+source=("http://download.kde.org/stable/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
+	     'pulsesupport.patch')
+sha256sums=('4ff7802deeac1557166591deb9fc2bfdfcaacdeb5389d07f08255365fb91b75d'         
+            'bc3b4cc3ac171462adc3730e5f80a65bcfc082f04282ad605765f0db5954d4c7')
 
+prepare(){
+  mkdir "${srcdir}"/build
+  # patch form Comment#38 at https://bugs.kde.org/show_bug.cgi?id=324975#c38
+  patch -uN ${srcdir}/${pkgname}-${pkgver}/phonon/pulsesupport.cpp ${srcdir}/pulsesupport.patch
+}
 build() {
-  cd "${srcdir}"
-  mkdir build
-  cd build
+  cd "${srcdir}"/build
   cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_SKIP_RPATH=ON \
