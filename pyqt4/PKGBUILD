@@ -1,6 +1,3 @@
-#
-# Platform Packages for Chakra, part of www.chakra-project.org
-#
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: A Boersma (abveritas) <abveritas@chakra-project.org>
 #               F Kosmale (Inkane) <inkane@chakra-project.org>
@@ -11,11 +8,10 @@
 #               Gerardo
 # NOTE: PyQt5 supports Qt v5. PyQt4 supports Qt v4 and will build against Qt v5.
 
-pkgbase=pyqt
-pkgname=('python-pyqt4-common' 'python2-pyqt4' 'python3-pyqt4')
+pkgbase=pyqt4
+pkgname=('python-pyqt4-common' 'python3-pyqt4' 'python2-pyqt4')
 pkgver=4.10.3
 pkgrel=11
-pkgdesc="A set of Python bindings for the Qt toolkit"
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
 license=('GPL')
@@ -99,7 +95,7 @@ build() {
 }
 
 package_python-pyqt4-common() {
-    pkgdesc="Parts of PyQt for Qt4 shared between python3-pyqt4 and python2-pyqt4"
+    pkgdesc="Common PyQt files shared between python3-pyqt4 and python2-pyqt4"
     depends=('qt')
     conflicts=('pyqt4-common' 'pyqt-common')
     replaces=('pyqt4-common' 'pyqt-common')
@@ -113,11 +109,11 @@ package_python-pyqt4-common() {
 
 package_python3-pyqt4() {
     pkgdesc="A set of Python 3 bindings for the Qt toolkit"
-    depends=('python3-dbus'
-             'python-pyqt4-common'
+    depends=('python-pyqt4-common'
              'python3'
-             'qtwebkit'
-             'python3-sip>=4.15')
+             'python3-dbus'
+             'python3-sip>=4.15'
+             'qtwebkit')
     optdepends=('phonon: enable audio and video in PyQt applications'
                 'python-opengl: enable OpenGL 3D graphics in PyQt applications'
                 'qscintilla-python3: QScintilla API'
@@ -126,13 +122,13 @@ package_python3-pyqt4() {
     replaces=('pyqt4-python3' 'pyqt')
     provides=("pyqt=${pkgver}")
 
-    cd "${srcdir}/PyQt-x11-gpl-${pkgver}"
+    cd ${srcdir}/PyQt-x11-gpl-${pkgver}
     msg "Packaging python3-pyqt4"
 
     # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
 
-    #  Fix naming conflict with pyqt4-python2
+    # Fix naming conflict with python2-pyqt4
     mv "${pkgdir}"/usr/bin/pyuic4{,-3.3}
 
     # Provided by python-pyqt4-common
@@ -142,26 +138,28 @@ package_python3-pyqt4() {
 
 package_python2-pyqt4() {
     pkgdesc="A set of Python 2 bindings for the Qt toolkit"
-    depends=('python2-dbus'
-             'python-pyqt4-common'
+    depends=('python-pyqt4-common'
              'python2'
-             'qtwebkit'
-             'python2-sip>=4.15')
+             'python2-dbus'
+             'python2-sip>=4.15'
+             'qtwebkit')
     optdepends=('phonon: enable audio and video in PyQt applications'
                 'python-opengl: enable OpenGL 3D graphics in PyQt applications'
                 'qscintilla-python2: QScintilla API'
                 'qt-assistant-compat: add PyQt online help in Qt Assistant')
-    conflicts=('pyqt4-python2' 'pyqt-python2')
-    replaces=('pyqt4-python2' 'pyqt-python2')
+    conflicts=('pyqt4-python2'
+               'pyqt-python2')
+    replaces=('pyqt4-python2'
+              'pyqt-python2')
     provides=("pyqt4-python2=${pkgver}")
 
-    cd "${srcdir}/python2-PyQt-x11-gpl-${pkgver}"
+    cd ${srcdir}/python2-PyQt-x11-gpl-${pkgver}
     msg "Packaging pyqt4-python2"
 
     # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
 
-    #  Fix naming conflict with pyqt4-python3
+    #  Fix naming conflict with python3-pyqt4
     mv "${pkgdir}"/usr/bin/pyuic4{,-2.7}
 
     # Default /usr/bin/pyuic4
