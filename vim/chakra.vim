@@ -42,3 +42,4 @@ set t_Co=256
 set wildmode=list:longest
 set wrap                        " Enable soft linewrap
 set wrapmargin=0                " Number of characters from the right
+colorscheme molokai
