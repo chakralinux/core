@@ -14,7 +14,7 @@ _patchlevel=131
 __hgrev=c7bcb04f613e
 _versiondir="vim${_topver//./}"
 pkgver=${_topver}.${_patchlevel}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 license=('custom:vim')
 url="http://www.vim.org"
@@ -36,9 +36,9 @@ source=("vim-${pkgver}.tar.xz"
         'chakra.vim'
         'vimrc'
         'https://raw.github.com/tomasr/molokai/master/colors/molokai.vim')
-sha512sums=('d4b7fa11ab77b759493ae05126d08502df8566eb962a8e81303eb89f786ed416068b6bdff037fb6df78fd4fa0bd390336cae8c00b915ec4e01bb905d41c535f7'
-            '89332cf83ff32c1f5a7492db65675ba424af87967fdae64ccdd8b2f468cdae493c4a1daacf6a7b306ccaf844a4147af32606ddb652098ca36f63c37df53100af'
-            '81d931203d5c387bdb56ab1b1fca3962e5569e019b066a34c7078353332eff13152e99d818c471bdb0e8424dd9cae4d896c2ffebc0d5b53121ed6c13406f41cb'
+sha512sums=('4fed94267aa1f2435a09a3aef76eceffb7a50179e19960bf581110373d537843e1e355f050c404234ea44ae7f1396bb43b54ca2eb0d3a33b35dd0571669b1674'
+            '493b95e83bd6fb6ce2ebec17994af0bf8e6b209383979d9a1cda58c9af947acda04f8917d39e4e4a4a5db414043c7b44a5347f9bbbb0fb1fb7ca2674387b638a'
+            '5f7af0b78acfbec6b3909e025621a713b36775f48ff0f1af8a3f5f46d668090e88c1d70e167129eeaec2dfd0af1c0de4e728915bae3982206db7d03bb596a6bd'
             'a8bffc4461363ffc6edf9c13223e23a334817b1a0bd82b32f55b4014fbe63c4b59490b2f1744e93e21f5dd80fe4131c41f2e7cc716878fc9563017ef59dbf297')
 
 # source PKGBUILD && mksource
@@ -166,6 +166,7 @@ package_vim() {
   done
 
   # Move the runtime for later packaging
+  msg2 "MOVING THE RUNTIME! $pkgdir"
   mv -v "${pkgdir}"/usr/share/vim "${srcdir}"/runtime-install
 
   # License
@@ -187,6 +188,10 @@ package_vim-tiny() {
 
   # Provided by (n)vi in core
   rm "${pkgdir}"/usr/bin/{ex,view}
+
+  # Remove the runtime
+  msg2 "REMOVING THE RUNTIME! $pkgdir"
+  rm -rv "${pkgdir}"/usr/share/vim
 
   # Delete some manpages
   find "${pkgdir}"/usr/share/man -type d -name 'man1' 2>/dev/null | \
