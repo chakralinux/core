@@ -1,26 +1,27 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=libxxf86dga
-pkgver=1.1.2
+pkgver=1.1.4
 pkgrel=1
 pkgdesc="X11 Direct Graphics Access extension library"
-arch=(i686 x86_64)
+arch=(x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('libxext' 'xf86dgaproto')
 makedepends=('xorg-util-macros')
 options=('!libtool')
 source=(${url}/releases/individual/lib/libXxf86dga-${pkgver}.tar.bz2)
-sha1sums=('333a9f5c61eba896f420969561606551174645cd')
+sha1sums=('51f2fc8d5d5fb398cf3c66735789feadb9aaeba9')
 
 build() {
   cd "${srcdir}/libXxf86dga-${pkgver}"
   ./configure --prefix=/usr --disable-static
   make
+}
+
+package() {
+  cd "${srcdir}/libXxf86dga-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
