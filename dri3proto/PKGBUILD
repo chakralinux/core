@@ -1,0 +1,27 @@
+# Part of X.org group
+# Contributor: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: Bruce Liu <brli@users.sourceforge.net>
+
+pkgname=dri3proto
+pkgver=1.0
+pkgrel=1
+pkgdesc="X11 DRI protocol"
+arch=('x86_64')
+license=('custom')
+url="http://xorg.freedesktop.org/"
+depends=('xorg-util-macros')
+source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('a3d2cbe60a9ca1bf3aea6c93c817fee3')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  # License missing
+  #install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+}
+
