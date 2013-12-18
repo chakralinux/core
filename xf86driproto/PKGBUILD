@@ -1,17 +1,15 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Part of X.org group
+# Contributor: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: Bruce Liu <brli@users.sourceforge.net)
 
 # include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+#source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=xf86driproto
 pkgver=2.1.1
-pkgrel=1
+pkgrel=2
 pkgdesc="X11 DRI extension wire protocol"
-arch=(any)
+arch=(x86_64)
 makedepends=('xorg-util-macros')
 url="http://xorg.freedesktop.org/"
 license=('custom')
@@ -22,8 +20,10 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr
   make
+}
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
 }
