@@ -1,29 +1,27 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xorg-xauth
-pkgver=1.0.6
+pkgver=1.0.8
 pkgrel=1
 pkgdesc="X.Org authorization settings program"
-arch=(i686 x86_64)
+arch=(x86_64)
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('libxmu')
-makedepends=('pkgconfig')
+makedepends=('pkgconfig' 'xorg-util-macros')
 source=(${url}/releases/individual/app/xauth-${pkgver}.tar.bz2)
-md5sums=('105f5b00bb9293b3db36f7e500d4f950')
+md5sums=('50ee2ec0836c0186b05ec8fdcfd566d0')
 
 build() {
   cd "${srcdir}/xauth-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr 
+  make
+}
+
+package() {
+  cd "${srcdir}/xauth-${pkgver}"
+  make DESTDIR="${pkgdir}" install
   install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
