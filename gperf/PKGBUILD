@@ -1,4 +1,6 @@
-# maintainer: <abveritas[at]chakra-project[dot]org>
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# contributor: <abveritas[at]chakra-project[dot]org>
 
 pkgname=gperf
 pkgver=3.0.4
@@ -14,7 +16,6 @@ md5sums=('c1f1db32fb6598d6a93e6e88796a8632')
 
 build() {
   cd "${srcdir}"/${pkgname}-${pkgver}
-  
   ./configure --prefix=/usr \
     --docdir=/usr/share/gperf/doc/
   make
@@ -22,6 +23,5 @@ build() {
 
 package() {
   cd "${srcdir}"/${pkgname}-${pkgver}
-  
   make DESTDIR="${pkgdir}" install
 }
