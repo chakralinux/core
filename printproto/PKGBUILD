@@ -1,23 +1,27 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=printproto
 pkgver=1.0.5
 pkgrel=2
 pkgdesc="X11 print extension wire protocol"
-arch=(any)
+arch=(x86_64)
 license=('custom')
 url="http://xorg.freedesktop.org/"
+makedepends=('xorg-util-macros')
 source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
 sha1sums=('4ddb7781ebc2418d681a6f5e16d777aed56ea35e')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  ./configure --prefix=/usr 
+  make
+}
 
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install 
+  
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
