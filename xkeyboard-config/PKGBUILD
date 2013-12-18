@@ -1,23 +1,17 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xkeyboard-config
-pkgver=2.7
+pkgver=2.10.1
 pkgrel=1
 pkgdesc="X keyboard configuration files"
-arch=(any)
+arch=(x86_64)
 license=('custom')
 url="http://www.freedesktop.org/wiki/Software/XKeyboardConfig"
 depends=('xorg-xkb-utils')
 makedepends=('intltool')
-provides=('xkbdata')
-replaces=('xkbdata')
-conflicts=('xkbdata')
 source=(http://www.x.org/releases/individual/data/${pkgname}/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('e5db0175511103fdf360c45b958f79967e665693')
+sha1sums=('09114bfd92f5c5a468a02cb0b3593e8a78adaa0e')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -26,6 +20,10 @@ build() {
       --with-xkb-rules-symlink=xorg \
       --enable-compat-rules=yes
   make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
   rm -f "${pkgdir}/usr/share/X11/xkb/compiled"
   install -m755 -d "${pkgdir}/var/lib/xkb"
