@@ -1,81 +1,85 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xorg-server-utils
 pkgver=7.6
-pkgrel=3
+pkgrel=4
 pkgdesc="X.Org utilities required by xorg-server"
-arch=(i686 x86_64)
+arch=(x86_64)
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('libxfontcache>=1.0.5' 'libxi>=1.3' 'libxaw>=1.0.7' 'libxxf86misc>=1.0.2' 'libxrandr>=1.3.0' 'libxxf86vm>=1.1.0' 'mcpp>=2.7.2')
+depends=('libxfontcache' 'libxi' 'libxaw' 'libxrandr' 'libxxf86vm' 'mcpp' 'xcb-util' 'libxinerama' 'libxcursor')
 makedepends=('pkgconfig' 'xbitmaps' 'bigreqsproto' 'xtrans')
 groups=('xorg')
-source=(${url}/releases/individual/app/iceauth-1.0.5.tar.bz2
-        ${url}/releases/individual/app/rgb-1.0.4.tar.bz2
-        ${url}/releases/individual/app/sessreg-1.0.7.tar.bz2
-        ${url}/releases/individual/app/xcmsdb-1.0.3.tar.bz2
-        ${url}/releases/individual/app/xbacklight-1.1.2.tar.bz2
-        ${url}/releases/individual/app/xgamma-1.0.4.tar.bz2
-        ${url}/releases/individual/app/xhost-1.0.4.tar.bz2
-        ${url}/releases/individual/app/xinput-1.5.3.tar.bz2
-        ${url}/releases/individual/app/xmodmap-1.0.5.tar.bz2
-        ${url}/releases/individual/app/xrandr-1.3.5.tar.bz2
-        ${url}/releases/individual/app/xrdb-1.0.9.tar.bz2
-        ${url}/releases/individual/app/xrefresh-1.0.4.tar.bz2
-        ${url}/releases/individual/app/xset-1.2.2.tar.bz2
+source=(${url}/releases/individual/app/iceauth-1.0.6.tar.bz2
+        ${url}/releases/individual/app/rgb-1.0.5.tar.bz2
+        ${url}/releases/individual/app/sessreg-1.0.8.tar.bz2
+        ${url}/releases/individual/app/xcmsdb-1.0.4.tar.bz2
+        ${url}/releases/individual/app/xbacklight-1.2.1.tar.bz2
+        ${url}/releases/individual/app/xgamma-1.0.5.tar.bz2
+        ${url}/releases/individual/app/xhost-1.0.6.tar.bz2
+        ${url}/releases/individual/app/xinput-1.6.1.tar.bz2
+        ${url}/releases/individual/app/xmodmap-1.0.8.tar.bz2
+        ${url}/releases/individual/app/xrandr-1.4.1.tar.bz2
+        ${url}/releases/individual/app/xrdb-1.1.0.tar.bz2
+        ${url}/releases/individual/app/xrefresh-1.0.5.tar.bz2
+        ${url}/releases/individual/app/xset-1.2.3.tar.bz2
         ${url}/releases/individual/app/xsetmode-1.0.0.tar.bz2
-        ${url}/releases/individual/app/xsetroot-1.1.0.tar.bz2
-        ${url}/releases/individual/app/xvidtune-1.0.2.tar.bz2
+        ${url}/releases/individual/app/xsetroot-1.1.1.tar.bz2
+        ${url}/releases/individual/app/xvidtune-1.0.3.tar.bz2
         LICENSE.iceauth
         LICENSE.xcmsdb
         LICENSE.xvidtune)
-md5sums=('08e3f6b523da8b0af179f22f339508b2'
-         '35c6cccbf25a872bdd62bfcb1a73d951'
-         'e99172cbd72700eeeae99f64632b5dc2'
-         'a8f013229f7234d582e0ee2c89879e30'
-         'c9891d6a3f3129d56cede72daa0ba26c'
-         '34d22b130bffd8aa857eae6d9da4bbb1'
-         '2be663a0afbcc0856c1591477d5bf32a'
-         '1e2f0ad4f3fa833b65c568907f171d28'
-         'b18850d373f3717dca569377c449d091'
-         '9735173a84dca9b05e06fd4686196b07'
-         'ed2e48cf33584455d74615ad4bbe4246'
-         '2f63f88ad0dcecd33c8cf000f38e9250'
-         'd44e0057d6722b25d5a314e82e0b7e7c'
+md5sums=('2527344acc60741a709f4858564c5ae6'
+         'bcd820d967eaa51bd25b86c0ee682d4e'
+         'f548e389ff68424947b87785df6a321b'
+         '5812be48cbbec1068e7b718eec801766'
+         '0066f23f69ca3ef62dcaeb74a87fdc48'
+         'c06067f572bc4a5298f324f27340da95'
+         'f1669af1fe0554e876f03319c678e79d'
+         '305980ac78a6954e306a14d80a54c441'
+         '5511da3361eea4eaa21427652c559e1c'
+         '52c3de0297bf45be6a189dc2e0515638'
+         'b54c7e3e53b4f332d41ed435433fbda0'
+         'a896382bc53ef3e149eaf9b13bc81d42'
+         'dcd227388b57487d543cab2fd7a602d7'
          'd074e79d380b031d2f60e4cd56538c93'
-         'b78a2da4cf128775031a5a3422fc0b78'
-         'e40eeb4454f2a7cdde3a14f5dfd3aadd'
+         '7211b31ec70631829ebae9460999aa0b'
+         '8676c9bb1658fe91de244e850f6c3ca8'
          '65695dc24c24958190724a23655ffda7'
          'b6235416dca2205f0ba83c0c4b3ddeb8'
          '4e6babde6334e3c5cb4a3136526aa564')
 
 build() {
   cd "${srcdir}"
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   for i in *; do
     if [ -d "${i}" ]; then
       pushd "${i}"
       case "${i}" in
         xrdb*)
-          ./configure --prefix=/usr --mandir=/usr/share/man --with-cpp=/usr/bin/mcpp || return 1
+          ./configure --prefix=/usr --mandir=/usr/share/man --with-cpp=/usr/bin/mcpp
           ;;
         *)
-          ./configure --prefix=/usr --mandir=/usr/share/man || return 1
+          ./configure --prefix=/usr --mandir=/usr/share/man 
           ;;
       esac
-      make || return 1
-      make DESTDIR="${pkgdir}" install || return 1
-      install -m644 COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE.${i%-*} || return 1
+      make 
+      popd
+    fi
+  done
+}
+
+package() {
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  for i in *; do
+    if [ -d "${i}" ]; then
+      pushd "${i}"
+      make DESTDIR="${pkgdir}" install 
+      install -m644 COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE.${i%-*} 
       popd
     fi
   done
 # Replacing stub license files
-  install -m644 "${srcdir}"/LICENSE.* "${pkgdir}/usr/share/licenses/${pkgname}/"  || return 1
+  install -m644 "${srcdir}"/LICENSE.* "${pkgdir}/usr/share/licenses/${pkgname}/"  
 }
