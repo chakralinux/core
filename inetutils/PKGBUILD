@@ -1,62 +1,87 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Contributions from: https://www.archlinux.org/packages/core/x86_64/inetutils/
 
 pkgname=inetutils
-pkgver=1.9.1
+pkgver=1.9.1.341
 pkgrel=1
-pkgdesc="A collection of common network programs."
-arch=('i686' 'x86_64')
+pkgdesc="A collection of common network programs"
+arch=('x86_64')
 url="http://www.gnu.org/software/inetutils/"
-license=('GPL')
-depends=('readline' 'ncurses' 'pam')
-backup=('etc/conf.d/ftpd' 'etc/xinetd.d/telnet' 'etc/xinetd.d/talk')
+license=('GPL3')
+groups=('base')
+depends=('pam')
+makedepends=('help2man')
+backup=('etc/xinetd.d/telnet' 'etc/xinetd.d/talk'
+        'etc/xinetd.d/rlogin' 'etc/xinetd.d/rsh'
+	'etc/pam.d/rlogin' 'etc/pam.d/rsh')
 options=('!emptydirs')
-install="inetutils.install"
-source=("http://ftp.gnu.org/gnu/inetutils/${pkgname}-${pkgver}.tar.gz"
-        ftpd.rc ftpd.conf telnet.xinetd talk.xinetd rlogin.xinetd rsh.xinetd)
-md5sums=('944f7196a2b3dba2d400e9088576000c' 
-         'c167200f6faeb64659e69ced2a9d672a'
-         'e6e6e5990a2e8159a276fef8fbf54c04' 
-         '8596208d119045543c5fb644e1d713d5'
-         '2c3655985cf122591d71d031af84ff90' 
-         'c25d8382a994de84d9c6962d804f689b'
-         'c3aa508a9d1293a787341108cd49c1b7')
+install=inetutils.install
+source=(ftp://ftp.archlinux.org/other/packages/inetutils/${pkgname}-${pkgver}.tar.xz
+        ftpd.service rlogin.pam rlogin@.service rlogin.socket rlogin.xinetd
+        rsh.pam rsh@.service rsh.socket rsh.xinetd talk.service talk.socket talk.xinetd
+        telnet@.service telnet.socket telnet.xinetd)
+sha1sums=('eaccc1568c9cc624f6cda3a265fb92ec72c7304d'
+          '6d2c3079265ace3b67ae1ff31315e96da18c238c'
+          '7cb23306b7bf8cd6e3239e627ff7b92fcd658cf0'
+          '5c0a586000127242934cb2d08cf63c711fc69ae3'
+          'ec066d15ea7dad170a6c34caf181ac3d0c41c5e9'
+          '81f10b3b688e3952f793b35bcef63b5bf257a92b'
+          'ebd6e4f683be8c7b4270fc90472578279d8c7d49'
+          'aab2b3f0201db5dc557690f22b22938a48cb9cd1'
+          '09b0b12b08eb23583344fcdded377478f3c3135f'
+          '81f4a8da823cf0bb14284fc71ee6108849691eda'
+          'fd5c4d1a376a2e9bb6d9ef30beaa0bdec6e5da08'
+          'd1813d42c5c9d2c60f03ebe33961de357a4b8b43'
+          '27d99b910eec0fc26bd79ccc2c1de26608330298'
+          '52ad2341bfcf11ab56aa2b1850b9647ee7447c48'
+          '71fd0d26ea3f2dada707ca7f57b25a26eedca9cf'
+          'bfad98a4a62f1fff8779f076c6019ed07f9111af')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  ./configure --prefix=/usr --libexec=/usr/sbin --localstatedir=/var \
-    --mandir=/usr/share/man --infodir=/usr/share/info \
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr --libexec=/usr/bin \
+    --localstatedir=/var --sysconfdir=/etc \
     --without-wrap --with-pam \
     --enable-ftp --enable-ftpd \
     --enable-telnet --enable-telnetd \
     --enable-talk --enable-talkd \
     --enable-rlogin --enable-rlogind \
     --enable-rsh --enable-rshd \
+    --enable-rcp --enable-hostname --enable-dnsdomainname \
     --disable-rexec --disable-rexecd \
-    --enable-rcp \
     --disable-tftp --disable-tftpd \
     --disable-ping --disable-ping6 \
     --disable-logger --disable-syslogd \
     --disable-inetd --disable-whois \
-    --disable-uucpd --disable-hostname \
-    --disable-ifconfig --disable-traceroute
-
+    --disable-uucpd --disable-ifconfig --disable-traceroute
   make
 }
 
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
+}
+
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
 
-  install -D -m755 "${srcdir}/ftpd.rc" "${pkgdir}/etc/rc.d/ftpd"
-  install -D -m644 "${srcdir}/ftpd.conf" "${pkgdir}/etc/conf.d/ftpd"
   install -D -m644 "${srcdir}/telnet.xinetd" "${pkgdir}/etc/xinetd.d/telnet"
   install -D -m644 "${srcdir}/talk.xinetd" "${pkgdir}/etc/xinetd.d/talk"
   install -D -m644 "${srcdir}/rlogin.xinetd" "${pkgdir}/etc/xinetd.d/rlogin"
   install -D -m644 "${srcdir}/rsh.xinetd" "${pkgdir}/etc/xinetd.d/rsh"
-}
 
-# vim:set ts=2 sw=2 et:
+  install -D -m644 "${srcdir}/rlogin.pam" "${pkgdir}/etc/pam.d/rlogin"
+  install -D -m644 "${srcdir}/rsh.pam" "${pkgdir}/etc/pam.d/rsh"
+
+  install -D -m644 "${srcdir}/ftpd.service" "${pkgdir}/usr/lib/systemd/system/ftpd.service"
+  install -D -m644 "${srcdir}/rlogin@.service" "${pkgdir}/usr/lib/systemd/system/rlogin@.service"
+  install -D -m644 "${srcdir}/rlogin.socket" "${pkgdir}/usr/lib/systemd/system/rlogin.socket"
+  install -D -m644 "${srcdir}/rsh@.service" "${pkgdir}/usr/lib/systemd/system/rsh@.service"
+  install -D -m644 "${srcdir}/rsh.socket" "${pkgdir}/usr/lib/systemd/system/rsh.socket"
+  install -D -m644 "${srcdir}/talk.service" "${pkgdir}/usr/lib/systemd/system/talk.service"
+  install -D -m644 "${srcdir}/talk.socket" "${pkgdir}/usr/lib/systemd/system/talk.socket"
+  install -D -m644 "${srcdir}/telnet@.service" "${pkgdir}/usr/lib/systemd/system/telnet@.service"
+  install -D -m644 "${srcdir}/telnet.socket" "${pkgdir}/usr/lib/systemd/system/telnet.socket" 
+}
