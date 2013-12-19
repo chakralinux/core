@@ -2,7 +2,7 @@
 
 pkgname=ttf-raleway
 pkgver=3.0
-pkgrel=1
+pkgrel=2
 _update=100
 pkgdesc="A sans-serif typeface"
 arch=('any')
@@ -16,8 +16,14 @@ md5sums=('fd753c68236f5c712a89bb798a90c4a1')
 package() {
   cd ${srcdir}/r*
   
+  # Install only Raleway-Thin because is used in our KDM theme and is 
+  # the Chakra default font.
+  # An other reason is that QFontComboBox can show only the font family
+  # and not the single styles (like Thin/Medium/ExtraBold/...) and the
+  # user can not choose/change the font style correctly.
   install -dm755 "${pkgdir}/usr/share/fonts/TTF/"
-  install -Dpm644 *.ttf "${pkgdir}/usr/share/fonts/TTF/"
+  install -Dpm644 Raleway-Thin.ttf "${pkgdir}/usr/share/fonts/TTF/"
+  #install -Dpm644 *.ttf "${pkgdir}/usr/share/fonts/TTF/"
 
   install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}/"
   install -Dpm644 OFL.txt "${pkgdir}/usr/share/licenses/${pkgname}/"
