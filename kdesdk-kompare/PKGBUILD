@@ -1,6 +1,3 @@
-
-
-
 # Maintainer Manuel Tortosa <manutortosa@chakra-project@org>
 
 # Include global configuration
@@ -22,22 +19,19 @@ conflicts=('kdesdk-doc')
 install=kdesdk.install
 options=('docs' '!header' 'debug' 'log')
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'docbook-xsl')
-provides="kompare"
-
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha1sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
 build() {
-  cd ${srcdir}/${_pkgname}-${pkgver}
-
-  msg "starting build ..."
-  cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-          -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-          -DCMAKE_SKIP_RPATH=ON 
-  make 
+    cd "${srcdir}/${_pkgname}-${pkgver}"
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON 
+    make
 }
 
 package() {
-        cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install
+    cd "${srcdir}/${_pkgname}-${pkgver}"
+    make DESTDIR=${pkgdir} install
 }
