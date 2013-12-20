@@ -6,8 +6,8 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel="3.12.3"
-pkgver=3.12.3
+_basekernel="3.12.5"
+pkgver=3.12.5
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -30,9 +30,9 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         'linux.preset'
         'change-default-console-loglevel.patch')
 
-sha256sums=('b649c759646a630893c98855fb7e9e87e954105e3acac7b81ca85b1161572713'
-            '22f2f3249e9014693a487c9734dc4142d89ed8bd9e3b2a74128208f5ea7e47d6'
-            'c5b5405252250cac6085bddb13f0a2a6007d14d627ebc1f5fed79f9e91e78602'
+sha256sums=('48181474f3943f77c1e62bed676b09a9fed64364d5847ce14a45b8d947112719'
+            'bfb519ae2a3662340cb20b5f9433f9b3b8598e612286274f96ec8c8bf6bc09c4'
+            '0d4db87a200ec7451f7b89bad62832267b76487825b3bfc9a1a445d5cc3d5f15'
             'e9604c6d87ae87830c154c1b12065eb6361e503006025497741f15dbaa9fd3ff'
             '03ec8d29245b222c21aee0a043ab9a48702d252d8460d44541fa9ea65bcea7ce'
             '62815bffbd29d5f2bdcda387788d2fcdf62cd61e51105ce41a63b70fc14bda68'
@@ -42,6 +42,7 @@ sha256sums=('b649c759646a630893c98855fb7e9e87e954105e3acac7b81ca85b1161572713'
             'b1b1cf291bd68270b700eb21f19f7b052116d07dde492761227cd94bb775910c'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182')
+
 
 build() {
   cd "${srcdir}/linux-${_basekernel}"
@@ -106,9 +107,9 @@ build() {
   ####################
   # stop here
   # this is useful to configure the kernel
-  # make nconfig
-  # msg "Stopping build"
-  # return 1
+    make nconfig
+    msg "Stopping build"
+    return 1
   ####################
 
   # build!
