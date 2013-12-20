@@ -1,14 +1,11 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# contributor: abveritas@chakra-project.org
 
 pkgname=nvidia-173xx-utils
-pkgver=173.14.37
-pkgrel=2
+pkgver=173.14.39
+pkgrel=1
 pkgdesc="NVIDIA drivers utilities and libraries, 173xx branch."
 arch=('x86_64') 
-ARCH=x86_64
 url="http://www.nvidia.com/"
 depends=('xorg-server')
 conflicts=('nvidia-utils' 'libgl')
@@ -17,13 +14,13 @@ optdepends=('gtk2: nvidia-settings' 'pkgconfig: nvidia-xconfig')
 license=('custom')
 install=nvidia.install
 options=(!strip)
-source=("http://download.nvidia.com/XFree86/Linux-${ARCH}/${pkgver}/NVIDIA-Linux-${ARCH}-${pkgver}-pkg0.run")
-md5sums=('761fec0664e715df35cdb64cd4b087f4')
+source=("http://us.download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/NVIDIA-Linux-${arch}-${pkgver}-pkg0.run")
+md5sums=('0799f194869e40141c7bac8a71762db6')
 
 package() {
 	cd $srcdir
-	sh NVIDIA-Linux-${ARCH}-${pkgver}-pkg0.run --extract-only
-	cd NVIDIA-Linux-${ARCH}-${pkgver}-pkg0/usr/
+	sh NVIDIA-Linux-${arch}-${pkgver}-pkg0.run --extract-only
+	cd NVIDIA-Linux-${arch}-${pkgver}-pkg0/usr/
 
 	mkdir -p $pkgdir/usr/{lib,bin,share/applications,share/pixmaps,share/man/man1}
 	mkdir -p $pkgdir/usr/lib/xorg/modules/{extensions,drivers}
@@ -54,10 +51,10 @@ package() {
 	cd $pkgdir/usr/lib/xorg/modules/extensions
 	ln -s libglx.so.$pkgver libglx.so
 
-	install -m644 $srcdir/NVIDIA-Linux-${ARCH}-${pkgver}-pkg0/LICENSE $pkgdir/usr/share/licenses/nvidia-173xx/
+	install -m644 $srcdir/NVIDIA-Linux-${arch}-${pkgver}-pkg0/LICENSE $pkgdir/usr/share/licenses/nvidia-173xx/
 	ln -s nvidia-173xx $pkgdir/usr/share/licenses/nvidia-173xx-utils
 
-	install -D -m644 $srcdir/NVIDIA-Linux-${ARCH}-${pkgver}-pkg0/usr/share/doc/README.txt $pkgdir/usr/share/doc/nvidia-173xx/README
+	install -D -m644 $srcdir/NVIDIA-Linux-${arch}-${pkgver}-pkg0/usr/share/doc/README.txt $pkgdir/usr/share/doc/nvidia-173xx/README
 
 	find $pkgdir/usr -type d -exec chmod 755 {} \;
 }
