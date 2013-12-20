@@ -2,7 +2,7 @@
 
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
 pkgver=304.117
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=('linux-headers' 'linux>=3.12' 'linux<3.13' "nvidia-304xx-utils=${pkgver}")
@@ -14,7 +14,7 @@ md5sums=('62d0cdb856cfae64753c0f3acf729d47'
          '8ee9f672028971c6d36118894d0e2c59')
 
 build() {
-    _extramodules=extramodules-3.12.5-CHAKRA
+    _extramodules=extramodules-3.12.6-CHAKRA
     _kver=$(cat /lib/modules/${_extramodules}/version)
     cd "${srcdir}"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
@@ -24,7 +24,7 @@ build() {
 }
 
 package_nvidia-304xx() {
-    _extramodules=extramodules-3.12.5-CHAKRA
+    _extramodules=extramodules-3.12.6-CHAKRA
     _kver=$(cat /lib/modules/${_extramodules}/version)
     pkgdesc="NVIDIA drivers for linux."
     depends=('linux>=3.12' 'linux<3.13' "nvidia-304xx-utils=${pkgver}")
