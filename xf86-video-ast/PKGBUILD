@@ -4,19 +4,25 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-ast
-pkgver=0.93.10
-pkgrel=2
+pkgver=0.97.0
+pkgrel=1
 pkgdesc="X.org ASPEED AST Graphics video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server')
+makedepends=('xorg-server' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.12.3')
 options=('!libtool')
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('40e8acd04ccf670b196be74a2c806d064f7b68db')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 git-fix.diff)
+sha1sums=('11cb9a687cec6f0943ad6b9a47434815334d2a20'
+          '23f8ad4527e304cc900861b6471abda0e37237e5')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i ${srcdir}/git-fix.diff
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
