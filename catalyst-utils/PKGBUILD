@@ -4,14 +4,13 @@
 
 pkgname=catalyst-utils
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 1x.x
-pkgver=13.4
+pkgver=13.12
 pkgrel=1
-_amdver=12.104
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('x86_64')
 url="http://www.amd.com/us/Pages/AMDHomePage.aspx"
 license=('custom')
-depends=('xorg-server>=1.11.0' 'xorg-server<1.13.0' 'netkit-bsd-finger' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs' 'libxinerama')
+depends=('xorg-server>=1.14.0' 'xorg-server<1.15.0' 'netkit-bsd-finger' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs' 'libxinerama')
 optdepends=('qt: to run ATi Catalyst Control Center (amdcccle)'
 	    'libxxf86vm: to run ATi Catalyst Control Center (amdcccle)')
 conflicts=('catalyst-test' 'nvidia-utils' 'libgl' 'libcl' 'catalystpxp-utils' 'catalyst-legacy-utils')
@@ -19,7 +18,7 @@ provides=('libgl' 'libcl' "libatical=${pkgver}")
 install=${pkgname}.install
 
 source=(
-    http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-x86.x86_64.zip
+    "http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-x86.x86_64.zip"
     catalyst.sh
     atieventsd.sh
     atieventsd.service
@@ -27,17 +26,16 @@ source=(
     arch-fglrx-authatieventsd.patch
     hw_ati_legacy_hwdb)
 
-md5sums=('558bd1b31173b06b25da647a7112e734'
+md5sums=('2418a94b699fe8fdec01ccd32f684c90'
          'bdafe749e046bfddee2d1c5e90eabd83'
          'f729bf913613f49b0b9759c246058a87'
-	 'bccf181a981ff429fe66f6ca5c3ea75a'
-	 '3e19c2285c76f4cb92108435a1e9c302'
-	 '4ec9ba4440ec5a320ed3987c1d3b417d'
+         'bccf181a981ff429fe66f6ca5c3ea75a'
+         '3e19c2285c76f4cb92108435a1e9c302'
+         '4ec9ba4440ec5a320ed3987c1d3b417d'
          'e88b99bb50f38bc96c880407b36b45a8')
 
-
 build() {
-     /bin/sh ./amd-catalyst-13.4-linux-x86.x86_64.run --extract archive_files
+     /bin/sh ./amd-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
 }
 
 package() {
