@@ -1,7 +1,5 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# contributor: abveritas@chakra-project.org
 
 # Find the kernel name inside the chroot
 _extramodules=extramodules-3.2-lts
@@ -9,23 +7,26 @@ _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=ndiswrapper-lts
 _pkgname=ndiswrapper
-pkgver=1.57
-pkgrel=8
+pkgver=1.59
+pkgrel=1
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
 url="http://ndiswrapper.sourceforge.net"
 install="ndiswrapper.install"
-depends=('linux-lts>=3.2' 'linux-lts<3.4' 'ndiswrapper')
+depends=('linux-lts>=3.2' 'linux-lts<3.4')
 makedepends=('linux-lts-headers')
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
-md5sums=('7a401dc540938bf07893c67f418b6152')
+md5sums=('e26a7213468ccd6b0bb4c211c7aadeaa')
 
 build() {
   cd "$srcdir/$_pkgname-$pkgver"
 
   sed -i "/modinfo/s/s/usr\//" driver/Makefile
-
+  
+  #Fix error: http://forum.mandriva.com/en/viewtopic.php?t=71416
+  KBUILD=/usr/src/linux-3.2.51-1-lts
+  
   make KVERS=$_kver
 }
 
