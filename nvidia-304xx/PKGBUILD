@@ -2,7 +2,7 @@
 
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
 pkgver=304.117
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=('linux-headers' 'linux>=3.12' 'linux<3.13' "nvidia-304xx-utils=${pkgver}")
@@ -10,12 +10,11 @@ license=('custom')
 source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
 _pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run")
-md5sums=('4e409620bb6d6a001c6b2e1a663ef1f0'
-         'f12bb3f5829b979a0d79e68b78c2ba6a'
-         '35e0c7d30de795cccb6b95bda991fb77')
+md5sums=('62d0cdb856cfae64753c0f3acf729d47'
+         '8ee9f672028971c6d36118894d0e2c59')
 
 build() {
-    _extramodules=extramodules-3.12-CHAKRA
+    _extramodules=extramodules-3.12.6-CHAKRA
     _kver=$(cat /lib/modules/${_extramodules}/version)
     cd "${srcdir}"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
@@ -25,7 +24,7 @@ build() {
 }
 
 package_nvidia-304xx() {
-    _extramodules=extramodules-3.12-CHAKRA
+    _extramodules=extramodules-3.12.6-CHAKRA
     _kver=$(cat /lib/modules/${_extramodules}/version)
     pkgdesc="NVIDIA drivers for linux."
     depends=('linux>=3.12' 'linux<3.13' "nvidia-304xx-utils=${pkgver}")
