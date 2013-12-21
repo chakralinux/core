@@ -18,22 +18,20 @@ depends=('linux-lts>=3.2' 'linux-lts<3.4')
 makedepends=('linux-lts-headers')
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
 md5sums=('e26a7213468ccd6b0bb4c211c7aadeaa')
+KBUILD=/usr/src/linux-3.2.51-1-lts
 
 build() {
   cd "$srcdir/$_pkgname-$pkgver"
 
   sed -i "/modinfo/s/s/usr\//" driver/Makefile
   
-  #Fix error: http://forum.mandriva.com/en/viewtopic.php?t=71416
-  KBUILD=/usr/src/linux-3.2.51-1-lts
-  
-  make KVERS=$_kver
+  make KBUILD=$KBUILD KVERS=$_kver
 }
 
 package() {
   cd "$srcdir/$_pkgname-$pkgver"
 
-  make INST_DIR="lib/modules/$_extramodules" \
+  make KBUILD=$KBUILD INST_DIR="lib/modules/$_extramodules" \
     KVERS=$_kver DESTDIR="$pkgdir/" install
 
   # rm ndiswrapper
