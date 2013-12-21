@@ -1,30 +1,37 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer:   Manuel Tortosa <manutortosa@chakra-project.org>
+# Contributors: H W Tovetjärn (totte) <totte@tott.es>
+#               Andrea Scarpino <andrea@archlinux.org>
+#               Jaroslav Lichtblau <dragonlord@aur.archlinux.org>
+#               Ionut Biru <ibiru@archlinux.org>
+#               Joeny Ang <ang.joeny@gmail.com>
+#               Brad Fanella <bradfanella@archlinux.us>
 
 pkgname=libraw
-pkgver=0.14.4
+pkgver=0.15.4
 pkgrel=1
 pkgdesc="A library for reading RAW files obtained from digital photo cameras (CRW/CR2, NEF, RAF, DNG, and others)"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.libraw.org/"
-license=('CDDL' 'LGPL' 'custom')
+license=('CDDL'
+         'LGPL'
+         'custom')
 depends=('lcms')
 options=('!makeflags')
-source=(http://www.libraw.org/data/LibRaw-${pkgver}.tar.gz)
-sha256sums=('795a8615381868942b27636ea83d741d7c8d17afa9f00b5b7fe26212c42ee59c')
+source=("http://www.libraw.org/data/LibRaw-${pkgver}.tar.gz")
+sha512sums=('aa6efbb5218238d0fd1c18f3da2966a880700f094d333e8d714c13f50382f84bb30d96d07396b3492dd555bb5bade218c80f6314c504b8f3f4c7ae509a99ccaf')
 
 build() {
-  cd ${srcdir}/LibRaw-${pkgver}
-
-  ./configure --prefix=/usr
-  make
+    cd ${srcdir}/LibRaw-${pkgver}
+    ./configure \
+        --prefix=/usr \
+        --disable-static
+    make
 }
 
 package() {
-  cd ${srcdir}/LibRaw-${pkgver}
-
-  make DESTDIR=${pkgdir} install
+    cd ${srcdir}/LibRaw-${pkgver}
+    make DESTDIR=${pkgdir} install
+    install -d "${pkgdir}"/usr/share/licenses/${pkgname}
+    install -D -m644 LICENSE.LibRaw.pdf \
+        "${pkgdir}"/usr/share/licenses/${pkgname}
 }

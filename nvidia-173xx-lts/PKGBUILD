@@ -1,29 +1,27 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# contributor abveritas@chakra-project.org
 
 # Find the kernel name inside the chroot
 _extramodules=extramodules-3.2-CHAKRA-LTS
 _kver="3.2.51-1-lts"
 
 pkgname=nvidia-173xx-lts
-pkgver=173.14.36
-pkgrel=2
+pkgver=173.14.39
+pkgrel=1
+pkgdesc="NVIDIA drivers for linux - LTS package"
 arch=('x86_64')
-ARCH=x86_64
 url="http://www.nvidia.com/"
 depends=('linux-lts>=3.2' 'linux-lts<3.4' 'nvidia-173xx-utils')
 makedepends=('linux-lts-headers')
 conflicts=('nvidia-96xx-lts' 'nvidia-lts')
 license=('custom')
 install=nvidia.install
-source=("http://download.nvidia.com/XFree86/Linux-$ARCH/${pkgver}/NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run")
-md5sums=('c341612429c2885980103b40542cb2b2')
+source=("http://download.nvidia.com/XFree86/Linux-$arch/${pkgver}/NVIDIA-Linux-$arch-${pkgver}-pkg0.run")
+md5sums=('0799f194869e40141c7bac8a71762db6')
 
 build() {
-    sh "NVIDIA-Linux-$ARCH-${pkgver}-pkg0.run" --extract-only
-    cd "NVIDIA-Linux-$ARCH-${pkgver}-pkg0"
+    sh "NVIDIA-Linux-$arch-${pkgver}-pkg0.run" --extract-only
+    cd "NVIDIA-Linux-$arch-${pkgver}-pkg0"
 
     cd "usr/src/nv/"
     ln -s Makefile.kbuild Makefile
@@ -31,7 +29,7 @@ build() {
 }
 
 package() {
-    cd "NVIDIA-Linux-$ARCH-${pkgver}-pkg0/usr/src/nv/"
+    cd "NVIDIA-Linux-$arch-${pkgver}-pkg0/usr/src/nv/"
     mkdir -p $pkgdir//lib/modules/${_extramodules}
     install -m644 nvidia.ko $pkgdir/lib/modules/${_extramodules}
     install -d -m755 "${pkgdir}/etc/modprobe.d"

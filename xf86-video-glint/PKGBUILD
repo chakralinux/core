@@ -4,19 +4,25 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-glint
-pkgver=1.2.7
-pkgrel=2
+pkgver=1.2.8
+pkgrel=1
 pkgdesc="X.org GLINT/Permedia video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('pkgconfig' 'xorg-server>=1.12.3' 'xf86dgaproto')
+makedepends=('pkgconfig' 'xorg-server>=1.12.3' 'xf86dgaproto' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.12.3')
 options=('!libtool')
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('c4edb998485020debffeafc491ea759e')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 "git-fix.diff")
+md5sums=('775579c67dc55ff4909de3638bafd19f'
+         '9afce8beedb2335e297c58471a4184fa')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i ${srcdir}/git-fix.diff
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"

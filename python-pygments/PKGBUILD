@@ -1,27 +1,61 @@
-# Moved from CCR - PKGBUILD by Renan Biegelmeyer (RenanBS) <renan.biegel[at]gmail[.dot]com>
+#
+# Software packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: R Biegelmeyer (RenanBS) <renan.biegel@gmail.com>
+#               Evangelos Foutras <evangelos@foutrelis.com>
+#               T Preetz <timm@preetz.us>
 
-pkgname=python2-pygments
+pkgbase=python-pygments
+pkgname=('python3-pygments' 'python2-pygments')
 pkgver=1.6
-pkgrel=1
+pkgrel=3
 pkgdesc="Python syntax highlighter"
 arch=('any')
 url="http://pygments.org/"
 license=('BSD')
-depends=('setuptools')
-provides=('pygments' 'python-pygments')
-conflicts=('pygments' 'python-pygments')
-replaces=('pygments' 'python-pygments')
+makedepends=('python3-setuptools' 'python2-setuptools')
+options=(!emptydirs)
 source=(http://pypi.python.org/packages/source/P/Pygments/Pygments-$pkgver.tar.gz)
-md5sums=('a18feedf6ffd0b0cc8c8b0fbdb2027b1')
+sha512sums=('552d0c2a1296773a5482122bd5cbec0ce91a497cd86ee105e1c5ddf2bfa9c206fcc7de504c6da480344c6e1bee30d7b26012fd061dcb2091d8b2b21bcd163bf0')
 
-build() 
-{
-  cd "$srcdir/Pygments-$pkgver"
+build() {
+  cd "$srcdir"
 
-  python setup.py install --root="$pkgdir" -O1
+  rm -rf python{2,3}-build
+  for builddir in python{2,3}-build; do
+    cp -r Pygments-$pkgver $builddir
+    pushd $builddir
+    ${builddir%-build} setup.py build
+    popd
+  done
+}
+
+package_python3-pygments() {
+  depends=('python3-setuptools')
+
+  cd "$srcdir/python3-build"
+
+  python3 setup.py install --root="$pkgdir" -O1
+
+  # pygmentize has been moved to the python2-pygments package
+  rm "$pkgdir/usr/bin/pygmentize"
+
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
+
+package_python2-pygments() {
+  depends=('python2-setuptools')
+  conflicts=('pygments')
+  replaces=('pygments')
+  provides=('python-pygments' 'pygments')
+
+  cd "$srcdir/python2-build"
+
+  python2 setup.py install --root="$pkgdir" -O1
 
   install -Dm644 external/pygments.bashcomp \
-                 "$pkgdir/etc/bash_completion.d/pygments"
+    "$pkgdir/usr/share/bash-completion/completions/pygmentize"
 
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

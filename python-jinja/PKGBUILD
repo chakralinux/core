@@ -13,8 +13,8 @@ pkgdesc="A simple pythonic template language written in Python"
 arch=('any')
 url="http://jinja.pocoo.org"
 license=('BSD')
-makedepends=('python3-distribute'
-             'python2-distribute'
+makedepends=('python3-setuptools'
+             'python2-setuptools'
              'python3-markupsafe'
              'python2-markupsafe')
 source=(http://pypi.python.org/packages/source/J/Jinja2/Jinja2-$pkgver.tar.gz
@@ -39,7 +39,7 @@ build() {
 }
 
 package_python3-jinja() {
-    depends=('python3-distribute' 'python3-markupsafe')
+    depends=('python3-setuptools' 'python3-markupsafe')
 
     cd "${srcdir}/python3-build"
     python3 setup.py install --root="$pkgdir" -O1
@@ -47,7 +47,7 @@ package_python3-jinja() {
 }
 
 package_python2-jinja() {
-    depends=('python2-distribute' 'python2-markupsafe')
+    depends=('python2-setuptools' 'python2-markupsafe')
     replaces=('python-jinja')
     provides=('python-jinja')
     conflicts=('python-jinja')

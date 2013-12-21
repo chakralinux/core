@@ -1,0 +1,18 @@
+--- archive_files/common/lib/modules/fglrx/build_mod/firegl_public.c	2013-12-20 19:57:53.151466606 +0000
++++ archive_files/common/lib/modules/fglrx/build_mod/firegl_public.c	2013-12-20 19:55:58.498099013 +0000
+@@ -1754,11 +1754,15 @@
+  */
+ KCL_TYPE_Uid ATI_API_CALL KCL_GetEffectiveUid(void)
+ {
++#ifdef CONFIG_UIDGID_STRICT_TYPE_CHECKS
++    return __kuid_val(current_euid());
++#else
+ #ifdef current_euid
+     return current_euid();
+ #else
+     return current->euid;
+ #endif
++#endif
+ }
+ 
+ /** /brief Delay execution for the specified number of microseconds

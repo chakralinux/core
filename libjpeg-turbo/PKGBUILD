@@ -1,49 +1,75 @@
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abeveritas[at]chakra-project[dot]org>
+# Maintainer:
+# Contributors: H W Tovetjärn (totte) <totte@tott.es>
+#               Anke Boersma (abveritas) <abveritas@chakra-project.org>
+#               Gaetan Bisson <bisson@archlinux.org>
+#               Allan McRae <allan@archlinux.org>
+#               Simone Sclavi 'Ito' <darkhado@gmail.com>
 
 pkgname=libjpeg-turbo
-pkgver=1.2.1
+pkgver=1.3.0
 pkgrel=1
-pkgdesc="libjpeg derivative with accelerated baseline JPEG compression and decompression"
-arch=('i686' 'x86_64')
-url="http://libjpeg-turbo.virtualgl.org/"
-license=('GPL' 'custom')
+pkgdesc='JPEG image codec with accelerated baseline compression and decompression'
+arch=('x86_64')
+url='http://libjpeg-turbo.virtualgl.org/'
+license=('GPL'
+         'custom')
 makedepends=('nasm')
-provides=('libjpeg=8.0.2' 'libjpeg6')
-replaces=('libjpeg' 'libjpeg6')
-conflicts=('libjpeg' 'libjpeg6')
+provides=('libjpeg=8.0.2'
+          'libjpeg6')
+replaces=('libjpeg'
+          'libjpeg6')
+conflicts=('libjpeg'
+           'libjpeg6')
 options=('!libtool')
-source=("http://sourceforge.net/projects/$pkgname/files/$pkgver/$pkgname-$pkgver.tar.gz")
-md5sums=('f61e60ff01381ece4d2fe65eeb52669e')
+source=("http://sourceforge.net/projects/$pkgname/files/$pkgver/$pkgname-$pkgver.tar.gz"
+        'cve-2013-6629.patch')
+sha512sums=('4d34c3c5f2cdd70b2a3d1b55eeb4ce59cb3d4b8d22bb6d43c2ec844b7eb5685b55a9b1b46ad2bc5f2756b5f5535ccad032791c3b932af9c1efc502aa5e701053'
+            'c5f063f87305ab48cb40c243df9e7a307efedc02eef8eee65e9ca5006676d5257a6d1dc7a32ff77a2486c8be8792b4f5431d18e46759ad63c182b8332a736099')
+
+prepare() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    patch -i ../cve-2013-6629.patch # FS#38094
+}
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+    cd "${srcdir}/${pkgname}-${pkgver}"
 
-  # create libjpeg6
-  ./configure --prefix=/usr --with-jpeg6 --mandir=/usr/share/man
-  make
-  mkdir -p $srcdir/libjpeg6
-  cp -d .libs/libjpeg.so.6* $srcdir/libjpeg6
-  rm -R .libs
-  # create libjpeg8
-  ./configure --prefix=/usr --with-jpeg8 --mandir=/usr/share/man
-  make
+    # Create libjpeg6
+    ./configure \
+        --prefix=/usr \
+        --with-jpeg6 \
+        --mandir=/usr/share/man
+    make
+    mkdir -p ${srcdir}/libjpeg6
+    cp -d .libs/libjpeg.so.6* ${srcdir}/libjpeg6
+    rm -R .libs
+
+    # Create libjpeg8
+    ./configure \
+        --prefix=/usr \
+        --with-jpeg8 \
+        --mandir=/usr/share/man
+    make
+}
+
+check() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    make test
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+    cd "${srcdir}/${pkgname}-${pkgver}"
 
-  # install libjpeg6
-  mkdir -p $pkgdir/usr/lib
-  cp -vd $srcdir/libjpeg6/libjpeg.so.6* $pkgdir/usr/lib
-  
-  # install libjpeg8
-  make DESTDIR="$pkgdir/" install
+    # Install libjpeg6
+    mkdir -p $pkgdir/usr/lib
+    cp -vd $srcdir/libjpeg6/libjpeg.so.6* $pkgdir/usr/lib
 
-  # provide jpegint.h as it is required by various software
-  install -m644 jpegint.h $pkgdir/usr/include/
+    # Install libjpeg8
+    make DESTDIR="$pkgdir/" install
 
-  install -Dm644 README-turbo.txt $pkgdir/usr/share/licenses/libjpeg-turbo/README-turbo.txt
-  install -Dm644 README $pkgdir/usr/share/licenses/libjpeg-turbo/README
+    # Provide jpegint.h as it is required by various software
+    install -m644 jpegint.h $pkgdir/usr/include/
+
+    install -Dm644 README-turbo.txt $pkgdir/usr/share/licenses/libjpeg-turbo/README-turbo.txt
+    install -Dm644 README $pkgdir/usr/share/licenses/libjpeg-turbo/README
 }

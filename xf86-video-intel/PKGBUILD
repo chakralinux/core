@@ -2,20 +2,20 @@
 # contributor: abveritas@chakra-project.org
 
 pkgname=xf86-video-intel
-pkgver=2.21.13
+pkgver=2.21.15
 pkgrel=1
 pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
 arch=('x86_64')
 url="http://xorg.freedesktop.org"
 license=('custom')
-depends=('mesa' 'libxvmc' 'libpciaccess' 'libdrm' 'xcb-util' 'libxfixes' 'systemd')
-makedepends=('xorg-server>=1.12.3' 'libx11' 'xf86driproto' 'glproto' 'libxrender')
-conflicts=('xorg-server<1.12.3' 'xf86-video-i810' 'xf86-video-intel-legacy')
+depends=('mesa' 'libxvmc' 'libpciaccess' 'libdrm' 'xcb-util' 'pixman' 'libxfixes' 'systemd')
+makedepends=('xorg-server>=1.14.0' 'libx11' 'xf86driproto' 'glproto' 'libxrender' 'resourceproto' 'scrnsaverproto')
+conflicts=('xf86-video-i810' 'xf86-video-intel-legacy')
 options=('!libtool')
 groups=('xorg-drivers' 'xorg')
 install=xf86-video-intel.install
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('0bae9d893f3b2b382514d53e84d00a29f27b93fc')
+sha1sums=('6952e6e1deff1c4580ddee472dbc2223c3248d0f')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"

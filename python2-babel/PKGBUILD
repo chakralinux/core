@@ -6,21 +6,23 @@
 
 pkgname=python2-babel
 pkgver=0.9.6
-pkgrel=3
+pkgrel=5
 pkgdesc="A collection of tools for internationalizing Python applications"
 url="http://babel.edgewall.org/"
 license=("BSD")
 arch=('any')
 depends=('python2')
-conflicts=('python-babel<=0.9.6-2')
-replaces=('python-babel<=0.9.6-2')
-makedepends=('setuptools')
+conflicts=('python-babel')
+replaces=('python-babel')
+provides=('python-babel')
+makedepends=('python2-setuptools')
 source=("http://ftp.edgewall.com/pub/babel/Babel-$pkgver.tar.gz")
-md5sums=('f0edcad03dfdb5505f337ef1a7690325')
+sha512sums=('65a93a405f8734dba5e36bac62e574633214660667ba5b2a8c1120924a93fed84a2a5087127d20bd33e98fbd8400bb7634f56b27d5f6db574c81ee5fe10ee537')
 
 build() {
     cd $srcdir/Babel-${pkgver}
-    # python2 fix
+    
+    # Python 2 fix
     sed -i 's_#!/usr/bin/env python_#!/usr/bin/env python2_' babel/messages/frontend.py
     python2 setup.py install --root=$pkgdir
     install -D -m0644 COPYING $pkgdir/usr/share/licenses/$pkgname/COPYING

@@ -1,10 +1,7 @@
-#
-# Platform Packages for Chakra, part of www.chakra-project.org
-#
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: A Boersma (abveritas) <abveritas@chakra-project.org>
 
-pkgname=mysql-python
+pkgname=python2-mysql
 pkgver=1.2.4
 pkgrel=1
 pkgdesc="MySQL support for Python"
@@ -15,8 +12,10 @@ depends=('python2' 'libmariadbclient')
 makedepends=('mariadb' 'python2-distribute')
 source=("http://pypi.python.org/packages/source/M/MySQL-python/MySQL-python-${pkgver}.zip")
 sha1sums=('9af66e09713a79a08a312a7da87f0f0dccfc0a91')
+conflicts=('mysql-python')
+replaces=('mysql-python')
 
 package() {
   cd ${srcdir}/MySQL-python-${pkgver}
-  python setup.py install --root=${pkgdir} --optimize=1
+  python2 setup.py install --root=${pkgdir} --optimize=1
 }
