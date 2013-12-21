@@ -3,10 +3,10 @@
 pkgbase=mesa
 pkgname=('mesa' 'libgl' 'libglapi')
 pkgver=10.0.1
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 makedepends=('glproto>=1.4.14' 'libdrm>=2.4.38' 'libxxf86vm>=1.1.1' 'libxdamage>=1.1.3' 'expat>=2.0.1' 'libx11>=1.4.3' 'libxt>=1.1.1' 
-             'gcc-libs' 'dri2proto>=2.8' 'python2' 'libxml2' 'imake' 'llvm' 'systemd' 'libvdpau')
+             'gcc-libs' 'dri2proto>=2.8' 'python2' 'libxml2' 'imake' 'llvm' 'systemd' 'libvdpau' 'wayland')
 url="http://mesa3d.sourceforge.net"
 license=('custom')
 source=(${source[@]} "ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/MesaLib-${pkgver}.tar.bz2" 
@@ -24,7 +24,7 @@ build() {
     --with-dri-drivers=i915,i965,r200,radeon,nouveau,swrast \
     --enable-gallium-llvm \
     --enable-gallium-egl \
-    --with-egl-platforms=x11,drm \
+    --with-egl-platforms=x11,drm,wayland \
     --enable-shared-glapi \
     --enable-gbm \
     --enable-glx-tls \
@@ -78,7 +78,7 @@ package_libglapi() {
 }
 
 package_mesa() {
-  depends=('libglapi' 'libgl' 'libx11' 'libxt' 'gcc-libs' 'dri2proto' 'glproto' 'glu') #dri2proto + glproto needed for gl.pc
+  depends=('libglapi' 'libgl' 'libx11' 'libxt' 'gcc-libs' 'dri2proto' 'glproto' 'glu' 'wayland') #dri2proto + glproto needed for gl.pc
   optdepends=('opengl-man-pages: for the OpenGL API man pages')
   pkgdesc="Mesa 3-D graphics libraries and include files"
   provides=('libgles' 'libegl' 'khrplatform-devel' 'ati-dri' 'intel-dri' 'svga-dri' 'nouveau-dri')
