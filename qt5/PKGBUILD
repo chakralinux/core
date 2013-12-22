@@ -1,15 +1,17 @@
 #
 # QT Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas@chakra-project.org
+# maintainer: Fabian Kosmale <inkane@chakra-project.org>
+# heavily sto^H^H^H inspired by Andrea Scarpino' PKGBUILD from Arch
 
 pkgbase=qt5
-pkgname=('qt5' )
 pkgname=('qt5-base'
+         'qt5-connectivity'
+         'qt5-doc'
          'qt5-declarative'
          'qt5-graphicaleffects'
          'qt5-imageformats'
-         'qt5-jsbackend'
+         'qt5-location'
          'qt5-multimedia'
          'qt5-quick1'
          'qt5-quickcontrols'
@@ -23,27 +25,26 @@ pkgname=('qt5-base'
          'qt5-x11extras'
          'qt5-xmlpatterns'
          'qt5-private-headers')
-pkgver=5.1.1
-_pkgver=5.1.1
-pkgrel=3
+pkgver=5.2.0
+pkgrel=1
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
 makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
     'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib' 'icu'
     'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
-    'mariadb' 'unixodbc' 'cups' 'libxinerama' 'libxcursor' 'python2' 'gperf' 'ruby'
+    'mariadb' 'unixodbc' 'cups' 'libxinerama' 'libxcomposite' 'libxcursor' 'python2' 'gperf' 'ruby'
     'xcb-util-image' 'xcb-util-keysyms' 'xcb-util-renderutil' 'xcb-util-wm' 'pulseaudio'
     'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins'
     'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins')
 options=('!libtool')
-_pkgfqn="qt-everywhere-opensource-src-${_pkgver}"
+_pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=(#"${pkgname}.tar.xz"
-        "http://download.qt-project.org/official_releases/qt/5.1/${pkgver}/single/qt-everywhere-opensource-src-${_pkgver}.tar.xz"
+	"http://download.qt-project.org/official_releases/qt/5.2/${pkgver}/single/${_pkgfqn}.tar.xz"
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
         'youtubeview.desktop' 'flickrview.desktop' 'browser.desktop' 'fancybrowser.desktop' 'qmlviewer.desktop'
         'qdbusviewer-qt5.desktop'  'defaultbookmarks_new.diff')
-sha1sums=('e09a34ef5a80b98eda4e07dcf810d1ce0ef62346'
+sha1sums=('7d9d8cad4434bc200d9ed87b3c7cb39654a2f1b4'
           '981cf376da66c8be7c7ec99866da0299114192f6'
           'e131a17beda4625f21022981a519b5e8d8c8e6f7'
           '62806b6696696d4ef69e4c0733fc9f1d761f08cd'
@@ -60,6 +61,14 @@ _prlfix() {
   # Fix wrong path in prl files
   find "${pkgdir}/usr/lib" -type f -name '*.prl' \
     -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
+}
+
+prepare() {
+  cd ${_pkgfqn}
+
+  sed -i "s|-O2|${CXXFLAGS}|" qtbase/mkspecs/common/{g++,gcc}-base.conf
+  sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" qtbase/mkspecs/common/gcc-base-unix.conf
+  sed -i "/^QMAKE_LFLAGS\s/s|+=|+= ${LDFLAGS}|g" qtbase/mkspecs/common/gcc-base.conf
 }
 
 build() {
@@ -86,12 +95,9 @@ build() {
                 -examplesdir /usr/share/qt5/examples \
 		-system-sqlite \
                 -openssl-linked \
-                -nomake tests \
                 -optimized-qmake \
                 -reduce-relocations \
                 -dbus-linked \
-                -no-openvg \
-                -no-separate-debug-info \
                 -no-gtkstyle \
                 -opengl desktop \
                 -feature-menu \
@@ -125,8 +131,8 @@ package_qt5-base() {
 
     # Fix wrong qmake path in pri file
     sed -i "s|${srcdir}/${_pkgfqn}/qtbase|/usr|" \
-       "${pkgdir}"/usr/lib/qt5/mkspecs/modules/qt_lib_bootstrap.pri
-    
+    "${pkgdir}"/usr/lib/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri
+
 
     # consider moving the following stuff into a new packgage, like qt5-examples
     install -d ${pkgdir}/usr/share/applications
@@ -148,9 +154,22 @@ package_qt5-base() {
 
 }
 
+package_qt5-connectivity() {
+  pkgdesc='A cross-platform application and UI framework (QtBluetooth, QtNfc)'
+  depends=('qt5-declarative')
+
+  cd ${_pkgfqn}/qtconnectivity
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
+
+  install -D -m644 LGPL_EXCEPTION.txt \
+    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
+}
+
 package_qt5-declarative() {
     pkgdesc='A cross-platform application and UI framework (QtQml, QtQuick)'
-    depends=('qt5-jsbackend' 'qt5-xmlpatterns')
+    depends=('qt5-xmlpatterns')
     conflicts=('qt5')
 
     cd $srcdir/$_pkgfqn/qtdeclarative
@@ -165,16 +184,23 @@ package_qt5-declarative() {
     done
 }
 
-package_qt5-jsbackend() {
-    pkgdesc='A cross-platform application and UI framework (QtV8)'
-    depends=('qt5-base')
-    conflicts=('qt5')
+package_qt5-doc() {
+  pkgdesc='A cross-platform application and UI framework (Documentation)'
+  depends=('qt5-base')
+  arch=('any')
+  conflicts=('qt-doc')
+  replaces=('qt-doc')
+  provides=('qt-doc')
+  options=('docs' '!emptydirs')
 
-    cd $srcdir/$_pkgfqn/qtjsbackend
-	make INSTALL_ROOT=$pkgdir install
+  cd ${_pkgfqn}
+  make INSTALL_ROOT="${pkgdir}" install_docs
 
-    _prlfix
+  install -D -m644 LGPL_EXCEPTION.txt \
+    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
 }
+
+
 
 package_qt5-xmlpatterns() {
     pkgdesc='A cross-platform application and UI framework (QtXmlPatterns)'
@@ -230,6 +256,19 @@ package_qt5-imageformats() {
 
   cd ${srcdir}/${_pkgfqn}/qtimageformats
       make INSTALL_ROOT="${pkgdir}" install
+}
+
+package_qt5-location() {
+  pkgdesc='A cross-platform application and UI framework (QtLocation, QtPositioning)'
+  depends=('qt5-declarative')
+
+  cd ${_pkgfqn}/qtlocation
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
+
+  install -D -m644 LGPL_EXCEPTION.txt \
+    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
 }
 
 package_qt5-quick1() {
