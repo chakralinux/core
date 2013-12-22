@@ -1,10 +1,9 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=libice
 pkgver=1.0.8
-pkgrel=1
+pkgrel=2
 pkgdesc="X11 Inter-Client Exchange library"
 arch=(x86_64)
 url="http://xorg.freedesktop.org/"
@@ -23,7 +22,7 @@ build() {
 
 package() {
   cd "${srcdir}/libICE-${pkgver}"
-  make DESTDIR="${pkgdir}" install || return 1
+  make DESTDIR="${pkgdir}" install
   install -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }

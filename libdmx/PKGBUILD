@@ -1,26 +1,27 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=libdmx
-pkgver=1.1.1
+pkgver=1.1.3
 pkgrel=1
 pkgdesc="X11 Distributed Multihead extension library"
-arch=('x86_64' 'i686')
+arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('dmxproto' 'libxext')
 makedepends=('xorg-util-macros')
 options=('!libtool')
 source=(${url}/releases/individual/lib/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('49aeab743cb8b667829efda140487b69a7148676')
+sha1sums=('0eeac14a06cffb04a1c78793563f233a8f8b79be')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr --disable-static
   make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"

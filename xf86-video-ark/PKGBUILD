@@ -4,19 +4,25 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=xf86-video-ark
-pkgver=0.7.4
+pkgver=0.7.5
 pkgrel=1
 pkgdesc="X.org ark video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server')
+makedepends=('xorg-server' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
 conflicts=('xorg-server<1.12.3')
 options=('!libtool')
 groups=('xorg-video-drivers')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('d95cb9aa56e7db542b3ac8fed9cb519b11f77556')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 build-fix.diff) # diff taken from Arch; without it will look for a non-existing header
+sha1sums=('6abadee761f1a49b399361ecbcecef4e4a097c0d'
+          '24e31dbac42182c7455a5d4f9e58cf1b0dc120d3')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i ${srcdir}/build-fix.diff
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"

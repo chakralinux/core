@@ -19,7 +19,7 @@ set incsearch                   " Match while typing
 set laststatus=2                " Always display statusline
 set linebreak
 set list
-set listchars=tab:>\ ,eol:¬     " Use these symbols for tabstops and EOLs
+set listchars=eol:¬             " Use this symbol for EOLs
 set mouse=a
 set nobackup
 set nocompatible                " Disable Vi-like behaviour

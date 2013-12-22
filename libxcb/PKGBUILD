@@ -1,27 +1,28 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
+# Part of the Xorg group
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=libxcb
-pkgver=1.9
-pkgrel=2
+pkgver=1.9.3
+pkgrel=1
 pkgdesc="X11 client-side library"
 arch=(x86_64)
 url="http://xcb.freedesktop.org/"
-depends=('xcb-proto>=1.6' 'libxdmcp' 'libxau')
+depends=('xcb-proto' 'libxdmcp' 'libxau')
 makedepends=('pkgconfig' 'libxslt' 'python')
-conflicts=('libx11<1.1.99.2')
 options=('!libtool')
 license=('custom')
 source=(${url}/dist/${pkgname}-${pkgver}.tar.bz2
         libxcb-1.1-no-pthread-stubs.patch)
-sha1sums=('ad2fb95eeec41ba3d39502a4f7460c3b64fdf061'
-          '4fd68570c793af070988ba75a2b79de5d9f9e66e')
+sha1sums=('28076500e2ca05e5887c7ed231ba305a85e8bd0b'
+          '93330bdcf29a9386b4222e2f0c3cea3add93f5c0')
+
+prepare() { 
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i "${srcdir}/libxcb-1.1-no-pthread-stubs.patch"
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np1 -i "${srcdir}/libxcb-1.1-no-pthread-stubs.patch"
   PYTHON=/usr/bin/python2 ./autogen.sh --prefix=/usr --enable-xinput --enable-xkb
   make
 }
