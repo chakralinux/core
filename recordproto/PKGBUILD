@@ -1,21 +1,25 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=recordproto
 pkgver=1.14.2
 pkgrel=1
 pkgdesc="X11 Record extension wire protocol"
-arch=('any')
+arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
+depends=(xorg-util-macros)
 source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
 sha1sums=('1f48c4b0004d8b133efd0498e8d88d68d3b9199c')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
   ./configure --prefix=/usr
-  make || return 1
-  make DESTDIR=${pkgdir} install || return 1
+  make
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
   install -D -m644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }

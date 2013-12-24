@@ -1,14 +1,11 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xcalib
 pkgver=0.8
-pkgrel=1
+pkgrel=2
 pkgdesc="A tiny monitor calibration loader for X.org"
-arch=(i686 x86_64)
+arch=(x86_64)
 url="http://www.etg.e-technik.uni-erlangen.de/web/doe/xcalib/"
 license=('GPL')
 depends=(libx11 libxext libxxf86vm xf86vidmodeproto)
@@ -17,13 +14,20 @@ source=(http://downloads.sourceforge.net/xcalib/xcalib-source-$pkgver.tar.gz \
 md5sums=('1fbcae44ad8d754512fdd1e5f1b3a7e7'
          'fd3aa535f50234ee7d46494913abc1a7')
 
-build() {
+prepare() {
   cd ${srcdir}/$pkgname-$pkgver
   patch -p0 < ../makefile-ldflags.patch
-  make || return 1
+}
+
+  build() {
+  cd ${srcdir}/$pkgname-$pkgver
+  make
+}
+
+package() {
+  cd ${srcdir}/$pkgname-$pkgver
   install -D -m755 xcalib ${pkgdir}/usr/bin/xcalib
   
   mkdir -p ${pkgdir}/usr/share/xcalib
   cp README  *.icc *.icm  ${pkgdir}/usr/share/xcalib
-
 }

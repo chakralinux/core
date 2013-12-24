@@ -1,14 +1,11 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=libxp
 pkgver=1.0.1
-pkgrel=1
+pkgrel=2
 pkgdesc="X11 X Print Library"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('libxext' 'printproto')
@@ -22,6 +19,10 @@ build() {
   cd "${srcdir}/libXp-${pkgver}"
   ./configure --prefix=/usr
   make
+}
+
+package() {
+  cd "${srcdir}/libXp-${pkgver}"
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
