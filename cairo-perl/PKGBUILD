@@ -1,19 +1,20 @@
-# Platform Packages for Chakra, part of chakra-project.org
+# Maintainer: Bruce Liu <brli@users.sourceforge.net>
 
 pkgname=cairo-perl
-pkgver=1.081
+pkgver=1.104
 pkgrel=1
 pkgdesc="Perl wrappers for cairo"
-arch=(i686 x86_64)
+arch=('x86_64')
 license=('LGPL')
 url="http://gtk2-perl.sourceforge.net/"
 options=('!emptydirs')
 depends=('cairo' 'perl')
-makedepends=('perl-extutils-depends' 'perl-extutils-pkgconfig')
-source=(http://downloads.sourceforge.net/sourceforge/gtk2-perl/Cairo-${pkgver}.tar.gz)
-md5sums=('52c712b0f749f2fe232ae6e18880fe7d')
+makedepends=('perl-extutils-depends' 'perl-extutils-pkgconfig' 'libxxf86vm' 'libxdamage')
+source=("http://sourceforge.net/projects/gtk2-perl/files/Cairo/${pkgver}/Cairo-${pkgver}.tar.gz")
+md5sums=('c7d2eee6c319588c04a6b95efe39b0ae')
 
 build() {
+  export PKG_CONFIG_PATH=/usr/lib/pkgconfig
   cd "${srcdir}/Cairo-${pkgver}"
   perl Makefile.PL INSTALLDIRS=vendor
   make
