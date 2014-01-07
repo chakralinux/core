@@ -6,7 +6,7 @@ pkgname=('dhcp'
 # separate patch levels with a period to maintain proper versioning.
 pkgver=4.2.5
 _pkgver=4.2.5-P1
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 license=('custom:isc-dhcp')
 url="https://www.isc.org/software/dhcp"
@@ -18,12 +18,12 @@ source=(ftp://ftp.isc.org/isc/${pkgbase}/${_pkgver}/${pkgbase}-${_pkgver}.tar.gz
         dhclient-script-pathFixes.patch)
 md5sums=('f68e3c1f00a9af5742bc5e71d567cf93'
          '8f357e46e1efcbb746f38737a3f977a2'
-         '7045e63a5d294c761ce306084eec2c67'
-         'a2ebf4460c049cbee3e49cb26a475f68'
+         '2096289173267f576ddea543b84a3f11'
+         '4fd48bd1edadfc5cd17dd34a57a04e07'
          '55967504078bfd7f821d2bd7c2542b29'
-         '0fc1241ef7879d8be0fe140deb8ae48d')
+         'f340a7241c6bbfdb792ddc474fa0d720')
 
-build() {
+prepare() {
   cd "${srcdir}/${pkgname}-${_pkgver}"
 
   # Define _GNU_SOURCE to fix IPV6.
@@ -31,8 +31,15 @@ build() {
 
   # Make not having ipv6 non-fatal.
   patch -p1 -i "${srcdir}/dhcp-4.2.4-P2-missing-ipv6-not-fatal.patch"
+  
+  patch -i "${srcdir}/dhclient-script-pathFixes.patch" client/scripts/linux
+
+}
+build() {
+  cd "${srcdir}/${pkgname}-${_pkgver}"
 
   ./configure --prefix=/usr \
+	      --sbindir=/usr/bin \
               --sysconfdir=/etc \
               --with-srv-lease-file=/var/state/dhcp/dhcpd.leases \
               --with-srv6-lease-file=/var/state/dhcp/dhcpd6.leases \
@@ -40,8 +47,6 @@ build() {
               --with-cli6-lease-file=/var/state/dhclient/dhclient6.leases
 
   make
-
-  patch -i "${srcdir}/dhclient-script-pathFixes.patch" client/scripts/linux
 }
 
 package_dhcp() {
@@ -83,7 +88,7 @@ package_dhclient() {
   install -d "${pkgdir}/var/lib/dhclient"
 
   # install dhclient linux script
-  install -m755 -D client/scripts/linux "${pkgdir}/sbin/dhclient-script"
+  install -m755 -D client/scripts/linux "${pkgdir}/usr/bin/dhclient-script"
 
   # install license
   install -m644 -D LICENSE "${pkgdir}/usr/share/licenses/dhclient/LICENSE"
