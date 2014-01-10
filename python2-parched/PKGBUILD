@@ -2,22 +2,29 @@
 
 pkgname=python2-parched
 pkgver=20091016
-pkgrel=3
+pkgrel=4
 pkgdesc="A Pacman package and PKGBUILD parser module"
 arch=('any')
 url="http://github.com/sebnow/parched"
 license=('MIT')
 depends=('python2')
 makedpends=('python2-distribute')
-source=("parched-${pkgver}::https://github.com/sebnow/parched/archive/master.zip")
-md5sums=('328aba1706733ae01f0e67e281430831')
+source=("parched-${pkgver}::https://github.com/sebnow/parched/archive/master.zip"
+splitted_pkg.patch)
+md5sums=('328aba1706733ae01f0e67e281430831'
+         '210bb3d99dc4b431c77bf858d78178d4')
 
-
+prepare() {
+  cd $srcdir/parched-master
+  
+  # workaround: enable the parsing of splitted pkgs in PKGBUILD
+  patch -p1 -i "${srcdir}"/splitted_pkg.patch
+}
 build() {
-    cd $srcdir/parched-master
-        python setup.py build || return 1
+  cd $srcdir/parched-master
+  python setup.py build || return 1
 }
 package() {
-    cd $srcdir/parched-master
-        python setup.py install --root=$pkgdir --optimize=1 || return 1
+  cd $srcdir/parched-master
+  python setup.py install --root=$pkgdir --optimize=1 || return 1
 }
