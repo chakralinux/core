@@ -1,43 +1,38 @@
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
 
-
-
-
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-_pkgname="kdnssd"
-pkgname="kdenetwork-kdnssd"
+pkgname="kdnssd"
 arch=('x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 pkgdesc='Monitors the network for DNS-SD services'
 depends=("kdelibs>=${_kdever}")
-conflicts=("kdenetwork-common" "kdenetwork-doc")
+provides=("kdenetwork-kdnssd")
+replaces=("kdenetwork-kdnssd")
+conflicts=("kdenetwork-common" "kdenetwork-doc" "kdenetwork-kdnssd")
 groups=("kde" "kdenetwork" "kde-uninstall")
 categories=('network')
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!header' 'debug' 'log')
-
 makedepends=('pkg-config' 'cmake' 'automoc4' 'docbook-xsl')
-
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
 build() {
-  cd ${srcdir}/${_pkgname}-${pkgver}
-	
-  cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-          -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-          -DCMAKE_SKIP_RPATH=ON \
-          -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-  make 
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON \
+        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+    make
 }
 
 package() {
-  cd ${srcdir}/${_pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install 
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    make DESTDIR=${pkgdir} install 
 }
-sha256sums=('54f1f23720f90ce63d21f51acc3f211042f4868192a41fcc942365448e22a776')
