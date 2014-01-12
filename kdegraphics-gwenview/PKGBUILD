@@ -1,42 +1,39 @@
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
 
-
-
-# Maintainer: Manuel Tortosa <manutortosa@chakra-project@org>
-
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=kdegraphics-gwenview
 _pkgname=gwenview
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 pkgdesc="A fast and easy to use image viewer for KDE"
 arch=('x86_64')
 url="http://kde.org/applications/graphics/gwenview/"
 license=('GPL' 'LGPL' 'FDL')
 depends=("kde-runtime>=${_kdever}" "kdegraphics-libkipi>=${_kdever}" "lcms2")
-makedepends=('cmake' 'automoc4' "kde-baseapps-konqueror>=${_kdever}" 'pkg-config')
-opdepends=('kdegraphics-kamera: to work directly with cameras')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+makedepends=('cmake' 'automoc4' "konqueror>=${_kdever}" 'pkg-config')
+optdepends=('kdegraphics-kamera: to work directly with cameras')
 install=${pkgname}.install
 groups=("kde" "kdegraphics" "kde-uninstall")
 categories=('graphics')
 provides=('gwenview')
 options=('docs' '!header' 'debug' 'log')
+source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
 build() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-                -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-                -DCMAKE_SKIP_RPATH=ON \
-                -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON \
+        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+    make
 }
 
 package() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install || return 1
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    make DESTDIR=${pkgdir} install
 }
-sha256sums=('73da65204cb1cafbdae12d0583f8c5affd955656c5de7c718e4ffe521ca2c234')
