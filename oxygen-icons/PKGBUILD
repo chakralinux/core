@@ -1,9 +1,10 @@
-# Maintainer: Manuel Tortosa <manutortosa@chakra-project@org>
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
 
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-_origname=oxygen-icons
+pkgbase=oxygen-icons
 pkgname=('oxygen-icons' 'oxygen-icons-svg')
 arch=('x86_64')
 pkgver=${_kdever}
@@ -13,36 +14,40 @@ license=('GPL' 'LGPL' 'FDL')
 install=oxygen-icons.install
 options=('log')
 makedepends=('pkg-config' 'cmake' 'automoc4')
-source=($_mirror/${_origname}-$_kdever.tar.xz)
-#sha256sums=(`grep ${_origname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
-sha1sums=('SKIP')
+source=($_mirror/$pkgbase-$_kdever.tar.xz)
+sha256sums=(`grep $pkgbase-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+prepare() {
+    mkdir -p "${srcdir}/svg"
+    cd "${srcdir}/$pkgbase-$pkgver"
+    patch -Np0 -i "${srcdir}/install_svg_icons_too.patch"
+}
 
 build() {
-    cd $srcdir/$_origname-$pkgver
-    patch -Np0 -i $startdir/install_svg_icons_too.patch || return 1
-    cmake . -DCMAKE_BUILD_TYPE=Release \
+    cd "${srcdir}/$pkgbase-$pkgver"
+    cmake . \
+        -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=${_installprefix}
     make
 }
 
 package_oxygen-icons() {
-    pkgdesc="Oxygen (Emot)Icons"
+    pkgdesc="Oxygen icons"
     groups=("kde" "kde-minimal" "kde-uninstall")
 
-    cd $srcdir/$_origname-$pkgver
-    make DESTDIR=$pkgdir install || return 1
-    # move out some svg icons
-    mkdir -p $srcdir/svg
-    mv $pkgdir/usr/share/icons/oxygen/scalable $srcdir/svg
+    cd "${srcdir}/$pkgbase-$pkgver"
+    make DESTDIR=${pkgdir} install
+    
+    # Move SVG files
+    mv "${pkgdir}/usr/share/icons/oxygen/scalable" "${srcdir}/svg"
 }
 
 package_oxygen-icons-svg() {
-    pkgdesc="Oxygen (Emot)Icons - SVG Sources"
+    pkgdesc="Oxygen icons (SVG sources)"
     groups=("kde-uninstall")
-    depends=("${_origname}")
+    depends=("oxygen-icons")
 
-    mkdir -p $pkgdir/usr/share/icons/oxygen
-    mv $srcdir/svg/scalable $pkgdir/usr/share/icons/oxygen
-    rm -rf $pkgdir/usr/share/icons/oxygen/scalable/apps/clock.svgz
+    mkdir -p "${pkgdir}/usr/share/icons/oxygen"
+    mv "${srcdir}/svg/scalable" "${pkgdir}/usr/share/icons/oxygen"
+    rm -rf "$pkgdir/usr/share/icons/oxygen/scalable/apps/clock.svgz"
 }
-sha1sums=('ee5d1658c9880e556b7e9304844fee026fab8c12')

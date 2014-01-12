@@ -1,16 +1,16 @@
-# Maintainer:   Manuel Tortosa <manutortosa@chakra-project@org>
-# Contributors: H W Tovetjarn (totte) <totte@tott.es>
+# Maintainer:   H W Tovetjarn (totte) <totte@tott.es>
+# Contributors: Manuel Tortosa <manutortosa@chakra-project@org>
 #               Andrea Scarpino <andrea@archlinux.org>
 
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgbase='kate'
-pkgname=('kde-baseapps-kate'
-         'kde-baseapps-kwrite'
-         'kde-baseapps-katepart')
+pkgname=('kate'
+         'kwrite'
+         'katepart')
 pkgver=${_kdever}
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 license=('GPL'
          'LGPL'
@@ -40,31 +40,36 @@ build() {
     cd "${srcdir}/build"
     cmake "../${pkgbase}-${pkgver}" \
         -DCMAKE_BUILD_TYPE=${_build_type} \
-        -DKDE4_BUILD_TESTS=OFF \
+        -DKDE4_BUILD_TESTS=ON \
         -DCMAKE_INSTALL_PREFIX=${_installprefix} \
         -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
     make
 }
 
-package_kde-baseapps-katepart() {
+package_katepart() {
     pkgdesc='A fast and feature-rich text editor component'
-    depends=('kdelibs')
     url='http://kate-editor.org/about-katepart/'
-    install='kdebase-katepart.install'
+    depends=('kdelibs')
+    provides=("kdebase-katepart")
+    replaces=("kdebase-katepart")
+    conflicts=("kdebase-katepart")
+    install='katepart.install'
 
     cd "${srcdir}/build/part"
     make DESTDIR="${pkgdir}" install
 }
 
-package_kde-baseapps-kwrite() {
+package_kwrite() {
     pkgdesc='KDE text editor'
     depends=('kde-runtime'
-             'kde-baseapps-katepart')
+             'katepart')
     groups=('kde'
-            'kde-baseapps'
             'kde-uninstall')
+    provides=("kdebase-kwrite")
+    replaces=("kdebase-kwrite")
+    conflicts=("kdebase-kwrite")
     url='http://www.kde.org/applications/utilities/kwrite/'
-    install='kdebase-kwrite.install'
+    install='kwrite.install'
 
     cd "${srcdir}/build/kwrite"
     make DESTDIR="${pkgdir}" install
@@ -73,17 +78,19 @@ package_kde-baseapps-kwrite() {
     make DESTDIR="${pkgdir}" install
 }
 
-package_kde-baseapps-kate() {
-    pkgdesc='KDE advanced text editor'
+package_kate() {
+    pkgdesc='KDE Advanced Text Editor'
     depends=('kde-runtime'
-             'kde-baseapps-katepart'
+             'katepart'
              'qjson')
     groups=('kde'
-            'kde-baseapps'
             'kde-uninstall')
+    provides=("kdesdk-kate")
+    replaces=("kdesdk-kate")
+    conflicts=("kdesdk-kate")
     url='http://www.kde.org/applications/utilities/kate/'
-    install='kdesdk-kate.install'
-    optdepends=('kdebase-konsole: Open a terminal in Kate'
+    install='kate.install'
+    optdepends=('konsole: Open a terminal in Kate'
                 'kdebindings-python2: Python 2 bindings'
                 'kdebindings-python3: Python 3 bindings')
 
