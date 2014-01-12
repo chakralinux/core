@@ -1,10 +1,6 @@
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
 
-
-
-# Maintainer: Manuel Tortosa <manutortosa@chakra-project@org>
-
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
@@ -12,30 +8,38 @@ pkgname=kdegames-klines
 _pkgname=klines
 pkgver=${_kdever}
 pkgrel=1
-pkgdesc="Tactical Game"
+pkgdesc="Tactical game"
 arch=('x86_64')
 url='http://www.kde.org'
-license=('GPL' 'LGPL' 'FDL')
+license=('GPL'
+         'LGPL'
+         'FDL')
 depends=("kdegames-libkdegames>=${_kdever}")
-makedepends=('pkg-config' 'cmake' 'automoc4')
+makedepends=('pkg-config'
+             'cmake'
+             'automoc4')
+groups=("kde"
+        "kdegames"
+        "kde-uninstall")
+provides=('klines')
+options=('docs'
+         '!header'
+         'debug'
+         'log')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
-groups=("kde" "kdegames" "kde-uninstall")
-provides=('klines')
-options=('docs' '!header' 'debug' 'log')
 
 build() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-                -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-                -DCMAKE_SKIP_RPATH=ON \
-                -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON \
+        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+    make
 }
 
 package() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install
-
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    make DESTDIR=${pkgdir} install
 }
-sha256sums=('efba77d5e91cafd3c2805650788c2f10e2086fce99c15e90b5e057714e08fc9f')

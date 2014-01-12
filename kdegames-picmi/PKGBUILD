@@ -1,6 +1,5 @@
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-# Maintainer: Manuel Tortosa <manutortosa@chakra-project@org>
 
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
@@ -12,18 +11,30 @@ pkgrel=1
 pkgdesc="A nonogram logic game for KDE"
 arch=('x86_64')
 url='http://kde.org/applications/games/picmi/'
-license=('GPL' 'LGPL' 'FDL')
+license=('GPL'
+         'LGPL'
+         'FDL')
 depends=("kdegames-libkdegames>=${_kdever}")
-makedepends=('pkg-config' 'cmake' 'automoc4')
+makedepends=('pkg-config'
+             'cmake'
+             'automoc4')
+groups=("kde"
+        "kdegames"
+        "kde-uninstall")
+options=('docs'
+         '!header'
+         'debug'
+         'log')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
-groups=("kde" "kdegames" "kde-uninstall")
-options=('docs' '!header' 'debug' 'log')
+
+prepare() {
+    rm -rf "${srcdir}/build"
+    mkdir "${srcdir}/build"
+}
 
 build() {
-    cd ${srcdir}
-    mkdir build
-    cd build
+    cd "${srcdir}/build"
     cmake "../${_pkgname}-${pkgver}" \
         -DCMAKE_BUILD_TYPE=${_build_type} \
         -DKDE4_BUILD_TESTS=ON \
@@ -37,4 +48,3 @@ package() {
     cd "${srcdir}/build"
     make DESTDIR=${pkgdir} install
 }
-sha256sums=('eab129f9288c9bf9373de72d86f88d2c6cf95bc6a0dce5578908eeab0d595d91')

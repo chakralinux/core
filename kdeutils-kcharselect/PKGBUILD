@@ -6,20 +6,32 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname="kdeutils-kcharselect"
 _pkgname="kcharselect"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Character selector"
 url="http://www.kde.org"
-license=('GPL' 'LGPL' 'FDL')
-options=('docs' '!header' 'debug' 'log')
-depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
-conflicts=("kdeutils-common" "kdeutils-doc")
-groups=("kde" "kdeutils" "kde-uninstall")
+license=('GPL'
+         'LGPL'
+         'FDL')
+options=('docs'
+         '!header'
+         'debug'
+         'log')
+depends=("kde-runtime>=${_kdever}"
+         "kde-baseapps>=${_kdever}")
+conflicts=("kdeutils-common"
+           "kdeutils-doc")
+groups=("kde"
+        "kdeutils"
+        "kde-uninstall")
 provides=("kcharselect")
 categories=('utils')
 install=kdeutils.install
-makedepends=('pkg-config' 'cmake' 'automoc4' "kdelibs>=${_kdever}")
+makedepends=('pkg-config'
+             'cmake'
+             'automoc4'
+             "kdelibs>=${_kdever}")
 source=($_mirror/${_pkgname}-$_kdever.tar.xz)
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 

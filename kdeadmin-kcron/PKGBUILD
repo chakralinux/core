@@ -10,22 +10,34 @@ arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 url="http://www.kde.org/"
-license=('GPL' 'LGPL' 'FDL')
+license=('GPL'
+         'LGPL'
+         'FDL')
 install=kdeadmin.install
 pkgdesc="Crontab editor"
 depends=("kde-runtime>=${_kdever}")
-groups=("kdeadmin" "kde" "kde-uninstall")
+groups=("kdeadmin"
+        "kde"
+        "kde-uninstall")
 conflicts=("kdeadmin-doc")
 categories=('system')
-options=('docs' '!header' 'debug' 'log')
-makedepends=('pkg-config' 'cmake' 'automoc4')
+options=('docs'
+         '!header'
+         'debug'
+         'log')
+makedepends=('pkg-config'
+             'cmake'
+             'automoc4')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
+prepare() {
+  rm -rf "${srcdir}/build"
+  mkdir "${srcdir}/build"
+}
+
 build() {
-    cd ${srcdir}
-    mkdir build 
-    cd build
+    cd "${srcdir}/build"
     cmake ../${_pkgname}-${pkgver} \
         -DCMAKE_BUILD_TYPE=${_build_type} \
         -DCMAKE_INSTALL_PREFIX=${_installprefix} \

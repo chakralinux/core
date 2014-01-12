@@ -1,10 +1,6 @@
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
 
-
-
-# Maintainer: Manuel Tortosa <manutortosa@chakra-project@org>
-
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
@@ -15,27 +11,35 @@ pkgrel=1
 pkgdesc="A Simple Ball Dodging Game"
 arch=('x86_64')
 url='http://www.kde.org'
-license=('GPL' 'LGPL' 'FDL')
+license=('GPL'
+         'LGPL'
+         'FDL')
 depends=("kdegames-libkdegames>=${_kdever}")
-makedepends=('pkg-config' 'cmake' 'automoc4')
+makedepends=('pkg-config'
+             'cmake'
+             'automoc4')
+groups=("kde"
+        "kdegames"
+        "kde-uninstall")
+provides=('kollision')
+options=('docs'
+         '!header'
+         'debug'
+         'log')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
-groups=("kde" "kdegames" "kde-uninstall")
-provides=('kollision')
-options=('docs' '!header' 'debug' 'log')
 
 build() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-                -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-                -DCMAKE_SKIP_RPATH=ON \
-                -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON \
+        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+    make
 }
 
 package() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install
-
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    make DESTDIR=${pkgdir} install
 }
-sha256sums=('7e46bbe20462620381073d16836e0824a1d658f57cf04e2425045abb5f847bfb')
