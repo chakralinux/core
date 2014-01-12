@@ -1,10 +1,6 @@
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
 
-
-
-# Maintainer: Manuel Tortosa <manutortosa@chakra-project@org>
-
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
@@ -12,7 +8,7 @@ pkgname="kdeutils-kcharselect"
 _pkgname="kcharselect"
 arch=('i686' 'x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 pkgdesc="Character selector"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
@@ -24,26 +20,20 @@ provides=("kcharselect")
 categories=('utils')
 install=kdeutils.install
 makedepends=('pkg-config' 'cmake' 'automoc4' "kdelibs>=${_kdever}")
-
 source=($_mirror/${_pkgname}-$_kdever.tar.xz)
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
-
 build() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-
-	msg "starting build ..."
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DCMAKE_SKIP_RPATH=ON \
-		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-
-	make
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON \
+        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+    make
 }
 
 package() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    make DESTDIR=${pkgdir} install
 }
-
-sha256sums=('f7380c68da9cec7bacfcd72ace497a645b24f89acc88d84e7db304cd4137ff3d')

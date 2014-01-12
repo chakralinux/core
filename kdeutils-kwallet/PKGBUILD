@@ -1,10 +1,6 @@
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
 
-
-
-# Maintainer: Manuel Tortosa <manutortosa@chakra-project@org>
-
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
@@ -12,7 +8,7 @@ pkgname="kdeutils-kwallet"
 _pkgname="kwallet"
 arch=('x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 pkgdesc="The KDE wallet system"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
@@ -23,23 +19,20 @@ groups=("kde" "kdeutils" "kde-uninstall")
 install=kdeutils.install
 makedepends=('pkg-config' 'cmake' 'automoc4' "kdelibs>=${_kdever}")
 categories=('utils')
-
 source=($_mirror/${_pkgname}-$_kdever.tar.xz)
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
 build() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-
-	msg "starting build ..."
-	cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-		-DCMAKE_INSTALL_PREFIX=${_installprefix} \
-		-DCMAKE_SKIP_RPATH=ON \
-		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-	make
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON \
+        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+    make
 }
 
 package() {
-	cd ${srcdir}/${_pkgname}-${pkgver}
-	make DESTDIR=${pkgdir} install
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    make DESTDIR=${pkgdir} install
 }
-sha256sums=('54953bce2c762558717a473e2623441ad4b106c8488c881389db86cd7407219d')
