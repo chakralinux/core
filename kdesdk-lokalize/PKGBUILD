@@ -1,10 +1,6 @@
 # Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
 # Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
 
-
-
-# Maintainer Manuel Tortosa <manutortosa@chakra-project@org>
-
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
@@ -12,7 +8,7 @@ _pkgname="lokalize"
 pkgname="kdesdk-lokalize"
 arch=('x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 pkgdesc="Computer aided translation system"
 screenshot="http://www.kde.org/images/screenshots/lokalize.png"
 depends=("kde-runtime>=${_kdever}" "kdebindings-pykde4>=${_kdever}" "kdesdk-strigi-analyzers>=${_kdever}" "hunspell")
@@ -30,17 +26,15 @@ source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
 build() {
-  cd ${srcdir}/${_pkgname}-${pkgver}
-
-  msg "starting build ..."
-  cmake . -DCMAKE_BUILD_TYPE=${_build_type} \
-          -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-          -DCMAKE_SKIP_RPATH=ON 
-  make 
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON 
+    make 
 }
 
 package() {
-  cd ${srcdir}/${_pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install 
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    make DESTDIR=${pkgdir} install 
 }
-sha256sums=('fbdf2745d5957d5998b822e12a28f919b6ed77b84d8255287091efe2e19fe72f')
