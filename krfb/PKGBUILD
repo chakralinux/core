@@ -23,11 +23,11 @@ url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!header' 'debug' 'log')
 makedepends=('pkg-config' 'cmake' 'automoc4' 'docbook-xsl')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+source=("$_mirror/$pkgname-$_kdever.tar.xz")
+sha256sums=(`grep $pkgname-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
 build() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
+    cd ${srcdir}/$pkgname-$pkgver
     cmake . \
         -DCMAKE_BUILD_TYPE=${_build_type} \
         -DCMAKE_INSTALL_PREFIX=${_installprefix} \
@@ -37,6 +37,6 @@ build() {
 }
 
 package() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
-    make DESTDIR=${pkgdir} install 
+    cd ${srcdir}/$pkgname-$pkgver
+    make DESTDIR=${pkgdir} install
 }
