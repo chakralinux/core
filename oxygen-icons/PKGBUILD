@@ -14,8 +14,10 @@ license=('GPL' 'LGPL' 'FDL')
 install=oxygen-icons.install
 options=('log')
 makedepends=('pkg-config' 'cmake' 'automoc4')
-source=($_mirror/$pkgbase-$_kdever.tar.xz)
-sha256sums=(`grep $pkgbase-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+source=("$_mirror/$pkgbase-$_kdever.tar.xz"
+        'install_svg_icons_too.patch')
+sha256sums=(`grep $pkgbase-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`
+            '4dd5a9ab2b204c4f7826ede8831099d7f4bb47c21c2eaaea11851eb0d3ed87de')
 
 prepare() {
     mkdir -p "${srcdir}/svg"

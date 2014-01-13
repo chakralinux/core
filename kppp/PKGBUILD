@@ -24,7 +24,7 @@ source=("$_mirror/$pkgname-$_kdever.tar.xz")
 sha256sums=(`grep $pkgname-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
 build() {
-    cd ${srcdir}/$pkgname-${pkgver}
+    cd ${srcdir}/$pkgname-$pkgver
     cmake . \
         -DCMAKE_BUILD_TYPE=${_build_type} \
         -DCMAKE_INSTALL_PREFIX=${_installprefix} \
@@ -34,6 +34,6 @@ build() {
 }
 
 package() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
+    cd ${srcdir}/$pkgname-$pkgver
     make DESTDIR=${pkgdir} install
 }
