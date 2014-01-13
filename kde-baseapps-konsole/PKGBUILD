@@ -1,0 +1,41 @@
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
+
+# Include global configuration
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=kde-baseapps-konsole
+pkgver=${_kdever}
+pkgrel=1
+pkgdesc="KDE terminal emulator"
+url='http://kde.org/applications/system/konsole/'
+screenshot="http://userbase.kde.org/images.userbase/6/64/Konsole-KDE4.png"
+arch=('x86_64')
+license=('GPL' 'LGPL' 'FDL')
+depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
+makedepends=('cmake' 'automoc4')
+groups=('kde' 'kde-baseapps' 'kde-uninstall')
+provides=('kdebase-konsole')
+conflicts=('kdebase-konsole')
+replaces=('kdebase-konsole')
+categories=('system')
+options=('docs' '!header' 'debug' 'log')
+source=("$_mirror/konsole-$_kdever.tar.xz"
+        "Shell_new.diff")
+sha256sums=(`grep konsole-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`
+            '3a3f0fbc43cbeef19fecc5d6602ac97ff9982990a22b933e0f7c8333559e9d8e')
+
+build() {
+    cd "${srcdir}/konsole-$pkgver"
+    patch -p1 -i ${srcdir}/Shell_new.diff
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' 
+    make
+}
+
+package() {
+    cd "${srcdir}/konsole-$pkgver"
+    make DESTDIR="${pkgdir}" install
+}
