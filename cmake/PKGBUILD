@@ -1,32 +1,41 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=cmake
-pkgver=2.8.10.2
-pkgrel=3
+pkgver=2.8.12.1
+pkgrel=1
 pkgdesc="A cross-platform open-source make system"
 arch=('x86_64')
 license=('custom')
 url="http://www.cmake.org"
 depends=('curl' 'libarchive>=2.3.1' 'shared-mime-info')
-makedepends=('qt')
+makedepends=('qt' 'cmake')
 install=${pkgname}.install
 source=("http://www.cmake.org/files/v2.8/${pkgname}-${pkgver}.tar.gz"
-        "add_extra_prefix_to_find_paths.patch")
-md5sums=('097278785da7182ec0aea8769d06860c'
-         '1e6575c3c54ecbbbccd64dd94a4192df')
+        "findfreetype.patch")
+sha1sums=('5661a607acbce7c16bb5f15ff2895fa5ca53a4da'
+          '6976bb5d6e54931b360a79e74f1425354f01d1fb')
+
+prepare() {
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  patch -Np1 < ${srcdir}/findfreetype.patch
+}
 
 build() {
   cd "${srcdir}"/${pkgname}-${pkgver}
   
-  # add /extra prefix to find paths
-  patch -Np1 -i ../add_extra_prefix_to_find_paths.patch
+  cmake -DBUILD_QtDialog=ON \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+	-DCMAKE_USE_SYSTEM_LIBRARIES=ON \
+        . 
 
-  ./bootstrap --prefix=/usr \
-    --mandir=/share/man \
-    --docdir=/share/doc/cmake \
-    --system-libs \
-    --qt-gui \
-    --parallel=$(/usr/bin/getconf _NPROCESSORS_ONLN)
+  # below version is for boostrapping cmake;
+  # one can use it to break the recursive makedependency
+  #./bootstrap --prefix=/usr \
+  #  --mandir=/share/man \
+  #  --docdir=/share/doc/cmake \
+  #  --system-libs \
+  #  --qt-gui \
+  #  --parallel=$(/usr/bin/getconf _NPROCESSORS_ONLN)
   make
 }
 
