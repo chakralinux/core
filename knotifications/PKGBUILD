@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=knotifications
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Event notifier'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/knotifications'
+license=('LGPL')
+depends=('kwindowsystem' 'libdbusmenu-qt5' 'libxslt')
+makedepends=('extra-cmake-modules')
+groups=('kf5')
+options=('debug')
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('9bf086a6ae58fd67f378cc3d108ae051')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib
+  make
+}
+
+check() {
+  cd build
+  msg "does not work currently, needs gui?"
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
