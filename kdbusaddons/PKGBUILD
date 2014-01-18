@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kdbusaddons
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Provides API for registering services, KDED modules and applications according to Freedesktop standards.'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/kdbusaddons'
+license=('LGPL')
+depends=('qt5-base')
+makedepends=('extra-cmake-modules')
+groups=('kf5')
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('f56571303e78ea1b86768a7414610902')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  msg "tests currently don't run, waits forever"
+  # make test 
+  return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
