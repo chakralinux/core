@@ -1,0 +1,42 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=frameworkintegration
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Framework providing components to allow applications to integrate with a KDE Workspace'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/frameworkintegration'
+license=('LGPL')
+depends=('kf5-attica' 'kio' 'kbookmarks')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake")
+options=("debug")
+groups=('kf5')
+source=("http://download.kde.org/unstable/frameworks/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('f01f07b9d8b452b4db4a1d2fa223d120')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  msg "doesn't work currently, needs gui?"
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
