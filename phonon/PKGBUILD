@@ -1,15 +1,15 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/phonon
 
-pkgname=phonon
+pkgbase=phonon
+pkgname=("phonon" "phonon-qt5")
 pkgver=4.7.1
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://phonon.kde.org"
 license=('LGPL')
-pkgdesc="The multimedia framework for KDE4"
-depends=('pulseaudio' 'libqzeitgeist' 'qtwebkit')
-makedepends=('cmake' 'automoc4')
+makedepends=('cmake' 'automoc4' qt5-base' 'qt5-tools' 'qt5-quick1' qt5-base' 'qt5-tools' 'qt5-quick1')
+options=("debug" "!emptydirs")
 source=("http://download.kde.org/stable/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
 	     'pulsesupport.patch')
 sha256sums=('4ff7802deeac1557166591deb9fc2bfdfcaacdeb5389d07f08255365fb91b75d'         
@@ -17,21 +17,41 @@ sha256sums=('4ff7802deeac1557166591deb9fc2bfdfcaacdeb5389d07f08255365fb91b75d'
 
 prepare(){
   mkdir "${srcdir}"/build
+  mkdir "${srcdir}"/build-qt5
   # patch form Comment#38 at https://bugs.kde.org/show_bug.cgi?id=324975#c38
   patch -uN ${srcdir}/${pkgname}-${pkgver}/phonon/pulsesupport.cpp ${srcdir}/pulsesupport.patch
 }
+
 build() {
   cd "${srcdir}"/build
   cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_SKIP_RPATH=ON \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DPHONON_INSTALL_QT_EXTENSIONS_INTO_SYSTEM_QT=ON \
     -DCMAKE_INSTALL_LIBDIR=lib
   make
+  cd "${srcdir}"/build-qt5
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DPHONON_INSTALL_QT_EXTENSIONS_INTO_SYSTEM_QT=ON \
+    -DPHONON_BUILD_PHONON4QT5=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib
+  make
 }
 
-package(){
+package_phonon(){
+  pkgdesc="The multimedia framework for KDE4"
+  depends=('pulseaudio' 'libqzeitgeist' 'qtwebkit')
+  cd "${srcdir}"/build
+  make DESTDIR="${pkgdir}" install
+}
+
+package_phonon-qt5(){
+  depends=('phonon-backend' 'libpulse' 'qt5-base')
+  pkgdesc="The multimedia framework for KF5"
   cd "${srcdir}"/build
   make DESTDIR="${pkgdir}" install
 }
