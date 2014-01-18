@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=knewstuff
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KNewStuff'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/knewstuff'
+license=('LGPL')
+depends=('kf5-attica' 'kconfigwidgets' 'kio')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake")
+groups=('kf5')
+options=("debug")
+source=("http://download.kde.org/unstable/frameworks/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('eae32999db435df96c04374210752458')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
