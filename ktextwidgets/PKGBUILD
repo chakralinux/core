@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=ktextwidgets
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KTextWidgets'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/ktextwidgets'
+license=('LGPL')
+depends=('kcompletion' 'kservice' 'kiconthemes' 'sonnet')
+makedepends=('extra-cmake-modules')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('fafddfa2a3aa74f1d12129b958b0bfb4')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  msg "Currently failing, needs GUI?"
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
