@@ -1,0 +1,42 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kwidgetsaddons
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Higher level user interface elements for common tasks'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/kwidgetsaddons'
+license=('LGPL')
+depends=('qt5-base')
+makedepends=('extra-cmake-modules')
+groups=('kf5')
+options=("debug")
+source=(${KFServer}/"${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('89923e78e0f0a6a8741dfac0f401a89c')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  msg "tests currently fail as they require a GUI"
+  make test | return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
+
