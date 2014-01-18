@@ -1,0 +1,40 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kimageformats
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KImageFormats'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/kimageformats'
+license=('LGPL')
+depends=('qt5-base' 'jasper' 'openexr')
+makedepends=('extra-cmake-modules')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('ca5b68492547aef3a7079d3504321347')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType}\
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
