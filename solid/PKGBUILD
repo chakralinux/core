@@ -1,0 +1,40 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=solid
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='A platform-independent hardware abstraction layer'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/solid'
+license=('LGPL')
+depends=('qt5-declarative' 'media-player-info' 'upower' 'udisks2' )
+makedepends=('extra-cmake-modules')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('2ebd469ea61eb0b221142ae13647a5ea')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test 
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
