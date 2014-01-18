@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kunitconversion
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KUnitConversion'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/kunitconversion'
+license=('LGPL')
+depends=('kconfig' 'ki18n')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('c70e01fd396fa90c1ae7b52652db39da')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
