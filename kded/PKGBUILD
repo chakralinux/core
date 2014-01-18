@@ -1,0 +1,43 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kded
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KDE Daemon'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/kded'
+license=('LGPL')
+depends=('kservice' 'kinit')
+makedepends=('extra-cmake-modules' 'kdoctools')
+checkdepends=("cmake")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('682e835e7618468d3a87011a4e4f58f3')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  # export XDG_DATA_DIRS="/opt/kf5/share:$XDG_DATA_DIRS"
+
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
