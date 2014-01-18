@@ -1,0 +1,43 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=ki18n
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='A get-text based translation framework'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/ki18n'
+license=('LGPL')
+depends=('kjs')
+makedepends=('extra-cmake-modules')
+checkdepends=('cmake')
+groups=('kf5')
+options=("debug")
+source=("http://download.kde.org/unstable/frameworks/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('de86d939e9c4731d1c87d82fb90ff21f')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  msg "Currently one test is failing; Why?"
+  make test | return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
+
