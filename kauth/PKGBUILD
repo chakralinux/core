@@ -1,0 +1,45 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kauth
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KAuth'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/kauth'
+license=('LGPL')
+depends=('kcoreaddons')
+makedepends=('extra-cmake-modules')
+checkdepends=('cmake')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('0004ade80d8f93d2f708eb30b3ee2f81')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib \
+    -DKAUTH_BACKEND_NAME=FAKE \
+    -DSYSCONF_INSTALL_DIR=/etc
+  make
+}
+
+check() {
+  cd build
+  msg "Tests currently don't work!"
+  return 0
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
