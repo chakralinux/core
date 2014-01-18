@@ -1,0 +1,40 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kf5umbrella
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KF5 Umbrella'
+arch=('any')
+url='https://projects.kde.org/projects/frameworks/kf5umbrella'
+license=('LGPL')
+depends=('qt5-base')
+makedepends=('extra-cmake-modules')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('8751db282da92ff6ada3c5136c21966c')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
