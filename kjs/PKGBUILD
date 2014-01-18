@@ -1,0 +1,42 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kjs
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KJS'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/kjs'
+license=('LGPL')
+depends=('qt5-base')
+makedepends=('extra-cmake-modules')
+checkdepends=('cmake')
+groups=('kf5')
+options=('debug')
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('3385476b429c6b2ea6f2c6ee42012d7d')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
+
