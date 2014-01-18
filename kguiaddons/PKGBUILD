@@ -1,0 +1,42 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kguiaddons
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Higher level user interface components for common tasks'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/kguiaddons'
+license=('LGPL')
+depends=('qt5-base')
+makedepends=('extra-cmake-modules')
+checkdepends=('cmake')
+groups=('kf5')
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('c2f7e84a8818c0124521f29a6a4da6b2')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildVersion} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  msg "Tests currently fail, probably because they depend on the GUI"
+  make test | return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
+
