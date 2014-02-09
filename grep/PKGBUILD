@@ -1,10 +1,9 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=grep
-pkgver=2.14
+pkgver=2.16
 pkgrel=1
 pkgdesc="A string search utility"
 arch=('x86_64')
@@ -12,17 +11,22 @@ license=('GPL3')
 url="http://www.gnu.org/software/grep/grep.html"
 groups=('base')
 depends=('glibc' 'pcre' 'sh')
-makedepends=('texinfo>=4.8a')
+makedepends=('texinfo')
 install="${pkgname}.install"
-source=("ftp://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('d4a3f03849d1e17ce56ab76aa5a24cab')
+source=(ftp://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz{,.sig})
+md5sums=('502350a6c8f7c2b12ee58829e760b44d'
+         'SKIP')
+
+# If pcre get a major upgrade in order to compile grep you must:
+# downgrade pcre, compile grep static by adding  LDFLAGS="$LDFLAGS -static"
+# install the static version of grep, compile/install the new pcre
+# compile normally grep
+# this is needed because grep needs grep to compile (is hardcoded in the source)
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
   ./configure --prefix=/usr \
               --without-included-regex
-
   make
 }
 
