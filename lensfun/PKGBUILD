@@ -4,7 +4,7 @@
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=lensfun
-pkgver=0.2.7
+pkgver=0.2.8
 pkgrel=1
 pkgdesc="Database of photographic lenses and a library that allows advanced access to the database"
 arch=('x86_64')
@@ -13,11 +13,15 @@ license=('LGPL3')
 depends=('glibc' 'glib2')
 makedepends=('python2' 'libpng')
 source=("http://download.berlios.de/${pkgname}/${pkgname}-${pkgver}.tar.bz2") 
-md5sums=('6061cc2d00a42d3e62512878426fc841')
+md5sums=('db2988505e7432c6b331aa597789c639')
+
+prepare() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    sed -i 's|#!/usr/bin/python|#!/usr/bin/python2|' configure
+}
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
-    sed -i 's|#!/usr/bin/python|#!/usr/bin/python2|' configure
     ./configure \
         --prefix=/usr \
         --libdir=/usr/lib

@@ -3,25 +3,22 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=cairo
-pkgver=1.12.14
-pkgrel=4
-_ubuntu_diff_version=${pkgver}-0ubuntu1
+pkgver=1.12.16
+pkgrel=1
+_ubuntu_diff_version=${pkgver}-0ubuntu2
 pkgdesc="Cairo vector graphics library"
 arch=('x86_64')
 license=('LGPL' 'MPL')
 url="http://cairographics.org/"
-depends=('libpng>=1.6.0' 'libxrender' 'libxext' 'fontconfig>=2.8.0' 'pixman' 'glib2' 'sh' 'mesa>=9.0' 'libgl' 'lzo2')
+depends=('libpng>=1.6.0' 'libxrender' 'libxext' 'fontconfig>=2.8.0' 'pixman' 'glib2' 'sh' 'mesa>=9.0' 'libgl' 'lzo2' 'librsvg')
 makedepends=('librsvg' 'poppler-glib' 'libspectre' 'valgrind' 'ttf-dejavu' 'gsfonts' 'xorg-server')
 provides=('cairo-xcb' 'cairo-ubuntu')
 replaces=('cairo-xcb' 'cairo-ubuntu')
 conflicts=('cairo-ubuntu')
-options=('!libtool')
 source=("http://cairographics.org/releases/${pkgname}-${pkgver}.tar.xz"
-        "http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_${_ubuntu_diff_version}.debian.tar.gz"
-        "libpng16.patch")
-sha1sums=('9106ab09b2e7b9f90521b18dd4a7e9577eba6c15'
-          'c4c89d212f1e3a131ea4e228562c91a0a632118f'
-          'c9911f185637d266ce1d2985bd6fb7d0df3d75b2')
+        "http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_${_ubuntu_diff_version}.debian.tar.gz")
+sha1sums=('4f6e337d5d3edd7ea79d1426f575331552b003ec'
+          '95d873fda436a1cc29cda1310f155ef0e3258c05')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -31,7 +28,6 @@ prepare() {
     patch -Np1 -i "$srcdir/debian/patches/$_f"
   done
 
-  patch -p1 < ../libpng16.patch
 }
   
 build() {
@@ -51,6 +47,14 @@ build() {
   make
 }
 
+check() {
+  cd $pkgname-$pkgver
+  make -k test || /bin/true
+  
+  # results:
+  # 2014-02-11: 154 Passed, 352 Failed [2 crashed, 9 expected], 29 Skipped
+
+}
 package() {
   cd "$srcdir/$pkgname-$pkgver"
   make DESTDIR="$pkgdir" install
