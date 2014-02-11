@@ -8,53 +8,50 @@ pkgname=('postgresql-libs'
          'postgresql')
 pkgver=9.3.2
 _majorver=${pkgver%.*}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://www.postgresql.org/'
 license=('custom:PostgreSQL')
 makedepends=('krb5'
              'libxml2'
-             'python3'
+             'openssl>=1.0.0'
              'perl'
-             'tcl>=8.6.0'
-             'openssl>=1.0.0')
+             'python3'
+             'tcl>=8.6.0')
 source=("ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar.bz2"
-        'postgresql.confd'
-        'postgresql.pam'
-        'postgresql.logrotate'
-        'postgresql.service'
-        'postgresql-run-socket.patch'
-        'postgresql.tmpfiles.conf'
         'postgresql-check-db-dir'
-        'postgresql-initdb')
+        'postgresql-run-socket.patch'
+        'postgresql.confd'
+        'postgresql.logrotate'
+        'postgresql.pam'
+        'postgresql.service'
+        'postgresql.tmpfiles.conf')
 sha512sums=('53f6b2b491d1bff4cddd22387f882be3f96affb656a08a93fc757d117d922d0fe211dba6db0d718ed4eca88ed988eaec8ef3aac079b69da9782b42d658c9396f'
-            'a60faeca09e6a4e8b2ada06b16768a8f4db39710af4c47aab82842a085b80d6be4252c8d030de90e3d8f2b2a0c8317bcb1b891316358079d807501544745a4cf'
-            '1e6183ab0eb812b3ef687ac2c26ce78f7cb30540f606d20023669ac00ba04075487fb72e4dc89cc05dab0269ff6aca98fc1167cc75669c225b88b592482fbf67'
-            '9ab4da01337ffbab8faec0e220aaa2a642dbfeccf7232ef2645bdc2177a953f17ee3cc14a4d8f8ebd064e1dae8b3dba6029adbffb8afaabea383963213941ba8'
-            '6c0f9e817306b7f3882e8483c94305cf6de707b3d30469f71314d5668a316ab0f54e33f8b93f2517ef01a0b58d6f54f3cb4f02bac9c12b36e2a57423b7cff742'
-            '031efe12d18ce386989062327cdbbe611c5ef1f94e4e1bead502304cb3e2d410af533d3c7f1109d24f9da9708214fe32f9a10ba373a3ca8d507bdb521fbb75f7'
-            '583f4add381b6d076237f9b1f3a8d095340621d6ba75222dbabb8af71a96efa5b1a69b75cc3c60f27c258c5be6e3de94fe258dc9d523e306f1e8cb60885e7242'
             '464073b8745dafa2ab222cb827068cb33bee3d597e43097e619396d4ed40218af9366cf61e1d8a4cfe0f8079d5df10126a34acc2deced8778c2ba80617b40c97'
-            'dc507e4ceb928967186003e43a9dc005f3a48dcd21e54a949fa4aa149f2e410119275d50486dae818b13c572768c6995f28ef8cb0708c9997ce2ddb6de8b336d')
+            '031efe12d18ce386989062327cdbbe611c5ef1f94e4e1bead502304cb3e2d410af533d3c7f1109d24f9da9708214fe32f9a10ba373a3ca8d507bdb521fbb75f7'
+            'a60faeca09e6a4e8b2ada06b16768a8f4db39710af4c47aab82842a085b80d6be4252c8d030de90e3d8f2b2a0c8317bcb1b891316358079d807501544745a4cf'
+            '9ab4da01337ffbab8faec0e220aaa2a642dbfeccf7232ef2645bdc2177a953f17ee3cc14a4d8f8ebd064e1dae8b3dba6029adbffb8afaabea383963213941ba8'
+            '1e6183ab0eb812b3ef687ac2c26ce78f7cb30540f606d20023669ac00ba04075487fb72e4dc89cc05dab0269ff6aca98fc1167cc75669c225b88b592482fbf67'
+            'c59846579b91e3b04776a83e7f59acb482db2abecf31b33a451dd07df2afa426e69c5188ab19d09b7ad87df81fec1778f6f4b35a8073dbe8055b4e0a1af5020a'
+            '583f4add381b6d076237f9b1f3a8d095340621d6ba75222dbabb8af71a96efa5b1a69b75cc3c60f27c258c5be6e3de94fe258dc9d523e306f1e8cb60885e7242')
 
 build() {
     cd "${srcdir}/postgresql-${pkgver}"
-
     patch -Np1 < ../postgresql-run-socket.patch
-
-    ./configure --prefix=/usr \
-                --mandir=/usr/share/man \
-                --datadir=/usr/share/postgresql \
-                --with-krb5 \
-                --with-libxml \
-                --with-openssl \
-                --with-perl \
-                --with-python PYTHON=/usr/bin/python3 \
-                --with-tcl \
-                --with-pam \
-                --with-system-tzdata=/usr/share/zoneinfo \
-                --enable-nls \
-                --enable-thread-safety
+    ./configure \
+        --prefix=/usr \
+        --mandir=/usr/share/man \
+        --datadir=/usr/share/postgresql \
+        --with-krb5 \
+        --with-libxml \
+        --with-openssl \
+        --with-perl \
+        --with-python PYTHON=/usr/bin/python3 \
+        --with-tcl \
+        --with-pam \
+        --with-system-tzdata=/usr/share/zoneinfo \
+        --enable-nls \
+        --enable-thread-safety
     make world
 }
 
@@ -69,18 +66,18 @@ package_postgresql-libs() {
     cd "${srcdir}/postgresql-${pkgver}"
 
     # Install license
-    install -Dm0644 COPYRIGHT "${pkgdir}/usr/share/licenses/postgresql-libs/LICENSE"
+    install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/postgresql-libs/LICENSE"
 
-    # Install libs
+    # Install libraries
     for dir in src/interfaces src/bin/pg_config src/bin/psql src/bin/pg_dump; do
         make -C ${dir} DESTDIR="${pkgdir}" install
     done
 
-    install -D -m644 doc/src/sgml/man1/pg_config.1 "${pkgdir}/usr/share/man/man1/pg_config.1"
-    install -D -m644 doc/src/sgml/man1/pg_dump.1 "${pkgdir}/usr/share/man/man1/pg_dump.1"
-    install -D -m644 doc/src/sgml/man1/pg_dumpall.1 "${pkgdir}/usr/share/man/man1/pg_dumpall.1"
-    install -D -m644 doc/src/sgml/man1/pg_restore.1 "${pkgdir}/usr/share/man/man1/pg_restore.1"
-    install -D -m644 doc/src/sgml/man1/psql.1 "${pkgdir}/usr/share/man/man1/psql.1"
+    install -Dm644 doc/src/sgml/man1/pg_config.1 "${pkgdir}/usr/share/man/man1/pg_config.1"
+    install -Dm644 doc/src/sgml/man1/pg_dump.1 "${pkgdir}/usr/share/man/man1/pg_dump.1"
+    install -Dm644 doc/src/sgml/man1/pg_dumpall.1 "${pkgdir}/usr/share/man/man1/pg_dumpall.1"
+    install -Dm644 doc/src/sgml/man1/pg_restore.1 "${pkgdir}/usr/share/man/man1/pg_restore.1"
+    install -Dm644 doc/src/sgml/man1/psql.1 "${pkgdir}/usr/share/man/man1/psql.1"
 
     cd src/include
 
@@ -108,7 +105,7 @@ package_postgresql-docs() {
     cd "${srcdir}/postgresql-${pkgver}"
 
     # Install license
-    install -D -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/postgresql-docs/LICENSE"
+    install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/postgresql-docs/LICENSE"
 
     make -C doc/src/sgml DESTDIR="${pkgdir}" install-html
     chown -R root:root "${pkgdir}/usr/share/doc/postgresql/html/"
@@ -120,14 +117,13 @@ package_postgresql-docs() {
 
 package_postgresql() {
     pkgdesc="A sophisticated object-relational DBMS"
-    backup=('etc/conf.d/postgresql'
-            'etc/pam.d/postgresql'
+    backup=('etc/pam.d/postgresql'
             'etc/logrotate.d/postgresql')
     depends=("postgresql-libs>=${pkgver}"
              'krb5'
              'libxml2'
-             'readline>=6.0'
-             'openssl>=1.0.0')
+             'openssl>=1.0.0'
+             'readline>=6.0')
     optdepends=('python3: for PL/Python support'
                 'perl: for PL/Perl support'
                 'tcl: for PL/Tcl support'
@@ -154,7 +150,7 @@ package_postgresql() {
     rm "${pkgdir}/usr/share/man/man1/psql.1"
 
     # Install license
-    install -D -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgbase}/LICENSE"
+    install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgbase}/LICENSE"
 
     # Remove unneeded installed items
     rm -rf "${pkgdir}/usr/include/postgresql/internal"
@@ -163,26 +159,24 @@ package_postgresql() {
     rmdir "${pkgdir}/usr/share/doc/postgresql/html"
 
     # Install conf file
-    install -D -m644 "${srcdir}/postgresql.confd" \
-        "${pkgdir}/etc/conf.d/postgresql"
+    #install -Dm644 "${srcdir}/postgresql.confd" \
+    #    "${pkgdir}/etc/conf.d/postgresql"
+    install -D -m644 "${srcdir}/postgresql.tmpfiles.conf" \
+        "${pkgdir}/usr/lib/tmpfiles.d/postgresql.conf"
 
     # Install pam file
-    install -D -m644 "${srcdir}/postgresql.pam" \
+    install -Dm644 "${srcdir}/postgresql.pam" \
         "${pkgdir}/etc/pam.d/postgresql"
 
     # Install logrotate file
-    install -D -m644 "${srcdir}/postgresql.logrotate" \
+    install -Dm644 "${srcdir}/postgresql.logrotate" \
         "${pkgdir}/etc/logrotate.d/postgresql"
 
     # Install systemd unit
-    install -D -m644 "${srcdir}/postgresql.service" \
+    install -Dm644 "${srcdir}/postgresql.service" \
         "${pkgdir}/usr/lib/systemd/system/postgresql.service"
-    install -D -m755 "$srcdir/postgresql-initdb" \
-        "$pkgdir/usr/lib/systemd/scripts/postgresql-initdb"
 
     # ?
-    #install -D -m755 "${srcdir}/postgresql-check-db-dir" \
-    #    "${pkgdir}/usr/bin/postgresql-check-db-dir"
-    #install -D -m644 "${srcdir}/postgresql.tmpfiles.conf" \
-    #    "${pkgdir}/usr/lib/tmpfiles.d/postgresql.conf"
+    install -Dm755 "${srcdir}/postgresql-check-db-dir" \
+        "${pkgdir}/usr/bin/postgresql-check-db-dir"
 }

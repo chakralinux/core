@@ -1,24 +1,23 @@
 # Maintainer: Fabian Kosmale <0inkane@googlemail.com>
 pkgname=libodfgen
-pkgver=0.0.2
+pkgver=0.0.4
 pkgrel=1
-pkgdesc="Library to extract valid data from within an Excel (.xls) spreadsheet."
-arch=('i686' 'x86_64')
-url="https://www.gaia-gis.it/fossil/freexl/index"
-depends=("libwpd" "libwpg")
-makedepends=("boost-libs")
-license=('LGPL 2.1')
-source=(http://prdownloads.sourceforge.net/libwpd/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('8473296c671b6e3dd8197f4145e0854b')
+pkgdesc='Library for generating documents in Open Document Format'
+arch=('x86_64')
+url='http://sf.net/p/libwpd/libodfgen/'
+license=('MPL')
+depends=('libwpd' 'zlib')
+makedepends=('boost' 'libwpg' 'libetonyek')
+source=(http://dev-www.libreoffice.org/src/$pkgname-$pkgver.tar.bz2)
+md5sums=('e5483d1f0b71e64c367c1194b54b0f53')
 
 build() {
-    cd "$srcdir/${pkgname}-$pkgver"
-    ./configure --prefix=/usr
-    make
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
 }
 
 package() {
-    cd "$srcdir/${pkgname}-$pkgver"
-    make DESTDIR="$pkgdir/" install
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
 }
-
