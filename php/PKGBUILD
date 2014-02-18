@@ -26,9 +26,10 @@ pkgname=('php'
          'php-tidy'
          'php-xsl')
 pkgver=5.5.9
-pkgrel=1
+pkgrel=3
 arch=('x86_64')
 license=('PHP')
+# options=('!buildflags' '!makeflags')
 url='http://www.php.net'
 makedepends=('apache' 'imap' 'postgresql-libs' 'mariadb' 'libldap' 'postfix' 'libvpx'
              'sqlite3' 'unixodbc' 'net-snmp' 'libzip' 'enchant' 'file' 'freetds'
@@ -147,7 +148,7 @@ build() {
 
   cd "${srcdir}/${pkgbase}-${pkgver}"
 
-  # php
+  msg "php"
   mkdir -p "${srcdir}/build-php"
   cd "${srcdir}/build-php"
   ln -sf "${srcdir}/${pkgbase}-${pkgver}/configure"
@@ -158,7 +159,7 @@ build() {
               "${phpextensions[@]}"
   make
 
-  # cgi and fcgi
+  msg "cgi and fcgi"
   # reuse the previous run; this will save us a lot of time
   cp -a "${srcdir}/build-php" "${srcdir}/build-cgi"
   cd "${srcdir}/build-cgi"
@@ -168,16 +169,17 @@ build() {
               "${phpextensions[@]}"
   make
 
-  # apache
-  cp -a "${srcdir}/build-php" "${srcdir}/build-apache"
+  msg "apache"
+  mkdir "${srcdir}/build-apache"
   cd "${srcdir}/build-apache"
+  ln -sf "${srcdir}/${pkgbase}-${pkgver}/configure"
   ./configure "${phpconfig[@]}" \
               --disable-cli \
               --with-apxs2 \
               "${phpextensions[@]}"
   make
 
-  # fpm
+  msg "fpm"
   cp -a "${srcdir}/build-php" "${srcdir}/build-fpm"
   cd "${srcdir}/build-fpm"
   ./configure "${phpconfig[@]}" \
@@ -188,7 +190,7 @@ build() {
               "${phpextensions[@]}"
   make
 
-  # embed
+  msg "embed"
   cp -a "${srcdir}/build-php" "${srcdir}/build-embed"
   cd "${srcdir}/build-embed"
   ./configure "${phpconfig[@]}" \
@@ -197,7 +199,7 @@ build() {
               "${phpextensions[@]}"
   make
 
-  # pear
+  msg "pear"
   cp -a "${srcdir}/build-php" "${srcdir}/build-pear"
   cd "${srcdir}/build-pear"
   ./configure "${phpconfig[@]}" \
