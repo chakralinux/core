@@ -1,8 +1,8 @@
-# maintainer abveritas@chakra-project.org
+# maintainer almack@chakra-project.org
 
 pkgname=lirc-utils
 pkgver=0.9.0
-pkgrel=20
+pkgrel=21
 _extramodules=extramodules-3.12.6-CHAKRA
 pkgdesc="Linux Infrared Remote Control utils"
 arch=('x86_64')
@@ -14,7 +14,7 @@ makedepends=('help2man' 'linux-headers>=3.12' 'linux-headers<3.13' 'python2' 'li
 optdepends=('python2: pronto2lirc utility')
 replaces=('lirc+pctv')
 backup=('etc/conf.d/lircd.conf' 'etc/conf.d/irexec.conf')
-options=('!libtool' '!makeflags')
+options=('!makeflags')
 install=lirc-utils.install
 source=(http://sourceforge.net/projects/lirc/files/LIRC/$pkgver/lirc-$pkgver.tar.bz2
         lirc_wpc8769l.patch
@@ -23,7 +23,7 @@ source=(http://sourceforge.net/projects/lirc/files/LIRC/$pkgver/lirc-$pkgver.tar
         kernel-2.6.39.patch
         linux-3.8.patch
         lirc.logrotate lircd.conf irexec.conf 
-	lirc.service lircm.service irexec.service lirc.tmpfiles)
+        lirc.service lircm.service irexec.service lirc.tmpfiles)
 md5sums=('b232aef26f23fe33ea8305d276637086'
          '1cce37e18e3f6f46044abab29016d18f'
          '1014f2ea03a557c673c9084118676111'
@@ -33,12 +33,13 @@ md5sums=('b232aef26f23fe33ea8305d276637086'
          '3deb02604b37811d41816e9b4385fcc3'
          '5b1f8c9cd788a39a6283f93302ce5c6e'
          'f0c0ac930326168035f0c8e24357ae55'
-         'dab8a73bcc5fd5479d8750493d8d97dc'
-         'c2e20fe68b034df752dba2773db16ebe'
+         'f367f3dfecd10b9cfa035f9a6c2d2ea6'
+         'e2a9a403c2f5107bb9ef1eb70a623876'
          '07131d117fcfe9dcd50c453c3a5e9531'
          'febf25c154a7d36f01159e84f26c2d9a')
 
-build() {
+
+prepare() {
         # configure
         cd "${srcdir}/lirc-$pkgver" 
         patch -Np1 -i "${srcdir}/lirc_wpc8769l.patch"
@@ -58,7 +59,10 @@ build() {
 
 	libtoolize 
 	autoreconf 
+}
 
+build() {
+	cd "${srcdir}/lirc-${pkgver}"
 	./configure --enable-sandboxed --prefix=/usr \
 	--with-driver=all --with-kerneldir=/usr/src/linux-${_kernver} \
 	--with-moduledir=/lib/modules/${_kernver}/kernel/drivers/misc \
