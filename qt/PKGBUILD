@@ -8,7 +8,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers')
 pkgver=4.8.5
-pkgrel=11
+pkgrel=12
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -92,8 +92,7 @@ package_qt() {
 	  'libxinerama: Xinerama support'
 	  'libxfixes: Xfixes support'
 	  'icu: Unicode support')
-    conflicts=('qt-doc' 'qt-demos' 'qt-tools')
-    provides=('qt-tools')
+    provides=('qt4')
     install='qt.install'
 	
     cd $srcdir/$_pkgfqn
@@ -123,6 +122,7 @@ package_qt() {
 
 package_qt-private-headers() {
     pkgdesc="Qt private headers for development"
+    provides=('qt4-private-headers')
     depends=("qt=${pkgver}")
 
     install -d ${pkgdir}/usr/include/{QtCore,QtDeclarative,QtGui,QtScript}
