@@ -6,7 +6,7 @@
 
 
 pkgname=syslog-ng
-pkgver=3.4.2
+pkgver=3.5.3
 pkgrel=1
 pkgdesc="Next-generation syslogd with advanced networking and filtering capabilities"
 arch=('x86_64')
@@ -16,14 +16,13 @@ depends=('glib2' 'eventlog' 'openssl' 'libcap' 'awk' 'systemd' 'python2')
 makedepends=('flex' 'pkg-config')
 optdepends=('logrotate: for rotating log files')
 provides=('logger')
-options=('!libtool')
 backup=('etc/syslog-ng/modules.conf' 'etc/syslog-ng/scl.conf' \
         'etc/syslog-ng/syslog-ng.conf' 'etc/logrotate.d/syslog-ng' 'etc/logrotate.d/syslog-ng')
 source=("http://www.balabit.com/downloads/files/syslog-ng/sources/$pkgver/source/${pkgname}_$pkgver.tar.gz"
         'syslog-ng.conf'
         'syslog-ng.conf.d'
         'syslog-ng.logrotate')
-sha1sums=('96474f955fb51d4f31ce1154c84b0cb48c8748d2'
+sha1sums=('7a8070f384e0dba1dfd6622c40bc6e402fa6178f'
           '98074e0facfc6ef036202662cc86d04b38a2c142'
           'eb2aa25737e0cb9453c7b058f0e2dcf16abf21cd'
           '949128fe3d7f77a7aab99048061f885bc758000c')
@@ -44,6 +43,11 @@ build() {
     --with-systemdsystemunitdir=/usr/lib/systemd/system
 
   make
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  make check
 }
 
 package() {
