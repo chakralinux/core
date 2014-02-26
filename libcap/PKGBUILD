@@ -5,7 +5,7 @@
 
 pkgname=libcap
 pkgver=2.24
-pkgrel=1
+pkgrel=2
 pkgdesc="POSIX 1003.1e capabilities"
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/pub/linux/libs/security/linux-privs/"
@@ -27,7 +27,8 @@ build() {
 
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  make prefix=/usr DESTDIR=${pkgdir} RAISE_SETFCAP=no install
+  # libcap installs to /usr/lib64 by default, which is rather bad when everything looks for the .sos under /usr/lib
+  make prefix=/usr lib=/lib DESTDIR=${pkgdir} RAISE_SETFCAP=no install
 
   install -Dm644 pam_cap/capability.conf \
     $pkgdir/usr/share/doc/$pkgname/capability.conf.example
