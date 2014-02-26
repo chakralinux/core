@@ -1,24 +1,23 @@
-#
-# Platform packages of Chakra, part of chakra-project.org
-#
-# Maintainer abveritas@chakra-project.org
+# Contributor: abveritas@chakra-project.org
+# Maintainer: Bruce Liu <brli@users.sourceforge.net>
 
 pkgname=ffmpeg
-pkgver=2.1.1
+pkgver=2.1.4
 pkgrel=1
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('x86_64')
-url="http://ffmpeg.org/"
+url="http://ffmpeg.org"
 license=('GPL')
 depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'celt'
          'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx>=1.1.0'
          'libva' 'openjpeg' 'rtmpdump' 'speex' 'gsm' 'pulseaudio' 'v4l-utils' 'libass'
-         'libbluray' 'fontconfig' 'freetype2' 'libdc1394' 'libavc1394' 'libavc1394' 'libcaca'
-         'openal')
-makedepends=('yasm')
-source=("http://${pkgname}.org/releases/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('2719ab2b3311ac3775b9cdeb66c54849')
-
+         'fontconfig' 'freetype2' 'openal' 'libdc1394' 'libavc1394' 'libcaca')
+makedepends=('yasm' 'libbluray')
+optdepends=('libbluray: for Blueray disc playback support')
+source=("${url}/releases/${pkgname}-${pkgver}.tar.gz"
+        "${url}/releases/${pkgname}-${pkgver}.tar.gz.asc")
+md5sums=('bf8414a2c4c092330041cfdfe110cd2f'
+         'SKIP')
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
