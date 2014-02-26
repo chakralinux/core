@@ -1,12 +1,10 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas[at]chakra-project[dog]org>
-# maintainer Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=pam
-pkgver=1.1.6
-pkgrel=2
+pkgver=1.1.8
+pkgrel=1
 pkgdesc="PAM (Pluggable Authentication Modules) library"
 arch=('x86_64')
 license=('GPL2')
@@ -19,28 +17,30 @@ source=("https://fedorahosted.org/releases/l/i/linux-pam/Linux-PAM-$pkgver.tar.b
         "pam_unix2-glibc216.patch"
         # file below should have been at https://build.opensuse.org/package/show/Linux-PAM/pam-modules
         "pam_unix2-2.9.1.tar.bz2" # actually now from Arch ftp://ftp.archlinux.org/other/pam_unix2/pam_unix2-2.9.1.tar.bz2
-        'other'
-        'pam_namespace.patch')
-md5sums=('7b73e58b7ce79ffa321d408de06db2c4'
+        'other')
+md5sums=('35b6091af95981b1b2cd60d813b5e4ee'
          'dac109f68e04a4df37575fda6001ea17'
          'da6a46e5f8cd3eaa7cbc4fc3a7e2b555'
-         '59981f79765a38cda7386bd8db22ba5b'
-         'ac4900287a767654a3e8d9251a43f5e4'
-         'd2f510a2f3a5505a11c51d46e615c7cb')
-options=('!libtool' '!emptydirs')
+         'ac4900287a767654a3e8d9251a43f5e4')
+options=('!emptydirs')
+
+prepare() {
+  cd $srcdir/pam_unix2-2.9.1
+  # compile fix
+  patch -Np1 -i ../pam_unix2-glibc216.patch  
+}
 
 build() {
   cd $srcdir/Linux-PAM-$pkgver
   
   ./configure --libdir=/usr/lib
-  patch -p0 -i ../pam_namespace.patch
   make
 
   cd $srcdir/pam_unix2-2.9.1
-  # compile fix
-  patch -Np1 -i ../pam_unix2-glibc216.patch  
-  #patch -Np1 -i ../pam-fix-includes.patch
-  ./configure --libdir=/usr/lib
+  ./configure \
+   CFLAGS="$CFLAGS -I$srcdir/Linux-PAM-$pkgver/libpam/include/" \
+   LDFLAGS="$LDFLAGS -L$srcdir/Linux-PAM-$pkgver/libpam/.libs/" \
+   --libdir=/usr/lib
   make
 }
 
