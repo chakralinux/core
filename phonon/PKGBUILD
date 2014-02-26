@@ -4,7 +4,7 @@
 pkgbase=phonon
 pkgname=("phonon" "phonon-qt5")
 pkgver=4.7.1
-pkgrel=5
+pkgrel=6
 arch=('x86_64')
 url="http://phonon.kde.org"
 license=('LGPL')
@@ -44,13 +44,13 @@ build() {
 
 package_phonon(){
   pkgdesc="The multimedia framework for KDE4"
-  depends=('pulseaudio' 'libqzeitgeist' 'qtwebkit')
+  depends=('pulseaudio' 'libqzeitgeist' 'qtwebkit' 'phonon-backend')
   cd "${srcdir}"/build
   make DESTDIR="${pkgdir}" install
 }
 
 package_phonon-qt5(){
-  depends=('libpulse' 'qt5-base')
+  depends=('libpulse' 'qt5-base' 'phonon-backend')
   pkgdesc="The multimedia framework for KF5"
   cd "${srcdir}"/build-qt5
   make DESTDIR="${pkgdir}" install
