@@ -6,7 +6,7 @@
 
 pkgname=shadow
 pkgver=4.1.5.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Password and account management tool suite with support for shadow files and PAM"
 arch=('x86_64')
 url='http://pkg-shadow.alioth.debian.org/'
@@ -20,7 +20,7 @@ backup=(etc/login.defs
         etc/default/useradd)
 options=('!libtool')
 install='shadow.install'
-source=("http://pkg-shadow.alioth.debian.org/releases/$pkgname-$pkgver.tar.bz2"{,.sig}
+source=("http://cdn.debian.net/debian/pool/main/s/shadow//shadow_4.1.5.1.orig.tar.gz" #"http://cdn.debian.net/debian/pool/main/s/$pkgname//$pkgname_$pkgver.orig.tar.gz"
         LICENSE
         adduser
         chgpasswd
@@ -33,8 +33,7 @@ source=("http://pkg-shadow.alioth.debian.org/releases/$pkgname-$pkgver.tar.bz2"{
         useradd.defaults
         xstrdup.patch
         shadow-strncpy-usage.patch)
-sha1sums=('81f38720b953ef9c2c100c43d02dfe19cafd6c30'
-          '126570e2939bf3b57f28df5197ab9309747a6b5c'
+sha1sums=('6e4de75de58405d21b0377b926ae770afccd95bc'
           '7ab316761036787c0cfcb53b7a6e82da7c373123'
           'cdb0ec4dc094a091c1053d74b4b6cb89327362dc'
           '4ad0e059406a305c8640ed30d93c2a1f62c2f4ad'
@@ -112,7 +111,8 @@ package() {
   rm \
       "$pkgdir"/usr/bin/{chsh,chfn,sg} \
       "$pkgdir"/bin/{login,su} \
-      "$pkgdir"/usr/sbin/{vipw,vigr}
+      "$pkgdir"/usr/sbin/{vipw,vigr,logoutd} \
+      "$pkgdir"/sbin/nologin
 
   # but we keep newgrp, as sg is really an alias to it
   mv "$pkgdir"/usr/bin/{newgrp,sg}
