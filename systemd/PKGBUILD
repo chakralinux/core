@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
 pkgver=210
-pkgrel=1
+pkgrel=2
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -29,13 +29,11 @@ install="systemd.install"
 options=('!libtool')
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-hook-udev'
-        'use-split-usr-path.patch'
         'initcpio-install-udev'
         'initcpio-install-systemd'
         '99-default.preset')
-md5sums=('a07619bb19f48164fbf0761d12fd39a8'
+md5sums=('03efddf8c9eca36d4d590f9967e7e818'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
-         '21572b99173a7cdeaff965e0a5e9182b'
          'fb37e34ea006c79be1c54cbb0f803414'
          '9027b31a875e74a45623954b3b23d09f'
          'a1bf25da736d3719e9720b2e4caea341')
@@ -43,8 +41,6 @@ md5sums=('a07619bb19f48164fbf0761d12fd39a8'
 build() {
   
   cd "$pkgname-$pkgver"
-  patch -p1 -i "$srcdir/use-split-usr-path.patch"
-  autoreconf
   
   ./configure  \
       PYTHON=python2 \
@@ -53,9 +49,11 @@ build() {
       --localstatedir=/var \
       --sysconfdir=/etc \
       --enable-introspection \
+      --enable-compat-libs \
       --disable-gtk-doc \
       --disable-audit \
       --disable-ima \
+      --disable-kdbus \
       --with-sysvinit-path= \
       --with-sysvrcnd-path= \
       --with-firmware-path=/usr/lib/firmware/updates:/lib/firmware/updates:/usr/lib/firmware:/lib/firmware
@@ -84,6 +82,9 @@ package() {
   # udevd is no longer udevd because systemd. why isn't udevadm now udevctl?
   ln -s ../lib/systemd/systemd-udevd "$pkgdir/usr/bin/udevd"
 
+  # get rid of RPM macros
+  rm -r "$pkgdir/usr/lib/rpm"
+
   # add back tmpfiles.d/legacy.conf
   install -m644 "systemd-$pkgver/tmpfiles.d/legacy.conf" "$pkgdir/usr/lib/tmpfiles.d"
 
@@ -96,6 +97,14 @@ package() {
   install -Dm644 "$srcdir/initcpio-install-udev" "$pkgdir/usr/lib/initcpio/install/udev"
   install -Dm644 "$srcdir/initcpio-hook-udev" "$pkgdir/usr/lib/initcpio/hooks/udev"
   install -Dm644 "$srcdir/initcpio-install-systemd" "$pkgdir/usr/lib/initcpio/install/systemd"
+
+
+  # ensure proper permissions for /var/log/journal
+  chown root:systemd-journal "$pkgdir/var/log/journal"
+  chmod 2755 "$pkgdir/var/log/journal"
+
+  # fix pam file
+  sed 's|system-auth|system-login|g' -i "$pkgdir/etc/pam.d/systemd-user"
   
   # Chakra specific .preset
   install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
