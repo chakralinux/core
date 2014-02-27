@@ -1,11 +1,9 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
+# Maintainer: Francesco Marinucci <franzmari[at]chakra-project[dot]it>
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=modemmanager
 _realname=ModemManager
-pkgver=0.6.2.0
+pkgver=1.2.0
 pkgrel=1
 pkgdesc="Mobile broadband modem management service"
 arch=('x86_64')
@@ -14,9 +12,11 @@ license=('GPL2')
 depends=('dbus-glib>=0.100' 'systemd' 'ppp>=2.4.5' 'polkit')
 makedepends=('intltool')
 options=('!libtool')
-source=("http://download.gnome.org/sources/${_realname}/0.6/${_realname}-${pkgver}.tar.xz"
+source=("http://www.freedesktop.org/software/${_realname}/${_realname}-${pkgver}.tar.xz"
 	'modem-manager.service')
 optdepends=('usb-modeswitch: install if your modem shows up as a storage drive')
+md5sums=('6e70ab7c5f96aa6a4d5612c1d5ae5bb3'
+         'e098d96691f38eb4c91c6a5e6acae307')
 
 build() {
   cd "$srcdir/${_realname}-${pkgver}"
@@ -25,7 +25,9 @@ build() {
 	--localstatedir=/var \
 	--with-udev-base-dir=/usr/lib/udev \
 	--disable-static \
-        --with-polkit
+        --with-polkit \
+	--without-qmi \
+	--without-mbim
   sed -i 's/-Werror/-w/g' Makefile
   CFLAGS="${CFLAGS} -Wno-error -w" CPPFLAGS="${CPPFLAGS} -Wno-error -w" make
 }
@@ -38,5 +40,3 @@ package() {
   echo "SystemdService=modem-manager.service" \
     >> "$pkgdir/usr/share/dbus-1/system-services/org.freedesktop.ModemManager.service"
 }
-md5sums=('29f97defbf9429f648c888a42732a955'
-         'e098d96691f38eb4c91c6a5e6acae307')
