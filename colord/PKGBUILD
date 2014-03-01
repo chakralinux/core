@@ -5,17 +5,27 @@
 # contributor: Ionut Biru <ibiru@archlinux.org>
 
 pkgname=colord
-pkgver=0.1.28
+pkgver=1.0.6
 pkgrel=1
-pkgdesc="System service easily manage, install and generate color profiles to manage input and output devices"
+pkgdesc="System daemon for managing color devices"
 arch=('x86_64')
 url="http://www.freedesktop.org/software/colord"
 license=('GPL2')
-depends=('lcms2' 'polkit' 'shared-color-profiles' 'sqlite3' 'systemd' 'libgusb')
-makedepends=('intltool' 'gobject-introspection' 'vala' 'docbook-xsl')
-source=($url/releases/$pkgname-$pkgver.tar.xz)
-options=('!libtool')
-sha1sums=('d53167727ab0f1014ded86675ac8b518c188a88b')
+depends=('lcms2' 'polkit' 'shared-color-profiles' 'sqlite3' 'systemd' 'libgusb' 'dbus')
+makedepends=('intltool' 'gobject-introspection' 'vala' 'docbook-xsl' 'sane' 'bash-completion')
+optdepends=('sane: UseSANE support [/etc/colord.conf]')
+install=colord.install
+backup=(etc/colord.conf)
+source=($url/releases/$pkgname-$pkgver.tar.xz{,.asc}
+        udev-systemd.patch)
+sha1sums=('b3ad9d1cd90ff0ea4d955b253dc0491d851c2778'
+          'SKIP'
+          '3b467b9674f767c804943d191beaf6bd1ba3a606')
+
+prepare() {
+  cd $pkgname-$pkgver
+  patch -Np1 -i ../udev-systemd.patch
+}
 
 build() {
   cd "$pkgname-$pkgver"
@@ -23,16 +33,15 @@ build() {
   # put udev files in /usr/lib
   sed -i "/slashlibdir=/s#/lib#/usr/lib#" configure
   
-  ./configure --prefix=/usr \
-    --sysconfdir=/etc --libexecdir=/usr/lib/colord \
-    --localstatedir=/var --disable-static \
-    --with-systemdsystemunitdir=/usr/lib/systemd/system
+  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+    --libexecdir=/usr/lib/$pkgname --disable-static \
+    --with-systemdsystemunitdir=/usr/lib/systemd/system \
+    --enable-vala --enable-sane --disable-volume-search
   make
 }
 
 package() {
   cd "$pkgname-$pkgver"
-  make DESTDIR="$pkgdir" install \
-    bashcompletiondir=/usr/share/bash-completion/completions
+  make DESTDIR="$pkgdir" install
 }
 
