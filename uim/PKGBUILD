@@ -3,13 +3,13 @@
 
 pkgname=uim
 pkgver=1.8.6
-pkgrel=2
+pkgrel=3
 pkgdesc='Multilingual input method library'
 url='http://code.google.com/p/uim/'
 license=('custom:BSD')
 arch=('i686' 'x86_64')
 depends=('libxft' 'libedit' 'anthy' 'm17n-lib')
-makedepends=('intltool' 'gettext' 'qt')
+makedepends=('intltool' 'gettext' 'qt' 'kdelibs')
 optdepends=('qt: immodule and helper applications'
             'gtk2: immodule and helper applications'
             'gtk3: immodules and helper applications')
@@ -26,7 +26,7 @@ build() {
 		--with-qt4-immodule \
 		--with-qt4 \
 	        --enable-kde4-applet \
-                --enable-notify \
+                --enable-notify=knotify4 \
                 --enable-dict \
                 --with-sqlite3 \
                 --with-ffi 
