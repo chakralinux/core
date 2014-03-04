@@ -1,11 +1,11 @@
 pkgname=aubio
 pkgver=0.3.2
-pkgrel=1
+pkgrel=2
 pkgdesc="A library for audio labelling"
 arch=('x86_64')
 url="http://aubio.piem.org/"
 license=('GPL')
-depends=('libsamplerate' 'fftw' 'jack-audio-connection-kit')
+depends=('libsamplerate' 'fftw' 'jack')
 options=('!libtool')
 source=(http://aubio.piem.org/pub/${pkgname}-${pkgver}.tar.gz)
 md5sums=('ffc3e5e4880fec67064f043252263a44')
@@ -14,6 +14,10 @@ build() {
   cd ${srcdir}/${pkgname}-${pkgver}
  export LDFLAGS='-lm'
   ./configure --prefix=/usr
-  make || return 1
+  make
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
   make DESTDIR=${pkgdir} install
 }
