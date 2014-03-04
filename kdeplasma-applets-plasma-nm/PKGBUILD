@@ -1,0 +1,37 @@
+# Maintainer: FranzMari <franzmari[at]chakra-project[dot]it>
+# Contributors: H W Tovetj√rn (totte) <totte@tott.es>
+
+pkgname=kdeplasma-applets-plasma-nm
+_pkgname=plasma-nm
+pkgver=0.9.3.2
+pkgrel=1
+pkgdesc='Plasma applet written in QML for managing network connections'
+arch=('x86_64')
+url='https://projects.kde.org/projects/playground/network/plasma-nm'
+license=('GPL2')
+depends=('kde-workspace'
+         'libnm-qt'
+         'openconnect')
+makedepends=('cmake'
+             'automoc4')
+conflicts=('kdeplasma-applets-plasma-nm-git'
+           'kdeplasma-applets-networkmanagement')
+screenshot="http://grulja.files.wordpress.com/2013/06/nm1.png?w=268&h=300"
+source="http://download.kde.org/unstable/${_pkgname}/${_pkgname}-${pkgver}.tar.xz"
+sha512sums=('51b9b4a2d861fd6d3deb1a28f977cb4e817ab5b14f512b4b2dd1f4a6bc43fc6e1d575930cd5c654e540c0d29200b17088f7026b7ab8d33341887e38cd13716aa')
+ 
+build() {
+  cd $srcdir/${_pkgname}-${pkgver}
+  mkdir build
+  cd build
+  cmake .. \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  make
+}
+ 
+package() {
+  cd $srcdir/${_pkgname}-${pkgver}
+  cd build
+  make DESTDIR="${pkgdir}" install
+} 
