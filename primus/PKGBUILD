@@ -1,8 +1,8 @@
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
-# Contributions from AUR: https://aur.archlinux.org/packages/primus-git/
+# Contributions from Arch:  https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/primus
 
 pkgname=primus
-pkgver=20130522
+pkgver=20131127
 pkgrel=1
 pkgdesc="Faster OpenGL offloading for Bumblebee (git sources)"
 arch=('x86_64')
@@ -11,23 +11,8 @@ license=('custom:ISC')
 depends=('bumblebee')
 makedepends=('git')
 provides=('primus')
-source=("${pkgname}-${pkgver}.tar.xz")
-md5sums=('2fc8e98a02a0b20fb46e7797ee058bd9')
-
-# run this first to create the tarball: source PKGBUILD && mksource
-
-mksource() {
-    if [ "${1}" = "" ] ; then
-        git clone git://github.com/amonakov/primus.git ${pkgname}
-    else
-        git clone -b "${1}" git://github.com/amonakov/primus.git ${pkgname}
-    fi
-    pushd ${pkgname}
-    popd
-    rm ${pkgname}/PKGBUILD
-    tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}
-    md5sum ${pkgname}-${pkgver}.tar.xz
-}
+source=("git://github.com/amonakov/primus.git#commit=074817614c")
+sha1sums=('SKIP')
 
 build() {
   cd "${srcdir}/${pkgname}"
