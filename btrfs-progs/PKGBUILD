@@ -2,22 +2,22 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/btrfs-progs
 
 pkgname=btrfs-progs
-pkgver=0.19.20131027
+pkgver=3.12
 pkgrel=1
-pkgdesc="Btrfs filesystem utilities."
+pkgdesc="btrfs filesystem utilities."
 license=('GPL2')
 arch=('x86_64')
 depends=('glibc' 'e2fsprogs' 'lzo2')
 makedepends=('git')
 url="http://btrfs.wiki.kernel.org/"
 options=(!staticlibs)
-#git commit was chosen from here: http://git.kernel.org/cgit/linux/kernel/git/mason/btrfs-progs.git/
-source=("git://git.kernel.org/pub/scm/linux/kernel/git/mason/${pkgname}.git#commit=d1570a06184ed3748536a67693ef5cfd954d4032"
+source=("git://git.kernel.org/pub/scm/linux/kernel/git/mason/${pkgname}.git#tag=v${pkgver}"
         'initcpio-install-btrfs'
-	'initcpio-hook-btrfs')
+        'initcpio-hook-btrfs')
+install=btrfs-progs.install
 md5sums=('SKIP'
-         'c6dca7145b3cd80bee0d2b665d8259e8'
-         '85ff8daca50a5ba3dff3c3e641d38b1e')
+         '7241ba3a4286d08da0d50b7176941112'
+         'b09688a915a0ec8f40e2f5aacbabc9ad')
 
 build() {
    cd $pkgname
