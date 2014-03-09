@@ -2,7 +2,7 @@
 # Core Packages for Chakra, part of chakra-project.org
 
 pkgname=procps-ng
-pkgver=3.3.7
+pkgver=3.3.9
 pkgrel=1
 pkgdesc='Utilities for monitoring your system and its processes'
 url='http://gitorious.org/procps'
@@ -10,23 +10,22 @@ license=('GPL' 'LGPL')
 arch=('x86_64')
 groups=('base')
 depends=('ncurses')
-backup=('etc/sysctl.conf')
-source=("procps-ng-${pkgver}.tar.gz::http://gitorious.org/procps/procps/archive-tarball/v${pkgver}"
-        'sysctl.conf')
-sha1sums=('436ce9e585210340ff1673157e402e07879a6239'
-          '97ff07bab9aa5daa8d54a1346f73ba74f8e12a53')
+source=("http://downloads.sourceforge.net/project/${pkgname}/Production/${pkgname}-${pkgver}.tar.xz")
+sha1sums=('088c77631745fc75ee41fc29c254a4069be4869a')
 
 conflicts=('procps')
 provides=('procps')
 replaces=('procps')
 
-options=('!libtool')
+prepare() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	sed 's:<ncursesw/:<:g' -i watch.c
+}
 
 build() {
-	cd "${srcdir}/procps-procps"
+	cd "${srcdir}/${pkgname}-${pkgver}"
 	echo ${pkgver} > .tarball-version
 
-	./autogen.sh
 	./configure \
 		--prefix=/usr \
 		--exec-prefix=/ \
@@ -34,14 +33,14 @@ build() {
 		--libdir=/usr/lib \
 		--bindir=/usr/bin \
 		--sbindir=/usr/bin \
-		--disable-static
+		--disable-static \
+                --enable-watch8bit
 	make
 }
 
 package() {
-	cd "${srcdir}/procps-procps"
+	cd "${srcdir}/${pkgname}-${pkgver}"
 	make DESTDIR="${pkgdir}" install
-	install -D -m644 ../sysctl.conf "${pkgdir}/etc/sysctl.conf"
 
 	# provided by util-linux
 	rm "${pkgdir}/usr/bin/kill"
