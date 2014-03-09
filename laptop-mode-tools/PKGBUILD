@@ -1,18 +1,21 @@
-# maintainer abveritas@chakra-project.org
+# Contributor: abveritas@chakra-project.org
+# Maintainer: Bruce Liu <brli@users.sourceforge.net>
 
 pkgname=laptop-mode-tools
 pkgver=1.64
-pkgrel=2
+pkgrel=3
 pkgdesc="Laptop mode is a kernel mode that allows you to extend the battery life of your laptop"
 arch=('x86_64')
 url="http://www.samwel.tk/laptop_mode/"
 license=('GPL')
 depends=('bash')
+makedepends=('python2-pyqt4')
 optdepends=('acpid: for ACPI support'
             'hdparm: hard disk power management'
             'sdparm: SCSI disk power management'
             'ethtool: ethernet support'
-            'wireless_tools: WiFi support')
+            'wireless_tools: WiFi support'
+	    'python2-pyqt4: for GUI support')
 backup=(etc/laptop-mode/conf.d/ac97-powersave.conf
         etc/laptop-mode/conf.d/auto-hibernate.conf
         etc/laptop-mode/conf.d/battery-level-polling.conf
@@ -45,11 +48,11 @@ install=laptop-mode.install
 source=("http://www.samwel.tk/laptop_mode/tools/downloads/${pkgname}_${pkgver}.tar.gz")
 md5sums=('d3bc81f0eac6315e5653cd4f8965d844')
 
-build() {
-  cd ${pkgname}_${pkgver}
-}
-
 package() {
   cd ${pkgname}_${pkgver}
   make DESTDIR="${pkgdir}" INIT_D=none MAN_D=/usr/share/man LIB_D=/usr/lib install
+  cd ${srcdir}/${pkgname}_${pkgver}/gui/
+  sed -i '1s|^|#!/usr/bin/python \n|' LMT.py
+  install -Dm755 LMT.py ${pkgdir}/usr/sbin/${pkgname}-gui
+  
 }
