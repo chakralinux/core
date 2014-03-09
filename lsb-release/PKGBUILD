@@ -5,10 +5,11 @@
 
 pkgname=lsb-release
 pkgver=1.4
-pkgrel=6
+pkgrel=7
 pkgdesc="LSB version query program."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.linuxbase.org/"
+depends=('bash')
 makedepends=('perl') # to generate the man page
 license=('GPL2')
 source=("http://downloads.sourceforge.net/lsb/${pkgname}-${pkgver}.tar.gz")
@@ -27,10 +28,13 @@ package() {
   install -d -m755 "${pkgdir}/etc"
   cat > "${pkgdir}/etc/lsb-release" <<-EOF
 DISTRIB_ID="Chakra"
-DISTRIB_RELEASE="2013.02"
-DISTRIB_CODENAME="Benz"
+DISTRIB_RELEASE="2014.02"
+DISTRIB_CODENAME="Curie"
 DISTRIB_DESCRIPTION="Chakra"
 EOF
+
+  install -Dm 644 lsb_release.1.gz "$pkgdir/usr/share/man/man1/lsb_release.1.gz"
+  install -Dm 755 lsb_release "$pkgdir/usr/bin/lsb_release"
 }
 
 # vim:set ts=2 sw=2 et:
