@@ -1,0 +1,39 @@
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
+
+# Include global configuration
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+_pkgname="umbrello"
+pkgname="kdesdk-umbrello"
+arch=('x86_64')
+pkgver=${_kdever}
+pkgrel=1
+pkgdesc="An UML modeling tool for KDE"
+screenshot="http://uml.sourceforge.net/screenshots/umbrello-2.0.png"
+depends=("kde-runtime>=${_kdever}" "libxslt" "libxml2")
+conflicts=('kdesdk-doc')
+groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
+categories=('programming')
+provides="umbrello"
+install=kdesdk.install
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+options=('docs' '!header' 'debug' 'log')
+makedepends=('pkg-config' 'cmake' 'automoc4' 'boost')
+source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+build() {
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    cmake . \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DCMAKE_SKIP_RPATH=ON 
+    make
+}
+
+package() {
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    make DESTDIR=${pkgdir} install 
+}

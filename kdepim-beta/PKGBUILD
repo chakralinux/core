@@ -1,10 +1,10 @@
-#
-# KDE SC Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
+
+
+# Maintainer (i686): Phil Miller <philm@chakra-project[dog]org>
+# Maintainer (x86_64): Manuel Tortosa <manutortosa@chakra-project@org>
+
+# Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 
@@ -14,9 +14,9 @@ _origname=kdepim
 
 
 
-#
+
 # package info
-#
+
 pkgbase=('kdepim')
 pkgname=('kdepim-common'
          'kdepim-doc'
@@ -49,7 +49,7 @@ pkgdesc="split package"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
-options=('!docs' '!splithdr' 'splitdbg' 'log')
+options=('!docs' '!header' 'debug' 'log')
 
 makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' "kdelibs>=${_kdever}" "kdepimlibs>=${_kdever}"
              "kdepim-runtime>=${pkgver}" 'libxss' "kdebase-runtime>=${_kdever}" 
@@ -58,12 +58,12 @@ makedepends=('pkgconfig' 'cmake' 'automoc4' 'boost' "kdelibs>=${_kdever}" "kdepi
 #source=($_mirror/${_origname}-$_kdever.tar.bz2)
 source=($_mirror/${_origname}-4.5.94.1.tar.bz2)
 
-#md5sums=(`grep ${_origname}-$_kdever.tar.bz2 ../kde-sc.md5 | cut -d" " -f1`)
+#sha256sums=(`grep ${_origname}-$_kdever.tar.bz2  ../checksums.txt | cut -d" " -f1`)
 md5sums=('f15ee286bb5bc034f5dd607c2b391b54')
 
-#
+
 # build function
-#
+
 build()
 {
 	cd ${srcdir}/${_origname}-${_pkgver}
@@ -78,14 +78,14 @@ build()
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
-	make || return 1
+	make
 }
 
 
 
-#
+
 # split-install functions
-#
+
 package_kdepim-common()
 {
 	pkgdesc="KDE PIM - Common files and libraries"
@@ -99,7 +99,7 @@ package_kdepim-common()
 	splitdirs="akonadi_next icons calendarsupport calendarviews console incidenceeditor-ng kdgantt2 kleopatra kresources ksendemail libkdepim libkdepimdbusinterfaces libkleo libkpgp libksieve mailcommon messagecore messagecomposer messagecore messagelist messageviewer nepomuk_email_feeder ontologies plugins strigi-analyzer templateparser"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 
 #	# include our patches into the package
@@ -129,7 +129,7 @@ package_kdepim-doc()
 	splitdirs="doc"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -144,7 +144,7 @@ package_kdepim-akonadiconsole()
 	splitdirs="akonadiconsole"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -159,7 +159,7 @@ package_kdepim-akregator()
 	splitdirs="akregator"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -174,7 +174,7 @@ package_kdepim-blogilo()
 	splitdirs="blogilo"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -189,7 +189,7 @@ package_kdepim-kaddressbook()
 	splitdirs="kaddressbook"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -204,7 +204,7 @@ package_kdepim-kalarm()
 	splitdirs="kalarm"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -219,7 +219,7 @@ package_kdepim-kitchensync()
 	splitdirs="kitchensync"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -234,7 +234,7 @@ package_kdepim-kjots()
 	splitdirs="kjots"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -249,7 +249,7 @@ package_kdepim-kmail()
 	splitdirs="kmail kmailcvt"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -264,7 +264,7 @@ package_kdepim-mobile()
 	splitdirs="mobile"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -279,7 +279,7 @@ package_kdepim-knode()
 	splitdirs="knode"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -294,7 +294,7 @@ package_kdepim-knotes()
 	splitdirs="knotes"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -309,7 +309,7 @@ package_kdepim-kontact()
 	splitdirs="kontact"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -324,7 +324,7 @@ package_kdepim-korganizer()
 	splitdirs="korganizer"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 
 	# remove conflict with kdebase-runtime
@@ -342,7 +342,7 @@ package_kdepim-ktimetracker()
 	splitdirs="ktimetracker"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
@@ -357,7 +357,7 @@ package_kdepim-wizards()
 	splitdirs="wizards"
 		for i in ${splitdirs} ; do
 			cd ${srcdir}/${_origname}-${_pkgver}/${i}
-			make DESTDIR=${pkgdir} install || return 1
+			make DESTDIR=${pkgdir} install
 		done
 }
 
