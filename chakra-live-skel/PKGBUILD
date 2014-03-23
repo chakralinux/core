@@ -1,0 +1,21 @@
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+
+pkgname=chakra-live-skel
+pkgver=1.0
+pkgrel=1
+pkgdesc="The inital user configuration of a Chakra system"
+arch=('x86_64')
+url="http://www.archlinux.org/"
+license=('GPL')
+source=("skel.tar.gz")
+md5sums=('ac84be7618e02f22f4e975770765a960')
+
+package() {
+  cd ${srcdir}/skel
+  for folder in ./*; do \
+    cp -a $folder ${pkgdir}; \
+  done
+  chmod 750 ${pkgdir}/etc/sudoers.d/
+}
