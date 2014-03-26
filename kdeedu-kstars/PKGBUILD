@@ -16,7 +16,7 @@ license=('GPL'
          'LGPL'
          'FDL')
 depends=("kde-runtime>=${_kdever}"
-         'eigen'
+         'eigen3'
          'cfitsio'
          'indilib>=0.9.6'
          'wcslib'
@@ -35,6 +35,14 @@ options=('docs'
 install=${pkgname}.install
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+prepare() {
+  # add min cmake version to kstars
+  cd ${srcdir}/${_pkgname}-${pkgver}
+  local old_cmake=$(<./CMakeLists.txt)
+  echo "cmake_minimum_required(VERSION 2.8)" > ./CMakeLists.txt
+  echo -e "${old_cmake}" >> ./CMakeLists.txt
+}
 
 build() {
     cd ${srcdir}/${_pkgname}-${pkgver}
