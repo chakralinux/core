@@ -1,22 +1,18 @@
 # Maintainer: Francesco Marinucci <franzmari[at]chakra-project[dot]it>
-# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=modemmanager
 _realname=ModemManager
 pkgver=1.2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Mobile broadband modem management service"
 arch=('x86_64')
 url="http://cgit.freedesktop.org/ModemManager/ModemManager/"
 license=('GPL2')
 depends=('dbus-glib>=0.100' 'systemd' 'ppp>=2.4.5' 'polkit')
 makedepends=('intltool')
-options=('!libtool')
-source=("http://www.freedesktop.org/software/${_realname}/${_realname}-${pkgver}.tar.xz"
-	'modem-manager.service')
+source=("http://www.freedesktop.org/software/${_realname}/${_realname}-${pkgver}.tar.xz")
 optdepends=('usb-modeswitch: install if your modem shows up as a storage drive')
-md5sums=('6e70ab7c5f96aa6a4d5612c1d5ae5bb3'
-         'e098d96691f38eb4c91c6a5e6acae307')
+md5sums=('6e70ab7c5f96aa6a4d5612c1d5ae5bb3')
 
 build() {
   cd "$srcdir/${_realname}-${pkgver}"
@@ -35,8 +31,4 @@ build() {
 package() {
   cd "$srcdir/${_realname}-${pkgver}"
   make DESTDIR="$pkgdir" install
-  
-  install -Dm644 "$srcdir/modem-manager.service" "$pkgdir/usr/lib/systemd/system/modem-manager.service"
-  echo "SystemdService=modem-manager.service" \
-    >> "$pkgdir/usr/share/dbus-1/system-services/org.freedesktop.ModemManager.service"
 }
