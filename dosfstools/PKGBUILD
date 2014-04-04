@@ -1,7 +1,7 @@
 # maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=dosfstools
-pkgver=3.0.23
+pkgver=3.0.26
 pkgrel=1
 pkgdesc="DOS filesystem utilities."
 arch=('x86_64')
@@ -9,17 +9,14 @@ depends=('glibc')
 url="http://www.daniel-baumann.ch/software/dosfstools/"
 license=('GPL2')
 source=("http://www.daniel-baumann.ch/files/software/dosfstools/${pkgname}-${pkgver}.tar.xz")
-        #'gentoo-3.0.12-name-ext.patch')
-md5sums=('bfdca786880a7f1cc9ce8ac68cb1fd51')
-#         'e6fb867c72aa5dffaed0cd62fbaa4c69')
+md5sums=('45012f5f56f2aae3afcd62120b9e5a08')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-#  patch -Np0 -i "${srcdir}/gentoo-3.0.12-name-ext.patch"
   make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR=$pkgdir PREFIX=/usr MANDIR=/usr/share/man DOCDIR=/usr/share/doc install
+  make DESTDIR=$pkgdir SBINDIR=/sbin MANDIR=/usr/share/man DOCDIR=/usr/share/doc install
 }

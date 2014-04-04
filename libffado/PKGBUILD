@@ -3,7 +3,7 @@
 
 pkgname=libffado
 pkgver=2.1.0
-pkgrel=5
+pkgrel=6
 pkgdesc="Driver for FireWire audio devices"
 arch=('x86_64')
 url="http://www.ffado.org/"
@@ -13,11 +13,16 @@ depends=('libiec61883' 'libavc1394' 'libsigc++' 'libxml++' 'alsa-lib'
 makedepends=('scons' 'python2-pyqt4' 'python2')
 optdepends=('python2-pyqt4: mixer applet'
             'python2: ffado-diag')
-source=("http://www.ffado.org/files/libffado-$pkgver.tgz")
-md5sums=('26bce2be0b9c1fa4e614f2f494edf388')
+source=("http://www.ffado.org/files/libffado-$pkgver.tgz"
+	"libffado-2.1.0-udev-rules.patch::http://subversion.ffado.org/attachment/ticket/373/libffado-2.1.0-udev-rules.patch?format=raw")
+md5sums=('26bce2be0b9c1fa4e614f2f494edf388'
+         'da1102bfb02e67b3dfcb3947435a81e9')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
+
+  # udev rules fix for new systemd
+  patch -i ../libffado-2.1.0-udev-rules.patch -p0 || return 1
 
   # python2 fix
   sed -i 's:python $SOURCE:python2 $SOURCE:' SConstruct
