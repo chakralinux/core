@@ -2,7 +2,7 @@
 
 pkgname=cups-filters
 pkgver=1.0.37
-pkgrel=2
+pkgrel=3
 pkgdesc="OpenPrinting CUPS Filters"
 arch=('x86_64')
 url="http://www.linuxfoundation.org/collaborate/workgroups/openprinting"
@@ -14,7 +14,6 @@ optdepends=('ghostscript: for non-PostScript printers to print with CUPS to conv
 	    'foomatic-db-engine: drivers use Ghostscript to convert PostScript to a printable form directly'
 	    'foomatic-db-nonfree: drivers use Ghostscript to convert PostScript to a printable form directly')
 backup=(etc/fonts/conf.d/99pdftoopvp.conf)
-options=(!libtool)
 source=("http://www.openprinting.org/download/cups-filters/$pkgname-$pkgver.tar.gz"
         'cups-browsed.service')
 md5sums=('42d2dd9745d4d5d626c7b871155cb430'
@@ -25,6 +24,7 @@ build() {
   
   ./configure --prefix=/usr  \
     --sysconfdir=/etc \
+    --sbindir=/usr/bin \
     --with-rcdir=no \
     --enable-avahi \
     --with-test-font-path=/usr/share/fonts/TTF/DejaVuSans.ttf \
