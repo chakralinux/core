@@ -5,7 +5,7 @@
 
 pkgname=lsb-release
 pkgver=1.4
-pkgrel=7
+pkgrel=8
 pkgdesc="LSB version query program."
 arch=('x86_64')
 url="http://www.linuxbase.org/"
@@ -27,6 +27,7 @@ package() {
   # Create an /etc/lsb-release file suitable for Chakra
   install -d -m755 "${pkgdir}/etc"
   cat > "${pkgdir}/etc/lsb-release" <<-EOF
+LSB_VERSION=${pkgver}
 DISTRIB_ID="Chakra"
 DISTRIB_RELEASE="2014.02"
 DISTRIB_CODENAME="Curie"
