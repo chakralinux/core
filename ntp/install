@@ -14,6 +14,15 @@ post_upgrade() {
 	if [[ $(vercmp $2 4.2.6.p5-5) -le 0 ]]; then
 		chown -R ntp /var/lib/ntp
 	fi
+	if [[ $(vercmp $2 4.2.6.p5-6) -le 0 ]]; then
+		cat <<EOF
+
+==> The PID file /var/run/ntpd.pid has been renamed /run/ntpd.pid
+==> and the new systemd service only takes the latter into account.
+==> To stop your old ntpd process, please kill it manually.
+
+EOF
+	fi
 }
 
 pre_remove() {
