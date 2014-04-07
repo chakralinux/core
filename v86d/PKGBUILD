@@ -2,7 +2,7 @@
 
 pkgname="v86d"
 pkgver=0.1.10
-pkgrel=1
+pkgrel=2
 pkgdesc="userspace helper for uvesafb that runs x86 code in an emulated environment"
 url="http://dev.gentoo.org/~spock/projects/uvesafb/"
 license=('GPL2')
@@ -10,27 +10,31 @@ arch=("x86_64")
 depends=('glibc')
 backup=(etc/modprobe.d/uvesafb.conf)
 source=("https://github.com/mjanusz/v86d/archive/v86d-${pkgver}.tar.gz"
-        v86d
+        v86d_install
         v86d_hook
         modprobe.uvesafb)
 md5sums=('f9e583d399b1f0513dc06adcc7b479da'
-         '33f3131e7bf041ed6a67e92bff272f4c'
+         '66ab32602ab29cc5635eaac7f3e42283'
          '813958b8f6c75a7063e4858f31509694'
          '2d7cc8dc6a41916a13869212d0191147')
 options=(!makeflags)
 
 build() {
-  cd $srcdir/v86d-86d-$pkgver
+  cd "$srcdir/v86d-86d-$pkgver"
   ./configure --with-x86emu
   # we only need /usr/include/video/uvesafb.h
   make KDIR=/usr
 }
 
 package() {
-  cd $srcdir/v86d-86d-$pkgver
-  make DESTDIR=$pkgdir install
+  cd "$srcdir/v86d-86d-$pkgver"
+  make DESTDIR="$pkgdir" install
 
-  install -D -m644 $srcdir/v86d $pkgdir/lib/initcpio/install/v86d
-  install -D -m644 $srcdir/v86d_hook $pkgdir/lib/initcpio/hooks/v86d
-  install -D -m644 $srcdir/modprobe.uvesafb $pkgdir/etc/modprobe.d/uvesafb.conf
+  install -D -m644 "$srcdir/v86d_install" "$pkgdir/usr/lib/initcpio/install/v86d"
+  install -D -m644 "$srcdir/v86d_hook" "$pkgdir/usr/lib/initcpio/hooks/v86d"
+  install -D -m644 "$srcdir/modprobe.uvesafb" "$pkgdir/usr/lib/modprobe.d/uvesafb.conf"
+
+  # usrmove
+  cd "$pkgdir"
+  mv sbin usr/bin
 }
