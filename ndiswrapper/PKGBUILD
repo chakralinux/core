@@ -1,12 +1,12 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
-_extramodules=extramodules-3.12.6-CHAKRA
+_extramodules=extramodules-3.12.15-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
-_rootOfSourceTree=/usr/src/linux-3.12.6-1-CHAKRA  # TODO: make this easier to upgrade
+_rootOfSourceTree=/usr/src/linux-${_kver}
 
 pkgname=ndiswrapper
 pkgver=1.59
-pkgrel=2
+pkgrel=3
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
@@ -35,6 +35,9 @@ package() {
 
   make KBUILD=${_rootOfSourceTree} INST_DIR="lib/modules/$_extramodules" \
     KVERS=$_kver DESTDIR="$pkgdir/" install
+  
+  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
+          "${startdir}/ndiswrapper.install"
 
   gzip "$pkgdir/lib/modules/$_extramodules/$pkgname.ko"
 }
