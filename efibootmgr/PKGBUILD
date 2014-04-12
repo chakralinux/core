@@ -3,41 +3,51 @@
 #
 # maintainer abveritas[at]chakra-project[dot]org>
 
-pkgname=efibootmgr
-pkgver=0.6.0
-pkgrel=1
-pkgdesc="Tool to modify UEFI Firmware Boot Manager Variables."
-arch=('x86_64')
-url="http://linux.dell.com/efibootmgr/"
+pkgname="efibootmgr"
+pkgdesc="Tool to modify UEFI Firmware Boot Manager Variables"
+pkgver="0.7.0"
+pkgrel="1"
+arch=('x86_64' 'i686')
+url="https://github.com/vathpela/efibootmgr"
 license=('GPL2')
-depends=('zlib' 'pciutils')
-options=(strip purge docs zipman !emptydirs)
-source=("http://linux.dell.com/efibootmgr/permalink/${pkgname}-${pkgver}.tar.gz")
-md5sums=('9e9a31d79e579644de83a14139b66d10')
+makedepends=('git')
+depends=('pciutils' 'efivar' 'zlib')
+options=('strip' 'zipman' 'docs' '!emptydirs')
 
-build () {	
-	rm -rf ${srcdir}/efibootmgr-${pkgver}_build/ || true
+source=("efibootmgr::git+https://github.com/vathpela/efibootmgr.git#tag=efibootmgr-${pkgver}")
+sha1sums=('SKIP')
+
+_pkgver() {
+	cd "${srcdir}/efibootmgr/"
+	echo "$(git describe --tags)" | sed -e 's|efibootmgr-||g' -e 's|-|\.|g'
+}
+
+prepare() {
 	
-	cp -r ${srcdir}/efibootmgr-${pkgver} ${srcdir}/efibootmgr-${pkgver}_build
+	cd "${srcdir}/efibootmgr/"
 	
-	cd ${srcdir}/efibootmgr-${pkgver}_build/
-	
-	echo
-	
-	CFLAGS= make
+	git clean -x -d -f
 	echo
 	
 }
 
+build() {
+	
+	cd "${srcdir}/efibootmgr/"
+	
+	make EXTRA_CFLAGS="-Os"
+	echo
+	
+}
 
 package() {
 	
-	mkdir -p ${pkgdir}/usr/sbin/
-	mkdir -p ${pkgdir}/usr/share/man/man8/
+	cd "${srcdir}/efibootmgr/"
 	
-	cd ${srcdir}/efibootmgr-${pkgver}_build/
+	install -d "${pkgdir}/usr/bin/"
+	install -D -m0755 "${srcdir}/efibootmgr/src/efibootmgr/efibootmgr" "${pkgdir}/usr/bin/efibootmgr"
 	
-	install -D -m755 ${srcdir}/efibootmgr-${pkgver}_build/src/efibootmgr/efibootmgr ${pkgdir}/usr/sbin/efibootmgr
-	install -D -m644 ${srcdir}/efibootmgr-${pkgver}_build/src/man/man8/efibootmgr.8 ${pkgdir}/usr/share/man/man8/efibootmgr.8
+	install -d "${pkgdir}/usr/share/man/man8/"
+	install -D -m0644 "${srcdir}/efibootmgr/src/man/man8/efibootmgr.8" "${pkgdir}/usr/share/man/man8/efibootmgr.8"
 	
 }
