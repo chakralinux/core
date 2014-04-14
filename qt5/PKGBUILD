@@ -26,7 +26,7 @@ pkgname=('qt5-base'
          'qt5-xmlpatterns'
          'qt5-private-headers')
 pkgver=5.2.1
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -205,6 +205,9 @@ package_qt5-doc() {
 
   install -D -m644 LGPL_EXCEPTION.txt \
     "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
+  
+  # remove duplicated files from qt5-tools
+  rm -rf "${pkgdir}"/usr/share/qt5
 }
 
 
