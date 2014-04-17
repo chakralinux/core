@@ -1,27 +1,30 @@
+# Maintainer: Francesco Marinucci <franzmari[at]chakra-project[dot]it>
+# contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
+
 pkgname=guile
-pkgver=1.8.8
-pkgrel=3
-pkgdesc="GNU Ubiquitous Intelligent Language for Extensions, the official extension language for the GNU operating system"
+pkgver=2.0.11
+pkgrel=2
+pkgdesc="Guile is a portable, embeddable Scheme implementation written in C"
 url="http://www.gnu.org/software/guile/"
 arch=('x86_64')
 license=('GPL')
-depends=('gmp' 'libltdl' 'ncurses>=5.7' 'texinfo')
+depends=('gmp' 'libtool' 'ncurses>=5.7' 'texinfo')
+makedepends=('gc' 'libunistring')
 install=guile.install
-source=("ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-options=('!libtool')
-md5sums=('18661a8fdfef13e2fcb7651720aa53f3')
+source=(ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz)
+options=('!libtool' '!makeflags')
+md5sums=('e532c68c6f17822561e3001136635ddd')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  
-  ./configure --prefix=/usr \
-	--disable-static  \
-	--disable-error-on-warning
-  make LDFLAGS+="-lpthread"
+  ./configure --prefix=/usr --disable-error-on-warning 
+  make LDFLAGS+="-lpthread" 
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  
+
   make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+  gzip "${pkgdir}/usr/share/info"/* 
 }
