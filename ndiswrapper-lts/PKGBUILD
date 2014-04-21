@@ -8,7 +8,7 @@ _kver="$(cat /lib/modules/${_extramodules}/version)"
 pkgname=ndiswrapper-lts
 _pkgname=ndiswrapper
 pkgver=1.59
-pkgrel=1
+pkgrel=2
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
@@ -18,20 +18,19 @@ depends=('linux-lts>=3.2' 'linux-lts<3.4')
 makedepends=('linux-lts-headers')
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
 md5sums=('e26a7213468ccd6b0bb4c211c7aadeaa')
-KBUILD=/usr/src/linux-3.2.51-1-lts
 
 build() {
   cd "$srcdir/$_pkgname-$pkgver"
 
   sed -i "/modinfo/s/s/usr\//" driver/Makefile
   
-  make KBUILD=$KBUILD KVERS=$_kver
+  make KBUILD=/usr/src/linux-$_kver KVERS=$_kver
 }
 
 package() {
   cd "$srcdir/$_pkgname-$pkgver"
 
-  make KBUILD=$KBUILD INST_DIR="lib/modules/$_extramodules" \
+  make KBUILD=/usr/src/linux-$_kver INST_DIR="lib/modules/$_extramodules" \
     KVERS=$_kver DESTDIR="$pkgdir/" install
 
   # rm ndiswrapper
