@@ -1,0 +1,24 @@
+# Maintainer: AlmAck <almack@chakraos.org>
+# Contributor: Vellerofonte <vellelinux@gmail.com> <www.chakragalaxy.blogspot.it>
+
+pkgname=ttf-opensans
+pkgver=20140120
+pkgrel=2
+pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
+arch=('any')
+license=('Apache')
+url="http://en.wikipedia.org/wiki/Open_Sans"
+screenshot="https://db.tt/xgJB0BOl"
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+install=$pkgname.install
+source=("https://hexchain.org/pub/archlinux/ttf-opensans/opensans.tar.gz")
+
+package()
+{
+        # Install fonts
+        cd "$srcdir"
+        install -d "$pkgdir/usr/share/fonts/TTF/"
+        install -m644 *.ttf "$pkgdir/usr/share/fonts/TTF/"
+}
+
+md5sums=('82a1828670d0cd79148a19fbdac9d85f')
