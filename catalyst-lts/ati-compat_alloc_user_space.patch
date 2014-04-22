@@ -1,0 +1,15 @@
+--- 13.11/common/lib/modules/fglrx/build_mod/kcl_ioctl.c	2013-11-22 19:52:37.000000000 +0100
++++ 13.11/common/lib/modules/fglrx/build_mod/kcl_ioctl.c	2013-11-25 11:48:51.227678982 +0100
+@@ -193,7 +193,11 @@ void ATI_API_CALL KCL_IOCTL_UnregisterCo
+  */
+ void* ATI_API_CALL KCL_IOCTL_AllocUserSpace32(long size)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)
++ void __user *ret = arch_compat_alloc_user_space(size);
++#else
+     void __user *ret = COMPAT_ALLOC_USER_SPACE(size);
++#endif
+ 
+     /* prevent stack overflow */
+     if (!access_ok(VERIFY_WRITE, ret, size))
+ 

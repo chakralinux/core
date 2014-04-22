@@ -1,13 +1,12 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
-# contributor: abveritas@chakra-project.org
 
-_extramodules=extramodules-3.2-CHAKRA-LTS
-_kver="3.2.51-1-lts"
+_extramodules=extramodules-3.2-lts
+_kver="$(cat /lib/modules/${_extramodules}/version)"
  
 pkgname=bbswitch-lts
 _pkgname=bbswitch
-pkgver=0.7
-pkgrel=2
+pkgver=0.8
+pkgrel=1
 pkgdesc="kernel module allowing to switch dedicated graphics card on Optimus laptops"
 arch=('x86_64')
 url=("http://github.com/Bumblebee-Project/bbswitch")
@@ -17,7 +16,7 @@ install=bbswitch.install
 depends=('linux-lts>=3.2' 'linux-lts<3.4')
 makedepends=('linux-lts' 'linux-lts-headers')
 source=("https://github.com/Bumblebee-Project/bbswitch/archive/v${pkgver}.tar.gz")
-md5sums=('b9df5ea40109ef9766448a0577c798e6')
+md5sums=('5b116b31ace3604ddf9d1fc1f4bc5807')
 build() {
   cd ${srcdir}/${_pkgname}-${pkgver}
   make KDIR=/lib/modules/${_kver}/build KVERSION=${_kver} 
