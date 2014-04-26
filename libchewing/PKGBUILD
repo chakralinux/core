@@ -2,7 +2,7 @@
 #contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/libchewing/
 
 pkgname=libchewing
-pkgver=0.3.5
+pkgver=0.4.0
 pkgrel=1
 pkgdesc="Improved Smart Chewing Library - Intelligent Chinese Phonetic Input Method"
 arch=('x86_64')
@@ -12,7 +12,7 @@ depends=('glibc')
 makedepends=('libtool')
 options=('!libtool')
 source=("https://github.com/chewing/libchewing/archive/v${pkgver}.tar.gz")
-sha1sums=('b578577bef40c1986a87cf0fd1a2103dc5736518')
+sha1sums=('f66c6176d8565dbf8f0026beea0cf824aa013a39')
 
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
@@ -21,8 +21,12 @@ build() {
 	make
 }
 
+check() {
+       cd "${srcdir}/${pkgname}-${pkgver}"
+       make check || return 0
+}
+
 package() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
 	make DESTDIR="${pkgdir}" install
 }
-
