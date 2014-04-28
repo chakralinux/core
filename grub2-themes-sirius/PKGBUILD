@@ -1,0 +1,22 @@
+# maintainer: almack[at]chakraos[dot]org>
+
+pkgname=grub2-themes-sirius
+_pkgname=Sirius
+pkgver=1.0
+pkgrel=1
+pkgdesc="Chakra Sirius Grub2-theme"
+url="http://chakraos.org"
+screenshot="http://ext4.files.wordpress.com/2012/08/dharma-grub-theme.png"
+arch=('any')
+license=('CC-BY-ND')
+depends=('grub2-common')
+install=${pkgname}.install
+source=("http://chakra.sourceforge.net/sources/chakra-artwork/$_pkgname/grub2-themes/$pkgver/$_pkgname.tar.gz")
+md5sums=('039d7476285aca6e2f8f7f2c358a2321')
+ 
+build() {
+  cd "${srcdir}"
+  
+  install -dm755 "$pkgdir/usr/share/grub/themes"
+  cp -dpr --no-preserve=ownership "${_pkgname}" "$pkgdir/usr/share/grub/themes"
+}
