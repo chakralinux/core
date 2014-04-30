@@ -1,0 +1,24 @@
+#
+# Core Packages for Chakra, part of chakra-project.org
+#
+
+pkgname=chakra-live-skel
+_gitname=chakra-iso
+_gitsha=a6f30db
+pkgver=1.0
+pkgrel=1
+pkgdesc="The inital user configuration of a Chakra system"
+arch=('x86_64')
+url="http://www.chakraos.org/"
+license=('GPL')
+source=("skel.tar.gz")
+source=("$pkgname"::"git://gitorious.org/chakra/${_gitname}.git#commit=${_gitsha}")
+md5sums=('SKIP')
+
+package() {
+  cd ${srcdir}/${pkgname}/chakra-live-packages/chakra-live-skel/skel
+  for folder in ./*; do \
+    cp -a $folder ${pkgdir}; \
+  done
+  chmod 750 ${pkgdir}/etc/sudoers.d/
+}
