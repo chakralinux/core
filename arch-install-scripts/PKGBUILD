@@ -1,0 +1,32 @@
+pkgname=arch-install-scripts
+pkgver=13
+pkgrel=1
+pkgdesc="Scripts to aid in installing Arch Linux (with modifications for Chakra)"
+arch=('any')
+url="https://projects.archlinux.org/arch-install-scripts.git"
+license=('GPL')
+depends=('bash' 'coreutils' 'pacman' 'util-linux')
+source=("ftp://ftp.archlinux.org/other/$pkgname/$pkgname-$pkgver.tar.gz"{,.sig})
+md5sums=('5294b927fea89f5a88c051c970946c24'
+         'SKIP')
+
+prepare() {
+  # for some reasons the iso build script throws an error without -yy
+  # --needed is a time saver
+  sed -i 's/pacman -r "$newroot" -Sy/pacman -r "$newroot" -Syy --needed/g'  ${srcdir}/${pkgname}-${pkgver}/pacstrap.in
+}
+
+
+build() {
+  make -C "$pkgname-$pkgver"
+}
+
+check() {
+  make -C "$pkgname-$pkgver" check
+}
+
+package() {
+  make -C "$pkgname-$pkgver" PREFIX=/usr DESTDIR="$pkgdir" install
+}
+
+# vim:set ts=2 sw=2 et:
