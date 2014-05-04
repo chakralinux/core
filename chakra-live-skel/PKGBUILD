@@ -12,8 +12,11 @@ arch=('x86_64')
 url="http://www.chakraos.org/"
 license=('GPL')
 source=("skel.tar.gz")
-source=("$pkgname"::"git://gitorious.org/chakra/${_gitname}.git#commit=${_gitsha}")
-md5sums=('SKIP')
+source=("$pkgname"::"git://gitorious.org/chakra/${_gitname}.git#commit=${_gitsha}"
+        'locale-gen-fixme')
+install=chakra-live-skel.install
+md5sums=('SKIP'
+         '476e9113489f93b348b21e144b6a8fcf')
 
 package() {
   cd ${srcdir}/${pkgname}/chakra-live-packages/chakra-live-skel/skel
@@ -21,4 +24,8 @@ package() {
     cp -a $folder ${pkgdir}; \
   done
   chmod 750 ${pkgdir}/etc/sudoers.d/
+  
+  # copy the parallel version of locale-gen
+  install -dm755 ${pkgdir}/usr/sbin
+  install -m755 ${srcdir}/locale-gen-fixme ${pkgdir}/usr/sbin
 }
