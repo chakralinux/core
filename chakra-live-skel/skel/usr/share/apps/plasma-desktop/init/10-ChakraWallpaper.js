@@ -1,6 +1,7 @@
 /* Copyright 2014 Chakra Developer Team */
 
 var activity = activities()[0]
+activity.name = i18n("Chakra")
 activity.currentConfigGroup = new Array("Wallpaper", "image");
 activity.writeConfig("wallpaper", "/usr/share/wallpapers/descartes/");
 activity.writeConfig("userswallpaper", "/usr/share/wallpapers/descartes");
