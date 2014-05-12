@@ -8,7 +8,7 @@ pkgname=('linux' 'linux-headers' 'linux-docs')
 _kernelname=${pkgname#linux}
 _basekernel="3.12.15"
 pkgver=3.12.15
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -26,6 +26,8 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         'aufs3-loopback.patch'
         'aufs3.patch'
         'config.aufs'
+        # cve patches (for tty issue, see patch)
+        CVE-2014-0196.patch
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch')
@@ -79,6 +81,9 @@ prepare() {
   cat "${srcdir}/config.x86_64" > ./.config
 
   cat "${srcdir}/config.aufs" >> ./.config
+
+  # CVE patch
+  patch -p1 -i ${srcdir}/CVE-2014-0196.patch
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
@@ -328,3 +333,16 @@ package_linux-docs() {
   # remove a file already in linux package
   rm -f "${pkgdir}/usr/src/linux-${_kernver}/Documentation/DocBook/Makefile"
 }
+sha256sums=('f6116819985f0402392580704bf4b3b2f0dd6d0ab7f16b36a078c5788b17c423'
+            '6fa9dfea3d3bb41464652f07fd036886336be3fbb73e2c06baabd1005af1d2cf'
+            '316d7b429cac1d0b407eb3a36403ecc55813fd3941f517c58ab6514433a7ddd9'
+            'e9604c6d87ae87830c154c1b12065eb6361e503006025497741f15dbaa9fd3ff'
+            '03ec8d29245b222c21aee0a043ab9a48702d252d8460d44541fa9ea65bcea7ce'
+            '68426d50a9e774526d039be3e48cdff8f85ee8a37a77bd1aa0671885a09060ec'
+            '6c9a05787a392bd86da8f0fb66abd32a72808576aa7c635e5c2ae678134b59dd'
+            '86bf44ad0ea7c2afa4b195f8858f07eb8e35562c73290a8ba0ca723ee2a1932e'
+            'c4bc9e482581b2e58bb69a11e42636b5b75f0fa5bf0eb20a034594ec8f40f2d6'
+            'b1b1cf291bd68270b700eb21f19f7b052116d07dde492761227cd94bb775910c'
+            '00c522829c322004ea87ae3e228ebb73aa4b4160068078f8b46a7033490df21f'
+            'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
+            'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182')
