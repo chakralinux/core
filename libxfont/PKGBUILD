@@ -2,7 +2,7 @@
 
 pkgname=libxfont
 pkgver=1.4.6
-pkgrel=1
+pkgrel=2
 pkgdesc="X11 font rasterisation library"
 arch=(x86_64)
 url="http://xorg.freedesktop.org/"
@@ -10,8 +10,17 @@ license=('custom')
 depends=('freetype2' 'libfontenc' 'xproto' 'fontsproto')
 makedepends=('xorg-util-macros' 'xtrans')
 options=('!libtool')
-source=(${url}/archive/individual/lib/libXfont-${pkgver}.tar.bz2)
-sha1sums=('356512420fa8573a541450b957526dfd151b4870')
+source=(${url}/archive/individual/lib/libXfont-${pkgver}.tar.bz2
+        CVE-2014-209-210-211.patch)
+sha1sums=('356512420fa8573a541450b957526dfd151b4870'
+          '028e2ca692f6f847322bf00a9361d5a324396e95')
+
+prepare() {
+  cd "${srcdir}/libXfont-${pkgver}"
+  # fix CVE-2014-209 CVE-2014-210 CVE-2014-211 - merged upstream
+  patch -Np1 -i ../CVE-2014-209-210-211.patch
+}
+
 
 build() {
   cd "${srcdir}/libXfont-${pkgver}"
