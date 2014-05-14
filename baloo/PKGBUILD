@@ -7,7 +7,7 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 pkgname="baloo"    
 arch=('x86_64')
 pkgver=${_kdever}
-pkgrel=3
+pkgrel=1
 pkgdesc="The core baloo system"
 url="http://www.kde.org"
 license=('GPL'
@@ -27,16 +27,16 @@ makedepends=('pkg-config'
              'doxygen')
 optdepends=("nepomuk-core: To migrate nepomuk metadata to baloo")
 install="baloo.install"
-source=($_mirror/${pkgname}-$_kdever.tar.xz
-       'add_disable_kcm.diff')
-sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d" " -f1`
-	    'e524850a76bc9e7499c8f2702e186c8fba978b670d9b6cb45902fe93cc133f2d')
+source=($_mirror/${pkgname}-$_kdever.tar.xz)
+   #    'add_disable_kcm.diff')
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d" " -f1`)
+	    #'e524850a76bc9e7499c8f2702e186c8fba978b670d9b6cb45902fe93cc133f2d')
 
-prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+#prepare() {
+ # cd "${srcdir}/${pkgname}-${pkgver}"
   # https://bugs.kde.org/show_bug.cgi?id=331932#c59
-  patch -p1 -i "${srcdir}/add_disable_kcm.diff"
-}
+ # patch -p1 -i "${srcdir}/add_disable_kcm.diff"
+#}
 
 build() {
     cd ${pkgname}-${pkgver}
