@@ -62,8 +62,6 @@ set_locale() {
   echo "LC_MESSAGES=${LOCALE}.UTF-8" >> /etc/locale.conf
 
   # generate LOCALE
-  # comment out all locales which we don't need
-  sed  -i "s/^/#/g" /etc/locale.gen
   local TLANG=${LOCALE%.*} # remove everything after the ., including the dot from LOCALE
   sed -i -r "s/#(.*${TLANG}.*UTF-8)/\1/g" /etc/locale.gen
   # add also American English as safe default
