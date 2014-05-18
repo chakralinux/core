@@ -1,7 +1,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=vala
-pkgver=0.23.1
+pkgver=0.24.0
 pkgrel=1
 pkgdesc="Compiler for the GObject type system."
 arch=('x86_64')
@@ -9,22 +9,16 @@ url="http://live.gnome.org/Vala"
 license=('LGPL')
 depends=('glib2')
 makedepends=('libxslt')
-source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('3339d98b43038b4cb72b4c9bc40309d4')
+source=(http://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver:0:4}/$pkgname-$pkgver.tar.xz)
+sha256sums=('22a37c977512c19cd29c373eaaef96cb2c994795d491106f32387f3f9d1e899c')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  # No, please DON'T mark this as a development version only because Git tells you so;
-  # Git is only watching my chroot status, not Vala's repository directory...
-  sed -i 's#v="\$v-dirty" ;;$#;;#g' build-aux/git-version-gen
-
-  ./configure --prefix=/usr --enable-vapigen
-
-  make
+    cd $pkgname-$pkgver
+    ./configure --prefix=/usr --enable-vapigen
+    make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+    cd $pkgname-$pkgver
+    make DESTDIR="$pkgdir" install
 }
