@@ -4,23 +4,20 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=ppl
-pkgver=1.0
-pkgrel=3
+pkgver=1.1
+pkgrel=1
 pkgdesc="A modern library for convex polyhedra and other numerical abstractions."
 arch=('i686' 'x86_64')
 url="http://bugseng.com/products/ppl"
 license=('GPL3')
 depends=('gmp>=5.1')
 options=('!docs' '!libtool')
-source=(http://bugseng.com/products/ppl/download/ftp/releases/$pkgver/ppl-$pkgver.tar.gz{,.sign}
-        "ppl-fix-gmp-5.1.0.patch")
-md5sums=('c4566928c6b7bb63e95f96d1a7b5cb4c'
-         'SKIP'
-         '781098eb6da66a4567a9f6fc758fffc8')
+source=(http://bugseng.com/products/ppl/download/ftp/releases/$pkgver/ppl-$pkgver.tar.gz{,.sign})
+md5sums=('4f2422c0ef3f409707af32108deb30a7'
+         'SKIP')
 
 prepare() {
   cd ${srcdir}/ppl-${pkgver}
-  patch -p0 < ${srcdir}/ppl-fix-gmp-5.1.0.patch
 }
 
 build() {
