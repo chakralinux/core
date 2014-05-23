@@ -1,14 +1,15 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
+
 pkgname=glibc
-pkgver=2.18
-pkgrel=5
+pkgver=2.19
+pkgrel=2
 pkgdesc="GNU C Library"
 arch=('x86_64')
 url="http://www.gnu.org/software/libc"
 license=('GPL' 'LGPL')
 groups=('base')
-depends=('linux-api-headers>=3.10' 'tzdata')
+depends=('linux-api-headers>=3.12.15' 'tzdata')
 makedepends=('gcc>=4.8')
 backup=(etc/gai.conf
         etc/locale.gen
@@ -16,71 +17,47 @@ backup=(etc/gai.conf
 options=('!strip' 'staticlibs')
 install=glibc.install
 source=(http://ftp.gnu.org/gnu/libc/${pkgname}-${pkgver}.tar.xz{,.sig}
-        glibc-2.18-readdir_r-CVE-2013-4237.patch
-	glibc-2.18-malloc-corrupt-CVE-2013-4332.patch
-	glibc-2.18-strcoll-CVE-2012-4412+4424.patch
-	glibc-2.18-ptr-mangle-CVE-2013-4788.patch
-        glibc-2.18-strstr-hackfix.patch
-        nscd.service
-        nscd.tmpfiles
+        glibc-2.19-xattr_header.patch
+        glibc-2.19-fix-sign-in-bsloww1-input.patch
+        glibc-2.19-tzselect-default.patch
         locale.gen.txt
-        locale-gen  # parallel version, see https://bugs.archlinux.org/task/36955
-        locale.patch
-        glibc.conf)
-sha1sums=('1f0e4e7ba5fe1f45ffd0548b6c36caef0bc7e51f'
-          'SKIP'
-          '7ecd9abb03495a620f0e4a2d45a6046310649fde'
-          'd3dd647f2f292c44f31311ea3cf9e39db7ba798e'
-          '04f38fe8508e2541c9d946a9d788c60f160c1cc0'
-          'f0117b071f5f24c2522231aa9452342bea0d0c3f'
-          'f928cedf0fb3d2bf046975680c637d6b09ad93cf'
-          '18406ad58e562a85a13b3cebe938841cf5d624ff'
-          '1a9eb962463409159792a1a2d768524f37ce2e7b'
-          '61f72da0b1f44af013c8a6873a298c2b6efb3f3d'
-          'b8a9e83a5c0d22066a7923f07d02c88484d438ba'
-          '46afb75ca2197d84d6e8cc426389a1e7d8aca479'
-          'b335a2526d631aaed53d3a88cc3904a51fccd1a4')
+        locale-gen)
+md5sums=('e26b8cc666b162f999404b03970f14e4'
+         'SKIP'
+         '39a4876837789e07746f1d84cd8cb46a'
+         '755a1a9d7844a5e338eddaa9a5d974cd'
+         'c772dc99ddd8032ecbf43884ae0cf42e'
+         '07ac979b6ab5eeb778d55f041529d623'
+         '476e9113489f93b348b21e144b6a8fcf')
 
 prepare() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  
-  # upstream commit 91ce4085
-  patch -p1 -i $srcdir/glibc-2.18-readdir_r-CVE-2013-4237.patch
 
-  # upstream commits 1159a193, 55e17aad and b73ed247
-  patch -p1 -i $srcdir/glibc-2.18-malloc-corrupt-CVE-2013-4332.patch
+  # fix for {linux,sys}/xattr.h incompatibility - commit fdbe8eae
+  patch -p1 -i $srcdir/glibc-2.19-xattr_header.patch
 
-  # upstream commits 1326ba1a, 141f3a77 and 303e567a
-  # https://sourceware.org/ml/libc-alpha/2013-08/msg00394.html
-  # https://sourceware.org/ml/libc-alpha/2013-08/msg00462.html
-  patch -p1 -i $srcdir/glibc-2.18-strcoll-CVE-2012-4412+4424.patch
+  # fix issues in sin/cos slow path calculation - commit ffe768a9
+  patch -p1 -i $srcdir/glibc-2.19-fix-sign-in-bsloww1-input.patch
 
-  # upstream commits c61b4d41 and 0b1f8e35
-  patch -p1 -i $srcdir/glibc-2.18-ptr-mangle-CVE-2013-4788.patch
-
-  # hack fix for strstr issues on x86
-  patch -p1 -i $srcdir/glibc-2.18-strstr-hackfix.patch
-
-  # patch regarding locale generation, severly affects ISO creation
-  # origin: http://comments.gmane.org/gmane.comp.lib.glibc.alpha/31543
-  patch -p1 -u -i ${srcdir}/locale.patch
+  # fix tzselect with missing TZDIR - commit 893b4f37/c72399fb
+  patch -p1 -i $srcdir/glibc-2.19-tzselect-default.patch
 
   mkdir ${srcdir}/glibc-build
 }
-
 
 build() {
   cd ${srcdir}/glibc-build
 
   echo "slibdir=/lib" >> configparms
-  
+
   # remove hardening options for building libraries
-  CFLAGS=${CFLAGS/-fstack-protector/}
+  CFLAGS=${CFLAGS/-fstack-protector-strong/}
   CPPFLAGS=${CPPFLAGS/-D_FORTIFY_SOURCE=2/}
 
-  ${srcdir}/glibc-${pkgver}/configure --prefix=/usr \
+  ${srcdir}/${pkgname}-${pkgver}/configure --prefix=/usr \
       --libdir=/usr/lib --libexecdir=/usr/lib \
       --with-headers=/usr/include \
+      --with-bugurl=https://chakraos.org/bugtracker \
       --enable-add-ons=nptl,libidn \
       --enable-obsolete-rpc \
       --enable-kernel=2.6.32 \
@@ -92,27 +69,24 @@ build() {
   # build libraries with hardening disabled
   echo "build-programs=no" >> configparms
   make
-  
+
   # re-enable hardening for programs
   sed -i "/build-programs=/s#no#yes#" configparms
-  echo "CC += -fstack-protector -D_FORTIFY_SOURCE=2" >> configparms
-  echo "CXX += -fstack-protector -D_FORTIFY_SOURCE=2" >> configparms
+  echo "CC += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
+  echo "CXX += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
   make
 
   # remove harding in preparation to run test-suite
-  sed -i '2,4d' configparms
+  sed -i '4,6d' configparms
 }
 
 check() {
-  # bug to file - the linker commands need to be reordered
+  # the linker commands need to be reordered - fixed in 2.19
   LDFLAGS=${LDFLAGS/--as-needed,/}
 
   cd ${srcdir}/glibc-build
-  #  from LFS:
-  #  The nptl/tst-clock2, nptl/tst-attr3, tst/tst-cputimer1, and rt/tst-cpuclock2 tests have been known to fail.
-  #  The reason is not completely understood, but indications are that minor timing issues can trigger these failures. 
-  # -k is an ugly workaround
-  make -k check 2>&1 | tee glibc-check-log
+
+  make -k check || true
 }
 
 package() {
@@ -125,15 +99,15 @@ package() {
 
   rm -f ${pkgdir}/etc/ld.so.{cache,conf}
 
-  install -dm755 ${pkgdir}/{,usr/{sbin,lib/{,locale,systemd/system,tmpfiles.d}}}
+  install -dm755 ${pkgdir}/usr/lib/{locale,systemd/system,tmpfiles.d}
 
-  install -m644 ${srcdir}/glibc-${pkgver}/nscd/nscd.conf ${pkgdir}/etc/nscd.conf
-  sed -i -e 's/^\tserver-user/#\tserver-user/' ${pkgdir}/etc/nscd.conf
-  install -m644 ${srcdir}/nscd.service ${pkgdir}/usr/lib/systemd/system
-  install -m644 ${srcdir}/nscd.tmpfiles ${pkgdir}/usr/lib/tmpfiles.d/nscd.conf
+  install -m644 ${srcdir}/${pkgname}-${pkgver}/nscd/nscd.conf ${pkgdir}/etc/nscd.conf
+  install -m644 ${srcdir}/${pkgname}-${pkgver}/nscd/nscd.service ${pkgdir}/usr/lib/systemd/system
+  install -m644 ${srcdir}/${pkgname}-${pkgver}/nscd/nscd.tmpfiles ${pkgdir}/usr/lib/tmpfiles.d/nscd.conf
 
-  install -m755 ${srcdir}/locale-gen ${pkgdir}/usr/sbin
-  install -m644 ${srcdir}/glibc-${pkgver}/posix/gai.conf ${pkgdir}/etc/gai.conf
+  install -m644 ${srcdir}/${pkgname}-${pkgver}/posix/gai.conf ${pkgdir}/etc/gai.conf
+
+  install -m755 ${srcdir}/locale-gen ${pkgdir}/usr/bin
 
   # create /etc/locale.gen
   install -m644 ${srcdir}/locale.gen.txt ${pkgdir}/etc/locale.gen
@@ -143,25 +117,34 @@ package() {
   # fix for the linker
   sed -i '/RTLDLIST/s%lib64%lib%' ${pkgdir}/usr/bin/ldd
   # Comply with multilib binaries, they look for the linker in /lib64
-  mkdir ${pkgdir}/lib64
+  mkdir -p ${pkgdir}/lib64
   cd ${pkgdir}/lib64
-  ln -v -s ../lib/ld* .
+  ln -v -s ../lib/ld* || true
 
-  cd ${pkgdir}
-  strip $STRIP_BINARIES sbin/{ldconfig,sln} \
-                        usr/bin/{gencat,getconf,getent,iconv,locale} \
-                        usr/bin/{localedef,pcprofiledump,rpcgen,sprof} \
-                        usr/lib/getconf/* \
-                        usr/sbin/{iconvconfig,nscd}
+  # remove the static libraries that have a shared counterpart
+  # libc, libdl, libm and libpthread are required for toolchain testsuites
+  # in addition libcrypt appears widely required
+  rm $pkgdir/usr/lib/lib{anl,BrokenLocale,nsl,resolv,rt,util}.a
 
-  strip $STRIP_STATIC usr/lib/*.a 
+  # Do not strip the following files for improved debugging support
+  # ("improved" as in not breaking gdb and valgrind...):
+  #   ld-${pkgver}.so
+  #   libc-${pkgver}.so
+  #   libpthread-${pkgver}.so
+  #   libthread_db-1.0.so
+
+  cd $pkgdir
+  strip $STRIP_BINARIES usr/bin/{gencat,getconf,getent,iconv,makedb,locale,localedef} \
+                        usr/sbin/{iconvconfig,nscd} \
+                        sbin/{ldconfig,sln} \
+                        usr/bin/{pcprofiledump,pldd,rpcgen,sprof} \
+                        usr/lib/getconf/*
+
+  strip $STRIP_STATIC usr/lib/*.a
 
   strip $STRIP_SHARED lib/{libanl,libBrokenLocale,libcidn,libcrypt}-${pkgver}.so \
                       lib/libnss_{compat,dns,files,hesiod,nis,nisplus}-${pkgver}.so \
                       lib/{libdl,libm,libnsl,libresolv,librt,libutil}-${pkgver}.so \
                       lib/{libmemusage,libpcprofile,libSegFault}.so \
                       usr/lib/{audit,gconv}/*.so
-
-  # Add /usr/lib32 to the default library search path
-  install -Dm644 "$srcdir/glibc.conf" "$pkgdir/etc/ld.so.conf.d/glibc.conf"
 }
