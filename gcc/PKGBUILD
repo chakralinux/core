@@ -3,7 +3,7 @@
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada' 'gcc-go')
 pkgver=4.9.0
 _pkgver=4.9
-pkgrel=3
+pkgrel=8
 _snapshot=4.9-20140521
 pkgdesc="The GNU Compiler Collection"
 arch=('x86_64')
@@ -34,7 +34,7 @@ prepare() {
   sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # Arch Linux installs x86_64 libraries /lib, so do we
-  [[ $CARCH == "x86_64" ]] && sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
+  sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
 
   echo ${pkgver} > gcc/BASE-VER
 
@@ -69,6 +69,7 @@ build() {
       --enable-lto --enable-plugin --enable-install-libiberty \
       --with-linker-hash-style=gnu \
       --disable-multilib --disable-werror \
+      --enable-bootstrap \
       --enable-checking=release
   make
   
@@ -84,7 +85,7 @@ check() {
   ulimit -s 32768
 
   # do not abort on error as some are "expected"
-  make -k check || true
+  make -k check | tee gcc-check-log || true
   ${srcdir}/${_basedir}/contrib/test_summary
 }
 
