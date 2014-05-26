@@ -1,0 +1,52 @@
+# maintainer: Neophytos Kolokotronis <tetris4ATgmailDOTcom>
+
+pkgname=cmake
+pkgver=2.8.12.1
+pkgrel=2
+pkgdesc="A cross-platform open-source make system"
+arch=('x86_64')
+license=('custom')
+url="http://www.cmake.org"
+depends=('curl' 'libarchive>=2.3.1' 'shared-mime-info')
+makedepends=('qt' 'cmake')
+install=${pkgname}.install
+source=("http://www.cmake.org/files/v2.8/${pkgname}-${pkgver}.tar.gz"
+        "findfreetype.patch")
+sha1sums=('5661a607acbce7c16bb5f15ff2895fa5ca53a4da'
+          '6976bb5d6e54931b360a79e74f1425354f01d1fb')
+
+prepare() {
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  patch -Np1 < ${srcdir}/findfreetype.patch
+}
+
+build() {
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  
+ # cmake -DBUILD_QtDialog=ON \
+ #       -DCMAKE_INSTALL_PREFIX=/usr \
+#	-DCMAKE_USE_SYSTEM_LIBRARIES=ON \
+ #       . 
+
+  # below version is for boostrapping cmake;
+  # one can use it to break the recursive makedependency
+  ./bootstrap --prefix=/usr \
+    --mandir=/share/man \
+    --docdir=/share/doc/cmake \
+    --system-libs \
+    --qt-gui \
+    --parallel=$(/usr/bin/getconf _NPROCESSORS_ONLN)
+  make
+}
+
+package() {
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+
+  vimpath="$pkgdir/usr/share/vim/vimfiles"
+  install -Dm644 Docs/cmake-indent.vim ${vimpath}/indent/cmake-indent.vim
+  install -Dm644 Docs/cmake-syntax.vim ${vimpath}/syntax/cmake-syntax.vim
+  install -Dm644 Docs/cmake-mode.el ${pkgdir}/usr/share/emacs/site-lisp/cmake-mode.el
+
+  install -Dm644 Copyright.txt ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+}
