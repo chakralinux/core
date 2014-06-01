@@ -2,7 +2,7 @@
 
 pkgname=binutils
 pkgver=2.24
-pkgrel=2
+pkgrel=3
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('x86_64')
 url="http://www.gnu.org/software/binutils/"
@@ -10,6 +10,8 @@ license=('GPL')
 groups=('base-devel')
 depends=('glibc>=2.18' 'zlib')
 checkdepends=('dejagnu' 'bc')
+conflicts=('binutils-multilib')
+replaces=('binutils-multilib')
 options=('!libtool' '!distcc' '!ccache' 'staticlibs')
 install=binutils.install
 source=(ftp://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.bz2{,.sig}
@@ -41,7 +43,7 @@ build() {
 
   ${srcdir}/binutils-${pkgver}/configure --prefix=/usr \
     --with-lib-path=/usr/lib:/usr/local/lib \
-    --with-bugurl=http://chakraos.org/bugs \
+    --with-bugurl=http://chakraos.org/bugtracker \
     --enable-ld=default --enable-gold \
     --enable-plugins --enable-threads \
     --enable-shared \
