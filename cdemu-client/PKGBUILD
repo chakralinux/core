@@ -4,7 +4,7 @@
 
 pkgname=cdemu-client
 pkgver=2.1.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Simple command-line client for controlling cdemu-daemon"
 arch=('x86_64')
 url=("http://cdemu.sourceforge.net/")
@@ -14,13 +14,19 @@ makedepends=('intltool' 'cmake')
 source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2")
 md5sums=('e3062659481b804d12fac58ad64316a0')
 
-build() {
+prepare() {
   cd "$srcdir/$pkgname-$pkgver"
 
-  # python2 fix
+  msg 'python2 fix'
   sed -i 's_#!/usr/bin/env python_#!/usr/bin/env python2_' src/cdemu
 
-  mkdir build
+  msg 'bash completion fix'
+  sed -i CMakeLists.txt -e "s|DESTINATION \${CMAKE_INSTALL_SYSCONFDIR}/bash_completion.d|DESTINATION \${CMAKE_INSTALL_DATADIR}/bash-completion/completions|"
+}
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  [[ -d build ]] && rm -rf build ; mkdir build
   cd build
   cmake .. \
     -DCMAKE_BUILD_TYPE=Release \
