@@ -3,13 +3,13 @@
 
 pkgname=libchewing
 pkgver=0.4.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Improved Smart Chewing Library - Intelligent Chinese Phonetic Input Method"
 arch=('x86_64')
 url="http://chewing.im/"
 license=("GPL")
-depends=('glibc')
-makedepends=('libtool' 'cmake')
+depends=('sqlite3')
+makedepends=('valgrind' 'libtool')
 options=('!libtool')
 source=("https://github.com/chewing/libchewing/archive/v${pkgver}.tar.gz")
 sha1sums=('f66c6176d8565dbf8f0026beea0cf824aa013a39')
@@ -17,18 +17,16 @@ sha1sums=('f66c6176d8565dbf8f0026beea0cf824aa013a39')
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
         ./autogen.sh
-	[[ -d build ]] && rm -rf build ; mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+        ./configure --prefix=/usr
 	make
 }
 
 check() {
-       cd "${srcdir}/${pkgname}-${pkgver}/build"
+       cd "${srcdir}/${pkgname}-${pkgver}"
        make check
 }
 
 package() {
-	cd "${srcdir}/${pkgname}-${pkgver}/build"
+	cd "${srcdir}/${pkgname}-${pkgver}"
 	make DESTDIR="${pkgdir}" install
 }
