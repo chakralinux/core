@@ -26,7 +26,7 @@ pkgname=('qt5-base'
          'qt5-xmlpatterns'
          'qt5-private-headers')
 pkgver=5.3.0
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -43,7 +43,7 @@ source=(#"${pkgname}.tar.xz"
 	"http://download.qt-project.org/official_releases/qt/5.3/${pkgver}/single/${_pkgfqn}.tar.xz"
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
         'youtubeview.desktop' 'flickrview.desktop' 'browser.desktop' 'fancybrowser.desktop' 'qmlviewer.desktop'
-        'qdbusviewer-qt5.desktop'  'defaultbookmarks_new.diff')
+        'qdbusviewer-qt5.desktop'  'defaultbookmarks_new.diff' 'QTBUG-39047.patch')
 sha1sums=('bdda9ff75da8172cb430a11b42de166c11a3f49c'
           '981cf376da66c8be7c7ec99866da0299114192f6'
           'e131a17beda4625f21022981a519b5e8d8c8e6f7'
@@ -55,7 +55,8 @@ sha1sums=('bdda9ff75da8172cb430a11b42de166c11a3f49c'
           'b4ddedb067154a959c1b4577de8829dffd710f7a'
           'b0e6c61b8364eb3f7af4dae41fa7738c3181dd96'
           '6c845b5879d2f443078e25856cf60cf53644c41b'
-          'c0c37469bbecfbc3d15eb21020e1078f4ed47784')
+          'c0c37469bbecfbc3d15eb21020e1078f4ed47784'
+	  '1409ae2ed41ab6f02e4a47a9a31ce624f0d5cabc')
 
 _prlfix() {
   # Fix wrong path in prl files
@@ -69,6 +70,9 @@ prepare() {
   sed -i "s|-O2|${CXXFLAGS}|" qtbase/mkspecs/common/{g++,gcc}-base.conf
   sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" qtbase/mkspecs/common/gcc-base-unix.conf
   sed -i "/^QMAKE_LFLAGS\s/s|+=|+= ${LDFLAGS}|g" qtbase/mkspecs/common/gcc-base.conf
+
+  cd qtdeclarative
+  patch -p1 -i "${srcdir}"/QTBUG-39047.patch
 }
 
 build() {
