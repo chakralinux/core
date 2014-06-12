@@ -6,7 +6,7 @@
 ## rebuild on icu update
 
 pkgbase=qt
-pkgname=('qt' 'qt-private-headers')
+pkgname=('qt' 'qt-private-headers' 'qt-docs')
 pkgver=4.8.6
 pkgrel=1
 arch=('x86_64')
@@ -138,4 +138,19 @@ package_qt-private-headers() {
     done
 
     find ${pkgdir} -name \*.o -type f -delete 
+}
+
+package_qt-docs() {
+    pkgdesc='The Qt gui toolkit documentation'
+    arch=('any')
+    options=('docs')
+    depends=('qt')
+    replaces=('qt-doc')
+    conflicts=("qt-doc=${pkgver}")
+    categories=('documentation')
+    cd ${srcdir}/${_pkgfqn}
+    install -d ${pkgdir}/usr/share/doc/qt
+    cp -r doc/* ${pkgdir}/usr/share/doc/qt
+    cp -r demos ${pkgdir}/usr/share/doc/qt
+    cp -r examples ${pkgdir}/usr/share/doc/qt
 }

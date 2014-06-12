@@ -6,8 +6,8 @@
  
 pkgbase=qt
 pkgname=('qt-debug' 'qt-debug-private-headers')
-pkgver=4.8.4
-pkgrel=4
+pkgver=4.8.6
+pkgrel=1
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -17,11 +17,11 @@ makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'db
     'mysql' 'unixodbc' 'cups' 'libxinerama' 'libxcursor')
 options=('!libtool' '!strip')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
-source=("http://releases.qt-project.org/qt4/source/${_pkgfqn}.tar.gz"
+source=("http://download.qt-project.org/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar.gz"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
         'qtconfig.desktop' 'improve-cups-support.patch'
         'qlocale.diff')
-md5sums=('89c5ecba180cae74c66260ac732dc5cb'
+md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
@@ -107,7 +107,7 @@ package_qt-debug() {
           'unixodbc: ODBC driver'
           'libxinerama: Xinerama support'
           'libxfixes: Xfixes support')
-    conflicts=('qt-doc' 'qt-demos' 'qt-tools' 'qt')
+    conflicts=('qt-docs' 'qt')
     provides=('qt-tools' "qt=${pkgver}")
     install='qt.install'
  
