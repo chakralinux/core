@@ -3,7 +3,7 @@
 
 pkgname=opengtl
 pkgver=0.9.18
-pkgrel=3
+pkgrel=4
 pkgdesc="A set of library for using and integrating transformation algorithms (such as filter or color conversion) in graphics applications"
 url="http://www.opengtl.org"
 arch=('x86_64')
@@ -12,16 +12,16 @@ depends=('gcc-libs' 'llvm')
 makedepends=('cmake' 'libpng')
 optdepends=('libpng: for using the png extension')
 source=("http://download.opengtl.org/OpenGTL-${pkgver}.tar.bz2"
-        "opengtl-0.9.18-llvm-3.3.patch"
+        "opengtl-0.9.18-llvm-3.4.1.patch"
         "opengtl-0.9.18-memcpy.patch")
 sha256sums=('f094b3d2a1a60519975bb3badc05e704f2b93c7a3d2cb753041f2ff27cfcd9f8'
-            'c43418bc039660ae86cb86b8b8175342793cb1361c699faa9b6342bc896e3d6c'
+            '83df283425e59b8f883bab2ba6b477f85629e4dcc85dc5098939407e74db0b04'
             '934f2d3b0452b0505d0b4a39f2f9022ea490be12eda77d46caf0d66eabef59f3')
 
 prepare() {
   patch -d OpenGTL-$pkgver -Np1 -i "$srcdir/opengtl-0.9.18-memcpy.patch"
-  # Fix build with LLVM 3.3 (patch from Fedora)
-  patch -d OpenGTL-$pkgver -Np1 -i "$srcdir/opengtl-0.9.18-llvm-3.3.patch"
+  # Fix build with LLVM 3.4 (patch from Rosa https://abf.rosalinux.ru/openmandriva/opengtl/)
+  patch -d OpenGTL-$pkgver -Np1 -i "$srcdir/opengtl-0.9.18-llvm-3.4.1.patch"
 }
             
 build() {
