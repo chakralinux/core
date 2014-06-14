@@ -8,6 +8,7 @@ pkgbase=qt5
 pkgname=('qt5-base'
          'qt5-connectivity'
          'qt5-doc'
+         'qt5-enginio'
          'qt5-declarative'
          'qt5-graphicaleffects'
          'qt5-imageformats'
@@ -23,20 +24,21 @@ pkgname=('qt5-base'
          'qt5-translations'
          'qt5-webkit'
          'qt5-x11extras'
+         'qt5-websockets'
          'qt5-xmlpatterns'
          'qt5-private-headers')
 pkgver=5.3.0
-pkgrel=3
+pkgrel=7
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
 makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
     'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib' 'icu'
     'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
-    'mariadb' 'unixodbc' 'cups' 'libxinerama' 'libxcomposite' 'libxcursor' 'python2' 'gperf' 'ruby'
+    'mariadb' 'unixodbc' 'cups' 'libxinerama' 'libxcomposite' 'libxcursor' 'libxkbcommon' 'python2' 'gperf' 'ruby'
     'xcb-util-image' 'xcb-util-keysyms' 'xcb-util-renderutil' 'xcb-util-wm' 'pulseaudio'
     'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins' 'gstreamer0.10-good-plugins'
-    'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins' 'qt5-tools')
+    'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg' 'gstreamer0.10-ugly-plugins' 'harfbuzz' 'qt5-base' 'qt5-tools' 'pkg-config' 'xkeyboard-config')
 options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=(#"${pkgname}.tar.xz"
@@ -82,6 +84,12 @@ build() {
 
         unset QTDIR
         export PATH="$PWD/qtbase/bin:$PWD/qtrepotools/bin:$PATH"
+        export LD_LIBRARY_PATH="${QTDIR}"/qtbase/lib:"${QTDIR}"/qttools/lib:"${LD_LIBRARY_PATH}"
+        export QT_PLUGIN_PATH="${QTDIR}"/qtbase/plugins
+
+
+        # our xkb is too old
+        export _xkbconfigroot=$(pkg-config --variable=xkb_base xkeyboard-config)
 
 	./configure -confirm-license -opensource \
 		-prefix /usr \
@@ -99,25 +107,29 @@ build() {
                 -examplesdir /usr/share/qt5/examples \
 		-system-sqlite \
                 -openssl-linked \
+                -no-rpath \
                 -optimized-qmake \
                 -reduce-relocations \
                 -dbus-linked \
+	        -system-harfbuzz \
+                -journald \
                 -no-gtkstyle \
                 -opengl desktop \
                 -feature-menu \
                 -feature-textdate \
+                -qt-xkbcommon \
+	        -xkb-config-root $_xkbconfigroot \
                 -feature-ftp \
                 -xcursor
 	 make
          #make module-qtwebkit
          
 	 # Fix paths
-#	 export QTDIR="${srcdir}"/${_pkgfqn}
-#	 find "${QTDIR}" -name Makefile -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
-#	 find "${QTDIR}" -name Makefile.qmake-docs -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
-#	 find "${QTDIR}" -name Makefile -exec sed -i "s|/usr/lib/qt/5bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
-#	 find "${QTDIR}" -name Makefile.qmake-docs -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
-#	 sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" qtwebkit/Source/Makefile.api
+	 find "${QTDIR}" -name Makefile -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
+	 find "${QTDIR}" -name Makefile.qmake-docs -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
+	 find "${QTDIR}" -name Makefile -exec sed -i "s|/usr/lib/qt/5bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
+	 find "${QTDIR}" -name Makefile.qmake-docs -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
+	 sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" qtwebkit/Source/Makefile.api
 
 	 make docs
   }
@@ -135,6 +147,7 @@ package_qt5-base() {
     optdepends=('postgresql-libs: PostgreSQL driver'
           'libmariadbclient: MySQL driver'
 	  'unixodbc: ODBC driver'
+          'libxkbcommon-x11: xcb plugin'
 	  'libxinerama: Xinerama support'
 	  'libxfixes: Xfixes support')
 	
@@ -170,7 +183,7 @@ package_qt5-base() {
 
 package_qt5-connectivity() {
   pkgdesc='A cross-platform application and UI framework (QtBluetooth, QtNfc)'
-  depends=('qt5-declarative')
+  depends=('qt5-declarative' 'libxkbcommon-x11')
 
   cd ${_pkgfqn}/qtconnectivity
   make INSTALL_ROOT="${pkgdir}" install
@@ -212,6 +225,19 @@ package_qt5-doc() {
   
   # remove duplicated files from qt5-tools
   rm -rf "${pkgdir}"/usr/share/qt5
+}
+
+package_qt5-enginio() {
+  pkgdesc='A Backend-as-a-Service solution to ease the backend development for connected and data-driven application'
+  depends=('qt5-declarative')
+
+  cd ${_pkgfqn}/qtenginio
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
+
+  install -D -m644 LGPL_EXCEPTION.txt \
+    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
 }
 
 
@@ -408,6 +434,18 @@ package_qt5-webkit() {
   
   # Fix wrong path in pc file
   perl -pi -e "s, -L${srcdir}/?\S+,,g" "${pkgdir}"/usr/lib/pkgconfig/Qt5WebKit.pc
+}
+
+
+package_qt5-websockets() {
+  pkgdesc='Provides WebSocket communication compliant with RFC 6455'
+  depends=('qt5-declarative')
+  license=('LGPL')
+
+  cd ${_pkgfqn}/qtwebsockets
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
 }
 
 package_qt5-x11extras() {
