@@ -6,9 +6,9 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel="3.12.15"
-pkgver=3.12.15
-pkgrel=2
+_basekernel="3.15"
+pkgver=3.15
+pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -26,21 +26,19 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         'aufs3-loopback.patch'
         'aufs3.patch'
         'config.aufs'
-        # cve patches (for tty issue, see patch)
-        CVE-2014-0196.patch
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch')
 
-sha256sums=('f6116819985f0402392580704bf4b3b2f0dd6d0ab7f16b36a078c5788b17c423'
-            '6fa9dfea3d3bb41464652f07fd036886336be3fbb73e2c06baabd1005af1d2cf'
-            '316d7b429cac1d0b407eb3a36403ecc55813fd3941f517c58ab6514433a7ddd9'
-            'e9604c6d87ae87830c154c1b12065eb6361e503006025497741f15dbaa9fd3ff'
-            '03ec8d29245b222c21aee0a043ab9a48702d252d8460d44541fa9ea65bcea7ce'
-            '68426d50a9e774526d039be3e48cdff8f85ee8a37a77bd1aa0671885a09060ec'
-            '6c9a05787a392bd86da8f0fb66abd32a72808576aa7c635e5c2ae678134b59dd'
-            '86bf44ad0ea7c2afa4b195f8858f07eb8e35562c73290a8ba0ca723ee2a1932e'
-            'c4bc9e482581b2e58bb69a11e42636b5b75f0fa5bf0eb20a034594ec8f40f2d6'
+sha256sums=('c3927e87be4040fa8aca1b58663dc0776aaf00485604ff88a623be2f3fb07794'
+            '47c17659830e26b2dcee47731de08629060753aa85232b1cf148875aebba9f04'
+            'd1a300347218a8ca6b7d0a1c05706be8a254b117a5ef1c26f1b0238e5f89c165'
+            'd9c11adc0ba2a1af3015084e1b824cb5ab3851d04baac954411f7e8e2d978014'
+            '1d31fce8dca96f934fca54ba779305aca6e591951fb031f57211f9c006662e9f'
+            '44d7b905865f8200733608ab1148af893103c4e45bfe5c8386ae816232d085ba'
+            '65d1a9d18fd3f494742619cfc8f39455b207d7de45fa1f23ecbcc9ee49acf240'
+            '6c09de56705615d9d836584d1abc4fc3fb073a6de5deb55bd6a500d4811a5ce5'
+            '460991dca26b087b1b89993b426e254cad1b4e1bde6443869919add39efafed9'
             'b1b1cf291bd68270b700eb21f19f7b052116d07dde492761227cd94bb775910c'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182')
@@ -81,9 +79,6 @@ prepare() {
   cat "${srcdir}/config.x86_64" > ./.config
 
   cat "${srcdir}/config.aufs" >> ./.config
-
-  # CVE patch
-  patch -p1 -i ${srcdir}/CVE-2014-0196.patch
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
@@ -239,7 +234,8 @@ package_linux-headers() {
     cp -a drivers/media/pci/${i}/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/pci/${i}"
   done
   # usb
-  for i in cpia2 em28xx pwc sn9c102; do
+  # removed sn9c102 because it doesn't exist anymore?
+  for i in cpia2 em28xx pwc ; do
     mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/usb/${i}"
     cp -a drivers/media/usb/${i}/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/usb/${i}"
   done
@@ -333,16 +329,3 @@ package_linux-docs() {
   # remove a file already in linux package
   rm -f "${pkgdir}/usr/src/linux-${_kernver}/Documentation/DocBook/Makefile"
 }
-sha256sums=('f6116819985f0402392580704bf4b3b2f0dd6d0ab7f16b36a078c5788b17c423'
-            '6fa9dfea3d3bb41464652f07fd036886336be3fbb73e2c06baabd1005af1d2cf'
-            '316d7b429cac1d0b407eb3a36403ecc55813fd3941f517c58ab6514433a7ddd9'
-            'e9604c6d87ae87830c154c1b12065eb6361e503006025497741f15dbaa9fd3ff'
-            '03ec8d29245b222c21aee0a043ab9a48702d252d8460d44541fa9ea65bcea7ce'
-            '68426d50a9e774526d039be3e48cdff8f85ee8a37a77bd1aa0671885a09060ec'
-            '6c9a05787a392bd86da8f0fb66abd32a72808576aa7c635e5c2ae678134b59dd'
-            '86bf44ad0ea7c2afa4b195f8858f07eb8e35562c73290a8ba0ca723ee2a1932e'
-            'c4bc9e482581b2e58bb69a11e42636b5b75f0fa5bf0eb20a034594ec8f40f2d6'
-            'b1b1cf291bd68270b700eb21f19f7b052116d07dde492761227cd94bb775910c'
-            '00c522829c322004ea87ae3e228ebb73aa4b4160068078f8b46a7033490df21f'
-            'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
-            'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182')
