@@ -1,11 +1,11 @@
 #maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
-_extramodules=extramodules-3.12.15-CHAKRA
+_extramodules=extramodules-3.15-CHAKRA
 _kernver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=broadcom-wl
 pkgver=6.30.223.141
-pkgrel=7
+pkgrel=8
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 arch=('x86_64')
@@ -16,24 +16,31 @@ source=("http://www.broadcom.com/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pk
          #"http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" "http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
         'modprobe.d'
         'license.patch'
-       # 'user-ioctl.patch'
+        'gcc.patch'
         'linux-recent.patch')
 sha1sums=('3a2453c71a07030f41a8fc613c87badf8452848c'
           '8f5234da6769784b3331d2fefac4a38b20b5723f'
           '81c05d48b234d56ad2e18eaee5ce89b79550ef20'
-        #  'a41f11ffc18dbb126176259e02dd93b6ade04a10'
-          '0d59426647fffe5b8c3835c7c6198ee4074ef1db')
+          '9ba530076d0b45eb96b2134e6b5d9f3a61adf4e0'
+          'c6a935a08480ca36f9e4b10b745ed46467fccc00')
 
 backup=('etc/modprobe.d/broadcom-wl.conf')
 install=install
 
-build() {
+
+prepare() {
 	cd "${srcdir}"
 
 	patch -p1 -i linux-recent.patch
-	#patch -p1 -i user-ioctl.patch
 	patch -p1 -i license.patch
+        patch -p1 -i gcc.patch
 
+        sed -e "/BRCM_WLAN_IFNAME/s:eth:wlan:" \
+            -i src/wl/sys/wl_linux.c
+}
+
+build() {
+	cd "${srcdir}"
 	make -C /lib/modules/"${_kernver}"/build M=`pwd`
 }
 
