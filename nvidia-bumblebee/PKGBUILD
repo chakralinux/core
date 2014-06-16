@@ -3,18 +3,18 @@
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 # Contributions from AUR: https://aur.archlinux.org/packages/nvidia-bumblebee/
 
-_extramodules=extramodules-3.12.15-CHAKRA
+_extramodules=extramodules-3.15-CHAKRA
 _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=nvidia-bumblebee
-pkgver=331.38
-pkgrel=4
+pkgver=331.79
+pkgrel=1
 pkgdesc="NVIDIA drivers for linux. Packaged for Bumblebee"
 arch=('x86_64')
 url="http://www.nvidia.com/"
-depends=('linux>3.12' 'linux<3.13' "nvidia-utils-bumblebee")
+depends=('linux>=3.15' 'linux<3.16' "nvidia-utils-bumblebee")
 provides=("nvidia=${pkgver}")
-makedepends=('linux-headers>=3.12' 'linux-headers<3.13')
+makedepends=('linux-headers>=3.15' 'linux-headers<3.16')
 conflicts=('nvidia' 'nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx' 'dkms-nvidia')
 license=('custom')
 install=nvidia.install
@@ -23,7 +23,7 @@ options=(!strip)
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-md5sums=('f2059ae373665cb6c8fb826e1173b04d')
+md5sums=('1f0708b913403b4f5b494b0daf0415eb')
 
 build() {
     cd "${srcdir}"
