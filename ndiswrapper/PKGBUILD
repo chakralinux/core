@@ -1,29 +1,34 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
-_extramodules=extramodules-3.12.15-CHAKRA
+_extramodules=extramodules-3.15-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 _rootOfSourceTree=/usr/src/linux-${_kver}
 
 pkgname=ndiswrapper
 pkgver=1.59
-pkgrel=3
+pkgrel=4
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
 url="http://ndiswrapper.sourceforge.net"
 install="ndiswrapper.install"
-depends=('linux>=3.12' 'linux<3.13')
+depends=('linux>=3.15' 'linux<3.16')
 makedepends=( 'linux-headers')
 provides=("ndiswrapper-utils=$pkgver")
 replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
-source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
-sha1sums=('75fbbda677fe91ee07a6f6a8e19b1f3e2479540f')
+source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
+        "ndiswrapper-1.59.patch"
+)
+
+sha1sums=('75fbbda677fe91ee07a6f6a8e19b1f3e2479540f'
+          'f120e96fa9abab45e1c724aaac29da7b892820f0')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
   
+  patch -p1 -i ../ndiswrapper-1.59.patch
   sed -i "/modinfo/s/s/usr\//" driver/Makefile
 
   make -C driver KVERS_UNAME=${_kver}
