@@ -1,12 +1,12 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 
-_extramodules=extramodules-3.12.15-CHAKRA
+_extramodules=extramodules-3.15-CHAKRA
 _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=('nvidia' 'chd-nvidia')
-pkgver=331.38
-pkgrel=2
+pkgver=331.79
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=('linux-headers' "nvidia-utils=${pkgver}")
@@ -17,7 +17,7 @@ _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         'f2059ae373665cb6c8fb826e1173b04d')
+         '1f0708b913403b4f5b494b0daf0415eb')
 
 build() {
     cd "${srcdir}"
@@ -29,7 +29,7 @@ build() {
 
 package_nvidia() {
     pkgdesc="NVIDIA drivers for linux."
-    depends=('linux>=3.12' 'linux<3.13' "nvidia-utils=${pkgver}")
+    depends=('linux>=3.15' 'linux<3.16' "nvidia-utils=${pkgver}")
     conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx')
     install=nvidia.install
     
