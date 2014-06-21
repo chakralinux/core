@@ -7,15 +7,13 @@ _kernver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=(catalyst chd-catalyst)
 pkgver=14.4
-pkgrel=1
+pkgrel=2
 _amdver=14.10.1006.1001
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only. Radeons HD 2 3 4 xxx ARE NOT SUPPORTED"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 arch=('x86_64')
 url="http://www.amd.com"
 license=('custom')
-
-depends=('linux>=3.15' 'linux<3.16' 'catalyst-utils')
 makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-headers')
 conflicts=('nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'catalyst-legacy')
 
@@ -84,7 +82,7 @@ build() {
 package_catalyst() {
     pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
     screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
-    depends=('linux>=3.12' 'linux<3.13' 'catalyst-utils')
+    depends=('linux>=3.15' 'linux<3.16' 'catalyst-utils')
     conflicts=('nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'catalyst-legacy')
     install=catalyst.install
 
