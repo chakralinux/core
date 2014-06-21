@@ -1,58 +1,49 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 _extramodules=extramodules-3.2-lts
-_kver="$(cat /lib/modules/${_extramodules}/version)"
+_kernver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=catalyst-lts
-pkgver=13.12
-pkgrel=2
+pkgver=14.4
+pkgrel=1
+_amdver=14.10.1006.1001
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
 arch=('x86_64')
-url="http://www.ati.amd.com"
+url="http://www.amd.com"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 license=('custom')
 depends=('linux-lts>=3.2' 'linux-lts<3.4' 'catalyst-utils')
 makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-lts-headers')
 conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd')
 install=catalyst.install
-source=(http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-x86.x86_64.zip
+source=(        http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver/./-}-rev2-linux-x86-x86-64-may6.zip
         ati_make.sh
-        makefile_compat.patch
+	makefile_compat.patch
 	lano1106_fglrx_intel_iommu.patch
 	lano1106_kcl_agp_13_4.patch
 	lano1106_fglrx-13.8_proc.patch
-	arch_3.13_kernel_acpi_node.patch
-	looks_like_amd_forgot_this.patch
 	ati-compat_alloc_user_space.patch
-	jammy.patch # changes taken from http://ati.cchtml.com/show_bug.cgi?id=944#c5
-	fglrx_supported
-	switchlibglx
-	switchlibGL)
-md5sums=('6b16cad1acf7aa4851fa00e43b9e3c1f'
+	fglrx_supported)
+
+md5sums=('6e9483e8d34aea68af22fbb70116275f'
          '660396540b0ceaff71d6155c986734de'
          '3e1b82bd69774ea808da69c983d6a43b'
          '5184b94a2a40216a67996999481dd9ee'
          'c5156eddf81c8a1719b160d05a2e8d67'
          '2ab4837233de42332753882445373d7b'
-         '25e7c640aeafb08bb5593b647c69cf9b'
-         '1c86b8e1d298ed29a7f6da65132620c6'
          '21013e49598edfffa7f37b62b2d6a930'
-         '3af2f4eca848d595791b8a4adc48a4cc'
-         '8bd182de340d6ed8b2dfcedfd3e5a389'
-         '99032d919ede27884b5c3e87ab110a96'
-         '99032d919ede27884b5c3e87ab110a96')
+         '8bd182de340d6ed8b2dfcedfd3e5a389')
 
 build() {
 
+    msg "Unpacking archive ..."
+    /bin/sh ./fglrx-${_amdver}/amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
+    
     msg "Setting compilation variables ..."
     # include ati_make.sh and use _ati_check function from it
     . ati_make.sh
     _ati_check
 
-
-    msg "Unpacking archive ..."
-    /bin/sh ./amd-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
-    
     BUILDARCH=x86_64
     _archdir=x86_64
 
@@ -62,13 +53,10 @@ build() {
     msg "Applying patch(es) ..."
     # makefile patch to choose arch_compat_alloc_user_space or older compat_alloc_user_space
     # works only in combination with ati_make.sh script
-    patch -Np1 -i ${srcdir}/jammy.patch
     patch -Np1 -i ../makefile_compat.patch
     patch -Np1 -i ../lano1106_fglrx_intel_iommu.patch
     patch -Np1 -i ../lano1106_kcl_agp_13_4.patch
     patch -Np1 -i ../lano1106_fglrx-13.8_proc.patch
-    patch -Np1 -i ../arch_3.13_kernel_acpi_node.patch
-    patch -Np1 -i ../looks_like_amd_forgot_this.patch
     # https://github.com/herecura/herecura/blob/master/keep-old-system-alive/catalyst-legacy-slk/ati-2.6.36-compat_alloc_user_space.patch
     patch -Np1 -i ../ati-compat_alloc_user_space.patch
 
@@ -79,42 +67,38 @@ build() {
 
     msg "Compiling fglrx module ..."
     # Compile module using _ati_check variables
-    make -C /lib/modules/${_kver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} \
-    MODFLAGS="-DMODULE -DATI -DFGL -DPAGE_ATTR_FIX=$PAGE_ATTR_FIX -DCOMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE $def_smp $def_modversions" \
-    PAGE_ATTR_FIX=$PAGE_ATTR_FIX COMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE modules
+    CFLAGS_MODULE="-DMODULE -DATI -DFGL -DPAGE_ATTR_FIX=$PAGE_ATTR_FIX -DCOMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE $def_smp $def_modversions"
+    
+    make -C /lib/modules/${_kernver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} \
+    MODFLAGS="$CFLAGS_MODULE" \
+    CFLAGS_MODULE="$CFLAGS_MODULE" \
+    PAGE_ATTR_FIX=$PAGE_ATTR_FIX COMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE modules 
 }
 
-package() {
+package_catalyst() {
 
     # here we are checking kernel's extramodules dir
     for r in /lib/modules/*; do
       s=${r:13}
       if [[ ${s:0:3} = "ext" ]]; then
-	if [[ `cat ${r}/version | grep -c ${_kver}` != 0 ]]; then
+	if [[ `cat ${r}/version | grep -c ${_kernver}` != 0 ]]; then
 	  _destidir=${s}
 	  sed -i -e "s/EXTRAMODULES=.*/EXTRAMODULES=${s}/" $startdir/catalyst.install
 	fi
-	elif [[ ${s} = ${_kver} ]] && [[ ! -e ${r}/extramodules ]]; then
-	  _destidir=${_kver}/video
+	elif [[ ${s} = ${_kernver} ]] && [[ ! -e ${r}/extramodules ]]; then
+	  _destidir=${_kernver}/video
 	  sed -i -e "s/EXTRAMODULES=.*/EXTRAMODULES=null/" $startdir/catalyst.install
       fi
     done
 
 
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
-    install -m755 -d "${pkgdir}/lib/modules/${_destidir}/"
-    install -m644 fglrx.ko "${pkgdir}/lib/modules/${_destidir}/"
+    install -m755 -d "${pkgdir}/lib/modules/${_destidir}/" 
+    install -m644 fglrx.ko "${pkgdir}/lib/modules/${_destidir}/" 
     find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
-    sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kver}/" $startdir/catalyst.install
+    sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/catalyst.install
 
     # License
     install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
     install -m644 "${srcdir}/archive_files/LICENSE.TXT" "${pkgdir}/usr/share/licenses/${pkgname}/"
-            
-    # Switcheroo files
-    install -m755 -d "${pkgdir}/usr/lib/fglrx"
-    install -m644 "${srcdir}/switchlibglx" "${pkgdir}/usr/lib/fglrx/"
-    install -m644 "${srcdir}/switchlibGL" "${pkgdir}/usr/lib/fglrx/"
-
-    sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kver}/" $startdir/*.install
 }

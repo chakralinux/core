@@ -7,30 +7,46 @@ whisperer(){
     echo "This driver is not compatible, install catalyst-legacy before rebooting."
     echo "sudo pacman -S catalyst-legacy"
     echo "You can use the tool 'aticonfig' to regenerate an xorg.conf file."
-    echo "Further reading: http://chakra-project.org/bbs/viewtopic.php?pid=56704#p56704"
+    echo "Further reading:"
+    echo "http://chakraos.org/forum/viewtopic.php?pid=56704#p56704"
+    echo "http://chakraos.org/wiki/index.php?title=Catalyst"
     echo "--------------------------------"
     echo "WARNING WARNING WARNING WARNING"
     echo "----------------------------------------------------------------"
 }
 
-check_libdri_so(){
-    if [ ! -e usr/lib/xorg/modules/extensions/libdri.so ]; then
-        ln -sf usr/lib/xorg/modules/extensions/libdri.xorg usr/lib/xorg/modules/extensions/libdri.so
-    fi
+split(){
+    echo -e "\e[1;31m-------------------------- SPLIT -------------------------------\e[0m"
+    echo "catalyst-utils is now splitted into:"
+    echo "catalyst-utils"
+    echo "catalyst-libgl"
+    echo "opencl-catalyst"
+    echo ""
+    echo -e "You MOST probably want to also install \e[1;31mcatalyst-libgl\e[0m"
+    echo -e "\e[1;31m----------------------------------------------------------------\e[0m"
 }
 
-post_install(){
-    check_libdri_so
+post_install() {
+    echo "----------------------------------------------------------------"
+    echo "PLEASE NOTE:"
+    echo "----------------------------------------------------------------"
+    echo "You can use the tool 'aticonfig' to generate an xorg.conf file."
+    echo "--------------------- ^^^^^^^^^ --------------------------------"
+    echo "IMPORTANT:"
+    echo "fglrx was added into /etc/modules-load.d/catalyst.conf"
+    echo "----------------------------------------------------------------"
+    echo "	atieventsd (needs acpid pkg) on systemd:"
+    echo "systemctl enable atieventsd"
+    echo "systemctl start atieventsd"
+    echo "----------------------------------------------------------------"
     whisperer
+    split
 }
 
 post_upgrade(){
-    check_libdri_so
-    whisperer
+    split
 }
 
 post_remove(){
-    # If the symlink is dead, remove it
-     check_libdri_so
      echo "NOTE: Don't forget to recover your original xorg.conf file."
 }
