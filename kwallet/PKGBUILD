@@ -2,20 +2,20 @@
 
 source ../frameworks.conf
 
-pkgname=kwallet-framework
+pkgname=kwallet
 pkgver=${KFVersion}
 pkgrel=1
 pkgdesc='KWallet Framework'
 arch=('i686' 'x86_64')
-url='https://projects.kde.org/projects/frameworks/kwallet-framework'
+url='https://projects.kde.org/projects/frameworks/kwallet'
 license=('LGPL')
-depends=('kwindowsystem' 'kconfig')
+depends=('kwindowsystem' 'kconfig' 'kcoreaddons' 'kdbusaddons' 'ki18n' 'kiconthemes' 'knotifications')
 makedepends=('extra-cmake-modules')
 checkdepends=('cmake')
 groups=('kf5')
 options=("debug")
 source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('611b8cf450f5cf67620ee6935ed52484')
+sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
