@@ -3,18 +3,19 @@
 source ../frameworks.conf
 
 pkgname=kf5-attica
+_pkgname=attica
 pkgver=${KFVersion}
 pkgrel=1
 arch=('i686' 'x86_64')
-url='https://projects.kde.org/projects/kdesupport/attica'
+url='https://projects.kde.org/projects/kdesupport/${_pkgname}'
 pkgdesc='A Qt5 library that implements the Open Collaboration Services API'
 license=('LGPL')
 depends=('qt5-base')
 makedepends=('extra-cmake-modules')
 checkdepends=("cmake")
 options=("debug")
-source=("${KFServer}/${pkgver}/attica-${pkgver}.tar.xz")
-md5sums=('c2d1cdc706b6fdd145f3319f68ec6d33')
+source=("${KFServer}/${pkgver}/${_pkgname}-${pkgver}.tar.xz")
+sha256sums=($(getSum $_pkgname))
 
 prepare() {
   mkdir -p build
