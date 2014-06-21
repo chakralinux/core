@@ -13,14 +13,11 @@ depends=('kglobalaccel' 'ktextwidgets' 'kf5-attica')
 makedepends=('extra-cmake-modules')
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
-        "${pkgname}-${pkgver}-attica-tests.patch")
-md5sums=('26388cf42f06e8be77d6d48cbaac9857')
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
-  mkdir -p build
-  cd ${srcdir}/${pkgname}-${pkgver}
-  patch -uNp1 -i ${srcdir}/${pkgname}-${pkgver}-attica-tests.patch
+  mkdir -p ${srcdir}/build
 }
 
 build() {
@@ -43,6 +40,3 @@ package() {
   cd build
   make DESTDIR="${pkgdir}" install
 }
-md5sums=('08ec20c30633854d0ae2827c52648bbf')
-md5sums=('08ec20c30633854d0ae2827c52648bbf'
-         'e813c4689ce74af330d40aa02682d2ff')
