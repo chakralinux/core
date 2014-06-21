@@ -18,8 +18,10 @@ md5sums=('5a8740bd517f06ca37ed420c91c22f04')
 build() {
     cd "$srcdir/$pkgname-snapshot-$pkgver-2245-stable"
 
-    ./configure --enable-shared
-
+    ./configure --enable-shared \
+                --prefix=/usr \
+                --enable-pic \
+                --bit-depth=10
     make
 }
 package() {
