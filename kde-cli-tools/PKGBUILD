@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../plasma.conf
+
+pkgname=kde-cli-tools
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='KDE CLI tools'
+arch=('i686' 'x86_64')
+url='projects.kde.org/'
+license=('LGPL')
+depends=('qt5-base')
+makedepends=('extra-cmake-modules' 'kwindowsystem' 'kdesu' 'kdelibs4support' 'kcmutils' 'kemoticons' 'kitemmodels' 'kinit')
+checkdepends=("cmake")
+groups=('kf5')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${PBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
