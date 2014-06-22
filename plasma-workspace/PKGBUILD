@@ -1,0 +1,39 @@
+source ../plasma.conf
+
+pkgname=plasma-workspace
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="Plasma Workspace"
+arch=('i686' 'x86_64')
+url='http://projects.kde.org'
+license=('LGPL')
+depends=('qt5-base' 'qt5-declarative' 'qt5-script' 'plasma-framework' 'kdelibs4support' 'kemoticons' 'kdesu' 'knewstuff' 'krunner' 'kcmutils' 'kjs' 'kjsembed' 'knotifyconfig' 'ksysguard' 'libkscreen2' 'kwin' 'ktexteditor' 'akonadi')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake")
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${PBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
