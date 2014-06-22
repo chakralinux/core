@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../plasma.conf
+
+pkgname=oxygen-fonts
+pkgver=0.3.97
+pkgrel=1
+pkgdesc="Oxygen font"
+arch=('i686' 'x86_64')
+url='projects.kde.org/'
+license=('LGPL')
+depends=('qt5-base')
+makedepends=('extra-cmake-modules' 'fontforge')
+checkdepends=("cmake")
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname} | head -n 1) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${PBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
