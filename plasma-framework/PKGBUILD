@@ -3,39 +3,30 @@
 source ../frameworks.conf
 
 pkgname=plasma-framework
-pkgver=0.plasma2tp
+pkgver=${KFVersion}
 pkgrel=1
 pkgdesc='Plasma library and runtime components based upon KF5 and Qt5'
 arch=('i686' 'x86_64')
 url='https://projects.kde.org/projects/playground/libs/plasma-framework'
 license=('LGPL')
 depends=('qt5-quickcontrols' 'kidletime' 'kitemmodels' 'threadweaver'
-         'kwallet-framework' 'kdeclarative' 'kunitconversion'
-         'kross' 'kdnssd-framework' 'kde4support' 'kinit'
-         'kactivities-frameworks-git' 'qt5-quick1' 'kdoctools')
+         'kwallet' 'kdeclarative' 'kunitconversion'
+         'kross' 'kdnssd' 'kinit'
+         'kactivities' 'kdoctools')
 makedepends=('extra-cmake-modules' 'git' 'qt5-tools')
 optdepends=('kde-workspace: provide a Plasma shell')
 options=("debug")
-source=(${pkgname}-${pkgver}.tar.bz2::"http://quickgit.kde.org/?p=plasma-framework.git&a=snapshot&h=d2992acfa72c6a3aec848f1f766196023270161f&fmt=tbz2"
-        'kdnssd.patch'
-        'threadweaver.patch')
-md5sums=('SKIP'
-         '129069b582053f2b57228a872ab74b3b'
-         'bd9dbb036909a2177464e7ba2b835ade')
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
-
-  cd plasma-framework
-  patch -p1 -i "${srcdir}"/kdnssd.patch
-  patch -p1 -i "${srcdir}"/threadweaver.patch
 }
 
 build() {
-  #export CMAKE_PREFIX_PATH="/opt/kf5"
 
   cd build
-  cmake ../plasma-framework \
+  cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=${KFBuildType} \
     -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
     -DLIB_INSTALL_DIR=lib 
