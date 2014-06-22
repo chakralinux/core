@@ -1,10 +1,10 @@
-#
-# KDE SC Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
+
+
+# Maintainer (i686): Phil Miller <philm@chakra-project[dog]org>
+# Maintainer (x86_64): Manuel Tortosa <manutortosa@chakra-project@org>
+
+# Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 
@@ -14,9 +14,9 @@ _origname=kdepim-runtime
 
 
 
-#
+
 # package info
-#
+
 pkgname=${_origname}
 arch=('i686' 'x86_64')
 #pkgver=${_kdever}
@@ -29,7 +29,7 @@ url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 
 install=${_origname}.install
-options=('docs' '!splithdr' 'splitdbg' 'log')
+options=('docs' '!header' 'debug' 'log')
 
 #provides=("${_origname}=${_kdever}")
 conflicts=("kdemod-${_origname}")
@@ -43,9 +43,9 @@ groups=("kde" "kde-complete" "kde-uninstall" "kde-minimal")
 source=($_mirror/${_origname}-4.5.94.1.tar.bz2)
 md5sums=('fdc28e6eea4200829a66c86435acc9a0')
 
-#
+
 # build and install
-#
+
 build()
 {
 	msg "starting build ..."
@@ -59,9 +59,9 @@ build()
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
 
-	make || return 1
+	make
 
-	make DESTDIR=${pkgdir} install || return 1
+	make DESTDIR=${pkgdir} install
 
 #	# include our patches into the package
 #	ls -1 ${startdir}/*.patch &>/dev/null 2>&1

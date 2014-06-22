@@ -1,10 +1,10 @@
-#
-# KDE SC Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
+
+
+# Maintainer (i686): Phil Miller <philm@chakra-project[dog]org>
+# Maintainer (x86_64): Manuel Tortosa <manutortosa@chakra-project@org>
+
+# Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname=kwin-fx-bereflected
@@ -28,11 +28,11 @@ build() {
   cd ${srcdir}/${_origname}-kwin-fx
 
   cmake -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` .
-  make || return 1
+  make
 }
 
 package() {
   cd ${srcdir}/${_origname}-kwin-fx
-  make DESTDIR=${pkgdir} install || return 1 
+  make DESTDIR=${pkgdir} install 
 }
 # vim:syntax=sh
