@@ -1,0 +1,42 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=ktexteditor
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Library providing Job- and Qeueinterfaces'
+arch=('i686' 'x86_64')
+url='https://projects.kde.org/projects/frameworks/threadweaver'
+license=('LGPL')
+depends=('qt5-base' 'qt5-script' 'karchive' 'kconfig' 'kguiaddons' 'ki18n' 'kio' 'kparts')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  msg "needs GUI?"
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
