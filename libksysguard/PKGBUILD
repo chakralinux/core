@@ -1,0 +1,39 @@
+source ../plasma.conf
+
+pkgname=libksysguard
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="KSysguard library"
+arch=('i686' 'x86_64')
+url='http://projects.kde.org'
+license=('LGPL')
+depends=('qt5-base' 'qt5-script' 'ki18n' 'kdelibs4support' 'kemoticons' 'plasma-framework')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake")
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${PBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
