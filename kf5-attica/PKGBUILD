@@ -2,7 +2,7 @@
 
 source ../frameworks.conf
 
-pkgname=kf5-attica
+pkgname=attica-qt5
 _pkgname=attica
 pkgver=${KFVersion}
 pkgrel=1
@@ -15,6 +15,9 @@ makedepends=('extra-cmake-modules')
 checkdepends=("cmake")
 options=("debug")
 source=("${KFServer}/${pkgver}/${_pkgname}-${pkgver}.tar.xz")
+replaces=("kf5-attica")
+provides=("kf5-attica")
+conflicts=("kf5-attica")
 sha256sums=($(getSum $_pkgname))
 
 prepare() {
@@ -23,11 +26,11 @@ prepare() {
 
 build() {
   cd build
-  cmake ../attica-${pkgver} \
+  cmake ../${_pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=${KFBuildType} \
     -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
     -DQT4_BUILD=OFF \
-    -DLIB_DESTINATION=${KFInstallPrefix}/lib
+    -DLIB_INSTALL_DIR=lib 
   make
 }
 
