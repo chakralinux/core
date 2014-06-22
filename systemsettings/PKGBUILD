@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../plasma.conf
+
+pkgname=systemsettings
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='Systemsettings'
+arch=('i686' 'x86_64')
+url='projects.kde.org/'
+license=('LGPL')
+depends=('qt5-base' 'kdelibs4support' 'kio' 'kiconthemes' 'kemoticons' 'kitemmodels' 'kinit' 'khtml' 'kcmutils')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake")
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${PBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
