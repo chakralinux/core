@@ -4,31 +4,30 @@
 # Maintainer: FranzMari <franzmari[at]chakra-project[dot]org>
 
 pkgname=xf86-video-vmware
-pkgver=13.0.1
-pkgrel=3
+pkgver=13.0.2
+pkgrel=1
 pkgdesc="X.org vmware video driver"
 arch=('i686' 'x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('libdrm' 'mesa' 'llvm')
-makedepends=('xorg-server'  'libx11' 'libxext' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
-groups=('xorg-video-drivers')
+depends=('libdrm' 'svga-dri' 'mesa>=10.0')
+makedepends=('xorg-server-devel')
+conflicts=('xorg-server<1.15.0') 
+groups=('xorg-drivers' 'xorg')
 options=('!emptydirs')
-source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('b08e0195ebf3f88a82129322cb93da08')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+sha256sums=('c8ba3d2cead3620dba2cbf5defb7f1759b2b96f4fe209f4bf6976832b6763c54')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr --enable-vmwarectrl-client
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
+  
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
