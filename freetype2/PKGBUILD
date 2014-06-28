@@ -1,35 +1,48 @@
-# Platform Packages for Chakra, part of chakra-project.org
-#
+# Maintainer: UtG <utg[dot]chakra.linux[at]gmail[dot]com>
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Maintainer: JIN Xiao-Yong <jinxiaoyong@gmail.com>
+# Maintainer: bohoomil <@zoho.com>
 
+# Installation order: freetype2-iu, fontconfig-iu, cairo-iu
 pkgname=freetype2
-pkgver=2.5.2
+pkgver=2.5.3
 pkgrel=1
-_ubuntu_diff_version=${pkgver}-1ubuntu2
-pkgdesc="TrueType font rendering library"
-arch=('x86_64')
-license=('GPL')
+pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
+arch=(x86_64)
+license=('GPL' 'MIT')
+groups=('infinality-bundle')
 url="http://freetype.sourceforge.net"
-depends=('zlib' 'sh' 'bzip2' 'libpng')
-source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2"
-        "http://archive.ubuntu.com/ubuntu/pool/main/f/freetype/freetype_${_ubuntu_diff_version}.diff.gz")
+depends=('zlib' 'bzip2' 'sh' 'xorg-server-utils' 'libpng' 'harfbuzz')
+install='infinality.install'
+backup=('etc/profile.d/infinality-settings.sh')
+source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
+        infinality-settings.sh
+        freetype-2.5.3-enable-valid.patch
+        upstream-15.05.2014.patch
+        infinality-2.5.3.patch)
+sha1sums=('d3c26cc17ec7fe6c36f4efc02ef92ab6aa3f4b46'
+          '8c15e24f37a3c0f74e5f901190247dc566cac79b'
+          'abf7a8f726ad6359533651a8942636880febf9f6'
+          '06cc4283cb797fbdc9c4dcef9730e9b41f45078f'
+          'cff259cd69dba17e4b284619cf8f0adccd6af0ed')
 
-md5sums=('10e8f4d6a019b124088d18bc26123a25'
-         'eda9c925032709bbd7463edcded05881')
-provides=('freetype2-ubuntu')
-conflicts=('freetype2-ubuntu')
-replaces=('freetype2-ubuntu')
+prepare() {
+  cd "${srcdir}/freetype-${pkgver}"
+
+  patches=(freetype-2.5.3-enable-valid.patch
+           upstream-15.05.2014.patch
+           infinality-2.5.3.patch)
+
+  # infinality & post release fixes
+  for patch in "${patches[@]}"; do
+    patch -Np1 -i ${srcdir}/${patch}
+  done
+}
 
 build() {
   cd "${srcdir}/freetype-${pkgver}"
-  
-  # apply ubuntu patches
-  patch -Np1 -i ../freetype_${_ubuntu_diff_version}.diff
-  patch -p0 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/freetype-2.1.7-backwards.compat.patch"
-  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/enable-subpixel-rendering.patch"
-  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/enable-gxvalid-otvalid.patch"
-  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/revert_scalable_fonts_metric.patch"
 
-  ./configure --prefix=/usr
+  ./configure --prefix=/usr --disable-static
   make
 }
 
@@ -42,6 +55,5 @@ package() {
   cd "${srcdir}/freetype-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
+  install -Dm755 "${srcdir}/infinality-settings.sh" "${pkgdir}/etc/profile.d/infinality-settings.sh"
 }
-
-
