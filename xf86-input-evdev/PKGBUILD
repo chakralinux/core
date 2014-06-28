@@ -1,13 +1,10 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Maintainer: Drake Justice <djustice@chakraos.org>
 
 pkgname=xf86-input-evdev
-pkgver=2.8.2
-pkgrel=2
+pkgver=2.9.0
+pkgrel=1
 pkgdesc="X.org evdev input driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc' 'systemd' 'mtdev')
@@ -16,17 +13,18 @@ conflicts=('xorg-server<1.12.0')
 options=('!libtool' '!makeflags')
 groups=('xorg-drivers' 'xorg')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('750461749a83bdee7771592aa5c0db5e267b18d847078a4b8622f55b04797eb3')
+sha256sums=('0c0c4aa393cb027a2304967944867a21a340bcad2e5efe630291b6906c3abc35')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
+
