@@ -2,25 +2,25 @@
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=xcb-proto
-pkgver=1.9
-pkgrel=1
+pkgver=1.10
+pkgrel=2
 pkgdesc="XML-XCB protocol descriptions"
-arch=(x86_64)
+arch=(any)
 url="http://xcb.freedesktop.org/"
 license=('custom')
-makedepends=('python2' 'libxml2')
-source=(${url}/dist/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('b22d6d64d1bb2490b61f5afb4f0be1f6efcfd8b7')
+makedepends=('python' 'libxml2')
+source=($url/dist/$pkgname-$pkgver.tar.bz2)
+sha256sums=('7ef40ddd855b750bc597d2a435da21e55e502a0fefa85b274f2c922800baaf05')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd $pkgname-$pkgver
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "$srcdir/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+  install -m755 -d "$pkgdir/usr/share/licenses/$pkgname"
+  install -m644 COPYING "$pkgdir/usr/share/licenses/$pkgname"
 }
