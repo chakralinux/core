@@ -3,27 +3,26 @@
 # contributor: abveritas@chakra-project.org
 
 pkgname=inputproto
-pkgver=2.3
+pkgver=2.3.1
 pkgrel=1
 pkgdesc="X11 Input extension wire protocol"
-arch=(x86_64)
+arch=(any)
 license=('custom')
 url="http://xorg.freedesktop.org/"
 makedepends=('xorg-util-macros' 'asciidoc')
 source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('4eacc1883593d3f0040e410be3afc8483c7d2409')
+sha256sums=('5a47ee62053a6acef3a83f506312494be1461068d0b9269d818839703b95c1d1')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr 
+  ./configure --prefix=/usr
   make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  
-  make DESTDIR="${pkgdir}" install 
+  make DESTDIR="${pkgdir}" install
 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" 
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
