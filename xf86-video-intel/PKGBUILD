@@ -1,36 +1,51 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
-# contributor: abveritas@chakra-project.org
 
 pkgname=xf86-video-intel
-pkgver=2.21.15
+pkgver=2.99.912
 pkgrel=1
-pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
-arch=('x86_64')
-url="http://xorg.freedesktop.org"
+arch=(i686 x86_64)
+url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('mesa' 'libxvmc' 'libpciaccess' 'libdrm' 'xcb-util' 'pixman' 'libxfixes' 'systemd')
-makedepends=('xorg-server>=1.14.0' 'libx11' 'xf86driproto' 'glproto' 'libxrender' 'resourceproto' 'scrnsaverproto')
-conflicts=('xf86-video-i810' 'xf86-video-intel-legacy')
-options=('!libtool')
+install=$pkgname.install
+pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
+depends=('intel-dri' 'libxvmc' 'pixman' 'xcb-util>=0.3.9' 'glamor-egl')
+makedepends=('xorg-server-devel' 'libx11' 'libxrender'
+             # additional deps for intel-virtual-output
+            'libxrandr' 'libxinerama' 'libxcursor' 'libxtst')
+optdepends=('libxrandr: for intel-virtual-output'
+            'libxinerama: for intel-virtual-output'
+            'libxcursor: for intel-virtual-output'
+            'libxtst: for intel-virtual-output')
+replaces=('xf86-video-intel-uxa' 'xf86-video-intel-sna')
+provides=('xf86-video-intel-uxa' 'xf86-video-intel-sna')
+conflicts=('xorg-server<1.15.0' 
+           'xf86-video-intel-sna' 
+           'xf86-video-intel-uxa' 
+           'xf86-video-i810' 
+           'xf86-video-intel-legacy')
 groups=('xorg-drivers' 'xorg')
-install=xf86-video-intel.install
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('6952e6e1deff1c4580ddee472dbc2223c3248d0f')
+source=(${url}/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+sha256sums=('7c8ffc492d59f34cac64093deb70717b4d9223cf416ecc6fa016ab2e8bde9501')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr \
-              --enable-dri \
-              --enable-sna \
-              --enable-uxa \
-              --with-default-accel=sna
+    --libexecdir=/usr/lib \
+    --enable-glamor
   make
 }
 
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
+
   make DESTDIR="${pkgdir}" install
+
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
+
