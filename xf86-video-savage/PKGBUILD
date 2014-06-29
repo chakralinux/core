@@ -4,15 +4,15 @@
 
 pkgname=xf86-video-savage
 pkgver=2.3.7
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org savage video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server>=1.12.3' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
-options=(!libtool !makeflags)
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
+options=('!makeflags')
 groups=('xorg-video-drivers')
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
 md5sums=('e813271ab43cc6a95ac0ab252b90a885')

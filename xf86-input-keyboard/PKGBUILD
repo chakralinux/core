@@ -1,19 +1,16 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Part of X.org group
+# maintainer AlmAck almack@chakraos.org
 
 pkgname=xf86-input-keyboard
 pkgver=1.8.0
-pkgrel=2
+pkgrel=3
 pkgdesc="X.Org keyboard input driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('glibc')
-makedepends=('xorg-server' 'resourceproto' 'scrnsaverproto' 'xf86driproto')
-conflicts=('xorg-server<1.12.3')
-options=('!libtool')
+makedepends=('xorg-server' 'X-ABI-XINPUT_VERSION=20' 'resourceproto' 'scrnsaverproto')
+conflicts=('xorg-server<1.15.0' 'X-ABI-XINPUT_VERSION<20' 'X-ABI-XINPUT_VERSION>=21')
 groups=('xorg-input-drivers')
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
 sha1sums=('7728d733ef16d664a201868ecae5db3705cf8ef1')

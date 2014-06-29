@@ -4,16 +4,15 @@
 
 pkgname=xf86-video-mach64
 pkgver=6.9.4
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org mach64 video driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('pkgconfig' 'xorg-server>=1.12.3' 'xineramaproto' 'xf86driproto' 'mesa>=7.6' 'glproto' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
-options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
 sha1sums=('59ef55e9962d6ff2d9f4583d95fdffc37cbcde86')
 

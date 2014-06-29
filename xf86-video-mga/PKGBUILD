@@ -4,15 +4,14 @@
 
 pkgname=xf86-video-mga
 pkgver=1.6.3
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org mga video driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'xf86driproto' 'mesa' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
-options=('!libtool')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
 sha1sums=('6ac9f61ece9d9449f914137b3eef685b2eebf66c')

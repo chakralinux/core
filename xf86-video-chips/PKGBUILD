@@ -1,20 +1,17 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakar-project.org
+# Part of X.org group
+# maintainer AlmAck almack@chakraos.org
 
 pkgname=xf86-video-chips
 pkgver=1.2.5
-pkgrel=2
+pkgrel=3
 pkgdesc="X.org Chips and Technologies video driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
-options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 iopl.h git-fix.diff)
 sha1sums=('5642e1d1bf3a05d24a0b8db48ca3b522c1962b00'
           'ec143f9a8c2958ba5fcd6759780362a70fa8abba'
@@ -23,7 +20,7 @@ sha1sums=('5642e1d1bf3a05d24a0b8db48ca3b522c1962b00'
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   cp ${srcdir}/iopl.h util/
-  patch -Np1 -i ${srcdir}/git-fix.dif
+  patch -Np1 -i ${srcdir}/git-fix.diff
 }
 
 build() {

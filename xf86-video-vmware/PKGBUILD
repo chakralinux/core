@@ -1,18 +1,16 @@
-#
 # Part of X.org group
-#
 # Maintainer: FranzMari <franzmari[at]chakra-project[dot]org>
 
 pkgname=xf86-video-vmware
 pkgver=13.0.2
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org vmware video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('libdrm' 'svga-dri' 'mesa>=10.0')
-makedepends=('xorg-server')
-conflicts=('xorg-server<1.15.0') 
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-drivers' 'xorg')
 options=('!emptydirs')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)

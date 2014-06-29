@@ -4,16 +4,15 @@
 
 pkgname=xf86-video-r128
 pkgver=6.9.2
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org ati Rage128 video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server>=1.12.3' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
-options=('!libtool')
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
 md5sums=('2e906d856a1c477bde000254b142445c')
 

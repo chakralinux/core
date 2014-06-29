@@ -4,16 +4,15 @@
 
 pkgname=xf86-video-trident
 pkgver=1.3.6
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org Trident video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'xf86dgaproto' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15' 'xf86dgaproto')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
-options=(!libtool)
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2" "git-fixes.patch")
 sha1sums=('9af5d275e6f4247cde19765178c3a797b4a7351d'
           'd187c12e24a736a782bc4272710a93da14ebe30f')

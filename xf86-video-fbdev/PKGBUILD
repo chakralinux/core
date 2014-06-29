@@ -1,20 +1,17 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Part of X.org group
+# maintainer AlmAck almack@chakraos.org
 
 pkgname=xf86-video-fbdev
 pkgver=0.4.4
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org framebuffer video driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('glibc')
-makedepends=('xorg-server' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
-groups=('xorg-video-drivers')
-options=('!libtool')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
+groups=('xorg-drivers' 'xorg')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
 sha1sums=('237ea14a55ca4012d6ce18fbfdc697d48d5838a2')
 

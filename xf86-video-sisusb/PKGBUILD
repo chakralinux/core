@@ -4,16 +4,15 @@
 
 pkgname=xf86-video-sisusb
 pkgver=0.9.6
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org SiS USB video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
-options=('!libtool')
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2" "git-fixes.patch")
 sha1sums=('acb96457a0f3f5631129841cb4477d61fd2707dd'
           '6516bba2443ad24ef7a10f16fa43e23ece6fb87e')
