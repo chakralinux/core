@@ -3,7 +3,7 @@
 
 pkgname=xcb-proto
 pkgver=1.10
-pkgrel=2
+pkgrel=1
 pkgdesc="XML-XCB protocol descriptions"
 arch=(any)
 url="http://xcb.freedesktop.org/"
@@ -21,6 +21,5 @@ build() {
 package() {
   cd $pkgname-$pkgver
   make DESTDIR="$pkgdir" install
-  install -m755 -d "$pkgdir/usr/share/licenses/$pkgname"
-  install -m644 COPYING "$pkgdir/usr/share/licenses/$pkgname"
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
 }
