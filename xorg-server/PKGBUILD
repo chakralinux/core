@@ -1,7 +1,7 @@
 # Maintainer: Drake Justice <djustice@chakraos.org>
 
 pkgbase=xorg-server
-pkgname=('xorg-server' 'xorg-server-xephyr' 'xorg-server-xdmx' 'xorg-server-xvfb' 'xorg-server-xnest' 'xorg-server-common' 'xorg-server-devel')
+pkgname=('xorg-server' 'xorg-server-xephyr' 'xorg-server-xdmx' 'xorg-server-xvfb' 'xorg-server-xnest' 'xorg-server-common')
 pkgver=1.15.1
 pkgrel=1 # build first with 0.1 and then rebuild it after xf86-input-evdev rebuild
 arch=('x86_64')
@@ -103,10 +103,19 @@ package_xorg-server-common() {
 
 package_xorg-server() {
   pkgdesc="Xorg X server"
-  depends=(libxdmcp libxfont libpciaccess libdrm pixman libgcrypt libxau xorg-server-common xf86-input-evdev libxshmfence)
+  # see pkgdir/usr/lib/pkgconfig/xorg-server.pc
+  depends=(xproto randrproto renderproto xextproto inputproto kbproto
+           fontsproto pixman videoproto xf86driproto glproto
+           mesa dri2proto dri3proto xineramaproto libpciaccess
+           resourceproto scrnsaverproto presentproto
+           libxdmcp libxfont libdrm libgcrypt libxau xorg-server-common
+           xf86-input-evdev libxshmfence
+           # not technically required but almost every Xorg pkg needs it to build
+           xorg-util-macros)
+
   backup=('etc/X11/xorg.conf.d/10-evdev.conf' 'etc/X11/xorg.conf.d/10-quirks.conf')
   # see xorg-server-*/hw/xfree86/common/xf86Module.h for ABI versions - we provide major numbers that drivers can depend on
-  # and /usr/lib/pkgconfig/xorg-server.pc in xorg-server-devel pkg
+  # and /usr/lib/pkgconfig/xorg-server.pc
   provides=('X-ABI-VIDEODRV_VERSION=15' 'X-ABI-XINPUT_VERSION=20' 'X-ABI-EXTENSION_VERSION=8.0' 'x-server')
   groups=('xorg')
   conflicts=('nvidia-utils<=331.20')
@@ -131,10 +140,6 @@ package_xorg-server() {
 
   install -m755 -d "${pkgdir}/usr/share/licenses/xorg-server"
   ln -sf ../xorg-server-common/COPYING "${pkgdir}/usr/share/licenses/xorg-server/COPYING"
-
-  rm -rf "${pkgdir}/usr/lib/pkgconfig"
-  rm -rf "${pkgdir}/usr/include"
-  rm -rf "${pkgdir}/usr/share/aclocal"
 }
 
 package_xorg-server-xephyr() {
@@ -184,26 +189,3 @@ package_xorg-server-xdmx() {
   ln -sf ../xorg-server-common/COPYING "${pkgdir}/usr/share/licenses/xorg-server-xdmx/COPYING"
 }
 
-package_xorg-server-devel() {
-  pkgdesc="Development files for the X.Org X server"
-  depends=(# see pkgdir/usr/lib/pkgconfig/xorg-server.pc
-           xproto randrproto renderproto xextproto inputproto kbproto 
-           fontsproto pixman videoproto xf86driproto glproto 
-           mesa dri2proto dri3proto xineramaproto libpciaccess
-           resourceproto scrnsaverproto presentproto
-           # not technically required but almost every Xorg pkg needs it to build
-           xorg-util-macros)
-
-  cd "${pkgbase}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-
-  rm -rf "${pkgdir}/usr/bin"
-  rm -rf "${pkgdir}/usr/share/man"
-  rm -rf "${pkgdir}/usr/share/doc"
-  rm -rf "${pkgdir}/usr/share/X11"
-  rm -rf "${pkgdir}/usr/lib/xorg"
-  rm -rf "${pkgdir}/var"
-
-  install -m755 -d "${pkgdir}/usr/share/licenses/xorg-server-devel"
-  ln -sf ../xorg-server-common/COPYING "${pkgdir}/usr/share/licenses/xorg-server-devel/COPYING"
-}
