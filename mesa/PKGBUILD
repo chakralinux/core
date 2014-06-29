@@ -1,67 +1,72 @@
-# Maintainer:  inkane@chakra-project.org
+# maintainer:  inkane@chakraos.org
+# contributor:  almack@chakraos.org
 
 pkgbase=mesa
-pkgname=('opencl-mesa' 'ati-dri' 'intel-dri' 'nouveau-dri' 'svga-dri' 'mesa' 'mesa-libgl')
-pkgver=10.2.2
-pkgrel=1
+pkgname=('mesa' 'mesa-libgl' 'opencl-mesa' 'ati-dri' 'intel-dri' 'nouveau-dri' 'svga-dri')
+pkgver=10.0.5
+pkgrel=10
 arch=('x86_64')
-makedepends=('python2' 'libxml2' 'libx11' 'glproto' 'libdrm' 'dri2proto' 'dri3proto' 'presentproto' 
-             'libxshmfence' 'libxxf86vm'  'libxdamage' 'libvdpau' 'wayland' 'elfutils' 'llvm' 'systemd'
-             'libclc' 'clang') # libomxil-bellagio
+makedepends=('python2' 'libxml2' 'libx11' 'glproto' 'libdrm' 'dri2proto' 'dri3proto' 'libxxf86vm'  'libxdamage' 'libvdpau' 'wayland' 'elfutils' 'llvm' 'systemd'
+             'libclc' 'clang')
+
+
 url="http://mesa3d.sourceforge.net"
 license=('custom')
-source=(ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/MesaLib-${pkgver}.tar.bz2
-        LICENSE)
-options=('libtool')
-sha256sums=('38c4a40364000f89cddaa1694f6f3cfb444981d1110238ce603093585477399c'
-            '7fdc119cf53c8ca65396ea73f6d10af641ba41ea1dd2bd44a824726e01c8b3f2')
+source=(${source[@]} 
+"ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/MesaLib-${pkgver}.tar.gz" 
+       'LICENSE'
+       "brw_get_graphics_reset_status.patch"
+)
+md5sums=('db606aadd0fe321f3664099677d159bc'
+         '5c65a0fe315dd347e09b1f2826a1df5a'
+         '48882338d0ddcad7b890e233b847b5c3')
+options=('libtool' 'debug')
+
+prepare() {
+    cd ${srcdir}/?esa-*
+    patch -Np1 < ${srcdir}/brw_get_graphics_reset_status.patch
+}
 
 build() {
-  cd ${srcdir}/?esa-*
-
-  autoreconf -vfi # our automake is far too new for their build system :)
-
-  ./configure --prefix=/usr \
-    --sysconfdir=/etc \
+    cd ${srcdir}/?esa-*
+    
+   autoreconf -vfi
+    ./configure --prefix=/usr \
     --with-dri-driverdir=/usr/lib/xorg/modules/dri \
     --with-gallium-drivers=r300,r600,radeonsi,nouveau,svga,swrast \
     --with-dri-drivers=i915,i965,r200,radeon,nouveau,swrast \
     --with-egl-platforms=x11,drm,wayland \
-    --enable-llvm-shared-libs \
-    --enable-egl \
-    --disable-gallium-egl \
-    --enable-gbm \
-    --enable-gallium-gbm \
+    --with-llvm-shared-libs \
     --enable-gallium-llvm \
+    --enable-gallium-egl \
     --enable-shared-glapi \
+    --enable-gbm \
     --enable-glx-tls \
     --enable-dri \
     --enable-glx \
     --enable-osmesa \
     --enable-gles1 \
     --enable-gles2 \
+    --enable-egl \
     --enable-texture-float \
     --enable-xa \
     --enable-vdpau \
-    --enable-dri3 \
     --enable-opencl --enable-opencl-icd \
     --with-clang-libdir=/usr/lib
-
-    # --help
-    # --disable-gallium-egl : not well maintained/expose more bugs, so prefer egl_dri2 (FS#40096)
-
+    
   make
-
-  # fake installation
+  
+  # fake installation, needed to be able to split the files
+  [ -d $srcdir/fakeinstall ] && rm -r $srcdir/fakeinstall
   mkdir $srcdir/fakeinstall
   make DESTDIR=${srcdir}/fakeinstall install
 }
+
 
 package_opencl-mesa() {
   pkgdesc="OpenCL support for AMD/ATI Radeon mesa drivers"
   depends=('mesa-libgl' "mesa=${pkgver}" 'libcl' 'libclc' 'clang')
   optdepends=('opencl-headers: headers necessary for OpenCL development')
-  options=('libtool')
   
   install -m755 -d ${pkgdir}/etc
   mv -v ${srcdir}/fakeinstall/etc/OpenCL ${pkgdir}/etc/
@@ -75,9 +80,7 @@ package_opencl-mesa() {
 
 package_ati-dri() {
   pkgdesc="Mesa drivers for AMD/ATI Radeon"
-  depends=('mesa-libgl' 'libtxc_dxtn' "mesa=${pkgver}") # libomxil-bellagio
-  conflicts=('xf86-video-ati<6.9.0-6')
-  options=('libtool')
+  depends=('mesa-libgl' 'libtxc_dxtn' "mesa=${pkgver}")
 
   install -m755 -d ${pkgdir}/usr/lib/vdpau/
   mv -v ${srcdir}/fakeinstall/usr/lib/vdpau/libvdpau_{r600,radeonsi}.* ${pkgdir}/usr/lib/vdpau/
@@ -87,9 +90,6 @@ package_ati-dri() {
   
   install -m755 -d ${pkgdir}/usr/lib/gallium-pipe
   mv -v ${srcdir}/fakeinstall/usr/lib/gallium-pipe/pipe_{r300,r600,radeonsi}* ${pkgdir}/usr/lib/gallium-pipe/
-  
-  # install -m755 -d ${pkgdir}/usr/lib/bellagio
-  # mv -v ${srcdir}/fakeinstall/usr/lib/bellagio/libomx_{r600,radeonsi}.so ${pkgdir}/usr/lib/bellagio/
 
   install -m755 -d "${pkgdir}/usr/share/licenses/ati-dri"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/ati-dri/"
@@ -98,7 +98,6 @@ package_ati-dri() {
 package_intel-dri() {
   pkgdesc="Mesa drivers for Intel"
   depends=('mesa-libgl' 'libtxc_dxtn' "mesa=${pkgver}")
-  options=('libtool')
 
   install -m755 -d ${pkgdir}/usr/lib/xorg/modules/dri
   mv -v ${srcdir}/fakeinstall/usr/lib/xorg/modules/dri/{i915,i965}_dri.so ${pkgdir}/usr/lib/xorg/modules/dri/
@@ -109,8 +108,7 @@ package_intel-dri() {
 
 package_nouveau-dri() {
   pkgdesc="Mesa drivers for Nouveau"
-  depends=('mesa-libgl' 'libtxc_dxtn' "mesa=${pkgver}") # libomxil-bellagio
-  options=('libtool')
+  depends=('mesa-libgl' 'libtxc_dxtn' "mesa=${pkgver}")
 
   install -m755 -d ${pkgdir}/usr/lib/vdpau/
   mv -v ${srcdir}/fakeinstall/usr/lib/vdpau/libvdpau_nouveau.* ${pkgdir}/usr/lib/vdpau/
@@ -120,9 +118,6 @@ package_nouveau-dri() {
   
   install -m755 -d ${pkgdir}/usr/lib/gallium-pipe
   mv -v ${srcdir}/fakeinstall/usr/lib/gallium-pipe/pipe_nouveau* ${pkgdir}/usr/lib/gallium-pipe/
-
-  # install -m755 -d ${pkgdir}/usr/lib/bellagio
-  # mv -v ${srcdir}/fakeinstall/usr/lib/bellagio/libomx_nouveau.so ${pkgdir}/usr/lib/bellagio/
   
   install -m755 -d "${pkgdir}/usr/share/licenses/nouveau-dri"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/nouveau-dri/"
@@ -131,7 +126,6 @@ package_nouveau-dri() {
 package_svga-dri() {
   pkgdesc="Gallium3D VMware guest GL driver"
   depends=('libdrm' 'expat' 'llvm-libs')
-  options=('libtool')
 
   install -m755 -d ${pkgdir}/usr/lib/xorg/modules/dri
   mv -v ${srcdir}/fakeinstall/usr/lib/xorg/modules/dri/vmwgfx_dri.so ${pkgdir}/usr/lib/xorg/modules/dri/
@@ -144,21 +138,23 @@ package_svga-dri() {
 }
 
 package_mesa() {
-  pkgdesc="an open-source implementation of the OpenGL specification"
-  depends=('libdrm' 'libvdpau' 'wayland' 'libxxf86vm' 'libxdamage' 'libxshmfence' 'systemd' 'elfutils' 'llvm-libs')
+  pkgdesc="Mesa 3-D graphics libraries and include files"
+  depends=('libdrm' 'libvdpau' 'wayland' 'libxxf86vm' 'libxdamage' 'systemd' 'elfutils' 'llvm-libs')
   optdepends=('opengl-man-pages: for the OpenGL API man pages')
-  provides=('libglapi' 'osmesa' 'libgbm' 'libgles' 'libegl' 'khrplatform-devel')
-  conflicts=('libglapi' 'osmesa' 'libgbm' 'libgles' 'libegl' 'khrplatform-devel')
-  replaces=('libglapi' 'osmesa' 'libgbm' 'libgles' 'libegl' 'khrplatform-devel')
-  options=('libtool')
+  provides=('libglapi' 'libgles' 'libegl')
+  conflicts=('libglapi' 'libgles' 'libegl')
+  replaces=('libglapi' 'libgles' 'libegl')
 
   install -m755 -d ${pkgdir}/etc
-  mv -v ${srcdir}/fakeinstall/etc/drirc ${pkgdir}/etc
+  mv -v ${srcdir}/fakeinstall/usr/etc/drirc ${pkgdir}/etc
   
-  install -m755 -d ${pkgdir}/usr/lib/{gallium-pipe,gbm}
+  install -m755 -d ${pkgdir}/usr/lib/{gallium-pipe,gbm,egl}
   mv -v ${srcdir}/fakeinstall/usr/lib/lib{OSMesa,gbm,glapi,wayland-egl,xatracker}.so* ${pkgdir}/usr/lib/
+  mv -v ${srcdir}/fakeinstall/usr/lib/lib{OSMesa,gbm,glapi,wayland-egl,xatracker}.la* ${pkgdir}/usr/lib/
+  
   mv -v ${srcdir}/fakeinstall/usr/lib/gallium-pipe/pipe_swrast* ${pkgdir}/usr/lib/gallium-pipe/
   mv -v ${srcdir}/fakeinstall/usr/lib/gbm/gbm_gallium_drm* ${pkgdir}/usr/lib/gbm/
+  mv -v ${srcdir}/fakeinstall/usr/lib/egl/egl_gallium* ${pkgdir}/usr/lib/egl/
 
   mv -v ${srcdir}/fakeinstall/usr/include ${pkgdir}/usr
   mv -v ${srcdir}/fakeinstall/usr/lib/pkgconfig ${pkgdir}/usr/lib/
@@ -171,6 +167,10 @@ package_mesa() {
   mv -v ${srcdir}/fakeinstall/usr/lib/libGL.so* 	${pkgdir}/usr/lib/mesa/
   mv -v ${srcdir}/fakeinstall/usr/lib/libEGL.so* 	${pkgdir}/usr/lib/mesa/
   mv -v ${srcdir}/fakeinstall/usr/lib/libGLES*.so*	${pkgdir}/usr/lib/mesa/
+  
+  mv -v ${srcdir}/fakeinstall/usr/lib/libGL.la* 	${pkgdir}/usr/lib/mesa/
+  mv -v ${srcdir}/fakeinstall/usr/lib/libEGL.la* 	${pkgdir}/usr/lib/mesa/
+  mv -v ${srcdir}/fakeinstall/usr/lib/libGLES*.la*	${pkgdir}/usr/lib/mesa/
 
   install -m755 -d "${pkgdir}/usr/share/licenses/mesa"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/mesa/"
@@ -186,13 +186,11 @@ package_mesa-libgl() {
   install -m755 -d "${pkgdir}/usr/lib/xorg/modules/extensions"
   ln -s libglx.xorg "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so"
 
-  ln -s /usr/lib/mesa/libGL.so.1.2.0 ${pkgdir}/usr/lib/libGL.so.1.2.0
-  ln -s libGL.so.1.2.0	             ${pkgdir}/usr/lib/libGL.so.1
-  ln -s libGL.so.1.2.0               ${pkgdir}/usr/lib/libGL.so
+  ln -s /usr/lib/mesa/libGL.so.1     ${pkgdir}/usr/lib/libGL.so.1
+  ln -s libGL.so.1                   ${pkgdir}/usr/lib/libGL.so
 
-  ln -s /usr/lib/mesa/libEGL.so.1.0.0 ${pkgdir}/usr/lib/libEGL.so.1.0.0
-  ln -s libEGL.so.1.0.0	              ${pkgdir}/usr/lib/libEGL.so.1
-  ln -s libEGL.so.1.0.0               ${pkgdir}/usr/lib/libEGL.so
+  ln -s /usr/lib/mesa/libEGL.so.1     ${pkgdir}/usr/lib/libEGL.so.1
+  ln -s libEGL.so.1                   ${pkgdir}/usr/lib/libEGL.so
 
   ln -s /usr/lib/mesa/libGLESv1_CM.so.1.1.0 ${pkgdir}/usr/lib/libGLESv1_CM.so.1.1.0
   ln -s libGLESv1_CM.so.1.1.0	            ${pkgdir}/usr/lib/libGLESv1_CM.so.1
@@ -201,8 +199,12 @@ package_mesa-libgl() {
   ln -s /usr/lib/mesa/libGLESv2.so.2.0.0 ${pkgdir}/usr/lib/libGLESv2.so.2.0.0
   ln -s libGLESv2.so.2.0.0               ${pkgdir}/usr/lib/libGLESv2.so.2
   ln -s libGLESv2.so.2.0.0               ${pkgdir}/usr/lib/libGLESv2.so
+  
+  ln -s /usr/lib/mesa/libGL.la     ${pkgdir}/usr/lib/libGL.la
+  ln -s /usr/lib/mesa/libEGL.la     ${pkgdir}/usr/lib/libEGL.la
+  ln -s /usr/lib/mesa/libGLESv1_CM.la ${pkgdir}/usr/lib/libGLESv1_CM.la
+  ln -s /usr/lib/mesa/libGLESv2.la ${pkgdir}/usr/lib/libGLESv2.la
 
   install -m755 -d "${pkgdir}/usr/share/licenses/mesa-libgl"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/mesa-libgl/"
 }
-
