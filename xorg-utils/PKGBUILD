@@ -1,11 +1,68 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xorg-utils
-pkgver=7.6
-pkgrel=8
-pkgdesc="Transition package depending on xorg utils"
-arch=(any)
+pkgver=8.0
+pkgrel=1
+pkgdesc="Collection of client utilities used to query the X server"
+arch=(x86_64)
 url="http://xorg.freedesktop.org/"
-license=('GPL')
-depends=('xorg-xdpyinfo' 'xorg-xdriinfo' 'xorg-xev' 'xorg-xlsatoms' 'xorg-xlsclients' 'xorg-xprop' 'xorg-xvinfo' 'xorg-xwininfo')
-#removed: xorg-xfd, xorg-xfontsel, xorg-xlsfonts
+license=('custom')
+depends=('libxxf86dga' 'libxi' 'libxtst' 'libxinerama' 'libxv'
+         'libdmx' 'libxft' 'libxaw>=1.0.6' 'libgl' 'libxcomposite' 'xorg-util-macros' 'xcb-util')
+makedepends=('pkgconfig' 'mesa' 'glproto')
+groups=('xorg')
+source=(${url}/releases/individual/app/xdpyinfo-1.3.1.tar.bz2
+        ${url}/releases/individual/app/xdriinfo-1.0.4.tar.bz2
+        ${url}/releases/individual/app/xev-1.2.1.tar.bz2
+        ${url}/releases/individual/app/xlsatoms-1.1.1.tar.bz2
+        ${url}/releases/individual/app/xlsclients-1.1.3.tar.bz2
+        ${url}/releases/individual/app/xprop-1.2.2.tar.bz2
+        ${url}/releases/individual/app/xvinfo-1.1.2.tar.bz2
+        ${url}/releases/individual/app/xwininfo-1.1.2.tar.bz2
+        'LICENSE.xdpyinfo' 'LICENSE.xfd' 'LICENSE.xlsclients' 
+        'LICENSE.xprop' 'LICENSE.xwininfo' 'LICENSE.xev' 
+        'LICENSE.xlsatoms' 'LICENSE.xlsfonts' 'LICENSE.xvinfo')
+md5sums=('cacc0733f16e4f2a97a5c430fcc4420e'
+         '3d3cad4d754e10e325438193433d59fd'
+         '5b0a0b6f589441d546da21739fa75634'
+         '9d0e16d116d1c89e6b668c1b2672eb57'
+         '9fbf6b174a5138a61738a42e707ad8f5'
+         'fae3d2fda07684027a643ca783d595cc'
+         '1fbd65e81323a8c0a4b5e24db0058405'
+         '9e8b58c8aa6172e87ab4f9cf3612fedd'
+         'b43f731a9e2684728230ce8e33f63228'
+         '9e8a82b7e9898f36c378b80509f170a6'
+         '9e8a82b7e9898f36c378b80509f170a6'
+         '801f9850b29dad506e995d011efe2914'
+         '1c47d00801594a0e251694d70c7fb0b8'
+         'e84310edd65e120d85914350c795bfac'
+         '9ee99bda91248e945186090905db25d8'
+         '345d6e65d71fdde292cc27f93c15e4a1'
+         '67ea6bb3b11620c82ce4d24e78b4a0a9')
+
+build() {
+  cd "${srcdir}"
+  for i in *; do
+    if [ -d "${i}" ]; then
+      pushd "${i}"
+	msg "Making ${i}"
+	./configure --prefix=/usr --mandir=/usr/share/man
+	make
+      popd
+    fi
+  done
+}
+
+package() {
+  cd "${srcdir}"
+  for i in *; do
+    if [ -d "${i}" ]; then
+      pushd "${i}"
+	make DESTDIR="${pkgdir}" install
+	install -D -m644 COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE.${i%-*}
+      popd
+    fi
+  done
+# Replacing stub license files
+  install -Dm644 "${srcdir}"/LICENSE.* "${pkgdir}/usr/share/licenses/${pkgname}/"
+}
