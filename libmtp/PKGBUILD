@@ -3,15 +3,22 @@
 
 pkgname=libmtp
 pkgver=1.1.6
-pkgrel=3
+pkgrel=4
 pkgdesc="Library implementation of the Media Transfer Protocol"
 arch=('x86_64')
 url="http://libmtp.sourceforge.net"
 license=('LGPL')
 depends=('libusbx' 'libgcrypt')
 options=('!libtool')
-source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('87835626dbcf39e62bfcdd4ae6da2063')
+source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+        "music-players.h.new")
+md5sums=('87835626dbcf39e62bfcdd4ae6da2063'
+         'eee4f256cf1a095e8322b2f86fb26f1d')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  mv --verbose ${srcdir}/music-players.h.new src/music-players.h
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -28,4 +35,3 @@ package() {
   # fix broken udev rule
   sed -i "/^Unable to open/d" ${pkgdir}/usr/lib/udev/rules.d/69-libmtp.rules
 }
-
