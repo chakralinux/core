@@ -1,20 +1,17 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Part of X.org group
+# maintainer AlmAck almack@chakraos.org
 
 pkgname=xf86-video-i740
 pkgver=1.3.4
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org Intel i740 video driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('pkgconfig' 'xorg-server>=1.12.3' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
-options=('!libtool')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 git-fix.diff)
 md5sums=('11c0aa1036ba8c203a03d1f00bbec195'
          '3a2b499ce4d6dc54f2ce0c306ab1ebb0')

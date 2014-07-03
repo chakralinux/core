@@ -2,34 +2,48 @@
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=libxcb
-pkgver=1.9.3
-pkgrel=1
+pkgver=1.10
+pkgrel=2
 pkgdesc="X11 client-side library"
 arch=(x86_64)
 url="http://xcb.freedesktop.org/"
-depends=('xcb-proto' 'libxdmcp' 'libxau')
+depends=('xcb-proto>=1.10' 'libxdmcp' 'libxau')
 makedepends=('pkgconfig' 'libxslt' 'python')
 options=('!libtool')
 license=('custom')
-source=(${url}/dist/${pkgname}-${pkgver}.tar.bz2
-        libxcb-1.1-no-pthread-stubs.patch)
-sha1sums=('28076500e2ca05e5887c7ed231ba305a85e8bd0b'
-          '93330bdcf29a9386b4222e2f0c3cea3add93f5c0')
+source=($url/dist/$pkgname-$pkgver.tar.bz2
+        libxcb-1.1-no-pthread-stubs.patch
+	Ensure-xcb-owns-socket-and-no-other-threads-are-writ.patch)
+sha256sums=('98d9ab05b636dd088603b64229dd1ab2d2cc02ab807892e107d674f9c3f2d5b5'
+            '748ed83af60468a0eb6785222e4a5ca589d28f20b9bfc60d5936ec93b8eef356'
+            '47de1025bb16446b9e69ff7b6b262a0a1af957d350afe897421b9105c89befeb')
 
-prepare() { 
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np1 -i "${srcdir}/libxcb-1.1-no-pthread-stubs.patch"
+prepare() {
+  cd "$pkgname-$pkgver"
+  patch -Np1 -i ../libxcb-1.1-no-pthread-stubs.patch
+  autoreconf -vfi
+
+  # fix FS#40289 merged upstream 
+  patch -Np1 -i ../Ensure-xcb-owns-socket-and-no-other-threads-are-writ.patch 
 }
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  PYTHON=/usr/bin/python2 ./autogen.sh --prefix=/usr --enable-xinput --enable-xkb
+  cd "$pkgname-$pkgver"
+  ./configure --prefix=/usr \
+    --enable-xinput \
+    --enable-xkb \
+    --disable-static
   make
 }
 
-package () {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+check() {
+  cd $pkgname-$pkgver
+  make -k check
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+  install -m755 -d "$pkgdir/usr/share/licenses/$pkgname"
+  install -m644 COPYING "$pkgdir/usr/share/licenses/$pkgname"
 }

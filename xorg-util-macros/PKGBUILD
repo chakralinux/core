@@ -3,14 +3,14 @@
 # Contributor: abveritas@chakra-project.org
 
 pkgname=xorg-util-macros
-pkgver=1.18.0
+pkgver=1.19.0
 pkgrel=1
 pkgdesc="X.Org Autotools macros"
 arch=('x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 source=("http://ftp.x.org/pub/individual/util/util-macros-${pkgver}.tar.bz2")
-sha1sums=('c0b04a082e50bb8d56a904648f61a8f3eea63043')
+sha1sums=('00cfc636694000112924198e6b9e4d72f1601338')
 
 build() {
   cd "${srcdir}/util-macros-${pkgver}"
@@ -23,9 +23,10 @@ package() {
   cd "${srcdir}/util-macros-${pkgver}" 
 
   make DESTDIR="${pkgdir}" install 
-  install -m755 -d "${pkgdir}/usr/lib"
+  install -dm755 "${pkgdir}/usr/lib"
 
   mv "${pkgdir}/usr/share/pkgconfig" "${pkgdir}/usr/lib/" 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" 
 }
+

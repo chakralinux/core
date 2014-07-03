@@ -1,19 +1,16 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dot]org>
+# Part of X.org group
+# maintainer AlmAck almack@chakraos.org
 
 pkgname=xf86-input-mouse
 pkgver=1.9.0
-pkgrel=2
+pkgrel=3
 pkgdesc="X.org mouse input driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('glibc')
-makedepends=('xorg-server' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
-options=('!libtool')
+makedepends=('xorg-server' 'X-ABI-XINPUT_VERSION=20' 'resourceproto' 'scrnsaverproto')
+conflicts=('xorg-server<1.15.0' 'X-ABI-XINPUT_VERSION<20' 'X-ABI-XINPUT_VERSION>=21')
 groups=('xorg-drivers' 'xorg')
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
 sha1sums=('5f9e5f450100252efa4f8b074fbb262c42811d46')

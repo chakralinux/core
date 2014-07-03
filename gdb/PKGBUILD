@@ -1,19 +1,26 @@
-# Maintainer: abveritas@chakra-project.org
+# Maintainer: Drake Justice <djustice@chakraos.org>
 
 pkgname=gdb
-pkgver=7.5.1
+pkgver=7.7.1
 pkgrel=1
 pkgdesc="The GNU Debugger"
 arch=('x86_64')
 url="http://www.gnu.org/software/gdb/"
 license=('GPL3')
-depends=('ncurses' 'expat' 'python')
+depends=('ncurses' 'expat' 'python2' 'xz')
 makedepends=('texinfo')
 backup=('etc/gdb/gdbinit')
-options=('!libtool')
 install=gdb.install
-source=("http://ftp.gnu.org/gnu/gdb/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('3f48f468b24447cf24820054ff6e85b1')
+source=(http://ftp.gnu.org/gnu/gdb/${pkgname}-${pkgver}.tar.bz2{,.sig})
+md5sums=('77b20b515e7c25f032cb9732a66620fe'
+         'SKIP')
+
+prepare() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+
+  # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
+}
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
@@ -35,6 +42,5 @@ package() {
 
   # resolve conflicts with binutils
   rm ${pkgdir}/usr/include/{ansidecl,bfd,bfdlink,dis-asm,symcat}.h
-  rm ${pkgdir}/usr/lib/{libbfd,libiberty,libopcodes}.a
   rm ${pkgdir}/usr/share/info/{bfd,configure,standards}.info
 }

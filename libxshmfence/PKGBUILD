@@ -1,0 +1,37 @@
+# Maintainer: AlmAck <almack@chakraos.org>
+# Arch Contributor AndyRTR <andyrtr@archlinux.org>
+
+pkgname=libxshmfence
+pkgver=1.1
+pkgrel=1
+pkgdesc="a library that exposes a event API on top of Linux futexes"
+arch=('x86_64')
+url="http://xorg.freedesktop.org/"
+license=('GPL')
+#groups=()
+depends=('glibc')
+makedepends=('xorg-util-macros' 'xproto')
+source=(${url}/releases/individual/lib/${pkgname}-${pkgver}.tar.bz2)
+sha256sums=('dbc2db2925ca9f216fd1e9c63d0974db9f4d49aaf5877ffb606d2d8d7e58cebe')
+
+build() {
+	cd $pkgname-$pkgver
+	
+	# fix some libtools errors
+	#autoreconf -vfi
+	
+	./configure --prefix=/usr
+	make
+}
+
+check() {
+	cd $pkgname-$pkgver
+	make -k check
+}
+
+package() {
+	cd $pkgname-$pkgver
+	make DESTDIR="$pkgdir/" install
+	install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+	install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

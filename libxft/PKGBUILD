@@ -2,36 +2,20 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=libxft
-pkgver=2.3.1
-_ubuntu_diff_version=${pkgver}-1ubuntu1
-pkgrel=1
+pkgver=2.3.2
+pkgrel=2
 pkgdesc="FreeType-based font drawing library for X"
 arch=('x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('fontconfig' 'libxrender')
 makedepends=('pkgconfig')
-options=('!libtool')
-provides=('libxft-ubuntu')
-conflicts=('libxft-ubuntu')
-replaces=('libxft-ubuntu')
-source=(${url}/releases/individual/lib/libXft-${pkgver}.tar.bz2
-        "http://archive.ubuntu.com/ubuntu/pool/main/x/xft/xft_${_ubuntu_diff_version}.diff.gz")
-sha1sums=('c7ec1361e3d4f095910f8c58988ab42e32f314d9'
-          'bf806f8db675c503d48d89c0226a82ef5e7ad44f')
-          
+source=(${url}/releases/individual/lib/libXft-${pkgver}.tar.bz2)
+sha256sums=('f5a3c824761df351ca91827ac221090943ef28b248573486050de89f4bfcdc4c')
+
 build() {
   cd "${srcdir}/libXft-${pkgver}"
-
-  # apply ubuntu patches
-  patch -Np1 -i ../xft_${_ubuntu_diff_version}.diff
-  for _f in $(cat "$srcdir/libXft-${pkgver}/debian/patches/series" | grep -v '#') ; do    
-    patch -Np1 -i "$srcdir/libXft-${pkgver}/debian/patches/$_f"
-  done
-  
-  ./configure --prefix=/usr \
-              --sysconfdir=/etc \
-              --disable-static
+  ./configure --prefix=/usr --sysconfdir=/etc --disable-static
   make
 }
 
@@ -40,4 +24,5 @@ package() {
   make DESTDIR="${pkgdir}" install
   install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+
 }

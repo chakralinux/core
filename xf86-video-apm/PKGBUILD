@@ -1,26 +1,24 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Part of X.org group
+# maintainer AlmAck almack@chakraos.org
 
 pkgname=xf86-video-apm
 pkgver=1.2.5
-pkgrel=1
+pkgrel=2
 pkgdesc="X.org Alliance ProMotion video driver"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server')
-conflicts=('xorg-server<1.12.3')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15' 'resourceproto' 'scrnsaverproto')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
-options=('!libtool')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('a4cdb587f94c0fd28bea92b2469ea1e55d6d6589')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 git-fix.diff)
+sha1sums=('a4cdb587f94c0fd28bea92b2469ea1e55d6d6589'
+          '547e48cf27f4877a7205254679c9cd137d1c9953')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
+  patch -Np1 -i ${srcdir}/git-fix.diff
   ./configure --prefix=/usr
   make
 }

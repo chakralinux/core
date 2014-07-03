@@ -1,23 +1,21 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# maintainer almack@chakraos.org
 
 pkgname=libdrm
-pkgver=2.4.50
-pkgrel=1
+pkgver=2.4.54
+pkgrel=3
 pkgdesc="Userspace interface to kernel DRM services"
 arch=('x86_64')
 license=('custom')
 depends=('glibc' 'libpciaccess')
-makedepends=('cairo' 'valgrind')
+makedepends=('valgrind')
+checkdepends=('cairo')
 replaces=('libdrm-nouveau' 'libdrm-nouveau-lts')
 url="http://dri.freedesktop.org/"
 
 source=(http://dri.freedesktop.org/$pkgname/$pkgname-$pkgver.tar.bz2
         COPYING)
-sha256sums=('3823d24cda800c2cd36995e01830b890edb8fb1bebf97d5ea4318b8c3933b045'
-            '9631d4f694952e3e6ae5a05534c2e93e994e47d3413677a3a00e45c8cef6db93')
+md5sums=('56e98a9c2073c3fab7f95e003b657f46'
+         'ba65e71c481b94ef0fb6c23c7f21ffa1')
 
 build() {
   cd $pkgname-$pkgver
@@ -26,7 +24,7 @@ build() {
   sed -i "/pthread-stubs/d" configure.ac
   autoreconf --force --install
   
-  ./configure --prefix=/usr --enable-udev
+  ./configure --prefix=/usr --enable-udev --disable-cairo-tests
   make
 }
 

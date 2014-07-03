@@ -2,7 +2,7 @@
 
 pkgname=cairo
 pkgver=1.12.16
-pkgrel=2
+pkgrel=3
 _ubuntu_diff_version=${pkgver}-0ubuntu2
 pkgdesc="Cairo vector graphics library"
 arch=('x86_64')
@@ -23,11 +23,13 @@ prepare() {
     patch -Np1 -i "$srcdir/debian/patches/$_f"
   done
 
+  autoreconf -vfi
 }
   
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
+  # --enable-qt? interesting feature, but still experimental (2014)
   ./configure --prefix=/usr \
               --sysconfdir=/etc \
               --localstatedir=/var \
@@ -44,7 +46,7 @@ build() {
 
 check() {
   cd $pkgname-$pkgver
-  make -k test || /bin/true
+  #make -k test || /bin/true
   
   # results:
   # 2014-02-11: 154 Passed, 352 Failed [2 crashed, 9 expected], 29 Skipped

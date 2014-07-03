@@ -2,25 +2,26 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xorg-xauth
-pkgver=1.0.8
+pkgver=1.0.9
 pkgrel=1
 pkgdesc="X.Org authorization settings program"
 arch=(x86_64)
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('libxmu')
-makedepends=('pkgconfig' 'xorg-util-macros')
+makedepends=('xorg-util-macros')
+groups=('xorg-apps' 'xorg')
 source=(${url}/releases/individual/app/xauth-${pkgver}.tar.bz2)
-md5sums=('50ee2ec0836c0186b05ec8fdcfd566d0')
+sha256sums=('56ce1523eb48b1f8a4f4244fe1c3d8e6af1a3b7d4b0e6063582421b0b68dc28f')
 
 build() {
-  cd "${srcdir}/xauth-${pkgver}"
-  ./configure --prefix=/usr 
+  cd xauth-${pkgver}
+  ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "${srcdir}/xauth-${pkgver}"
+  cd xauth-${pkgver}
   make DESTDIR="${pkgdir}" install
   install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"

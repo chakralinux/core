@@ -1,10 +1,5 @@
 _libvirt_setup() {
-  rm -f /usr/lib/python?.?/site-packages/libvirt.pyc
-  echo ">>> To use libvirt as a non-root user:"
-  echo ">>>  Use polkit to grant access."
-  echo ">>>  ...or change the access model in /etc/libvirt/libvirtd.conf."
-  echo ">>>     (see unixperms.patch in PKGBUILD for help)"
-  echo ""
+  systemd-tmpfiles --create libvirt.conf
 }
 
 post_install() {
@@ -12,9 +7,7 @@ post_install() {
   echo ">>> Be sure to see optdepends as you may find some of them helpfull."
   echo ">>>  Especially: bridge-utils and qemu-kvm."
   echo ""
-  echo ">>> To start libvirtd run: '/etc/rc.d/libvirtd start' as root."
-  echo ">>> Add 'libvirtd' to daemons in /etc/rc.conf if you want it to load upon"
-  echo ">>>  booting."
+  echo ">>> To start libvirtd run: 'systemctrl start libvirtd' as root."
   echo ""
   /bin/true
 }
@@ -22,7 +15,7 @@ post_install() {
 post_upgrade() {
   _libvirt_setup || return 1
   echo ">>> To finish the upgrade, restart libvirtd by running the command:"
-  echo ">>>  '/etc/rc.d/libvirtd restart' as root or rebooting."
+  echo ">>>  'systemctrl restart libvirtd' as root or rebooting."
   echo ">>> You may also need to run 'rm -rf ~/.libvirt'"
   echo ""
   /bin/true

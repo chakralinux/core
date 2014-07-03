@@ -1,18 +1,16 @@
-#
 # Part of X.org group
-#
 # Maintainer: FranzMari <franzmari[at]chakra-project[dot]org>
 
 pkgname=xf86-video-voodoo
 pkgver=1.2.5
-pkgrel=2
+pkgrel=3
 pkgdesc="X.org 3dfx Voodoo1/Voodoo2 2D video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'xf86dgaproto' 'xf86driproto' 'resourceproto' 'scrnsaverproto')
-conflicts=('xorg-server<1.12.3')
+makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15' 'xf86dgaproto')
+conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
 groups=('xorg-video-drivers')
 source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
 sha1sums=('7316df33814694ad2fb1617bcd92e6e42c3d184f')

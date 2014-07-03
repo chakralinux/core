@@ -4,7 +4,7 @@
 
 pkgname=bumblebee
 pkgver=3.2.1
-pkgrel=3
+pkgrel=5
 pkgdesc="Bumblebee brings Optimus Support for Linux Through VirtualGL. You need to install proper drivers separately. Can be used with Nouveau or Nvidia"
 arch=('x86_64')
 depends=('virtualgl' 'glib2')
@@ -20,10 +20,11 @@ optdepends=('xf86-video-nouveau: Nouveau driver'
 url="http://www.Bumblebee-Project.org"
 license=("GPL3")
 install='bumblebee.install'
-provides=('bumblebee')
+conflicts=('nvidia-libgl')
+provides=('nvidia-libgl')
 backup=('etc/bumblebee/bumblebee.conf'
         'etc/bumblebee/xorg.conf.nouveau'
-         'etc/bumblebee/xorg.conf.nvidia')
+        'etc/bumblebee/xorg.conf.nvidia')
 source=("http://www.bumblebee-project.org/${pkgname}-${pkgver}.tar.gz")
 md5sums=('30974e677bb13e8a3825fd6f3e7d3b24')
 
@@ -31,8 +32,8 @@ build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
     ./configure \
         CONF_DRIVER_MODULE_NVIDIA=nvidia \
-        CONF_LDPATH_NVIDIA=/usr/lib/nvidia-bumblebee:/usr/lib32/nvidia-bumblebee \
-        CONF_MODPATH_NVIDIA=/usr/lib/nvidia-bumblebee/xorg/,/usr/lib/xorg/modules \
+        CONF_LDPATH_NVIDIA=/usr/lib/nvidia:/usr/lib32/nvidia \
+        CONF_MODPATH_NVIDIA=/usr/lib/nvidia/xorg/,/usr/lib/xorg/modules \
         --prefix=/usr \
         --with-udev-rules=/usr/lib/udev/rules.d/ \
         --without-pidfile \
@@ -43,6 +44,10 @@ build() {
 package() {
     cd "${srcdir}/${pkgname}-${pkgver}"
     make install DESTDIR="$pkgdir"
+
+    # Stop nvidia from loading on boot
+    mkdir -p "${pkgdir}/usr/lib/modprobe.d/"
+    echo "blacklist nvidia" > "${pkgdir}/usr/lib/modprobe.d/bumblebee.conf"
   
     # Install systemd unit
     install -D -m644 "scripts/systemd/bumblebeed.service" "${pkgdir}/usr/lib/systemd/system/bumblebeed.service"
