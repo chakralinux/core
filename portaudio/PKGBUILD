@@ -1,0 +1,29 @@
+# Maintainer: almack@chakraos.org
+
+pkgname=portaudio
+pkgver=19_20140130
+pkgrel=1
+pkgdesc="PortAudio is a free, cross platform, open-source, audio I/O library."
+arch=('x86_64')
+url="http://www.portaudio.com"
+license="custom"
+depends=('gcc-libs' 'jack')
+conflicts=('portaudio-svn')
+provides=('portaudio-svn')
+replaces=('portaudio-svn')
+source=("http://www.portaudio.com/archives/pa_stable_v$pkgver.tgz")
+md5sums=('7f220406902af9dca009668e198cbd23')
+
+build() {
+  cd "$srcdir/$pkgname"
+
+  ./configure --prefix=/usr --with-alsa --with-jack
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname"
+
+  make DESTDIR="$pkgdir" install
+  install -Dm0644 LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE.txt"
+}
