@@ -84,9 +84,6 @@ build() {
         export QT_PLUGIN_PATH="${QTDIR}"/qtbase/plugins
         export QTDIR=${srcdir}/${_pkgfqn}
 
-        # our xkb is too old
-        #export _xkbconfigroot=$(pkg-config --variable=xkb_base xkeyboard-config)
-
 	./configure -confirm-license -opensource \
 		-prefix /usr \
                 -bindir /usr/lib/qt5/bin \
@@ -113,8 +110,7 @@ build() {
                 -opengl desktop \
                 -feature-menu \
                 -feature-textdate \
-                -qt-xkbcommon \
-	        -xkb-config-root $_xkbconfigroot \
+                -system-xkbcommon \
                 -feature-ftp \
                 -xcursor
 	 make
@@ -137,9 +133,8 @@ package_qt5-base() {
     depends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
              'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib' 'ruby'
              'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'libxinerama' 'libxcursor'
-             'pulseaudio' 'gstreamer0.10' 'gstreamer0.10-base' 'gstreamer0.10-base-plugins'
-             'gstreamer0.10-good-plugins' 'gstreamer0.10-bad-plugins' 'gstreamer0.10-ffmpeg'
-             'gstreamer0.10-ugly-plugins' 'xcb-util-image' 'xcb-util-keysyms'
+             'pulseaudio' 'gstreamer' 'gst-plugins-base' 'gst-plugins-ulgy' 'gst-plugins-good'
+              'xcb-util-image' 'xcb-util-keysyms'
              'xcb-util-renderutil' 'xcb-util-wm')
     optdepends=('postgresql-libs: PostgreSQL driver'
           'libmariadbclient: MySQL driver'
@@ -268,7 +263,7 @@ package_qt5-translations() {
 
 package_qt5-multimedia() {
   pkgdesc='A cross-platform application and UI framework (QtMultimedia)'
-  depends=('qt5-declarative' 'libpulse' 'gstreamer0.10-base' 'openal')
+  depends=('qt5-declarative' 'libpulse' 'gstreamer' 'openal')
   conflicts=('qt5')
 
   cd ${srcdir}/${_pkgfqn}/qtmultimedia
@@ -422,7 +417,7 @@ package_qt5-tools() {
 
 package_qt5-webkit() {
   pkgdesc='A cross-platform application and UI framework (QtWebKit)'
-  depends=('qt5-declarative' 'gstreamer0.10-base' 'libxslt' 'libxcomposite' 'qt5-sensors' 'qt5-location')
+  depends=('qt5-declarative' 'gstreamer' 'libxslt' 'libxcomposite' 'qt5-sensors' 'qt5-location')
   conflicts=('qt5') 
 
   cd ${srcdir}/${_pkgfqn}/qtwebkit
