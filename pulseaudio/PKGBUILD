@@ -4,7 +4,7 @@ pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse)
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=5.0
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(GPL LGPL)
@@ -84,8 +84,8 @@ package_pulseaudio() {
   sed -e 's|; flat-volumes = yes|flat-volumes = no|' -i "$pkgdir/etc/pulse/daemon.conf"
   #### default.pa ####
   # Delay of sound notification workaround, needs to be removed once fixed in systemd
-  sed -e 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' \
-      -i "${pkgdir}/etc/pulse/default.pa"
+  #sed -e 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' \
+  #    -i "${pkgdir}/etc/pulse/default.pa"
   
   # Used only for SystemWide no needed for us
   # http://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/WhatIsWrongWithSystemWide/
