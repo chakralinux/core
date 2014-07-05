@@ -1,27 +1,25 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# maintainer almack@chakraos.org
 
 pkgname=xapian-core
-pkgver=1.2.9
+pkgver=1.2.18
 pkgrel=1
 pkgdesc='Open source search engine library.'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='http://www.xapian.org/'
 license=('GPL')
-depends=('sh' 'gcc-libs' 'zlib' 'util-linux')
+depends=('gcc-libs' 'util-linux')
+# xapian config requires libxapian.la
 options=('libtool')
-source=("http://oligarchy.co.uk/xapian/${pkgver}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('909dd02931fe8f37690aa82a4daaa441')
+source=("http://oligarchy.co.uk/xapian/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('0ccbf68ade12e7b1ead10c57f4447899')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
 }
