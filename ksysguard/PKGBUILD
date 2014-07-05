@@ -16,6 +16,7 @@ source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname} | head -n 1) )
 
 prepare() {
+  sed -e "s/PO_FILES //" -i ${srcdir}/$pkgname-$pkgver/po/*/CMakeLists.txt
   mkdir -p build
 }
 
