@@ -4,8 +4,8 @@
 # maintainer almack@chakraos.org
 
 pkgname=subversion
-pkgver=1.8.8
-pkgrel=2
+pkgver=1.8.9
+pkgrel=1
 pkgdesc="A Modern Concurrent Version Control System"
 arch=('x86_64')
 license=('apache')
@@ -26,12 +26,12 @@ source=(http://www.apache.org/dist/subversion/subversion-${pkgver}.tar.bz2{,.asc
 	svnserve.tmpfiles
 	svnserve.service
         subversion.rpath.fix.patch)
-sha1sums=('8e9f10b7a9704c90e17cfe76fd56e3fe74c01a7a'
+sha1sums=('424ee12708f39a126efd905886666083dcc4eeaf'
           'SKIP'
           '73b36c046c09cec2093354911c89e3ba8056af6c'
           'ad117bf3b2a838a9a678a93fd8db1a066ad46c41'
           '00cc36e69077a8c45674ead6dd62a7647b3a3b6d'
-          '9f6790d842cf3e0228b007483a43e39a42724068'
+          'd299e1612d5e48afb877bd3ae18338d198f89dfa'
           '3d1e28408a9abb42af2e531adc0d01ce21acfad6')
 
 prepare() {
@@ -67,7 +67,7 @@ package() {
      swig_pydir_extra=/usr/lib/python2.7/site-packages/svn \
      install install-swig-py install-swig-pl install-javahl install-swig-rb
 
-   install -d "${pkgdir}"/usr/share/subversion
+   install -dm755 "${pkgdir}"/usr/share/subversion
    cp -a tools/hook-scripts "${pkgdir}"/usr/share/subversion/
    rm "${pkgdir}"/usr/share/subversion/hook-scripts/*.in
 
