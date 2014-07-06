@@ -2,22 +2,25 @@ source ../plasma.conf
 
 pkgname=plasma-workspace
 pkgver=${PVersion}
-pkgrel=1
+pkgrel=4
 pkgdesc="Plasma Workspace"
 arch=('i686' 'x86_64')
 url='http://projects.kde.org'
 license=('LGPL')
 depends=('qt5-base' 'qt5-declarative' 'qt5-script' 'plasma-framework' 'kdelibs4support' 'kemoticons' 'kdesu' 'knewstuff' 'krunner' 'kcmutils' 'kjs' 'kjsembed' 'knotifyconfig' 'ksysguard' 'libkscreen2' 'kwin' 'ktexteditor' 'akonadi-qt5')
-makedepends=('extra-cmake-modules')
+makedepends=('extra-cmake-modules' 'kapidox')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n1) )
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz" "startkde.patch")
+sha256sums=( $(getSum ${pkgname} | head -n1) 
+             "d52494b1f154582fe75c9c48654cd4d0c9c968858faa2bceac3a053004b384b8")
 
 prepare() {
   mkdir -p build
   sed -e "s/PO_FILES //" -i ${srcdir}/$pkgname-$pkgver/po/*/CMakeLists.txt
+  cd ${srcdir}/${pkgname}-${pkgver}/
+  patch -p2 -i ${srcdir}/startkde.patch
 }
 
 build() {
