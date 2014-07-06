@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
 pkgver=214
-pkgrel=2
+pkgrel=3
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -30,7 +30,6 @@ provides=("udev=$pkgver")
 conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
 replaces=('udev')
 install="systemd.install"
-#options=('!libtool')
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-hook-udev'
         'initcpio-install-udev'
@@ -86,6 +85,15 @@ package() {
 
   # udevd is no longer udevd because systemd. why isn't udevadm now udevctl?
   ln -s ../lib/systemd/systemd-udevd "$pkgdir/usr/bin/udevd"
+
+  # don't write units to /etc by default. some of these will be re-enabled on
+  # post_install.
+  rm "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service" \
+      "$pkgdir/etc/systemd/system/multi-user.target.wants/systemd-networkd.service" \
+      "$pkgdir/etc/systemd/system/multi-user.target.wants/systemd-resolved.service" \
+      "$pkgdir/etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service"
+  rmdir "$pkgdir/etc/systemd/system/getty.target.wants" \
+      "$pkgdir/etc/systemd/system/network-online.target.wants"
 
   # get rid of RPM macros
   rm -r "$pkgdir/usr/lib/rpm"
