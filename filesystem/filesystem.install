@@ -36,13 +36,23 @@ post_upgrade() {
 	_addgroup games   -g 50
 	_addgroup uucp    -g 14
 	_addgroup http    -g 33
-	_adduser  http    -u 33 -d /srv/http -g http -s /bin/false
+	_adduser  http    -u 33 -d /srv/http -g http -s /sbin/nologin
 	_addgroup scanner -g 96
 	_addgroup rfkill  -g 24
 	_addgroup lock    -g 54
 	_addgroup uuidd   -g 68
 	_adduser uuidd   -u 68 -d / -g uuidd -s /sbin/nologin
+	_addgroup dbus    -g 81
+	_adduser dbus     -u 81 -d / -g dbus -s /sbin/nologin
 	_addgroup systemd-journal -g 110
+	_addgroup systemd-timesync -g 112
+	_adduser systemd-timesync -u 112 -g 112 -d / -s /sbin/nologin
+	_addgroup systemd-network -g 113
+	_adduser systemd-network -u 113 -g 113 -d / -s /sbin/nologin
+	_addgroup systemd-bus-proxy -g 114
+	_adduser systemd-bus-proxy -u 114 -g 114 -d / -s /sbin/nologin
+	_addgroup systemd-resolve -g 115
+	_adduser systemd-resolve -u 115 -g 115 -d / -s /sbin/nologin
 
 	# sync gshadow to group 
 	if ! grep -q '^lock:' etc/gshadow; then
