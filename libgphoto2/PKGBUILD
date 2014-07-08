@@ -8,7 +8,7 @@
 
 pkgname=libgphoto2
 pkgver=2.5.4
-pkgrel=1
+pkgrel=2
 pkgdesc='The core library of gphoto2, designed to allow access to digital camera by external programs'
 arch=('x86_64')
 url='http://www.gphoto.org'
@@ -53,11 +53,11 @@ package() {
     rm -rf ${pkgdir}/usr/lib/*.la
     rm -rf ${pkgdir}/usr/lib/*.la
 
-    install -m755 -d "${pkgdir}/usr/lib/udev/hwdb.d"
+    install -m755 -d "${pkgdir}/usr/lib/udev/rules.d"
     LD_LIBRARY_PATH="${pkgdir}/usr/lib${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH" \
     CAMLIBS="${pkgdir}/usr/lib/libgphoto2/${pkgver}" \
-        "${pkgdir}/usr/lib/libgphoto2/print-camera-list" hwdb > \
-        "${pkgdir}/usr/lib/udev/hwdb.d/20-gphoto.hwdb"
+        "${pkgdir}/usr/lib/libgphoto2/print-camera-list" udev-rules version 175 > \
+        "${pkgdir}/usr/lib/udev/rules.d/54-gphoto.rules"
 
     # Remove recursive symlink
     rm -fv "${pkgdir}/usr/include/gphoto2/gphoto2"
