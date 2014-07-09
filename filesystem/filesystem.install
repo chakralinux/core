@@ -10,15 +10,15 @@ post_install() {
 
 # args: <group> [options]
 _addgroup() {
-	if ! getent group "$1" >/dev/null; then
-		groupadd "$@" >/dev/null
+	if ! getent group "$1" >/dev/null && groupadd "$@" >/dev/null; then
+		need_group_update=1
 	fi
 }
 
 # args: <group> [options]
 _adduser() {
-	if ! getent passwd "$1" >/dev/null; then
-		useradd "$@" >/dev/null
+	if ! getent passwd "$1" >/dev/null && useradd "$@" >/dev/null; then
+		need_passwd_update=1
 	fi
 }
 
@@ -54,9 +54,13 @@ post_upgrade() {
 	_addgroup systemd-resolve -g 115
 	_adduser systemd-resolve -u 115 -g 115 -d / -s /sbin/nologin
 
-	# sync gshadow to group 
-	if ! grep -q '^lock:' etc/gshadow; then
+	# update shadow files if needed
+	if (( need_group_update )); then
 		grpconv >/dev/null
+	fi
+
+	if (( need_passwd_update )); then
+		pwconv >/dev/null
 	fi
 
 	if ! grep -q '^include /etc/ld.so.conf.d/\*.conf$' etc/ld.so.conf; then
