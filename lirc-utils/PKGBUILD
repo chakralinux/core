@@ -5,7 +5,7 @@ _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=lirc-utils
 pkgver=0.9.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Linux Infrared Remote Control utils"
 arch=('x86_64')
 url="http://www.lirc.org/"
@@ -88,5 +88,7 @@ package() {
 	# install conf.d file
         install -D -m644 "${srcdir}"/irexec.conf "${pkgdir}"/etc/conf.d/irexec.conf 
 
-	install -d -m755 "${pkgdir}"/etc/lirc 
+	install -d -m755 "${pkgdir}"/etc/lirc
+	
+	sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/lirc-utils.install"
 }
