@@ -1,11 +1,11 @@
 # maintainer almack@chakra-project.org
 
-_extramodules=extramodules-3.15.1-CHAKRA
+_extramodules=extramodules-3.15.5-CHAKRA
 _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=lirc-utils
-pkgver=0.9.0
-pkgrel=23
+pkgver=0.9.1
+pkgrel=1
 pkgdesc="Linux Infrared Remote Control utils"
 arch=('x86_64')
 url="http://www.lirc.org/"
@@ -18,17 +18,11 @@ backup=('etc/conf.d/lircd.conf' 'etc/conf.d/irexec.conf')
 options=('!makeflags')
 install=lirc-utils.install
 source=(http://sourceforge.net/projects/lirc/files/LIRC/$pkgver/lirc-$pkgver.tar.bz2
-        lirc_wpc8769l.patch
-        lircd-handle-large-config.patch
-        lirc_atiusb-kfifo.patch
         kernel-2.6.39.patch
         linux-3.8.patch
         lirc.logrotate lircd.conf irexec.conf 
-        lirc.service lircm.service irexec.service lirc.tmpfiles)
-md5sums=('b232aef26f23fe33ea8305d276637086'
-         '1cce37e18e3f6f46044abab29016d18f'
-         '1014f2ea03a557c673c9084118676111'
-         '86e6894acde723ebc8a2284512283f17'
+        lirc.tmpfiles)
+md5sums=('3b78c3cc872d5e2fa78b796c2efd46db'
          '087a7d102e1c96bf1179f38db2b0b237'
          '9ee196bd03ea44af5a752fb0cc6ca96a'
          '3deb02604b37811d41816e9b4385fcc3'
@@ -39,13 +33,9 @@ md5sums=('b232aef26f23fe33ea8305d276637086'
          '07131d117fcfe9dcd50c453c3a5e9531'
          'febf25c154a7d36f01159e84f26c2d9a')
 
-
 prepare() {
         # configure
         cd "${srcdir}/lirc-$pkgver" 
-        patch -Np1 -i "${srcdir}/lirc_wpc8769l.patch"
-	patch -Np1 -i "${srcdir}/lircd-handle-large-config.patch"
-	patch -Np1 -i "${srcdir}/lirc_atiusb-kfifo.patch"
 	patch -Np1 -i "${srcdir}/kernel-2.6.39.patch"
 	patch -Np1 -i "${srcdir}/linux-3.8.patch"
 
@@ -83,9 +73,6 @@ package() {
         cd "${srcdir}/lirc-${pkgver}"
 	make DESTDIR=""${pkgdir}"" install 
 	
-        install -D -m644 "${srcdir}"/lirc.service "${pkgdir}"/usr/lib/systemd/system/lirc.service
-	install -D -m644 "${srcdir}"/lircm.service "${pkgdir}"/usr/lib/systemd/system/lircm.service
-	install -D -m644 "${srcdir}"/irexec.service "${pkgdir}"/usr/lib/systemd/system/irexec.service
 	install -D -m644 "${srcdir}"/lirc.tmpfiles "${pkgdir}"/usr/lib/tmpfiles.d/lirc.conf
 		
 	cp -rp remotes "${pkgdir}"/usr/share/lirc 
