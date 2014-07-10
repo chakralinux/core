@@ -1,23 +1,35 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
+# maintainer (x86_64): AlmAck <almack[at]chakraos[dot]org>
 
 pkgname=pcre
-pkgver=8.34
-pkgrel=1
+pkgver=8.35
+pkgrel=2
 pkgdesc="A library that implements Perl 5-style regular expressions"
 arch=('x86_64')
 url="http://www.pcre.org/"
 license=('BSD')
-depends=('gcc-libs' 'zlib' 'bzip2')
-source=("ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('5439e321351bddd5533551bbce128d07')
+depends=('gcc-libs' 'readline' 'zlib' 'bzip2')
+source=("ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/${pkgname}-${pkgver}.tar.bz2"
+'pcre-8.35-Do-not-rely-on-wrapping-signed-integer-while-parsein.patch')
+md5sums=('6aacb23986adccd9b3bc626c00979958'
+         'a2bc385e8c65edc84e98c9ea5471f169')
+
+prepare(){
+  cd ${pkgname}-${pkgver}
+  
+  # patch from fedora to fix error on "RunTest" tests
+  patch -Np1 -i "${srcdir}/pcre-8.35-Do-not-rely-on-wrapping-signed-integer-while-parsein.patch"
+}
 
 build() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr \
     --enable-unicode-properties \
     --enable-utf8 \
+    --enable-pcre16 \
+    --enable-pcre32 \
     --enable-jit \
     --enable-pcregrep-libz \
     --enable-pcregrep-libbz2 \
@@ -26,12 +38,12 @@ build() {
 }
 
 check() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
   make -j1 check
 }
 
 package() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
 
   install -Dm644 LICENCE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE

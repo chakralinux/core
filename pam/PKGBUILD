@@ -1,10 +1,10 @@
 #
-# Core Packages for Chakra, part of chakra-project.org
+# Core Packages for Chakra, part of chakraos.org
 #
 
 pkgname=pam
 pkgver=1.1.8
-pkgrel=1
+pkgrel=2
 pkgdesc="PAM (Pluggable Authentication Modules) library"
 arch=('x86_64')
 license=('GPL2')
@@ -16,15 +16,25 @@ source=("https://fedorahosted.org/releases/l/i/linux-pam/Linux-PAM-$pkgver.tar.b
         #http://www.kernel.org/pub/linux/libs/pam/library/Linux-PAM-$pkgver.tar.bz2
         "pam_unix2-glibc216.patch"
         # file below should have been at https://build.opensuse.org/package/show/Linux-PAM/pam-modules
-        "pam_unix2-2.9.1.tar.bz2" # actually now from Arch ftp://ftp.archlinux.org/other/pam_unix2/pam_unix2-2.9.1.tar.bz2
-        'other')
+        #"pam_unix2-2.9.1.tar.bz2" # actually now from Arch
+        "ftp://ftp.archlinux.org/other/pam_unix2/pam_unix2-2.9.1.tar.bz2"
+        pam-1.1.8-cve-2013-7041.patch
+        pam-1.1.8-cve-2014-2583.patch
+        other)
 md5sums=('35b6091af95981b1b2cd60d813b5e4ee'
          'dac109f68e04a4df37575fda6001ea17'
          'da6a46e5f8cd3eaa7cbc4fc3a7e2b555'
+         '653661bea920de3bb2713bb85b408bc2'
+         '144ea8e2f9d49a0f4021027ca2c1558f'
          'ac4900287a767654a3e8d9251a43f5e4')
 options=('!emptydirs')
 
 prepare() {
+  cd $srcdir/Linux-PAM-$pkgver
+  # fix CVEs in pam
+  patch -Np1 -i  "${srcdir}/pam-1.1.8-cve-2013-7041.patch"
+  patch -Np1 -i  "${srcdir}/pam-1.1.8-cve-2014-2583.patch"
+  
   cd $srcdir/pam_unix2-2.9.1
   # compile fix
   patch -Np1 -i ../pam_unix2-glibc216.patch  

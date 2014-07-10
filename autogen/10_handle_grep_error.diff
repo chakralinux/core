@@ -1,0 +1,20 @@
+Description: Correct build against gnuile 2.0.11
+ grep -l exits with code 1 when there are no matches. Catch this
+ exit status instead throwing an error in the script.
+Author: Andreas Metzler <ametzler@debian.org>
+Origin: vendor
+Bug: <url in upstream bugtracker>
+Last-Update: 2014-05-04
+
+--- autogen-5.18.3~pre34.orig/autoopts/mk-tpl-config.sh
++++ autogen-5.18.3~pre34/autoopts/mk-tpl-config.sh
+@@ -201,7 +201,8 @@ fix_guile() {
+     find_libguiledir "${LGCFLAGS}"
+ 
+     list=`find ${libguiledir}/libguile* -type f`
+-    list=`grep -l -E '\<noreturn\>' $list`
++    # only fail if grep throws an error, exitcode >= 2.
++    list=`if ! grep -l -E '\<noreturn\>' $list ; then [ $? -lt 2 ] ; fi`
+ 
+     test -z "$list" && exit 0
+ 

@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=212
-pkgrel=2
+pkgver=214
+pkgrel=3
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -15,24 +15,27 @@ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/dbus-1/system.d/org.freedesktop.hostname1.conf
         etc/dbus-1/system.d/org.freedesktop.login1.conf
         etc/dbus-1/system.d/org.freedesktop.locale1.conf
+        etc/dbus-1/system.d/org.freedesktop.machine1.conf
         etc/dbus-1/system.d/org.freedesktop.timedate1.conf
+        etc/pam.d/systemd-user
         etc/systemd/system.conf
         etc/systemd/user.conf
         etc/systemd/logind.conf
         etc/systemd/journald.conf
+        etc/systemd/timesyncd.conf
+        etc/systemd/resolved.conf
+        etc/systemd/bootchart.conf
         etc/udev/udev.conf)
 provides=("udev=$pkgver")
 conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
 replaces=('udev')
-groups=('base')
 install="systemd.install"
-options=('!libtool')
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-hook-udev'
         'initcpio-install-udev'
         'initcpio-install-systemd'
         '99-default.preset')
-md5sums=('257a75fff826ff91cb1ce567091cf270'
+md5sums=('eac4f9fc5bd18a0efc3fc20858baacf3'
          'e99e9189aa2f6084ac28b8ddf605aeb8'
          'fb37e34ea006c79be1c54cbb0f803414'
          '9027b31a875e74a45623954b3b23d09f'
@@ -82,6 +85,15 @@ package() {
 
   # udevd is no longer udevd because systemd. why isn't udevadm now udevctl?
   ln -s ../lib/systemd/systemd-udevd "$pkgdir/usr/bin/udevd"
+
+  # don't write units to /etc by default. some of these will be re-enabled on
+  # post_install.
+  rm "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service" \
+      "$pkgdir/etc/systemd/system/multi-user.target.wants/systemd-networkd.service" \
+      "$pkgdir/etc/systemd/system/multi-user.target.wants/systemd-resolved.service" \
+      "$pkgdir/etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service"
+  rmdir "$pkgdir/etc/systemd/system/getty.target.wants" \
+      "$pkgdir/etc/systemd/system/network-online.target.wants"
 
   # get rid of RPM macros
   rm -r "$pkgdir/usr/lib/rpm"

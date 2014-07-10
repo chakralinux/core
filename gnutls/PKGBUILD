@@ -1,36 +1,32 @@
-# Maintainer: abveritas[at]chakra-project[dot]org>
+# Maintainer: almack[at]chakraos[dot]org>
  
 pkgname=gnutls
-pkgver=3.2.12.1
-pkgrel=1
+pkgver=3.2.15
+pkgrel=2
 pkgdesc="A library which provides a secure layer over a reliable transport layer"
 arch=('x86_64')
-license=('GPL3' 'LGPL')
+license=('GPL3' 'LGPL2.1')
 url="http://www.gnu.org/software/gnutls/"
 install=gnutls.install
-options=('libtool')
-depends=('gcc-libs' 'libtasn1>=3.2' 'readline' 'zlib' 'libgcrypt' 'texinfo' 'nettle')
+depends=('gcc-libs' 'libtasn1' 'readline' 'zlib' 'libgcrypt' 'texinfo' 'nettle')
 source=(ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/${pkgname}-${pkgver}.tar.xz{,.sig})
-md5sums=('a795db68253d1336f1e3c2ee48c1fee4'
+md5sums=('ec3b06f80e312137386c5d322183ca5a'
          'SKIP')
  
 build() {
-  # cd "${srcdir}/${pkgname}-${pkgver}"
-  cd "${srcdir}/${pkgname}-3.2.12"
+  cd ${pkgname}-${pkgver}
  
   ./configure --prefix=/usr --with-zlib --disable-guile --disable-valgrind-tests --disable-static
   make
 }
  
 check() {
-  #cd "${srcdir}/${pkgname}-${pkgver}"
-  cd "${srcdir}/${pkgname}-3.2.12"
+  cd ${pkgname}-${pkgver}
   make -j1 check
 }
  
 package() {
-  #cd "${srcdir}/${pkgname}-${pkgver}"
-  cd "${srcdir}/${pkgname}-3.2.12"
+  cd ${pkgname}-${pkgver}
  
   make DESTDIR="${pkgdir}" install
 }

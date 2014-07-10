@@ -1,5 +1,5 @@
 pkgname=asciidoc
-pkgver=8.6.8
+pkgver=8.6.9
 pkgrel=1
 pkgdesc='Text document format for short documents, articles, books and UNIX man pages.'
 arch=('any')
@@ -14,7 +14,7 @@ optdepends=('lilypond: music-filter'
             'lynx: text generation'
             'w3m: text generation (alternative to lynx)')
 source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('6ffff1ab211f30481741ce4d1e4b12bf')
+md5sums=('c59018f105be8d022714b826b0be130a')
 
 build() {
   cd ${pkgname}-${pkgver}
@@ -42,9 +42,6 @@ package() {
 
   install -Dm644 vim/syntax/asciidoc.vim \
     ${pkgdir}/usr/share/vim/vimfiles/syntax/asciidoc.vim
-
-  install -Dm644 vim/ftdetect/asciidoc_filetype.vim \
-    ${pkgdir}/usr/share/vim/vimfiles/ftdetect/asciidoc.vim
 
   # fix FS#21579 - [asciidoc] 8.6.2-2 "asciidoc" table style doesn't work (mismatched python version) 
   sed -i 's/python/python2/' \

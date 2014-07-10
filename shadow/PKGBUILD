@@ -1,12 +1,13 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 #
-# maintainer abveritas[at]chakra-project[dog]org>
-# maintainer Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer almack[at]chakraos[dog]org>
+# contributor abveritas[at]chakra-project[dog]org>
+# contributor Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=shadow
 pkgver=4.1.5.1
-pkgrel=3
+pkgrel=4
 pkgdesc="Password and account management tool suite with support for shadow files and PAM"
 arch=('x86_64')
 url='http://pkg-shadow.alioth.debian.org/'
@@ -18,31 +19,31 @@ backup=(etc/login.defs
         etc/pam.d/{chpasswd,newusers,groupadd,groupdel,groupmod}
         etc/pam.d/{chgpasswd,groupmems}
         etc/default/useradd)
-options=('!libtool')
+options=(strip debug)
 install='shadow.install'
-source=("http://cdn.debian.net/debian/pool/main/s/shadow//shadow_4.1.5.1.orig.tar.gz" #"http://cdn.debian.net/debian/pool/main/s/$pkgname//$pkgname_$pkgver.orig.tar.gz"
+source=("http://fossies.org/linux/misc/shadow_4.1.5.1.orig.tar.gz"
+#"http://cdn.debian.net/debian/pool/main/s/shadow//shadow_4.1.5.1.orig.tar.gz" #"http://cdn.debian.net/debian/pool/main/s/$pkgname//$pkgname_$pkgver.orig.tar.gz"
         LICENSE
-        adduser
         chgpasswd
         chpasswd
         defaults.pam
         login.defs
         newusers
         passwd
-        shadow.cron.daily
+        shadow.{timer,service}
         useradd.defaults
         xstrdup.patch
         shadow-strncpy-usage.patch)
 sha1sums=('6e4de75de58405d21b0377b926ae770afccd95bc'
           '7ab316761036787c0cfcb53b7a6e82da7c373123'
-          'cdb0ec4dc094a091c1053d74b4b6cb89327362dc'
           '4ad0e059406a305c8640ed30d93c2a1f62c2f4ad'
           '87186f6e5e00d195cafba5e38400418481dce3af'
           '0e56fed7fc93572c6bf0d8f3b099166558bb46f1'
           'e5cab2118ecb1e61874cde842d7d04d1003f35cb'
           '12427b1ca92a9b85ca8202239f0d9f50198b818f'
-          '49cb1b18af9d2ae7cc4a2441f1a6951d313f7c60'
-          '5d83ba7e11c765c951867cbe00b0ae7ff57148fa'
+          '9f9bfe1168c234d5f7a6131a4f76c3fc6360fd8a'
+          'a154a94b47a3d0c6c287253b98c0d10b861226d0'
+          '4fb696c722ed59e74a98a682a4f780bf9f1cf031'
           '80e3d2ee8c990c2f7fbd0dcf406a9e41cbe66fe2'
           '6010fffeed1fc6673ad9875492e1193b1a847b53'
           '3bc0e0968ddec0e58b1e2de88d9d0065c93d60c9')
@@ -54,7 +55,7 @@ build() {
   sed -i '/^user\(mod\|add\)_LDADD/s|$| -lattr|' src/Makefile.am
 
   # link to glibc's crypt(3)
-  LDFLAGS+=" -lcrypt"
+  export LIBS="-lcrypt"
 
   # need to offer these upstream
   patch -p1 <"$srcdir/xstrdup.patch"
@@ -69,7 +70,8 @@ build() {
     --mandir=/usr/share/man \
     --sysconfdir=/etc \
     --with-libpam \
-    --without-selinux
+    --without-selinux \
+    --with-group-name-max-length=32
 
   make
 }
@@ -82,14 +84,14 @@ package() {
   # license
   install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/shadow/LICENSE"
 
-  # interactive useradd
-  install -Dm755 "$srcdir/adduser" "$pkgdir/usr/sbin/adduser"
-
   # useradd defaults
   install -Dm644 "$srcdir/useradd.defaults" "$pkgdir/etc/default/useradd"
 
-  # cron job
-  install -Dm744 "$srcdir/shadow.cron.daily" "$pkgdir/etc/cron.daily/shadow"
+  # systemd timer
+  install -D -m644 ${srcdir}/shadow.timer ${pkgdir}/usr/lib/systemd/system/shadow.timer
+  install -D -m644 ${srcdir}/shadow.service ${pkgdir}/usr/lib/systemd/system/shadow.service
+  install -d -m755 ${pkgdir}/usr/lib/systemd/system/multi-user.target.wants
+  ln -s ../shadow.timer ${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/shadow.timer
 
   # login.defs
   install -Dm644 "$srcdir/login.defs" "$pkgdir/etc/login.defs"
