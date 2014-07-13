@@ -3,8 +3,8 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xf86-video-intel
-pkgver=2.99.912
-pkgrel=3
+pkgver=2.21.15 # WARINING, tried with version 2.99.912 but seems that with sna the rendering is corrupted (http://chakraos.org/forum/viewtopic.php?pid=81925#p81925)
+pkgrel=2
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
@@ -26,14 +26,18 @@ conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERS
            'xf86-video-i810' 
            'xf86-video-intel-legacy')
 groups=('xorg-drivers' 'xorg')
-source=(${url}/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('7c8ffc492d59f34cac64093deb70717b4d9223cf416ecc6fa016ab2e8bde9501')
+source=(${url}/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2
+intel-2.21.15-xserver-1.15-compat.patch)
+sha256sums=('7d5a140f82a72fd1cbc8a664d66c3d4eca47ee240ca4927b8a98d7af6f65d6fc'
+            'fbf8fa35974dbf758b095c390d79f542b97993482ae3b63ec6542bffa87ba09f')
 
 build() {
   cd ${pkgname}-${pkgver}
+  # fix build with Xorg 1.15
+  patch -Np1 -i ${srcdir}/intel-2.21.15-xserver-1.15-compat.patch
   ./configure --prefix=/usr \
     --libexecdir=/usr/lib \
-    --enable-glamor
+    --enable-dri
   make
 }
 

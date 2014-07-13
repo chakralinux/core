@@ -1,25 +1,33 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 #
-# maintainer abveritas@chakra-project.org
+# maintainer almack@chakraos.org
+# contributor abveritas@chakra-project.org
 
 pkgname=libva
-pkgver=1.2.1
-pkgrel=4
-pkgdesc="libva with patches to extend VA API with data needed for VDPAU and XvBA backends."
+pkgver=1.3.1
+pkgrel=2
+pkgdesc='Video Acceleration (VA) API for Linux'
 arch=('x86_64')
 url="http://freedesktop.org/wiki/Software/vaapi"
 license=('MIT')
 depends=('libgl' 'libdrm' 'libxfixes')
 makedepends=('mesa')
-optdepends=('vdpau-video: VDPAU backend for VA API'
+optdepends=('libva-vdpau-driver: VDPAU backend for VA API'
             'libva-driver-intel: back-end for intel cards')
-source=(http://cgit.freedesktop.org/libva/snapshot/${pkgname}-${pkgver}.tar.gz)
-md5sums=('a979a2531a08a24fdfda8bfc8c4b2629')
+source=(http://freedesktop.org/software/vaapi/releases/$pkgname/$pkgname-$pkgver.tar.bz2
+        0001-va-release-VADisplayContext-at-the-end-of-vaTerminat.patch)
+md5sums=('eb4db967f068854444b597071c66b480'
+         'e564ae7c20962c821ac2b5cb1693e1a2')
+
+prepare() {
+  cd $pkgname-$pkgver
+  # backport patch fixing flashplugin and firefox segfaults (FS#40914, FS#40807)
+  patch -p1 -i ../0001-va-release-VADisplayContext-at-the-end-of-vaTerminat.patch
+}
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  ./autogen.sh
   ./configure --prefix=/usr  
   make
 }
