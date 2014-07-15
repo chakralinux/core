@@ -5,22 +5,21 @@
 
 pkgbase=opencv
 pkgname=('opencv' 'opencv-samples')
-_realname=OpenCV
-pkgver=2.4.7
-pkgrel=1
+pkgver=2.4.9
+pkgrel=2
 pkgdesc="Open Source Computer Vision Library"
 arch=('x86_64')
 license=('BSD')
 url="http://opencv.willowgarage.com/"
-depends=('jasper' 'gstreamer0.10-base' 'intel-tbb' 'libcl' 
+depends=('gstreamer0.10-base' 'intel-tbb' 'libcl' 
          'xine-lib' 'libdc1394' 'openexr' 'v4l-utils' 'ffmpeg' 'qt')
-makedepends=('pkgconfig' 'cmake' 'python-numpy' 'eigen' 'python2-sphinx' 'mesa')
-optdepends=('python-numpy: Python 2.x interface'
-            'eigen')
-source=("http://downloads.sourceforge.net/opencvlibrary/$pkgname-$pkgver.tar.gz"
+makedepends=('pkgconfig' 'cmake' 'python2-numpy' 'eigen2' 'mesa')
+optdepends=('python2-numpy: Python 2.x interface'
+            'eigen2')
+source=("http://downloads.sourceforge.net/opencvlibrary/$pkgname-$pkgver.zip"
         'pkgconfig.patch'
         'fsh.patch')
-sha1sums=('67ec788943894d4be3dff6efd7720591108feb29'
+sha1sums=('4f5166e2bd22bd6167cb56dd04f2c6ed68148b2c'
           'c5202144d24671cbee411207d65b4ea05747b0f4'
           'e39a8f3f39298b2dcca604af95dee3e13689a55a')
 
@@ -32,8 +31,8 @@ _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
             '-D INSTALL_C_EXAMPLES=ON'
             '-D INSTALL_PYTHON_EXAMPLES=ON'
             '-D WITH_XINE=ON'
+            '-D WITH_OPENGL=ON'
             '-D WITH_QT=ON'
-	    '-D WITH_OPENGL=ON'
             '-D WITH_GTK=OFF'
             '-D ENABLE_SSE3=OFF'
             '-D ENABLE_FAST_MATH=ON')
@@ -48,7 +47,7 @@ prepare() {
 
   # fix another upstream mess that they won't fix
   # see http://code.opencv.org/issues/2512
-  patch -Np1 -i "$srcdir/fsh.patch"
+  #patch -Np1 -i "$srcdir/fsh.patch"
 
 }
 
@@ -70,24 +69,30 @@ package_opencv() {
   make DESTDIR="$pkgdir" install
 
   # install license file
-  install -Dm644 "$srcdir/$pkgbase-$pkgver/doc/license.txt" \
+  install -Dm644 "$srcdir/$pkgbase-$pkgver/LICENSE" \
     "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 
   cd "$pkgdir/usr/share"
 
-  # separate samples package
-  [ -d $pkgname/samples ] && mv $pkgname/samples "$srcdir/opencv-samples"
+  # separate samples package; also be -R friendly
+  if [[ -d OpenCV/samples ]]; then
+    mv OpenCV/samples "$srcdir/$pkgname-samples"
+    mv OpenCV $pkgname # otherwise folder naming is inconsistent
+  elif [[ ! -d OpenCV ]]; then
+    warning "Directory naming issue; samples package may not be built!"
+  fi
 }
 
 package_opencv-samples() {
   pkgdesc+=" (samples)"
-  depends=()
-  optdepends=()
-  options=()
-
-  cd "$srcdir"
+  depends=("opencv=$pkgver")
+  unset optdepends
 
   mkdir -p "$pkgdir/usr/share/opencv"
-  cp -r opencv-samples "$pkgdir/usr/share/opencv/samples"
+  cp -r "$srcdir/opencv-samples" "$pkgdir/usr/share/opencv/samples"
+  
+  # install license file
+  install -Dm644 "$srcdir/opencv-$pkgver/LICENSE" \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
 
