@@ -1,16 +1,17 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
 pkgver=214
-pkgrel=3
+pkgrel=4
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
 depends=('acl' 'bash' 'glibc' 'glib2' 'hwids' 'util-linux' 'kbd' 'kmod' 'libcap' 'libxslt'
          'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus-core') 
-makedepends=('docbook-xsl' 'gobject-introspection' 'gperf' 'intltool')
-optdepends=('python2-gobject3: systemd-analyze'
-            'dbus-python: systemd-analyze')
+makedepends=('docbook-xsl' 'cryptsetup' 'gobject-introspection' 'python' 'gperf' 'intltool' 'libmicrohttpd')
+optdepends=('python: systemd library bindings'
+            'cryptsetup: required for encrypted block devices'
+            'libmicrohttpd: remote journald capabilities')
 backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/dbus-1/system.d/org.freedesktop.hostname1.conf
         etc/dbus-1/system.d/org.freedesktop.login1.conf
