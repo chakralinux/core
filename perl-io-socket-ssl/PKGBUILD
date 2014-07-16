@@ -2,20 +2,21 @@
 
 pkgname=perl-io-socket-ssl
 _cpanname=IO-Socket-SSL
-pkgver=1.66
+pkgver=1.988
 pkgrel=1
 pkgdesc="Nearly transparent SSL encapsulation for IO::Socket::INET"
 arch=('any')
 license=('GPL' 'PerlArtistic')
 url="http://search.cpan.org/dist/${_cpanname}/"
-depends=('perl-net-ssleay' 'perl>=5.14.2')
+depends=('perl-net-ssleay' 'perl>=5.14.2' 'perl-uri')
+checkdepends=('perl-io-socket-inet6')
 options=('!emptydirs')
 source=(http://www.cpan.org/authors/id/S/SU/SULLR/${_cpanname}-${pkgver}.tar.gz)
-sha1sums=('89d506e1241e9bb132599b7bbacb8b9e40d8dfe2')
+sha1sums=('f2f7927d79634f8318c53cf97187618bd8412a64')
 
 build() {
   cd "${srcdir}/${_cpanname}-${pkgver}"
-  perl Makefile.PL INSTALLDIRS=vendor
+  yes | perl Makefile.PL INSTALLDIRS=vendor
   make
 }
 
