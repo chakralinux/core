@@ -1,8 +1,8 @@
 pkgname=akonadi-qt5
-pkgver=1.12.0
+pkgver=1.72.43
 pkgrel=1
 pkgdesc="PIM layer, which provides an asynchronous API to access all kind of PIM data"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='http://community.kde.org/KDE_PIM/Akonadi'
 license=('LGPL')
 depends=('shared-mime-info' 'boost-libs' 'mariadb')
@@ -10,16 +10,18 @@ makedepends=('cmake' 'automoc4' 'boost' 'postgresql')
 optdepends=('postgresql: PostgreSQL backend')
 install="${pkgname}.install"
 conflicts=('akonadi')
-source=("http://download.kde.org/stable/akonadi/src/akonadi-${pkgver}.tar.bz2")
-md5sums=('3fb6703072410534bce51bbc3e6aa6e4')
+#source=("http://download.kde.org/stable/akonadi/src/akonadi-${pkgver}.tar.bz2")
+source=("git://anongit.kde.org/akonadi")
+md5sums=('SKIP')
 
 prepare() {
+  [ -d build ] && rm -r build
   mkdir build
 }
 
 build() {
   cd build
-  cmake ../akonadi-${pkgver} \
+  cmake ../akonadi \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DINSTALL_QSQLITE_IN_QT_PREFIX=TRUE \

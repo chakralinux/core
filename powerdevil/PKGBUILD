@@ -1,16 +1,14 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
 source ../plasma.conf
 
-pkgname=oxygen
+pkgname=powerdevil
 pkgver=${PVersion}
 pkgrel=2
-pkgdesc="Oxygen"
+pkgdesc="KSysguard"
 arch=('i686' 'x86_64')
-url='projects.kde.org/'
+url='http://projects.kde.org'
 license=('LGPL')
-depends=('qt5-base' 'frameworkintegration' 'kwindowsystem' 'kwidgetsaddons' 'kcompletion' 'kservice' 'kguiaddons')
-makedepends=('extra-cmake-modules')
+depends=('plasma-workspace' 'libxrandr')
+makedepends=('extra-cmake-modules' 'kdoctools')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -18,6 +16,7 @@ source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname} | head -n 1) )
 
 prepare() {
+  sed -e "s/PO_FILES //" -i ${srcdir}/$pkgname-$pkgver/po/*/CMakeLists.txt
   mkdir -p build
 }
 

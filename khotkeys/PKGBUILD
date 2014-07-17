@@ -2,23 +2,24 @@
 
 source ../plasma.conf
 
-pkgname=oxygen
+pkgname=khotkeys
 pkgver=${PVersion}
 pkgrel=2
-pkgdesc="Oxygen"
+pkgdesc='kinfocenter'
 arch=('i686' 'x86_64')
 url='projects.kde.org/'
 license=('LGPL')
-depends=('qt5-base' 'frameworkintegration' 'kwindowsystem' 'kwidgetsaddons' 'kcompletion' 'kservice' 'kguiaddons')
-makedepends=('extra-cmake-modules')
+depends=('plasma-workspace')
+makedepends=('extra-cmake-modules' 'kdoctools')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n 1) )
+sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
+  sed -e "s/PO_FILES //" -i ${srcdir}/$pkgname-$pkgver/po/*/CMakeLists.txt
 }
 
 build() {
@@ -32,7 +33,7 @@ build() {
 
 check() {
   cd build
-  make test || return 0
+  make test
 }
 
 package() {
