@@ -1,0 +1,58 @@
+# Maintainer: Weng Xuetian <wengxt@gmail.com>
+
+pkgbase=otf-source-han-sans
+pkgver=1.000
+pkgrel=1
+pkgdesc='Adobe Source Han Sans - Religion-specific subsets'
+arch=('any')
+url='https://github.com/adobe-fonts/source-han-sans'
+license=('apache')
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+install="otf-source-han-sans.install"
+
+_languages=(
+'cn "Simplified Chinese"'
+'jp "Japanese"'
+'kr "Korean"'
+'twhk "Traditional Chinese"'
+)
+
+pkgname=()
+source=()
+
+for _lang in "${_languages[@]}"; do
+  _locale=${_lang%% *}
+  _pkgname=${pkgbase}-${_locale,,}
+  _upper_locale=`echo $_locale | tr '[:lower:]' '[:upper:]'`
+  pkgname+=(${_pkgname})
+  source+=("http://sourceforge.net/projects/source-han-sans.adobe/files/SourceHanSans${_upper_locale}-${pkgver}.zip"
+           "44-source-han-sans-${_locale}.conf")
+  eval "function package_${_pkgname}() { _package $_lang; }"
+done
+
+
+function _package {
+    pkgdesc="Adobe Source Han Sans - $2 OpenType fonts"
+     _upper_locale=`echo $1 | tr '[:lower:]' '[:upper:]'`
+
+    # Prepare destination directory
+    install -dm755 "$pkgdir/usr/share/fonts/OTF"
+
+    # Install fonts
+    for font in "SourceHanSans${_upper_locale}-${pkgver}"/*.otf; do
+        install -m644 "$font" "$pkgdir/usr/share/fonts/OTF"
+    done
+
+    install -dm755 "$pkgdir/etc/fonts/conf.d/"
+    install -Dm644 "44-source-han-sans-${1}.conf" "$pkgdir/etc/fonts/conf.avail/44-source-han-sans-${1}.conf"
+    cd "$pkgdir/etc/fonts/conf.d/"
+    ln -s ../conf.avail/44-source-han-sans-${1}.conf .
+}
+md5sums=('146465b5e0efa1709433bed888622b06'
+         '71e97aa9698fd241aede6d6f7dda6dc8'
+         '10fbb83ab3e77cbf292bb20d50b1f7c9'
+         '3281df1f09624f680988cbee60406609'
+         '745ffdb9dad770472623a9430f3cabab'
+         'efb45e8595fb8ff9264203346b2e9485'
+         '39d5915f35f7a46aae293eaf91fd9a17'
+         '98141e67f7405249da9ec7800211be01')
