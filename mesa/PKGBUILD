@@ -3,7 +3,7 @@
 
 pkgbase=mesa
 pkgname=('mesa' 'mesa-libgl' 'opencl-mesa' 'ati-dri' 'intel-dri' 'nouveau-dri' 'svga-dri')
-pkgver=10.2.3
+pkgver=10.2.4
 pkgrel=1
 arch=('x86_64')
 makedepends=('python2' 'libxml2' 'libx11' 'glproto' 'libdrm' 'dri2proto' 'dri3proto' 'presentproto' 'libxshmfence' 'libxxf86vm'  'libxdamage' 'libvdpau' 'wayland' 'elfutils' 'llvm' 'systemd' 'libclc' 'clang')
@@ -13,7 +13,7 @@ source=(${source[@]}
 "ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/MesaLib-${pkgver}.tar.gz" 
        'LICENSE'
 )
-md5sums=('e806a4a98dd77cfed573e27bedfffbe8'
+md5sums=('7ae0932bfe2f8593ad7c6242478912b3'
          '5c65a0fe315dd347e09b1f2826a1df5a')
 options=('debug')
 
@@ -27,6 +27,7 @@ build() {
     --with-dri-drivers=i915,i965,r200,radeon,nouveau,swrast \
     --with-egl-platforms=x11,drm,wayland \
     --enable-llvm-shared-libs \
+    --with-clang-libdir=/usr/lib \
     --enable-gallium-llvm \
     --enable-gallium-egl \
     --enable-shared-glapi \
@@ -42,8 +43,8 @@ build() {
     --enable-xa \
     --enable-vdpau \
     --enable-dri3 \
-    --enable-opencl --enable-opencl-icd \
-    --with-clang-libdir=/usr/lib
+    --enable-opencl --enable-opencl-icd
+    
     
   make
   
