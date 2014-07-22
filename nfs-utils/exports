@@ -1,7 +1,7 @@
-# /etc/exports
+# /etc/exports - exports(5) - directories exported to NFS clients
 #
 # List of directories exported to NFS clients.  See exports(5).
-# Use exportfs -arv to reread.
+# Use exportfs -arv to reload.
 #
 # Example for NFSv2 and NFSv3:
 #  /srv/home       hostname1(rw,sync) hostname2(ro,sync)
@@ -9,7 +9,8 @@
 # Example for NFSv4:
 #  /srv/nfs4	   hostname1(rw,sync,fsid=0)
 #  /srv/nfs4/home   hostname1(rw,sync,nohide)
+#
 # Using Kerberos and integrity checking:
-#  /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt)
-#  /srv/nfs4/home   gss/krb5i(rw,sync,nohide)
+#  /srv/nfs4        *(rw,sync,sec=krb5i,fsid=0)
+#  /srv/nfs4/home   *(rw,sync,sec=krb5i,nohide)
 #
