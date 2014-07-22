@@ -6,7 +6,7 @@ pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia' 'libcl')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 # Update nvidia-settings too
 pkgver=337.25
-pkgrel=5
+pkgrel=6
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
@@ -60,8 +60,8 @@ package_opencl-nvidia() {
 package_nvidia-libgl() {
     pkgdesc="NVIDIA drivers libraries symlinks"
     depends=('nvidia-utils')
-    conflicts=('libgl')
-    provides=('libgl')
+    conflicts=('libgl' 'mesa-libgl')
+    provides=('libgl' 'mesa-libgl')
     cd "${srcdir}/${_pkg}"
 
     mkdir -p "${pkgdir}/usr/lib/xorg/modules/extensions"

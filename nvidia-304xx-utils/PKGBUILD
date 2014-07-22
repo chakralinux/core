@@ -5,7 +5,7 @@ pkgbase=nvidia-304xx-utils
 pkgname=('nvidia-304xx-utils')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 pkgver=304.123
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
@@ -34,8 +34,8 @@ package() {
   optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig'
               'opencl-nvidia: OpenCL support'
 	      'nvidia-settings: Gtk GUI')
-  conflicts=('libgl' 'nvidia-utils')
-  provides=('libgl')
+  conflicts=('libgl' 'nvidia-utils' 'mesa-libgl')
+  provides=('libgl' 'mesa-libgl')
 
   cd "${srcdir}/${_pkg}"
 

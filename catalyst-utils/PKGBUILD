@@ -6,7 +6,7 @@ pkgbase=catalyst-utils
 pkgname=('catalyst-utils' 'catalyst-libgl' 'opencl-catalyst')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 1x.x
 pkgver=14.4
-pkgrel=5
+pkgrel=6
 _amdver=14.10.1006.1001
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('x86_64')
@@ -48,8 +48,8 @@ build() {
 package_catalyst-libgl() {
       pkgdesc="AMD/ATI drivers. Catalyst drivers libraries symlinks + experimental powerXpress support."
       depends=('catalyst-utils' 'mesa>=10.0.5')
-      conflicts=('libgl')
-      provides=('libgl')
+      conflicts=('libgl' 'mesa-libgl')
+      provides=('libgl' 'mesa-libgl')
 
       install -m755 -d ${pkgdir}/usr/lib/xorg/modules/extensions
       ln -snf /usr/lib/xorg/modules/extensions/fglrx/fglrx-libglx.so ${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so
