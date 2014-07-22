@@ -1,56 +1,59 @@
 #
 # Chakra Packages for Chakra, part of chakra-project.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer : AlmAck <almack[at]chakraos[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=iputils
-pkgver=20100214
-_traceroutever=1.4a12
-pkgrel=5
+pkgver=20121221
+pkgrel=1
 pkgdesc="IP Configuration Utilities (and Ping)."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL')
-url="http://www.linuxfoundation.org/en/Net:Iputils"
+url="http://www.skbuff.net/iputils/"
 groups=('base')
-depends=('glibc')
-makedepends=('libxslt')
-conflicts=('netkit-base' 'arping' 'netkit-tftpd' 'traceroute')
-replaces=('netkit-base' 'traceroute')
-source=("http://www.skbuff.net/iputils/${pkgname}-s${pkgver}.tar.bz2"
-        "ftp://ftp.ee.lbl.gov/traceroute-${_traceroutever}.tar.gz"
-	      'permission-fix.patch')
-options=(!makeflags)
-md5sums=('37596c8b3eed537294e77464b9804726'
-         '964d599ef696efccdeebe7721cd4828d'
-         '66109966cad06e425bb12a78bab85b70')
+depends=('openssl' 'sysfsutils' 'libcap')
+optdepends=('xinetd: for tftpd')
+makedepends=('docbook2x' 'opensp')
+conflicts=('netkit-base' 'arping' 'netkit-tftpd')
+replaces=('netkit-base')
+source=(http://www.skbuff.net/${pkgname}/${pkgname}-s${pkgver}.tar.bz2
+        tftp.xinetd)
+sha1sums=('4d56d8c75d6a5d58f052e4056e975f01ebab9ba9'
+          'fc2ae26f5609725e3f4aeaf4ab82dfa6d2e378fd')
 
-build()
-{
-  #build iptuils
+build() {
   cd "${srcdir}/${pkgname}-s${pkgver}"
-  make KERNEL_INCLUDE=/usr/include || return 1   # for i686
 
-  # build traceroute
-  # this is combined in this package because it's awkward as a separate package
-  cd "${srcdir}/traceroute-${_traceroutever}"
-  patch -Np1 -i "${srcdir}/permission-fix.patch" || return 1
-  ./configure --prefix=/usr --sbindir=/bin --mandir=/usr/share/man
-  make CFLAGS="${CFLAGS} -Ilinux-include/" || return 1
+  make USE_GNUTLS=no CCOPTOPT="$CFLAGS"
+
+  cd doc
+  for file in *.sgml; do
+    xf=${file/.sgml/.xml}
+    osx -xlower -xno-nl-in-tag $file > $xf || true
+    sed -i "s|<refname>\(.*\), \(.*\)</refname>|<refname>\1</refname>, <refname>\2</refname>|g" $xf
+    docbook2man $xf
+  done
 }
 
 package() {
   cd "${srcdir}/${pkgname}-s${pkgver}"
-  for i in arping clockdiff rarpd rdisc tftpd tracepath tracepath6; do
-    install -D -m755 "${i}" "${pkgdir}/usr/sbin/${i}"
-  done
-  for i in ping ping6 traceroute6; do
-    install -D -m4755 "${i}" "${pkgdir}/bin/${i}"
-  done
 
-  cd "${srcdir}/traceroute-${_traceroutever}"
-  install -d -m755 "${pkgdir}/usr/share/man/man8"
-  make DESTDIR="${pkgdir}" install install-man
+  install -dm755 "${pkgdir}"/usr/bin
+
+  install -m755 arping clockdiff rarpd rdisc tftpd tracepath tracepath6 "${pkgdir}"/usr/bin/
+
+  install -m755 ping{,6} "${pkgdir}"/usr/bin/
+
+  install -dm755 "${pkgdir}"/usr/share/man/man8
+  install -m644 doc/{arping,clockdiff,ping,rarpd,rdisc,tftpd,tracepath}.8 \
+     "${pkgdir}"/usr/share/man/man8/
+
+  cd "${pkgdir}"/usr/share/man/man8
+  ln -sf ping.8.gz  ping6.8.gz
+  ln -sf tracepath.8.gz tracepath6.8.gz
+
+  # FS#24768
+  install -dm755 "${pkgdir}"/etc/xinetd.d/
+  install -m644 "${srcdir}"/tftp.xinetd "${pkgdir}"/etc/xinetd.d/tftp
 }
-
-# vim:set ts=2 sw=2 et:
