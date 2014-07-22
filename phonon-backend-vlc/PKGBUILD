@@ -1,32 +1,57 @@
 # Contributor: abveritas@chakra-project.org
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
-pkgname=('phonon-backend-vlc')
-pkgver=0.7.1
-pkgrel=2
+pkgbase=phonon-backend-vlc
+pkgname=('phonon-backend-vlc' 'phonon-qt5-backend-vlc')
+pkgver=0.7.2
+pkgrel=1
 pkgdesc='Phonon VLC backend'
 arch=('x86_64')
 url='http://phonon.kde.org'
 license=('LGPL')
-depends=('vlc')
-makedepends=('qt' 'pkgconfig' 'cmake' 'automoc4' 'mesa' 'phonon')
+makedepends=('qt' 'pkgconfig' 'cmake' 'automoc4' 'vlc' 'phonon' 'phonon-qt5')
 groups=("kde-complete" "kde-uninstall")
-provides=('phonon-backend')
-source=("http://download.kde.org/stable/phonon/${pkgname}/$pkgver/${pkgname}-$pkgver.tar.xz")
-sha256sums=('230bb7f3377fd6e82b19d9438026308d7584ae34945cb5aa9fdb23f39980158e')
+source=("http://download.kde.org/stable/phonon/phonon-backend-vlc/${pkgver}/src/phonon-backend-vlc-${pkgver}.tar.xz")
+md5sums=('10f26393df35c01f0526807980eadb1c')
 
-build() {
-	cd "${srcdir}"
-	mkdir -p build
-	cd build
-	cmake "../${pkgname}-$pkgver" \
-		 -DCMAKE_BUILD_TYPE=Release \
-		 -DCMAKE_INSTALL_PREFIX=/usr \
-		 -DCMAKE_INSTALL_LIBDIR=/usr/lib
-	make
+prepare() {
+  mkdir build-qt4
+  mkdir build-qt5
 }
 
-package() {
-	cd "${srcdir}/build"
-	make DESTDIR="${pkgdir}" install
-} 
+build() {
+  cd build-qt4
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DPLUGIN_INSTALL_DIR=/usr/lib/kde4
+  make
+
+  cd ../build-qt5
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DPHONON_BUILD_PHONON4QT5=ON
+  make
+}
+
+package_phonon-backend-vlc() {
+  pkgdesc="Phonon VLC backend for Qt4"
+  depends=('vlc')
+  provides=('phonon-backend')
+
+  cd build-qt4
+  make DESTDIR="${pkgdir}" install
+}
+
+package_phonon-qt5-backend-vlc() {
+  pkgdesc="Phonon VLC backend for Qt5"
+  depends=('vlc')
+  provides=('phonon-qt5-backend')
+
+  cd build-qt5
+  make DESTDIR="${pkgdir}" install
+}
