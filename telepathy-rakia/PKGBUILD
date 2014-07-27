@@ -1,8 +1,8 @@
 # maintainer: Neophytos Kolokotronis <tetris4@gmail.com<>
 
 pkgname=telepathy-rakia
-pkgver=0.7.4
-pkgrel=3
+pkgver=0.8.0
+pkgrel=1
 pkgdesc="A SIP-protocol connection manager for the Telepathy framework based on SofiaSIP-stack."
 arch=('i686' 'x86_64')
 url="http://telepathy.freedesktop.org"
@@ -11,14 +11,11 @@ depends=('telepathy-glib' 'sofia-sip')
 makedepends=('libxslt' 'python2')
 install=telepathy-rakia.install
 groups=('telepathy')
-source=(http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz
-        conf.patch)
-md5sums=('f9f47f18db033afe29fd6963c7748e37'
-         '03c69793fecad0a2a2a5bbd9c92e82ab')
+source=(http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz)
+md5sums=('09038d4625fcf81e9d3228ebf18bc378')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -Np0 -i $srcdir/conf.patch
   autoreconf -fi
   ./configure --prefix=/usr --libexecdir=/usr/lib/telepathy
   make
