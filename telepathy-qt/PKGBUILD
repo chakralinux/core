@@ -1,8 +1,8 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=telepathy-qt
-pkgver=0.9.3
-pkgrel=6
+pkgver=0.9.4
+pkgrel=1
 pkgdesc="A library for Qt-based Telepathy clients."
 arch=('x86_64')
 url="http://telepathy.freedesktop.org"
@@ -14,21 +14,22 @@ makedepends=('libxslt' 'python2' 'cmake' 'doxygen')
 conflicts=('telepathy-qt4')
 provides=('telepathy-qt4')
 source=("http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz"
-        "avatar.patch::http://cgit.freedesktop.org/telepathy/telepathy-qt/patch/?id=8da9f7069929893bcee64dab22101134752fe618")
-md5sums=('94ac93aedf5f6fff49837bc8368e5a37'
-         'f469dc15bffa8ac00ccdb523c8788e06')
+        "farstream-0.2.patch")
+sha256sums=('f1b1db3a9f96ece92df430a8de4d30317f4c58a06fe99e82cc2c6875791e61f2'
+            '5eb39f16b3988f0b50da29a64838af36e96aec38a1e9353a22242eec76ec0f8a')
+
+prepare() {
+ mkdir build
+
+  cd ${pkgname}-${pkgver}
+  patch -p1 -i "${srcdir}"/farstream-0.2.patch
+}
 
 build() {
-    cd "${srcdir}"
-
-    cd "${pkgname}-${pkgver}"
-    patch -i ../avatar.patch -p1 || return 1
-
-    cd "${srcdir}"
-    mkdir build
     cd build
     cmake ../${pkgname}-${pkgver} \
         -DCMAKE_BUILD_TYPE=Release \
+        -DPYTHON_EXECUTABLE=/usr/bin/python2 \
         -DCMAKE_INSTALL_PREFIX=/usr
     make
 }
