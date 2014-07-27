@@ -2,33 +2,25 @@
 # Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/farstream-0.1/
 
 pkgname=farstream
-pkgver=0.1.2
-pkgrel=3
+pkgver=0.2.4
+pkgrel=1
 pkgdesc="Audio/Video Communications Framework (legacy version)"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/Farstream"
 license=('LGPL2.1')
-depends=('libnice' 'gstreamer0.10-base' 'gstreamer0.10-bad-plugins'
-         'gstreamer0.10-good' 'gstreamer0.10-ffmpeg')
-makedepends=('gobject-introspection' 'gstreamer0.10-python' 'python2-gobject')
+depends=('libnice' 'gstreamer' 'gst-plugins-base')
+makedepends=('gobject-introspection')
 options=('!libtool')
-source=(http://freedesktop.org/software/$pkgname/releases/$pkgname/$pkgname-$pkgver.tar.gz
-        farstream-0.1.2-prefer-vp8.patch
-        farstream-0.1.2-introspection-tag-order.patch)
-sha256sums=('fa5a40597b47b59d124f7fd57f66704b030d576cdc0d90e107c7a592f05e73d9'
-            '0c22dbc92cf0b54a2895db0f62d4934c9d81a0d72e8237bfbc5b4845c347b554'
-            'c4a5ee0a3a86e5e10fb6a296fe05337e0cf4865a63ea708ef9027cd1a7ebc200')
+source=(http://freedesktop.org/software/$pkgname/releases/$pkgname/$pkgname-$pkgver.tar.gz)
+sha256sums=('120d5b5cd79fcbe19d9e046526fc4bc059e0a3733b3de2d7e5299dc5a3a7bb30')
 
 build() {
   cd "$pkgname-$pkgver"
 
-  patch -Np1 -i "$srcdir/farstream-0.1.2-prefer-vp8.patch"
-  patch -Np1 -i "$srcdir/farstream-0.1.2-introspection-tag-order.patch"
-
   ./configure \
     --prefix=/usr \
-    --with-package-name='Chakra Farstream 0.1 Package' \
-    --with-package-origin='httpw://www.chakra-project.org/' \
+    --with-package-name='Chakra Farstream Package' \
+    --with-package-origin='httpw://www.chakraos.org/' \
     --disable-static
   make
 }
