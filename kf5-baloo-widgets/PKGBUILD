@@ -1,0 +1,48 @@
+
+source ../plasma.conf
+
+pkgname=kf5-baloo-widgets
+_pkgname=baloo-widgets
+#pkgver=${PVersion}
+pkgver=4.98.0
+pkgrel=1
+pkgdesc='Widgets for the baloo framework for searching and managing metadata'
+arch=('x86_64')
+url='community.kde.org/Baloo'
+license=('LGPL')
+depends=('kf5-baloo' 'kdelibs4support' 'kemoticons')
+makedepends=('extra-cmake-modules' 'kdoctools' 'git')
+checkdepends=("cmake")
+conflicts=('baloo-widgets')
+groups=('plasma')
+options=("debug")
+#source=("${PServer}/${pkgver}/${_pkgname}-${pkgver}.tar.xz")
+source=("git://anongit.kde.org/baloo-widgets#branch=frameworks")
+#sha256sums=( $(getSum ${_pkgname}) )
+md5sums=('SKIP')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  #cmake ../${_pkgname}-${pkgver} \
+  cmake ../${_pkgname} \
+    -DCMAKE_BUILD_TYPE=${PBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDEPIM_SUPPORT_BUILD=FALSE
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+  return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

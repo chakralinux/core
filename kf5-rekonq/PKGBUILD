@@ -1,0 +1,47 @@
+
+source ../frameworks.conf
+
+pkgname=kf5-rekonq
+_pkgname=rekonq
+pkgver=2.9.93
+pkgrel=1
+pkgdesc='A WebKit based web browser for KDE'
+arch=('x86_64')
+url='http://rekonq.sourceforge.net/'
+license=('GPL')
+depends=('kauth' 'kbookmarks' 'kcmutils' 'kcodecs' 'kcompletion' 'kconfig' 'kconfigwidgets' 'kcoreaddons' 
+         'kdbusaddons' 'kdewebkit' 'kglobalaccel' 'kguiaddons' 'ki18n' 'kiconthemes' 'kinit'  'kio' 
+         'kjobwidgets' 'knotifications' 'kparts' 'kservice' 'ktextwidgets' 'kwallet'
+         'kwidgetsaddons' 'kwindowsystem' 'kxmlgui' 'qt5-webkit' 'sonnet') #'qca-qt5'
+makedepends=('extra-cmake-modules' 'git' 'kdoctools')
+conflicts=('rekonq')
+source=("git://anongit.kde.org/rekonq.git#branch=frameworks")
+md5sums=('SKIP')
+
+
+prepare() {
+  mkdir -p build
+  sed -i -e 's/KF5 CONFIG REQUIRED/KF5 REQUIRED/' ${srcdir}/${_pkgname}/CMakeLists.txt
+}
+
+build() {
+  cd build
+  #cmake ../${_pkgname}-${pkgver} \
+  cmake ../${_pkgname} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DQT4_BUILD=OFF \
+    -DLIB_INSTALL_DIR=lib 
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
+ 

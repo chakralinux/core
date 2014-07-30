@@ -2,12 +2,12 @@ source ../plasma.conf
 
 pkgname=plasma-workspace
 pkgver=${PVersion}
-pkgrel=3
+pkgrel=5
 pkgdesc="Plasma Workspace"
 arch=('x86_64')
 url='http://projects.kde.org'
 license=('LGPL')
-depends=('qt5-base' 'qt5-declarative' 'qt5-script' 'plasma-framework' 'kdelibs4support' 'kemoticons' 'kdesu' 'knewstuff' 'krunner' 'kcmutils' 'kjs' 'kjsembed' 'knotifyconfig' 'ksysguard' 'libkscreen2' 'kwin' 'ktexteditor' 'akonadi-qt5' 'baloo5')
+depends=('qt5-base' 'qt5-declarative' 'qt5-script' 'plasma-framework' 'kdelibs4support' 'kemoticons' 'kdesu' 'knewstuff' 'krunner' 'kcmutils' 'kjs' 'kjsembed' 'knotifyconfig' 'ksysguard' 'libkscreen2' 'kwin' 'ktexteditor' 'akonadi-qt5' 'kf5-baloo')
 makedepends=('extra-cmake-modules' 'kapidox')
 checkdepends=("cmake")
 groups=('plasma')
@@ -44,6 +44,6 @@ package() {
   cd build
   make DESTDIR="${pkgdir}" install
   
-  sed 's|qtpaths|qtpaths-qt5|' -i "$pkgdir/usr/bin/startkde"
+  sed 's|qtpaths|qtpaths-qt5|g' -i "$pkgdir/usr/bin/startkde"
   install -Dm755 "${srcdir}/10-kf5" "${pkgdir}/etc/X11/xinit/xinitrc.d/10-kf5"
 }
