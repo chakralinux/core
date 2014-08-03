@@ -1,7 +1,7 @@
 # maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=telepathy-gabble
-pkgver=0.18.1
+pkgver=0.18.3
 pkgrel=1
 pkgdesc="A Jabber/XMPP connection manager that handles single- and multi-user chats and voice/video calls."
 arch=('x86_64')
@@ -13,7 +13,7 @@ groups=('telepathy')
 options=('!libtool' '!emptydirs')
 install=telepathy-gabble.install
 source=("http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('a5384758df829b80d47fbc8a672609ad')
+sha1sums=('1c71c5acf2c506788aa4b1604390f38979d88887')
 
 build() {
   cd $pkgname-$pkgver
@@ -26,5 +26,6 @@ build() {
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
   make DESTDIR=${pkgdir} install
+  sed -i "s|#!/usr/bin/env python|#!/usr/bin/env python2|" "$pkgdir/usr/bin/telepathy-gabble-xmpp-console"
 }
 
