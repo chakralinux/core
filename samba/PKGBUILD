@@ -239,5 +239,12 @@ sys.path.insert(0, '/usr/lib/python${_pyver}/site-packages')" \
   
   # copy ldap example
   install -D -m644 ${srcdir}/samba-${pkgver}/examples/LDAP/samba.schema ${pkgdir}/usr/share/doc/samba/examples/LDAP/samba.schema
+
+
+  # FIXME: the fact that we need to remove those files probably means that packages in the stack are outdated, and it's likely that something will break
+  rm ${pkgdir}/usr/bin/{ldbadd,ldbdel,ldbedit,ldbmodify,ldbrename,ldbsearch}
+  rm ${pkgdir}/usr/lib/python2.7/site-packages/ldb.so
+  rm ${pkgdir}/usr/share/man/man1/{ldbadd.1,ldbdel.1,ldbedit.1,ldbmodify.1,ldbrename.1,ldbsearch.1}
+  rm ${pkgdir}/usr/share/man/man3/ldb.3
 }
 
