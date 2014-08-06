@@ -6,14 +6,16 @@
 # Contributor: Giuseppe Calà <jiveaxe@gmail.com>
 
 pkgname=texlive-latexextra
-pkgver=2013.30964
+pkgver=2013.33063
 _revnr=${pkgver#*.}
 pkgrel=1
 pkgdesc="TeX Live - Large collection of add-on packages for LaTeX"
 license=('GPL')
 arch=(any)
-depends=('texlive-core')
+depends=('texlive-core'
+	 'perl-file-which')
 optdepends=(
+  'texlive-genericextras: to use the calctab package'
   'texlive-pictures: to use the package overpic'
   'java-environment: to use pdfannotextractor'
 )
@@ -24,11 +26,10 @@ source=("ftp://ftp.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
 options=('!emptydirs')
 options=(!strip)
 install=texlive.install
-md5sums=('64386dfe9fc40f2d4edc7c653d716bdf'
+md5sums=('ef7a22d455bcf59aee21fc65274df5b8'
          '9e4825f47dac663dd62c4bfa67899e84')
 
 build() {
-   cd "${srcdir}"
    for p in *.tar.xz; do
       bsdtar -xf $p
    done
@@ -36,8 +37,6 @@ build() {
 }
 
 package() {
-   cd "${srcdir}"
-
    install -m755 -d $pkgdir/var/lib/texmf/arch/installedpkgs
    sed -i '/^#/d' CONTENTS
    install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_${_revnr}.pkgs
