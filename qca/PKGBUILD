@@ -1,31 +1,49 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakraos.org
 #
 
-pkgname=qca
-pkgver=2.0.3
+pkgbase=qca
+pkgname=("qca" "qca-qt5")
+pkgver=2.0.3.1
 pkgrel=2
-pkgdesc="Qt Cryptographic Architecture"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://delta.affinix.com/qca/"
 license=('LGPL')
-depends=('qt' 'ca-certificates')
-source=("http://delta.affinix.com/download/qca/2.0/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('fc15bd4da22b8096c51fcfe52d2fa309')
+makedepends=('qt' 'qt5-base' 'cmake' 'git' 'nss')
+source=("git://anongit.kde.org/qca.git")
+md5sums=('SKIP')
 
-build() {
-	cd $srcdir/${pkgname}-${pkgver}
-	sed -i '217s@set@this->set@' src/botantools/botan/botan/secmem.h &&
-	./configure \
-		--prefix=/usr \
-		--disable-tests \
-		--certstore-path=/etc/ssl/certs/ca-certificates.crt \
-		--release \
-		--no-separate-debug-info
-	make
+prepare(){
+  mkdir $srcdir/build
+  mkdir $srcdir/build-qt5
 }
 
-package() {
-	cd $srcdir/${pkgname}-${pkgver}
-	make INSTALL_ROOT=$pkgdir install
+build() {
+  cd $srcdir/build
+  cmake ../${pkgbase} \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DQT4_BUILD=true
+  make
+
+  cd $srcdir/build-qt5
+  cmake ../${pkgbase} \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  make
+}
+
+package_qca() {
+  pkgdesc="Qt Cryptographic Architecture"
+  depends=('qt' 'ca-certificates' 'nss')
+
+  cd $srcdir/build
+  make DESTDIR=${pkgdir} install
+}
+
+package_qca-qt5() {
+  pkgdesc="Qt5 Cryptographic Architecture"
+  depends=('qt5-base' 'ca-certificates' 'nss')
+  conflicts=('qca')
+
+  cd $srcdir/build-qt5
+  make DESTDIR=${pkgdir} install
 }
