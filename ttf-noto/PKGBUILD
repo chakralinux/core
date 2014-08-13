@@ -1,7 +1,8 @@
 # Maintainer: wengxt <wengxt at gmail dot com>
 
-pkgname=ttf-noto
-pkgver=20140714
+pkgbase=ttf-noto
+pkgname=('ttf-noto' 'otf-noto')
+pkgver=20140813
 pkgrel=1
 pkgdesc="Fonts support all languages/characters in Unicode"
 arch=('any')
@@ -15,15 +16,18 @@ source=("http://www.google.com/get/noto/pkgs/Noto-hinted.zip")
 md5sums=('e72d000d9e90729a6caceff7afaf1f45')
 install=$pkgname.install
 
-package() {
+package_ttf-noto() {
     for file in *.ttf
     do
         install -Dm644 $file $pkgdir/usr/share/fonts/TTF/$file
     done
-    
+    install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+}
+package_otf-noto() {
     for file in *.otf
     do
         install -Dm644 $file $pkgdir/usr/share/fonts/OTF/$file
     done
+    install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }
 
