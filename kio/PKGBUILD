@@ -4,9 +4,9 @@ source ../frameworks.conf
 
 pkgname=kio
 pkgver=${KFVersion}
-pkgrel=5
+pkgrel=1
 pkgdesc='KIO'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kio'
 license=('LGPL')
 depends=('krb5' 'solid' 'knotifications' 'kjobwidgets' 'kbookmarks'
@@ -23,8 +23,6 @@ prepare() {
 }
 
 build() {
-   # export XDG_DATA_DIRS="/opt/kf5/share:$XDG_DATA_DIRS"
-
   cd build
   cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=${KFBuildType} \
