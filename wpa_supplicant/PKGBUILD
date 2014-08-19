@@ -5,34 +5,40 @@
 # contributor <abveritas[at]chakra-project[dot]org>
 
 pkgname=wpa_supplicant
-pkgver=2.0
-pkgrel=3
+pkgver=2.2
+pkgrel=1
 pkgdesc="A utility providing key negotiation for WPA wireless networks"
 arch=('x86_64')
-depends=('openssl' 'dbus-core>=1.2.4' 'readline>=6.0' 'libnl')
+depends=('openssl' 'dbus-core' 'readline' 'libnl')
 license=('GPL')
 groups=('base')
-backup=('etc/wpa_supplicant.conf')
+backup=('etc/wpa_supplicant/wpa_supplicant.conf')
 url="http://hostap.epitest.fi/wpa_supplicant"
 source=("http://hostap.epitest.fi/releases/wpa_supplicant-$pkgver.tar.gz"
         'config')
-md5sums=('3be2ebfdcced52e00eda0afe2889839d'
-         '4aa1e5accd604091341b989b47fe1076')
+md5sums=('238e8e888bbd558e1a57e3eb28d1dd07'
+         'd621945fe43f04f8fdea612ae6d1251e')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}/${pkgname}/"
+  cp "${srcdir}/config" ./.config
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}/${pkgname}"
-  cp "${srcdir}/config" ./.config
-  sed -i 's@/usr/local@$(PREFIX)@g' Makefile
-  
-  make PREFIX=/usr
+
+  # The Makefile does not pick up our CPPFLAGS
+  export CFLAGS="$CPPFLAGS $CFLAGS"
+  make LIBDIR=/usr/lib BINDIR=/usr/bin
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}/${pkgname}"
-  make PREFIX=/usr DESTDIR="${pkgdir}" install
+  make LIBDIR=/usr/lib BINDIR=/usr/bin DESTDIR="${pkgdir}" install
   
-  install -m755 -d "${pkgdir}/etc"
-  install -m644 wpa_supplicant.conf "${pkgdir}/etc/wpa_supplicant.conf"
+  install -m755 -d "${pkgdir}/etc/wpa_supplicant"
+  install -m644 wpa_supplicant.conf "${pkgdir}/etc/wpa_supplicant/wpa_supplicant.conf"
+  
   install -d -m755 "${pkgdir}/usr/share/man/man"{5,8}
   install -m644 doc/docbook/*.5 "${pkgdir}/usr/share/man/man5/"
   install -m644 doc/docbook/*.8 "${pkgdir}/usr/share/man/man8/"
