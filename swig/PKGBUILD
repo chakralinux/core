@@ -4,20 +4,26 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=swig
-pkgver=2.0.11
+pkgver=3.0.2
 pkgrel=1
 pkgdesc="A compiler that makes it easy to integrate C and C++ code with scripting languages"
 arch=('x86_64')
 url="http://www.swig.org/"
 license=('custom')
-depends=('pcre' 'zlib')
+depends=('pcre' 'gcc-libs')
+checkdepends=('ruby' 'python2' 'java-environment' 'tcl' 'php' 'lua' 'ocaml' 'r' 'go')
 source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-sha1sums=('d3bf4e78824dba76bfb3269367f1ae0276b49df9')
+sha1sums=('e695a14acf39b25f3ea2d7303e23e39dfe284e31')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr
   make
+}
+
+check() {
+  cd ${pkgname}-${pkgver}
+  make check || warning "Tests failed"
 }
 
 package() {
