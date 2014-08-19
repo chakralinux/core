@@ -4,7 +4,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=man-pages
-pkgver=3.51
+pkgver=3.70
 _posixver=2003-a
 pkgrel=1
 pkgdesc="Linux man pages"
@@ -15,7 +15,7 @@ groups=('base')
 depends=()
 source=(http://www.kernel.org/pub/linux/docs/man-pages/$pkgname-$pkgver.tar.xz
         http://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/$pkgname-posix-${_posixver}.tar.bz2)
-md5sums=('63eef7d6d5abf30bc5b785e344d1df8b'
+md5sums=('e5a3fc1d7ae4f03a27676d7bad725416'
          '7c78aff03c0a6767ba483d34f19e4b09')
 
 build() {
@@ -33,6 +33,10 @@ package() {
   cd ${srcdir}/$pkgname-$pkgver
 
   make prefix=${pkgdir}/usr install
+
+  # posix pages have a custom license
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/$pkgname-posix-${_posixver}/POSIX-COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/POSIX-COPYRIGHT"
 
   cd ${pkgdir}/usr/share/man
   # these are included in coreutils || return 1
