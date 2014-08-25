@@ -1,38 +1,30 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakraos.org
 #
 # Maintainer: Weng Xuetian <wengxt@gmail.com>
 
 pkgname=dnsmasq
-pkgver=2.66
+pkgver=2.71
 pkgrel=1
 pkgdesc="Lightweight, easy to configure DNS forwarder and DHCP server"
 url="http://www.thekelleys.org.uk/dnsmasq/doc.html"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL')
 depends=('glibc' 'dbus-core')
 install=$pkgname.install
 backup=('etc/dnsmasq.conf')
 source=("http://www.thekelleys.org.uk/$pkgname/$pkgname-$pkgver.tar.xz"
-        '0001-Fix-wrong-size-in-memset-call.patch'
-        '0001-Fix-failure-to-start-with-ENOTSOCK.patch'
         'dnsmasq.service')
-md5sums=('cd1c70dd66d2e3ad02b66ca6af4ebf20'
-         '05ccefefde68ebdebce5e40d2b3c78be'
-         '98cc950a6b0482eb7e61969dafb4f764'
+md5sums=('9e2e4d59c75e71ee3ca817ff0f9be69e'
          '7ac45726cabef4145db40d758cc7fedf')
 
 build() {
   cd "$pkgname-$pkgver"
 
-  patch -Np1 -i "$srcdir/0001-Fix-wrong-size-in-memset-call.patch" || return 1
-  patch -Np1 -i "$srcdir/0001-Fix-failure-to-start-with-ENOTSOCK.patch" || return 1
-
-  # link against dbus. this ugliness is needed to ensure that the
-  # compile time opts report properly on startup. yuck.
-  sed -i '/^#ifdef DNSMASQ_COMPILE_OPTS/ i#define HAVE_DBUS' src/config.h
-
-  make "CFLAGS=$CPPFLAGS $CFLAGS" "LDFLAGS=$LDFLAGS"
+  make \
+    CFLAGS="$CPPFLAGS $CFLAGS" \
+    LDFLAGS="$LDFLAGS" \
+    COPTS="-DHAVE_DNSSEC -DHAVE_DBUS"
 }
 
 package() {
@@ -43,6 +35,10 @@ package() {
   install -Dm644 "dbus/dnsmasq.conf" "$pkgdir"/etc/dbus-1/system.d/dnsmasq.conf
   install -Dm644 "dnsmasq.conf.example" "$pkgdir"/etc/dnsmasq.conf
   install -Dm644 "$srcdir/dnsmasq.service" "$pkgdir"/usr/lib/systemd/system/dnsmasq.service
+
+  # DNSSEC setup
+  sed -i 's,%%PREFIX%%,/usr,' "$pkgdir"/etc/dnsmasq.conf
+  install -Dm644 "trust-anchors.conf" "$pkgdir"/usr/share/dnsmasq/trust-anchors.conf
 }
 
 # vim: ts=2 sw=2 et ft=sh
