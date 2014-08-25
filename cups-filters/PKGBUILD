@@ -1,8 +1,8 @@
 # Maintainer: Neophytos Kolokotronis <tetris4ATgmailDOTcom>
 
 pkgname=cups-filters
-pkgver=1.0.37
-pkgrel=3
+pkgver=1.0.58
+pkgrel=1
 pkgdesc="OpenPrinting CUPS Filters"
 arch=('x86_64')
 url="http://www.linuxfoundation.org/collaborate/workgroups/openprinting"
@@ -14,10 +14,8 @@ optdepends=('ghostscript: for non-PostScript printers to print with CUPS to conv
 	    'foomatic-db-engine: drivers use Ghostscript to convert PostScript to a printable form directly'
 	    'foomatic-db-nonfree: drivers use Ghostscript to convert PostScript to a printable form directly')
 backup=(etc/fonts/conf.d/99pdftoopvp.conf)
-source=("http://www.openprinting.org/download/cups-filters/$pkgname-$pkgver.tar.gz"
-        'cups-browsed.service')
-md5sums=('42d2dd9745d4d5d626c7b871155cb430'
-         '9ef68d7c2a84713fd421f4e87dec0a6e')
+source=("http://www.openprinting.org/download/cups-filters/$pkgname-$pkgver.tar.gz")
+md5sums=('0143ef62cd229e99fd3b03e827b1c122')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
@@ -43,5 +41,5 @@ package() {
   # drop static lib
   rm -f ${pkgdir}/usr/lib/*.a
   # systemd service
-  install -Dm644 ${srcdir}/cups-browsed.service ${pkgdir}/usr/lib/systemd/system/cups-browsed.service
+  install -Dm644 utils/cups-browsed.service ${pkgdir}/usr/lib/systemd/system/cups-browsed.service
 }
