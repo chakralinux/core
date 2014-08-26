@@ -1,13 +1,12 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=readline
-_basever=6.2
-_patchlevel=004 #prepare for some patches
+_basever=6.3
+_patchlevel=006 #prepare for some patches
 pkgver=$_basever.$_patchlevel
-pkgrel=2
+pkgrel=1
 pkgdesc="GNU readline library"
 arch=('x86_64')
 url="http://tiswww.case.edu/php/chet/readline/rltop.html"
@@ -18,27 +17,26 @@ options=('!emptydirs')
 install='readline.install'
 source=("http://ftp.gnu.org/gnu/readline/readline-$_basever.tar.gz"
         'inputrc')
-if [ $_patchlevel -gt 00 ]; then
-    for (( p=1; p<=$((10#${_patchlevel})); p++ )); do
-        source=(${source[@]} http://ftp.gnu.org/gnu/readline/readline-$_basever-patches/readline${_basever//./}-$(printf "%03d" $p))
+
+if [[ $_patchlevel -gt 0 ]]; then
+    for (( _p=1; _p <= $((10#${_patchlevel})); _p++ )); do
+        source=(${source[@]} http://ftp.gnu.org/gnu/readline/readline-$_basever-patches/readline${_basever//.}-$(printf "%03d" $_p){,.sig})
     done
 fi
-md5sums=('67948acb2ca081f23359d0256e9a271c'
-         '58d54966c1191db45973cb3191ac621a'
-         '83287d52a482f790dfb30ec0a8746669'
-         '0665020ea118e8434bd145fb71f452cc'
-         'c9d5d79718856e711667dede87cb7622'
-         'c08e787f50579ce301075c523fa660a4')
 
-build() {
-  cd ${srcdir}/${pkgname}-$_basever
-  for (( p=1; p<=$((10#${_patchlevel})); p++ )); do
-    msg "applying patch readline${_basever//./}-$(printf "%03d" $p)"
-    patch -Np0 -i $srcdir/readline${_basever//./}-$(printf "%03d" $p)
+prepare() {
+  cd $pkgname-$_basever
+  for (( _p=1; _p <= $((10#${_patchlevel})); _p++ )); do
+    msg "applying patch readline${_basever//.}-$(printf "%03d" $_p)"
+    patch -p0 -i ../readline${_basever//.}-$(printf "%03d" $_p)
   done
 
-  # Remove RPATH from shared objects
+  # remove RPATH from shared objects (FS#14366)
   sed -i 's|-Wl,-rpath,$(libdir) ||g' support/shobj-conf
+}
+
+build() {
+  cd $pkgname-$_basever
 
   # build with -fPIC for x86_64 (FS#15634)
   [ $CARCH == "x86_64" ] && CFLAGS="$CFLAGS -fPIC"
@@ -53,4 +51,19 @@ package() {
   
   install -Dm644 ${srcdir}/inputrc ${pkgdir}/etc/inputrc
 }
+
+md5sums=('33c8fb279e981274f485fd91da77e94a'
+         '58d54966c1191db45973cb3191ac621a'
+         '4343f5ea9b0f42447f102fb61576b398'
+         'SKIP'
+         '700295212f7e2978577feaee584afddb'
+         'SKIP'
+         'af4963862f5156fbf9111c2c6fa86ed7'
+         'SKIP'
+         '11f9def89803a5052db3ba72394ce14f'
+         'SKIP'
+         '93721c31cd225393f80cb3aadb165544'
+         'SKIP'
+         '71dc6ecce66d1489b96595f55d142a52'
+         'SKIP')
 
