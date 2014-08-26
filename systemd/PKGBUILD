@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=214
-pkgrel=4
+pkgver=216
+pkgrel=1
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -36,10 +36,10 @@ source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
         'initcpio-install-udev'
         'initcpio-install-systemd'
         '99-default.preset')
-md5sums=('eac4f9fc5bd18a0efc3fc20858baacf3'
-         'e99e9189aa2f6084ac28b8ddf605aeb8'
-         'fb37e34ea006c79be1c54cbb0f803414'
-         '9027b31a875e74a45623954b3b23d09f'
+md5sums=('04fda588a04f549da0f397dce3ae6a39'
+         '7a79eb3e4ce19906cfebfea75fb9f8bb'
+         'bde43090d4ac0ef048e3eaee8202a407'
+         'a736284f0c8e549dd988522e75628ec0'
          'a1bf25da736d3719e9720b2e4caea341')
 
 build() {
@@ -106,6 +106,9 @@ package() {
   sed -i 's#GROUP="dialout"#GROUP="uucp"#g;
           s#GROUP="tape"#GROUP="storage"#g;
           s#GROUP="cdrom"#GROUP="optical"#g' "$pkgdir"/usr/lib/udev/rules.d/*.rules
+  sed -i 's/dialout/uucp/g;
+          s/tape/storage/g;
+          s/cdrom/optical/g' "$pkgdir"/usr/lib/sysusers.d/basic.conf
 
   # add mkinitcpio hooks
   install -Dm644 "$srcdir/initcpio-install-udev" "$pkgdir/usr/lib/initcpio/install/udev"
