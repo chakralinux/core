@@ -1,11 +1,11 @@
-# maintainer almack@chakra-project.org
+# maintainer almack@chakraos.org
 
 _extramodules=extramodules-3.15.5-CHAKRA
 _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=lirc-utils
 pkgver=0.9.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Linux Infrared Remote Control utils"
 arch=('x86_64')
 url="http://www.lirc.org/"
@@ -14,23 +14,20 @@ depends=('alsa-lib' 'libx11' 'libftdi' 'linux')
 makedepends=('help2man' 'linux-headers>=3.15' 'linux-headers<3.16' 'python2' 'libtool')
 optdepends=('python2: pronto2lirc utility')
 replaces=('lirc+pctv')
-backup=('etc/conf.d/lircd.conf' 'etc/conf.d/irexec.conf')
+backup=('etc/lirc/lirc_options.conf' 'etc/lirc/lircd.conf' 'etc/lirc/lircmd.conf')
 options=('!makeflags')
 install=lirc-utils.install
 source=(http://sourceforge.net/projects/lirc/files/LIRC/$pkgver/lirc-$pkgver.tar.bz2
         kernel-2.6.39.patch
         linux-3.8.patch
-        lirc.logrotate lircd.conf irexec.conf 
+        irexec.service
+        lirc.logrotate
         lirc.tmpfiles)
 md5sums=('3b78c3cc872d5e2fa78b796c2efd46db'
          '087a7d102e1c96bf1179f38db2b0b237'
          '9ee196bd03ea44af5a752fb0cc6ca96a'
+         '32df3b9bc859565d6acf5f0e5b747083'
          '3deb02604b37811d41816e9b4385fcc3'
-         '5b1f8c9cd788a39a6283f93302ce5c6e'
-         'f0c0ac930326168035f0c8e24357ae55'
-         'f367f3dfecd10b9cfa035f9a6c2d2ea6'
-         'e2a9a403c2f5107bb9ef1eb70a623876'
-         '07131d117fcfe9dcd50c453c3a5e9531'
          'febf25c154a7d36f01159e84f26c2d9a')
 
 prepare() {
@@ -74,19 +71,13 @@ package() {
 	make DESTDIR=""${pkgdir}"" install 
 	
 	install -D -m644 "${srcdir}"/lirc.tmpfiles "${pkgdir}"/usr/lib/tmpfiles.d/lirc.conf
+	install -Dm644 "${srcdir}"/irexec.service "${pkgdir}"/usr/lib/systemd/system/irexec.service
 		
 	cp -rp remotes "${pkgdir}"/usr/share/lirc 
 	chmod -R go-w "${pkgdir}"/usr/share/lirc/ 
 
-
 	# install the logrotate config
     	install -D -m644 "${srcdir}"/lirc.logrotate "${pkgdir}"/etc/logrotate.d/lirc 
-    
-	# install conf.d file
-	install -D -m644 "${srcdir}"/lircd.conf "${pkgdir}"/etc/conf.d/lircd.conf 
-
-	# install conf.d file
-        install -D -m644 "${srcdir}"/irexec.conf "${pkgdir}"/etc/conf.d/irexec.conf 
 
 	install -d -m755 "${pkgdir}"/etc/lirc
 	
