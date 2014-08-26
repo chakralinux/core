@@ -5,9 +5,9 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel="3.15.5"
-pkgver=3.15.5
-pkgrel=2
+_basekernel="3.16"
+pkgver=3.16.1
+pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -29,18 +29,18 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         'linux.preset'
         'change-default-console-loglevel.patch')
 
-sha256sums=('62e367abb19bfc0cd5576c516b5b3b18827377ea288e97a85b0e2466877a4026'
-            '9b0d000e0bdec7a25ee6303afdab8d2af77439995876eadd6ce248e5c954037d'
+sha256sums=('4813ad7927a7d92e5339a873ab16201b242b2748934f12cb5df9ba2cfe1d77a0'
+            'd2bf33289acf5c05b57aaca1fd8bb1935ac280c5c4090874e84806d35e17012e'
             'a3ff475da2d11620bed6de14d858b463d3045fe259de199f92d94c4264f16ee3'
-            'd9c11adc0ba2a1af3015084e1b824cb5ab3851d04baac954411f7e8e2d978014'
-            '1d31fce8dca96f934fca54ba779305aca6e591951fb031f57211f9c006662e9f'
-            '44d7b905865f8200733608ab1148af893103c4e45bfe5c8386ae816232d085ba'
-            '65d1a9d18fd3f494742619cfc8f39455b207d7de45fa1f23ecbcc9ee49acf240'
-            '6c09de56705615d9d836584d1abc4fc3fb073a6de5deb55bd6a500d4811a5ce5'
-            '460991dca26b087b1b89993b426e254cad1b4e1bde6443869919add39efafed9'
+            'a91c5affffb9e24cf0e34e1ab1c9e593219f67ef81834e0e4e9572281ef760c0'
+            '537150c576a296ddc99c4f8f51fabc2f3577acf3a6e375edbfd60be337c1b122'
+            'c5ecc97e669d8bcc4540c12ee74c7aecc4e2e8102993407a96a4f7463be74d80'
+            '1aa96e559617365d4ba770454931232de8edb17005341ff00313bce950b34797'
+            '395197bc5073f0f84441eb65f50b3429bb9137952f786f4f23ce60c52d1c3d74'
+            '75329858084586fc5dbc3af7bd4dd18abbf9d3f65b8a29c684d2f3920d648f65'
             'b1b1cf291bd68270b700eb21f19f7b052116d07dde492761227cd94bb775910c'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
-            'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182')
+            '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99')
 
 prepare() {
   cd "${srcdir}/linux-${_basekernel}"
@@ -49,8 +49,8 @@ prepare() {
   make mrproper
 
   # add upstream patch
-  # msg "adding upstream patch"
-  # patch -p1 -i "${srcdir}/patch-${pkgver}"
+  msg "adding upstream patch"
+  patch -p1 -i "${srcdir}/patch-${pkgver}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -91,11 +91,10 @@ prepare() {
 
   # don't run depmod on 'make install'. We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
-}
 
-build() {
-  cd "${srcdir}/linux-${_basekernel}"
-
+  ####################
+  # prepare
+  ####################
   # get kernel version
   make prepare
 
@@ -118,7 +117,10 @@ build() {
   # this is useful to configure the kernel
   # msg "Stopping build"; return 1
   ####################
+}
 
+build() {
+  cd "${srcdir}/linux-${_basekernel}"
   # build!
   make ${MAKEFLAGS} LOCALVERSION= bzImage modules
 }
