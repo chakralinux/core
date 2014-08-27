@@ -1,5 +1,5 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakraos.org
 #
 # Maintainer:  Samir Benmendil <ram-z[at]chakra-project[dot]org>
 # Contributor: Rémy Oudompheng <remy@archlinux.org
@@ -7,7 +7,7 @@
 
 pkgname=texlive-bin
 pkgver=2013.30973
-pkgrel=7
+pkgrel=8
 _biber_ver=1.9
 pkgdesc="TeX Live binaries"
 url='http://tug.org/texlive/'
@@ -21,7 +21,7 @@ makedepends=('perl' 'clisp' 'ffcall')
 optdepends=('ed: for texconfig')
 provides=('lcdf-typetools' 'kpathsea' 'xindy' 'pdfjam')
 conflicts=('pdfjam')
-options=('!libtool' '!strip')
+options=('!strip')
 install="texlive.install"
 source=(
 	'fix-fontforge-encoding.patch'
@@ -121,7 +121,7 @@ package() {
 
   ## install Perl libraries
   mkdir -p "$pkgdir"/usr/share/tlpkg/TeXLive
-  install -m755 "${srcdir}"/biber "${pkgdir}/usr/biber"
+  install -m755 "${srcdir}"/biber "${pkgdir}/usr/bin/biber"
   install -m644 "${srcdir}"/source/utils/biber/TeXLive/*.pm "$pkgdir"/usr/share/tlpkg/TeXLive
 
   ## symlink engines by hand. texlinks has moved to texlive-core...
