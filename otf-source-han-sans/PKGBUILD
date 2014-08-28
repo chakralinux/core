@@ -1,58 +1,137 @@
-# Maintainer: Weng Xuetian <wengxt@gmail.com>
-
 pkgbase=otf-source-han-sans
+pkgname=($pkgbase-jp $pkgbase-kr $pkgbase-cn $pkgbase-twhk ${pkgbase/otf/otc})
 pkgver=1.000
-pkgrel=3
-pkgdesc='Adobe Source Han Sans - Religion-specific subsets'
+pkgrel=4
+pkgdesc='Adobe Source Han Sans - A set of Pan-CJK fonts designed to complement Source Sans Pro'
 arch=('any')
-url='https://github.com/adobe-fonts/source-han-sans'
-license=('apache')
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
-install="otf-source-han-sans.install"
+license=('Apache')
+url='http://sourceforge.net/adobe/source-han-sans'
+depends=('fontconfig')
+makedepends=('unzip')
+install="${pkgbase}.install"
+source=("http://sourceforge.net/projects/source-han-sans.adobe/files/SourceHanSansJP-$pkgver.zip"
+        "http://sourceforge.net/projects/source-han-sans.adobe/files/SourceHanSansKR-$pkgver.zip"
+        "http://sourceforge.net/projects/source-han-sans.adobe/files/SourceHanSansCN-$pkgver.zip"
+        "http://sourceforge.net/projects/source-han-sans.adobe/files/SourceHanSansTWHK-$pkgver.zip"
+        "http://sourceforge.net/projects/source-han-sans.adobe/files/SourceHanSansOTC-$pkgver.zip"
+        44-source-han-sans-jp.conf
+        44-source-han-sans-kr.conf
+        44-source-han-sans-cn.conf
+        44-source-han-sans-twhk.conf
+        44-source-han-sans-otc.conf)
+noextract=(SourceHanSansJP-$pkgver.zip SourceHanSansKR-$pkgver.zip SourceHanSansCN-$pkgver.zip SourceHanSansTWHK-$pkgver.zip SourceHanSansOTC-$pkgver.zip)
+sha256sums=('c5930036660bea22ffceaa9e2df765776494800d330a59be7936ab3c763c4c82'
+            '8eed4ad092fcf640e44f73ba510e0ed1c1cabf79776f68d02820734bbba21cf8'
+            '88117aa8f8b4ab65d6f7a919a5e1b06d6c00f75b1abecccf120246536123754d'
+            '2371a726757a51322243b1ed7a9fde562621b0813b5e6d6443e06847ad7bbd20'
+            'd6eb107eaf7f7b7e6b775905e2f5b335c989c7b06a46fc7286d3e71c4ffde4d8'
+            'f0e87368ffa91ac76b253846836da05baa120ab4f8a7bfd90fded36f4988c9e0'
+            'fa8d487c7ba67489bde7b4d8558e07abb6d8bcb4d4e9db1bf454c2db23af9547'
+            'd42ed0092a47cee5c7ff3972c90676109212dafc2cffb3388a8b339788a6cdb5'
+            'bfcdadbe66f70baaf617c582ec69ccc6b10175020ccb1ec2de26220b09270e60'
+            'd9ef4ab4db1ad22be57d7c4bfe1cc75e9e1ed5e41887fba49dd137a88401b5f2')
 
-_languages=(
-'cn "Simplified Chinese"'
-'jp "Japanese"'
-'kr "Korean"'
-'twhk "Traditional Chinese"'
+_jp=(
+SourceHanSansJP-Bold.otf
+SourceHanSansJP-ExtraLight.otf
+SourceHanSansJP-Heavy.otf
+SourceHanSansJP-Light.otf
+SourceHanSansJP-Medium.otf
+SourceHanSansJP-Normal.otf
+SourceHanSansJP-Regular.otf
+)
+_kr=(
+SourceHanSansKR-Bold.otf
+SourceHanSansKR-ExtraLight.otf
+SourceHanSansKR-Heavy.otf
+SourceHanSansKR-Light.otf
+SourceHanSansKR-Medium.otf
+SourceHanSansKR-Normal.otf
+SourceHanSansKR-Regular.otf
+)
+_cn=(
+SourceHanSansCN-Bold.otf
+SourceHanSansCN-ExtraLight.otf
+SourceHanSansCN-Heavy.otf
+SourceHanSansCN-Light.otf
+SourceHanSansCN-Medium.otf
+SourceHanSansCN-Normal.otf
+SourceHanSansCN-Regular.otf
+)
+_twhk=(
+SourceHanSansTWHK-Bold.otf
+SourceHanSansTWHK-ExtraLight.otf
+SourceHanSansTWHK-Heavy.otf
+SourceHanSansTWHK-Light.otf
+SourceHanSansTWHK-Medium.otf
+SourceHanSansTWHK-Normal.otf
+SourceHanSansTWHK-Regular.otf
+)
+_otc=(
+SourceHanSans-Bold.ttc
+SourceHanSans-ExtraLight.ttc
+SourceHanSans-Heavy.ttc
+SourceHanSans-Light.ttc
+SourceHanSans-Medium.ttc
+SourceHanSans-Normal.ttc
+SourceHanSans-Regular.ttc
 )
 
-pkgname=()
-source=()
-
-for _lang in "${_languages[@]}"; do
-  _locale=${_lang%% *}
-  _pkgname=${pkgbase}-${_locale,,}
-  _upper_locale=`echo $_locale | tr '[:lower:]' '[:upper:]'`
-  pkgname+=(${_pkgname})
-  source+=("http://sourceforge.net/projects/source-han-sans.adobe/files/SourceHanSans${_upper_locale}-${pkgver}.zip"
-           "44-source-han-sans-${_locale}.conf")
-  eval "function package_${_pkgname}() { _package $_lang; }"
-done
-
-
 function _package {
-    pkgdesc="Adobe Source Han Sans - $2 OpenType fonts"
-     _upper_locale=`echo $1 | tr '[:lower:]' '[:upper:]'`
+    cd "$srcdir"
+
+    case "$1" in
+        $pkgbase-jp)
+            fonts=(${_jp[@]})
+            unzip -j SourceHanSansJP-$pkgver.zip
+            _fontconfig_filename=44-source-han-sans-jp.conf
+            pkgdesc="Adobe Source Han Sans - Japanese OpenType/CFF fonts";;
+        $pkgbase-kr)
+            fonts=(${_kr[@]})
+            unzip -j SourceHanSansKR-$pkgver.zip
+            _fontconfig_filename=44-source-han-sans-kr.conf
+            pkgdesc="Adobe Source Han Sans - Korean OpenType/CFF fonts";;
+        $pkgbase-cn)
+            fonts=(${_cn[@]})
+            unzip -j SourceHanSansCN-$pkgver.zip
+            _fontconfig_filename=44-source-han-sans-cn.conf
+            pkgdesc="Adobe Source Han Sans - Simplified Chinese OpenType/CFF fonts";;
+        $pkgbase-twhk)
+            fonts=(${_twhk[@]})
+            unzip -j SourceHanSansTWHK-$pkgver.zip
+            _fontconfig_filename=44-source-han-sans-twhk.conf
+            pkgdesc="Adobe Source Han Sans - Traditional Chinese OpenType/CFF fonts";;
+        ${pkgbase/otf/otc})
+            fonts=(${_otc[@]})
+            unzip -j SourceHanSansOTC-$pkgver.zip
+            _fontconfig_filename=44-source-han-sans-otc.conf
+            pkgdesc="Adobe Source Han Sans - Pan-CJK OpenType/CFF Collection fonts";;
+    esac
 
     # Prepare destination directory
-    install -dm755 "$pkgdir/usr/share/fonts/OTF"
+    install -dm755 "$pkgdir/usr/share/fonts/adobe-source-han-sans"
 
     # Install fonts
-    for font in "SourceHanSans${_upper_locale}-${pkgver}"/*.otf; do
-        install -m644 "$font" "$pkgdir/usr/share/fonts/OTF"
+    for font in "${fonts[@]}"; do
+        install -m644 "$font" "$pkgdir/usr/share/fonts/adobe-source-han-sans"
     done
 
-    install -dm755 "$pkgdir/etc/fonts/conf.d/"
-    install -Dm644 "44-source-han-sans-${1}.conf" "$pkgdir/etc/fonts/conf.avail/44-source-han-sans-${1}.conf"
-    cd "$pkgdir/etc/fonts/conf.d/"
-    ln -s ../conf.avail/44-source-han-sans-${1}.conf .
+    # Install fontconfig fix
+    install -d "$pkgdir/etc/fonts/conf.d"
+    install -Dm644 "$srcdir/$_fontconfig_filename" "$pkgdir/etc/fonts/conf.avail/$_fontconfig_filename"
+    ln -s ../conf.avail/$_fontconfig_filename "$pkgdir/etc/fonts/conf.d/$_fontconfig_filename"
 }
-md5sums=('146465b5e0efa1709433bed888622b06'
-         'a50ac4d9ac547fad1e1d17a154091891'
-         '10fbb83ab3e77cbf292bb20d50b1f7c9'
-         '61f8c22e0ab20a5cb96112b872f142e0'
-         '745ffdb9dad770472623a9430f3cabab'
-         'c348dbe1d30ef117419cd2358ca556b3'
-         '39d5915f35f7a46aae293eaf91fd9a17'
-         '06fc090fa48689e5b42d5e95edf553e8')
+
+for _pkgname in ${pkgname[@]}; do
+    eval "function package_$_pkgname() { _package $_pkgname; }"
+done
+sha256sums=('c5930036660bea22ffceaa9e2df765776494800d330a59be7936ab3c763c4c82'
+            '8eed4ad092fcf640e44f73ba510e0ed1c1cabf79776f68d02820734bbba21cf8'
+            '88117aa8f8b4ab65d6f7a919a5e1b06d6c00f75b1abecccf120246536123754d'
+            '2371a726757a51322243b1ed7a9fde562621b0813b5e6d6443e06847ad7bbd20'
+            'd6eb107eaf7f7b7e6b775905e2f5b335c989c7b06a46fc7286d3e71c4ffde4d8'
+            'e63cd2f10be167e2422d1d30f179bfb45aa06c8b98a65127130b57d8a9a3da09'
+            '02000c16fafddd555cab0a93c564674b317829be038a2ff0a6cafd9b91016d63'
+            'ea33fb6a17a3b4e5e73b0c07a9d5e932c6b8ab85bec3df07d68291888bc2f0ec'
+            'e0d64198c581c8a1925be4b463eecdb52ca059bea15598f5b856d2377f719f4e'
+            'd9ef4ab4db1ad22be57d7c4bfe1cc75e9e1ed5e41887fba49dd137a88401b5f2')
