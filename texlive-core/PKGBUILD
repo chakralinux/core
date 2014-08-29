@@ -9,7 +9,7 @@
 pkgname=texlive-core
 pkgver=2014.34872
 _revnr=${pkgver#*.}
-pkgrel=1
+pkgrel=2
 pkgdesc="TeX Live core distribution"
 url='http://tug.org/texlive/'
 license=('GPL')
@@ -23,6 +23,7 @@ optdepends=(
   'psutils:      to manipulate the output of dvips'
   'python2:      for dviasm'
   'python3:      for pythontex'
+  'ruby:        for old ConTeXT MkII and epspdf'
   't1utils:     can be useful when installing Type1 fonts'
 )
 groups=('texlive-most')
@@ -61,7 +62,7 @@ build() {
      bsdtar -xf $p
    done
    echo "done"
-   rm -rf {tlpkg,doc,source,omega}
+   rm -rf source doc
 }
 
 package() {
@@ -145,13 +146,25 @@ package() {
    mkdir -p "${pkgdir}/usr/bin"
    bash "${pkgdir}"/usr/share/texmf-dist/scripts/texlive/texlinks.sh -f "$pkgdir"/usr/share/texmf-dist/web2c/fmtutil.cnf "$pkgdir"/usr/bin/
 
-   # use python2 for dviasm
+   # use python2 instead of python for scripts.
+   sed -i '1s/python/python2/' $pkgdir/usr/share/texmf-dist/scripts/de-macro/de-macro
    sed -i 's/env python/env python2/' $pkgdir/usr/share/texmf-dist/scripts/dviasm/dviasm.py
+
+   # install Perl libraries
+   mv "$pkgdir"/usr/share/texmf-dist/tlpkg "$pkgdir"/usr/share
+   rm -rf "$pkgdir"/usr/share/tlpkg/tlpobj
+
+   # copy config file to texmf-config
+   #mkdir -p $pkgdir/etc/texmf/tex/context/config
+   #cp -a $pkgdir/usr/share/texmf-dist/tex/context/config/cont-usr.tex \
+   #	  $pkgdir/etc/texmf/tex/context/config/cont-usr.tex
    
    # remove obsolete stuff (we don't provide the omega and aleph binaries anyway)
    rm -f $pkgdir/usr/share/texmf-dist/tex/plain/config/{omega,aleph}.ini
+   #sed -i '/cherokee\.map/d; /oinuit\.map/d; /omega\.map/d' \
+   #    "${pkgdir}/usr/share/texmf-dist/web2c/updmap.cfg"
 
-   # remove upstreams updmap.cfg: it contains too many maps.
+   # remove upstream updmap.cfg: it contains too many maps.
    rm "${pkgdir}/usr/share/texmf-dist/web2c/updmap.cfg"
 
    # more cleanup
@@ -172,9 +185,11 @@ chktex/chkweb.sh
 chktex/deweb.pl
 context/perl/mptopdf.pl
 context/stubs/unix/context
+context/stubs/unix/contextjit
 context/stubs/unix/ctxtools
 context/stubs/unix/luatools
 context/stubs/unix/mtxrun
+context/stubs/unix/mtxrunjit
 context/stubs/unix/pstopdf
 context/stubs/unix/texexec
 context/stubs/unix/texmfstart
@@ -191,14 +206,17 @@ fontools/autoinst
 fontools/ot2kpx
 fragmaster/fragmaster.pl
 installfont/installfont-tl
+latex-git-log/latex-git-log
 latex2man/latex2man
 latexdiff/latexdiff-vc.pl
 latexdiff/latexdiff.pl
 latexdiff/latexrevise.pl
 latexfileversion/latexfileversion
+latexindent/latexindent.pl
 latexmk/latexmk.pl
 latexpand/latexpand
 ltxfileinfo/ltxfileinfo
+ltximg/ltximg.pl
 lua2dox/lua2dox_filter
 luaotfload/luaotfload-tool.lua
 match_parens/match_parens
@@ -224,6 +242,8 @@ pkfix-helper/pkfix-helper
 pkfix/pkfix.pl
 ps2eps/ps2eps.pl
 purifyeps/purifyeps
+pythontex/pythontex.py
+pythontex/depythontex.py
 simpdftex/simpdftex
 sty2dtx/sty2dtx.pl
 texcount/texcount.pl
@@ -232,6 +252,7 @@ texdiff/texdiff
 texdirflatten/texdirflatten
 texdoc/texdoc.tlu
 texdoctk/texdoctk.pl
+texfot/texfot.pl
 texlive/allcm.sh
 texlive/allneeded.sh
 texlive/dvi2fax.sh
