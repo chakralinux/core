@@ -7,8 +7,8 @@
 # Contributor: Drake Justice <djustice[at]chakra-linux[dot]org>
 
 pkgname=texlive-core
-pkgver=2013.33063
-_revnr=${pkgver#2013.}
+pkgver=2014.34872
+_revnr=${pkgver#*.}
 pkgrel=1
 pkgdesc="TeX Live core distribution"
 url='http://tug.org/texlive/'
@@ -16,13 +16,14 @@ license=('GPL')
 arch=(any)
 depends=('texlive-bin' 'perl')
 optdepends=(
-  'ruby:        for old ConTeXT MkII and epspdf'
-  'tk:          for texdoctk'
-  'python:      for dviasm'
-  'ghostscript: for epstopdf, epspdf and other ConTeXt tools' 
-  'psutils:     to manipulate the output of dvips'
-  't1utils:     can be useful when installing Type1 fonts'
+  'dialog:       for texconfig'
+  'ghostscript:  for epstopdf, epspdf and other ConTeXt tools' 
   'java-runtime: for utilities like arara'
+  'perl-tk:      for texdoctk'
+  'psutils:      to manipulate the output of dvips'
+  'python2:      for dviasm'
+  'python3:      for pythontex'
+  't1utils:     can be useful when installing Type1 fonts'
 )
 groups=('texlive-most')
 conflicts=('tetex' 'texlive-latex3')
@@ -33,7 +34,6 @@ source=("ftp://ftp.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
 	"texmf.cnf"
 	"texmfcnf.lua"
 	"09-texlive-fonts.conf")
-options=(!strip)
 install=texlive.install
 backup=(etc/texmf/web2c/texmf.cnf \
         etc/texmf/chktex/chktexrc \
@@ -47,8 +47,8 @@ backup=(etc/texmf/web2c/texmf.cnf \
 	etc/texmf/web2c/mktex.cnf \
 	etc/texmf/xdvi/XDvi)
 
-md5sums=('7e11e1bf401d0a152ac50ef48d676bb3'
-         '306ab28bb9b070fc3e40d86d28ea7e8e'
+md5sums=('65e63bdefdc909b9d6e6624924e53feb'
+         '75c813acb5df57d174e4bd07019adf34'
          'df537245012f3e5f05bdc55644b7a3df'
          '16ad4dc53deb00029baef1b01ba1d984'
          '393a4bf67adc7ca5df2b386759d1a637')
