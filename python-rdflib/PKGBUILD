@@ -1,0 +1,51 @@
+#
+# Platform Packages for Chakra, part of chakraos.org
+#
+
+pkgbase=python-rdflib
+pkgname=('python2-rdflib' 'python3-rdflib')
+pkgver=4.1.2
+pkgrel=1
+pkgdesc="A Python library for working with RDF, a simple yet powerful language for representing information"
+arch=('any')
+url="http://rdflib.net/"
+license=('BSD')
+makedepends=('python2-isodate' 'python3-isodate' 'python2-setuptools' 'python3-setuptools')
+source=(rdflib-$pkgver.tar.gz::https://github.com/RDFLib/rdflib/tarball/$pkgver)
+sha1sums=('64e58e6bd4cc257cd0f3c75d312de0ea1466fcb1')
+
+prepare() {
+  cp -r RDFLib-rdflib-* python2-rdflib
+  cd python2-rdflib
+  sed -i 's|/usr/bin/env python|/usr/bin/env python2|' rdflib/extras/{describer.py,infixowl.py} \
+    rdflib/plugins/parsers/{ntriples.py,notation3.py,structureddata.py,pyRdfa/extras/httpheader.py} \
+    rdflib/tools/rdfpipe.py
+}
+
+build() {
+  cd RDFLib-rdflib-*
+  python3 setup.py build
+  cd ../python2-rdflib
+  python2 setup.py build
+}
+
+package_python2-rdflib() {
+  depends=('python2-isodate')
+
+  cd python2-rdflib
+  python2 setup.py install --root="$pkgdir" --optimize=1
+  install -Dm644  LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+  cd "$pkgdir/usr/bin"
+  for i in * ; do 
+    mv $i $i-py2
+  done
+}
+
+package_python3-rdflib() {
+  depends=('python3-isodate')
+
+  cd RDFLib-rdflib-*
+  python3 setup.py install --root="$pkgdir" --optimize=1
+  install -Dm644  LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

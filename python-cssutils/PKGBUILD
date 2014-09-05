@@ -4,7 +4,7 @@
 
 pkgbase=python-cssutils
 pkgname=('python3-cssutils' 'python2-cssutils')
-pkgver=0.9.10
+pkgver=1.0
 pkgrel=1
 pkgdesc="A CSS (Cascading Style Sheets) library for Python"
 arch=('any')
@@ -12,7 +12,7 @@ url="http://code.google.com/p/cssutils/"
 license=('LGPL3')
 makedepends=('python3-setuptools' 'python2-setuptools')
 source=(http://pypi.python.org/packages/source/c/cssutils/cssutils-${pkgver}.zip)
-sha512sums=('09f6ab240822aa1c74a30875c49c91282f9c865780b99af0e23950d1dd7b0737c7ddf98b18ecf2eb05ddd6d7261679e26d75aa906a586488c76b997e5178c3ab')
+md5sums=('0c0b9df329ec1461c732d0f3cba05e93')
 
 build() {
     cd "${srcdir}"
@@ -26,10 +26,10 @@ package_python3-cssutils() {
     python3 setup.py install --root="$pkgdir" --optimize=1
     
     # Don't install tests (FS#27567)
-    rm -rf "${pkgdir}/usr/lib/python3.3/site-packages/tests"
+    rm -rf "${pkgdir}/usr/lib/python3.4/site-packages/tests"
 
     # Use #!/usr/bin/python3 
-    cd "${pkgdir}/usr/lib/python3.3/site-packages/cssutils"
+    cd "${pkgdir}/usr/lib/python3.4/site-packages/cssutils"
     find . -maxdepth 2 -mindepth 1 -type f -iname '*.py' -exec sed -i 's/env python/python3/' '{}' \;
 }
 

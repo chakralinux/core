@@ -1,27 +1,25 @@
 #maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 pkgname=('python2-cython' 'python3-cython')
 pkgbase=cython
-pkgver=0.18
+pkgver=0.20.2
 pkgrel=1
 arch=(x86_64)
 url="http://www.cython.org"
 license=('APACHE')
-makedepends=('python2-distribute' 'python3-distribute')
+makedepends=('python3-setuptools' 'python2-setuptools')
 source=("http://cython.org/release/Cython-$pkgver.tar.gz")
-md5sums=('6a72d14e72f3df597b34ac326152f8d2')
+md5sums=('7fc13e1c665bdf7cea19ad08906af91f')
 
 package_python2-cython() {
-  depends=('python2')
+  depends=('python2' 'python2-setuptools')
   pkgdesc="C-Extensions for Python 2"
-  conflicts=('python2-c')
-  provides=('python2-c')
-  replaces=('python2-c')
+  
   cd $srcdir/Cython-$pkgver
   python2 -O setup.py install --root=$pkgdir
 }
 
 package_python3-cython() {
-  depends=('python3')
+  depends=('python3' 'python3-setuptools')
   pkgdesc="C-Extensions for Python 3"
 
   cd $srcdir/Cython-$pkgver

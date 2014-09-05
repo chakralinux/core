@@ -6,23 +6,20 @@
 
 pkgbase=python-lxml
 pkgname=('python3-lxml' 'python2-lxml' 'python-lxml-docs')
-pkgver=3.2.3
-pkgrel=2
+pkgver=3.3.6
+pkgrel=1
 arch=('x86_64')
 license=('BSD' 'GPL' 'custom')
 makedepends=('python3' 'python2' 'libxslt')
 # makedepends=('python3' 'python2' 'libxslt' 'python3-cssselect' 'python2-cssselect')
 source=(http://pypi.python.org/packages/source/l/lxml/lxml-${pkgver}.tar.gz)
-sha512sums=('c3af0d94a93a289c47d60bd96b4f55529bb01da086c8e716e3b7d9fcaf89b7bd4b5357c01ca393d41379c7593e2ba48bb9cfbca1626dd33b60f7f73d621a1d5a')
+md5sums=('a804b36864c483fe7abdd7f493a0c379')
 
 package_python2-lxml() {
     pkgdesc="Python 2 binding for the libxml2 and libxslt libraries"
     depends=('python2' 'libxslt')
     optdepends=('python2-beautifulsoup: support for parsing not well formed HTML'
                 'python-lxml-docs: offline docs')
-    provides=('python-lxml')
-    replaces=('python-lxml')
-    conflicts=('python-lxml')
 
     cd ${srcdir}/lxml-$pkgver
     python2 setup.py install --root="${pkgdir}" --optimize=1

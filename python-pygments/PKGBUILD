@@ -9,15 +9,23 @@
 pkgbase=python-pygments
 pkgname=('python3-pygments' 'python2-pygments')
 pkgver=1.6
-pkgrel=3
+pkgrel=4
 pkgdesc="Python syntax highlighter"
 arch=('any')
 url="http://pygments.org/"
 license=('BSD')
 makedepends=('python3-setuptools' 'python2-setuptools')
 options=(!emptydirs)
-source=(http://pypi.python.org/packages/source/P/Pygments/Pygments-$pkgver.tar.gz)
-sha512sums=('552d0c2a1296773a5482122bd5cbec0ce91a497cd86ee105e1c5ddf2bfa9c206fcc7de504c6da480344c6e1bee30d7b26012fd061dcb2091d8b2b21bcd163bf0')
+source=(http://pypi.python.org/packages/source/P/Pygments/Pygments-$pkgver.tar.gz
+        make-pygments.lexers.guess_lexer_for_filename-py3-compatible.patch)
+md5sums=('a18feedf6ffd0b0cc8c8b0fbdb2027b1'
+         '417f20255f7410065e73269b52497f1f')
+
+prepare() {
+  cd "$srcdir/Pygments-$pkgver"
+
+  patch -Np1 -i "$srcdir/make-pygments.lexers.guess_lexer_for_filename-py3-compatible.patch"
+}
 
 build() {
   cd "$srcdir"

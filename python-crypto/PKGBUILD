@@ -1,0 +1,66 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# Maintainer:  Adrian Chaves Fernandez (Gallaecio) <adriyetichaves@gmail.com>
+# Contributor: Jan de Groot <jgc@archlinux.org>
+# Contributor: Kritoke <kritoke@gamebox.net>
+
+pkgbase=pycrypto
+pkgname=('python2-crypto' 'python3-crypto')
+pkgver=2.6.1
+pkgrel=1
+pkgdesc="A collection of cryptographic algorithms and protocols, implemented for use from Python."
+arch=("x86_64")
+makedepends=('python2' 'python3' 'gmp')
+url="http://www.dlitz.net/software/pycrypto/"
+license=(custom)
+source=(http://ftp.dlitz.net/pub/dlitz/crypto/${pkgbase}/${pkgbase}-${pkgver}.tar.gz)
+md5sums=('55a61a054aa66812daf5161a0d5d7eda')
+
+prepare() {
+  find ${pkgbase}-${pkgver}/LEGAL -type f -exec chmod 644 {} \;
+  find ${pkgbase}-${pkgver}/LEGAL -type d -exec chmod 755 {} \;
+ 
+  cp -r ${pkgbase}-${pkgver} ${pkgbase}-${pkgver}-py3
+}
+
+build() {
+  cd ${pkgbase}-${pkgver}
+  python2 setup.py build
+
+  cd ../${pkgbase}-${pkgver}-py3
+  python3 setup.py build
+}
+
+package_python2-crypto() {
+  pkgdesc="Collection of cryptographic algorithms and protocols, implemented for use from Python 2."
+  depends=('python2' 'gmp')
+  replaces=('pycrypto')
+  conflicts=('pycrypto')
+  provides=("pycrypto=${pkgver}")
+
+  cd ${pkgbase}-${pkgver}
+  python2 setup.py install --root="${pkgdir}" --optimize=1
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/"
+  cp -r LEGAL "${pkgdir}/usr/share/licenses/${pkgname}/"
+}
+
+package_python3-crypto() {
+  pkgdesc="Collection of cryptographic algorithms and protocols, implemented for use from Python 3."
+  depends=('python3' 'gmp')
+
+  cd ${pkgbase}-${pkgver}-py3
+  python3 setup.py install --root="${pkgdir}" --optimize=1
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/"
+  cp -r LEGAL "${pkgdir}/usr/share/licenses/${pkgname}/"
+}
+
+check() {
+  cd ${pkgbase}-${pkgver}
+  python2 setup.py test
+
+  cd ../${pkgbase}-${pkgver}-py3
+  python3 setup.py test
+}

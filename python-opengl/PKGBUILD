@@ -8,7 +8,7 @@
 
 pkgbase=python-opengl
 pkgname=('python3-opengl' 'python2-opengl')
-pkgver=3.0.2
+pkgver=3.1.0
 pkgrel=1
 pkgdesc="The cross platform Python binding to OpenGL and related APIs"
 arch=('any')
@@ -17,8 +17,9 @@ url="http://pyopengl.sourceforge.net"
 makedepends=('freeglut' 'python2-setuptools' 'python3-setuptools')
 source=("http://pypi.python.org/packages/source/P/PyOpenGL/PyOpenGL-${pkgver}.tar.gz"
         'LICENSE')
-sha512sums=('e5663682eee5aa7276590ae7547d8345141e2e8e34ddfcbb3867c10a91e9959ebe8ec82606e257826ba6dd21d731ad76f38134849f095a01760d007d752fe9a9'
-            '84e8b6e984aa53ffdce33df2f4ee8993887bdb8752617d7f66b2ff5641ca16f9c3a13b383a9bb3236192b3af9518a3f3de1e7ac9f1496c8704911bb4238d091d')
+md5sums=('0de021941018d46d91e5a8c11c071693'
+         '0b53c508a63e5dbaf44cdfb0fa103b3a')
+
 
 prepare() {
     cp -r PyOpenGL-${pkgver} python3-PyOpenGL-${pkgver}
@@ -52,7 +53,7 @@ package_python3-opengl() {
 
     # Fix the shebang
     sed -i 's|#!/usr/bin/env python|#!/usr/bin/python3|' \
-      "${pkgdir}"/usr/lib/python3.3/site-packages/OpenGL/Tk/__init__.py
+      "${pkgdir}"/usr/lib/python3.4/site-packages/OpenGL/Tk/__init__.py
     sed -i 's|#! /usr/bin/env python|#!/usr/bin/python3|' \
-      "${pkgdir}"/usr/lib/python3.3/site-packages/OpenGL/arrays/{_,}buffers.py
+      "${pkgdir}"/usr/lib/python3.4/site-packages/OpenGL/arrays/{_,}buffers.py
 }

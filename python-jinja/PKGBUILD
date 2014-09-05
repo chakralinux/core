@@ -7,7 +7,7 @@
 
 pkgbase=python-jinja
 pkgname=('python3-jinja' 'python2-jinja')
-pkgver=2.7.1
+pkgver=2.7.3
 pkgrel=1
 pkgdesc="A simple pythonic template language written in Python"
 arch=('any')
@@ -17,16 +17,11 @@ makedepends=('python3-setuptools'
              'python2-setuptools'
              'python3-markupsafe'
              'python2-markupsafe')
-source=(http://pypi.python.org/packages/source/J/Jinja2/Jinja2-$pkgver.tar.gz
-        Fix-PrefixLoader-does-not-pass-globals-to-load.patch)
-sha512sums=('c5d4262f6dfec77c74496f0b3afd88a37fc0573133810cfdc29fadbd9d02bb7af10b2a3ddf3075f8b682629cd41a949dcbccb293b84b0aeff9090b0aa9669e02'
-            '66f9c29b6c49dbee70121a8671fd683b039a37d9c903edef27b9eee2d8e27c3b6a1bf087ccb45b2e78ac83194f9781e5f1814f9b10d50005b5e646a025789c21')
+source=(http://pypi.python.org/packages/source/J/Jinja2/Jinja2-$pkgver.tar.gz)
+md5sums=('b9dffd2f3b43d673802fe857c8445b1a')
 
 build() {
     cd "${srcdir}/Jinja2-$pkgver"
-
-    # https://github.com/mitsuhiko/jinja2/issues/225
-    patch -Np1 -i "$srcdir/Fix-PrefixLoader-does-not-pass-globals-to-load.patch"
 
     cd "${srcdir}"
     rm -rf python{2,3}-build
