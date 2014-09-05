@@ -4,7 +4,7 @@
 
 pkgname=dhcpcd
 pkgver=6.4.3
-pkgrel=2
+pkgrel=3
 pkgdesc="RFC2131 compliant DHCP client daemon"
 url="http://roy.marples.name/projects/dhcpcd/"
 arch=('x86_64')
@@ -29,14 +29,15 @@ prepare() {
 }
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   # configure variables
   ./configure \
-      --sbindir=/usr/sbin \
+      --sbindir=/usr/bin \
       --libexecdir=/usr/lib/dhcpcd \
       --dbdir=/var/lib/dhcpcd \
       --rundir=/run
+
   # Build
   make
 }
@@ -48,8 +49,8 @@ check() {
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 
   # Install License
   install -d "$pkgdir/usr/share/licenses/$pkgname"
@@ -57,9 +58,13 @@ package() {
       >>"$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 
   # Set Options in /etc/dhcpcd.conf
-  echo noipv4ll >> ${pkgdir}/etc/dhcpcd.conf # Disable ip4vall
+  echo noipv4ll >> "${pkgdir}/etc/dhcpcd.conf" # Disable ip4vall
 
-  # install systemd unit
-  install -Dm644 "$srcdir/dhcpcd@.service" "$pkgdir/usr/lib/systemd/system/dhcpcd@.service"
-  install -Dm644 "$srcdir/dhcpcd.service" "$pkgdir/usr/lib/systemd/system/dhcpcd.service"
+  # install systemd files
+  install -Dm644 "${srcdir}/dhcpcd@.service" "${pkgdir}/usr/lib/systemd/system/dhcpcd@.service"
+  install -Dm644 "${srcdir}/dhcpcd.service" "${pkgdir}/usr/lib/systemd/system/dhcpcd.service"
 }
+sha1sums=('d90e5a0537ea902335a48a61703f49b5cd53c8f1'
+          '6f1633edde14d29b5cdc09c4f029a450ef2ebc96'
+          '52c1bad9ab43e9a253c1eb175e7eefb13497b8f9'
+          '5898ea748c7886f47d653ffdfeb23a24d67c01aa')
