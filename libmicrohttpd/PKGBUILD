@@ -2,36 +2,31 @@
 # contributor abveritas@chakra-project.org
 
 pkgname=libmicrohttpd
-pkgver=0.9.28
+pkgver=0.9.37
 pkgrel=1
 pkgdesc="a small C library that is supposed to make it easy to run an HTTP server as part of another application."
 arch=('x86_64')
 url="http://www.gnu.org/software/libmicrohttpd/"
 license=('LGPL')
+depends=('gnutls' 'libgcrypt')
+optdepends=('file' 'curl')
 options=(!libtool)
-depends=('gnutls')
 install=libmicrohttpd.install
 source=("ftp://ftp.gnu.org/gnu/libmicrohttpd/$pkgname-$pkgver.tar.gz")
-md5sums=('16c3cb66c839c6f929677471401a5b53')
+md5sums=('fdf1e0534d83bbf2663f80fa7873be77')
 
 build() {
   cd ${pkgname}-${pkgver}
-  
-  ./configure --prefix=/usr \
-              --enable-largefile \
-	      --enable-curl \
-	      --enable-messages \
-	      --with-pic
+  ./configure --prefix=/usr --disable-dependency-tracking --enable-largefile \
+	--enable-curl --enable-messages --with-pic
   make
 }
 
 package() {
   cd ${pkgname}-${pkgver}
   make DESTDIR=${pkgdir} install
-  
   install -Dm644 ${srcdir}/${pkgname}-${pkgver}/src/include/platform.h \
 	${pkgdir}/usr/include/$pkgname/platform.h
-  install -Dm644 ${srcdir}/${pkgname}-${pkgver}/src/include/plibc/plibc.h \
-	${pkgdir}/usr/include/$pkgname/plibc.h
-  sed -i 's#Cflags: -I${includedir}#Cflags: -I${includedir} -I{includedir}/libmicrohttpd#' $pkgdir/usr/lib/pkgconfig/libmicrohttpd.pc
+  sed -i 's#Cflags: -I${includedir}#Cflags: -I${includedir} -I${includedir}/libmicrohttpd#' \
+	$pkgdir/usr/lib/pkgconfig/libmicrohttpd.pc
 }
