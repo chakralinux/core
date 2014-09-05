@@ -1,17 +1,19 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
 pkgver=216
-pkgrel=1
+pkgrel=2
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
 depends=('acl' 'bash' 'glibc' 'glib2' 'hwids' 'util-linux' 'kbd' 'kmod' 'libcap' 'libxslt'
-         'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus-core') 
-makedepends=('docbook-xsl' 'cryptsetup' 'gobject-introspection' 'python' 'gperf' 'intltool' 'libmicrohttpd')
+         'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus-core' 'libidn' 'quota-tools' 'elfutils' 'curl') 
+makedepends=('docbook-xsl' 'cryptsetup' 'gobject-introspection' 'python2' 'python2-lxml' 'gperf' 'intltool' 'libmicrohttpd')
 optdepends=('python: systemd library bindings'
             'cryptsetup: required for encrypted block devices'
-            'libmicrohttpd: remote journald capabilities')
+            'libmicrohttpd: remote journald capabilities'
+            'quota-tools: kernel-level quota management'
+            'polkit: allow administration as unprivileged user')
 backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/dbus-1/system.d/org.freedesktop.hostname1.conf
         etc/dbus-1/system.d/org.freedesktop.login1.conf
@@ -19,13 +21,14 @@ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/dbus-1/system.d/org.freedesktop.machine1.conf
         etc/dbus-1/system.d/org.freedesktop.timedate1.conf
         etc/pam.d/systemd-user
-        etc/systemd/system.conf
-        etc/systemd/user.conf
-        etc/systemd/logind.conf
+        etc/systemd/bootchart.conf
+        etc/systemd/coredump.conf
         etc/systemd/journald.conf
+        etc/systemd/logind.conf
+        etc/systemd/system.conf
         etc/systemd/timesyncd.conf
         etc/systemd/resolved.conf
-        etc/systemd/bootchart.conf
+        etc/systemd/user.conf
         etc/udev/udev.conf)
 provides=("udev=$pkgver")
 conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
@@ -92,6 +95,7 @@ package() {
   rm "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service" \
       "$pkgdir/etc/systemd/system/multi-user.target.wants/systemd-networkd.service" \
       "$pkgdir/etc/systemd/system/multi-user.target.wants/systemd-resolved.service" \
+      "$pkgdir/etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service" \
       "$pkgdir/etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service"
   rmdir "$pkgdir/etc/systemd/system/getty.target.wants" \
       "$pkgdir/etc/systemd/system/network-online.target.wants"
@@ -111,14 +115,13 @@ package() {
           s/cdrom/optical/g' "$pkgdir"/usr/lib/sysusers.d/basic.conf
 
   # add mkinitcpio hooks
+  install -Dm644 "$srcdir/initcpio-install-systemd" "$pkgdir/usr/lib/initcpio/install/systemd"
   install -Dm644 "$srcdir/initcpio-install-udev" "$pkgdir/usr/lib/initcpio/install/udev"
   install -Dm644 "$srcdir/initcpio-hook-udev" "$pkgdir/usr/lib/initcpio/hooks/udev"
-  install -Dm644 "$srcdir/initcpio-install-systemd" "$pkgdir/usr/lib/initcpio/install/systemd"
 
-
-  # ensure proper permissions for /var/log/journal
+  # ensure proper permissions for /var/log/journal. This is only to placate
   chown root:systemd-journal "$pkgdir/var/log/journal"
-  chmod 2755 "$pkgdir/var/log/journal"
+  chmod 2755 "$pkgdir/var/log/journal"{,/remote}
 
   # fix pam file
   sed 's|system-auth|system-login|g' -i "$pkgdir/etc/pam.d/systemd-user"
