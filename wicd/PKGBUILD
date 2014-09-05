@@ -2,14 +2,17 @@
 
 pkgname=wicd
 pkgver=1.7.2.4
-pkgrel=8
+pkgrel=10
 pkgdesc="New and alternative wireless/wired network management utility"
 arch=('x86_64')
 url="http://wicd.sourceforge.net/"
 license=('GPL2')
-depends=('python2' 'dhcpcd' 'wpa_supplicant' 'wireless_tools' 'python-babel'
+depends=('python2' 'dhcpcd' 'wpa_supplicant' 'wireless_tools' 'python2-babel'
            'net-tools' 'ethtool' 'shared-mime-info' 'python2-urwid' 'python2-gobject' 
            'python2-dbus' 'gettext')
+depends=('python2' 'python2-dbus' 'dhcpcd' 'wpa_supplicant' 'wireless_tools'
+         'inetutils' 'net-tools' 'ethtool' 'shared-mime-info' 'python2-urwid' 'python2-gobject2' 'dbus-glib' 'rfkill')
+makedepends=('python2-babel' 'python2-setuptools' 'gettext')
 optdepends=('python-wpactrl:    needed if you want to use the new experimental ioctrl backend'
             'python-iwscan:     needed if you want to use the new experimental ioctrl backend'
             'wicd-client-kde:   needed if you want to use kde ui')
@@ -36,6 +39,7 @@ prepare() {
   export PYTHON=python2
   
   sed -i 's|/usr/sbin/|/usr/bin/|' other/wicd.service
+  sed -i 's|pybabel|pybabel2|' setup.py
 
   patch -p0 < "$srcdir/dbus_string_fix.patch"
   
@@ -58,6 +62,9 @@ build() {
 
   mkdir -p translations/ast/LC_MESSAGES
   msgfmt po/ast.po -o translations/ast/LC_MESSAGES/wicd.mo
+#  msgfmt po/ko.po -o translations/ko/LC_MESSAGES/wicd.mo
+#  msgfmt po/cs.po -o translations/cs/LC_MESSAGES/wicd.mo
+#  msgfmt po/bg.po -o translations/bg/LC_MESSAGES/wicd.mo
 }
 
 package() {
