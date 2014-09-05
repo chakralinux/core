@@ -4,7 +4,7 @@
 
 pkgname=dhcpcd
 pkgver=6.4.3
-pkgrel=1
+pkgrel=2
 pkgdesc="RFC2131 compliant DHCP client daemon"
 url="http://roy.marples.name/projects/dhcpcd/"
 arch=('x86_64')
@@ -18,8 +18,8 @@ source=("http://roy.marples.name/downloads/$pkgname/$pkgname-$pkgver.tar.bz2" \
 	'dhcpcd.service'
 	'Makefile_test.patch')
 sha1sums=('d90e5a0537ea902335a48a61703f49b5cd53c8f1'
-          '6f1633edde14d29b5cdc09c4f029a450ef2ebc96'
-          '52c1bad9ab43e9a253c1eb175e7eefb13497b8f9'
+          '6245b8db7e6f39a0305571726bb693a53901c400'
+          'cad7ad8621af58bccccae421cc5d3f1360b02273'
           '5898ea748c7886f47d653ffdfeb23a24d67c01aa')
 
 prepare() {
@@ -33,7 +33,7 @@ build() {
 
   # configure variables
   ./configure \
-      --sbindir=/usr/bin \
+      --sbindir=/usr/sbin \
       --libexecdir=/usr/lib/dhcpcd \
       --dbdir=/var/lib/dhcpcd \
       --rundir=/run
