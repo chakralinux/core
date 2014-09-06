@@ -7,21 +7,32 @@
 # include global config
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgname=pyxdg
-pkgver=0.19
-pkgrel=3
+pkgbase=pyxdg
+pkgname=('python2-xdg' 'python3-xdg')
+pkgver=0.25
+pkgrel=1
 pkgdesc="Python library to access freedesktop.org standards."
 arch=('any')
 url="http://freedesktop.org/Software/pyxdg"
 license=("LGPL")
-depends=('python')
-source=(http://www.freedesktop.org/~lanius/${pkgname}-${pkgver}.tar.gz)
-md5sums=('9f33542e846d0fc1e0bfa992a8555b0a')
+makedepends=('python2' 'python3')
+source=(http://www.freedesktop.org/~takluyver/${pkgbase}-${pkgver}.tar.gz{,.asc})
+sha1sums=('1272ee62b8c3909ac4844a34a95f8b1fb3398af2'
+          'b5ec82567cc4d7bcf3a151eaf70c42dd3ed5b194')
 
-build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  python setup.py install --prefix=/usr --root=${pkgdir} || return 1
+package_python2-xdg() {
+  depends=('python2')
+  conflicts=('pyxdg')
+  provides=('pyxdg')
+  replaces=('pyxdg')
+
+  cd "${srcdir}/${pkgbase}-${pkgver}"
+  python2 setup.py install --prefix=/usr --root="${pkgdir}"
 }
 
-# package() {
-# }
+package_python3-xdg() {
+  depends=('python3')
+
+  cd "${srcdir}/${pkgbase}-${pkgver}"
+  python3 setup.py install --prefix=/usr --root="${pkgdir}" --skip-build --optimize=1
+}
