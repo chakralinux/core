@@ -10,6 +10,13 @@ ATTENTION:
   by /etc/NetworkManager/NetworkManager.conf. Make sure you move
   any custom settings to the new config file.
 MSG
+  (( $(vercmp 0.9.10 $2) > 0 )) && cat <<MSG
+ATTENTION:
+  This package now has hard dependency on dhclient and will use it
+  by default. To use dhcpcd add
+      dhcp=dhcpcd
+  to /etc/NetworkManager/NetworkManager.conf and restart.
+MSG
   true
 }
 
