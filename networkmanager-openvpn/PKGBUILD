@@ -4,22 +4,23 @@
 # maintainer abveritas@cahkra-project.org
 
 pkgname=networkmanager-openvpn
-pkgver=0.9.6.0
-pkgrel=2
+pkgver=0.9.10.0
+pkgrel=1
 pkgdesc="NetworkManager VPN plugin for OpenVPN"
 arch=('x86_64')
 license=('GPL')
 url="http://www.gnome.org/projects/NetworkManager/"
-depends=('networkmanager>=0.9' 'openvpn')
+depends=('networkmanager>=0.9.10' 'openvpn')
 makedepends=('intltool') 
 options=('!libtool')
 source=("http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-openvpn/0.9/NetworkManager-openvpn-${pkgver}.tar.xz")
-md5sums=('c4c11aae895f5967d36f3dc7a24046b2')
+md5sums=('e85cf325233c10a692d976d2cecdc702')
 
 build() {
   cd "${srcdir}/NetworkManager-openvpn-${pkgver}"
   ./configure --prefix=/usr \
   	--sysconfdir=/etc \
+	--localstatedir=/var \
 	--libexecdir=/usr/lib/networkmanager \
         --without-gnome \
 	--disable-static 

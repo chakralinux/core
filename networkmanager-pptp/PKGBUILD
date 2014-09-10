@@ -4,24 +4,27 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=networkmanager-pptp
-pkgver=0.9.6.0
-pkgrel=3
+pkgver=0.9.10.0
+_pppver=2.4.7
+pkgrel=1
 pkgdesc="NetworkManager VPN plugin for pptp "
 arch=('x86_64')
 license=('GPL')
 url="http://www.gnome.org/projects/NetworkManager/"
-depends=('networkmanager>=0.9' 'pptpclient')
+depends=('networkmanager>=0.9.10' 'pptpclient' "ppp=$_pppver")
 makedepends=('intltool')
 options=('!libtool')
 source=("http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-pptp/0.9/NetworkManager-pptp-${pkgver}.tar.xz")
-md5sums=('30ff4312ca86f7ae0c78896a9af221ea')
+md5sums=('767fc3d4a3c86cb4b85abe1d5e21f78f')
 
 build() {
   cd "${srcdir}/NetworkManager-pptp-${pkgver}"
   ./configure --prefix=/usr \
   	--sysconfdir=/etc \
+	--localstatedir=/var \
 	--libexecdir=/usr/lib/networkmanager \
         --without-gnome \
+        --with-pppd-plugin-dir=/usr/lib/pppd/$_pppver \
 	--disable-static 
   make 
 }

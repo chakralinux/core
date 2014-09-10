@@ -4,8 +4,8 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=networkmanager-vpnc
-pkgver=0.9.6.0
-pkgrel=3
+pkgver=0.9.10.0
+pkgrel=1
 pkgdesc="NetworkManager VPN plugin for vpnc"
 arch=('x86_64')
 license=('GPL')
@@ -14,12 +14,13 @@ depends=('networkmanager>=0.9' 'vpnc')
 makedepends=('intltool') 
 options=('!libtool')
 source=("http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-vpnc/0.9/NetworkManager-vpnc-${pkgver}.tar.xz")
-md5sums=('5ab836d732a532b474f9b579e3a7a0cf')
+md5sums=('1109597f5fa8b3c00472a23fdeb787f0')
 
 build() {
   cd "${srcdir}/NetworkManager-vpnc-${pkgver}"
   ./configure --prefix=/usr \
   	--sysconfdir=/etc \
+	--localstatedir=/var \
 	--libexecdir=/usr/lib/networkmanager \
         --without-gnome \
 	--disable-static 
