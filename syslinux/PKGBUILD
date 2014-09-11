@@ -9,7 +9,7 @@
 
 pkgname=syslinux
 pkgver=6.02
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 pkgdesc="Collection of boot loaders that boot from FAT, ext2/3/4 and btrfs filesystems, from CDs and via PXE"
 url="http://syslinux.zytor.com/"
@@ -26,18 +26,21 @@ optdepends=('perl-passwd-md5:  For md5pass'
 makedepends=('nasm' 'python2' 'gnu-efi-libs')
 backup=('boot/syslinux/syslinux.cfg')
 install=syslinux.install
-source=(http://www.kernel.org/pub/linux/utils/boot/syslinux/$pkgname-${pkgver}.tar.bz2
-        syslinux.cfg
-        syslinux-install_update)
+source=("https://www.kernel.org/pub/linux/utils/boot/syslinux/${pkgname}-${pkgver}.tar.xz"
+        'syslinux.cfg'
+        'syslinux-install_update'
+        'syslinux-6.02-fix-chainloading.patch'
+        'syslinux-6.02-fix-bios-isolinux.patch'
+        'syslinux-6.02-fix-efi-ovmf.patch')
 md5sums=('6f275813a1b08cf852e55c0a3f8fbc78'
          '1748911710a7a93de11babbedb50325e'
-         'b5b4953c0a5a01cd16441402f6321765')
+         'b5b4953c0a5a01cd16441402f6321765'
+         '9dbede6b71a4de9e46aac4aad65334d7'
+         'adf71eceb4fccecd9a7efe1ab3d54918'
+         '62d22b101ef2ef53e25b4f86d9f41cb5')
 
 install="${pkgname}.install"
 
-source=("https://www.kernel.org/pub/linux/utils/boot/syslinux/${pkgname}-${pkgver}.tar.xz"
-        'syslinux.cfg'
-        'syslinux-install_update')
 
 prepare() {
 
@@ -53,6 +56,19 @@ prepare() {
     
     ## Fix FHS manpage path
     sed 's|/usr/man|/usr/share/man|g' -i "${srcdir}/${pkgname}-${pkgver}/mk/syslinux.mk" || true
+
+    # fix chainloading
+    # http://bugzilla.syslinux.org/show_bug.cgi?id=31
+    # http://www.syslinux.org/archives/2013-October/020971.html
+    patch -Np1 -i "${srcdir}/syslinux-6.02-fix-chainloading.patch"
+    
+    # fix bios booting from isohybrid
+    # http://www.syslinux.org/archives/2013-November/021189.html
+    patch -Np1 -i "${srcdir}/syslinux-6.02-fix-bios-isolinux.patch"
+
+    # fix efi booting in qemu/ovmf
+    # http://bugzilla.syslinux.org/show_bug.cgi?id=23
+    patch -Np1 -i  "${srcdir}/syslinux-6.02-fix-efi-ovmf.patch"
 }
 
 _build_syslinux_bios() {
