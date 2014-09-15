@@ -5,8 +5,8 @@
 # maintainer Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=util-linux
-pkgver=2.25
-pkgrel=2
+pkgver=2.25.1
+pkgrel=1
 pkgdesc="Miscellaneous system utilities for Linux"
 url="http://www.kernel.org/pub/linux/utils/util-linux/"
 arch=('x86_64')
@@ -17,7 +17,7 @@ conflicts=('util-linux-ng' 'eject')
 provides=("util-linux-ng=${pkgver}" 'eject')
 license=('GPL2')
 options=('strip' 'debug')
-source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v2.25/${pkgname}-${pkgver}.tar.xz
+source=("ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v2.25/${pkgname}-${pkgver}.tar.xz"
         uuidd.tmpfiles
         pam-login
         pam-common
@@ -26,15 +26,14 @@ source=(ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v2.25/${pkgname}-${pkgve
         system-local-login
         system-login
         system-remote-login
-        system-services
-        0001-fdisk-fix-l-device.patch)
+        system-services)
 backup=(etc/pam.d/chfn
         etc/pam.d/chsh
         etc/pam.d/login
         etc/pam.d/su
         etc/pam.d/su-l)
 install=util-linux.install
-md5sums=('4c78fdef4cb882caafad61e33cafbc14'
+md5sums=('2ff36a8f8ede70f66c5ad0fb09e40e79'
          'a39554bfd65cccfd8254bb46922f4a67'
          '4368b3f98abd8a32662e094c54e7f9b1'
          'a31374fef2cba0ca34dfc7078e2969e4'
@@ -43,13 +42,10 @@ md5sums=('4c78fdef4cb882caafad61e33cafbc14'
          '477237985820117a0e6e1b13a86eb599'
          '17c691f2da319df8fe851bc47cc1d662'
          '477237985820117a0e6e1b13a86eb599'
-         '30fe7d41e054ee43fab7855bf88a07e5'
-         '93cf977a7abc6f30152295e2aef453fa')
+         '30fe7d41e054ee43fab7855bf88a07e5')
 
 prepare() {
   cd "$pkgname-$pkgver"
-
-  patch -Np1 <"$srcdir"/0001-fdisk-fix-l-device.patch
 }
 
 build() {
@@ -59,11 +55,11 @@ build() {
               --libdir=/usr/lib \
               --localstatedir=/run \
               --enable-fs-paths-extra=/usr/bin:/usr/sbin \
-              --enable-write \
               --enable-raw \
               --enable-vipw \
               --enable-newgrp \
               --enable-chfn-chsh \
+              --enable-write \
               --enable-mesg \
               --enable-socket-activation \
               --with-python=3
@@ -85,6 +81,7 @@ package() {
   
   chmod 4755 "$pkgdir"/usr/bin/{newgrp,ch{sh,fn}}
 
+  # install PAM files for login-utils
   install -Dm644 "$srcdir/pam-common" "$pkgdir/etc/pam.d/chfn"
   install -m644 "$srcdir/pam-common" "$pkgdir/etc/pam.d/chsh"
   install -m644 "$srcdir/pam-login" "$pkgdir/etc/pam.d/login"
