@@ -2,50 +2,40 @@
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 
-_extramodules=extramodules-3.15.5-CHAKRA
-_kver="$(cat /lib/modules/${_extramodules}/version)"
+_extramodules=extramodules-3.16-CHAKRA
+_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
 
 pkgname=vhba-module
-pkgver=20130607
-pkgrel=4
+pkgver=20140629
+pkgrel=1
 pkgdesc="Kernel module that emulates SCSI devices"
 arch=('x86_64')
 url="http://cdemu.sourceforge.net/"
 license=('GPL2')
-depends=('linux>=3.15' 'linux<3.16')
+depends=('linux>=3.16' 'linux<3.17')
 makedepends=('linux-headers')
 install=vhba-module.install
 source=("http://sourceforge.net/projects/cdemu/files/vhba-module/vhba-module-$pkgver.tar.bz2"
-        '60-vhba.rules'
-        '0001-VHBA-module-define-scmd_dbg-and-scmd_warn-macros-onl.patch')
-md5sums=('660df41d08b1fd86baad1f16a0264438'
-         '4dc37dc348b5a2c83585829bde790dcc'
-         '8c929ef662de89f348d277983cbb3952'
-)
+        '60-vhba.rules')
+md5sums=('6b307a80df9c163768cc7ecb3ccebb71'
+         '4dc37dc348b5a2c83585829bde790dcc')
 
 
 prepare() {
   cd $pkgname-$pkgver
-
-  # Fix build with Linux 3.15
-  # http://sourceforge.net/p/cdemu/bugs/76/
-  patch -Np2 -i ../0001-VHBA-module-define-scmd_dbg-and-scmd_warn-macros-onl.patch
 }
 
-
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$pkgname-$pkgver"
 
-  make -j1 KDIR=/usr/src/linux-${_kver}
+  make KDIR=/usr/lib/modules/$_kver/build
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
+  install -Dm644 vhba.ko "$pkgdir/usr/lib/modules/${_extramodules}/vhba.ko"
+  install -Dm644 ../60-vhba.rules "$pkgdir/usr/lib/udev/rules.d/60-vhba.rules"
 
-  install -D vhba.ko "$pkgdir/lib/modules/${_extramodules}/vhba.ko"
-  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
+sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
           "${startdir}/vhba-module.install"
-
-  install -Dm644 "$srcdir/60-vhba.rules" \
-	  "$pkgdir/usr/lib/udev/rules.d/60-vhba.rules"
 }

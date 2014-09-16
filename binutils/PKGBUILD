@@ -2,13 +2,13 @@
 
 pkgname=binutils
 pkgver=2.24
-pkgrel=5
+pkgrel=7
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('x86_64')
 url="http://www.gnu.org/software/binutils/"
 license=('GPL')
 groups=('base-devel')
-depends=('glibc>=2.18' 'zlib')
+depends=('glibc>=2.20' 'zlib')
 checkdepends=('dejagnu' 'bc')
 conflicts=('binutils-multilib')
 replaces=('binutils-multilib')
@@ -16,11 +16,14 @@ options=('!libtool' '!distcc' '!ccache' 'staticlibs')
 install=binutils.install
 source=(ftp://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.bz2{,.sig}
         binutils-2.24-lto-testsuite.patch
-        binutils-2.24-static-pie-hang.patch)
+        binutils-2.24-gold-testsuite-plugin.patch
+        binutils-2.24-shared-pie.patch)
 md5sums=('e0f71a7b2ddab0f8612336ac81d9636b'
          'SKIP'
-         'b16e895c24ff80acd98a21021eccefad'
-         '4d2cf591560c3d25265778146bbe1941')
+         'e68a1f221545f082baa5bd417cd077af'
+         'e46bbb03abaa5db58c12247644dc4857'
+         'ec59461c4febab9cfe1c1ef33326bc50')
+validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93')
 
 prepare() {
   cd ${srcdir}/binutils-${pkgver}
@@ -28,25 +31,26 @@ prepare() {
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
   sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
 
-  # fix lto testsuite with gcc-4.9 - commit b35d44f1
+  # fix lto testsuite with gcc-4.9 - commits b35d44f1 and 37a6ac44
   patch -p1 -i $srcdir/binutils-2.24-lto-testsuite.patch
 
-  # fix autoconf hang with -static -fPIE -pie - commits d1ec1e40 and 818d220a
-  patch -p1 -i $srcdir/binutils-2.24-static-pie-hang.patch
+  # fix gold testsuite with gcc-4.9 - commit ae447ddd
+  patch -p1 -i $srcdir/binutils-2.24-gold-testsuite-plugin.patch
+
+  # fix issues with -static -fPIE -pie - commit 4199e3b8
+  patch -p1 -i $srcdir/binutils-2.24-shared-pie.patch
 
   mkdir ${srcdir}/binutils-build
 }
 
 build() {
-
   cd ${srcdir}/binutils-build
 
   ${srcdir}/binutils-${pkgver}/configure --prefix=/usr \
     --with-lib-path=/usr/lib:/usr/local/lib \
     --with-bugurl=http://chakraos.org/bugtracker \
-    --enable-ld=default --enable-gold \
-    --enable-plugins --enable-threads \
-    --enable-shared \
+    --enable-threads --enable-shared --with-pic \
+    --enable-ld=default --enable-gold --enable-plugins \
     --disable-werror
 
   # check the host environment and makes sure all the necessary tools are available
@@ -59,14 +63,14 @@ check() {
   cd ${srcdir}/binutils-build
   
   # unset LDFLAGS as testsuite makes assumptions about which ones are active
-  # do not abort on errors - manually check log files
-  make LDFLAGS="" -k check || true
+  # ignore failures in gold testsuite...
+  make -k LDFLAGS="" check
 }
 
 package() {
   cd ${srcdir}/binutils-build
   make prefix=${pkgdir}/usr tooldir=${pkgdir}/usr install
-  
+
   # Remove unwanted files
   rm ${pkgdir}/usr/share/man/man1/{dlltool,nlmconv,windres,windmc}*
   rm ${pkgdir}/usr/share/info/{configure,standards}.info

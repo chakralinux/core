@@ -1,18 +1,18 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 
-_extramodules=extramodules-3.15.5-CHAKRA
-_kver="$(cat /lib/modules/${_extramodules}/version)"
+_extramodules=extramodules-3.16-CHAKRA
+_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
 
 pkgname=acpi_call
 _pkgname=acpi_call
 pkgver=1.1.0
-pkgrel=10
+pkgrel=11
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('x86_64')
 url=("http://github.com/mkottman/acpi_call")
 license=('GPL')
-depends=('linux>=3.15' 'linux<3.16' 'linux-headers')
+depends=('linux>=3.16' 'linux<3.17' 'linux-headers')
 makedepends=('git')
 provides=('acpi-call')
 replaces=('acpi-call')
@@ -24,6 +24,7 @@ md5sums=('f69d40e130b0e5ed17ce8adb19e6dda1')
 build() {
   cd ${srcdir}/$_pkgname-${pkgver}
 
+  echo make KVERSION=${_kver}
   make KVERSION=${_kver}
 }
 package() {
@@ -53,5 +54,5 @@ package() {
   #make KDIR=/usr/src/linux-${_kver} clean
   make KDIR=/usr/src/linux-${_kver}
 
-  install -D -m644 acpi_call.ko $pkgdir/lib/modules/${_kver}/kernel/drivers/acpi/acpi_call.ko
+  install -D -m644 acpi_call.ko $pkgdir/usr/lib/modules/${_kver}/kernel/drivers/acpi/acpi_call.ko
 }
