@@ -2,12 +2,12 @@
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 
-_extramodules=extramodules-3.15.5-CHAKRA
-_kernver=$(cat /lib/modules/${_extramodules}/version)
+_extramodules=extramodules-3.16-CHAKRA
+_kernver=$(cat /usr/lib/modules/${_extramodules}/version)
 
 pkgname=(catalyst chd-catalyst)
 pkgver=14.4
-pkgrel=4
+pkgrel=5
 _amdver=14.10.1006.1001
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only. Radeons HD 2 3 4 xxx ARE NOT SUPPORTED"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
@@ -72,7 +72,7 @@ build() {
     # Compile module using _ati_check variables
     CFLAGS_MODULE="-DMODULE -DATI -DFGL -DPAGE_ATTR_FIX=$PAGE_ATTR_FIX -DCOMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE $def_smp $def_modversions"
     
-    make -C /lib/modules/${_kernver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} \
+    make -C /usr/lib/modules/${_kernver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} \
     MODFLAGS="$CFLAGS_MODULE" \
     CFLAGS_MODULE="$CFLAGS_MODULE" \
     PAGE_ATTR_FIX=$PAGE_ATTR_FIX COMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE modules 
@@ -81,13 +81,13 @@ build() {
 package_catalyst() {
     pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
     screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
-    depends=('linux>=3.15' 'linux<3.16' 'catalyst-utils')
+    depends=('linux>=3.16' 'linux<3.17' 'catalyst-utils')
     conflicts=('nvidia' 'xf86-video-ati' 'xf86-video-radeonhd' 'catalyst-legacy')
     install=catalyst.install
 
     # here we are checking kernel's extramodules dir
-    for r in /lib/modules/*; do
-      s=${r:13}
+    for r in /usr/lib/modules/*; do
+      s=${r:17}
       if [[ ${s:0:3} = "ext" ]]; then
 	if [[ `cat ${r}/version | grep -c ${_kernver}` != 0 ]]; then
 	  _destidir=${s}
@@ -101,8 +101,8 @@ package_catalyst() {
 
 
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
-    install -m755 -d "${pkgdir}/lib/modules/${_destidir}/" 
-    install -m644 fglrx.ko "${pkgdir}/lib/modules/${_destidir}/" 
+    install -m755 -d "${pkgdir}/usr/lib/modules/${_destidir}/" 
+    install -m644 fglrx.ko "${pkgdir}/usr/lib/modules/${_destidir}/" 
     find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
     sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/catalyst.install
 

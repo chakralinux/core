@@ -1,17 +1,17 @@
 # maintainer almack@chakraos.org
 
-_extramodules=extramodules-3.15.5-CHAKRA
-_kver=$(cat /lib/modules/${_extramodules}/version)
+_extramodules=extramodules-3.16-CHAKRA
+_kver=$(cat /usr/lib/modules/${_extramodules}/version)
 
 pkgname=lirc-utils
 pkgver=0.9.1
-pkgrel=3
+pkgrel=4
 pkgdesc="Linux Infrared Remote Control utils"
 arch=('x86_64')
 url="http://www.lirc.org/"
 license=('GPL')
 depends=('alsa-lib' 'libx11' 'libftdi' 'linux')
-makedepends=('help2man' 'linux-headers>=3.15' 'linux-headers<3.16' 'python2' 'libtool')
+makedepends=('help2man' 'linux-headers>=3.16' 'linux-headers<3.17' 'python2' 'libtool')
 optdepends=('python2: pronto2lirc utility')
 replaces=('lirc+pctv')
 backup=('etc/lirc/lirc_options.conf' 'etc/lirc/lircd.conf' 'etc/lirc/lircmd.conf')
@@ -53,7 +53,7 @@ build() {
 	cd "${srcdir}/lirc-${pkgver}"
 	./configure --enable-sandboxed --prefix=/usr \
 	--with-driver=all --with-kerneldir=/usr/src/linux-${_kver} \
-	--with-moduledir=/lib/modules/${_kver}/kernel/drivers/misc \
+	--with-moduledir=/usr/lib/modules/${_kver}/kernel/drivers/misc \
 	--with-transmitter
 		
         # Remove drivers already in kernel

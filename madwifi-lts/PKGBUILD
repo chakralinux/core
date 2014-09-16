@@ -2,12 +2,12 @@
 
 # Find the kernel name inside the chroot
 _extramodules=extramodules-3.2-lts
-_kver="$(cat /lib/modules/${_extramodules}/version)"
+_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
 
 pkgname=madwifi-lts
 pkgver=0.9.4.4182
 _ver=r4182-20140204
-pkgrel=1
+pkgrel=2
 pkgdesc="Madwifi drivers for Atheros wireless chipsets"
 arch=('x86_64')
 license=('GPL')
@@ -32,18 +32,15 @@ build()
 
   sed -i 's/-Werror//' Makefile.inc
   sed -i 's/\[4-9\]\\\./[0-9]-/' Makefile
-  make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules
+  make KMODPATH="/usr/lib/modules/$_extramodules" KERNELPATH=/usr/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules
 }
 
 package()
 {
   cd madwifi-*-${_ver}
-  make KERNELPATH=/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules \
+  make KMODPATH="/usr/lib/modules/$_extramodules" KERNELPATH=/usr/lib/modules/${_kver}/build KERNELRELEASE=${_kver} modules \
        DESTDIR="${pkgdir}" KERNELRELEASE=${_kver} install-modules
   sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" ${startdir}/*.install
-  mkdir -p "${pkgdir}/lib/modules/$_extramodules"
-  mv "${pkgdir}"/lib/modules/${_kver}/net/* "${pkgdir}/lib/modules/$_extramodules"
-  rm -r "${pkgdir}"/lib/modules/${_kver}
   find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
 }
 

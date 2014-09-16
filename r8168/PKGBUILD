@@ -3,30 +3,36 @@
 #
 # maintainer abveritas@chakra-project.org
 
-_extramodules=extramodules-3.12.15-CHAKRA
-_kernver="$(cat /lib/modules/$_extramodules/version || true)"
+_extramodules=extramodules-3.16-CHAKRA
+_kernver="$(cat /usr/lib/modules/$_extramodules/version || true)"
 
 pkgname=r8168
-pkgver=8.036.00
-pkgrel=7
+pkgver=8.038.00
+pkgrel=1
 pkgdesc="A kernel module for Realtek 8168 network cards"
 url="http://www.realtek.com.tw"
 license=("GPL")
 arch=('x86_64')
-depends=('glibc' 'linux>=3.12' 'linux<3.13')
+depends=('glibc' 'linux>=3.16' 'linux<3.17')
 makedepends=('linux-headers')
-source=("http://r8168.googlecode.com/files/$pkgname-$pkgver.tar.bz2"
-	'linux-3.10.patch')
-md5sums=('a9a5b238f59cc30eefa5917d7f6b728e'
-         '8790fa9f6ec1a4d51aec3dd5750e342b')
 install=$pkgname.install
+source=("https://dl.dropboxusercontent.com/u/362439/archlinux/r8168-$pkgver.tar.bz2"
+        delayed_work_ethtool_ops_fix2.patch)
+sha256sums=('1384bdf4d33b219f937bf1a600c72b22962baf7796e562b08e4da3c000f49072'
+            '2a03fa65e476cb7dd3ed5976037e0218260ff2660b6a4c495a824865eb10c303')
+
+prepare(){
+	cd "$pkgname-$pkgver"
+
+	# Fix build with Linux 3.15 and 3.16
+	# https://code.google.com/p/r8168/issues/detail?id=19
+	patch -Np1 -i "$srcdir/delayed_work_ethtool_ops_fix2.patch"
+}
 
 build() {
 	cd "$srcdir/$pkgname-$pkgver"
 	
-	patch -p0 -i "$srcdir/linux-3.10.patch"
-	
-	make -C /lib/modules/$_kernver/build \
+	make -C /usr/lib/modules/$_kernver/build \
 			SUBDIRS="$srcdir/$pkgname-$pkgver/src" \
 			EXTRA_CFLAGS="-DCONFIG_R8168_NAPI -DCONFIG_R8168_VLAN" \
 			modules
@@ -34,6 +40,7 @@ build() {
 
 package() {
 	cd "$srcdir/$pkgname-$pkgver/src"
-	install -D -m644 $pkgname.ko "$pkgdir/lib/modules/$_extramodules/$pkgname.ko"
+	install -D -m644 $pkgname.ko "$pkgdir/usr/lib/modules/$_extramodules/$pkgname.ko"
 	find "$pkgdir" -name '*.ko' -exec gzip -9 {} \;
+        sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/$pkgname.install"
 }

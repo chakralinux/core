@@ -1,18 +1,18 @@
 # maintainer tetris4@gmail.com
 # contributions from: https://www.archlinux.org/packages/community/x86_64/bbswitch/
 
-_extramodules=extramodules-3.15.5-CHAKRA
+_extramodules=extramodules-3.16-CHAKRA
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=bbswitch
 pkgver=0.8
-pkgrel=6
+pkgrel=7
 pkgdesc="kernel module allowing to switch dedicated graphics card on Optimus laptops"
 arch=('x86_64')
 url=("http://github.com/Bumblebee-Project/bbswitch")
 license=('GPL')
 install=bbswitch.install
-depends=('linux>=3.15' 'linux<3.16')
+depends=('linux>=3.16' 'linux<3.17')
 makedepends=('linux' 'linux-headers')
 source=("https://github.com/Bumblebee-Project/bbswitch/archive/v${pkgver}.tar.gz")
 md5sums=('5b116b31ace3604ddf9d1fc1f4bc5807')
@@ -33,6 +33,6 @@ package() {
 
   # KDIR is necessary even when cleaning
   #make KDIR=/usr/src/linux-${_kver} clean
-  install -Dm644 bbswitch.ko $pkgdir/lib/modules/${_extramodules}/bbswitch.ko
-  gzip "${pkgdir}/lib/modules/${_extramodules}/bbswitch.ko"
+  install -Dm644 bbswitch.ko $pkgdir/usr/lib/modules/${_extramodules}/bbswitch.ko
+  gzip "${pkgdir}/usr/lib/modules/${_extramodules}/bbswitch.ko"
 }

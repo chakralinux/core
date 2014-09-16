@@ -3,11 +3,11 @@
 
 # Find the kernel name inside the chroot
 _extramodules=extramodules-3.2-lts
-_kver="$(cat /lib/modules/${_extramodules}/version)"
+_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
 
 pkgname=nvidia-173xx-lts
 pkgver=173.14.39
-pkgrel=2
+pkgrel=3
 pkgdesc="NVIDIA drivers for linux - LTS package"
 arch=('x86_64')
 url="http://www.nvidia.com/"
@@ -25,14 +25,14 @@ build() {
 
     cd "usr/src/nv/"
     ln -s Makefile.kbuild Makefile
-    make SYSSRC=/lib/modules/${_kver}/build module 
+    make SYSSRC=/usr/lib/modules/${_kver}/build module 
 }
 
 package() {
     cd "NVIDIA-Linux-$arch-${pkgver}-pkg0/usr/src/nv/"
-    mkdir -p $pkgdir//lib/modules/${_extramodules}
-    install -m644 nvidia.ko $pkgdir/lib/modules/${_extramodules}
+    mkdir -p $pkgdir/usr/lib/modules/${_extramodules}
+    install -m644 nvidia.ko $pkgdir/usr/lib/modules/${_extramodules}
     install -d -m755 "${pkgdir}/etc/modprobe.d"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
-    gzip "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
+    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
 }
