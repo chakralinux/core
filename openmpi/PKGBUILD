@@ -1,21 +1,23 @@
 # Maintainer: Manuel Tortosa
 
 pkgname=openmpi
-pkgver=1.7.2
-pkgrel=3
-pkgdesc="High performance message passing library (MPI)"
-arch=('x86_64')
-url="http://www.open-mpi.org"
-license=('custom')
-depends=('gcc-fortran' 'openssh' 'valgrind' 'libltdl' 'hwloc')
-makedepends=('inetutils')
-source=(http://www.open-mpi.org/software/ompi/v1.7/downloads/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('89676c1171784b1c26e1598caf88e87f897f6653')
+pkgver=1.8.2
+pkgrel=1
+pkgdesc='High performance message passing library (MPI)'
+arch=(i686 x86_64)
+url='http://www.open-mpi.org'
+license=(custom)
+depends=(libltdl 'hwloc>=1.9')
+makedepends=(inetutils valgrind gcc-fortran)
+optdepends=('gcc-fortran: fortran support')
+options=(staticlibs)
+source=(http://www.open-mpi.org/software/ompi/v1.8/downloads/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('55067856b351cbeb5ebe8a430bfe0656115a04ed')
 
 prepare() {
-   cd "${srcdir}/${pkgname}-${pkgver}"
+   cd $pkgname-$pkgver
 
-   # Make sure we use the system ltdl librariry rather than the ones in the tarball
+   # Make sure we use the system ltdl library rather than the ones in the tarball
    rm -r opal/libltdl
 }
 
@@ -24,8 +26,7 @@ build() {
 
    ./configure --prefix=/usr \
                --sysconfdir=/etc/${pkgname} \
-               --mandir=/usr/share/man \
-               --enable-mpi-f90 \
+               --enable-mpi-fortran=all \
                --libdir=/usr/lib/${pkgname} \
                --with-threads=posix \
                --enable-smp-locks \
@@ -43,23 +44,20 @@ build() {
 }
 
 package() {
-   cd "${srcdir}/${pkgname}-${pkgver}"
-   make DESTDIR="${pkgdir}" install
+   cd $pkgname-$pkgver
+   make DESTDIR="$pkgdir" install
 
    # FS#28583
-   install -d -m 755 "${pkgdir}"/usr/lib/pkgconfig
+   install -d -m 755 "$pkgdir"/usr/lib/pkgconfig
    for i in ompi-c.pc ompi-cxx.pc ompi-f77.pc ompi-f90.pc ompi.pc; do
-      ln -sf /usr/lib/openmpi/pkgconfig/${i} "${pkgdir}"/usr/lib/pkgconfig/
+      ln -sf /usr/lib/openmpi/pkgconfig/$i "$pkgdir"/usr/lib/pkgconfig/
    done
 
    # Openmpi's otfinfo conflicts with the one from texlive
-   mv "${pkgdir}"/usr/bin/otfinfo{,mpi}
+   mv "$pkgdir"/usr/bin/otfinfo{,mpi}
 
-   # Remove dangling symlink
-   rm "${pkgdir}"/usr/share/man/man1/orteCC.1
-
-   # TODO: the safety of this is uncertain
-   rm -rf "${pkgdir}"/usr/include/event2
+   # Remove dangling symlink and useless file
+   rm "$pkgdir"/usr/share/vampirtrace/config.log
 
    install -d -m 755 "${pkgdir}"/etc/ld.so.conf.d
    echo "/usr/lib/${pkgname}" > "${pkgdir}"/etc/ld.so.conf.d/${pkgname}.conf
