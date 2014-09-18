@@ -1,7 +1,7 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=tzdata
-pkgver=2014e
+pkgver=2014g
 pkgrel=1
 pkgdesc="Sources for time zone and daylight saving time data"
 arch=('any')
@@ -16,8 +16,8 @@ timezones=('africa' 'antarctica' 'asia' 'australasia'
            'europe' 'northamerica' 'southamerica'
            'pacificnew' 'etcetera' 'backward'
            'systemv' 'factory')
-md5sums=('8a49fdedd4e832da8e85f7f9bcaedc33'
-         '552251600ee3571c244d33c7196ec2ed')
+md5sums=('f9f59425e55b21d2e52bb3a95fc17b8d'
+         'f154679d48b724fe191efc19b55abd24')
 
 package() {
   cd ${srcdir}
@@ -29,6 +29,6 @@ package() {
   zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo/right -L leapseconds ${timezones[@]}
   
   zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo -p America/New_York
-  install -m444 -t ${pkgdir}/usr/share/zoneinfo iso3166.tab zone.tab
+  install -m444 -t ${pkgdir}/usr/share/zoneinfo iso3166.tab zone1970.tab zone.tab # zone.tab is depricated and will go soon
 }
 
