@@ -27,26 +27,24 @@ pkgname=('qt5-base'
          'qt5-websockets'
          'qt5-xmlpatterns'
          'qt5-private-headers')
-pkgver=5.3.1
-pkgrel=5
+pkgver=5.3.2
+pkgrel=1
 arch=('x86_64')
-url='http://qt.nokia.com/'
-license=('GPL3' 'LGPL')
+url='http://qt-project.org/'
+license=('GPL3' 'LGPL' 'FDL' 'custom')
 makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
     'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib' 'icu'
     'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
     'mariadb' 'unixodbc' 'cups' 'libxinerama' 'libxcomposite' 'libxcursor' 'libxkbcommon' 'python2' 'gperf' 'ruby'
-    'xcb-util-image' 'xcb-util-keysyms' 'xcb-util-renderutil' 'xcb-util-wm' 'pulseaudio'
+    'xcb-util-image' 'xcb-util-keysyms' 'xcb-util-renderutil' 'xcb-util-wm' 'libpulse'
     'gstreamer' 'gst-plugins-base' 'gst-plugins-good'
     'gst-plugins-bad' 'gst-plugins-ugly' 'harfbuzz' 'pkg-config')
-options=('!libtool')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
-source=(#"${pkgname}.tar.xz"
-	"http://download.qt-project.org/official_releases/qt/5.3/${pkgver}/single/${_pkgfqn}.tar.xz"
+source=("http://download.qt-project.org/official_releases/qt/5.3/${pkgver}/single/${_pkgfqn}.tar.xz"
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
         'youtubeview.desktop' 'flickrview.desktop' 'browser.desktop' 'fancybrowser.desktop' 'qmlviewer.desktop'
         'qdbusviewer-qt5.desktop')
-sha1sums=('66b33ea66eb05a864e7ae417179ea24c8a45ec10'
+sha1sums=('fb156a87a193c9a7a2fa51efc89660a3b619ace5'
           '981cf376da66c8be7c7ec99866da0299114192f6'
           'e131a17beda4625f21022981a519b5e8d8c8e6f7'
           '62806b6696696d4ef69e4c0733fc9f1d761f08cd'
@@ -137,11 +135,10 @@ package_qt5-base() {
              'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'libxinerama' 'libxcursor'
              'pulseaudio' 'gstreamer' 'gst-plugins-base' 'gst-plugins-ugly' 'gst-plugins-good'
               'xcb-util-image' 'xcb-util-keysyms'
-             'xcb-util-renderutil' 'xcb-util-wm')
+             'xcb-util-renderutil' 'xcb-util-wm' 'libxkbcommon')
     optdepends=('postgresql-libs: PostgreSQL driver'
           'libmariadbclient: MySQL driver'
 	  'unixodbc: ODBC driver'
-          'libxkbcommon: xcb plugin'
 	  'libxinerama: Xinerama support'
 	  'libxfixes: Xfixes support')
 	
@@ -171,7 +168,7 @@ package_qt5-base() {
 
 package_qt5-connectivity() {
   pkgdesc='A cross-platform application and UI framework (QtBluetooth, QtNfc)'
-  depends=('qt5-declarative' 'libxkbcommon')
+  depends=('qt5-declarative')
 
   cd ${_pkgfqn}/qtconnectivity
   make INSTALL_ROOT="${pkgdir}" install
@@ -184,7 +181,7 @@ package_qt5-connectivity() {
 
 package_qt5-declarative() {
     pkgdesc='A cross-platform application and UI framework (QtQml, QtQuick)'
-    depends=('qt5-xmlpatterns' 'libxkbcommon')
+    depends=('qt5-xmlpatterns')
     conflicts=('qt5')
 
     cd $srcdir/$_pkgfqn/qtdeclarative
