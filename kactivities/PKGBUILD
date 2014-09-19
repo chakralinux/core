@@ -6,15 +6,13 @@ source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname="kactivities"
 pkgver=4.13.3 # there is no 4.14 version!
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 pkgdesc='API for using and interacting with Activities'
 url='http://kde.org/'
 license=('GPL'
          'FDL')
-depends=("kdelibs>=${_kdever}"
-         "baloo>=${_kdever}"
-         "soprano")
+depends=("kdelibs>=${_kdever}")
 makedepends=('cmake'
              'automoc4')
 options=('docs'
@@ -31,7 +29,8 @@ build() {
     mkdir build && cd build
     cmake .. \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DWITH_NepomukCore=OFF
     make
 }
 
