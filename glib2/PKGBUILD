@@ -4,7 +4,7 @@
 
 pkgname=glib2
 pkgver=2.38.2
-pkgrel=2
+pkgrel=3
 pkgdesc="Common C routines used by GTK+ and other libs"
 url="http://www.gtk.org/"
 arch=('x86_64')
@@ -13,13 +13,18 @@ depends=('pcre' 'libffi')
 makedepends=('pkg-config' 'python2' 'libxslt' 'docbook-xml')
 options=('!docs')
 source=("http://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver:0:4}/glib-${pkgver}.tar.xz"
-        'revert-warn-glib-compile-schemas.patch')
+        'revert-warn-glib-compile-schemas.patch' 'nodelete.patch')
 md5sums=('26d1d08e478fc48c181ca8be44f5b69f'
-         '3265d1afbcf1f5f308e26c3f9f6ca899')
+         '3265d1afbcf1f5f308e26c3f9f6ca899'
+         'cb9237731c0592f83d4e44613367870e')
 
 prepare() {
   cd glib-$pkgver
   patch -Rp1 -i ../revert-warn-glib-compile-schemas.patch
+  # see https://bugzilla.gnome.org/show_bug.cgi?id=707298
+  # and https://bugs.archlinux.org/task/39676
+  patch -p1 -i ../nodelete.patch
+  autoreconf -fiv
 }
 
 build() {
