@@ -29,12 +29,12 @@ install=nfs-utils.install
 md5sums=('3ac3726eda563946d1f44ac3e5b61d56'
          '31ca748f692c01d403dfe526c9527413'
          'a8974a59b375f6e6f883ddc9089a857f'
-         'b8af93d9267084227b7830f59930e4aa'
+         'b777554461bd67c6029dab18c0a9115e'
          'eb4f4027fab6fc1201f1ca04f5954c76'
          '7674106eaaa4c149bccd4f05fe3604e9'
          '8ac484023d786766d287ccbe878ae4ba'
-         'a43aabf0b8d02406b1babc3a206d952a'
-         'c6c9c32f153dfa6c0477ea6b99354288'
+         '3139890830c3f6bee42d1757282be9c1'
+         '517868c7475ff086f25c783eaceaf61c'
          '92423a1e833ba90fdc446aa2296ac7f0')
 
 prepare() {
@@ -48,17 +48,17 @@ prepare() {
 
 build() {
   cd $srcdir/${pkgname}-${pkgver}
-  ./configure --prefix=/usr --sbindir=/usr/bin --enable-nfsv4 --enable-nfsv41 --enable-gss \
+  ./configure --prefix=/usr --sbindir=/usr/sbin --enable-nfsv4 --enable-nfsv41 --enable-gss \
               --without-tcp-wrappers --with-statedir=/var/lib/nfs \
               --enable-ipv6 --sysconfdir=/etc --enable-libmount-mount \
               --with-gssglue \
               --enable-mountconfig --with-start-statd=/usr/bin/start-statd
   # move mount helpers to /usr/bin
-  sed -i -e 's#sbindir = /sbin#sbindir = /usr/bin#g' utils/mount/Makefile
+  #sed -i -e 's#sbindir = /sbin#sbindir = /usr/bin#g' utils/mount/Makefile
   # move osd_login to /usr/bin
-  sed -i -e 's#sbindir = /sbin#sbindir = /usr/bin#g' utils/osd_login/Makefile
+  #sed -i -e 's#sbindir = /sbin#sbindir = /usr/bin#g' utils/osd_login/Makefile
   # move nfsdcltrack to /usr/bin
-  sed -i -e 's#sbindir = /sbin#sbindir = /usr/bin#g' utils/nfsdcltrack/Makefile
+  #sed -i -e 's#sbindir = /sbin#sbindir = /usr/bin#g' utils/nfsdcltrack/Makefile
   make 
 }
 
@@ -66,16 +66,16 @@ package() {
   cd $srcdir/${pkgname}-${pkgver}
   make DESTDIR=$pkgdir install
 
-  sed -i '1s/python$/python2/' "$pkgdir"/usr/bin/{nfsiostat,mountstats}
+  #sed -i '1s/python$/python2/' "$pkgdir"/usr/bin/{nfsiostat,mountstats}
   install -D -m 644 utils/mount/nfsmount.conf "$pkgdir"/etc/nfsmount.conf
 
   # Configuration
-  install -D -m 644 ../exports "$pkgdir/"etc/exports
-  install -D -m 644 ../idmapd.conf "$pkgdir/"etc/idmapd.conf
-  install -D -m 644 ../nfs-server.conf "$pkgdir/"etc/conf.d/nfs-server.conf
-  install -D -m 644 ../nfs-common.conf "$pkgdir/"etc/conf.d/nfs-common.conf
+  install -D -m 644 ../exports          "$pkgdir/"etc/exports
+  install -D -m 644 ../idmapd.conf      "$pkgdir/"etc/idmapd.conf
+  install -D -m 644 ../nfs-server.conf  "$pkgdir/"etc/conf.d/nfs-server.conf
+  install -D -m 644 ../nfs-common.conf  "$pkgdir/"etc/conf.d/nfs-common.conf
   install -D -m 644 ../id_resolver.conf "$pkgdir"/etc/request-key.d/id_resolver.conf
-  install -D -m 644 ../nfs-utils.conf "$pkgdir/"usr/lib/modules-load.d/nfs-utils.conf
+  install -D -m 644 ../nfs-utils.conf   "$pkgdir/"usr/lib/modules-load.d/nfs-utils.conf
   install -D -m 755 ../nfs-utils_env.sh "$pkgdir"/usr/lib/systemd/scripts/nfs-utils_env.sh
   
   # systemd files
