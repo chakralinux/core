@@ -4,7 +4,7 @@
 
 pkgname=bash
 _basever=4.3
-_patchlevel=024 #prepare for some patches
+_patchlevel=025 #prepare for some patches
 pkgver=$_basever.$_patchlevel
 pkgrel=1
 pkgdesc="The GNU Bourne Again shell"
@@ -53,8 +53,7 @@ build() {
   export CFLAGS="${CFLAGS} ${_bashconfig[@]}"
 
   ./configure --prefix=/usr --with-curses --enable-readline \
-    --without-bash-malloc --with-installed-readline \
-    --bindir=/bin --mandir=/usr/share/man --infodir=/usr/share/info
+    --without-bash-malloc --with-installed-readline
   make
 }
 
@@ -67,9 +66,13 @@ package() {
   cd $pkgname-$_basever
   make DESTDIR=${pkgdir} install
 
-  # for now, bash is our default /bin/sh
-  cd ${pkgdir}/bin
-  ln -s bash sh
+  ln -s bash ${pkgdir}/usr/bin/sh
+
+  # pre-usr move
+  # put needed symlinks in /bin
+  install -dm755 ${pkgdir}/bin
+  ln -s ../usr/bin/bash ${pkgdir}/bin/bash
+  ln -s ../usr/bin/bash ${pkgdir}/bin/sh
 
   install -dm755 ${pkgdir}/etc/skel/
   
@@ -138,4 +141,6 @@ md5sums=('81348932d5da294953e15d4814c74dd1'
          'b3cb0d80fd0c47728264405cbb3b23c7'
          'SKIP'
          'b5ea5600942acceb4b6f07313d2de74e'
+         'SKIP'
+         '193c06f578d38ffdbaebae9c51a7551f'
          'SKIP')
