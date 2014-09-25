@@ -1,7 +1,7 @@
 # Maintainer: Bruce Liu <brli@users.sourceforge.net>
 
 pkgname=nspr
-pkgver=4.10.6
+pkgver=4.10.7
 pkgrel=1
 pkgdesc="Netscape Portable Runtime"
 arch=('x86_64')
@@ -11,27 +11,26 @@ depends=('glibc')
 makedepends=('zip')
 options=('!emptydirs')
 source=("ftp://ftp.mozilla.org/pub/mozilla.org/nspr/releases/v${pkgver}/src/${pkgname}-${pkgver}.tar.gz")
-md5sums=('6ab81e8d508457905223eaf4ed0a973b')
+sha1sums=('f62972d7c66d4621d6262c5bd9b5723fa67b6bff')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  confflags="--enable-64bit"
+  cd $pkgname-$pkgver
+  _confflags="--enable-64bit"
 
   ./nspr/configure \
       --prefix=/usr \
       --libdir=/usr/lib \
       --includedir=/usr/include/nspr \
       --enable-optimize \
-      --disable-debug ${confflags}
+      --disable-debug ${_confflags}
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd $pkgname-$pkgver
   make DESTDIR="$pkgdir" install
 
-  chmod 644 "$pkgdir"/usr/lib/*.a
-#  ln -s nspr.pc "$pkgdir/usr/lib/pkgconfig/mozilla-nspr.pc"
+  ln -s nspr.pc "$pkgdir/usr/lib/pkgconfig/mozilla-nspr.pc"
   rm -r "$pkgdir"/usr/bin/{compile-et.pl,prerr.properties} \
          "$pkgdir/usr/include/nspr/md"
 }
