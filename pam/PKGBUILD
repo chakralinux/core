@@ -4,7 +4,7 @@
 
 pkgname=pam
 pkgver=1.1.8
-pkgrel=2
+pkgrel=3
 pkgdesc="PAM (Pluggable Authentication Modules) library"
 arch=('x86_64')
 license=('GPL2')
@@ -34,29 +34,30 @@ prepare() {
   # fix CVEs in pam
   patch -Np1 -i  "${srcdir}/pam-1.1.8-cve-2013-7041.patch"
   patch -Np1 -i  "${srcdir}/pam-1.1.8-cve-2014-2583.patch"
-  
+
+  # fix pam_unix2 building
   cd $srcdir/pam_unix2-2.9.1
-  # compile fix
-  patch -Np1 -i ../pam_unix2-glibc216.patch  
+  patch -Np1 -i "../pam_unix2-glibc216.patch"
 }
 
 build() {
   cd $srcdir/Linux-PAM-$pkgver
-  
-  ./configure --libdir=/usr/lib
+  ./configure --libdir=/usr/lib --sbindir=/usr/sbin
   make
 
   cd $srcdir/pam_unix2-2.9.1
+  # modify flags to build against the pam compiled here, not a system lib.
   ./configure \
-   CFLAGS="$CFLAGS -I$srcdir/Linux-PAM-$pkgver/libpam/include/" \
-   LDFLAGS="$LDFLAGS -L$srcdir/Linux-PAM-$pkgver/libpam/.libs/" \
-   --libdir=/usr/lib
+      CFLAGS="$CFLAGS -I$srcdir/Linux-PAM-$pkgver/libpam/include/" \
+      LDFLAGS="$LDFLAGS -L$srcdir/Linux-PAM-$pkgver/libpam/.libs/" \
+      --libdir=/usr/lib \
+      --sbindir=/usr/sbin
   make
 }
 
 package() {
   cd $srcdir/Linux-PAM-$pkgver
-  make DESTDIR=$pkgdir install
+  make DESTDIR=$pkgdir SCONFIGDIR=/etc/security install
   install -D -m644 ../other $pkgdir/etc/pam.d/other
 
   # build pam_unix2 module
@@ -82,5 +83,5 @@ _EOT
   ln -s pam_unix.so pam_unix_session.so
 
   # set unix_chkpwd uid
-  chmod +s $pkgdir/sbin/unix_chkpwd
+  chmod +s $pkgdir/usr/sbin/unix_chkpwd
 }

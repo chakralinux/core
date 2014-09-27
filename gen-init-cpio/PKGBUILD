@@ -6,7 +6,7 @@
 
 pkgname=gen-init-cpio
 pkgver=2.6.36
-pkgrel=2
+pkgrel=3
 pkgdesc="Program to compress initramfs images"
 arch=(i686 x86_64)
 license=('custom:none')
@@ -21,5 +21,5 @@ build()
 {
   cd $srcdir/
   make || return 1
-  make DESTDIR=$pkgdir install
+  make PREFIX=/usr/ DESTDIR=$pkgdir install
 }

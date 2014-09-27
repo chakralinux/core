@@ -5,38 +5,34 @@
 # rebuild libtool on any update
 
 pkgname=sed
-pkgver=4.2.1
-pkgrel=6
+pkgver=4.2.2
+pkgrel=1
 pkgdesc="GNU stream editor"
 arch=('x86_64')
 url="http://www.gnu.org/software/sed"
 license=('GPL3')
 groups=('base')
-depends=('acl' 'sh')
+depends=('glibc' 'acl' 'attr')
 makedepends=('gettext')
 install=sed.install
-source=("ftp://ftp.gnu.org/pub/gnu/sed/${pkgname}-${pkgver}.tar.gz"{,.sig})
-md5sums=('f0fd4d7da574d4707e442285fd2d3b86'
-         '91871b227dbf0916e019ba1fb0fbfdf3')
+source=("ftp://ftp.gnu.org/pub/gnu/sed/$pkgname-$pkgver.tar.gz"{,.sig})
+md5sums=('4111de4faa3b9848a0686b2f260c5056'
+         '86a5ab72f414d4cb38126e8e27cf0101')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  ./configure --prefix=/usr \
-              --bindir=/bin \
-              --without-included-regex
-
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
   make
 }
 
 check() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd $pkgname-$pkgver
   make check
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
 }
 
 # vim:set ts=2 sw=2 et:

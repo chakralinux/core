@@ -7,7 +7,7 @@
 
 pkgname=filesystem
 pkgver=2014.07
-pkgrel=3
+pkgrel=4
 _codename=Descartes
 pkgdesc='Base filesystem'
 arch=('x86_64')
@@ -54,7 +54,7 @@ package() {
 	#
 	# setup root filesystem
 	#
-	for d in boot dev etc home media mnt usr var opt srv/http run; do
+	for d in boot dev etc home mnt usr var opt srv/http run; do
 		install -d -m755 ${d}
 	done
 	install -d -m555 proc
@@ -76,6 +76,7 @@ package() {
 	touch etc/chakra-release
 	install -D -m644 ${srcdir}/modprobe.d.usb-load-ehci-first usr/lib/modprobe.d/usb-load-ehci-first.conf
 	install -m755 ${srcdir}/locale.sh etc/profile.d/locale.sh
+	install -Dm644 "$srcdir"/os-release "$pkgdir"/usr/lib/os-release
 
 	# setup /var
 	for d in cache/man local opt log/old lib/misc empty; do
@@ -98,6 +99,11 @@ package() {
 		install -d -m755 usr/share/man/man${d}
 	done
 
+	#
+	# add bin symlinks
+	#
+	ln -s usr/bin ${pkgdir}/bin
+	ln -s usr/sbin ${pkgdir}/sbin
 
 	#
 	# setup /usr/local hierarchy

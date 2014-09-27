@@ -8,7 +8,8 @@ build() {
         echo "Custom /etc/mdadm.conf file will be used in initramfs for assembling arrays."
         add_file "/etc/mdadm.conf"
     fi
-    add_binary "/sbin/mdassemble"
+    add_binary "/usr/bin/mdassemble"
+    add_file "/usr/lib/udev/rules.d/63-md-raid-arrays.rules"
 
     add_runscript
 }
@@ -30,7 +31,7 @@ Command Line Setup:
   md=d<md device no.>,uuid
 
 Parameters:
-- <md device no.> = the number of the md device:
+- <md device no.> = the number of the md device: 
   0 means md0, 1 means md1, ...
 - <dev0-devn>: e.g. /dev/hda1,/dev/hdc1,/dev/sda1,/dev/sdb1
                  or 0900878d:f95f6057:c39a36e9:55efa60a
@@ -41,3 +42,5 @@ Examples:
   This will setup 2 md arrays with persistent superblocks.
 HELPEOF
 }
+
+# vim: set ft=sh ts=4 sw=4 et:

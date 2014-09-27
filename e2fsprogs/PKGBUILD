@@ -4,7 +4,7 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=e2fsprogs
-pkgver=1.42.7
+pkgver=1.42.12
 pkgrel=1
 pkgdesc="Ext2/3/4 filesystem utilities"
 arch=('x86_64')
@@ -12,41 +12,46 @@ license=('GPL' 'LGPL' 'MIT')
 url="http://e2fsprogs.sourceforge.net"
 groups=('base')
 depends=('sh' 'util-linux')
-makedepends=('bc' 'texlive-bin')
+makedepends=('bc' 'util-linux')
 source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.gz"
         'MIT-LICENSE')
 backup=('etc/mke2fs.conf')
+options=('staticlibs')
 install=${pkgname}.install
-sha1sums=('897ed5bab4f021834d00ec047ed83766d56ce0a8'
+sha1sums=('083c1bb0d1e85672e8038a2fadf70b24e7409db7'
           'f4a0d5b0cdb980e3fedd6f5e7dde0b0ffb7bbdfb')
 
-build() {
+prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   # Remove unnecessary init.d directory
   sed -i '/init\.d/s|^|#|' misc/Makefile.in
+}
 
-  ./configure --prefix=/usr \
-      --with-root-prefix="" \
-      --libdir=/usr/lib \
-      --enable-elf-shlibs \
-      --disable-fsck \
-      --disable-uuidd \
-      --disable-libuuid \
-      --disable-libblkid
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr --with-root-prefix="" --libdir=/usr/lib \
+      --sbindir=/usr/bin --enable-elf-shlibs --disable-fsck --disable-uuidd \
+      --disable-libuuid --disable-libblkid
 
   make
 }
 
 package() {
+  unset MAKEFLAGS
+
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install install-libs
 
   sed -i -e 's/^AWK=.*/AWK=awk/' "${pkgdir}/usr/bin/compile_et"
-  
+
   # remove references to build directory
   sed -i -e 's#^SS_DIR=.*#SS_DIR="/usr/share/ss"#' "${pkgdir}/usr/bin/mk_cmds"
   sed -i -e 's#^ET_DIR=.*#ET_DIR="/usr/share/et"#' "${pkgdir}/usr/bin/compile_et"
+
+  # remove static libraries with a shared counterpart
+  rm "${pkgdir}"/usr/lib/lib{com_err,e2p,ext2fs,ss}.a
 
   # install MIT license
   install -Dm644 "${srcdir}/MIT-LICENSE" \

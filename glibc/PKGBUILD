@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.20
-pkgrel=2
+pkgrel=3
 pkgdesc="GNU C Library"
 arch=('x86_64')
 url="http://www.gnu.org/software/libc"
@@ -51,6 +51,8 @@ build() {
 
   echo "slibdir=/usr/lib" >> configparms
   echo "rtlddir=/usr/lib" >> configparms
+  echo "sbindir=/usr/sbin" >> configparms
+  echo "rootsbindir=/usr/sbin" >> configparms
 
   # remove hardening options for building libraries
   CFLAGS=${CFLAGS/-fstack-protector-strong/}
@@ -111,9 +113,6 @@ package() {
 
   install -m755 ${srcdir}/locale-gen ${pkgdir}/usr/bin
 
-  # temporary symlink
-  ln -s ../../sbin/ldconfig ${pkgdir}/usr/bin/ldconfig
-
   # create /etc/locale.gen
   install -m644 ${srcdir}/locale.gen.txt ${pkgdir}/etc/locale.gen
   sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
@@ -134,7 +133,7 @@ package() {
   cd $pkgdir
   strip $STRIP_BINARIES usr/bin/{gencat,getconf,getent,iconv,makedb,locale,localedef} \
                         usr/sbin/{iconvconfig,nscd} \
-                        sbin/{ldconfig,sln} \
+                        usr/sbin/{ldconfig,sln} \
                         usr/bin/{pcprofiledump,pldd,rpcgen,sprof} \
                         usr/lib/getconf/*
 

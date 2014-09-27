@@ -6,8 +6,8 @@
 # contributor Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=shadow
-pkgver=4.1.5.1
-pkgrel=4
+pkgver=4.2.1
+pkgrel=1
 pkgdesc="Password and account management tool suite with support for shadow files and PAM"
 arch=('x86_64')
 url='http://pkg-shadow.alioth.debian.org/'
@@ -21,8 +21,7 @@ backup=(etc/login.defs
         etc/default/useradd)
 options=(strip debug)
 install='shadow.install'
-source=("http://fossies.org/linux/misc/shadow_4.1.5.1.orig.tar.gz"
-#"http://cdn.debian.net/debian/pool/main/s/shadow//shadow_4.1.5.1.orig.tar.gz" #"http://cdn.debian.net/debian/pool/main/s/$pkgname//$pkgname_$pkgver.orig.tar.gz"
+source=("http://pkg-shadow.alioth.debian.org/releases/$pkgname-$pkgver.tar.xz"{,.sig}
         LICENSE
         chgpasswd
         chpasswd
@@ -33,8 +32,10 @@ source=("http://fossies.org/linux/misc/shadow_4.1.5.1.orig.tar.gz"
         shadow.{timer,service}
         useradd.defaults
         xstrdup.patch
-        shadow-strncpy-usage.patch)
-sha1sums=('6e4de75de58405d21b0377b926ae770afccd95bc'
+        shadow-strncpy-usage.patch
+        lastlog.tmpfiles)
+sha1sums=('0917cbadd4ce0c7c36670e5ecd37bbed92e6d82d'
+          'SKIP'
           '7ab316761036787c0cfcb53b7a6e82da7c373123'
           '4ad0e059406a305c8640ed30d93c2a1f62c2f4ad'
           '87186f6e5e00d195cafba5e38400418481dce3af'
@@ -46,32 +47,34 @@ sha1sums=('6e4de75de58405d21b0377b926ae770afccd95bc'
           '4fb696c722ed59e74a98a682a4f780bf9f1cf031'
           '80e3d2ee8c990c2f7fbd0dcf406a9e41cbe66fe2'
           '6010fffeed1fc6673ad9875492e1193b1a847b53'
-          '3bc0e0968ddec0e58b1e2de88d9d0065c93d60c9')
+          '3bc0e0968ddec0e58b1e2de88d9d0065c93d60c9'
+          'f57ecde3f72b4738fad75c097d19cf46a412350f')
+
+prepare() {
+  cd "$pkgname-$pkgver"
+
+  # need to offer these upstream
+  patch -Np1 <"$srcdir/xstrdup.patch"
+  patch -Np1 <"$srcdir/shadow-strncpy-usage.patch"
+
+  # supress etc/pam.d/*, we provide our own
+  sed -i '/^SUBDIRS/s/pam\.d//' etc/Makefile.in
+}
 
 build() {
   cd "$pkgname-$pkgver"
 
-  # avoid transitive linking issues with binutils 2.22
-  sed -i '/^user\(mod\|add\)_LDADD/s|$| -lattr|' src/Makefile.am
-
-  # link to glibc's crypt(3)
-  export LIBS="-lcrypt"
-
-  # need to offer these upstream
-  patch -p1 <"$srcdir/xstrdup.patch"
-  patch -p1 <"$srcdir/shadow-strncpy-usage.patch"
-
-  # supress etc/pam.d/*, we provide our own
-  sed -i '/^SUBDIRS/s/pam.d//' etc/Makefile.in
-
   ./configure \
+    LIBS="-lcrypt" \
     --prefix=/usr \
-    --libdir=/lib \
+    --bindir=/usr/bin \
+    --sbindir=/usr/bin \
+    --libdir=/usr/lib \
     --mandir=/usr/share/man \
     --sysconfdir=/etc \
     --with-libpam \
-    --without-selinux \
-    --with-group-name-max-length=32
+    --with-group-name-max-length=32 \
+    --without-selinux
 
   make
 }
@@ -88,10 +91,10 @@ package() {
   install -Dm644 "$srcdir/useradd.defaults" "$pkgdir/etc/default/useradd"
 
   # systemd timer
-  install -D -m644 ${srcdir}/shadow.timer ${pkgdir}/usr/lib/systemd/system/shadow.timer
-  install -D -m644 ${srcdir}/shadow.service ${pkgdir}/usr/lib/systemd/system/shadow.service
-  install -d -m755 ${pkgdir}/usr/lib/systemd/system/multi-user.target.wants
-  ln -s ../shadow.timer ${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/shadow.timer
+  install -D -m644 "${srcdir}/shadow.timer" "${pkgdir}/usr/lib/systemd/system/shadow.timer"
+  install -D -m644 "${srcdir}/shadow.service" "${pkgdir}/usr/lib/systemd/system/shadow.service"
+  install -d -m755 "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants"
+  ln -s ../shadow.timer "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/shadow.timer"
 
   # login.defs
   install -Dm644 "$srcdir/login.defs" "$pkgdir/etc/login.defs"
@@ -109,25 +112,30 @@ package() {
     install -Dm644 "$srcdir/defaults.pam" "$pkgdir/etc/pam.d/$file"
   done
 
+  # lastlog log file creation
+  install -Dm644 "$srcdir/lastlog.tmpfiles" "$pkgdir/usr/lib/tmpfiles.d/lastlog.conf"
+
+  # Remove evil/broken tools
+  rm "$pkgdir"/usr/sbin/logoutd
+
   # Remove utilities provided by util-linux
   rm \
-      "$pkgdir"/usr/bin/{chsh,chfn,sg} \
-      "$pkgdir"/bin/{login,su} \
-      "$pkgdir"/usr/sbin/{vipw,vigr,logoutd} \
-      "$pkgdir"/sbin/nologin
+      "$pkgdir"/usr/bin/{login,su,chsh,chfn,sg,nologin} \
+      "$pkgdir"/usr/sbin/{vipw,vigr}
 
   # but we keep newgrp, as sg is really an alias to it
   mv "$pkgdir"/usr/bin/{newgrp,sg}
 
   # ...and their many man pages
   find "$pkgdir"/usr/share/man \
-      '(' -name 'chsh.1'  -o \
-          -name 'chfn.1'  -o \
-          -name 'su.1'    -o \
-          -name 'login.1' -o \
-          -name 'vipw.8'  -o \
-          -name 'vigr.8'  -o \
-          -name 'nologin.8'  -o \
+      '(' -name 'chsh.1'    -o \
+          -name 'chfn.1'    -o \
+          -name 'su.1'      -o \
+          -name 'logoutd.8' -o \
+          -name 'login.1'   -o \
+          -name 'nologin.8' -o \
+          -name 'vipw.8'    -o \
+          -name 'vigr.8'    -o \
           -name 'newgrp.1' ')' \
       -delete
   rmdir \

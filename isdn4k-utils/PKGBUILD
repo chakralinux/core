@@ -3,29 +3,67 @@
 # Maintainer: dorphell <dorphell@archlinux.org>
 pkgname=isdn4k-utils
 pkgver=3.2p1
-pkgrel=6
+pkgrel=7
 pkgdesc="User space administration programs and tools for ISDN"
 arch=('i686' 'x86_64')
 url="http://www.isdn4linux.de/"
 license=('GPL')
 depends=('ncurses') 
 backup=(etc/isdn/{callerid.conf,isdn.conf,rate.conf,isdnlog.isdnctrl0.options})
-source=(ftp://ftp.isdn4linux.de/pub/isdn4linux/utils/${pkgname}.v${pkgver}.tar.bz2 \
-        config gcc3.3-slashdev.patch gcc34.patch \
-	http://cvs.mandriva.com/cgi-bin/cvsweb.cgi/~checkout~/SPECS/isdn4k-utils/isdn4k-utils-gcc4.patch)
-md5sums=('d347afa462e46eccfd1284aebae227b6' '3429894039f33c114fef5ef9f866920e'\
-         '32f94ab17f6c2a1d5ab72b8b07a175ea' 'd90d56e1ecfb9329ff09d651b85f5c55'\
-         '7993f27b8d7239a35374da7d8f358cb9')
+source=(http://pkgs.fedoraproject.org/repo/pkgs/isdn4k-utils/isdn4k-utils-CVS-2010-05-01-patched.tar.bz2/8f0882970dc5ecc5128d1fd58449907b/isdn4k-utils-CVS-2010-05-01-patched.tar.bz2
+        http://pkgs.fedoraproject.org/cgit/isdn4k-utils.git/snapshot/isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898.tar.xz config)
+
+md5sums=('8f0882970dc5ecc5128d1fd58449907b'
+         'e957d3c7a6ad0cb9c776a1b487b11d9d'
+         'd3be8bf50f21bff277deff5e3bc46ef9')
+
+prepare() {
+  cd ${pkgname}-CVS-2010-05-01-patched
+
+
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2009-10-20-redhat.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2009-10-20-lib64.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-man.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2004-11-18-autoconf25x.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-0202131200-true.patch
+
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-statfs.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2005-03-09-xmon.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-capiinit.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2006-07-20-capi.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-misc-overflow-in-capi-subsystem.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-sh-linux.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-autoconf-2.6.4-quoting.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2010-05-01-capi.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2010-05-01-capi-soname.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2010-05-01-patched-vboxgetty-config.patch
+  patch -Np0 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn-manpages.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-fix-ipppd.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-capi20-link.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2010-05-01-patched-legal-fixes.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-CVS-2010-05-01-patched-strict-aliasing.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-fix-Werror-format-security-ftbfs.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/vbox-tcl-8.6.patch
+  patch -Np1 -i ../isdn4k-utils-a7b6469a45785f71cd963b316ccd0c5350dfc898/isdn4k-utils-mkzonedb.patch
+
+  for i in */configure; do
+    cd `dirname $i`
+    autoreconf --force --install
+    cd ..
+  done
+
+  cp ../config ./.config
+  sed -e "s,',,g" .config > .config.h
+}
 
 build() {
-  cd $srcdir/$pkgname
   export MAKEFLAGS="j1"
-  patch -Np1 -i ../gcc3.3-slashdev.patch
-  patch -Np1 -i ../gcc34.patch
-  patch -Np1 -i ../isdn4k-utils-gcc4.patch
-  cp ../config ./.config
+  export CPPFLAGS="-O2"
+  export CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
+  cd ${pkgname}-CVS-2010-05-01-patched
   make subconfig || return 1
   make || return 1
-  mkdir -p $pkgdir/sbin
+  install -dm755 $pkgdir/usr/bin
   make DESTDIR=$pkgdir install
+  chmod 755 $pkgdir/usr/bin/*
 }

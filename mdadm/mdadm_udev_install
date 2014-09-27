@@ -9,8 +9,9 @@ build() {
         add_file "/etc/mdadm.conf"
     fi
 
-    add_binary "mdadm"
-    add_file "/usr/lib/udev/rules.d/64-md-raid.rules"
+    add_binary "/usr/bin/mdadm"
+    add_file "/usr/lib/udev/rules.d/63-md-raid-arrays.rules"
+    add_file "/usr/lib/udev/rules.d/64-md-raid-assembly.rules"
 }
 
 help() {
@@ -20,3 +21,5 @@ assembly via udev at runtime to create the devices. This hook will NOT work
 without the udev hook included on the image.
 HELPEOF
 }
+
+# vim: set ft=sh ts=4 sw=4 et:

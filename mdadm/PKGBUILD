@@ -3,11 +3,11 @@
 #
 pkgname=mdadm
 pkgver=3.3.1
-pkgrel=1
+pkgrel=2
 pkgdesc="A tool for managing/monitoring Linux md device arrays, also known as Software RAID"
 arch=(x86_64)
 license=('GPL')
-url="http://www.cse.unsw.edu.au/~neilb/source/mdadm/"
+url="http://neil.brown.name/blog/mdadm"
 groups=('base')
 conflicts=('mkinitcpio<0.7')
 depends=('glibc')
@@ -22,10 +22,10 @@ source=(ftp://ftp.kernel.org/pub/linux/utils/raid/mdadm/mdadm-$pkgver.tar.xz
 replaces=('raidtools')
 md5sums=('4227d48de62dfb217c92fa0c54171bbe'
          '5a37c112aa07dccdde62f9fa5b888607'
-         '6e1a3377e2ac33e9fb222ab38050c654'
-         '8e02ee595dfa4e5178ed8886e822cf3a'
-         '21086c200486a5d9f51a6b59fb1444d9'
-         'aafb5f9ac8437a284cbf948b9b13b179'
+         'af2f73f0094ebee66f503ca4710c7142'
+         'fbfb7d07efcbaf5dc61af424c5f6e352'
+         'b6b0bfd6487c99264578630616dfe5eb'
+         'eb1786b18fa4d13cfd7b71d6b05cfb4f'
          '599745ed2bec4489e83991cff89c46ee')
 
 prepare() {
@@ -35,7 +35,7 @@ prepare() {
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-  make CXFLAGS="$CFLAGS" UDEVDIR=/usr/lib/udev #BINDIR=/usr/bin
+  make CXFLAGS="$CFLAGS" BINDIR=/usr/sbin UDEVDIR=/usr/lib/udev
   # build static mdassemble for initramfs
   make MDASSEMBLE_AUTO=1 mdassemble
 
@@ -43,15 +43,14 @@ build() {
 
 package() {
   cd $srcdir/$pkgname-$pkgver
-  make INSTALL=/usr/bin/install DESTDIR=$pkgdir UDEVDIR=/usr/lib/udev install
-  make SYSTEMD_DIR=$pkgdir/usr/lib/systemd/system install-systemd
-
-  install -D -m755 mdassemble $pkgdir/sbin/mdassemble
+  make INSTALL=/usr/bin/install BINDIR=/usr/sbin DESTDIR=$pkgdir UDEVDIR=/usr/lib/udev install
+  make BINDIR=/usr/sbin DESTDIR=$pkgdir \
+       SYSTEMD_DIR=/usr/lib/systemd/system install-systemd
+  install -D -m755 mdassemble $pkgdir/usr/sbin/mdassemble
   install -D -m644 ../mdadm.conf $pkgdir/etc/mdadm.conf
   install -D -m644 ../mdadm_install $pkgdir/usr/lib/initcpio/install/mdadm
   install -D -m644 ../mdadm_hook $pkgdir/usr/lib/initcpio/hooks/mdadm
   install -D -m644 ../mdadm_udev_install $pkgdir/usr/lib/initcpio/install/mdadm_udev
-
   # systemd service file
   install -D -m644 $srcdir/mdadm.service $pkgdir/usr/lib/systemd/system/mdadm.service
 }

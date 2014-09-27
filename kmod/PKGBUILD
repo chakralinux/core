@@ -2,7 +2,7 @@
 
 pkgname=kmod
 pkgver=18
-pkgrel=1
+pkgrel=2
 pkgdesc="Linux kernel module handling"
 arch=('x86_64')
 url='http://git.kernel.org/?p=utils/kernel/kmod/kmod.git;a=summary'
@@ -36,11 +36,11 @@ package() {
   make -C "$pkgname-$pkgver" DESTDIR="$pkgdir" install
 
   # extra directories
-  install -dm755 "$pkgdir"/{etc,usr/lib}/{depmod,modprobe}.d "$pkgdir/sbin"
+  install -dm755 "$pkgdir"/{etc,usr/lib}/{depmod,modprobe}.d
+  install -dm755 "$pkgdir"/usr/sbin
 
-  # add symlinks to kmod
-  ln -s ../usr/bin/kmod "$pkgdir/sbin/modprobe"
-  ln -s ../usr/bin/kmod "$pkgdir/sbin/depmod"
+  ln -s ../bin/kmod "$pkgdir/usr/sbin/modprobe"
+  ln -s ../bin/kmod "$pkgdir/usr/sbin/depmod"
 
   for tool in {ins,ls,rm}mod modinfo; do
     ln -s kmod "$pkgdir/usr/bin/$tool"
