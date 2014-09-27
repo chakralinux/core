@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
 pkgver=216
-pkgrel=3
+pkgrel=4
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -81,10 +81,10 @@ package() {
     ln -s '/usr/bin/systemctl' "$pkgdir/usr/sbin/$tool"
   done
 
-  ln -s '../usr/lib/systemd/systemd' "$pkgdir/usr/sbin/init"
+  ln -s '../lib/systemd/systemd' "$pkgdir/usr/sbin/init"
 
   # the path to udevadm is hardcoded in some places
-  ln -s ../../usr/bin/udevadm "$pkgdir/usr/sbin/udevadm"
+  ln -s ../bin/udevadm "$pkgdir/usr/sbin/udevadm"
 
   # udevd is no longer udevd because systemd. why isn't udevadm now udevctl?
   ln -s ../lib/systemd/systemd-udevd "$pkgdir/usr/bin/udevd"
