@@ -6,8 +6,8 @@
 
 pkgname=iputils
 pkgver=20121221
-pkgrel=2
-pkgdesc="IP Configuration Utilities (and Ping)."
+pkgrel=4
+pkgdesc="Network monitoring tools, including ping"
 arch=('x86_64')
 license=('GPL')
 url="http://www.skbuff.net/iputils/"
@@ -22,7 +22,7 @@ install=${pkgname}.install
 source=(http://www.skbuff.net/${pkgname}/${pkgname}-s${pkgver}.tar.bz2
         tftp.xinetd)
 sha1sums=('4d56d8c75d6a5d58f052e4056e975f01ebab9ba9'
-          'fca7b14d870d62e1f2109c314ef32f4fd8a46a58')
+          'fc2ae26f5609725e3f4aeaf4ab82dfa6d2e378fd')
 
 build() {
   cd "${srcdir}/${pkgname}-s${pkgver}"
@@ -41,14 +41,15 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-s${pkgver}"
 
+  # keep these in sbin
+  install -dm755 "${pkgdir}"/usr/sbin
+  install -m755 arping clockdiff rarpd rdisc tftpd tracepath tracepath6 "${pkgdir}"/usr/sbin/
+
   install -dm755 "${pkgdir}"/usr/bin
-
-  install -m755 arping clockdiff rarpd rdisc tftpd tracepath tracepath6 "${pkgdir}"/usr/bin/
-
-  install -m755 ping{,6} "${pkgdir}"/usr/bin/
+  install -m755 ipg ping{,6} "${pkgdir}"/usr/bin/
 
   install -dm755 "${pkgdir}"/usr/share/man/man8
-  install -m644 doc/{arping,clockdiff,ping,rarpd,rdisc,tftpd,tracepath}.8 \
+  install -m644 doc/{pg3,arping,clockdiff,ping,rarpd,rdisc,tftpd,tracepath}.8 \
      "${pkgdir}"/usr/share/man/man8/
 
   cd "${pkgdir}"/usr/share/man/man8
