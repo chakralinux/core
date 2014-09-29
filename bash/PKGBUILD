@@ -1,89 +1,94 @@
-#
-# Core Packages for Chakra, part of chakraos.org
-#
+	#
+	# Core Packages for Chakra, part of chakraos.org
+	#
 
-pkgname=bash
-_basever=4.3
-_patchlevel=027 #prepare for some patches
-pkgver=$_basever.$_patchlevel
-pkgrel=1
-pkgdesc="The GNU Bourne Again shell"
-arch=('x86_64')
-license=('GPL')
-url="http://www.gnu.org/software/bash/bash.html"
-groups=('base')
-backup=(etc/bash.bash{rc,_logout} etc/skel/.bash{rc,_profile,_logout})
-depends=('readline>=6.3' 'glibc')
-optdepends=('bash-completion: for tab completion')
-provides=('sh')
-install=bash.install
-source=(http://ftp.gnu.org/gnu/bash/bash-$_basever.tar.gz{,.sig}
-        dot.bashrc
-        dot.bash_profile
-        dot.bash_logout
-        system.bashrc
-        system.bash_logout
-        privmode-setuid-fail.patch)
+	pkgname=bash
+	_basever=4.3
+	_patchlevel=027 #prepare for some patches
+	pkgver=$_basever.$_patchlevel
+	pkgrel=3
+	pkgdesc="The GNU Bourne Again shell"
+	arch=('x86_64')
+	license=('GPL')
+	url="http://www.gnu.org/software/bash/bash.html"
+	groups=('base')
+	backup=(etc/bash.bash{rc,_logout} etc/skel/.bash{rc,_profile,_logout})
+	depends=('readline>=6.3' 'glibc')
+	optdepends=('bash-completion: for tab completion')
+	provides=('sh')
+	install=bash.install
+	source=(http://ftp.gnu.org/gnu/bash/bash-$_basever.tar.gz{,.sig}
+		dot.bashrc
+		dot.bash_profile
+		dot.bash_logout
+		"parser-oob-4.2.patch::http://seclists.org/oss-sec/2014/q3/att-712/parser-oob-4_2.patch"
+		system.bashrc
+		system.bash_logout
+		privmode-setuid-fail.patch)
 
-if [[ $((10#${_patchlevel})) -gt 0 ]]; then
-    for (( _p=1; _p<=$((10#${_patchlevel})); _p++ )); do
-        source=(${source[@]} http://ftp.gnu.org/gnu/bash/bash-$_basever-patches/bash${_basever//.}-$(printf "%03d" $_p){,.sig})
-    done
-fi
+	if [[ $((10#${_patchlevel})) -gt 0 ]]; then
+	    for (( _p=1; _p<=$((10#${_patchlevel})); _p++ )); do
+		source=(${source[@]} http://ftp.gnu.org/gnu/bash/bash-$_basever-patches/bash${_basever//.}-$(printf "%03d" $_p){,.sig})
+	    done
+	fi
 
-prepare() {
-  cd $pkgname-$_basever
+	prepare() {
+	  cd $pkgname-$_basever
 
-  for (( _p=1; _p<=$((10#${_patchlevel})); _p++ )); do
-    msg "applying patch bash${_basever//.}-$(printf "%03d" $_p)"
-    patch -p0 -i ../bash${_basever//.}-$(printf "%03d" $_p)
-  done
+	  for (( _p=1; _p<=$((10#${_patchlevel})); _p++ )); do
+	    msg "applying patch bash${_basever//.}-$(printf "%03d" $_p)"
+	    patch -p0 -i ../bash${_basever//.}-$(printf "%03d" $_p)
+	  done
 
-  # http://hmarco.org/bugs/bash_4.3-setuid-bug.html (FS#40663)
-  patch -p0 -i ../privmode-setuid-fail.patch
-}
+	  # this should fix CVE-2014-7186, CVE-2014-7187
+	  patch -p0 -i ../parser-oob-4.2.patch
 
-build() {
-  cd $pkgname-$_basever
+	  # http://hmarco.org/bugs/bash_4.3-setuid-bug.html (FS#40663)
+	  patch -p0 -i ../privmode-setuid-fail.patch
+	}
 
-  _bashconfig=(-DDEFAULT_PATH_VALUE=\'\"/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin\"\'
-               -DSTANDARD_UTILS_PATH=\'\"/usr/bin:/bin:/usr/sbin:/sbin\"\'
-               -DSYS_BASHRC=\'\"/etc/bash.bashrc\"\'
-               -DSYS_BASH_LOGOUT=\'\"/etc/bash.bash_logout\"\')
-  export CFLAGS="${CFLAGS} ${_bashconfig[@]}"
+	build() {
+	  cd $pkgname-$_basever
 
-  ./configure --prefix=/usr --with-curses --enable-readline \
-    --without-bash-malloc --with-installed-readline
-  make
-}
+	  _bashconfig=(-DDEFAULT_PATH_VALUE=\'\"/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin\"\'
+		       -DSTANDARD_UTILS_PATH=\'\"/usr/bin:/bin:/usr/sbin:/sbin\"\'
+		       -DSYS_BASHRC=\'\"/etc/bash.bashrc\"\'
+		       -DSYS_BASH_LOGOUT=\'\"/etc/bash.bash_logout\"\')
+	  export CFLAGS="${CFLAGS} ${_bashconfig[@]}"
 
-check() {
-  cd $pkgname-$_basever
-  make check
-}
+	  ./configure --prefix=/usr --with-curses --enable-readline \
+	    --without-bash-malloc --with-installed-readline
+	  make
+	}
 
-package() {
-  cd $pkgname-$_basever
-  make DESTDIR=${pkgdir} install
+	check() {
+	  cd $pkgname-$_basever
+	  make check
+	}
 
-  ln -s bash ${pkgdir}/usr/bin/sh
+	package() {
+	  cd $pkgname-$_basever
+	  make DESTDIR=${pkgdir} install
 
-  install -dm755 ${pkgdir}/etc/skel/
-  # system-wide configuration files
-  install -m644 ${srcdir}/system.bashrc ${pkgdir}/etc/bash.bashrc
-  install -m644 ${srcdir}/system.bash_logout ${pkgdir}/etc/bash.bash_logout
-  
-  # user configuration file skeletons
-  install -m644 ${srcdir}/dot.bashrc ${pkgdir}/etc/skel/.bashrc
-  install -m644 ${srcdir}/dot.bash_profile ${pkgdir}/etc/skel/.bash_profile
-  install -m644 ${srcdir}/dot.bash_logout ${pkgdir}/etc/skel/.bash_logout
-}
+	  ln -s bash ${pkgdir}/usr/bin/sh
+
+	  install -dm755 ${pkgdir}/etc/skel/
+	  # system-wide configuration files
+	  install -m644 ${srcdir}/system.bashrc ${pkgdir}/etc/bash.bashrc
+	  install -m644 ${srcdir}/system.bash_logout ${pkgdir}/etc/bash.bash_logout
+	  
+	  # user configuration file skeletons
+	  install -m644 ${srcdir}/dot.bashrc ${pkgdir}/etc/skel/.bashrc
+	  install -m644 ${srcdir}/dot.bash_profile ${pkgdir}/etc/skel/.bash_profile
+	  install -m644 ${srcdir}/dot.bash_logout ${pkgdir}/etc/skel/.bash_logout
+	}
 
 md5sums=('81348932d5da294953e15d4814c74dd1'
          'SKIP'
          '027d6bd8f5f6a06b75bb7698cb478089'
          '2902e0fee7a9168f3a4fd2ccd60ff047'
          '42f4400ed2314bd7519c020d0187edc5'
+         '913d5d556bbbf3119ad5bb5e58b01883'
          '3546099a1b2f667adc9794f52e78e35b'
          '472f536d7c9e8250dc4568ec4cfaf294'
          'a577d42e38249d298d6a8d4bf2823883'
