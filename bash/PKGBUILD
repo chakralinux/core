@@ -6,7 +6,7 @@
 	_basever=4.3
 	_patchlevel=027 #prepare for some patches
 	pkgver=$_basever.$_patchlevel
-	pkgrel=4
+	pkgrel=5
 	pkgdesc="The GNU Bourne Again shell"
 	arch=('x86_64')
 	license=('GPL')
@@ -71,13 +71,6 @@
 	  make DESTDIR=${pkgdir} install
 
 	  ln -s bash ${pkgdir}/usr/bin/sh
-
-  # pre-usr move
-  # put needed symlinks in /bin
-  install -dm755 ${pkgdir}/bin
-  ln -s ../usr/bin/bash ${pkgdir}/bin/bash
-  ln -s ../usr/bin/bash ${pkgdir}/bin/sh
-
 
 	  install -dm755 ${pkgdir}/etc/skel/
 	  # system-wide configuration files
