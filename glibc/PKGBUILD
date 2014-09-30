@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.20
-pkgrel=3
+pkgrel=4
 pkgdesc="GNU C Library"
 arch=('x86_64')
 url="http://www.gnu.org/software/libc"
@@ -112,6 +112,9 @@ package() {
   install -m644 ${srcdir}/${pkgname}-${pkgver}/posix/gai.conf ${pkgdir}/etc/gai.conf
 
   install -m755 ${srcdir}/locale-gen ${pkgdir}/usr/bin
+
+  # temporary symlink
+  ln -s ../sbin/ldconfig ${pkgdir}/usr/bin/ldconfig
 
   # create /etc/locale.gen
   install -m644 ${srcdir}/locale.gen.txt ${pkgdir}/etc/locale.gen
