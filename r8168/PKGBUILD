@@ -5,16 +5,17 @@
 
 _extramodules=extramodules-3.16-CHAKRA
 _kernver="$(cat /usr/lib/modules/$_extramodules/version || true)"
+_kernelver=3.16.3
 
 pkgname=r8168
 pkgver=8.038.00
-pkgrel=1
+pkgrel=2
 pkgdesc="A kernel module for Realtek 8168 network cards"
 url="http://www.realtek.com.tw"
 license=("GPL")
 arch=('x86_64')
-depends=('glibc' 'linux>=3.16' 'linux<3.17')
-makedepends=('linux-headers')
+depends=('glibc' "linux=${_kernelver}")
+makedepends=("linux-headers=${_kernelver}")
 install=$pkgname.install
 source=("https://dl.dropboxusercontent.com/u/362439/archlinux/r8168-$pkgver.tar.bz2"
         delayed_work_ethtool_ops_fix2.patch)

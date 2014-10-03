@@ -2,21 +2,22 @@
 
 _extramodules=extramodules-3.2-lts
 _kernver="$(cat /usr/lib/modules/${_extramodules}/version)"
+_kernelver=3.2.63
 
 url_ref="http://support.amd.com/en-us/download/desktop?os=Linux+x86"
 DLAGENTS="http::/usr/bin/curl --referer ${url_ref} -o %o %u"
 
 pkgname=catalyst-lts
 pkgver=14.4
-pkgrel=2
+pkgrel=3
 _amdver=14.10.1006.1001
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
 arch=('x86_64')
 url="http://www.amd.com"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 license=('custom')
-depends=('linux-lts>=3.2' 'linux-lts<3.4' 'catalyst-utils')
-makedepends=('gcc-libs' 'gcc>4.0.0' 'make' 'linux-lts-headers')
+depends=("linux-lts=${_kernelver}" 'linux-lts<3.4' 'catalyst-utils')
+makedepends=('gcc-libs' 'gcc>4.0.0' 'make' "linux-lts-headers=${_kernelver}")
 conflicts=('catalyst-test' 'nvidia' 'xf86-video-ati' 'xf86-video-radeonhd')
 install=catalyst.install
 source=(http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver/./-}-rev2-linux-x86-x86-64-may6.zip

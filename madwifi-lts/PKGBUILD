@@ -3,17 +3,18 @@
 # Find the kernel name inside the chroot
 _extramodules=extramodules-3.2-lts
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
+_kernelver=3.2.63
 
 pkgname=madwifi-lts
 pkgver=0.9.4.4182
 _ver=r4182-20140204
-pkgrel=2
+pkgrel=3
 pkgdesc="Madwifi drivers for Atheros wireless chipsets"
 arch=('x86_64')
 license=('GPL')
 url="http://madwifi-project.org"
-depends=('madwifi-utils' 'linux-lts>=3.2' 'linux-lts<3.4')
-makedepends=('linux-lts-headers' 'sharutils')
+depends=('madwifi-utils' "linux-lts=${_kernelver}")
+makedepends=("linux-lts-headers=${_kernelver}" 'sharutils')
 install=madwifi-ng.install
 # subversion source: svn checkout http:/madwifi-project.org/svn/madwifi/trunk madwifi
 source=(http://snapshots.madwifi-project.org/madwifi-0.9.4-current.tar.gz)

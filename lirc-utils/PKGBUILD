@@ -2,16 +2,17 @@
 
 _extramodules=extramodules-3.16-CHAKRA
 _kver=$(cat /usr/lib/modules/${_extramodules}/version)
+_kernelver=3.16.3
 
 pkgname=lirc-utils
 pkgver=0.9.1
-pkgrel=4
+pkgrel=5
 pkgdesc="Linux Infrared Remote Control utils"
 arch=('x86_64')
 url="http://www.lirc.org/"
 license=('GPL')
-depends=('alsa-lib' 'libx11' 'libftdi' 'linux')
-makedepends=('help2man' 'linux-headers>=3.16' 'linux-headers<3.17' 'python2' 'libtool')
+depends=('alsa-lib' 'libx11' 'libftdi' "linux=${_kernelver}")
+makedepends=('help2man' "linux-headers=${_kernelver}" 'python2' 'libtool')
 optdepends=('python2: pronto2lirc utility')
 replaces=('lirc+pctv')
 backup=('etc/lirc/lirc_options.conf' 'etc/lirc/lircd.conf' 'etc/lirc/lircmd.conf')
