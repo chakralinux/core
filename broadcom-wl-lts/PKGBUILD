@@ -4,16 +4,17 @@
 
 _extramodules=extramodules-3.2-lts
 _kernver="$(cat /lib/modules/${_extramodules}/version)"
+_kernelver=3.2.63
 
 pkgname=broadcom-wl-lts
 pkgver=6.30.223.248
-pkgrel=1
+pkgrel=2
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 arch=('x86_64')
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 license=('custom')
-depends=('linux-lts>=3.2' 'linux-lts<3.4')
-makedepends=('linux-lts-headers')
+depends=("linux-lts=${_kernelver}")
+makedepends=("linux-lts-headers=${_kernelver}")
 backup=('etc/modprobe.d/broadcom-wl-lts.conf')
 install=install
 

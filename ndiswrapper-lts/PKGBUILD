@@ -4,18 +4,19 @@
 # Find the kernel name inside the chroot
 _extramodules=extramodules-3.2-lts
 _kver="$(cat /lib/modules/${_extramodules}/version)"
+_kernelver=3.2.63
 
 pkgname=ndiswrapper-lts
 _pkgname=ndiswrapper
 pkgver=1.59
-pkgrel=3
+pkgrel=4
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
 url="http://ndiswrapper.sourceforge.net"
 install="ndiswrapper.install"
-depends=('linux-lts>=3.2' 'linux-lts<3.4')
-makedepends=('linux-lts-headers')
+depends=("linux-lts=${_kernelver}")
+makedepends=("linux-lts-headers=${_kernelver}")
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
 md5sums=('e26a7213468ccd6b0bb4c211c7aadeaa')
 

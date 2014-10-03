@@ -2,16 +2,17 @@
 
 _extramodules=extramodules-3.16-CHAKRA
 _kernver="$(cat /usr/lib/modules/${_extramodules}/version)"
+_kernelver=3.16.3
 
 pkgname=broadcom-wl
 pkgver=6.30.223.248
-pkgrel=1
+pkgrel=2
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 arch=('x86_64')
 license=('custom')
-depends=('linux>=3.16' 'linux<3.17')
-makedepends=('linux-headers')
+depends=("linux=${_kernelver}")
+makedepends=("linux-headers=${_kernelver}")
 source=("http://www.broadcom.com/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz"
          #"http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" "http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
         'modprobe.d'
