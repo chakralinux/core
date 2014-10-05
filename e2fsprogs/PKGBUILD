@@ -5,7 +5,7 @@
 
 pkgname=e2fsprogs
 pkgver=1.42.12
-pkgrel=1
+pkgrel=2
 pkgdesc="Ext2/3/4 filesystem utilities"
 arch=('x86_64')
 license=('GPL' 'LGPL' 'MIT')
@@ -14,15 +14,19 @@ groups=('base')
 depends=('sh' 'util-linux')
 makedepends=('bc' 'util-linux')
 source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.gz"
-        'MIT-LICENSE')
+        'MIT-LICENSE'
+        'dumpe2fs-segv.patch')
 backup=('etc/mke2fs.conf')
-options=('staticlibs')
+options=('staticlibs' 'debug')
 install=${pkgname}.install
 sha1sums=('083c1bb0d1e85672e8038a2fadf70b24e7409db7'
-          'f4a0d5b0cdb980e3fedd6f5e7dde0b0ffb7bbdfb')
+          'f4a0d5b0cdb980e3fedd6f5e7dde0b0ffb7bbdfb'
+          '25c7f7a3e8bb43d00dc04316fa91f864447347c8')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+
+  patch -Np1 -i ../dumpe2fs-segv.patch
 
   # Remove unnecessary init.d directory
   sed -i '/init\.d/s|^|#|' misc/Makefile.in
@@ -31,7 +35,7 @@ prepare() {
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr --with-root-prefix="" --libdir=/usr/lib \
+  CFLAGS="-g -O0" ./configure --prefix=/usr --with-root-prefix="" --libdir=/usr/lib \
       --sbindir=/usr/bin --enable-elf-shlibs --disable-fsck --disable-uuidd \
       --disable-libuuid --disable-libblkid
 
