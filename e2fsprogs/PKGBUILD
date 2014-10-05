@@ -17,7 +17,7 @@ source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pk
         'MIT-LICENSE'
         'dumpe2fs-segv.patch')
 backup=('etc/mke2fs.conf')
-options=('staticlibs' 'debug')
+options=('staticlibs')
 install=${pkgname}.install
 sha1sums=('083c1bb0d1e85672e8038a2fadf70b24e7409db7'
           'f4a0d5b0cdb980e3fedd6f5e7dde0b0ffb7bbdfb'
@@ -35,7 +35,7 @@ prepare() {
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  CFLAGS="-g -O0" ./configure --prefix=/usr --with-root-prefix="" --libdir=/usr/lib \
+  ./configure --prefix=/usr --with-root-prefix="" --libdir=/usr/lib \
       --sbindir=/usr/bin --enable-elf-shlibs --disable-fsck --disable-uuidd \
       --disable-libuuid --disable-libblkid
 
