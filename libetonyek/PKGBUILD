@@ -1,0 +1,29 @@
+# Maintainer: AlmAck
+
+pkgname=libetonyek
+pkgver=0.1.1
+pkgrel=1
+pkgdesc='Library and a set of tools for reading and converting Apple Keynote presentations'
+arch=('x86_64')
+url='http://www.freedesktop.org/wiki/Software/libetonyek/'
+license=('MPL')
+depends=('libxml2' 'zlib' 'libwpd' 'boost-libs' 'librevenge')
+makedepends=('boost' 'cppunit' 'gperf' 'doxygen')
+source=(http://dev-www.libreoffice.org/src/$pkgname-$pkgver.tar.bz2)
+md5sums=('805f941b06448212a988cb65f0691a7a')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+}
