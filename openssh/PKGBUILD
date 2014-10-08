@@ -5,36 +5,33 @@
 # contributor <abveritas[at]chakra-project[dot]org>
 
 pkgname=openssh
-pkgver=6.2p2
-pkgrel=2
+pkgver=6.7p1
+pkgrel=1
 pkgdesc='Free version of the SSH connectivity tools'
-arch=('x86_64')
-license=('custom:BSD')
 url='http://www.openssh.org/portable.html'
+license=('custom:BSD')
+arch=('x86_64')
+makedepends=('linux-headers')
+depends=('krb5' 'openssl' 'libedit' 'ldns')
+optdepends=('xorg-xauth: X11 forwarding'
+            'x11-ssh-askpass: input passphrase in X')
+source=("ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${pkgname}-${pkgver}.tar.gz"{,.asc}
+        'sshdgenkeys.service'
+        'sshd@.service'
+        'sshd.service'
+        'sshd.socket'
+        'sshd.pam')
+sha1sums=('14e5fbed710ade334d65925e080d1aaeb9c85bf6'
+          'SKIP'
+          'cc1ceec606c98c7407e7ac21ade23aed81e31405'
+          'bd6eae36c7ef9efb7147778baad7858b81f2d660'
+          '97b09fe4ebb8919832d9582c660d2a45d9f9f7c5'
+          'e12fa910b26a5634e5a6ac39ce1399a132cf6796'
+          'd93dca5ebda4610ff7647187f8928a3de28703f3')
 backup=('etc/ssh/ssh_config' 'etc/ssh/sshd_config' 'etc/pam.d/sshd')
-depends=('krb5' 'openssl' 'libedit')
-source=("ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${pkgname}-${pkgver}.tar.gz"
-        'sshd.confd'
-        'sshd.pam'
-	'sshdgenkeys.service'
-	'sshd.service'
-	'sshd@.service'
-	'sshd.socket'
-	'mem_corrupt.patch'
-)
-md5sums=('be46174dcbb77ebb4ea88ef140685de1'
-         'e2cea70ac13af7e63d40eb04415eacd5'
-         '2fd20d311d2afbfc6e576883224d8c97'
-         'bc3e6736086598ebb648c4d960c59d44'
-         '4bbc5818d93a2ad336d7191ed35c69f7'
-         'fdc4a47b4b8d0f0e2c395c9edcee8c14'
-         '76f52c66fb3193f301fe0a666e047ab1'
-         'e83b3676ea1279cae35a6c78084bfb0d')
 
 prepare() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
-	# see http://www.openssh.com/txt/gcmrekey.adv
-	patch -Np0 < ${srcdir}/mem_corrupt.patch
 }
 
 build() {
@@ -44,14 +41,15 @@ build() {
 		--prefix=/usr \
 		--libexecdir=/usr/lib/ssh \
 		--sysconfdir=/etc/ssh \
-		--with-privsep-user=nobody \
-		--with-md5-passwords \
-		--with-pam \
-		--with-mantype=man \
-		--with-xauth=/usr/bin/xauth \
-		--with-kerberos5=/usr \
-		--with-ssl-engine \
+		--with-ldns \
 		--with-libedit \
+		--with-ssl-engine \
+		--with-pam \
+		--with-privsep-user=nobody \
+		--with-kerberos5=/usr \
+		--with-xauth=/usr/bin/xauth \
+		--with-mantype=man \
+		--with-md5-passwords \
 		--with-pid-dir=/run \
 
 	make
@@ -66,14 +64,16 @@ check() {
 
 package() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
+
 	make DESTDIR="${pkgdir}" install
 
-	install -Dm644 ../sshd.pam "${pkgdir}"/etc/pam.d/sshd
-
+	ln -sf ssh.1.gz "${pkgdir}"/usr/share/man/man1/slogin.1.gz
 	install -Dm644 LICENCE "${pkgdir}/usr/share/licenses/${pkgname}/LICENCE"
 
-	rm "${pkgdir}"/usr/share/man/man1/slogin.1
-	ln -sf ssh.1.gz "${pkgdir}"/usr/share/man/man1/slogin.1.gz
+	# install systemd units
+	install -dm755 "$pkgdir/usr/lib/systemd/system/"
+	install -m644 "$srcdir"/sshd{{,@,genkeys}.service,.socket} "$pkgdir/usr/lib/systemd/system/"
+	install -Dm644 ../sshd.pam "${pkgdir}"/etc/pam.d/sshd
 
 	# additional contrib scripts that we like
 	install -Dm755 contrib/findssl.sh "${pkgdir}"/usr/bin/findssl.sh
@@ -82,10 +82,8 @@ package() {
 
 	# PAM is a common, standard feature to have
 	sed -i	-e '/^#ChallengeResponseAuthentication yes$/c ChallengeResponseAuthentication no' \
+		-e '/^#PrintMotd yes$/c PrintMotd no # pam does that' \
 		-e '/^#UsePAM no$/c UsePAM yes' \
 		"${pkgdir}"/etc/ssh/sshd_config
 
-	# install systemd units
-	install -dm755 "$pkgdir/usr/lib/systemd/system/"
-	install -m644 "$srcdir"/sshd{{,@,genkeys}.service,.socket} "$pkgdir/usr/lib/systemd/system/"
 }
