@@ -1,76 +1,108 @@
 # Maintainer: Manu
+# Contributor: AlmAck
 
 pkgname=sage-mathematics
-pkgver=5.8
+pkgver=6.3
 pkgrel=1
 pkgdesc='SAGE: Open Source Mathematics Software, a viable free alternative to Magma, Maple, Mathematica, and Matlab.'
 url='http://www.sagemath.org'
 arch=('x86_64')
 license=('GPL')
-depends=('desktop-file-utils')
-makedepends=('gcc-fortran' )
+depends=('freetype2' 'libatomic_ops')
+makedepends=('gcc-fortran' 'python2')
 optdepends=('imagemagick: some plotting functionality benefits from it'
             'texlive-core: some plotting functionality benefits from it, also to use SageTeX'
             'openssh: to use the notebook in secure mode'
-            'ffmpeg: to show animations')
+            'ffmpeg: to show animations'
+            'cairo: R plots')
 options=('!makeflags')
 install="${pkgname}.install"
-source=("http://sage.math.washington.edu/home/release/sage-${pkgver}/sage-${pkgver}.tar"
-        'SAGE-notebook.desktop')
-md5sums=('b91d6c20798f396a9c875527c78b3587'
-         'b82f94383829eee26648feb977e2d89b')
+source=("http://mirror.switch.ch/mirror/sagemath/src/sage-${pkgver}.tar.gz"
+        'sage.service'
+        'sage-notebook.desktop')
+md5sums=('668f080be70ffea8d67592ca00d161eb'
+         '985da1c1d1dcdc3ea9aa73035cb7996b'
+         '1c3e69dcf7bd5f6e9e092eb90e27fecb')
+
+prepare() {
+  # create DOT_SAGE directory
+  if [[ -d ${srcdir}/build ]]; then
+    rm -rf "${srcdir}/build"
+  fi
+  mkdir "${srcdir}/build"
+
+  # according to FS#34769
+  sed -e 's/FREETYPE/#FREETYPE/' -i "${srcdir}/sage-${pkgver}/build/install"
+
+  sed -e 's/READLINE/#READLINE/' -i "${srcdir}/sage-${pkgver}/build/install"
+}
 
 build() {
   cd sage-${pkgver}
 
-  # fix "missing sage.all error" during build
+  # disable default makepkg flags (needed for singular and libgap)
   unset CFLAGS
   unset CXXFLAGS
-
-  # fix build errors
   unset LDFLAGS
-
+  ## flags
   # enable multiple threads while building, is this really needed? check if uses MAKEFLAGS
   export SAGE_BUILD_THREADS=$(lscpu | awk '/^CPU\(s\):/ { print $2 }')
   export MAKE="make -j${SAGE_BUILD_THREADS}"
-
-  # use archlinux's fortran rather then the one that ships with sage to compile sage's fortran
-  export FC=/usr/bin/gfortran
-
-  # disable building with debugging support
+  # do not build own gcc
+  export SAGE_INSTALL_GCC='no'
+  # disable debug
   export SAGE_DEBUG='no'
-
-  # enable fat binaries (disables processor specific optimizations)
-  # comment out if you're only building it for yourself
+  # enable fat binaries
   export SAGE_FAT_BINARY='yes'
-
   # can't write to root in a clean chroot
-  export DOT_SAGE='/build/src/'
+  export DOT_SAGE="${srcdir}/build"
+  # singular is broken
+  export CPP='/usr/bin/cpp'
+  # use chakra's fortran rather then the one that ships with sage to compile sage's fortran
+  export FC='/usr/bin/gfortran'
+  export SAGE64='yes'
 
-  # only build sage, no documents
-  #make build
   make
-  ./sage --bdist "$pkgver"
 }
 
 package() {
   cd sage-${pkgver}
 
+  # remove build logs
+  rm -f *.log
+  rm -rf "${srcdir}/sage-${pkgver}/"{logs,upstream}
+  
   # cp because make install is experimental and will corrupt the install
-  install -d ${pkgdir}/opt/sage
-  cp -dpr --no-preserve=ownership dist/sage-"$pkgver-$CARCH-Linux/"* ${pkgdir}/opt/sage/
-
+  install -dm755 "${pkgdir}/opt/sage"
+  cp -r * "${pkgdir}/opt/sage/"
+  
   # move SageTeX files to more appropriate directory
   install -d ${pkgdir}/usr/share
   mv ${pkgdir}/opt/sage/local/share/texmf \
     ${pkgdir}/usr/share
 
-  desktop-file-install ${srcdir}/SAGE-notebook.desktop \
-    --dir ${pkgdir}/usr/share/applications 
-
+  # according to FS#37090
+  # install scripts
+  install -dm755 "${pkgdir}/usr/bin"
+  ./sage -c "install_scripts('${pkgdir}/usr/bin', ignore_existing=True)"
+  # rename scripts to avoid conflicts
+  for ITEM in $(ls "${pkgdir}/usr/bin"); do
+    mv "${pkgdir}/usr/bin/${ITEM}" "${pkgdir}/usr/bin/sage-${ITEM}"
+  done
   # create link to main binary
-  install -d ${pkgdir}/usr/bin
-  ln -s /opt/sage/sage ${pkgdir}/usr/bin/sage
+  ln -s "/opt/sage/sage" "${pkgdir}/usr/bin/sage"
+  
+  # FIXME fix bad mtime
+  cd "${pkgdir}/opt/sage/local/lib/python2.7"
+  find . -name '*.py' -exec sh -c "rm {}c 2> /dev/null && python2 -m compileall {}" \;
+
+  # install a systemd user unit
+  install -Dm644 "${srcdir}/sage.service" "${pkgdir}/usr/lib/systemd/user/sage.service"
+  # install *.desktop and icon files
+  install -Dm644 "${srcdir}/sage-notebook.desktop" \
+                 "${pkgdir}/usr/share/applications/sage-notebook.desktop"
+  install -Dm644 "${pkgdir}/opt/sage/local/lib/python2.7/site-packages/sagenb-0.10.8.2-py2.7.egg/sagenb/data/sage/images/icon48x48.png" \
+                 "${pkgdir}/usr/share/pixmaps/sage-notebook.png"
 
   # remove build logs
   rm -f ${pkgdir}/opt/sage/*.log
