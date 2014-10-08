@@ -6,25 +6,42 @@
 
 pkgname=libpaper
 pkgver=1.1.24
-pkgrel=1
+pkgrel=2
 pkgdesc="Library for handling paper characteristics"
 arch=('i686' 'x86_64')
 url="http://packages.debian.org/unstable/source/libpaper"
 license=('GPL')
-source=(http://ftp.debian.org/debian/pool/main/libp/libpaper/libpaper_${pkgver}.tar.gz)
-md5sums=('5bc87d494ba470aba54f6d2d51471834')
+depends=('sh')
+backup=('etc/papersize')
+source=("http://ftp.de.debian.org/debian/pool/main/libp/$pkgname/${pkgname}_$pkgver+nmu2.tar.gz")
+sha256sums=('c5bdd6d9dff179699160675dbb61651d9b3158f6da27558fdaba00e7c427ba96')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
+  cd "$pkgname-$pkgver+nmu2"
 
   ./configure \
-    --mandir=$pkgdir/usr/share/man \
     --prefix=/usr \
-    --sysconfdir=/etc
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin
   make
 }
 
 package() {
-  cd $srcdir/$pkgname-$pkgver
-  make prefix=$pkgdir/usr install
+  cd "$pkgname-$pkgver+nmu2"
+  make DESTDIR="$pkgdir" install
+  
+  # add systemwide default papersize read by many office applications
+  install -dm 755 $pkgdir/etc
+  echo '# Simply write the paper name. See papersize(5) for possible values' > $pkgdir/etc/papersize
+
+  # add libpaper.d directory other packages can use to store files
+  install -dm 755 $pkgdir/etc/libpaper.d
+
+  # add localisation
+  pushd debian/po
+  for i in `ls *.po`; do
+	install -dm 755 ${pkgdir}/usr/share/locale/${i%.po}/LC_MESSAGES/;
+	msgfmt $i -o ${pkgdir}/usr/share/locale/${i%.po}/LC_MESSAGES/${pkgname}.mo;
+  done
+  popd
 }
