@@ -4,9 +4,9 @@
 
 pkgname=bash
 _basever=4.3
-_patchlevel=027 #prepare for some patches
+_patchlevel=030 #prepare for some patches
 pkgver=$_basever.$_patchlevel
-pkgrel=5
+pkgrel=1
 pkgdesc="The GNU Bourne Again shell"
 arch=('x86_64')
 license=('GPL')
@@ -21,7 +21,6 @@ source=(http://ftp.gnu.org/gnu/bash/bash-$_basever.tar.gz{,.sig}
 	dot.bashrc
 	dot.bash_profile
 	dot.bash_logout
-	"parser-oob-4.2.patch::http://seclists.org/oss-sec/2014/q3/att-712/parser-oob-4_2.patch"
 	system.bashrc
 	system.bash_logout
 	privmode-setuid-fail.patch)
@@ -40,9 +39,6 @@ prepare() {
     patch -p0 -i ../bash${_basever//.}-$(printf "%03d" $_p)
   done
 
-  # this should fix CVE-2014-7186, CVE-2014-7187
-  patch -p0 -i ../parser-oob-4.2.patch
-
   # http://hmarco.org/bugs/bash_4.3-setuid-bug.html (FS#40663)
   patch -p0 -i ../privmode-setuid-fail.patch
 }
@@ -50,8 +46,8 @@ prepare() {
 build() {
   cd $pkgname-$_basever
 
-  _bashconfig=(-DDEFAULT_PATH_VALUE=\'\"/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin\"\'
-	       -DSTANDARD_UTILS_PATH=\'\"/usr/bin:/bin:/usr/sbin:/sbin\"\'
+  _bashconfig=(-DDEFAULT_PATH_VALUE=\'\"/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin\"\'
+	       -DSTANDARD_UTILS_PATH=\'\"/usr/bin:/usr/sbin\"\'
 	       -DSYS_BASHRC=\'\"/etc/bash.bashrc\"\'
 	       -DSYS_BASH_LOGOUT=\'\"/etc/bash.bash_logout\"\')
   export CFLAGS="${CFLAGS} ${_bashconfig[@]}"
@@ -88,7 +84,6 @@ md5sums=('81348932d5da294953e15d4814c74dd1'
          '027d6bd8f5f6a06b75bb7698cb478089'
          '2902e0fee7a9168f3a4fd2ccd60ff047'
          '42f4400ed2314bd7519c020d0187edc5'
-         '913d5d556bbbf3119ad5bb5e58b01883'
          '3546099a1b2f667adc9794f52e78e35b'
          '472f536d7c9e8250dc4568ec4cfaf294'
          'a577d42e38249d298d6a8d4bf2823883'
@@ -145,4 +140,10 @@ md5sums=('81348932d5da294953e15d4814c74dd1'
          '922578e2be7ed03729454e92ee8d3f3a'
          'SKIP'
          '8ff6948b16f2db5c29b1b9ae1085bbe7'
+         'SKIP'
+         'dd51fa67913b5dca45a702b672b3323f'
+         'SKIP'
+         '0729364c977ef4271e9f8dfafadacf67'
+         'SKIP'
+         'efb709fdb1368945513de23ccbfae053'
          'SKIP')
