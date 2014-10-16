@@ -32,8 +32,15 @@ options=('docs'
          '!header'
          'debug'
          'log')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+source=("$_mirror/${_pkgname}-$_kdever.tar.xz"
+        'libcups2_version.diff')
+sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`
+            '3fe146c93765f20d9e8156c82132a3fadaaee6481b5a0bb33599d38bbdb72106')
+
+prepare (){
+    cd ${srcdir}/${_pkgname}-${pkgver}
+    patch -p1 -i "${srcdir}/libcups2_version.diff"
+}
 
 build() {
     cd ${srcdir}/${_pkgname}-${pkgver}

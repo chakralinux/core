@@ -43,12 +43,23 @@ build() {
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DCMAKE_BUILD_TYPE=${_build_type} \
         -DCMAKE_SKIP_RPATH=ON \
-	-DQTONLY=FALSE  \
+        -DQTONLY=FALSE  \
+        -DWITH_DESIGNER_PLUGIN=ON \
         -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
     make
 }
 
 package() {
     cd ${srcdir}/${_pkgname}-${pkgver}
-    make DESTDIR=${pkgdir} install 
+    make DESTDIR=${pkgdir} install
+    
+    # Cleanup unused files
+    rm ${pkgdir}/usr/share/applications/kde4/marble-mobile.desktop
+    rm ${pkgdir}/usr/share/applications/kde4/marble-qt.desktop
+    rm ${pkgdir}/usr/share/applications/kde4/marble-touch.desktop
+
+    rm ${pkgdir}/usr/bin/marble-mobile
+    rm ${pkgdir}/usr/bin/marble-qt
+    rm ${pkgdir}/usr/bin/marble-touch
+
 }
