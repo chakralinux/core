@@ -1,16 +1,22 @@
 # maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=libotr
-pkgver=3.2.1
+pkgver=4.0.0
 pkgrel=1
 pkgdesc='Off-the-Record Messaging Library and Toolkit.'
-arch=('x86_64')
 url='http://www.cypherpunks.ca/otr/'
 license=('GPL' 'LGPL')
+arch=('x86_64')
 depends=('libgcrypt')
-options=('!libtool')
-source=("http://www.cypherpunks.ca/otr/${pkgname}-${pkgver}.tar.gz")
-md5sums=('974acf937d2ce0ee89b27a9815c17a3f')
+source=("http://www.cypherpunks.ca/otr/${pkgname}-${pkgver}.tar.gz"
+        'kopete.patch')
+sha1sums=('8865e9011b8674290837afcf7caf90c492ae09cc'
+          '55988c4f11b6852491a758ea7a5b7071e8959c55')
+
+prepare() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	patch -p1 -i ../kopete.patch # FS#38326
+}
 
 build() {
 	cd "$srcdir/$pkgname-$pkgver"
