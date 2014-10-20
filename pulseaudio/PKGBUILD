@@ -4,7 +4,7 @@ pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse)
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=5.0
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(GPL LGPL)
@@ -12,8 +12,23 @@ makedepends=(libasyncns libcap attr libxtst libsm libsamplerate libtool rtkit
              speex tdb systemd dbus avahi bluez intltool jack sbc
              lirc-utils openssl fftw orc json-c webrtc-audio-processing)
 options=(!emptydirs)
-source=(http://freedesktop.org/software/$pkgbase/releases/$pkgbase-$pkgver.tar.xz)
-md5sums=('c43749838612f4860465e83ed62ca38e')
+source=("http://freedesktop.org/software/$pkgbase/releases/$pkgbase-$pkgver.tar.xz"
+        "0036-module-switch-on-port-available-Don-t-switch-profile.patch"
+        "0112-rtp-recv-fix-crash-on-empty-UDP-packets-CVE-2014-397.patch"
+        "pulseaudio-4.0-kde_autostart_phase.patch")
+md5sums=('c43749838612f4860465e83ed62ca38e'
+         'ca8d776ad80578bb9464025f96ba4419'
+         'd3e60eb16d440d43793df245935e5413'
+         'f6e485048d939e681014ce87d1db6f43')
+
+prepare() {
+  cd $pkgbase-$pkgver
+
+  patch -Np1 -i ../0036-module-switch-on-port-available-Don-t-switch-profile.patch
+  patch -Np1 -i ../pulseaudio-4.0-kde_autostart_phase.patch
+  patch -Np1 -i ../0112-rtp-recv-fix-crash-on-empty-UDP-packets-CVE-2014-397.patch
+
+}
 
 build() {
   cd $pkgbase-$pkgver
