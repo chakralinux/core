@@ -1,8 +1,8 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=telepathy-qt
-pkgver=0.9.4
-pkgrel=5
+pkgver=0.9.5
+pkgrel=1
 pkgdesc="A library for Qt-based Telepathy clients."
 arch=('x86_64')
 url="http://telepathy.freedesktop.org"
@@ -10,20 +10,16 @@ groups=('telepathy')
 license=('LGPL')
 depends=('qt' 'telepathy-farstream' 'python2-dbus')
 makedepends=('libxslt' 'python2' 'cmake' 'doxygen')
+options=('staticlibs')
 conflicts=('telepathy-qt4')
 provides=('telepathy-qt4')
-source=("http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz"
-        "farstream-0.2.patch"
-        "gstreamer1.patch")
-sha256sums=('f1b1db3a9f96ece92df430a8de4d30317f4c58a06fe99e82cc2c6875791e61f2'
-            '5eb39f16b3988f0b50da29a64838af36e96aec38a1e9353a22242eec76ec0f8a')
+source=("http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz")
+sha256sums=('93474858efe55bf45ee9352f88b852d4a24505939dc81a3a3c6fa5a686809c8e')
 
 prepare() {
  mkdir build
 
   cd ${pkgname}-${pkgver}
-  patch -p1 -i "${srcdir}"/farstream-0.2.patch
-  patch -p1 -i "${srcdir}"/gstreamer1.patch
 }
 
 build() {
@@ -39,6 +35,3 @@ package() {
     cd "${srcdir}"/build
     make DESTDIR="$pkgdir" install
 }
-sha256sums=('f1b1db3a9f96ece92df430a8de4d30317f4c58a06fe99e82cc2c6875791e61f2'
-            '5eb39f16b3988f0b50da29a64838af36e96aec38a1e9353a22242eec76ec0f8a'
-            'f4a9272fdfbe29b41645e5c63f6dada764b3eb9c8eaa4f46cd1ec75f9266e828')
