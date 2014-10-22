@@ -6,15 +6,16 @@ pkgname=kwin
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc="A versative window manager"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='projects.kde.org/'
 license=('LGPL')
-depends=('qt5-base' 'qt5-declarative' 'qt5-script' 'qt5-tools' 'qt5-x11extras' 'kwindowsystem' 'kwidgetsaddons' 'kinit' 'knotifications' 'plasma-framework' 'kcmutils' 'knewstuff')
-makedepends=('extra-cmake-modules')
+depends=('qt5-multimedia' 'plasma-framework' 'knewstuff' 'libxcursor' 'kinit'
+         'hicolor-icon-theme' 'libepoxy') #'kwayland' update wayland °1.6 first
+makedepends=('extra-cmake-modules' 'qt5-tools' 'kdoctools')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {

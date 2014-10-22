@@ -14,7 +14,7 @@ makedepends=('extra-cmake-modules')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${pkgname} | head -n 1) )
 
 prepare() {
@@ -23,7 +23,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
+  #cmake ../${pkgname}-${pkgver} \
+  cmake ../${pkgname}-${PSubVersion} \
     -DCMAKE_BUILD_TYPE=${PBuildType} \
     -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
     -DLIB_INSTALL_DIR=lib 

@@ -2,9 +2,9 @@
 
 source ../plasma.conf
 
-pkgname=libkscreen2
+pkgname=libkscreen-kf5
 _pkgname=libkscreen
-pkgver=5.0.93
+pkgver=${PVersion}
 pkgrel=1
 pkgdesc="KDE's screen management library"
 arch=('x86_64')
@@ -15,8 +15,11 @@ makedepends=('extra-cmake-modules')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${PVersion}/${_pkgname}-${pkgver}.tar.xz")
+source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${_pkgname}) )
+
+replaces=('libkscreen2')
+provides=('libkscreen2')
 
 prepare() {
   mkdir -p build

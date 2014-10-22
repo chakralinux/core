@@ -2,18 +2,15 @@
 
 source ../plasma.conf
 
-pkgname=breeze
+pkgname=kwayland
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc='A plasma theme'
+pkgdesc='Qt-style Client and Server library wrapper for the Wayland libraries'
 arch=('x86_64')
-url='projects.kde.org/'
+url='http://www.kde.org'
 license=('LGPL')
-depends=('qt5-base' 'kconfig' 'kcoreaddons')
+depends=('qt5-base' 'wayland')
 makedepends=('extra-cmake-modules')
-checkdepends=("cmake")
-groups=('plasma')
-options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
@@ -23,19 +20,15 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${PSubVersion} \
+  #cmake ../${_pkgname}-${pkgver}
+  cmake ../$pkgname-5.1.0 \
     -DCMAKE_BUILD_TYPE=${PBuildType} \
     -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
     -DLIB_INSTALL_DIR=lib 
   make
 }
 
-check() {
-  cd build
-  make test
-}
-
 package() {
   cd build
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="$pkgdir" install
 }
