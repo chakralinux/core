@@ -3,18 +3,26 @@
 _pkgbase='pidgin'
 pkgname='libpurple'
 pkgver=2.10.10
-pkgrel=3
+pkgrel=4
 pkgdesc="IM library extracted from Pidgin"
 arch=('x86_64')
 url="http://pidgin.im/"
 license=('GPL')
 makedepends=('startup-notification' 'libxss' 'nss' 'libsasl' 'python2' 'silc-toolkit'
-             'avahi' 'tk' 'ca-certificates' 'intltool' 'networkmanager')
+             'avahi' 'tk' 'ca-certificates' 'intltool' 'networkmanager' 'farstream' 'gstreamer')
 depends=('libsasl' 'dbus-glib' 'silc-toolkit' 'nss>=3.17.1' 'nspr>=4.10.7' 'cyrus-sasl-plugins')
 optdepends=('dbus-python: for purple-remote and purple-url-handler')
 options=('!libtool')
-source=(http://downloads.sourceforge.net/${_pkgbase}/${_pkgbase}-${pkgver}.tar.bz2)
-md5sums=('5030d4750c73b211c7e82bb67ea3d016')
+source=("http://downloads.sourceforge.net/${_pkgbase}/${_pkgbase}-${pkgver}.tar.bz2"
+        'libpurple-gst1.patch')
+md5sums=('5030d4750c73b211c7e82bb67ea3d016'
+         'SKIP')
+
+prepare() {
+   cd "${srcdir}/${_pkgbase}-${pkgver}"
+   patch -Np1 -i $srcdir/libpurple-gst1.patch
+   autoreconf -vi
+}
 
 build() {
     cd "${srcdir}/${_pkgbase}-${pkgver}"
@@ -27,8 +35,6 @@ build() {
                 --disable-gtkui \
                 --disable-screensaver \
                 --disable-sm \
-                --disable-gstreamer \
-                --disable-vv \
                 --disable-gtkspell \
                 --disable-gnutls \
                 --enable-cyrus-sasl \
