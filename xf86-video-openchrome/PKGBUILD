@@ -4,29 +4,36 @@
 
 pkgname=xf86-video-openchrome
 pkgver=0.3.3
-pkgrel=4
+pkgrel=5
 pkgdesc="X.Org Openchrome drivers"
 arch=('x86_64')
 license=('custom')
-url="http://www.openchrome.org"
-depends=('libdrm' 'libxvmc')
-makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
+url="http://www.freedesktop.org/wiki/Openchrome/"
+depends=('libdrm' 'libxvmc' 'systemd')
+optdepends=('unichrome-dri')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=18')
+conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19'
+           'xf86-video-via' 'xf86-video-unichrome' 'openchrome')
 replaces=('openchrome' 'xf86-video-via')
-options=('!makeflags')
-conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16' 'xf86-video-via' 'xf86-video-unichrome' 'openchrome' 'unichrome-dri')
-source=("http://xorg.freedesktop.org/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('f21abcdf87f73b5b547491281e894c87')
+groups=('xorg-drivers' 'xorg')
+options=('!emptydirs' '!makeflags')
+source=(http://xorg.freedesktop.org/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2 fix.patch)
+sha1sums=('1f7b23d4ed53417eda5c6730486b36812f469295'
+          '252fc984bca2c8e4d236ede1f1806caceedcbff7')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  patch -Np1 -i ../fix.patch
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"

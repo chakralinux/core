@@ -4,29 +4,29 @@
 
 pkgname=xf86-video-r128
 pkgver=6.9.2
-pkgrel=3
+pkgrel=4
 pkgdesc="X.org ati Rage128 video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
-conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
-groups=('xorg-video-drivers')
-source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('2e906d856a1c477bde000254b142445c')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=18')
+conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19')
+optdepends=('r128-dri: DRI1 support from community repo')
+groups=('xorg-drivers' 'xorg')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+sha256sums=('8b2d295f1842d07304a75da1cfb9bf139b320a6539970eaf8d5ecc010cd36ee0')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  ./configure --prefix=/usr  
-  make 
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+  make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
 
-  make DESTDIR="${pkgdir}" install 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }

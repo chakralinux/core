@@ -3,35 +3,32 @@
 
 pkgname=xf86-video-i740
 pkgver=1.3.4
-pkgrel=3
+pkgrel=4
 pkgdesc="X.org Intel i740 video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
-conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
-groups=('xorg-video-drivers')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=18')
+conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2 git-fix.diff)
-md5sums=('11c0aa1036ba8c203a03d1f00bbec195'
-         '3a2b499ce4d6dc54f2ce0c306ab1ebb0')
+sha256sums=('1a24009bb2223b722fb41e1a2737a6e74bfecb0829e5583e270d267ee4ecca78'
+            '2b004773fe8090dea727590a7fc0389c53a16d068537fd1968ae320b0f1e36ca')
 
 prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   patch -Np1 -i ${srcdir}/git-fix.diff
 }
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  ./configure --prefix=/usr 
-  make 
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+  make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  make DESTDIR="${pkgdir}" install 
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }

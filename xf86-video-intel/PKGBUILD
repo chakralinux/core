@@ -3,15 +3,15 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xf86-video-intel
-pkgver=2.21.15 # WARINING, tried with version 2.99.912 but seems that with sna the rendering is corrupted (http://chakraos.org/forum/viewtopic.php?pid=81925#p81925)
-pkgrel=2
+pkgver=2.99.916
+pkgrel=1
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 install=$pkgname.install
 pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
-depends=('intel-dri' 'libxvmc' 'pixman' 'xcb-util>=0.3.9' 'glamor-egl')
-makedepends=('xorg-server' 'libx11' 'libxrender'
+depends=('mesa-dri' 'libxvmc' 'pixman' 'xcb-util>=0.3.9')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=18' 'libx11' 'libxrender'
              # additional deps for intel-virtual-output
             'libxrandr' 'libxinerama' 'libxcursor' 'libxtst')
 optdepends=('libxrandr: for intel-virtual-output'
@@ -20,24 +20,27 @@ optdepends=('libxrandr: for intel-virtual-output'
             'libxtst: for intel-virtual-output')
 replaces=('xf86-video-intel-uxa' 'xf86-video-intel-sna')
 provides=('xf86-video-intel-uxa' 'xf86-video-intel-sna')
-conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16'
-           'xf86-video-intel-sna' 
-           'xf86-video-intel-uxa' 
-           'xf86-video-i810' 
-           'xf86-video-intel-legacy')
+conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19'
+           'xf86-video-intel-sna' 'xf86-video-intel-uxa' 'xf86-video-i810' 'xf86-video-intel-legacy')
 groups=('xorg-drivers' 'xorg')
 source=(${url}/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2
-intel-2.21.15-xserver-1.15-compat.patch)
-sha256sums=('7d5a140f82a72fd1cbc8a664d66c3d4eca47ee240ca4927b8a98d7af6f65d6fc'
-            'fbf8fa35974dbf758b095c390d79f542b97993482ae3b63ec6542bffa87ba09f')
+        0001-sna-Use-default-monitor-options-on-the-first-output.patch)
+sha256sums=('409a819f4ac3e7c9432dd4acafe4621bbb3702adb34b1ea942b2e6d7c71eed01'
+            '0195f5e5e69fc4b86d7ab51bc3d297e283cbdaec5c729702cca1b213809b4a18')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+
+  # Fix FS#41944 merged upstream
+  patch -Np1 -i ../0001-sna-Use-default-monitor-options-on-the-first-output.patch
+}
 
 build() {
   cd ${pkgname}-${pkgver}
-  # fix build with Xorg 1.15
-  patch -Np1 -i ${srcdir}/intel-2.21.15-xserver-1.15-compat.patch
   ./configure --prefix=/usr \
     --libexecdir=/usr/lib \
-    --enable-dri
+    --enable-glamor \
+    --disable-dri3
   make
 }
 

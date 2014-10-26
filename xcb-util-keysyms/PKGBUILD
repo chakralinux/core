@@ -2,27 +2,32 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xcb-util-keysyms
-pkgver=0.3.9
-pkgrel=5
-pkgdesc="Utility libraries for XC Binding"
+pkgver=0.4.0
+pkgrel=1
+pkgdesc="Utility libraries for XC Binding - Standard X key constants and conversion to/from keycodes"
 arch=('x86_64')
 url="http://xcb.freedesktop.org"
 license=('custom')
-depends=('libxcb' 'xcb-util')
-makedepends=('gperf' 'xorg-util-macros')
-source=(http://xcb.freedesktop.org/dist/${pkgname}-${pkgver}.tar.bz2
-        LICENSE)
-md5sums=('64e4aad2d48cd4a92e2da13b9f35bfd2'
-         '2672c2e72dedb40f773e989dd622f298')
+depends=('libxcb')
+makedepends=('xorg-util-macros')
+source=("http://xcb.freedesktop.org/dist/${pkgname}-${pkgver}.tar.bz2"
+        'LICENSE')
+sha256sums=('0ef8490ff1dede52b7de533158547f8b454b241aa3e4dcca369507f66f216dd9'
+            'ded299aa179dcf0d885bf89274a4db77a530e03f9f5e7cf1c3c4ef1d60e914b9')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr --disable-static
   make
 }
 
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
+}
+
 package() { 
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
 
   install -D -m644 "${srcdir}/LICENSE" \

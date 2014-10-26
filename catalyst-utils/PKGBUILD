@@ -5,9 +5,9 @@
 pkgbase=catalyst-utils
 pkgname=('catalyst-utils' 'catalyst-libgl' 'opencl-catalyst')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 1x.x
-pkgver=14.4
-pkgrel=6
-_amdver=14.10.1006.1001
+pkgver=14.9
+pkgrel=1
+_amdver=14.201
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('x86_64')
 url="http://www.amd.com"
@@ -15,12 +15,13 @@ license=('custom')
 options=('staticlibs' 'libtool' '!strip' '!upx')
 
 source=(
-    http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver/./-}-rev2-linux-x86-x86-64-may6.zip
+#    http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver/./-}-rev2-linux-x86-x86-64-may6.zip
+    http://archive.ubuntu.com/ubuntu/pool/restricted/f/fglrx-installer/fglrx-installer_14.201.orig.tar.gz
     catalyst.sh
     atieventsd.sh
     atieventsd.service
     catalyst.conf
-    arch-fglrx-authatieventsd.patch
+    arch-fglrx-authatieventsd_new.patch
     hw_ati_legacy_hwdb
     switchlibGL
     switchlibglx
@@ -28,12 +29,12 @@ source=(
     temp_links_catalyst
     temp-links-catalyst.service)
 
-md5sums=('6e9483e8d34aea68af22fbb70116275f'
+md5sums=('ff3a7604051971de617a5f4703826ec6'
          'bdafe749e046bfddee2d1c5e90eabd83'
-         'f729bf913613f49b0b9759c246058a87'
-         'bccf181a981ff429fe66f6ca5c3ea75a'
+         '9d9ea496eadf7e883d56723d65e96edf'
+         '90a37e010f4e5f45e270cd000894d553'
          '3e19c2285c76f4cb92108435a1e9c302'
-         '4ec9ba4440ec5a320ed3987c1d3b417d'
+         'b3ceefeb97c609037845f65d0956c4f0'
          'e88b99bb50f38bc96c880407b36b45a8'
          '394bc493fdf493a5093f9e2095096d02'
          '3226230592fa3c91ff22389114fc5dc7'
@@ -42,7 +43,13 @@ md5sums=('6e9483e8d34aea68af22fbb70116275f'
          '2c22bb4d4f828cb8b024f670c1ae7e45')
 
 build() {
-     /bin/sh ./fglrx-${_amdver}/amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
+  ## Unpack archive
+#      /bin/sh ./amd-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
+#     /bin/sh ./fglrx-${_amdver}/amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
+mkdir common
+mv etc lib usr common
+mkdir archive_files
+mv arch common xpic xpic_64a archive_files
 }
 
 package_catalyst-libgl() {
@@ -116,7 +123,7 @@ package_opencl-catalyst() {
 
 package_catalyst-utils() {
       pkgdesc="AMD/ATI drivers. Utilities and libraries. Radeons HD 2 3 4 xxx ARE NOT SUPPORTED"
-      depends=('xorg-server>=1.7.0' 'xorg-server<1.16.0' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs' 'libxinerama')
+      depends=('xorg-server>=1.7.0' 'xorg-server<1.17.0' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs' 'libxinerama')
       optdepends=('qt4: to run ATi Catalyst Control Center (amdcccle)'
 		  'libxxf86vm: to run ATi Catalyst Control Center (amdcccle)'
 		  'acpid: acpi event support  / atieventsd'
@@ -181,7 +188,7 @@ package_catalyst-utils() {
       install -m644 X11R6/${_lib}/*.cap ${pkgdir}/usr/lib
       install -m755 X11R6/${_lib}/modules/dri/*.so ${pkgdir}/usr/lib/xorg/modules/dri
       install -m755 ${_lib}/*.so* ${pkgdir}/usr/lib
-#       install  -m755 ${_lib}/hsa/* ${pkgdir}/usr/lib/hsa
+#       install -m755 ${_lib}/hsa/* ${pkgdir}/usr/lib/hsa		#removed in 14.1
 
       ln -snf /usr/lib/xorg/modules/dri/fglrx_dri.so ${pkgdir}/usr/lib/dri/fglrx_dri.so
       ln -snf libfglrx_dm.so.1.0 ${pkgdir}/usr/lib/libfglrx_dm.so.1
@@ -193,7 +200,7 @@ package_catalyst-utils() {
       rm ${pkgdir}/usr/lib/lib{amdocl*,OpenCL}.so* 
 
       cd ${srcdir}/archive_files/common
-      patch -Np2 -i ${srcdir}/arch-fglrx-authatieventsd.patch
+      patch -Np2 -i ${srcdir}/arch-fglrx-authatieventsd_new.patch
       install -m644 etc/ati/* ${pkgdir}/etc/ati
       chmod 755 ${pkgdir}/etc/ati/authatieventsd.sh
 
@@ -220,7 +227,8 @@ package_catalyst-utils() {
       install -m755 ${srcdir}/catalyst.sh ${pkgdir}/etc/profile.d
 
     # License
-      install -m644 ${srcdir}/archive_files/LICENSE.TXT ${pkgdir}/usr/share/licenses/${pkgname}
+#      install -m644 ${srcdir}/archive_files/LICENSE.TXT ${pkgdir}/usr/share/licenses/${pkgname}
+      install -m644 ${srcdir}/archive_files/common/usr/share/doc/fglrx/LICENSE.TXT ${pkgdir}/usr/share/licenses/${pkgname}
       install -m644 ${srcdir}/archive_files/common/usr/share/doc/amdcccle/ccc_copyrights.txt \
 	${pkgdir}/usr/share/licenses/${pkgname}/amdcccle_copyrights.txt
 

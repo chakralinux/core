@@ -4,15 +4,15 @@
 
 pkgname=xf86-video-vesa
 pkgver=2.3.2
-pkgrel=3
+pkgrel=4
 pkgdesc="X.org vesa video driver"
 arch=('x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('glibc')
-makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
-conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
-groups=('xorg' 'xorg-video-drivers')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=18')
+conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19')
+groups=('xorg-drivers' 'xorg')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2
         revert-kernelcheck.patch
         git-fixes.patch)
@@ -21,23 +21,20 @@ sha256sums=('144a17ffae3c86603ddc4ae33521a52813498ee1f8213faa662dc4a8d6490ee3'
             'beba7e8499b1d0b457762e28e7e413b223cbe87a84a39a3566e96c44da8544a1')
 
 prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   patch -Np1 -R -i "${srcdir}/revert-kernelcheck.patch"
   patch -Np1 -i ${srcdir}/git-fixes.patch
 }
 
-
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  ./configure --prefix=/usr 
-  make 
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+  make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  make DESTDIR="${pkgdir}" install 
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
   install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/" 
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }

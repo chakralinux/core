@@ -4,30 +4,29 @@
 
 pkgname=xf86-video-savage
 pkgver=2.3.7
-pkgrel=3
+pkgrel=4
 pkgdesc="X.org savage video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 depends=('glibc')
-makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
-conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
-options=('!makeflags')
-groups=('xorg-video-drivers')
-source=("${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('e813271ab43cc6a95ac0ab252b90a885')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=18')
+conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19')
+optdepends=('savage-dri: DRI1 support from community repo')
+groups=('xorg-drivers' 'xorg')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+sha256sums=('041d4205c9222c1780fba6e0e397a559aed393b7a7991b58fa79ba8cccc54a44')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  ./configure --prefix=/usr --disable-dri 
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
 
-  make DESTDIR="${pkgdir}" install 
   install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }

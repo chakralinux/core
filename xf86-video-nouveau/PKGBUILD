@@ -3,26 +3,27 @@
 # contributor: abveritas@chakra-project.org
 
 pkgname=xf86-video-nouveau
-pkgver=1.0.10
-pkgrel=3
-pkgdesc="Open Source 3D acceleration driver for nVidia cards"
-arch=('x86_64')
+pkgver=1.0.11
+pkgrel=1
+pkgdesc="Open Source 2D acceleration driver for nVidia cards"
+arch=('i686' 'x86_64')
 url="http://nouveau.freedesktop.org/"
-license=('GPL') #and MIT, not yet a license file, see http://nouveau.freedesktop.org/wiki/FAQ#head-09f75d03eb30011c754038a3893119a70745de4e
-depends=('libdrm' 'systemd' 'nouveau-dri')
-makedepends=('xorg-server' 'X-ABI-VIDEODRV_VERSION=15')
-conflicts=('xorg-server<1.15.0' 'X-ABI-VIDEODRV_VERSION<15' 'X-ABI-VIDEODRV_VERSION>=16')
-install=${pkgname}.install
-source=("http://xorg.freedesktop.org/archive/individual/driver/$pkgname-$pkgver.tar.bz2")
-md5sums=('44fd65897630fdd19c086133cc1bd679')
+license=('GPL')
+depends=('libdrm' 'systemd' 'mesa-dri')
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=18')
+conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19')
+groups=('xorg-drivers' 'xorg')
+install=$pkgname.install
+source=(http://xorg.freedesktop.org/archive/individual/driver/$pkgname-$pkgver.tar.bz2)
+sha256sums=('f84fe2b2787f3ea9419eac3aa86462b929a551b3dbc4de550cc83b67f3216848')
 
 build() {
-  cd ${srcdir}/$pkgname-$pkgver
+  cd $pkgname-$pkgver
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd ${srcdir}/$pkgname-$pkgver
-  make DESTDIR=${pkgdir} install
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
 }
