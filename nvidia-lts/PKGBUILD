@@ -7,7 +7,7 @@ _kernelver=3.2.63
 
 pkgname=nvidia-lts
 pkgver=343.22
-pkgrel=1
+pkgrel=2
 pkgdesc="NVIDIA drivers for linux."
 arch=('x86_64')
 url="http://www.nvidia.com/"
@@ -20,17 +20,20 @@ _pkg="NVIDIA-Linux-${_arch}-${pkgver}-no-compat32"
 source=("http://us.download.nvidia.com/XFree86/Linux-${_arch}/${pkgver}/${_pkg}.run")
 md5sums=('3d98eaa01a94e86abb04723ae2a702b1')
 
+prepare() {
+    sh ${_pkg}.run --extract-only
+}
 build() {
-    cd "${srcdir}"
-    sh "${_pkg}.run" --extract-only
-    cd "${_pkg}/kernel"
-    make SYSSRC=/usr/lib/modules/"${_kver}/build" module
+  cd "${_pkg}/kernel"
+  make SYSSRC=/usr/lib/modules/"${_kver}/build" module
 }
 
 package() {
-    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
-        "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
-    install -d -m755 "${pkgdir}/etc/modprobe.d"
-    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
-    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
+  install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
+    "${pkgdir}/usr/lib/modules/${_extramodules}/kernel/drivers/video/nvidia.ko"
+  gzip "${pkgdir}/usr/lib/modules/${_extramodules}/kernel/drivers/video/"*.ko
+  install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
+  echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nvidia-lts.conf"
+  echo "blacklist nvidiafb" >> "${pkgdir}/usr/lib/modprobe.d/nvidia-lts.conf"
+  install -D -m644 "${srcdir}/${_pkg}/LICENSE" "${pkgdir}/usr/share/licenses/nvidia-lts/LICENSE"
 }
