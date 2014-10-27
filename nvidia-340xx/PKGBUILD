@@ -4,41 +4,51 @@ _extramodules=extramodules-3.16-CHAKRA
 _kver=$(cat /usr/lib/modules/${_extramodules}/version)
 _kernelver=3.16.4
 
-pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
-pkgver=304.123
-pkgrel=5
+pkgname=('nvidia-340xx' 'chd-nvidia-340xx')
+pkgver=340.46
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
-makedepends=("linux-headers=${_kernelver}" "linux=${_kernelver}" "nvidia-304xx-utils=${pkgver}")
+makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
-_pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
-source+=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run")
+
+_ARCH='x86_64'
+_pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
+source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '9d461e9e00e473f458aee96cd6d85101')
+         'bf40adc20ac9819b5f86cd91f6409e39')
+
+prepare() {
+    sh "${_pkg}.run" --extract-only
+}
 
 build() {
-    cd "${srcdir}"
-    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
-    sh "${_pkg}.run" --extract-only
     cd "${_pkg}/kernel"
+    make SYSSRC=/usr/lib/modules/"${_kver}/build" module
+
+    cd uvm
     make SYSSRC=/usr/lib/modules/"${_kver}/build" module
 }
 
-package_nvidia-304xx() {
+package_nvidia-340xx() {
     pkgdesc="NVIDIA drivers for linux."
-    depends=("linux=${_kernelver}" "nvidia-304xx-utils=${pkgver}")
-    conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia')
+    depends=("linux=${_kernelver}" "nvidia-340xx-libgl" "nvidia-340xx-utils=${pkgver}")
+    conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx' 'nvidia-bumblebee')
     install=nvidia.install
     
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
+    install -D -m644 "${srcdir}/${_pkg}/kernel/uvm/nvidia-uvm.ko" \
+        "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-uvm.ko"
+    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
+    
     install -d -m755 "${pkgdir}/etc/modprobe.d"
     echo "blacklist nouveau" >> "${pkgdir}/etc/modprobe.d/nouveau_blacklist.conf"
-    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
+    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
 }
 
-package_chd-nvidia-304xx() {
+package_chd-nvidia-340xx() {
     pkgdesc="CHD ids for nvidia $pkgver"
     arch=('x86_64')
 
@@ -46,5 +56,5 @@ package_chd-nvidia-304xx() {
 
     install -dm755 "${pkgdir}/opt/chakra/hwdb"
     sh -e "${srcdir}/nvidia_supported" README.txt kernel/nv-kernel.o \
-        > "${pkgdir}/opt/chakra/hwdb/hw_nvidia304xx_hwdb"
+        > "${pkgdir}/opt/chakra/hwdb/hw_nvidia340xx_hwdb"
 }
