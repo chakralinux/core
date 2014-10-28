@@ -3,8 +3,8 @@
 #
 
 pkgname=dhcpcd
-pkgver=6.4.3
-pkgrel=4
+pkgver=6.5.1
+pkgrel=1
 pkgdesc="RFC2131 compliant DHCP client daemon"
 url="http://roy.marples.name/projects/dhcpcd/"
 arch=('x86_64')
@@ -13,20 +13,12 @@ groups=('base')
 depends=('glibc' 'sh' 'systemd')
 backup=('etc/dhcpcd.conf')
 options=('emptydirs')  # We Need the Empty /var/lib/dhcpcd Directory
-source=("http://roy.marples.name/downloads/$pkgname/$pkgname-$pkgver.tar.bz2" \
-	'dhcpcd@.service'
-	'dhcpcd.service'
-	'Makefile_test.patch')
-sha1sums=('d90e5a0537ea902335a48a61703f49b5cd53c8f1'
-          '6245b8db7e6f39a0305571726bb693a53901c400'
-          'cad7ad8621af58bccccae421cc5d3f1360b02273'
-          '5898ea748c7886f47d653ffdfeb23a24d67c01aa')
-
-prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  patch -Np0 -i "${srcdir}/Makefile_test.patch"
-}
+source=("http://roy.marples.name/downloads/$pkgname/$pkgname-$pkgver.tar.bz2"
+        'dhcpcd_.service'
+		'dhcpcd.service')
+sha1sums=('e4ffeee13efff17aadbc60d669206819b99d0a74'
+          '6f1633edde14d29b5cdc09c4f029a450ef2ebc96'
+          '52c1bad9ab43e9a253c1eb175e7eefb13497b8f9')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -34,7 +26,6 @@ build() {
   # configure variables
   ./configure \
       --sbindir=/usr/bin \
-      --libdir=/usr/lib \
       --libexecdir=/usr/lib/dhcpcd \
       --dbdir=/var/lib/dhcpcd \
       --rundir=/run
@@ -62,10 +53,6 @@ package() {
   echo noipv4ll >> "${pkgdir}/etc/dhcpcd.conf" # Disable ip4vall
 
   # install systemd files
-  install -Dm644 "${srcdir}/dhcpcd@.service" "${pkgdir}/usr/lib/systemd/system/dhcpcd@.service"
-  install -Dm644 "${srcdir}/dhcpcd.service" "${pkgdir}/usr/lib/systemd/system/dhcpcd.service"
+  install -Dm644 "${srcdir}/dhcpcd_.service" "${pkgdir}/usr/lib/systemd/system/dhcpcd@.service"
+  install -Dm644 "${srcdir}/dhcpcd.service" "${pkgdir}/usr/lib/systemd/system/dhcpcd.service" # FS#31543
 }
-sha1sums=('d90e5a0537ea902335a48a61703f49b5cd53c8f1'
-          '6f1633edde14d29b5cdc09c4f029a450ef2ebc96'
-          '52c1bad9ab43e9a253c1eb175e7eefb13497b8f9'
-          '5898ea748c7886f47d653ffdfeb23a24d67c01aa')
