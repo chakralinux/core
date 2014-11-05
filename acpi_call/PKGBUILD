@@ -1,14 +1,14 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 
-_extramodules=extramodules-3.16-CHAKRA
+_extramodules=extramodules-3.17-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=3.16.4
+_kernelver=3.17.2
 
 pkgname=acpi_call
 _pkgname=acpi_call
 pkgver=1.1.0
-pkgrel=14
+pkgrel=15
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('x86_64')
 url=("http://github.com/mkottman/acpi_call")
@@ -22,38 +22,31 @@ install=acpi_call.install
 source=("https://github.com/mkottman/acpi_call/archive/v${pkgver}.tar.gz")
 md5sums=('f69d40e130b0e5ed17ce8adb19e6dda1')
 
-build() {
-  cd ${srcdir}/$_pkgname-${pkgver}
+prepare() {
+  cd ${pkgname}-${pkgver}
 
-  echo make KVERSION=${_kver}
+  # Fix build with Linux 3.17
+  sed -i 's|acpi/acpi.h|linux/acpi.h|' acpi_call.c
+}
+
+build() {
+  cd ${pkgname}-${pkgver}
+
   make KVERSION=${_kver}
 }
 package() {
-  cd ${srcdir}/$_pkgname-${pkgver}
-  install -d ${pkgdir}/usr/share/$_pkgname 
-  install -d ${pkgdir}/usr/bin  
-  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/examples/asus1215n.sh \
-    ${pkgdir}/usr/share/$_pkgname 
-  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/examples/m11xr2.sh \
-    ${pkgdir}/usr/share/$_pkgname 
-  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/examples/dellL702X.sh \
-    ${pkgdir}/usr/share/$_pkgname 
-  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/examples/turn_off_gpu.sh \
-    ${pkgdir}/usr/share/$_pkgname 
-  ln -s /usr/share/$_pkgname/turn_off_gpu.sh  \
+  cd ${pkgname}-${pkgver}
+
+  install -dm 755 "${pkgdir}"/usr/lib/{modules/${_extramodules},modules-load.d} "${pkgdir}"/usr/bin
+  install -m 644 ${pkgname}.ko "${pkgdir}"/usr/lib/modules/${_extramodules}
+  gzip "${pkgdir}"/usr/lib/modules/${_extramodules}/${pkgname}.ko
+  echo ${pkgname} > "${pkgdir}"/usr/lib/modules-load.d/${pkgname}.conf
+
+  install -dm 755 "${pkgdir}"/usr/share/${pkgname}
+  cp -dr --no-preserve='ownership' {examples,support} "${pkgdir}"/usr/share/${pkgname}/
+
+  ln -s /usr/share/$_pkgname/examples/turn_off_gpu.sh  \
     ${pkgdir}/usr/bin/turn_off_gpu.sh 
-  install -Dm755  ${srcdir}/$_pkgname-${pkgver}/support/query_dsdt.pl \
-    ${pkgdir}/usr/share/$_pkgname-${pkgver}
-  cp -R support/windump_hack \
-    ${pkgdir}/usr/share/$_pkgname/
-  install -Dm644 README.md \
-    ${pkgdir}/usr/share/$_pkgname/README.md
-
-    msg2 "Building module for $_kver..."
-
-  # KDIR is necessary even when cleaning
-  #make KDIR=/usr/src/linux-${_kver} clean
-  make KDIR=/usr/src/linux-${_kver}
-
-  install -D -m644 ${pkgname}.ko "${pkgdir}"/usr/lib/modules/${_extramodules}/${pkgname}.ko
 }
+
+# vim: ts=2 sw=2 et:
