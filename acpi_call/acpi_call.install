@@ -1,5 +1,6 @@
 post_install() {
-  depmod -a
+  EXTRAMODULES='extramodules-3.17-CHAKRA'
+  depmod $(cat /lib/modules/$EXTRAMODULES/version)
   echo ""
   echo "[+] modprobe acpi_call"
   echo ">>> run /usr/bin/turn_off_gpu.sh to test/view different acpi_call functions to see if it disables your secondary/hybrid video card"
@@ -11,7 +12,8 @@ post_upgrade() {
 }
 
 post_remove() {
-  depmod -a
+  EXTRAMODULES='extramodules-3.17-CHAKRA'
+  depmod $(cat /lib/modules/$EXTRAMODULES/version)
 }
 
 op=$1
