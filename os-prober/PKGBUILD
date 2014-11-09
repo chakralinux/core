@@ -4,59 +4,52 @@
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=os-prober
-pkgver=1.57
-pkgrel=2
-pkgdesc="Utility to detect other operating systems on a set of drives."
+pkgver=1.64
+pkgrel=1
+pkgdesc="Utility to detect other OSes on a set of drives"
 url="http://joey.kitenet.net/code/os-prober/"
 arch=('x86_64')
-license=('GPL')
+license=('GPL3')
 depends=('sh')
-makedepends=('gcc' 'sed')
-source=("ftp://ftp.us.debian.org/debian/pool/main/o/${pkgname}/${pkgname}_${pkgver}.tar.gz"
-        'btrfs-detection.patch')
-md5sums=('67548b17d55cc32c1168bb5a4061170d'
-         'c12d27b045ee044eb57d971ff74aaefe')
+source=(ftp://ftp.debian.org/debian/pool/main/o/${pkgname}/${pkgname}_${pkgver}.tar.xz
+	os-prober-util-linux-2.24.patch)
+md5sums=('b13047131d2b1a924ed97dd0fa0885a7'
+         'ce6218a8a0f791b617a79d29d097d7d8')
+sha256sums=('b0c14b530dd83856d17736e3758700f7e89fbf0ff6f6c20104b3b4ae1d8579df'
+            '5271a50ebeaea23b5f1e02a5d61b9a68c3b8f978f48cd8511cbec78773200e8e')
 
-build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+prepare() {
+  cd "$pkgname"
 
-  # patch to make it recognize systems on Btrfs volumes
-  patch -p1 -i "${srcdir}/btrfs-detection.patch"
+  patch -p1 -i "$srcdir"/os-prober-util-linux-2.24.patch
 
   # adjust lib dir to allow detection of 64-bit distros
-  sed -e "s:/lib/ld\*\.so\*:/lib*/ld*.so*:g" \
-      -i os-probes/mounted/common/90linux-distro 
+  sed -i -e "s:/lib/ld\*\.so\*:/lib*/ld*.so*:g" os-probes/mounted/common/90linux-distro
 
-  make
+  rm -f Makefile
+}
+
+build() {
+  cd "$pkgname"
+
+  make newns
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "$pkgname"
 
-  install -D -m755 linux-boot-prober "${pkgdir}/usr/bin/linux-boot-prober"
-  install -D -m755 os-prober "${pkgdir}/usr/bin/os-prober"
-  install -D -m755 newns "${pkgdir}/usr/lib/os-prober/newns"
-  install -D -m755 common.sh "${pkgdir}/usr/share/os-prober/common.sh"
+  install -Dm755 linux-boot-prober "$pkgdir"/usr/bin/linux-boot-prober
+  install -Dm755 os-prober "$pkgdir"/usr/bin/os-prober
+  install -Dm755 newns "$pkgdir"/usr/lib/os-prober/newns
+  install -Dm755 common.sh $pkgdir/usr/share/os-prober/common.sh  
 
-  local probelist=('os-probes' 'os-probes/mounted' 'os-probes/init'
-                   'linux-boot-probes' 'linux-boot-probes/mounted')
-
-  for probes in "${probelist[@]}"; do
-    install -d -m755 "${pkgdir}/usr/lib/${probes}"
-    install -m755 -t "${pkgdir}/usr/lib/${probes}" "${probes}/common"/*
-    if [ -e "${probes}/x86" ]; then
-      install -d -m755 "${pkgdir}/usr/lib/${probes}"
-      install -m755 -t "${pkgdir}/usr/lib/${probes}" "${probes}/x86"/*
-    fi
+  for dir in os-probes os-probes/mounted os-probes/init linux-boot-probes linux-boot-probes/mounted; do
+    install -dm755 "$pkgdir/usr/lib/$dir"
+    install -m755 -t "$pkgdir/usr/lib/$dir" "$dir"/common/*
+    [[ -d "$dir"/x86 ]] && cp -r "$dir"/x86/* "$pkgdir/usr/lib/$dir"
   done
 
-  install -D -m755 os-probes/mounted/powerpc/20macosx \
-                   "${pkgdir}/usr/lib/os-probes/mounted/20macosx"
-                   
-  # create a empty labels file, will be used by os-prober at execution
-  install -d "${pkgdir}/var/lib/os-prober"
-  touch "${pkgdir}/var/lib/os-prober/labels"
-  chmod 644 "${pkgdir}/var/lib/os-prober/labels"
-}
+  install -Dm755 os-probes/mounted/powerpc/20macosx "$pkgdir"/usr/lib/os-probes/mounted/20macosx
 
-# vim:set ts=2 sw=2 et:
+  install -dm755 "$pkgdir"/var/lib/os-prober
+}
