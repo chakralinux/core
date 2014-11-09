@@ -5,38 +5,32 @@
 # contributor <abveritas[at]chakra-project[dot]org>
 
 pkgname=openvpn
-pkgver=2.3.2
+pkgver=2.3.5
 pkgrel=1
 pkgdesc="An easy-to-use, robust, and highly configurable VPN (Virtual Private Network)"
 arch=('x86_64')
 url="http://openvpn.net/index.php/open-source.html"
-depends=('openssl' 'lzo2' 'iproute2')
+depends=('openssl' 'lzo2' 'iproute2' 'systemd')
 makedepends=('systemd')
 license=('custom')
-backup=(usr/share/openvpn/easy-rsa/vars
-        usr/share/openvpn/easy-rsa/openssl.cnf
-        etc/conf.d/openvpn-tapdev)
+backup=(usr/share/openvpn/easy-rsa/vars)
 source=(http://swupdate.openvpn.net/community/releases/openvpn-${pkgver}.tar.gz{,.asc}
         http://build.openvpn.net/downloads/releases/easy-rsa-2.2.0_master.tar.gz{,.asc}
-        "openvpn-2.3.0-fix-systemd-ask-password-path.patch"
 	'openvpn@.service')
-md5sums=('06e5f93dbf13f2c19647ca15ffc23ac1'
-         '7203a3f37b9a4351411429c96a3b089b'
-         'fbf818b6e1f212e77b9ce0e6d92584a1'
-         '46df49b85f9850fec287e311279bdbef'
-         'e1bd1523e38745e948c710db1a330bb1'
-         '44047df812a3fcd57a7e36a61732a9b9')
+sha256sums=('d93b447b014a41ec1550c3b760871aa72d7c09f1b5c6fc1e013d3073ac29ca21'
+            'SKIP'
+            'd23ddc3a764b40d03ada76f387c92ae4dcf4f5266da54c2bae130325b05eebe2'
+            'SKIP'
+            '4696aefe672b4a2e3e201d3c2c0211b08e87a3a1a039788013846629a79ec6fd')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
-  patch -p0 -i $srcdir/openvpn-2.3.0-fix-systemd-ask-password-path.patch
-  # Build openvpn
-  CFLAGS="$CFLAGS -DPLUGIN_LIBDIR=\\\"/usr/lib/openvpn\\\""
-     ./configure --prefix=/usr \
-        --enable-password-save \
-        --mandir=/usr/share/man \
-        --enable-iproute2 \
-        --enable-systemd
+  cd "${srcdir}"/$pkgname-$pkgver
+  CFLAGS="$CFLAGS -DPLUGIN_LIBDIR=\\\"/usr/lib/openvpn\\\"" ./configure \
+    --prefix=/usr \
+    --enable-password-save \
+    --mandir=/usr/share/man \
+    --enable-iproute2 \
+    --enable-systemd
   make
 
   # Build easy-rsa
@@ -46,22 +40,25 @@ build() {
 }
 
 package() {
-  cd $srcdir/$pkgname-$pkgver
+  cd "${srcdir}"/$pkgname-$pkgver
   # Install openvpn
-  make DESTDIR=$pkgdir install
-  install -d -m755 $pkgdir/etc/openvpn
+  make DESTDIR="${pkgdir}" install
+  install -d -m755 "${pkgdir}"/etc/openvpn
   # Install examples
-  install -d -m755 $pkgdir/usr/share/openvpn
-  cp -r sample/sample-config-files $pkgdir/usr/share/openvpn/examples
-  find $pkgdir/usr/share/openvpn -type f -exec chmod 644 {} \;
-  find $pkgdir/usr/share/openvpn -type d -exec chmod 755 {} \;
+  install -d -m755 "${pkgdir}"/usr/share/openvpn
+  cp -r sample/sample-config-files "${pkgdir}"/usr/share/openvpn/examples
   # Install license
-  install -D -m644 COPYING $pkgdir/usr/share/licenses/$pkgname/COPYING
+  install -d -m755 "${pkgdir}"/usr/share/licenses/${pkgname}/
+  ln -sf /usr/share/doc/${pkgname}/{COPYING,COPYRIGHT.GPL} "${pkgdir}"/usr/share/licenses/${pkgname}/
+
+  # Install contrib
+  install -d -m755 "${pkgdir}"/usr/share/openvpn/contrib
+  cp -r contrib "${pkgdir}"/usr/share/openvpn
+  # Install systemd service
+  install -D -m644 "${srcdir}"/openvpn@.service "${pkgdir}"/usr/lib/systemd/system/openvpn@.service
+
   # Install easy-rsa
   cd $srcdir/easy-rsa-2.2.0_master
   make install DESTDIR=$pkgdir
   rm -f ${pkgdir}/usr/share/ope
-
-  # install systemd units
-  install -Dm644 "$srcdir/openvpn@.service" "$pkgdir/usr/lib/systemd/system/openvpn@.service"
 }
