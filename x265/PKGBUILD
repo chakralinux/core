@@ -1,0 +1,25 @@
+# Maintainer: Giuseppe Calà <jiveaxe@gmail.com>
+
+pkgname=x265
+pkgver=1.4
+pkgrel=1
+pkgdesc='Open Source H265/HEVC video encoder'
+arch=('i686' 'x86_64')
+license=('GPL')
+depends=('gcc-libs')
+makedepends=('yasm' 'cmake')
+url='https://bitbucket.org/multicoreware/x265'
+source=($url/get/$pkgver.tar.bz2)
+md5sums=('b37bf7bd05b198c9dd9155d60e1f7100')
+
+build() {
+  cd multicoreware-x265-*/build/linux
+  [[ $CARCH == x86_64 ]] && LDFLAGS+=',-z,noexecstack'
+  cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr ../../source
+  make
+}
+
+package() {
+  cd multicoreware-x265-*/build/linux
+  make DESTDIR="$pkgdir" install
+}
