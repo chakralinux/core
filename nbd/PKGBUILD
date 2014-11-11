@@ -2,25 +2,25 @@
 # contributions from Arch: https://www.archlinux.org/packages/community/x86_64/nbd/
 
 pkgname=nbd
-pkgver=3.7
+pkgver=3.8
 pkgrel=1
 pkgdesc="Tools for network block devices, allowing you to use remote block devices over TCP/IP."
 arch=('x86_64')
 url="http://nbd.sourceforge.net"
 license=('GPL')
 source=("http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.xz"
-	'config' 'nbd.service')
+        'config' 'nbd.service')
 backup=('etc/nbd-server/config')
 depends=('glib2')
 install=nbd.install
-md5sums=('09a17fd19596b6908bff8b7db74141fc'
+md5sums=('e9bcdb3e18af815573880ccbaee02646'
          '2c43761cd261c9b002601bb78f7500a3'
          '59a2a7c119919d8f9b384b5a783af62a')
          
 build(){
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr --sysconfdir=/etc --enable-syslog
+  ./configure --prefix=/usr --sysconfdir=/etc --enable-syslog --sbindir=/usr/bin
 
   make
 }
