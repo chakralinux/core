@@ -2,29 +2,30 @@
 #contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/libzip/
 
 pkgname=libzip
-pkgver=0.11.1
-pkgrel=3
+pkgver=0.11.2
+pkgrel=1
 pkgdesc="A C library for reading, creating, and modifying zip archives"
 url="http://www.nih.at/libzip/index.html"
-license=('GPL2')
+license=('BSD')
 arch=('x86_64')
 depends=('zlib')
 options=('!libtool')
-source=("http://www.nih.at/${pkgname}/${pkgname}-${pkgver}.tar.gz"
-        'fix-headers.patch')
-md5sums=('bf50518665f4ebcce623c7dcdc2f422d'
-         '249395bd3a426c4c4e993e9d4753e1dd')
+source=("http://www.nih.at/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('c5437df15e4825d40cdc3ec8b9b7516c')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  patch -p1 -i "${srcdir}/fix-headers.patch"
-  autoreconf -i
+  cd ${pkgname}-${pkgver}
+
   ./configure --prefix=/usr
   make 
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
+
   make DESTDIR=${pkgdir} install
+
+  # preserve old header path for compatibility
+  ln -s /usr/lib/libzip/include/zipconf.h "${pkgdir}/usr/include/zipconf.h"
   install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
