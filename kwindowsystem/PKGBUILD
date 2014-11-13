@@ -1,0 +1,42 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kwindowsystem
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KWindowSystem'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kwindowsystem'
+license=('LGPL')
+depends=("qt5-x11extras>=${KFQtVersion}" 'libxfixes')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
+checkdepends=('cmake' 'xorg-server-xvfb' 'openbox')
+groups=('kf5')
+options=('debug')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
+  make
+}
+
+check() {
+  cd build
+  xvfb-run -s "-screen 0 640x480x24" sh -c "openbox & sleep 1; make test"
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

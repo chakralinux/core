@@ -1,0 +1,43 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kdbusaddons
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Provides API for registering services, KDED modules and applications according to Freedesktop standards.'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kdbusaddons'
+license=('LGPL')
+depends=("qt5-base>=${KFQtVersion}" 'qt5-x11extras')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
+checkdepends=("dbus-core")
+groups=('kf5')
+source=("${KFServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
+  make
+}
+
+check() {
+  cd build
+  eval `dbus-launch --sh-syntax `
+  make test 
+  kill $DBUS_SESSION_BUS_PID
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
