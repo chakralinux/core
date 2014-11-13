@@ -6,12 +6,12 @@ pkgbase=polkit-qt
 pkgname=('polkit-qt4' 'polkit-qt5')
 pkgver=0.112.0
 # we use 0.x since it's not released yet
-pkgrel=0.1
+pkgrel=1
 pkgdesc='A library that allows developers to access PolicyKit API with a nice Qt-style API'
 arch=('i686' 'x86_64')
 url='https://projects.kde.org/projects/kdesupport/polkit-qt-1'
 license=('LGPL')
-makedepends=('cmake' 'automoc4' 'polkit' 'qt4' 'qt5-base')
+makedepends=('cmake' 'automoc4' 'polkit' 'qt' 'qt5-base')
 source=("http://download.kde.org/stable/apps/KDE4.x/admin/${pkgbase}-1-${pkgver}.tar.bz2"
         'systembus-usage.patch')
 md5sums=('bee71b71c12797e6fc498540a06c829b'
@@ -42,10 +42,10 @@ build() {
 }
 
 package_polkit-qt4() {
-  depends=('polkit' 'qt4')
-  replaces=('polkit-qt')
-  provides=('polkit-qt')
-  conflicts=('polkit-qt')
+  depends=('polkit' 'qt')
+  replaces=("polkit-qt<${pkgver}")
+  provides=("polkit-qt=${pkgver}")
+  conflicts=("polkit-qt<${pkgver}")
 
   cd build
   make DESTDIR="${pkgdir}" install
