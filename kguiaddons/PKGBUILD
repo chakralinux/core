@@ -2,18 +2,18 @@
 
 source ../frameworks.conf
 
-pkgname=kconfig
+pkgname=kguiaddons
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='Offers functionality around reading and writing configuration'
+pkgdesc='Higher level user interface components for common tasks'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/kconfig'
+url='https://projects.kde.org/projects/frameworks/kguiaddons'
 license=('LGPL')
-depends=("qt5-base>=${KFQtVersion}")
-makedepends=("extra-cmake-modules>=${KFECMVersion}" "qt5-tools")
-checkdepends=("xorg-server-xvfb")
+depends=("qt5-base>=${KFQtVersion}" "qt5-x11extras")
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
+checkdepends=('xorg-server-xvfb')
 groups=('kf5')
-options=("debug")
+options=('debug')
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
@@ -24,10 +24,9 @@ prepare() {
 build() {
   cd build
   cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_BUILD_TYPE=${KFBuildVersion} \
     -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
     -DLIB_INSTALL_DIR=lib \
-    -DLIBEXEC_INSTALL_DIR=lib \
     -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
   make
 }

@@ -2,16 +2,17 @@
 
 source ../frameworks.conf
 
-pkgname=kdbusaddons
+pkgname=frameworkintegration
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='Provides API for registering services, KDED modules and applications according to Freedesktop standards.'
+pkgdesc='Framework providing components to allow applications to integrate with a KDE Workspace'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/kdbusaddons'
+url='https://projects.kde.org/projects/frameworks/frameworkintegration'
 license=('LGPL')
-depends=("qt5-base>=${KFQtVersion}" 'qt5-x11extras')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
-checkdepends=("dbus-core")
+depends=('kio' 'ttf-oxygen')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake" 'xorg-server-xvfb')
+options=("debug")
 groups=('kf5')
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
@@ -28,9 +29,7 @@ build() {
 
 check() {
   cd build
-  eval `dbus-launch --sh-syntax `
-  make test 
-  kill $DBUS_SESSION_BUS_PID
+  xvfb-run make test
 }
 
 package() {

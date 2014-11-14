@@ -2,17 +2,17 @@
 
 source ../frameworks.conf
 
-pkgname=kdbusaddons
+pkgname=kwidgetsaddons
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='Provides API for registering services, KDED modules and applications according to Freedesktop standards.'
+pkgdesc='Higher level user interface elements for common tasks'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/kdbusaddons'
+url='https://projects.kde.org/projects/frameworks/kwidgetsaddons'
 license=('LGPL')
-depends=("qt5-base>=${KFQtVersion}" 'qt5-x11extras')
+depends=("qt5-base>=${KFQtVersion}")
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
-checkdepends=("dbus-core")
 groups=('kf5')
+options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
@@ -22,15 +22,17 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
   make
 }
 
 check() {
   cd build
-  eval `dbus-launch --sh-syntax `
-  make test 
-  kill $DBUS_SESSION_BUS_PID
+  xvfb-run -s "-screen 0 640x480x24" make test
 }
 
 package() {

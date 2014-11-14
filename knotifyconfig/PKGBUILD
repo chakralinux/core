@@ -1,0 +1,38 @@
+# Maintainer: Andrea Scarpino <andrea@archlinux.org>
+
+source "../frameworks.conf"
+
+pkgname=knotifyconfig
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Configuration system for KNotify'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/knotifyconfig'
+license=('LGPL')
+depends=('kio' 'phonon-qt5')
+makedepends=('extra-cmake-modules')
+checkdepends=('cmake')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

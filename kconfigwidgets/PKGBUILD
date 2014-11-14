@@ -2,17 +2,17 @@
 
 source ../frameworks.conf
 
-pkgname=kdoctools
+pkgname=kconfigwidgets
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='Various tools to work with documentation'
+pkgdesc='Widgets for KConfig'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/kdoctools'
+url='https://projects.kde.org/projects/frameworks/kconfigwidgets'
 license=('LGPL')
-depends=('karchive' 'docbook-xsl')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" "ki18n" "python3")
+depends=('kauth' 'kcodecs' 'kconfig' 'kguiaddons' 'ki18n' 'kwidgetsaddons')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" "kdoctools" "python3")
 groups=('kf5')
-options=('staticlibs' 'debug')
+options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
@@ -25,14 +25,15 @@ build() {
   cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=${KFBuildType} \
     -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
-    -DLIB_INSTALL_DIR=lib
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 
 check() {
   cd build
-  make test
+  xvfb-run -s "-screen 0 640x480x24" make test
 }
 
 package() {

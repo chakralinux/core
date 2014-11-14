@@ -2,16 +2,17 @@
 
 source ../frameworks.conf
 
-pkgname=kdbusaddons
+pkgname=plasma-framework
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='Provides API for registering services, KDED modules and applications according to Freedesktop standards.'
+pkgdesc='Plasma library and runtime components based upon KF5 and Qt5'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/kdbusaddons'
+url='https://projects.kde.org/projects/frameworks/plasma-framework'
 license=('LGPL')
-depends=("qt5-base>=${KFQtVersion}" 'qt5-x11extras')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
-checkdepends=("dbus-core")
+depends=('qt5-quickcontrols' 'kactivities-frameworks')
+makedepends=('extra-cmake-modules' 'qt5-tools' 'kdoctools')
+checkdepends=("xorg-server-xvfb")
+options=("debug")
 groups=('kf5')
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
@@ -28,9 +29,7 @@ build() {
 
 check() {
   cd build
-  eval `dbus-launch --sh-syntax `
-  make test 
-  kill $DBUS_SESSION_BUS_PID
+  xvfb-run -s "-screen 0 640x480x24" make test
 }
 
 package() {

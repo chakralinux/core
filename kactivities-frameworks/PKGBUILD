@@ -1,0 +1,42 @@
+source ../frameworks.conf
+
+pkgname=kactivities-frameworks
+_pkgname=kactivities
+pkgver=${KFVersion}
+pkgrel=1
+arch=('x86_64')
+pkgdesc="Core components for the KDE's Activities"
+url='https://projects.kde.org/projects/kde/kdelibs/kactivities'
+license=('LGPL')
+depends=('kcmutils' 'kdeclarative')
+makedepends=('extra-cmake-modules' 'boost' 'python')
+provides=('kactivities')
+conflicts=('kactivities' 'libkactivities-frameworks')
+options=("debug")
+groups=('kf5')
+source=("$KFServer/${_pkgname}-${pkgver}.tar.xz"
+        "fix_plugin.patch::http://quickgit.kde.org/?p=kactivities.git&a=commitdiff&h=c5fa3e8f692de3d77a0b96f9f70ca625a3ff6542&o=plain")
+sha256sums=( $(getSum ${_pkgname}) 
+            '9c768714b931c2c971f025bcbb980609b012a3964ac5a7cd29dc58fd0412e4c7')
+
+prepare() {
+  mkdir -p build
+  cd ${_pkgname}-${pkgver}
+  patch -Np1 -i ../fix_plugin.patch
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${_pkgname}-${pkgver}
+  make
+}
+
+check() {
+  cd ${srcdir}/build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

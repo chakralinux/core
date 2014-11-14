@@ -1,0 +1,39 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kdesu
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Integration with su for elevated privileges'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kdesu'
+license=('LGPL')
+depends=('kservice' 'kpty')
+makedepends=('extra-cmake-modules' 'python3')
+checkdepends=('cmake')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+check() {
+  cd build
+  make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

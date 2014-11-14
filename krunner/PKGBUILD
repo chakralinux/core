@@ -1,0 +1,36 @@
+source ../frameworks.conf
+
+pkgname=krunner
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Framework for providing different actions given a string query'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/krunner'
+license=('LGPL')
+depends=('plasma-framework' 'threadweaver')
+makedepends=('extra-cmake-modules' 'kdoctools')
+checkdepends=('xorg-server-xvfb')
+groups=('kf5-aids')
+options=("debug")
+source=("${KFServer}/portingAids/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+check() {
+  cd build
+  xvfb-run make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

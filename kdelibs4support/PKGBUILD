@@ -1,0 +1,38 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kdelibs4support
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Porting aid from KDELibs4'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kdelibs4support'
+license=('LGPL')
+depends=('kunitconversion' 'kdesignerplugin' 'kinit' 'kitemmodels' 'kemoticons')
+makedepends=('extra-cmake-modules' 'kdoctools' 'qt5-tools' 'networkmanager')
+checkdeepends=("xorg-server-xvfb")
+groups=('kf5-aids')
+options=("debug")
+source=("${KFServer}/portingAids/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+check() {
+  cd build
+  xvfb-run make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

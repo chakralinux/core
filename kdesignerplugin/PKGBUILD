@@ -2,16 +2,16 @@
 
 source ../frameworks.conf
 
-pkgname=kdbusaddons
+pkgname=kdesignerplugin
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='Provides API for registering services, KDED modules and applications according to Freedesktop standards.'
+pkgdesc='Integration of Frameworks widgets in Qt Designer/Creator'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/kdbusaddons'
+url='https://projects.kde.org/projects/frameworks/kdesignerplugin'
 license=('LGPL')
-depends=("qt5-base>=${KFQtVersion}" 'qt5-x11extras')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
-checkdepends=("dbus-core")
+depends=('kplotting' 'kdewebkit')
+makedepends=('extra-cmake-modules' 'qt5-tools' 'kdoctools')
+checkdepends=('cmake' "xorg-server-xvfb")
 groups=('kf5')
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
@@ -28,9 +28,7 @@ build() {
 
 check() {
   cd build
-  eval `dbus-launch --sh-syntax `
-  make test 
-  kill $DBUS_SESSION_BUS_PID
+  xvfb-run make test
 }
 
 package() {

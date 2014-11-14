@@ -1,0 +1,39 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kcmutils
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Utilities for interacting with KCModules'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kcmutils'
+license=('LGPL')
+depends=('kxmlgui')
+makedepends=('extra-cmake-modules' 'python')
+checkdepends=("cmake" "xorg-server-xvfb")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+check() {
+  cd build
+  xvfb-run make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

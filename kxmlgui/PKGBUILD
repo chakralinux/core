@@ -1,0 +1,39 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kxmlgui
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='User configurable main windows'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kxmlgui'
+license=('LGPL')
+depends=('kglobalaccel' 'ktextwidgets' 'attica-qt5')
+makedepends=('extra-cmake-modules' 'python3')
+checkdepends=('xorg-server-xvfb')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+check() {
+  cd build
+  xvfb-run -s "-screen 0 640x480x24" make test
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

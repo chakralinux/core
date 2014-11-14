@@ -2,17 +2,18 @@
 
 source ../frameworks.conf
 
-pkgname=kdbusaddons
+pkgname=kemoticons
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='Provides API for registering services, KDED modules and applications according to Freedesktop standards.'
+pkgdesc='Support for emoticons and emoticons themes'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/kdbusaddons'
+url='https://projects.kde.org/projects/frameworks/kemoticons'
 license=('LGPL')
-depends=("qt5-base>=${KFQtVersion}" 'qt5-x11extras')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
-checkdepends=("dbus-core")
+depends=('karchive' 'kservice')
+makedepends=('extra-cmake-modules' 'python3')
+checkdepends=('cmake' 'kded')
 groups=('kf5')
+options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
@@ -28,8 +29,8 @@ build() {
 
 check() {
   cd build
-  eval `dbus-launch --sh-syntax `
-  make test 
+  eval `dbus-launch --sh-syntax`
+  xvfb-run -s "-screen 0 640x480x24" sh -c 'kded5 & sleep 3; make test'
   kill $DBUS_SESSION_BUS_PID
 }
 

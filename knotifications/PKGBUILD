@@ -1,0 +1,39 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=knotifications
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Abstraction for system notifications'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/knotifications'
+license=('LGPL')
+depends=('phonon-qt5' 'libdbusmenu-qt5' 'kservice' 'kiconthemes')
+makedepends=('extra-cmake-modules' 'qt5-tools' 'python3')
+checkdepends=('xorg-server-xvfb')
+groups=('kf5')
+options=('debug')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+check() {
+  cd build
+  xvfb-run make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

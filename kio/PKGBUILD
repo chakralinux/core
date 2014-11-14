@@ -1,0 +1,40 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kio
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Resource and network access abstraction'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kio'
+license=('LGPL')
+depends=('solid' 'karchive' 'kjobwidgets' 'kbookmarks' 'libxslt' 'kwallet'
+        'desktop-file-utils' 'krb5' 'acl')
+makedepends=('extra-cmake-modules' 'kdoctools')
+checkdepends=('xorg-server-xvfb' 'openbox')
+groups=('kf5')
+install=kio.install
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+check(){
+  cd build
+  xvfb-run -s "-screen 0 640x480x24" sh -c "openbox & sleep 1; make test"
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

@@ -2,17 +2,18 @@
 
 source ../frameworks.conf
 
-pkgname=kdbusaddons
+pkgname=threadweaver
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='Provides API for registering services, KDED modules and applications according to Freedesktop standards.'
+pkgdesc='High-level multithreading framework'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/kdbusaddons'
+url='https://projects.kde.org/projects/frameworks/threadweaver'
 license=('LGPL')
-depends=("qt5-base>=${KFQtVersion}" 'qt5-x11extras')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
-checkdepends=("dbus-core")
+depends=('qt5-base')
+makedepends=('extra-cmake-modules')
+checkdepends=("cmake")
 groups=('kf5')
+options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
@@ -28,9 +29,7 @@ build() {
 
 check() {
   cd build
-  eval `dbus-launch --sh-syntax `
-  make test 
-  kill $DBUS_SESSION_BUS_PID
+  make test
 }
 
 package() {
