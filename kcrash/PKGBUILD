@@ -5,12 +5,12 @@ source ../frameworks.conf
 pkgname=kcrash
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='KCrash'
+pkgdesc='Support for application crash analysis and bug report from apps'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kcrash'
 license=('LGPL')
 depends=('kcoreaddons' 'kwindowsystem')
-makedepends=('extra-cmake-modules')
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
 groups=('kf5')
 options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
@@ -22,12 +22,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${KFBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib \
-    -DLIBEXEC_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 

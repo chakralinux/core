@@ -5,16 +5,16 @@ source ../frameworks.conf
 pkgname=attica-qt5
 _pkgname=attica
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='https://projects.kde.org/projects/kdesupport/${_pkgname}'
 pkgdesc='A Qt5 library that implements the Open Collaboration Services API'
 license=('LGPL')
-depends=('qt5-base')
-makedepends=('extra-cmake-modules')
+depends=("qt5-base>=${KFQtVersion}")
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
 checkdepends=("cmake")
 options=("debug")
-source=("${KFServer}/${pkgver}/${_pkgname}-${pkgver}.tar.xz")
+source=("${KFServer}/${_pkgname}-${pkgver}.tar.xz")
 replaces=("kf5-attica")
 provides=("kf5-attica")
 conflicts=("kf5-attica")
@@ -26,11 +26,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${_pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${KFBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
+  cmake_kf5 ../${_pkgname}-${pkgver}
   make
 }
 

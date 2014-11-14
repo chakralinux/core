@@ -4,16 +4,16 @@ source ../frameworks.conf
 
 pkgname=ki18n
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='A get-text based translation framework'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/ki18n'
 license=('LGPL')
 depends=("qt5-script>=${KFQtVersion}")
-makedepends=("extra-cmake-modules>=${KFECMVersion}")
+makedepends=("extra-cmake-modules>=${KFECMVersion}" "python3")
 groups=('kf5')
 options=("debug")
-source=("$KFServer/${KFVersion}/${pkgname}-${pkgver}.tar.xz")
+source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
@@ -22,11 +22,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${KFBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+  cmake_kf5 ../${pkgname}-${pkgver} \
     -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }

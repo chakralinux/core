@@ -10,7 +10,7 @@ arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kservice'
 license=('LGPL')
 depends=('ki18n' 'kconfig' 'kcrash' 'kdbusaddons')
-makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools' 'python3')
 checkdepends=('xorg-server-xvfb' 'kded')
 groups=('kf5')
 options=("debug")
@@ -23,13 +23,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${KFBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
-    -DSYSCONF_INSTALL_DIR=/etc
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 

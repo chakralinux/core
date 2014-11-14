@@ -9,7 +9,7 @@ pkgdesc="Core components for the KDE's Activities"
 url='https://projects.kde.org/projects/kde/kdelibs/kactivities'
 license=('LGPL')
 depends=('kcmutils' 'kdeclarative')
-makedepends=('extra-cmake-modules' 'boost' 'python')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'boost' 'python3')
 provides=('kactivities')
 conflicts=('kactivities' 'libkactivities-frameworks')
 options=("debug")
@@ -27,7 +27,8 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${_pkgname}-${pkgver}
+  cmake_kf5 ../${_pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 
