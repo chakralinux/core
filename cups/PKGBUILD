@@ -2,12 +2,12 @@
 
 pkgbase="cups"
 pkgname=('libcups' 'cups')
-pkgver=2.0.0
+pkgver=2.0.1
 pkgrel=1
 arch=('x86_64')
 license=('GPL')
 url="http://www.cups.org/"
-makedepends=('libtiff>=4.0.0' 'libpng>=1.5.7' 'acl' 'pam' 'xdg-utils' 'krb5' 'gnutls>=2.8.3'
+makedepends=('libtiff>=4.0.0' 'libpng>=1.5.7' 'acl' 'pam' 'xdg-utils' 'krb5' 'gnutls'
              'cups-filters' 'bc' 'colord' 'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus-core'
              'avahi'  'hicolor-icon-theme' 'systemd' 'inetutils' 'libpaper' 'valgrind')
 source=(http://www.cups.org/software/${pkgver}/cups-${pkgver}-source.tar.bz2{,.sig}
@@ -18,7 +18,7 @@ source=(http://www.cups.org/software/${pkgver}/cups-${pkgver}-source.tar.bz2{,.s
         cups-no-gzip-man.patch
         cups-1.6.2-statedir.patch
         cups-1.6.0-fix-install-perms.patch)
-md5sums=('2cdd81fea23e9e29555c24bdfd0d7c89'
+md5sums=('7f7c33071035fb20d0879929a42da711'
          'SKIP'
          'fc8286f185e2cc5f7e1f6843bf193e2b'
          '96f82c38f3f540b53f3e5144900acf17'
@@ -34,9 +34,9 @@ prepare() {
   
   # improve build and linking
   # Do not export SSL libs in cups-config
-  patch -Np1 -i "${srcdir}/cups-no-export-ssllibs.patch"
+  patch -Np1 -i ${srcdir}/cups-no-export-ssllibs.patch
   # https://www.cups.org/str.php?L4399
-  patch -Np1 -i "${srcdir}/cups-no-gcrypt.patch"
+  patch -Np1 -i ${srcdir}/cups-no-gcrypt.patch
   # don't zip man pages in make install, let makepkg do that / Fedora
   patch -Np1 -i ${srcdir}/cups-no-gzip-man.patch
   # move /var/run -> /run for pid file
@@ -111,8 +111,7 @@ backup=(etc/cups/cupsd.conf
         etc/cups/subscriptions.conf
         etc/dbus-1/system.d/cups.conf
         etc/logrotate.d/cups
-        etc/pam.d/cups
-        etc/xinetd.d/cups-lpd)
+        etc/pam.d/cups)
 depends=('acl' 'pam' "libcups>=${pkgver}" 'cups-filters' 'bc' 'colord'
          'dbus-core' 'systemd' 'libpaper' 'hicolor-icon-theme')
 optdepends=('xdg-utils: xdg .desktop file support')
