@@ -5,31 +5,32 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=gawk
-pkgver=4.0.1
+pkgver=4.1.1
 pkgrel=1
 pkgdesc="The GNU awk utility interprets a special-purpose programming language that makes it possible to handle simple data-reformatting jobs with just a few lines of code."
 arch=('i686' 'x86_64')
-url="http://www.gnu.org/software/gawk/gawk.html"
+url="http://www.gnu.org/software/gawk/"
 license=('GPL')
 groups=('base')
+depends=('sh' 'glibc' 'mpfr')
 provides=('awk')
-install="gawk.install"
-source=("ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-depends=('sh' 'glibc')
-makedepends=('gzip')
-md5sums=('bab2bda483e9f32be65b43b8dab39fa5')
+install=gawk.install
+source=(ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz{,.sig})
+md5sums=('45f5b09aa87b4744c4c53bf274e96ed0'
+         'SKIP')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr --libexecdir=/usr/lib --without-libsigsegv
+  make 
+}
 
-  ./configure --prefix=/usr
-
-  make
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make install DESTDIR="${pkgdir}"
+  cd ${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
 }
-
-# vim:set ts=2 sw=2 et:
