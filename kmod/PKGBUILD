@@ -1,20 +1,19 @@
 # Maintainer: <inkane[at]chakra-project[dot]org>
 
 pkgname=kmod
-pkgver=18
-pkgrel=2
+pkgver=19
+pkgrel=1
 pkgdesc="Linux kernel module handling"
 arch=('x86_64')
 url='http://git.kernel.org/?p=utils/kernel/kmod/kmod.git;a=summary'
 license=('GPL2')
-depends=('glibc' 'zlib')
-options=('!libtool')
+depends=('glibc' 'zlib' 'xz')
 provides=('module-init-tools=3.16')
 conflicts=('module-init-tools')
 replaces=('module-init-tools')
 source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/$pkgname/$pkgname-$pkgver.tar.xz"
         "depmod-search.conf")
-sha1sums=('6cadc3b088fa5874f712d3bbe4df75ece59c4b77'
+sha1sums=('f59f7dabe32cbf007bcc30731821d5f3ac9a5706'
           '489b0ce0efd193aab70421a852526ed04dd026c4')
 
 build() {
@@ -29,7 +28,7 @@ build() {
 }
 
 check() {
-  make -C "$pkgname-$pkgver" check 
+  make -C "$pkgname-$pkgver" check
 }
 
 package() {

@@ -1,13 +1,14 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=216
-pkgrel=4
+pkgver=217
+pkgrel=1
+_fedora_patch=ea19761321f4e7f5e2cbdd66fe38388c93790c20
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
-depends=('acl' 'bash' 'glibc' 'glib2' 'hwids' 'util-linux' 'kbd' 'kmod' 'libcap' 'libxslt'
-         'linux-api-headers' 'pam' 'xz' 'libgcrypt' 'dbus-core' 'libidn' 'quota-tools' 'elfutils' 'curl') 
+depends=('acl' 'bash' 'glibc' 'glib2' 'hwids' 'util-linux' 'kbd' 'kmod>=19' 'libcap' 'libxslt'
+         'linux-api-headers' 'lz4' 'pam' 'xz' 'libgcrypt' 'dbus-core' 'libidn' 'quota-tools' 'elfutils' 'curl') 
 makedepends=('docbook-xsl' 'cryptsetup' 'gobject-introspection' 'python2' 'python2-lxml' 'gperf' 'intltool' 'libmicrohttpd')
 optdepends=('python: systemd library bindings'
             'cryptsetup: required for encrypted block devices'
@@ -35,18 +36,69 @@ conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
 replaces=('udev')
 install="systemd.install"
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
+        "git://pkgs.fedoraproject.org/systemd.git#commit=${_fedora_patch}"
         'initcpio-hook-udev'
-        'initcpio-install-udev'
         'initcpio-install-systemd'
+        'initcpio-install-udev'
         '99-default.preset')
-md5sums=('04fda588a04f549da0f397dce3ae6a39'
+md5sums=('e68dbff3cc19f66e341572d9fb2ffa89'
+         'SKIP'
          '7a79eb3e4ce19906cfebfea75fb9f8bb'
-         'bde43090d4ac0ef048e3eaee8202a407'
          'a736284f0c8e549dd988522e75628ec0'
+         'bde43090d4ac0ef048e3eaee8202a407'
          'a1bf25da736d3719e9720b2e4caea341')
 
-build() {
+prepare() {
+  cd "$pkgname-$pkgver"
   
+  git init
+  git config user.email "chakra-devel@googlegroups.com"
+  git config user.name "Chakra Packager"
+  git add .
+  git commit -a -q -m "${pkgver}} baseline."
+
+  git am \
+        --exclude .gitignore \
+        --exclude docs/.gitignore \
+        --exclude docs/gudev/.gitignore \
+        --exclude docs/libudev/.gitignore \
+        --exclude docs/sysvinit/.gitignore \
+        --exclude docs/var-log/.gitignore \
+        --exclude hwdb/.gitignore \
+        --exclude m4/.gitignore \
+        --exclude man/.gitignore \
+        --exclude po/.gitignore \
+        --exclude rules/.gitignore \
+        --exclude src/.gitignore \
+        --exclude src/analyze/.gitignore \
+        --exclude src/core/.gitignore \
+        --exclude src/gudev/.gitignore \
+        --exclude src/hostname/.gitignore \
+        --exclude src/journal/.gitignore \
+        --exclude src/libsystemd-daemon/.gitignore \
+        --exclude src/libsystemd-id128/.gitignore \
+        --exclude src/libudev/.gitignore \
+        --exclude src/locale/.gitignore \
+        --exclude src/login/.gitignore \
+        --exclude src/python-systemd/.gitignore \
+        --exclude src/python-systemd/docs/.gitignore \
+        --exclude src/timedate/.gitignore \
+        --exclude src/udev/.gitignore \
+        --exclude src/udev/scsi_id/.gitignore \
+        --exclude sysctl.d/.gitignore \
+        --exclude test/.gitignore \
+        --exclude units/.gitignore \
+        --exclude units/user/.gitignore \
+        --exclude src/libsystemd/sd-bus/PORTING-DBUS1 \
+        --exclude CODING_STYLE \
+        --exclude src/readahead/Makefile \
+        --exclude src/libsystemd-terminal/unifont-def.h \
+        ../systemd/00*-*.patch
+
+  autoreconf -i
+}
+
+build() {
   cd "$pkgname-$pkgver"
 
   ./configure \
@@ -56,9 +108,9 @@ build() {
       --localstatedir=/var \
       --sysconfdir=/etc \
       --enable-introspection \
-      --enable-compat-libs \
-      --enable-split-usr \
       --disable-gtk-doc \
+      --enable-lz4 \
+      --enable-compat-libs \
       --disable-audit \
       --disable-ima \
       --disable-kdbus \
@@ -70,8 +122,6 @@ build() {
 
 package() {
   make -C "$pkgname-$pkgver" DESTDIR="$pkgdir" install
-
-  printf "d /run/console 0755 root root\n" > "$pkgdir/usr/lib/tmpfiles.d/console.conf"
 
   install -dm755 "$pkgdir/usr/bin"
   ln -s ../../usr/lib/systemd/systemd "$pkgdir/usr/bin/systemd"
