@@ -1,42 +1,38 @@
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer : AlmAck
 
 pkgname=chakra-signatures
-pkgver=2011.09
+pkgver=2014.11
 pkgrel=1
 pkgdesc='Chakra Package Signatures'
 arch=('any')
 license=('GPL')
-url='http://www.chakra-project.org'
+url='http://www.chakraos.org'
 groups=('base')
-options=('sign')
 makedepends=('gnupg')
 
 package() {
 	cd ${pkgdir}
 	mkdir -p ${pkgdir}/usr/share/chakra/signatures
         cd ${pkgdir}/usr/share/chakra/signatures
-	# Phils key
-	gpg --recv-keys --keyserver keys.gnupg.net 0x58737A21
-	gpg --armor --export philm@chakra-project.org > philm.asc
-	# Manus key
-	gpg --recv-keys --keyserver keys.gnupg.net 0x90BFE697
-	gpg --armor --export manutortosa@chakra-project.org > manutortosa.asc
-	# Anke's key
-	gpg --recv-keys --keyserver keys.gnupg.net 0xA48944B0
-	gpg --armor --export abveritas@chakra-project.org > abveritas.asc
 	# Giuseppe's key
 	gpg --recv-keys --keyserver keys.gnupg.net 0x26C56140
 	gpg --armor --export jiveaxe@gmail.com > gcala.asc
-	# Adrián's key
-	gpg --recv-keys --keyserver keys.gnupg.net 0x67EA8C30
-	gpg --armor --export adriyetichaves@gmail.com > gallaecio.asc
+	# Weng Xuetian's key
+	gpg --recv-keys --keyserver keys.gnupg.net 0xBF2412F9
+	gpg --armor --export wengxt@gmail.com > csslayer.asc
 	# Neo's key
 	gpg --recv-keys --keyserver keys.gnupg.net 0x02238B03
 	gpg --armor --export tetris4@gmail.com > tetris4.asc
-	# Daniele's key
-	gpg --recv-keys --keyserver keys.gnupg.net 0x83E9564F
-	gpg --armor --export jmc@chakra-project.org > jmc.asc
+        # Luca's key
+        gpg --recv-keys --keyserver keys.gnupg.net 0x3EAE5303
+        gpg --armor --export gluca86@gmail.com > almack.asc
+        # Ryan's key
+        gpg --recv-keys --keyserver keys.gnupg.net 0xD417608D
+        gpg --armor --export ryan@rshipp.com > george2.asc
+        # Jeff's key
+        gpg --recv-keys --keyserver keys.gnupg.net 0xB6611E8A
+        gpg --armor --export s8321414@gmail.com > s8321414.asc
+
 }
