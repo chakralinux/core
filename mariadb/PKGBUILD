@@ -6,29 +6,31 @@
 
 pkgbase=mariadb
 pkgname=('libmariadbclient' 'mariadb-clients' 'mariadb')
-pkgver=5.5.30
-pkgrel=2
+pkgver=5.5.40
+pkgrel=1
 arch=('x86_64')
 license=('GPL')
 url="http://mariadb.org/"
-source=("http://mirrors.supportex.net/${pkgbase}/${pkgbase}-${pkgver}/kvm-tarbake-jaunty-x86/${pkgbase}-${pkgver}.tar.gz"
+makedepends=('cmake' 'openssl' 'zlib' 'libaio' 'libxml2' 'pcre' 'jemalloc')
+source=("https://downloads.mariadb.org/interstitial/mariadb-$pkgver/source/mariadb-$pkgver.tar.gz"
         'mariadb.service'
         'mariadb.tmpfiles')
-sha256sums=('64dba5f1819f1d4ebf7ed31d74e4106c981a24b88259995deba3734fb7c4635f'
+sha256sums=('cbde17f4a31483143490def6fcce33310ebae49eafe92dc4ada0e7227202415a'
             'ef3524c227ce0219e511fd4f3e17ec869fcde7ebf653d21e53bbf4d543cfcc20'
             '51ac45bce09f408d305dd770d75c7893e9f7612d9cf223a30aa22967dd7738de')
 
+prepare() {
+  sed -i 's/_SVID_SOURCE/_DEFAULT_SOURCE/' \
+    $pkgbase-$pkgver/storage/tokudb/ft-index/cmake_modules/TokuSetupCompiler.cmake
+}
+
 build() {
-  cd "${srcdir}"
+  [ -d build ] && rm -r build
   mkdir build
   cd build
 
-  # CFLAGS/CXXFLAGS as suggested upstream
-  CFLAGS="-fPIC ${CFLAGS} -fno-strict-aliasing -DBIG_JOINS=1 -fomit-frame-pointer" \
-  CXXFLAGS="-fPIC ${CXXFLAGS} -fno-strict-aliasing -DBIG_JOINS=1 -felide-constructors -fno-rtti" \
-
   cmake ../${pkgbase}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_CONFIG=mysql_release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DSYSCONFDIR=/etc/mysql \
     -DMYSQL_DATADIR=/var/lib/mysql \
@@ -49,24 +51,30 @@ build() {
     -DWITH_READLINE=ON \
     -DWITH_ZLIB=system \
     -DWITH_SSL=system \
+    -DWITH_PCRE=system \
     -DWITH_LIBWRAP=OFF \
-    -DWITH_MYSQLD_LDFLAGS="${LDFLAGS}" \
+    -DWITH_JEMALLOC=ON \
+    -DCMAKE_EXE_LINKER_FLAGS='-ljemalloc' \
     -DWITH_EXTRA_CHARSETS=complex \
     -DWITH_EMBEDDED_SERVER=ON \
     -DWITH_INNOBASE_STORAGE_ENGINE=1 \
     -DWITH_PARTITION_STORAGE_ENGINE=1 \
     -DWITH_PBXT_STORAGE_ENGINE=1 \
+    -DWITH_TOKUDB_STORAGE_ENGINE=1 \
     -DWITHOUT_EXAMPLE_STORAGE_ENGINE=1 \
     -DWITHOUT_ARCHIVE_STORAGE_ENGINE=1 \
     -DWITHOUT_BLACKHOLE_STORAGE_ENGINE=1 \
-    -DWITHOUT_FEDERATED_STORAGE_ENGINE=1
+    -DWITHOUT_FEDERATED_STORAGE_ENGINE=1\
+    -DCMAKE_C_FLAGS="-fPIC $CFLAGS -fno-strict-aliasing -DBIG_JOINS=1 -fomit-frame-pointer" \
+    -DCMAKE_CXX_FLAGS="-fPIC $CXXFLAGS -fno-strict-aliasing -DBIG_JOINS=1 -felide-constructors -fno-rtti" \
+    -DWITH_MYSQLD_LDFLAGS="$LDFLAGS"
 
   make
 }
 
 package_libmariadbclient(){
   pkgdesc="MariaDB client libraries"
-  depends=('openssl')
+  depends=('openssl' 'libaio' 'zlib' 'pcre')
   conflicts=('libmysqlclient')
   provides=("libmysqlclient=${pkgver}")
   
@@ -85,7 +93,7 @@ package_libmariadbclient(){
 
 package_mariadb-clients() {
   pkgdesc="MariaDB client tools"
-  depends=('libmariadbclient')
+  depends=('libmariadbclient' 'zlib' 'openssl' 'jemalloc')
   conflicts=('mysql-clients')
   provides=("mysql-clients=${pkgver}")
   
@@ -106,7 +114,7 @@ package_mariadb() {
   pkgdesc="A fast SQL database server, drop-in replacement for MySQL"
   backup=('etc/mysql/my.cnf')
   install=mariadb.install
-  depends=('mariadb-clients')
+  depends=('mariadb-clients' 'libaio' 'jemalloc')
   conflicts=('mysql')
   provides=("mysql=${pkgver}" 'akonadi-backend')
   optdepends=('perl-dbi' 'perl-dbd-mysql')
