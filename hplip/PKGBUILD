@@ -1,7 +1,6 @@
-# maintainer abveritas@chakra-project.org
 
 pkgname=hplip
-pkgver=3.13.9
+pkgver=3.14.10
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('x86_64')
@@ -14,24 +13,17 @@ optdepends=('cups: for printing support'
             'dbus-python: for dbus support'
             'sane: for scanner support'
             'rpcbind: for network support'
-            'pyqt: for running hp-toolbox'
-            'python2-gobject: for running hp-toolbox')
-options=('!libtool')
+            'python2-pyqt4: for running hp-toolbox'
+            'python2-gobject2: for running hp-toolbox')
 install=hplip.install
 source=(http://downloads.sourceforge.net/${pkgname}/$pkgname-$pkgver.tar.gz{,.asc}
-        hp-mkuri.patch)
-md5sums=('8fcbbd0d3a0b76550f325bd6cf46d9d9'
+        disable_upgrade.patch)
+md5sums=('7af44ee1c4312b00d2269c1b25008f73'
          'SKIP'
-         '296be786517ce997410380f1c3a6d525')
+         '4ebb9377a989b4fb776e37f5968bb7b0')
 
 build() {
  cd "$srcdir/$pkgname-$pkgver"
-
- # fix build with cups 1.6 - FC hplip-ipp-accessors.patch
- #patch -p1 -i "${srcdir}/cups-1.6-buildfix.diff"
- 
- # fix linking libnotify, FS#34283
- patch -Np0 -i ${srcdir}/hp-mkuri.patch
  
  export PYTHON=python2
  
@@ -43,16 +35,20 @@ build() {
  sed -i 's|python ./setup.py|python2 ./setup.py|' ui4/devmgr5.py ui4/nodevicesdialog.py 
  sed -i 's|python %HOME%|python2 %HOME%|' base/utils.py
  sed -i 's|python ./plugin.py|python2 ./plugin.py|' base/pkit.py
+ sed -i 's|/usr/bin/python|/usr/bin/python2|' data/rules/hplip-printer@.service
+ 
+ # disable insecure update
+ patch -Np0 -i ${srcdir}/disable_upgrade.patch
  
  # Use system foomatic-rip for hpijs driver instead of foomatic-rip-hplip
  # The hpcups driver does not use foomatic-rip
-	local i
-	for i in ppd/hpijs/*.ppd.gz ; do
-		rm -f ${i}.temp
-		gunzip -c ${i} | sed 's/foomatic-rip-hplip/foomatic-rip/g' | \
-			gzip > ${i}.temp || return 1
-		mv ${i}.temp ${i}
-	done
+ local i
+ for i in ppd/hpijs/*.ppd.gz ; do
+         rm -f ${i}.temp
+         gunzip -c ${i} | sed 's/foomatic-rip-hplip/foomatic-rip/g' | \
+                 gzip > ${i}.temp || return 1
+         mv ${i}.temp ${i}
+ done
    
  export AUTOMAKE='automake --foreign'
  autoreconf --force --install
@@ -82,9 +78,6 @@ package() {
   
   # remove HAL .fdi file because HAL is no longer used
   rm -rf "$pkgdir"/usr/share/hal
- 
-  # log dir should not be world writeable
-  chmod 775 "$pkgdir"/var/log/hp{,/tmp}
  
   # remove rc script
   rm -rf "$pkgdir"/etc/init.d
