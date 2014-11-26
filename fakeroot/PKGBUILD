@@ -1,29 +1,24 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer (x86_64): AlmAck <gluca86[at]google[dot]org>
 
 pkgname=fakeroot
-pkgver=1.18.4
+pkgver=1.20.2
 pkgrel=1
 pkgdesc="Gives a fake root environment, useful for building packages as a non-privileged user."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL')
 url="http://packages.debian.org/fakeroot"
 groups=('base-devel')
 install="fakeroot.install"
 depends=('glibc' 'filesystem' 'util-linux' 'sed' 'sh')
-options=('!libtool')
 source=("http://ftp.debian.org/debian/pool/main/f/${pkgname}/${pkgname}_${pkgver}.orig.tar.bz2")
-md5sums=('706171d8d520b1ca1576ac73f2ceb4f3')
+md5sums=('a4b4564a75024aa96c86e4d1017ac786')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   ./configure --prefix=/usr \
               --libdir=/usr/lib/libfakeroot \
-	            --disable-static \
+              --disable-static \
               --with-ipc=sysv
 	# --with-ipc=tcp is currently broken and no option on smp systems
 
@@ -34,11 +29,11 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
   
-  install -d -m755 "${pkgdir}/etc/ld.so.conf.d"
+  install -dm755 "${pkgdir}/etc/ld.so.conf.d"
   echo '/usr/lib/libfakeroot' > "${pkgdir}/etc/ld.so.conf.d/fakeroot.conf"
   
   # install README for sysv/tcp usage
-  install -D -m644 "${srcdir}/${pkgname}-${pkgver}/README" "${pkgdir}/usr/share/doc/${pkgname}/README"
+  install -Dm644 README "${pkgdir}/usr/share/doc/${pkgname}/README"
 }
 
 # vim:set ts=2 sw=2 et:
