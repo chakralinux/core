@@ -1,53 +1,57 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=mono
-pkgver=2.10.8
+pkgver=3.10.0
 pkgrel=1
 pkgdesc="Free implementation of the .NET platform including runtime and compiler"
-arch=('x86_64')
-license=('GPL' 'LGPL2' 'MPL' 'custom:MITX11')
+arch=(i686 x86_64)
+license=('GPL' 'LGPL2.1' 'MPL' 'custom:MITX11')
 url="http://www.mono-project.com/"
-depends=('zlib' 'libgdiplus>=2.10' 'sh')
-makedepends=('pkgconfig')
-options=('!libtool' '!makeflags')
+depends=('zlib' 'libgdiplus>=3.8' 'sh' 'python')
+options=('!makeflags')
 provides=('monodoc')
 conflicts=('monodoc')
-source=("http://download.mono-project.com/sources/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
-        'mono.binfmt.d')
-md5sums=('c012b01ac17bedb0af52b7a16405da84'
-         '568c72e1b42f089a9fec20dfe4bcc3b4')
+source=(http://download.mono-project.com/sources/mono/${pkgname}-${pkgver}.tar.bz2
+        mono.binfmt.d)
+sha1sums=('74e43604ea48e941c39a43ebc153abee4ddba56c'
+          '3c81ade946e6e3afab9f2e4eddc83023e01bfb85')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd "${srcdir}"/${pkgname}-${pkgver}
+
   # build mono
-  ./configure --prefix=/usr --sysconfdir=/etc \
-              --with-libgdiplus=installed 
-  make 
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --bindir=/usr/bin \
+    --sbindir=/usr/bin \
+    --disable-quiet-build \
+    --disable-system-aot \
+    --disable-static \
+    --with-mcs-docs=no
+  make
 
   # build jay
-  cd ${srcdir}/${pkgname}-${pkgver}/mcs/jay
-  make 
+  cd "${srcdir}"/${pkgname}-${pkgver}/mcs/jay
+  make
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install 
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
 
   # install jay
-  cd ${srcdir}/${pkgname}-${pkgver}/mcs/jay
-  make DESTDIR=${pkgdir} prefix=/usr INSTALL=../../install-sh install
-  cd ${srcdir}/${pkgname}-${pkgver}
+  pushd "${srcdir}"/${pkgname}-${pkgver}/mcs/jay
+  make DESTDIR="${pkgdir}" prefix=/usr INSTALL=../../install-sh install
+  popd
 
-  # install binfmt conf file
+  # install binfmt conf file and pathes
   install -D -m644 "${srcdir}"/mono.binfmt.d "${pkgdir}"/usr/lib/binfmt.d/mono.conf
 
   #install license
-  mkdir -p ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m644 mcs/MIT.X11 ${pkgdir}/usr/share/licenses/${pkgname}/
-  
-  #fix .pc file to be able to request mono on what it depends
-  sed -i -e "s:#Requires:Requires:" ${pkgdir}/usr/lib/pkgconfig/mono.pc
+  mkdir -p "${pkgdir}"/usr/share/licenses/${pkgname}
+  install -m644 mcs/MIT.X11 "${pkgdir}"/usr/share/licenses/${pkgname}/
+
+  #fix .pc file to be able to request mono on what it depends, fixes #go-oo build
+  sed -i -e "s:#Requires:Requires:" "${pkgdir}"/usr/lib/pkgconfig/mono.pc
 }
