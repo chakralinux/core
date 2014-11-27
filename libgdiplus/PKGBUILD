@@ -1,34 +1,19 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dot]org>
-
 pkgname=libgdiplus
-pkgver=2.10.9
-pkgrel=2
+pkgver=3.8
+pkgrel=1
 pkgdesc="An Open Source Implementation of the GDI+ API"
-arch=('x86_64')
+arch=(i686 x86_64)
 license=('MPL' 'LGPL')
 url="http://www.mono-project.com"
 depends=('libtiff' 'cairo' 'giflib' 'glib2' 'libexif')
-makedepends=('pkgconfig')
-source=("http://download.mono-project.com/sources/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
-        libpng15.patch
-        libgdiplus0-giflib5.patch
-        libgdiplus-2.10.9-gold.patch
-        libgdiplus-2.10.9-freetype25.patch)
-md5sums=('b4615c14584b5d73cbb9757c28887654'
-         'a2d143676bbaceeb88b4c34069e93986'
-         'ad97558c721106eea03c7808b501814b'
-         '95fb92750c131ce9287419c3ac5fcb76'
-         '6ee484dde02ea89aded1287c0a8d4bad')
+source=(http://download.mono-project.com/sources/${pkgname}/${pkgname}-${pkgver}.tar.gz
+	libgdiplus0-giflib5.patch)
+sha1sums=('9ac5b9a650d8dd4d3bb98b7d70c6ef4e768c35d8'
+          '3ad5abc3f434a5dc42071edfb0d646c588cda851')
 
 prepare() {
   cd ${pkgname}-${pkgver}
-  patch -Np0 -i ../libpng15.patch
   patch -Np1 -i ../libgdiplus0-giflib5.patch
-  patch -Np1 -i ../libgdiplus-2.10.9-gold.patch
-  patch -Np1 -i ../libgdiplus-2.10.9-freetype25.patch
 
   sed -i -e 's/-L\${libjpeg_prefix}\/lib -ljpeg/-ljpeg/' configure
 }
