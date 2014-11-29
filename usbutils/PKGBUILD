@@ -4,21 +4,20 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=usbutils
-pkgver=005
-pkgrel=2
+pkgver=008
+pkgrel=1
 pkgdesc="USB Device Utilities"
 arch=(i686 x86_64)
 license=('GPL')
 groups=('base')
 depends=('libusb' 'hwids')
 optdepends=('python2: for lsusb.py usage'
-            'coreutils: for lsusb.py usage'
-            'wget: for update-usbids.sh usage')
+            'coreutils: for lsusb.py usage')
 url="http://linux-usb.sourceforge.net/"
-source=("http://chakra-linux.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
+source=("http://www.kernel.org/pub/linux/utils/usb/usbutils/${pkgname}-${pkgver}.tar.xz"
         fix-python2.patch)
-md5sums=('6a21f7b6c02b76df5e8a7c208d746654'
-         '45766196895b4cc50b53cd56e1bbf3d1')
+sha1sums=('233dee6cd6829476be778554984045663b568b18'
+          '4d674f1ca826169c82bf2e433a4d0fe46c55ea27')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
@@ -34,4 +33,5 @@ package() {
   # this is now in the hwids package
   rm -rf $pkgdir/usr/{share/hwdata,sbin}
 }
+
 
