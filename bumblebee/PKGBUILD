@@ -4,24 +4,21 @@
 
 pkgname=bumblebee
 pkgver=3.2.1
-pkgrel=5
-pkgdesc="Bumblebee brings Optimus Support for Linux Through VirtualGL. You need to install proper drivers separately. Can be used with Nouveau or Nvidia"
+pkgrel=6
+pkgdesc="Bumblebee brings Optimus Support for Linux Through VirtualGL."
 arch=('x86_64')
-depends=('virtualgl' 'glib2')
+depends=('virtualgl' 'glib2' 'mesa-libgl')
 makedepends=('help2man')
-optdepends=('xf86-video-nouveau: Nouveau driver' 
-            'nouveau-dri: 3D acceleration features fo Nouveau'
-            'mesa: 3D acceleration features fo Nouveau'
-            'bbswitch: switch on/off discrete card' 'nvidia-utils-bumblebee: Nvidia utils not breaking LibGL'
-            'nvidia: Nvidia kernel driver'
-            'lib32-virtualgl: run 32bit applications with optirun'
-            'primus: alternative back-end for optirun'
-            'lib32-primus: alternative back-end for optirun' )
+optdepends=('bbswitch: switch on/off discrete card' 
+            'nvidia: NVIDIA kernel driver'
+            'nvidia-340xx: NVIDIA kernel driver for older devices'
+            'nvidia-304xx: NVIDIA kernel driver for even older devices'
+            'primus: faster back-end for optirun')
 url="http://www.Bumblebee-Project.org"
 license=("GPL3")
 install='bumblebee.install'
-conflicts=('nvidia-libgl')
-provides=('nvidia-libgl')
+conflicts=('nvidia-libgl' 'nvidia-340xx-libgl')
+provides=('nvidia-libgl' 'nvidia-340xx-libgl')
 backup=('etc/bumblebee/bumblebee.conf'
         'etc/bumblebee/xorg.conf.nouveau'
         'etc/bumblebee/xorg.conf.nvidia')
