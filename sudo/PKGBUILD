@@ -4,44 +4,62 @@
 # maintainer abveritas@chakra-project.org
 
 pkgname=sudo
-pkgver="1.8.7"
+_sudover=1.8.11p2
+pkgver=${_sudover/p/.p}
 pkgrel=1
 pkgdesc="Give certain users the ability to run some commands as root."
 arch=('i686' 'x86_64')
 url="http://www.sudo.ws/sudo/"
 license=('custom')
-depends=('glibc' 'pam')
+depends=('glibc' 'pam' 'libldap')
 backup=('etc/sudoers' 'etc/pam.d/sudo')
-options=('!libtool' '!makeflags')
-source=("ftp://ftp.sudo.ws/pub/sudo/${pkgname}-${pkgver}.tar.gz"
+source=("ftp://ftp.sudo.ws/pub/sudo/${pkgname}-${_sudover}.tar.gz"
+        sudo.tmpfiles.conf
         'sudo.pam')
-md5sums=('a02367090e1dac8d0c1747de1127b6bf'
-         '4e7ad4ec8f2fe6a40e12bcb2c0b256e3')
+sha1sums=('1fb7cff2b7ed67ba98b1518f6cb0dd80dbcc2c48'
+          'b2a8594916f6920568cf6d7eada5684109cf5510'
+          '2388e362dc31cc3d7270fe1c86b6be9e6d28470d')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "$srcdir/$pkgname-$_sudover"
 
-  ./configure --prefix=/usr \
-              --with-pam \
-              --libexecdir=/usr/lib \
-              --with-env-editor \
-              --with-all-insults \
-              --with-logfac=auth
-
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --libexecdir=/usr/lib \
+    --with-rundir=/run/sudo \
+    --with-vardir=/var/db/sudo \
+    --with-logfac=auth \
+    --with-pam \
+    --with-ldap \
+    --with-ldap-conf-file=/etc/openldap/ldap.conf \
+    --with-env-editor \
+    --with-passprompt="[sudo] password for %p: " \
+    --with-all-insults
   make
 }
 
-package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+check() {
+  cd "$srcdir/$pkgname-$_sudover"
+  make check
+}
 
-  # This is to ensure consistency with the permissions specified
-  # in the 'filesystem' package.
-  install -d -m755 "${pkgdir}/var/lib"
+package() {
+  cd "${srcdir}/${pkgname}-${_sudover}"
 
   make DESTDIR="${pkgdir}" install
-  install -D -m644 "${srcdir}/sudo.pam" "${pkgdir}/etc/pam.d/sudo"
 
-  install -D -m644 doc/LICENSE "${pkgdir}/usr/share/licenses/sudo/LICENSE"
+  # Remove /run/sudo directory from the package; we create it using tmpfiles.d
+  # see 'Major changes between version 1.8.10 and 1.8.9p5:' on http://www.sudo.ws/sudo/stable.html why the run dir is needed 
+  rmdir "$pkgdir/run/sudo"
+  rmdir "$pkgdir/run"
+
+  install -Dm644 "$srcdir/sudo.tmpfiles.conf" \
+    "$pkgdir/usr/lib/tmpfiles.d/sudo.conf"
+
+  install -Dm644 "$srcdir/sudo.pam" "$pkgdir/etc/pam.d/sudo"
+
+  install -Dm644 doc/LICENSE "$pkgdir/usr/share/licenses/sudo/LICENSE"
 }
 
 # vim:set ts=2 sw=2 et:
