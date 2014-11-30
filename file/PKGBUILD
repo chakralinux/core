@@ -1,11 +1,5 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dot]org>
-
-
 pkgname=file
-pkgver=5.11
+pkgver=5.20
 pkgrel=1
 pkgdesc="File type identification utility"
 arch=('x86_64')
@@ -13,9 +7,15 @@ license=('custom')
 groups=('base')
 url="http://www.darwinsys.com/file/"
 depends=('glibc' 'zlib')
-options=('!libtool')
-source=("ftp://ftp.astron.com/pub/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('16a407bd66d6c7a832f3a5c0d609c27b')
+source=("ftp://ftp.astron.com/pub/$pkgname/$pkgname-$pkgver.tar.gz"
+		'01-cve-2014-3710.patch')
+sha1sums=('4e93e9ae915f1812b05cc6012ae968fdb6416f8f'
+          'b8a422fe93e1bdda289cbb8174090dd4ef33ccf8')
+
+prepare() {
+  # https://bugs.archlinux.org/task/42759
+  patch -p1 -d $pkgname-$pkgver < '01-cve-2014-3710.patch'
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -30,5 +30,5 @@ package() {
   make DESTDIR="${pkgdir}" install
   
   install -D -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+  rmdir "$pkgdir/usr/share/man/man5"
 }
-
