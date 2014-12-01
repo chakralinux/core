@@ -3,13 +3,11 @@ source ../plasma.conf
 pkgname=plasma-workspace-wallpapers
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Plasma Desktop"
-arch=('x86_64')
-url='http://projects.kde.org'
+pkgdesc='Additional wallpapers for the Plasma Workspace'
+arch=('any')
+url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
 license=('LGPL')
-depends=('plasma-workspace')
 makedepends=('extra-cmake-modules')
-checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -21,16 +19,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
-}
-
-check() {
-  cd build
-  make test || return 0
 }
 
 package() {

@@ -6,11 +6,11 @@ pkgname=libkscreen-kf5
 _pkgname=libkscreen
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="KDE's screen management library"
+pkgdesc='KDE screen management software'
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/extragear/libs/libkscreen'
 license=('LGPL')
-depends=('qt5-base' 'qt5-x11extras')
+depends=('qt5-x11extras' 'libxrandr')
 makedepends=('extra-cmake-modules')
 checkdepends=("cmake")
 groups=('plasma')
@@ -27,10 +27,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${_pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${_pkgname}-${pkgver}
   make
 }
 

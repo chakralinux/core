@@ -3,12 +3,12 @@ source ../plasma.conf
 pkgname=khelpcenter
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="KHelpCenter"
+pkgdesc="Application to show KDE Applications' documentation"
 arch=('x86_64')
-url='http://projects.kde.org'
+url='https://projects.kde.org/projects/kde/workspace/khelpcenter'
 license=('LGPL')
-depends=('qt5-base')
-makedepends=('extra-cmake-modules' 'kdelibs4support' 'kemoticons' 'kinit' 'khtml' 'kcmutils' 'kitemmodels')
+depends=('khtml' 'kdelibs4support' 'kcmutils')
+makedepends=('extra-cmake-modules' 'kdoctools')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -21,10 +21,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 

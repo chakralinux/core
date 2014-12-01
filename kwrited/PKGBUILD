@@ -5,12 +5,12 @@ source ../plasma.conf
 pkgname=kwrited
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="KWrited"
+pkgdesc='Kwrited'
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/kwrited'
 license=('LGPL')
-depends=('qt5-base' 'kpty' 'kdelibs4support' 'kemoticons' 'kitemmodels' 'kinit')
-makedepends=('extra-cmake-modules')
+depends=('kpty' 'kdelibs4support')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -23,10 +23,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 
