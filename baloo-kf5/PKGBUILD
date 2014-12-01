@@ -6,18 +6,18 @@ pkgname=baloo-kf5
 _pkgname=baloo
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc='Library providing Job- and Qeueinterfaces'
+pkgdesc="A framework for searching and managing metadata"
 arch=('x86_64')
-url='community.kde.org/Baloo'
+url='https://projects.kde.org/projects/kde/kdelibs/baloo'
 license=('LGPL')
-depends=('qt5-base' 'solid' 'akonadi-qt5' 'krunner' 'kauth' 'kdelibs4support' 'kcmutils' 'kemoticons' 'kfilemetadata5' 'xapian-core')
-makedepends=('extra-cmake-modules')
+depends=('xapian-core' 'kfilemetadata5' 'kidletime' 'kcmutils' 'kdelibs4support')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
 replaces=('baloo5' 'kf5-baloo')
-provides=('baloo5' 'kf5-baloo')
-conflics=('baloo5' 'kf5-baloo' 'baloo')
+provides=('baloo5' 'kf5-baloo' 'baloo_file')
+conflicts=('baloo5' 'kf5-baloo' 'baloo<=4.14.3-1' 'baloo4')
 source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${_pkgname}) )
 
@@ -27,11 +27,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${_pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDEPIM_SUPPORT_BUILD=FALSE
+  cmake_kf5 ../${_pkgname}-${pkgver}
   make
 }
 

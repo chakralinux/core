@@ -5,10 +5,11 @@ pkgver=${PVersion}
 pkgrel=1
 pkgdesc="KSysguard"
 arch=('x86_64')
-url='http://projects.kde.org'
+url='https://projects.kde.org/projects/kde/workspace/ksysguard'
 license=('LGPL')
-depends=('qt5-base' 'libksysguard' 'knewstuff')
-makedepends=('extra-cmake-modules')
+depends=('knewstuff' 'libksysguard' 'lm_sensors' 'xdg-utils' 'hicolor-icon-theme')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python')
+conflicts=('kdebase-workspace')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -21,10 +22,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYHTON_EXECUTABLE=/usr/bin/python3
   make
 }
 

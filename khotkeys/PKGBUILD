@@ -5,12 +5,13 @@ source ../plasma.conf
 pkgname=khotkeys
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc='kinfocenter'
+pkgdesc='KHotKeys'
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/khotkeys'
 license=('LGPL')
 depends=('plasma-workspace')
-makedepends=('extra-cmake-modules' 'kdoctools')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+conflicts=('kde-workspace')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -23,10 +24,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver} \
+   -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 

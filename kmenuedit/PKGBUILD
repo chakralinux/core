@@ -5,13 +5,14 @@ source ../plasma.conf
 pkgname=kmenuedit
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc='kmenuedit'
+pkgdesc='KDE menu editor'
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/kmenuedit'
 license=('LGPL')
-depends=('qt5-base' 'sonnet' 'kdelibs4support' 'kemoticons' 'kitemmodels' 'kinit' 'khotkeys')
-makedepends=('extra-cmake-modules')
+depends=('khotkeys')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
 checkdepends=("cmake")
+conflicts=('kde-workspace')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -23,10 +24,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 

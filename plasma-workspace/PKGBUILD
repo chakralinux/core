@@ -3,12 +3,19 @@ source ../plasma.conf
 pkgname=plasma-workspace
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Plasma Workspace"
+pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
-url='http://projects.kde.org'
+url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
 license=('LGPL')
-depends=('qt5-base' 'qt5-declarative' 'qt5-script' 'plasma-framework' 'kdelibs4support' 'kemoticons' 'kdesu' 'knewstuff' 'krunner' 'kcmutils' 'kjs' 'kjsembed' 'knotifyconfig' 'ksysguard' 'libkscreen2' 'kwin' 'ktexteditor' 'akonadi-qt5' 'kf5-baloo')
-makedepends=('extra-cmake-modules' 'kapidox')
+depends=('knewstuff' 'baloo-kf5' 'kjsembed' 'knotifyconfig' 'libxcursor'
+         'libksysguard' 'libkscreen2' 'ktexteditor' 'libqalculate'
+         'qt5-tools' 'kded' 'kde-cli-tools' 'kio-extras' 'milou' 'breeze'
+         'xorg-xrdb' 'xorg-xsetroot' 'xorg-apps')
+makedepends=('extra-cmake-modules' 'kdoctools' 'kwin' 'gpsd')
+optdepends=('plasma-workspace-wallpapers: additional wallpapers'
+            'kwin: KDE Window Manager'
+            'gpsd: GPS support for geolocation')
+conflicts=('kde-workspace')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -23,10 +30,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 

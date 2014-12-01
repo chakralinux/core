@@ -5,12 +5,12 @@ source ../plasma.conf
 pkgname=kde-cli-tools
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc='KDE CLI tools'
+pkgdesc="Tools based on KDE Frameworks 5 to better interact with the system"
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/kde-cli-tools'
 license=('LGPL')
-depends=('qt5-base')
-makedepends=('extra-cmake-modules' 'kwindowsystem' 'kdesu' 'kdelibs4support' 'kcmutils' 'kemoticons' 'kitemmodels' 'kinit')
+depends=('kdesu' 'kdelibs4support' 'kcmutils')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -23,10 +23,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYHTON_EXECUTABLE=/usr/bin/python3
   make
 }
 
@@ -37,5 +35,8 @@ check() {
 
 package() {
   cd build
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="$pkgdir" install
+
+  # conflicts with kdebase-runtime
+  rm -r "$pkgdir"/usr/share/man
 }

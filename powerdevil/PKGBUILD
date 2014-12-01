@@ -3,13 +3,14 @@ source ../plasma.conf
 pkgname=powerdevil
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="KSysguard"
+pkgdesc='Manages the power consumption settings of a Plasma Shell'
 arch=('x86_64')
-url='http://projects.kde.org'
+url='https://projects.kde.org/projects/kde/workspace/powerdevil'
 license=('LGPL')
-depends=('plasma-workspace' 'libxrandr')
-makedepends=('extra-cmake-modules' 'kdoctools')
+depends=('plasma-workspace')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python')
 checkdepends=("cmake")
+conflicts=('kdebase-workspace')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -21,10 +22,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 

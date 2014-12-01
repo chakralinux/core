@@ -3,12 +3,13 @@ source ../plasma.conf
 pkgname=plasma-nm
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Plasma applet written in QML for managing network connections"
+pkgdesc='Plasma applet written in QML for managing network connections'
 arch=('x86_64')
 url="https://projects.kde.org/projects/playground/network/plasma-nm"
-license=('GPL')
-depends=('libmm-qt5' 'libnm-qt5' 'plasma-framework' 'kemoticons' 'mobile-broadband-provider-info' 'openconnect')
-makedepends=('extra-cmake-modules' 'kdoctools' 'qt5-tools')
+license=('GPL2')
+depends=('plasma-workspace' 'libmm-qt5' 'libnm-qt5')
+makedepends=('extra-cmake-modules' 'kdoctools' 'openconnect' 'mobile-broadband-provider-info')
+optdepends=('mobile-broadband-provider-info: Database of mobile broadband service providers' 'openconnect: Cisco AnyConnect VPN plugin')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -21,12 +22,7 @@ prepare() {
 
 build() {
   cd build
-  #cmake ../${pkgname}-${pkgver} \
-  cmake ../${pkgname}-${PSubVersion} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDEPIM_SUPPORT_BUILD=FALSE
+  cmake_kf5 ../${pkgname}-${PSubVersion}
   make
 }
 

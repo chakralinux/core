@@ -5,12 +5,13 @@ source ../plasma.conf
 pkgname=systemsettings
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc='Systemsettings'
+pkgdesc='KDE system settings'
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/systemsettings'
 license=('LGPL')
-depends=('qt5-base' 'kdelibs4support' 'kio' 'kiconthemes' 'kemoticons' 'kitemmodels' 'kinit' 'khtml' 'kcmutils')
-makedepends=('extra-cmake-modules')
+depends=('kcmutils' 'khtml' 'kdelibs4support')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+conflicts=('kde-workspace')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -23,10 +24,8 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 

@@ -9,7 +9,7 @@ pkgdesc="Oxygen"
 arch=('x86_64')
 url='projects.kde.org/'
 license=('LGPL')
-depends=('qt5-base' 'frameworkintegration' 'kwindowsystem' 'kwidgetsaddons' 'kcompletion' 'kservice' 'kguiaddons' 'kwin')
+depends=('frameworkintegration' 'kwin')
 makedepends=('extra-cmake-modules')
 checkdepends=("cmake")
 groups=('plasma')
@@ -23,11 +23,7 @@ prepare() {
 
 build() {
   cd build
-  #cmake ../${pkgname}-${pkgver} \
-  cmake ../${pkgname}-${PSubVersion} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${PSubVersion}
   make
 }
 

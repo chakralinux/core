@@ -9,7 +9,7 @@ pkgdesc='A plasma theme'
 arch=('x86_64')
 url='projects.kde.org/'
 license=('LGPL')
-depends=('qt5-base' 'kconfig' 'kcoreaddons')
+depends=('frameworkintegration')
 makedepends=('extra-cmake-modules')
 checkdepends=("cmake")
 groups=('plasma')
@@ -23,10 +23,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${PSubVersion} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${PSubVersion}
   make
 }
 
@@ -38,4 +35,9 @@ check() {
 package() {
   cd build
   make DESTDIR="${pkgdir}" install
+
+  # make QtCurve preset and color scheme available for KDE4 too
+  install -d "$pkgdir"/usr/share/apps/{QtCurve,color-schemes}
+  ln -s /usr/share/QtCurve/Breeze.qtcurve "$pkgdir"/usr/share/apps/QtCurve/
+  ln -s /usr/share/color-schemes/Breeze{,Dark}.colors "$pkgdir"/usr/share/apps/color-schemes/
 }

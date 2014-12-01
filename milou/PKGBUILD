@@ -5,12 +5,12 @@ source ../plasma.conf
 pkgname=milou
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc='KRunner alternative with focus on searching'
+pkgdesc="A dedicated search application built on top of Baloo"
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/milou/'
 license=('LGPL')
-depends=('qt5-base' 'qt5-script' 'qt5-declarative' 'qt5-webkit' 'krunner' 'kf5-baloo')
-makedepends=('extra-cmake-modules')
+depends=('krunner')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
@@ -23,10 +23,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 

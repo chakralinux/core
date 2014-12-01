@@ -3,13 +3,16 @@ source ../plasma.conf
 pkgname=plasma-desktop
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Plasma Desktop"
+pkgdesc='KDE Plasma Desktop'
 arch=('x86_64')
-url='http://projects.kde.org'
+url='https://www.kde.org/workspaces/plasmadesktop/'
 license=('LGPL')
-depends=('qt5-base' 'qt5-declarative' 'qt5-x11extras' 'kwallet' 'krunner' 'kdesu' 'knotifyconfig' 'kdelibs4support' 'kemoticons' 'knewstuff' 'kcmutils' 'kwin' 'plasma-workspace' 'xorg-server')
-makedepends=('extra-cmake-modules')
+depends=('qt5-graphicaleffects' 'powerdevil' 'polkit-kde-agent-frameworks' 'libcanberra'
+         'kwin' 'libusb-compat' 'libxkbfile' 'kmenuedit' 'systemsettings' 'ksysguard')
+makedepends=('extra-cmake-modules' 'kdoctools')
+optdepends=('plasma-nm: Network manager applet')
 checkdepends=("cmake")
+conflicts=('kde-workspace' 'kde-baseapps-kdepasswd')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -21,10 +24,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 

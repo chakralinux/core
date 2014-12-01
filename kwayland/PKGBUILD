@@ -9,9 +9,10 @@ pkgdesc='Qt-style Client and Server library wrapper for the Wayland libraries'
 arch=('x86_64')
 url='http://www.kde.org'
 license=('LGPL')
-depends=('qt5-base' 'wayland')
+depends=("qt5-base>=${PQtVersion}" 'wayland')
 makedepends=('extra-cmake-modules')
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+options=('debug')
 sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
@@ -20,11 +21,7 @@ prepare() {
 
 build() {
   cd build
-  #cmake ../${_pkgname}-${pkgver}
-  cmake ../$pkgname-5.1.0 \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../$pkgname-${pkgver}
   make
 }
 

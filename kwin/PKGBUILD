@@ -5,15 +5,17 @@ source ../plasma.conf
 pkgname=kwin
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="A versative window manager"
+pkgdesc='KDE Window manager'
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/kwin'
 license=('LGPL')
 depends=('qt5-multimedia' 'plasma-framework' 'knewstuff' 'libxcursor' 'kinit'
-         'hicolor-icon-theme' 'libepoxy') #'kwayland' update wayland °1.6 first
+         'hicolor-icon-theme' 'libepoxy' 'kwayland')
 makedepends=('extra-cmake-modules' 'qt5-tools' 'kdoctools')
-checkdepends=("cmake")
+checkdepends=("cmake" "xorg-server-xvfb")
 groups=('plasma')
+install=${pkgname}.install
+conflicts=('kde-workspace')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
@@ -24,16 +26,14 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${PBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${PInstallPrefix} \
-    -DLIB_INSTALL_DIR=lib 
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 
 check() {
   cd build
-  make test || return 0
+  # some test need kwin to be installed (service type)
+  xvfb-run -s "-screen 0 640x480x24" make test || return 0
 }
 
 package() {
