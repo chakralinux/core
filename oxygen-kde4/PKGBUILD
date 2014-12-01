@@ -1,0 +1,43 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../plasma.conf
+
+_pkgname=oxygen
+pkgname=oxygen-kde4
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='Artwork, styles and assets for the Oxygen visual style for the KDE4'
+arch=('x86_64')
+url='projects.kde.org/'
+license=('LGPL')
+depends=('kdelibs')
+makedepends=('extra-cmake-modules' 'automoc4')
+checkdepends=("cmake")
+groups=('plasma')
+options=("debug")
+conflicts=('kde-workspace')
+source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${_pkgname} | head -n 1) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${_pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DUSE_KDE4=ON \
+    -DBUILD_TESTING=OFF
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+
+  # needed for pure Qt4 apps
+  install -d "$pkgdir"/usr/lib/qt/plugins/styles
+  ln -s /usr/lib/kde4/plugins/styles/oxygen.so "$pkgdir"/usr/lib/qt/plugins/styles
+}
