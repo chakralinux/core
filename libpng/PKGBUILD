@@ -3,42 +3,48 @@
 #               Anke Boersma (abveritas) <abveritas@chakra-project.org>
 
 pkgname=libpng
-pkgver=1.6.11
-_apngver=1.6.11
+pkgver=1.6.15
+_apngver=1.6.15
 pkgrel=1
-pkgdesc='A collection of routines used to create PNG format graphics files'
+pkgdesc="A collection of routines used to create PNG format graphics files"
 arch=('x86_64')
-url='http://www.libpng.org/pub/png/libpng.html'
+url="http://www.libpng.org/pub/png/libpng.html"
 license=('custom')
-depends=('zlib'
-         'sh')
-options=('!libtool')
-source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.xz"
-        "http://downloads.sourceforge.net/sourceforge/libpng-apng/libpng-$_apngver-apng.patch.gz")
+depends=('zlib' 'sh')
+source=(http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.xz{,.asc}
+        http://downloads.sourceforge.net/sourceforge/libpng-apng/libpng-$_apngver-apng.patch.gz)
 # Change checksums to SF-avalible format
-sha1sums=('4d832e419bd4aaa2bb416a7421b2d0279d0dc1d9'
-          '611e2ca8d67a0d0b5c63f4c156c5bf63d6cf792f')
+sha1sums=('bddeac8ca97fbcf54d6d32c6eefed5d94b49df88'
+          'SKIP'
+          '2756699b149f5837dbc012f4eb62b8d684ad1ccb')
 
 prepare() {
-    cd ${srcdir}/${pkgname}-${pkgver}
-    # Add animated PNG (apng) support
-    # see http://sourceforge.net/projects/libpng-apng/
-    patch -p1 -i "${srcdir}/libpng-${_apngver}-apng.patch"
+  cd ${pkgname}-${pkgver}
+
+  # Add animated PNG (apng) support
+  # see http://sourceforge.net/projects/libpng-apng/
+  patch -Np1 -i "../libpng-${_apngver}-apng.patch"
 }
- 
+
 build() {
-    cd ${srcdir}/${pkgname}-${pkgver}
-    ./configure \
-        --prefix=/usr \
-        --disable-static
-    make
+  cd ${pkgname}-${pkgver}
+  ./configure \
+      --prefix=/usr \
+      --disable-static
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
 }
 
 package() {
-    cd ${srcdir}/${pkgname}-${pkgver}
-    make DESTDIR="${pkgdir}" install
-    cd contrib/pngminus
-    make PNGLIB="-L${pkgdir}/usr/lib -lpng" -f makefile.std png2pnm pnm2png
-    install -m755 png2pnm pnm2png "${pkgdir}/usr/bin/"
-    install -D -m644 ../../LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="$pkgdir" install
+
+  cd contrib/pngminus
+  make PNGLIB="-L${pkgdir}/usr/lib -lpng" -f makefile.std png2pnm pnm2png
+  install -m755 png2pnm pnm2png "${pkgdir}/usr/bin/"
+  install -D -m644 ../../LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
