@@ -1,7 +1,7 @@
 # Maintainer: almack[at]chakraos[dot]org>
  
 pkgname=gnutls
-pkgver=3.2.20
+pkgver=3.3.10
 pkgrel=1
 pkgdesc="A library which provides a secure layer over a reliable transport layer"
 arch=('x86_64')
@@ -9,20 +9,24 @@ license=('GPL3' 'LGPL2.1')
 url="http://www.gnu.org/software/gnutls/"
 install=gnutls.install
 depends=('gcc-libs' 'libtasn1' 'readline' 'zlib' 'libgcrypt' 'texinfo' 'nettle')
-source=(ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/${pkgname}-${pkgver}.tar.xz{,.sig})
-md5sums=('637ef52191bf87a597240a49cc533972'
+source=(ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/${pkgname}-${pkgver}.tar.xz{,.sig})
+md5sums=('c0a72b2c0553fe1c4992e30835808012'
          'SKIP')
  
 build() {
   cd ${pkgname}-${pkgver}
  
-  ./configure --prefix=/usr --with-zlib --disable-guile --disable-valgrind-tests --disable-static
+  ./configure --prefix=/usr \
+              --with-zlib \
+              --disable-guile \
+              --disable-valgrind-tests \
+              --disable-static
   make
 }
  
 check() {
   cd ${pkgname}-${pkgver}
-  make -j1 check
+  make check
 }
  
 package() {
