@@ -5,8 +5,8 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel="3.17"
-pkgver=3.17.4
+_basekernel="3.18"
+pkgver=3.18
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -14,25 +14,17 @@ license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'bc')
 options=('!strip')
 source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz"
-        "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
+        # "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config.x86_64'
-        #aufs patches
-        "git://git.code.sf.net/p/aufs/aufs3-standalone#branch=aufs${_basekernel}"
-        'config.aufs'
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch'
-        'fix_CPU0_microcode_on_resume.patch'
         )
-sha256sums=('f5153ec93c5fcd41b247950e6a9bcbc63fa87beafd112c133a622439a0f76251'
-            'eeef37397a15245bd143569908be40622a87dc7673965e623e811ea3f68b8434'
-            '86d194df1475364f131b67768ad9fbbc3f38fee5532492e4a5cda122d42f0e01'
-            'SKIP'
-            '89e31c3af4da1811ed42c19f905710f49809c03e4f758da0a49136dfee27a72c'
+sha256sums=('becc413cc9e6d7f5cc52a3ce66d65c3725bc1d1cc1001f4ce6c32b69eb188cbd'
+            '31865caeb22d0e9deffcc88153394add59654620ab7bd167717e68f09c050ac5'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
-            '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99'
-            '43668fe46147fe93f41b919db673574427ce5a8c376cd28ddddcbf3a00326491')
+            '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99')
 
 prepare() {
   cd "${srcdir}/linux-${_basekernel}"
@@ -41,8 +33,8 @@ prepare() {
   make mrproper
 
   # add upstream patch
-  msg "adding upstream patch"
-  patch -p1 -i "${srcdir}/patch-${pkgver}"
+  # msg "adding upstream patch"
+  # patch -p1 -i "${srcdir}/patch-${pkgver}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -53,28 +45,7 @@ prepare() {
   msg "changing default console loglevel"
   patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
 
-  # Fix FS#42689
-  # https://bugzilla.kernel.org/show_bug.cgi?id=88001
-  patch -p1 -i "${srcdir}/fix_CPU0_microcode_on_resume.patch"
-
-  #aufs patches for Live:
-  msg "starting aufs patches"
-  cp -va "${srcdir}/aufs3-standalone/"{Documentation,fs} .
-  cp -va "${srcdir}/aufs3-standalone/include/uapi/linux/aufs_type.h" ./include/uapi/linux
-  msg "starting aufs patches: kbuild"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-kbuild.patch"
-  msg "starting aufs patches: base"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-base.patch"
-  msg "starting aufs patches: loopback"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-loopback.patch"
-  msg "starting aufs patches: mmap"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-mmap.patch"
-  msg "starting aufs patches: standalone"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-standalone.patch"
-
   cat "${srcdir}/config.x86_64" > ./.config
-
-  cat "${srcdir}/config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
@@ -127,9 +98,9 @@ package_linux() {
   groups=('base')
   depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7')
   optdepends=('crda: to set the correct wireless channels of your country')
-  provides=('nouveau-drm' 'kernel26' 'acerhk=0.5.35' 'aufs3')
+  provides=('nouveau-drm' 'kernel26' 'acerhk=0.5.35')
   conflicts=('kernel26' 'nvidia-96xx=96.43.20-9' 'acerhk' 'tiacx')
-  replaces=('kernel26' 'aufs3' 'nouveau-drm')
+  replaces=('kernel26' 'nouveau-drm')
   backup=("etc/mkinitcpio.d/${pkgname}.preset")
   install=linux.install
 
