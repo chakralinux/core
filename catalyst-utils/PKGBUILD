@@ -5,9 +5,9 @@
 pkgbase=catalyst-utils
 pkgname=('catalyst-utils' 'catalyst-libgl' 'opencl-catalyst')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 1x.x
-pkgver=14.9
+pkgver=14.12
 pkgrel=1
-_amdver=14.201
+_amdver=14.501.1003
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('x86_64')
 url="http://www.amd.com"
@@ -15,8 +15,8 @@ license=('custom')
 options=('staticlibs' 'libtool' '!strip' '!upx')
 
 source=(
-#    http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver/./-}-rev2-linux-x86-x86-64-may6.zip
-    http://archive.ubuntu.com/ubuntu/pool/restricted/f/fglrx-installer/fglrx-installer_14.201.orig.tar.gz
+    http://www2.ati.com/drivers/linux/amd-catalyst-omega-${pkgver}-linux-run-installers.zip
+    # http://archive.ubuntu.com/ubuntu/pool/restricted/f/fglrx-installer/fglrx-installer_14.201.orig.tar.gz
     catalyst.sh
     atieventsd.sh
     atieventsd.service
@@ -29,7 +29,7 @@ source=(
     temp_links_catalyst
     temp-links-catalyst.service)
 
-md5sums=('ff3a7604051971de617a5f4703826ec6'
+md5sums=('ced4329274a02712406bda678ffbd743'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '9d9ea496eadf7e883d56723d65e96edf'
          '90a37e010f4e5f45e270cd000894d553'
@@ -45,11 +45,11 @@ md5sums=('ff3a7604051971de617a5f4703826ec6'
 build() {
   ## Unpack archive
 #      /bin/sh ./amd-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
-#     /bin/sh ./fglrx-${_amdver}/amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
-mkdir common
-mv etc lib usr common
-mkdir archive_files
-mv arch common xpic xpic_64a archive_files
+     /bin/sh ./fglrx-${_amdver}/amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
+#mkdir common
+#mv etc lib usr common
+#mkdir archive_files
+#mv arch common xpic xpic_64a archive_files
 }
 
 package_catalyst-libgl() {
