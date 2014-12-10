@@ -3,15 +3,16 @@
 
 pkgname=ffmpeg
 pkgver=2.1.6
-pkgrel=1
+pkgrel=2
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('x86_64')
 url="http://ffmpeg.org"
 license=('GPL')
-depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'libtheora' 'celt'
-         'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx>=1.1.0'
-         'libva' 'openjpeg' 'rtmpdump' 'speex' 'gsm' 'pulseaudio' 'v4l-utils' 'libass'
-         'fontconfig' 'freetype2' 'openal' 'libdc1394' 'libavc1394' 'libcaca' 'libxv' 'libbluray')
+depends=('alsa-lib' 'bzip2' 'fontconfig' 'freetype2' 'gnutls' 'harfbuzz' 'gsm' 'lame' 'libass' 'libavc1394'
+         'libbluray' 'libcaca' 'libdc1394' 'libmodplug' 'libtheora' 'libva' 'libvdpau'
+	 'libvorbis' 'libvpx>=1.1.0' 'libxfixes' 'libxv' 'openal' 'opencore-amr' 'openjpeg'
+	 'opus' 'pulseaudio' 'rtmpdump' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore'
+	 'zlib')
 makedepends=('yasm' 'x264' 'x265')
 source=("${url}/releases/${pkgname}-${pkgver}.tar.gz"
         "${url}/releases/${pkgname}-${pkgver}.tar.gz.asc")
@@ -23,21 +24,21 @@ build() {
   ./configure --prefix=/usr \
               --disable-debug \
               --disable-static \
+              --enable-avisynth \
               --enable-avresample \
-              --enable-bzlib \
-              --enable-dxva2 \
               --enable-fontconfig \
+              --enable-gnutls \
               --enable-gpl \
               --enable-libass \
               --enable-libbluray \
-              --enable-libcaca \
-              --enable-libcelt \
-              --enable-libdc1394 \
+              --enable-libfreetype \
               --enable-libgsm \
+              --enable-libmodplug \
               --enable-libmp3lame \
               --enable-libopencore_amrnb \
               --enable-libopencore_amrwb \
               --enable-libopenjpeg \
+              --enable-libopus \
               --enable-libpulse \
               --enable-librtmp \
               --enable-libschroedinger \
@@ -48,15 +49,12 @@ build() {
               --enable-libvpx \
               --enable-libx264 \
               --enable-libxvid \
-              --enable-openal \
-              --enable-postproc \
               --enable-runtime-cpudetect \
               --enable-shared \
-              --enable-vaapi \
-              --enable-vda \
+              --enable-swresample \
               --enable-vdpau \
               --enable-version3 \
-              --enable-x11grab
+              --enable-x11grab \
 
   make
   make tools/qt-faststart
