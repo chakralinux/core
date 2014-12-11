@@ -1,6 +1,6 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=217
+pkgver=218
 pkgrel=1
 _fedora_patch=ea19761321f4e7f5e2cbdd66fe38388c93790c20
 pkgdesc="A system and service manager for Linux"
@@ -36,13 +36,12 @@ conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
 replaces=('udev')
 install="systemd.install"
 source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
-        "git://pkgs.fedoraproject.org/systemd.git#commit=${_fedora_patch}"
+#        "git://pkgs.fedoraproject.org/systemd.git#commit=${_fedora_patch}"
         'initcpio-hook-udev'
         'initcpio-install-systemd'
         'initcpio-install-udev'
         '99-default.preset')
-md5sums=('e68dbff3cc19f66e341572d9fb2ffa89'
-         'SKIP'
+md5sums=('4e2c511b0a7932d7fc9d79822273aac6'
          '7a79eb3e4ce19906cfebfea75fb9f8bb'
          'a736284f0c8e549dd988522e75628ec0'
          'bde43090d4ac0ef048e3eaee8202a407'
@@ -51,51 +50,51 @@ md5sums=('e68dbff3cc19f66e341572d9fb2ffa89'
 prepare() {
   cd "$pkgname-$pkgver"
   
-  git init
-  git config user.email "chakra-devel@googlegroups.com"
-  git config user.name "Chakra Packager"
-  git add .
-  git commit -a -q -m "${pkgver}} baseline."
-
-  git am \
-        --exclude .gitignore \
-        --exclude docs/.gitignore \
-        --exclude docs/gudev/.gitignore \
-        --exclude docs/libudev/.gitignore \
-        --exclude docs/sysvinit/.gitignore \
-        --exclude docs/var-log/.gitignore \
-        --exclude hwdb/.gitignore \
-        --exclude m4/.gitignore \
-        --exclude man/.gitignore \
-        --exclude po/.gitignore \
-        --exclude rules/.gitignore \
-        --exclude src/.gitignore \
-        --exclude src/analyze/.gitignore \
-        --exclude src/core/.gitignore \
-        --exclude src/gudev/.gitignore \
-        --exclude src/hostname/.gitignore \
-        --exclude src/journal/.gitignore \
-        --exclude src/libsystemd-daemon/.gitignore \
-        --exclude src/libsystemd-id128/.gitignore \
-        --exclude src/libudev/.gitignore \
-        --exclude src/locale/.gitignore \
-        --exclude src/login/.gitignore \
-        --exclude src/python-systemd/.gitignore \
-        --exclude src/python-systemd/docs/.gitignore \
-        --exclude src/timedate/.gitignore \
-        --exclude src/udev/.gitignore \
-        --exclude src/udev/scsi_id/.gitignore \
-        --exclude sysctl.d/.gitignore \
-        --exclude test/.gitignore \
-        --exclude units/.gitignore \
-        --exclude units/user/.gitignore \
-        --exclude src/libsystemd/sd-bus/PORTING-DBUS1 \
-        --exclude CODING_STYLE \
-        --exclude src/readahead/Makefile \
-        --exclude src/libsystemd-terminal/unifont-def.h \
-        ../systemd/00*-*.patch
-
-  autoreconf -i
+#  git init
+#  git config user.email "chakra-devel@googlegroups.com"
+#  git config user.name "Chakra Packager"
+#  git add .
+#  git commit -a -q -m "${pkgver}} baseline."
+#
+#  git am \
+#        --exclude .gitignore \
+#        --exclude docs/.gitignore \
+#        --exclude docs/gudev/.gitignore \
+#        --exclude docs/libudev/.gitignore \
+#        --exclude docs/sysvinit/.gitignore \
+#        --exclude docs/var-log/.gitignore \
+#        --exclude hwdb/.gitignore \
+#        --exclude m4/.gitignore \
+#        --exclude man/.gitignore \
+#        --exclude po/.gitignore \
+#        --exclude rules/.gitignore \
+#        --exclude src/.gitignore \
+#        --exclude src/analyze/.gitignore \
+#        --exclude src/core/.gitignore \
+#        --exclude src/gudev/.gitignore \
+#        --exclude src/hostname/.gitignore \
+#        --exclude src/journal/.gitignore \
+#        --exclude src/libsystemd-daemon/.gitignore \
+#        --exclude src/libsystemd-id128/.gitignore \
+#        --exclude src/libudev/.gitignore \
+#        --exclude src/locale/.gitignore \
+#        --exclude src/login/.gitignore \
+#        --exclude src/python-systemd/.gitignore \
+#        --exclude src/python-systemd/docs/.gitignore \
+#        --exclude src/timedate/.gitignore \
+#        --exclude src/udev/.gitignore \
+#        --exclude src/udev/scsi_id/.gitignore \
+#        --exclude sysctl.d/.gitignore \
+#        --exclude test/.gitignore \
+#        --exclude units/.gitignore \
+#        --exclude units/user/.gitignore \
+#        --exclude src/libsystemd/sd-bus/PORTING-DBUS1 \
+#        --exclude CODING_STYLE \
+#        --exclude src/readahead/Makefile \
+#        --exclude src/libsystemd-terminal/unifont-def.h \
+#        ../systemd/00*-*.patch
+#
+#  autoreconf -i
 }
 
 build() {
