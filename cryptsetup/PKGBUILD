@@ -1,10 +1,9 @@
 #
 # Core Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas@chakra-project.org
 
 pkgname=cryptsetup
-pkgver=1.6.2
+pkgver=1.6.6
 pkgrel=1
 pkgdesc="Userspace setup tool for transparent encryption of block devices using the Linux 2.6 cryptoapi"
 arch=('i686' 'x86_64')
@@ -12,20 +11,22 @@ license=('GPL')
 url="http://code.google.com/p/cryptsetup/"
 groups=('base')
 depends=('device-mapper' 'libgcrypt' 'popt' 'util-linux')
-conflicts=('mkinitcpio<0.5.99')
-options=('!libtool' '!emptydirs')
-source=(http://cryptsetup.googlecode.com/files/${pkgname}-${pkgver}.tar.bz2
-        http://cryptsetup.googlecode.com/files/${pkgname}-${pkgver}.tar.bz2.asc
+options=('!emptydirs')
+source=(https://www.kernel.org/pub/linux/utils/cryptsetup/v1.6/${pkgname}-${pkgver}.tar.xz
         encrypt_hook
-        encrypt_install)
-sha256sums=('15723f0198303d4bcb99d480b7a773918e2d319f0348457988c063bdd03e109a'
-            'SKIP'
+        encrypt_install
+        sd_encrypt)
+sha256sums=('2d2ce28e4e1137dd599d87884b62ef6dbf14fd7848b2a2bf7d61cf125fbd8e6f'
             '4406f8dc83f4f1b408e49d557515f721d91b358355c71fbe51f74ab27e5c84ff'
-            '00c2da113d23d05fc13c4929e38a25111ba23a49da86e835d9fb55d45c7aaee2')
+            '00c2da113d23d05fc13c4929e38a25111ba23a49da86e835d9fb55d45c7aaee2'
+            'd442304e6a78b3513ebc53be3fe2f1276a7df470c8da701b3ece971d59979bdd')
 
 build() {
   cd "${srcdir}"/$pkgname-${pkgver}
-  ./configure --prefix=/usr --disable-static --enable-cryptsetup-reencrypt
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --enable-cryptsetup-reencrypt
   make
 }
 
@@ -35,4 +36,5 @@ package() {
   # install hook
   install -D -m644 "${srcdir}"/encrypt_hook "${pkgdir}"/usr/lib/initcpio/hooks/encrypt
   install -D -m644 "${srcdir}"/encrypt_install "${pkgdir}"/usr/lib/initcpio/install/encrypt
+  install -D -m644 "${srcdir}"/sd_encrypt "${pkgdir}"/usr/lib/initcpio/install/sd-encrypt
 }

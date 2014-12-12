@@ -6,42 +6,28 @@
 
 pkgname=vpnc
 pkgver=0.5.3.1
-_svnver=.svn527
+_svnver=527
+_git=d2c5a77f3f0ea6ad80fc59158127d63ede81a6cb
 pkgrel=2
 pkgdesc="VPN client for cisco3000 VPN Concentrators"
 url="http://www.unix-ag.uni-kl.de/~massar/vpnc/"
 license=('GPL')
 depends=('libgcrypt' 'openssl' 'iproute2')
+optdepends=('openresolv: Let vpnc manage resolv.conf')
+makedepends=('subversion')
 arch=('x86_64')
-source=("vpnc-.svn527.tar.xz" # need to urn mktarball first
+source=("$pkgname::svn+http://svn.unix-ag.uni-kl.de/vpnc/trunk/#revision=$_svnver"
         "http://git.infradead.org/users/dwmw2/vpnc-scripts.git/blob_plain/$_git:/vpnc-script"
-        'vpnc.conf')
-md5sums=('7d3ed0f51d6f18d78d3b96fbf1ac62e8'
+        'vpnc.conf'
+        'vpnc@.service')
+md5sums=('SKIP'
          '70198474faf36a84beaa11136f6c4d9c'
-         'a3f4e0cc682f437e310a1c86ae198e45')
+         'a3f4e0cc682f437e310a1c86ae198e45'
+         '09cfded435c43dd2adb5a8863bd74cfc')
 backup=(etc/vpnc/default.conf)
 
-
-mktarball() {
-  # before building run
-  # source PKGBUILD && mktarball
-  [[ -d tarball ]] || mkdir tarball
-
-  pushd tarball
-
-  svn co http://svn.unix-ag.uni-kl.de/vpnc/trunk
-  _svnrev=$(cd trunk >/dev/null; svn info | awk '/^Revision:/ { print $2 }')
-
-  find trunk/ -type d -name .svn -exec rm -rf {} +
-  mv trunk "$pkgname-$_vpncver.svn$_svnrev"
-  tar cJf "../$pkgname-$_vpncver.svn$_svnrev.tar.xz" "$pkgname-$_vpncver.svn$_svnrev/"
-
-  popd
-  rm -rf tarball
-}
-
 build() {
-  cd $srcdir/$pkgname-$_svnver
+  cd $pkgname
 
   # Build hybrid support
   sed -i 's|^#OPENSSL|OPENSSL|g' Makefile
@@ -53,10 +39,12 @@ build() {
 }
 
 package() {
-  cd "$pkgname-$_svnver"
+  cd $pkgname
 
   make DESTDIR="$pkgdir" PREFIX=/usr install
 
   install -Dm644 "$srcdir"/vpnc.conf "$pkgdir"/etc/vpnc/default.conf
   install -Dm755 "$srcdir"/vpnc-script "$pkgdir"/etc/vpnc/vpnc-script
+
+  install -Dm644 "$srcdir"/vpnc@.service "$pkgdir"/usr/lib/systemd/system/vpnc@.service
 }

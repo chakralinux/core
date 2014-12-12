@@ -4,7 +4,7 @@
 # maintainer almack@chakraos.org
 
 pkgname=libgcrypt
-pkgver=1.6.1
+pkgver=1.6.2
 pkgrel=1
 pkgdesc="a general purpose crypto library based on the code used"
 arch=('x86_64')
@@ -12,13 +12,20 @@ url="http://www.gnupg.org"
 license=('LGPL')
 depends=('libgpg-error')
 source=("ftp://ftp.gnupg.org/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-sha1sums=('f03d9b63ac3b17a6972fc11150d136925b702f02')
+sha1sums=('cc31aca87e4a3769cb86884a3f5982b2cc8eb7ec')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr --disable-padlock-support --disable-static
+  ./configure --prefix=/usr \
+    --disable-static \
+    --disable-padlock-support
   make
+}
+
+check() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make check
 }
 
 package() {
