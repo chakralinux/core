@@ -2,16 +2,16 @@
 # Core Packages for Chakra, part of chakraos.org
 
 pkgname=procps-ng
-pkgver=3.3.9
-pkgrel=2
+pkgver=3.3.10
+pkgrel=1
 pkgdesc='Utilities for monitoring your system and its processes'
-url='http://gitorious.org/procps'
+url='http://sourceforge.net/projects/procps-ng/'
 license=('GPL' 'LGPL')
 arch=('x86_64')
 groups=('base')
-depends=('ncurses')
+depends=('systemd' 'ncurses')
 source=("http://downloads.sourceforge.net/project/${pkgname}/Production/${pkgname}-${pkgver}.tar.xz")
-sha1sums=('088c77631745fc75ee41fc29c254a4069be4869a')
+sha1sums=('484db198d6a18a42b4011d5ecb2cb784a81b0e4f')
 
 conflicts=('procps')
 provides=('procps')
@@ -24,7 +24,6 @@ prepare() {
 
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
-	echo ${pkgver} > .tarball-version
 
 	./configure \
 		--prefix=/usr \
@@ -33,8 +32,8 @@ build() {
 		--libdir=/usr/lib \
 		--bindir=/usr/bin \
 		--sbindir=/usr/bin \
-		--disable-static \
-                --enable-watch8bit
+                --enable-watch8bit \
+		--with-systemd
 	make
 }
 
