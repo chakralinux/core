@@ -8,7 +8,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers' 'qt-docs')
 pkgver=4.8.6
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -19,9 +19,11 @@ makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'db
 options=('staticlibs')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("http://download.qt-project.org/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar.gz"
+        "kubuntu_14_systemtrayicon.diff"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
         'qtconfig.desktop' 'improve-cups-support.patch' 'qt_no_debug.patch')
 md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
+         'a523644faa8f98a73f55c4aa23c114a6'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
@@ -32,6 +34,8 @@ md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
 prepare() {
 	cd ${_pkgfqn}
 
+	# tray icon with sni
+        patch -Np1 -i "${srcdir}"/kubuntu_14_systemtrayicon.diff
         # from Fedora, removing "QDBusConnection:..." message for qt apps
 	patch -p1 -i "${srcdir}"/qt_no_debug.patch
 
