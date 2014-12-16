@@ -4,24 +4,25 @@
 # Tobias Powalowski <tpowa@archlinux.org>
 
 pkgname=libvncserver
-pkgver=0.9.9
-pkgrel=3
-pkgdesc="The vnc library"
-arch=('x86_64')
-url="http://libvncserver.sourceforge.net/"
+pkgver=0.9.10
+pkgrel=1
+pkgdesc="A cross-platform C libraries that allow you to easily implement VNC server"
+arch=('i686' 'x86_64')
+url="https://libvnc.github.io/"
 license=('GPL')
-depends=('libjpeg' 'zlib' 'libpng')
-options=('!libtool')
-source=(http://downloads.sourceforge.net/${pkgname}/LibVNCServer-${pkgver}.tar.gz)
-md5sums=('70422169b122765693d2a294d13e3714')
+depends=('libpng' 'libjpeg' 'gnutls' 'libgcrypt' 'openssl')
+makedepends=('sdl')
+source=("https://github.com/LibVNC/libvncserver/archive/LibVNCServer-${pkgver}.tar.gz")
+md5sums=('e1b888fae717b06896f8aec100163d27')
 
 build() {
-  cd $srcdir/LibVNCServer-$pkgver
-  ./configure --prefix=/usr
+  cd ${pkgname}-LibVNCServer-${pkgver}
+  ./autogen.sh
+  ./configure --prefix=/usr --without-liva
   make
 }
 
 package() {
-  cd $srcdir/LibVNCServer-$pkgver
-  make DESTDIR=$pkgdir install
+  cd ${pkgname}-LibVNCServer-${pkgver}
+  make DESTDIR="${pkgdir}" install
 }
