@@ -1,19 +1,16 @@
-# $Id$
 # Maintainer: Ionut Biru <ibiru@archlinux.org>
 
 pkgbase=pygobject
-pkgname=(python2-gobject pygobject-devel)
+pkgname=(python2-gobject python3-gobject pygobject-devel)
 pkgver=3.12.2
-pkgrel=1
+pkgrel=2
 arch=(i686 x86_64)
 url="https://live.gnome.org/PyGObject"
 license=(LGPL)
-makedepends=(python2 python2-cairo gobject-introspection gnome-common)
+makedepends=(python2 python2-cairo gobject-introspection gnome-common python3 python3-cairo)
 source=(http://ftp.gnome.org/pub/gnome/sources/$pkgbase/${pkgver:0:4}/$pkgbase-$pkgver.tar.xz)
 sha256sums=('7e7a3d349acf5bb4b68f8539a42e67958840a67cd4f0341ee9aa49189af2a522')
 
-
-# without python3 support, as we do not have a python3-cairo yet
 
 prepare() {
   mkdir build-py2 build-py3 devel
@@ -27,14 +24,14 @@ build() {
   make
 
   # enable at a later point
-  #cd ../build-py3
-  #../${pkgbase}-${pkgver}/configure --prefix=/usr --with-python=/usr/bin/python3
-  #make
+  cd ../build-py3
+  ../${pkgbase}-${pkgver}/configure --prefix=/usr --with-python=/usr/bin/python3
+  make
 }
 
 package_python3-gobject() {
   pkgdesc="Python 3 bindings for GObject"
-  depends=('gobject-introspection' 'python-cairo' "pygobject-devel=$pkgver")
+  depends=('gobject-introspection' 'python3-cairo' "pygobject-devel=$pkgver")
 
   cd build-py3
   make DESTDIR="$pkgdir" install
