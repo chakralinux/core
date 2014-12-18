@@ -19,17 +19,21 @@ makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'db
 options=('staticlibs')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("http://download.qt-project.org/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar.gz"
-        "kubuntu_14_systemtrayicon.diff"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
-        'qtconfig.desktop' 'improve-cups-support.patch' 'qt_no_debug.patch')
+        'qtconfig.desktop' 'improve-cups-support.patch' 'qt_no_debug.patch'
+        'moc-boost-workaround.patch'
+        'CVE-2014-0190.patch'
+        'kubuntu_14_systemtrayicon.diff')
 md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
-         'a523644faa8f98a73f55c4aa23c114a6'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
          '6b771c8a81dd90b45e8a79afa0e5bbfd'
          'b9fb6b953cec428d59c026b1ef370e86'
-         '742bfebaebc44c26f6cabe654f702cc8')
+         '742bfebaebc44c26f6cabe654f702cc8'
+         'da387bde22ae1c446f12525d2a31f070'
+         '34ed257109afb83342cfe514c8abe027'
+         'a523644faa8f98a73f55c4aa23c114a6')
 
 prepare() {
 	cd ${_pkgfqn}
@@ -40,6 +44,8 @@ prepare() {
 	patch -p1 -i "${srcdir}"/qt_no_debug.patch
 
 	patch -p1 -i "${srcdir}"/improve-cups-support.patch
+	patch -Np1 -i "${srcdir}"/moc-boost-workaround.patch
+	patch -Np1 -i "${srcdir}"/CVE-2014-0190.patch
 
         sed -i "s|-O2|${CXXFLAGS}|" mkspecs/common/{g++,gcc}-base.conf
         sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" mkspecs/common/gcc-base-unix.conf
