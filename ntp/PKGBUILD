@@ -1,9 +1,9 @@
 # maintainer almack[at]chakraos[dot]org>
 
 pkgname=ntp
-pkgver=4.2.6.p5
-_realver=4.2.6p5
-pkgrel=6
+pkgver=4.2.8
+_realver=4.2.8
+pkgrel=1
 pkgdesc="NTP (Network Time Protocol) tries to keep servers in sync"
 arch=('x86_64')
 license=('custom')
@@ -16,7 +16,7 @@ source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-${_realver}.tar.gz"
         'ntp.conf'
         'ntpdate.service'
         'ntpd.service')
-md5sums=('00df80a84ec9528fcfb09498075525bc'
+md5sums=('6972a626be6150db8cfbd0b63d8719e7'
          'ac884ad959850731d8f27667681bbdf8'
          '11c7dea7e35034ffc370dafae49f1d45'
          '47e56748b360693c7ebe3de990ff7e7c')
@@ -37,19 +37,9 @@ package() {
   
   make DESTDIR="${pkgdir}" install
   
-  rmdir "${pkgdir}"/usr/{lib,sbin}
   install -d -o 87 "${pkgdir}/var/lib/ntp"
   install -Dm644 ../ntp.conf "${pkgdir}"/etc/ntp.conf
   install -Dm644 ../ntpd.service "${pkgdir}"/usr/lib/systemd/system/ntpd.service
   install -Dm644 ../ntpdate.service "${pkgdir}"/usr/lib/systemd/system/ntpdate.service
   install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-  
-  cd html
-  ../scripts/html2man
-  install -d "${pkgdir}"/usr/share/man
-  mv man/man* "${pkgdir}"/usr/share/man
-  mv "${pkgdir}/usr/share/man/man8/ntpd.8" "${pkgdir}/usr/share/man/man8/ntp-ntpd.8" # we should ditch openntpd
- 
-  install -dm755 "$pkgdir/usr/lib/systemd/ntp-units.d"
-  echo "ntpd.service" > "$pkgdir/usr/lib/systemd/ntp-units.d/$pkgname.list"
 }
