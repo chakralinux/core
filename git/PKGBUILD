@@ -2,7 +2,7 @@
 # contributor <almack[at]chakraos[dot]org>
 
 pkgname=git
-pkgver=2.0.2
+pkgver=2.2.1
 pkgrel=1
 pkgdesc="Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 arch=('x86_64')
@@ -15,37 +15,49 @@ optdepends=('tk: gitk and git gui'
             'perl-term-readkey: git svn'
             'perl-net-smtp-ssl: git send-email TLS support'
             'python2: various helper scripts'
-            'subversion: git svn'
-            'cvsps: git cvsimport')
+            'subversion: git svn')
 replaces=('git-core')
 provides=('git-core')
-backup=('etc/conf.d/git-daemon.conf')
 install="git.install"
 source=("https://www.kernel.org/pub/software/scm/git/git-$pkgver.tar.xz"
-        'git-daemon@.service'
-        'git-daemon.socket')
-md5sums=('4515f5926ddae48fe42083a08bd958d5'
+        0001-create-gpg-homedir-on-the-fly.patch
+        0002-skip-RFC1991-tests-for-gnupg-2.1.patch
+        git-daemon@.service
+        git-daemon.socket)
+md5sums=('43e01f9d96ba8c11611e0eef0d9f9f28'
+         '5383e27f24bfd356f24b709ea27f8201'
+         '9bb82b29aee1772a893cc2a0a1584b89'
          '042524f942785772d7bd52a1f02fe5ae'
          'f67869315c2cc112e076f0c73f248002')
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+  patch -Np1 < ../0001-create-gpg-homedir-on-the-fly.patch
+  # patch utility doesn't support git binary diffs
+  rm t/lib-gpg/random_seed
+  rm t/lib-gpg/trustdb.gpg
+  patch -Np1 < ../0002-skip-RFC1991-tests-for-gnupg-2.1.patch
+}
 
 build() {
   export PYTHON_PATH='/usr/bin/python2'
   cd "${srcdir}/${pkgname}-${pkgver}"
   make prefix=/usr gitexecdir=/usr/lib/git-core \
+    CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
     USE_LIBPCRE=1 \
     NO_CROSS_DIRECTORY_HARDLINKS=1 \
     MAN_BOLD_LITERAL=1 \
     all doc
 
   make -C contrib/emacs prefix=/usr
-  make -C contrib/subtree prefix=/usr all doc
+  make -C contrib/subtree prefix=/usr gitexecdir=/usr/lib/git-core all doc
 }
 
 check() {
   export PYTHON_PATH='/usr/bin/python2'
   cd "$srcdir/$pkgname-$pkgver"
   local jobs
-  jobs=$(expr "$MAKEFLAGS" : '.*\(-j[0-9]*\).*')
+  jobs=$(expr "$MAKEFLAGS" : '.*\(-j[0-9]*\).*') || true
   mkdir -p /dev/shm/git-test
   make prefix=/usr gitexecdir=/usr/lib/git-core \
     CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
@@ -63,6 +75,7 @@ package() {
   export PYTHON_PATH='/usr/bin/python2'
   cd "${srcdir}/${pkgname}-${pkgver}"
   make prefix=/usr gitexecdir=/usr/lib/git-core \
+    CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
     USE_LIBPCRE=1 \
     NO_CROSS_DIRECTORY_HARDLINKS=1 \
     MAN_BOLD_LITERAL=1 \
@@ -77,18 +90,18 @@ package() {
   # emacs interface
   make -C contrib/emacs prefix=/usr DESTDIR="$pkgdir" install
   # subtree installation
-  sed "s|libexec/git-core|lib/git-core|" -i contrib/subtree/Makefile
-  make -C contrib/subtree prefix=/usr DESTDIR="$pkgdir" install install-doc
-  # more contrib stuff
-  cp -a ./contrib/* "${pkgdir}/usr/share/git/"
+  make -C contrib/subtree prefix=/usr gitexecdir=/usr/lib/git-core DESTDIR="$pkgdir" install install-doc
+  # the rest of the contrib stuff
+  cp -a ./contrib/* $pkgdir/usr/share/git/
 
   # scripts are for python 2.x
-  find "${pkgdir}" -name '*.py' \
-       -exec sed -e 's|#![ ]*/usr/bin/env python|#!/usr/bin/env python2|' -i \{\} \+
-
-  sed -e 's|#![ ]*/usr/bin/env python|#!/usr/bin/env python2|' \
-      -i "${pkgdir}/usr/lib/git-core/git-p4" \
-      -i "${pkgdir}/usr/share/git/gitview/gitview"
+  sed -i 's|#![ ]*/usr/bin/env python$|#!/usr/bin/env python2|' \
+    $(find "$pkgdir" -name '*.py') \
+    "$pkgdir"/usr/share/git/gitview/gitview \
+    "$pkgdir"/usr/share/git/remote-helpers/git-remote-bzr \
+    "$pkgdir"/usr/share/git/remote-helpers/git-remote-hg
+  sed -i 's|#![ ]*/usr/bin/python$|#!/usr/bin/python2|' \
+    "$pkgdir"/usr/share/git/svn-fe/svnrdump_sim.py
 
   # remove perllocal.pod, .packlist, and empty directories.
   rm -rf "${pkgdir}/usr/lib/perl5"
