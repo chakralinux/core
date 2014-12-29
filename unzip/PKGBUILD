@@ -11,8 +11,23 @@ arch=('i686' 'x86_64')
 url="http://www.info-zip.org/"
 license=('custom')
 depends=('bzip2' 'bash')
-source=('http://downloads.sourceforge.net/infozip/unzip60.tar.gz')
-md5sums=('62b490407489521db863b523a7f86375')
+source=('http://downloads.sourceforge.net/infozip/unzip60.tar.gz'
+        CVE-2014-8139-crc-overflow.patch
+        CVE-2014-8140-test-compr-eb.patch
+        CVE-2014-8141-getzip64data.patch)
+md5sums=('62b490407489521db863b523a7f86375'
+         '86fdb01be92ca170fca89ed9e914a560'
+         '04ab8f66ee5d869fa59f0e4998893691'
+         '48937fae1fe333db571cae9d570952dd')
+
+prepare(){
+  cd ${srcdir}/${pkgname}${pkgver/./}
+
+  # https://www.debian.org/security/2014/dsa-3113
+  patch -Np1 -i "${srcdir}"/CVE-2014-8139-crc-overflow.patch
+  patch -Np1 -i "${srcdir}"/CVE-2014-8140-test-compr-eb.patch
+  patch -Np1 -i "${srcdir}"/CVE-2014-8141-getzip64data.patch
+}
 
 build() {
   cd ${srcdir}/${pkgname}${pkgver/./}
