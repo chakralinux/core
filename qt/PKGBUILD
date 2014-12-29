@@ -8,7 +8,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers' 'qt-docs')
 pkgver=4.8.6
-pkgrel=2
+pkgrel=4
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -23,7 +23,10 @@ source=("http://download.qt-project.org/official_releases/qt/4.8/${pkgver}/${_pk
         'qtconfig.desktop' 'improve-cups-support.patch' 'qt_no_debug.patch'
         'moc-boost-workaround.patch'
         'CVE-2014-0190.patch'
-        'kubuntu_14_systemtrayicon.diff')
+        'kubuntu_14_systemtrayicon.diff'
+        'glib-honor-ExcludeSocketNotifiers-flag.diff'
+        'qtcore-4.8.5-qeventdispatcher-recursive.patch'
+        'l-qclipboard_delay.patch')
 md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
@@ -33,7 +36,10 @@ md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
          '742bfebaebc44c26f6cabe654f702cc8'
          'da387bde22ae1c446f12525d2a31f070'
          '34ed257109afb83342cfe514c8abe027'
-         'a523644faa8f98a73f55c4aa23c114a6')
+         'a523644faa8f98a73f55c4aa23c114a6'
+         '85679531c8a7310317adfb7002d9f99a'
+         '009de09b4e589a7770fba74405656c99'
+         'addc5e88d538ee55e17bd49ba337ca67')
 
 prepare() {
 	cd ${_pkgfqn}
@@ -46,6 +52,13 @@ prepare() {
 	patch -p1 -i "${srcdir}"/improve-cups-support.patch
 	patch -Np1 -i "${srcdir}"/moc-boost-workaround.patch
 	patch -Np1 -i "${srcdir}"/CVE-2014-0190.patch
+	
+	# https://bugreports.qt-project.org/browse/QTBUG-37380 (use by LibreOffice)
+	patch -Np1 -i "${srcdir}"/glib-honor-ExcludeSocketNotifiers-flag.diff
+	# https://bugreports.qt-project.org/browse/QTBUG-34614 (use by LibreOffice)
+	patch -Np0 -i "${srcdir}"/qtcore-4.8.5-qeventdispatcher-recursive.patch
+	# https://bugreports.qt-project.org/browse/QTBUG-38585 (use by LibreOffice)
+	patch -Np0 -i "${srcdir}"/l-qclipboard_delay.patch
 
         sed -i "s|-O2|${CXXFLAGS}|" mkspecs/common/{g++,gcc}-base.conf
         sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" mkspecs/common/gcc-base-unix.conf
