@@ -3,17 +3,23 @@
 #
 
 pkgname=gobject-introspection
-pkgver=1.38.0
-pkgrel=2
+pkgver=1.42.0
+pkgrel=1
 pkgdesc="Introspection system for GObject-based libraries"
 url="https://live.gnome.org/GObjectInstrospection"
 arch=('x86_64')
 license=('LGPL' 'GPL')
-depends=('libffi' 'glib2' 'python2' 'python2-mako')
-makedepends=('cairo')
+depends=('glib2')
+makedepends=('cairo' 'python2' 'python2-mako')
+optdepends=('python2: gir development tools'
+            'python2-mako: g-ir-doc-tool')
 source=(http://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver::4}/$pkgname-$pkgver.tar.xz)
-md5sums=('4851028e950ec0f809e26676b22aba97')
+md5sums=('4fa52f6b67367d9c1b99b98683ced202')
 
+prepare() {
+  cd $pkgname-$pkgver
+  sed -i '1s|#!/usr/bin/env python$|&2|' giscanner/*.py
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -24,8 +30,5 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
-
-  sed -i '1s|#!/usr/bin/env python$|&2|' \
-    "${pkgdir}"/usr/lib/gobject-introspection/giscanner/*.py
 }
 
