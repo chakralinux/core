@@ -3,62 +3,81 @@
 #
 # maintainer abveritas[at]chakra-project[dot]org>
 
-pkgname=postfix
-pkgver=2.11.0
+pkgname=(postfix postfix-tools)
+pkgbase=postfix
+pkgver=2.11.3
 pkgrel=1
 pkgdesc='Secure, fast, easy to administer alternative to Sendmail'
 url='http://www.postfix.org/'
 arch=('x86_64')
 license=('custom')
-depends=('pcre' 'libsasl' 'libmariadbclient' 'postgresql-libs' 'sqlite3' 'libldap' 'db')
-backup=('etc/postfix/'{access,aliases,canonical,generic,header_checks,main.cf,master.cf,relocated,transport,virtual})
-provides=('smtp-server' 'smtp-forwarder')
-replaces=('postfix-mysql' 'postfix-pgsql')
-conflicts=('postfix-mysql' 'postfix-pgsql' 'smtp-server' 'smtp-forwarder')
-install=$pkgname.install
+makedepends=('pcre' 'libsasl' 'libldap' 'db'
+                 'libmariadbclient' 'postgresql-libs' 'sqlite3' 'openssl')
 source=("ftp://ftp.porcupine.org/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz"
         'aliases.patch'
         'postfix.service')
-md5sums=('25fe7dd05f81cc0755131beecee046fd'
+md5sums=('c3f0f51d8865559b40e9350eb3816011'
          '9cc2ee3c72e134c2da5a895abaa56f30'
          '24af169de13c34dac03d787c3e607ec5')
 
 build() {
-	cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
-	make makefiles DEBUG='' CCARGS=' \
-		-DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl \
-		-DHAS_LDAP \
-		-DUSE_TLS \
-		-DHAS_MYSQL -I/usr/include/mysql \
-		-DHAS_PGSQL -I/usr/include/postgresql \
-		-DHAS_SQLITE \
-	' AUXLIBS=' \
-		-lsasl2 \
-		-lldap -llber \
-		-lssl -lcrypto \
-		-lmysqlclient -lz -lm \
-		-lpq \
-		-lsqlite3 -lpthread \
-	' OPT="${CFLAGS} ${LDFLAGS}"
+  make makefiles DEBUG='' CCARGS=' \
+          -DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl \
+          -DHAS_LDAP \
+          -DUSE_TLS \
+          -DHAS_MYSQL -I/usr/include/mysql \
+          -DHAS_PGSQL -I/usr/include/postgresql \
+          -DHAS_SQLITE \
+          -DDEF_COMMAND_DIR=\"/usr/bin\" \
+          -DDEF_DAEMON_DIR=\"/usr/lib/postfix\" \
+          -DDEF_SENDMAIL_PATH=\"/usr/bin/sendmail\" \
+          -DDEF_README_DIR=\"/usr/share/doc/postfix\" \
+          -DDEF_SAMPLE_DIR=\"/etc/postfix/sample\" \
+          -DDEF_MANPAGE_DIR=\"/usr/share/man\" \
+  ' AUXLIBS=' \
+          -lsasl2 \
+          -lldap -llber \
+          -lssl -lcrypto \
+          -lmysqlclient -lz -lm \
+          -lpq \
+          -lsqlite3 -lpthread \
+  ' OPT="${CFLAGS} ${LDFLAGS}"
 
-	make
+  make
 }
 
-package() {
-	cd "${srcdir}/${pkgname}-${pkgver}"
+package_postfix() {
+  pkgdesc='Fast, easy to administer, secure mail server'
+  depends=('pcre' 'libsasl' 'libldap' 'db'
+            'libmariadbclient' 'postgresql-libs' 'sqlite3')
+  backup=('etc/postfix/'{access,aliases,canonical,generic,header_checks,main.cf,master.cf,relocated,transport,virtual})
+  provides=('smtp-server' 'smtp-forwarder')
+  replaces=('postfix-mysql' 'postfix-pgsql')
+  conflicts=('postfix-mysql' 'postfix-pgsql' 'smtp-server' 'smtp-forwarder')
+  install=$pkgname.install
+  cd "${srcdir}/postfix-${pkgver}"
 
-	sh postfix-install -non-interactive \
-		install_root="${pkgdir}" \
-		daemon_directory="/usr/lib/${pkgname}" \
-		sample_directory="/etc/${pkgname}/sample" \
-		manpage_directory="/usr/share/man" \
-		readme_directory="/usr/share/doc/${pkgname}"
+  sh postfix-install -non-interactive install_root="${pkgdir}"
 
-	install -Dm644 "${srcdir}/${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
-	install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 ../postfix.service "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
 
-	cd "${pkgdir}"
-	patch -p0 < "${srcdir}"/aliases.patch
-	sed 's/^\(\$manpage[^:]*\):/\1.gz:/' -i "usr/lib/${pkgname}/postfix-files"
+  cd "${pkgdir}"
+  patch -p0 -i "${srcdir}"/aliases.patch
+  sed 's/^\(\$manpage[^:]*\):/\1.gz:/' -i "usr/lib/${pkgname}/postfix-files"
+}
+
+package_postfix-tools() {
+  pkgdesc='SMTP/QMQP tools from the postfix distribution'
+  depends=('openssl')
+  cd "${srcdir}/postfix-${pkgver}"
+
+  for name in posttls-finger {smtp,qmqp}-{sink,source}; do
+          install -Dm644 "man/man1/${name}.1" "$pkgdir/usr/share/man/man1/${name}.1"
+          install -Dm755 "bin/${name}" "$pkgdir/usr/bin/${name}"
+  done
+
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
