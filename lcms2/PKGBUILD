@@ -1,25 +1,29 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
+# maintainer almack <gluca86 at gmail dot com>
 
 pkgname=lcms2
-pkgver=2.5
+pkgver=2.6
 pkgrel=1
-pkgdesc="Small-footprint color management engine"
+pkgdesc="Small-footprint color management engine, version 2"
 arch=('x86_64')
 url="http://www.littlecms.com/"
 license=('MIT')
 depends=('libtiff')
-options=(!libtool)
-source=("http://downloads.sourceforge.net/project/lcms/lcms/$pkgver/lcms2-$pkgver.tar.gz")
-sha1sums=('bab3470471fc7756c5fbe71be9a3c7d677d2ee7b')
+source=(http://downloads.sourceforge.net/sourceforge/lcms/${pkgname}-${pkgver}.tar.gz)
+sha1sums=('b0ecee5cb8391338e6c281d1c11dcae2bc22a5d2')
 
 build() {
   cd "$srcdir"/lcms2-$pkgver
 
   ./configure --prefix=/usr
   make
+}
+
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
 }
 
 package() {
