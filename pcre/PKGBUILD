@@ -4,23 +4,20 @@
 # maintainer (x86_64): AlmAck <almack[at]chakraos[dot]org>
 
 pkgname=pcre
-pkgver=8.35
-pkgrel=2
+pkgver=8.36
+pkgrel=1
 pkgdesc="A library that implements Perl 5-style regular expressions"
 arch=('x86_64')
 url="http://www.pcre.org/"
 license=('BSD')
 depends=('gcc-libs' 'readline' 'zlib' 'bzip2')
 source=("ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/${pkgname}-${pkgver}.tar.bz2"
-'pcre-8.35-Do-not-rely-on-wrapping-signed-integer-while-parsein.patch')
-md5sums=('6aacb23986adccd9b3bc626c00979958'
-         'a2bc385e8c65edc84e98c9ea5471f169')
+'001-fix-heap-overflow.patch')
+md5sums=('b767bc9af0c20bc9c1fe403b0d41ad97'
+         '44a7e4fca07eff04d07bef65c982de9a')
 
 prepare(){
-  cd ${pkgname}-${pkgver}
-  
-  # patch from fedora to fix error on "RunTest" tests
-  patch -Np1 -i "${srcdir}/pcre-8.35-Do-not-rely-on-wrapping-signed-integer-while-parsein.patch"
+  patch -d $pkgname-$pkgver < 001-fix-heap-overflow.patch
 }
 
 build() {
