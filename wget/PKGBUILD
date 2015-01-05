@@ -5,7 +5,7 @@
 # contributor: <abveritas[at]chakra-project[dot]org>
 
 pkgname=wget
-pkgver=1.15
+pkgver=1.16.1
 pkgrel=1
 pkgdesc="A network utility to retrieve files from the Web"
 arch=('x86_64')
@@ -13,24 +13,35 @@ url="http://www.gnu.org/software/wget/wget.html"
 license=('GPL3')
 groups=('base')
 depends=('openssl' 'libidn' 'util-linux' 'pcre')
+checkdepends=('perl-http-daemon' 'perl-io-socket-ssl' 'python')
 optdepends=('ca-certificates: HTTPS downloads')
 backup=('etc/wgetrc')
 install=wget.install
 source=(ftp://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz{,.sig})
-md5sums=('7a279d5ac5594919124d5526e7143e28'
+md5sums=('78942cc0cce0a23e18114d982789e360'
          'SKIP')
 
+prepare() {
+  cd ${pkgname}-${pkgver}
+  cat >> doc/sample.wgetrc <<EOF
+
+# default root certs location
+ca_certificate=/etc/ssl/certs/ca-certificates.crt
+EOF
+}
+
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure -with-ssl=openssl --prefix=/usr --sysconfdir=/etc --enable-nls
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr --sysconfdir=/etc --enable-nls --with-ssl=openssl
   make
 }
 
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
+}
+
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
-
-  echo '# default root certs location' >> "$pkgdir/etc/wgetrc"
-  echo 'ca_certificate=/etc/ssl/certs/ca-certificates.crt' >> "$pkgdir/etc/wgetrc"
-
 }
