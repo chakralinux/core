@@ -7,46 +7,48 @@
 # Maintainer: BrLi <rainman59118[at]Gmail.com>
 
 pkgname=cdemu-daemon
-pkgver=2.1.1
-pkgrel=3
+pkgver=3.0.2
+pkgrel=1
 pkgdesc=("CD/DVD-ROM device emulator daemon")
 arch=('x86_64')
 backup=('etc/conf.d/cdemu-daemon'
 	'etc/dbus-1/system.d/cdemu-daemon-dbus.conf')
 url="http://cdemu.sourceforge.net/"
 license=('GPL')
-depends=('glib2' 'dbus' 'dbus-glib' 'libdaemon' 'vhba-module' "libmirage=$pkgver" 'libao')
+depends=('glib2' 'dbus' 'dbus-glib' 'libdaemon' 'vhba-module' "libmirage>=$pkgver" 'libao')
 makedepends=('cmake')
 optdepends=('alsa-lib: to enable the ALSA audio driver'
             'pulseaudio: to enable the PA audio driver')
 install=$pkgname.install
 source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2"
-        'cdemu-daemon.conf')
-md5sums=('a0ede84ba3278d2886358b4f3fec5e18'
-         '109d1eb46eb2943e511715611907d1e9')
+        'system-arch.patch')
+md5sums=('ada2ec2ff2e1bbbc10c596414b4ba77d'
+         'fd50ba1c66c95337044db494fba887c4')
+
+prepare() {
+  mkdir build
+  cd $pkgname-$pkgver
+
+  # Patch system daemon for Arch-friendlyness
+  # It's disabled by default. Should we even ship it?
+  patch -Np1 -i ../system-arch.patch
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  
-  mkdir build
   cd build
-  cmake .. \
+  cmake ../$pkgname-$pkgver \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
     -DCMAKE_INSTALL_SYSCONFDIR=/etc \
-    -DCMAKE_INSTALL_LIBEXECDIR=lib/$pkgname  
+    -DCMAKE_INSTALL_LIBEXECDIR=lib/$pkgname
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}/build"
-  make DESTDIR="${pkgdir}" install
-  
-  install -d "${pkgdir}/usr/lib/modules-load.d"
-  echo "vhba" > "${pkgdir}/usr/lib/modules-load.d/cdemu.conf"
-  
-  cd ../..
-  
-  # Chakra settings
-  install -Dm644 "${srcdir}/cdemu-daemon.conf" "${pkgdir}/etc/conf.d/cdemu-daemon"
+  cd build
+  make DESTDIR="$pkgdir" install
+
+  install -d "$pkgdir/usr/lib/modules-load.d"
+  echo vhba > "$pkgdir/usr/lib/modules-load.d/cdemu.conf"
 }

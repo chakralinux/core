@@ -2,14 +2,14 @@
 
 pkgbase=pygobject
 pkgname=(python2-gobject python3-gobject pygobject-devel)
-pkgver=3.12.2
-pkgrel=3
-arch=(i686 x86_64)
+pkgver=3.14.0
+pkgrel=1
+arch=('x86_64')
 url="https://live.gnome.org/PyGObject"
 license=(LGPL)
 makedepends=(python2 python2-cairo gobject-introspection gnome-common python3 python3-cairo)
 source=(http://ftp.gnome.org/pub/gnome/sources/$pkgbase/${pkgver:0:4}/$pkgbase-$pkgver.tar.xz)
-sha256sums=('7e7a3d349acf5bb4b68f8539a42e67958840a67cd4f0341ee9aa49189af2a522')
+sha256sums=('779effa93f4b59cdb72f4ab0128fb3fd82900bf686193b570fd3a8ce63392d54')
 
 
 prepare() {
@@ -45,6 +45,7 @@ package_python2-gobject() {
   cd build-py2
   make DESTDIR="$pkgdir" install
   mv "$pkgdir"/usr/{include,lib/pkgconfig} "$srcdir/devel"
+  python2 -m compileall "$pkgdir"//usr/lib/python2.7/site-packages/gi
 }
 
 package_pygobject-devel() {

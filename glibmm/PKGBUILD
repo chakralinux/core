@@ -1,18 +1,18 @@
 #
 # Platform Packages for Chakra, part of chakra-project.org
 #
-# maintainer abveritas@chakra-project.org
+# maintainer almack
 
 pkgbase=glibmm
 pkgname=('glibmm' 'glibmm-docs')
-pkgver=2.38.1
-pkgrel=2
+pkgver=2.42.0
+pkgrel=1
 arch=('x86_64')
 license=('LGPL')
-makedepends=('glib2' 'libsigc++2.0' 'pkgconfig')
+makedepends=('glib2' 'libsigc++' 'pkgconfig')
 source=(http://ftp.gnome.org/pub/GNOME/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz)
 url="http://gtkmm.sourceforge.net/"
-md5sums=('50d86a77398cd473ff13c4c9382e39bd')
+md5sums=('7c52cc42085d30ac3b73d74c3f2eb22e')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -22,7 +22,7 @@ build() {
 
 package_glibmm() {
   pkgdesc="Glib-- (glibmm) is a C++ interface for glib"
-  depends=('glib2' 'libsigc++2.0')
+  depends=('glib2' 'libsigc++')
   cd "${srcdir}/${pkgbase}-${pkgver}"
   sed -i -e 's/^doc_subdirs/#doc_subdirs/' Makefile
   make DESTDIR="${pkgdir}" install
