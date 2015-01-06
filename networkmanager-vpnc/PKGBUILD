@@ -1,20 +1,19 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 #
-# maintainer abveritas@chakra-project.org
+# maintainer almack
 
 pkgname=networkmanager-vpnc
-pkgver=0.9.10.0
+pkgver=1.0.0
 pkgrel=1
 pkgdesc="NetworkManager VPN plugin for vpnc"
 arch=('x86_64')
 license=('GPL')
 url="http://www.gnome.org/projects/NetworkManager/"
-depends=('networkmanager>=0.9' 'vpnc')
-makedepends=('intltool') 
-options=('!libtool')
-source=("http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-vpnc/0.9/NetworkManager-vpnc-${pkgver}.tar.xz")
-md5sums=('1109597f5fa8b3c00472a23fdeb787f0')
+depends=('networkmanager' 'vpnc')
+makedepends=('intltool')
+source=("http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-vpnc/1.0/NetworkManager-vpnc-${pkgver}.tar.xz")
+md5sums=('aef926b6888704b832feac8a9be57504')
 
 build() {
   cd "${srcdir}/NetworkManager-vpnc-${pkgver}"
@@ -23,7 +22,8 @@ build() {
 	--localstatedir=/var \
 	--libexecdir=/usr/lib/networkmanager \
         --without-gnome \
-	--disable-static 
+	--disable-static \
+        --disable-more-warnings
   make 
 }
 

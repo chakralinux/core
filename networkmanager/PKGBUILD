@@ -5,15 +5,14 @@
 
 pkgname=networkmanager
 _pkgname=NetworkManager
-pkgver=0.9.10.0
-pkgrel=3
+pkgver=1.0.0
+pkgrel=1
+_pppver=2.4.7
 pkgdesc="Network Management daemon"
 arch=('x86_64')
 license=('GPL')
 url="http://www.gnome.org/projects/NetworkManager/"
-_pppver=2.4.7
-depends=('dbus-glib' 'iproute2' 'libndp' 'libnl' 'nss' 'polkit' 'systemd' 'wpa_supplicant' "ppp=${_pppver}" 'dhclient'
-         'libsoup' 'modemmanager' 'libnewt' 'libteam')
+depends=('dbus-glib' 'iproute2' 'libndp' 'libnl' 'nss' 'polkit' 'systemd' 'wpa_supplicant' "ppp=${_pppver}" 'dhclient' 'libsoup' 'modemmanager' 'libnewt' 'libteam')
 makedepends=('intltool' 'dhclient' 'iptables' 'gobject-introspection' 'rp-pppoe')
 optdepends=('dhcpcd: Alternative dhcp support'
             'dnsmasq: connection sharing'
@@ -22,32 +21,20 @@ optdepends=('dhcpcd: Alternative dhcp support'
             'ppp: dialup connection support'
             'rp-pppoe: ADSL support'
             'modemmanager: cellular network support')
-options=('!libtool')
 backup=('etc/NetworkManager/NetworkManager.conf')
 install=networkmanager.install
-
 source=("http://ftp.gnome.org/pub/gnome/sources/$_pkgname/${pkgver:0:3}/$_pkgname-$pkgver.tar.xz"
         'NetworkManager.conf' 
-        'disable_set_hostname.patch' 
-        'git-fixes.patch' '0002-bluez-split-out-errors.patch' '0003-bluez-track-adapter-address-in-NMBluezDevice.patch' '0004-bluez-re-add-DUN-support-for-Bluez5.patch')
-sha256sums=('66a88346bb04d4f402540281181340313b2ec433e75aa9d9ea13f31697f9487e'
-            '44b048804c7c0b8b3b0c29b8632b6ad613c397d0a1635ec918e10c0fbcdadf21'
-            '25056837ea92e559f09563ed817e3e0cd9333be861b8914e45f62ceaae2e0460'
-            'cc1cadb35c21327bebdb222517a8872d612c8e60583f2f9f040162d74a293b1b'
-            '5b9901d4fdbad72ec40893517691be8e87e065a611f08d1fb9a17a6c32619539'
-            'f523b8df3b7a105eb94f58eb241216032660db5feb7a2a1f07b4a617a357058f'
-            '7e6807635d4b245d2702ae1fc68505411527f9d50af20e0907b3ee452e138d98')
+        'disable_set_hostname.patch' )
+md5sums=('71cae8707a90fa92e28cafbc9262b548'
+         '1653159d6634fb62d3a5c548b7a56151'
+         '6b5415350c04304a28d29294441a07ae')
 
 
 build() {
   cd $_pkgname-$pkgver
 
   patch -p1 -i ../disable_set_hostname.patch
-  patch -p1 -i ../git-fixes.patch
-  patch -Np1 -i ../0002-bluez-split-out-errors.patch
-  patch -Np1 -i ../0003-bluez-track-adapter-address-in-NMBluezDevice.patch
-  patch -Np1 -i ../0004-bluez-re-add-DUN-support-for-Bluez5.patch
-  NOCONFIGURE=1 ./autogen.sh
 
   ./configure \
     --prefix=/usr \
