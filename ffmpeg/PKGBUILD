@@ -1,9 +1,9 @@
-# Contributor: abveritas@chakra-project.org
+# Contributor: almack
 # Maintainer: Bruce Liu <brli@users.sourceforge.net>
 
 pkgname=ffmpeg
-pkgver=2.1.6
-pkgrel=2
+pkgver=2.5.2
+pkgrel=1
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('x86_64')
 url="http://ffmpeg.org"
@@ -12,11 +12,11 @@ depends=('alsa-lib' 'bzip2' 'fontconfig' 'freetype2' 'gnutls' 'harfbuzz' 'gsm' '
          'libbluray' 'libcaca' 'libdc1394' 'libmodplug' 'libtheora' 'libva' 'libvdpau'
 	 'libvorbis' 'libvpx>=1.1.0' 'libxfixes' 'libxv' 'openal' 'opencore-amr' 'openjpeg'
 	 'opus' 'pulseaudio' 'rtmpdump' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore'
-	 'zlib')
-makedepends=('yasm' 'x264' 'x265')
+	 'zlib' 'x264' 'x265')
+makedepends=('yasm')
 source=("${url}/releases/${pkgname}-${pkgver}.tar.gz"
         "${url}/releases/${pkgname}-${pkgver}.tar.gz.asc")
-md5sums=('ef83f6892508b1ea0943cbcb9d7e8ebe'
+md5sums=('9bcb1a7884f17e09a79337db724fa3fb'
          'SKIP')
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -48,6 +48,7 @@ build() {
               --enable-libvorbis \
               --enable-libvpx \
               --enable-libx264 \
+              --enable-libx265 \
               --enable-libxvid \
               --enable-runtime-cpudetect \
               --enable-shared \

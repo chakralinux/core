@@ -1,5 +1,5 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakraos.org
 #
 # Maintainer: Adrian Chaves Fernandez (Gallaecio) <adriyetichaves@gmail.com>
 # Contributor: Jan Alexander Steffens (heftig) <jan.steffens@gmail.com>
@@ -7,17 +7,18 @@
 # Contributer: Jason Chu <jchu@xentac.net>
 
 pkgname=openal
-pkgver=1.15.1
+pkgver=1.16.0
 pkgrel=1
 pkgdesc="OpenAL is a cross-platform 3D audio library for use with OpenGL"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.openal.org/"
 license=('LGPL')
 depends=('glibc')
-makedepends=('alsa-lib' 'sdl' 'cmake' 'libpulse')
-options=('!libtool')
+makedepends=('alsa-lib' 'sdl' 'cmake' 'libpulse' 'qt4' 'fluidsynth')
+optdepends=('qt4: alsoft-config GUI Configurator'
+            'fluidsynth: MIDI rendering')
 source=(http://kcat.strangesoft.net/$pkgname-releases/$pkgname-soft-${pkgver}.tar.bz2)
-md5sums=('ea83dec3b9655a27d28e7bc7cae9cd71')
+md5sums=('14db4b0d12f07252070b4fe5eb5911f6')
 
 build() {
   cd ${srcdir}/${pkgname}-soft-${pkgver}/build
