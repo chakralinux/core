@@ -7,9 +7,9 @@
 pkgbase=qt5
 pkgname=('qt5-base'
          'qt5-connectivity'
+	 'qt5-declarative'
          'qt5-doc'
          'qt5-enginio'
-         'qt5-declarative'
          'qt5-graphicaleffects'
          'qt5-imageformats'
          'qt5-location'
@@ -22,12 +22,15 @@ pkgname=('qt5-base'
          'qt5-svg'
          'qt5-tools'
          'qt5-translations'
+	 'qt5-wayland'
+	 'qt5-webchannel'
+	 'qt5-webengine'
          'qt5-webkit'
-         'qt5-x11extras'
          'qt5-websockets'
+         'qt5-x11extras'
          'qt5-xmlpatterns'
          'qt5-private-headers')
-pkgver=5.3.2
+pkgver=5.4.0
 pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
@@ -37,14 +40,14 @@ makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'db
     'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
     'mariadb' 'unixodbc' 'cups' 'libxinerama' 'libxcomposite' 'libxcursor' 'libxkbcommon' 'python2' 'gperf' 'ruby'
     'xcb-util-image' 'xcb-util-keysyms' 'xcb-util-renderutil' 'xcb-util-wm' 'libpulse'
-    'gstreamer' 'gst-plugins-base' 'gst-plugins-good'
+    'gstreamer' 'gst-plugins-base' 'gst-plugins-good' 'nss'
     'gst-plugins-bad' 'gst-plugins-ugly' 'harfbuzz' 'pkg-config')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
-source=("http://download.qt-project.org/official_releases/qt/5.3/${pkgver}/single/${_pkgfqn}.tar.xz"
+source=("http://download.qt-project.org/official_releases/qt/${pkgver%.*}/${pkgver}/single/${_pkgfqn}.tar.xz"
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
         'youtubeview.desktop' 'flickrview.desktop' 'browser.desktop' 'fancybrowser.desktop' 'qmlviewer.desktop'
         'qdbusviewer-qt5.desktop')
-sha1sums=('fb156a87a193c9a7a2fa51efc89660a3b619ace5'
+sha1sums=('2f5558b87f8cea37c377018d9e7a7047cc800938'
           '981cf376da66c8be7c7ec99866da0299114192f6'
           'e131a17beda4625f21022981a519b5e8d8c8e6f7'
           '62806b6696696d4ef69e4c0733fc9f1d761f08cd'
@@ -62,12 +65,9 @@ _prlfix() {
     -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
 }
 
-
 prepare() {
   cd ${_pkgfqn}
 
-  sed -i "s|-O2|${CXXFLAGS}|" qtbase/mkspecs/common/{g++,gcc}-base.conf
-  sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" qtbase/mkspecs/common/gcc-base-unix.conf
   sed -i "/^QMAKE_LFLAGS\s/s|+=|+= ${LDFLAGS}|g" qtbase/mkspecs/common/gcc-base.conf
 }
 
@@ -76,11 +76,10 @@ build() {
         # reenable patch later
 	#patch -p1 -i "$srcdir/defaultbookmarks_new.diff"
 
-        unset QTDIR
+        export QTDIR=${srcdir}/${_pkgfqn}
         export PATH="$PWD/qtbase/bin:$PWD/qtrepotools/bin:$PATH"
         export LD_LIBRARY_PATH="${QTDIR}"/qtbase/lib:"${QTDIR}"/qttools/lib:"${LD_LIBRARY_PATH}"
         export QT_PLUGIN_PATH="${QTDIR}"/qtbase/plugins
-        export QTDIR=${srcdir}/${_pkgfqn}
         export _xkbconfigroot=$(pkg-config --variable=xkb_base xkeyboard-config)
 
 	./configure -confirm-license -opensource \
@@ -97,6 +96,7 @@ build() {
                 -translationdir /usr/share/qt5/translations \
                 -sysconfdir /etc/xdg/qt5 \
                 -examplesdir /usr/share/qt5/examples \
+		-plugin-sql-{psql,mysql,sqlite,odbc} \
 		-system-sqlite \
                 -openssl-linked \
                 -no-rpath \
@@ -114,7 +114,6 @@ build() {
                 -feature-ftp \
                 -xcursor
 	 make
-         #make module-qtwebkit
          
 	 # Fix paths
 	 find "${QTDIR}" -name Makefile -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
@@ -428,6 +427,42 @@ package_qt5-webkit() {
   perl -pi -e "s, -L${srcdir}/?\S+,,g" "${pkgdir}"/usr/lib/pkgconfig/Qt5WebKit.pc
 }
 
+package_qt5-wayland() {
+  pkgdesc='Provides APIs for Wayland'
+  depends=('qt5-base' 'libxcomposite' 'libxkbcommon')
+
+  cd ${_pkgfqn}/qtwayland
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
+
+  install -D -m644 LGPL_EXCEPTION.txt \
+    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
+}
+
+package_qt5-webchannel() {
+  pkgdesc='Provides access to QObject or QML objects from HTML clients for seamless integration of Qt applications with HTML/JavaScript clients'
+  depends=('qt5-declarative')
+
+  cd ${_pkgfqn}/qtwebchannel
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
+
+  install -D -m644 LGPL_EXCEPTION.txt \
+    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
+}
+
+package_qt5-webengine() {
+  pkgdesc='Provides support for web applications using the Chromium browser project'
+  depends=('qt5-declarative' 'nss' 'libxtst' 'libxcursor' 'libxrandr' 'alsa-lib' 'libxcomposite')
+  license=('LGPL')
+
+  cd ${_pkgfqn}/qtwebengine
+  make INSTALL_ROOT="${pkgdir}" install
+
+  rm -rf "${pkgdir}"/usr/share/doc
+}
 
 package_qt5-websockets() {
   pkgdesc='Provides WebSocket communication compliant with RFC 6455'
