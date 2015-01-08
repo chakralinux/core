@@ -6,8 +6,8 @@
 
 pkgbase=mplayer
 pkgname=('mplayer' 'mencoder')
-pkgver=36505
-pkgrel=7
+pkgver=37344
+pkgrel=1
 arch=('x86_64')
 makedepends=('subversion' 'libxxf86vm' 'libmad' 'libxinerama' 'sdl' 'lame' 'libtheora'
              'xvidcore' 'libmng' 'libxss' 'libgl' 'smbclient' 'aalib' 'jack' 'libcaca'
@@ -21,20 +21,19 @@ categories=('multimedia')
 screenshot=("http://www.mplayerhq.hu/images/screenshots/gui-preview-01.jpg")
 install=mplayer.install
 source=("${pkgname}::svn://svn.mplayerhq.hu/mplayer/trunk#revision=${pkgver}"
-        "http://ffmpeg.org/releases/ffmpeg-2.1.4.tar.bz2"
+        "http://ffmpeg.org/releases/ffmpeg-2.5.2.tar.bz2"
         mplayer.desktop
         mplayer.png
         include-samba-4.0.patch)
 md5sums=('SKIP'
-         'dedc28003a77c69432c42ab16e5f6982'
+         '308d49d91752ac00ded9483ebaab849d'
          'c0d6ef795cf6de48e3b87ff7c23f0319'
          'd00874ccc644b7f43d6ef1c942fcef28'
          '868a92bdef148df7f38bfa992b26ce9d')
 
-
 prepare() {
     cd ${pkgname}
-    mv ../ffmpeg-2.1.4 ./ffmpeg
+    mv ../ffmpeg-*/ ./ffmpeg
 
     patch -p1 -i ../include-samba-4.0.patch
 }

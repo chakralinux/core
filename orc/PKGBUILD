@@ -1,21 +1,26 @@
 # Maintainer franzmari@chakra-project.it
 
 pkgname=orc
-pkgver=0.4.18
+pkgver=0.4.23
 pkgrel=1
 pkgdesc="The Oild Runtime Compiler"
 arch=('x86_64')
 license=('custom')
 url="http://code.entropywave.com/projects/orc/"
 depends=('glibc')
-options=('!libtool')
-source=("http://code.entropywave.com/download/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('1a2552e8d127526c48d644fe6437b377')
+makedepends=('valgrind')
+source=(http://gstreamer.freedesktop.org/data/src/orc/orc-${pkgver}.tar.xz)
+md5sums=('72e0612ace54d77aa2f7a006348ee81a')
 
 build () {
     cd "$srcdir/$pkgname-$pkgver"
     ./configure --prefix=/usr --disable-static
     make
+}
+
+check() {
+    cd $pkgname-$pkgver
+    make check
 }
 
 package() {

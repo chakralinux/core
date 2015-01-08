@@ -1,29 +1,22 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakraos.org
 #
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# maintainer (x86_64): AlmAck
 
 pkgname=sdl_gfx
-pkgver=2.0.22
+pkgver=2.0.25
 pkgrel=1
 pkgdesc="SDL Graphic Primitives"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('LGPL')
-options=(!libtool)
-url="http://www.ferzkopp.net/joomla/content/view/19/14/"
+url="http://cms.ferzkopp.net/index.php/software/13-sdl-gfx"
 source=(http://www.ferzkopp.net/Software/SDL_gfx-2.0/SDL_gfx-${pkgver}.tar.gz)
 depends=('sdl')
-md5sums=('330f291f1f09a1bdf397c9b40d92ca41')
+md5sums=('ea24ed4b82ff1304809c363494fa8e16')
 
 build() {
   cd ${srcdir}/SDL_gfx-${pkgver}
-
-  if [ "${CARCH}" == "x86_64" ]; then
-    ./configure --prefix=/usr --disable-mmx
-  else
-    ./configure --prefix=/usr
-  fi
+  ./configure --prefix=/usr --disable-mmx
 
   make
 }

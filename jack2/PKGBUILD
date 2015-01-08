@@ -1,17 +1,17 @@
 pkgbase=jack2
 pkgname=('jack2' 'jack2-dbus')
-_tarname=jack2-95a1162d6aecc91882e4d8b01ba7fb12f6d29d1c
-pkgver=1.9.9.5
-pkgrel=4
+_tarname=jack
+pkgver=1.9.10
+pkgrel=1
 arch=('x86_64')
 url="http://jackaudio.org/"
 backup=(etc/security/limits.d/99-audio.conf)
 license=('GPL')
 makedepends=('python2-dbus' 'libffado' 'celt' 'opus' 'libsamplerate')
-source=("http://chakra.sourceforge.net/sources/jack2/jack2.tar.xz"
+source=("https://dl.dropbox.com/u/28869550/jack-$pkgver.tar.bz2"
         '99-audio.conf'
         '40-hpet-permissions.rules')
-md5sums=('dea04856e7483f257da8ef3f1bea01ce'
+md5sums=('4aeb91d7ae0cabce98355436ed4f217a'
          '4d928a76e3f3d77d037c42ab75ac0f0b'
          '23eba69d2dbbb800f68176e5d38b9af5')
 
@@ -34,7 +34,7 @@ prepare() {
   cd "$srcdir"
 
   # we may do 2 different builds
-  cp -r $_tarname $_tarname-dbus
+  cp -r $_tarname-$pkgver $_tarname-dbus-$pkgver
 }
 
 build() {
@@ -42,7 +42,7 @@ build() {
 
   # mixed dbus/classic build
   if _isbuild jack2; then
-    cd $_tarname
+    cd $_tarname-$pkgver
     msg2 "Running Mixed D-Bus/Classic build"
     _wafconf --classic --dbus
     python2 waf build $MAKEFLAGS
@@ -51,7 +51,7 @@ build() {
 
   # dbus-ONLY build
   if _isbuild jack2-dbus; then
-    cd $_tarname-dbus
+    cd $_tarname-dbus-$pkgver
     msg2 "Running D-Bus-only build"
     _wafconf --dbus
     python2 waf build $MAKEFLAGS
@@ -68,7 +68,7 @@ package_jack2() {
   conflicts=('jack')
   provides=('jack' 'jackmp' 'jackdmp' 'jackdbus')
 
-  cd "$srcdir/$_tarname"
+  cd "$srcdir/$_tarname-$pkgver"
 
   python2 waf install --destdir="$pkgdir"
 
@@ -93,7 +93,7 @@ package_jack2-dbus() {
   conflicts=('jack' 'jack2')
   provides=('jack' 'jack2' 'jackmp' 'jackdmp' 'jackdbus')
 
-  cd "$srcdir/$_tarname-dbus"
+  cd "$srcdir/$_tarname-dbus-$pkgver"
 
   python2 waf install --destdir="$pkgdir"
 
