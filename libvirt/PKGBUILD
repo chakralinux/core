@@ -2,8 +2,8 @@
 # contributor abveritas@chakra-project.org
 
 pkgname=libvirt
-pkgver=1.2.5
-pkgrel=3
+pkgver=1.2.11
+pkgrel=1
 pkgdesc="API for controlling virtualization engines (openvz,kvm,qemu,virtualbox,xen,etc)"
 arch=('x86_64')
 url="http://libvirt.org/"
@@ -11,11 +11,12 @@ license=('LGPL')
 depends=('e2fsprogs' 'gnutls' 'iptables' 'libxml2' 'parted' 'polkit' 'python2'
 	 'avahi' 'yajl' 'libpciaccess' 'systemd' 'dbus-core' 'libxau' 'libxdmcp' 'libpcap'
 	 'curl' 'libsasl' 'libgcrypt' 'libgpg-error' 'openssl' 'libxcb' 'gcc-libs'
-	 'iproute2' 'netcf' 'libnl')
-makedepends=('pkgconfig' 'lvm2' 'linux-api-headers' 'audit' )
-optdepends=('bridge-utils: for briged networking (default)'
+	 'iproute2' 'netcf' 'libnl' 'libx11')
+makedepends=('pkgconfig' 'lvm2' 'linux-api-headers' 'audit' 'perl-xml-xpath' 'dnsmasq' 'perl-xml-xpath')
+optdepends=('dnsmasq: required for default NAT/DHCP for guests'
+            'bridge-utils: for briged networking (default)'
 	    'openbsd-netcat: for remote management over ssh'
-	    'qemu-kvm'
+	    'qemu'
 	    'dmidecode')
 options=('emptydirs')
 backup=('etc/conf.d/libvirtd'
@@ -24,6 +25,8 @@ backup=('etc/conf.d/libvirtd'
 	'etc/libvirt/libvirt.conf'
 	'etc/libvirt/lxc.conf'
 	'etc/libvirt/qemu.conf'
+	'etc/libvirt/virt-login-shell.conf'
+        'etc/libvirt/virtlockd.conf'
 	'etc/logrotate.d/libvirtd'
 	'etc/logrotate.d/libvirtd.lxc'
 	'etc/logrotate.d/libvirtd.qemu'
@@ -34,7 +37,7 @@ source=("http://libvirt.org/sources/$pkgname-$pkgver.tar.gz"
 	'libvirtd.conf.d'
 	'libvirtd-guests.conf.d'
 	'libvirt.tmpfiles.d')
-md5sums=('787960669a40181fd381a87a318c0660'
+md5sums=('616ad039f212c02f7e055c5cf28c0a76'
          '3ed0e24f5b5e25bf553f5427d64915e6'
          'bc2971dacdbac967fc3474e50affc345'
          '8d98e62915785686b0b6c8c070628392')

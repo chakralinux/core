@@ -1,8 +1,8 @@
-# Maintainer: abveritas@chakra-project.org
+# Maintainer: almack
 
 pkgname=timidity++
 pkgver=2.14.0
-pkgrel=5
+pkgrel=6
 pkgdesc="A MIDI to WAVE converter and player"
 arch=('x86_64')
 url="http://timidity.sourceforge.net"
@@ -12,10 +12,18 @@ makedepends=('tk' 'libxaw')
 optdepends=('xaw3d: for using the Xaw interface')
 backup=('etc/timidity++/timidity.cfg')
 source=("http://downloads.sourceforge.net/timidity/TiMidity++-${pkgver}.tar.bz2" \
-        'timidity.cfg' 'timidity.service')
+        'timidity.cfg' 'timidity.service' 'timidity-tk86.patch' 'timidity-jack.patch')
 md5sums=('37a8e9720928869e8adbfa6ce1c313aa'
-	 '3fcc8f065c959205113fa7e9ab2be3c6'
-	 '6e3e6080a74aa6774abfa661c6f67daa')
+         '3fcc8f065c959205113fa7e9ab2be3c6'
+         '6e3e6080a74aa6774abfa661c6f67daa'
+         '36f02b16c0ad8324d839ff8f3145384f'
+         'ac348d9fe09de26b2b18ac90edcdec9e')
+
+prepare() {
+  cd TiMidity++-${pkgver}
+  patch -p1 -i "${srcdir}/timidity-tk86.patch"
+  patch -p1 -i "${srcdir}/timidity-jack.patch"
+}
 
 build() {
   cd "${srcdir}/TiMidity++-${pkgver}"
