@@ -1,8 +1,8 @@
-# maintainer abveritas[at]chakra-project[dot]org>
+# maintainer almack
 
 pkgname=libsoup
-pkgver=2.44.2
-pkgrel=2
+pkgver=2.48.1
+pkgrel=1
 pkgdesc="GNOME HTTP Library - base library"
 arch=('x86_64')
 license=('LGPL')
@@ -11,10 +11,7 @@ makedepends=('intltool' 'gobject-introspection' 'python2' 'libgnome-keyring')
 url="http://www.gnome.org"
 source=(http://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver%.*}/$pkgname-$pkgver.tar.xz)
 options=('!emptydirs')
-provides=('libsoup-gnome')
-replaces=('libsoup-gnome')
-conflicts=('libsoup-gnome')
-md5sums=('92aa3667357157e8f3489bcca287f2fa')
+md5sums=('0a8d96e317c29a1fd711687931f8c10c')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -28,6 +25,7 @@ build() {
       --without-gnome 
   make 
 }
+
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
