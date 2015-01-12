@@ -2,8 +2,8 @@
 
 pkgbase=phonon-backend-gstreamer
 pkgname=('phonon-backend-gstreamer' 'phonon-qt5-backend-gstreamer')
-pkgver=4.8.0
-pkgrel=2
+pkgver=4.8.2
+pkgrel=1
 pkgdesc="Phonon GStreamer backend"
 arch=('x86_64')
 url='http://phonon.kde.org'
@@ -14,17 +14,12 @@ optdepends=('gst-plugins-good: For media format support'
             'gst-plugins-ugly: For media format support'
             'gst-libav: For media format support')
 groups=("kde-complete" "kde-uninstall")
-source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/phonon-backend-gstreamer-${pkgver}.tar.xz"
-        "streaming-freeze.patch::http://quickgit.kde.org/?p=phonon-gstreamer.git&a=commitdiff&h=4bb52a061b669c3ce03bb07e49a35a034aa5fc7b&hp=17cc78282f588f7e914244be222289b74934e9d9&o=plain")
-sha256sums=('f819cbd6296e1e19579e365902f7930ec8571e8cbb08718484091a795f70587e'
-            '142876ac4f0cdab7b7e173ae738b1771d44df27790c58dde02c3a18b35797dce')
+source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.xz")
+sha256sums=('20e0f71f2beb4f859db8385079a13aef5473863ee6f27aad7b065aa7bfe931e0')
 
 prepare() {
   mkdir build-qt4
   mkdir build-qt5
-
-  cd ${pkgname}-${pkgver}
-  patch -Np1 -i ../streaming-freeze.patch
 }
 
 
