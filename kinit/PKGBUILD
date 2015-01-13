@@ -10,7 +10,7 @@ arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kinit'
 license=('LGPL')
 depends=('kio')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools' 'qt5-tools' 'python3')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools' 'qt5-tools')
 checkdepends=('cmake')
 groups=('kf5')
 options=("debug")
@@ -23,8 +23,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver} \
-    -DPYHTON_EXECUTABLE=/usr/bin/python3
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 

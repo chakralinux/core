@@ -2,18 +2,19 @@
 
 source ../frameworks.conf
 
-pkgname=ki18n
+pkgname=kpackage
 pkgver=${KFVersion}
 pkgrel=1
-pkgdesc='A get-text based translation framework'
+pkgdesc='Framework that lets applications manage user installable packages of non-binary assets'
 arch=('x86_64')
-url='https://projects.kde.org/projects/frameworks/ki18n'
+url='https://projects.kde.org/projects/frameworks/kpackage'
 license=('LGPL')
-depends=("qt5-script>=${KFQtVersion}")
-makedepends=("extra-cmake-modules>=${KFECMVersion}" "python3")
+depends=('karchive' 'ki18n' 'kcoreaddons' 'kconfig')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'python3' 'kdoctools')
+checkdepends=("cmake")
 groups=('kf5')
 options=("debug")
-source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
@@ -29,7 +30,7 @@ build() {
 
 check() {
   cd build
-  make test
+  make test || return 0
 }
 
 package() {
