@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../plasma.conf
+
+pkgname=user-manager
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="KDE's user manager"
+arch=('x86_64')
+url='projects.kde.org/'
+license=('LGPL')
+depends=('qt5-base' 'kdelibs4support' 'libpwquality')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+checkdepends=("cmake")
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+
+  cd ${pkgname}-${pkgver}
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
