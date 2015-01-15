@@ -3,7 +3,7 @@ source ../frameworks.conf
 pkgname=kactivities-frameworks
 _pkgname=kactivities
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 pkgdesc="Core components for the KDE's Activities"
 url='https://projects.kde.org/projects/frameworks/kactivities'
@@ -14,12 +14,16 @@ provides=('kactivitymanagerd')
 conflicts=('kactivities<=4.13.3-3' 'kactivities4')
 options=("debug")
 groups=('kf5')
-source=("$KFServer/${_pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${_pkgname}) )
+source=("$KFServer/${_pkgname}-${pkgver}.tar.xz"
+        "activity-start-stop-fix.patch")
+sha256sums=( $(getSum ${_pkgname}) 
+             '0e18423f3143c5b01be506496eed72fa614d2fc9ec1112cb2aedccb13494cb56')
 
 prepare() {
   mkdir -p build
   cd ${_pkgname}-${pkgver}
+
+  patch -Np1 -i ../activity-start-stop-fix.patch
 }
 
 build() {
