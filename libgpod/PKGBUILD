@@ -1,16 +1,24 @@
-# maintainer abveritas@chakra-project.org
+# maintainer almack
 
 pkgname=libgpod
 pkgver=0.8.3
-pkgrel=1
+pkgrel=2
 pkgdesc="libgpod is a shared library to access the contents of an iPod"
 arch=('x86_64')
 license=('LGPL')
 depends=('mutagen' 'sg3_utils' 'libplist' 'libimobiledevice' 'gdk-pixbuf2')
-makedepends=('intltool' 'swig' 'docbook-xsl' 'python2-gobject')
+makedepends=('intltool' 'swig' 'docbook-xsl' 'pygobject2-devel')
 url="http://www.gtkpod.org/libgpod.html"
-source=("http://downloads.sourceforge.net/sourceforge/gtkpod/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('f8a0b7a34e768e33a708e8dd172bd6f8')
+source=("http://downloads.sourceforge.net/sourceforge/gtkpod/${pkgname}-${pkgver}.tar.bz2"
+        swig_gpod.patch)
+md5sums=('f8a0b7a34e768e33a708e8dd172bd6f8'
+         '4a748ac1275ace80728702e0903555e2')
+
+prepare(){
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np0 -i ${srcdir}/swig_gpod.patch
+  
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
