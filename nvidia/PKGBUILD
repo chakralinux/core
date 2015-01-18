@@ -7,21 +7,26 @@ _kernelver=3.18.1
 
 pkgname=('nvidia' 'chd-nvidia')
 pkgver=343.36
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
-source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported")
+source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported"
+        "nv-drm-343.36.patch")
 
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
+         'ff8a5f979e4428f8c847423fb007042c'
          'dfdf53ee8787455fe92a760ffa6badcb')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
+
+    cd "${_pkg}"
+    patch -p1 -i ../nv-drm-343.36.patch
 }
 
 build() {
