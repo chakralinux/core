@@ -6,13 +6,14 @@ pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
 _basekernel="3.18"
-pkgver=3.18.1
+pkgver=3.18.3
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'bc')
 options=('!strip')
+_aufsver=3.18.1+
 source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
@@ -20,23 +21,21 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch'
-        "git://git.code.sf.net/p/aufs/aufs3-standalone#branch=aufs${_basekernel}"
+        "git://git.code.sf.net/p/aufs/aufs3-standalone#branch=aufs${_aufsver}"
         'config.aufs'
-        'aufs-3.18.1.patch'
         'overlay-multi-layer.patch'
-        'gm450-fix.patch::http://cgit.freedesktop.org/drm-intel/patch/?id=14a369b6c9bdb40cebdac5a248321a05119fe02b'
+        'gm450-fix.patch::https://github.com/torvalds/linux/commit/656bfa3afc14e45e2d9e1624bf60d79b3beb12f2.patch'
         'disable-pin-ioctl.patch::http://cgit.freedesktop.org/drm-intel/patch/drivers/gpu/drm/i915/i915_gem.c?id=d472fcc8379c062bd56a3876fc6ef22258f14a91'
         )
 sha256sums=('becc413cc9e6d7f5cc52a3ce66d65c3725bc1d1cc1001f4ce6c32b69eb188cbd'
-            '4df87c395c94012544ca297db6608fe8e7c8fb5289641c4bfb4d9d87b6f06968'
+            '564eed0dfd7aadeec97566da6d09f8636b6335882139cf6d42e45381276bb2d0'
             '31865caeb22d0e9deffcc88153394add59654620ab7bd167717e68f09c050ac5'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99'
             'SKIP'
             'dc48a541d34416272892df18dafea760717f0724b1fcded39f359655b131425f'
-            '48994b09c02f21c010c6a4155ecd3bfd734c66a0d62d8603f4be3725d0995844'
-            'f1149df86975f381027530f4d3d04558efa0ff3af84c4e54261d27ce255dc08e'
-            '37dc9cb949e05e05c9daddf81a4d8164933d90c65584c5be6cb6b4b673dcd7e9'
+            '0f8c88a20b430208ef9ed5e9e744736857ea634abfb1eff9ef8dd9635d3f9eab'
+            '4707c0eecc2e57932521d04e66579eca475c232e47c324aae20a4f3a252bbc02'
             'f8dcee1e72762d7097e4c18e240d7b736db7a5f80bd99090884144efe5a8ecfb')
 
 prepare() {
@@ -73,7 +72,6 @@ prepare() {
   msg "starting aufs patches: standalone"
   patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-standalone.patch"
 
-  patch -p1 -i "${srcdir}/aufs-3.18.1.patch"
   patch -p1 -i "${srcdir}/overlay-multi-layer.patch"
   patch -p1 -i "${srcdir}/gm450-fix.patch"
   patch -p1 -i "${srcdir}/disable-pin-ioctl.patch"
