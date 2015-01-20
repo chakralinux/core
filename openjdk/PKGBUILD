@@ -1,158 +1,135 @@
-# Maintainer: AlmAck <almack[at]chakra-project[dot]org>
-# Contributor: Daniele Cocca <jmc@chakra-project.org>
 
-pkgname=('openjdk' 'openjdk-src')
+pkgname=('openjdk' 'openjdk-src' 'openjdk-doc')
 pkgbase='openjdk'
-_icedtea_release="2.4.5"
-_icedtea_jdkver="7"
-_openjdk_build="b31"
-_pkgver="7u51"
-pkgver="${_pkgver}_${_openjdk_build}_${_icedtea_release}"
-pkgrel=3
+_java_ver=8
+_jdk_update=40
+_jdk_build=19
+pkgver=${_java_ver}.u${_jdk_update}
+_repo_ver=jdk${_java_ver}u${_jdk_update}-b${_jdk_build}
+pkgrel=1
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 arch=('x86_64')
 url="http://icedtea.classpath.org/"
 license=('GPL2 with Classpath exception')
-makedepends=('java-environment=7' 'apache-ant>=1.8.1' 'zip' 'unzip'
-             'fastjar' 'cpio' 'cups' 'orbit2' 'gtk2' 'coreutils'
-             'wget' 'gzip' 'alsa-lib' 'libpulse' 'zlib' 'libjpeg-turbo'
+makedepends=('java-environment=7' 'apache-ant>=1.6.5' 'zip' 'unzip'
+             'fastjar' 'cpio' 'cups' 'orbit2' 'coreutils'
+             'wget' 'gzip' 'alsa-lib' 'pulseaudio' 'zlib' 'libjpeg-turbo'
              'libpng' 'giflib' 'lcms2' 'freetype2' 'rhino' 'nss' 'libxt'
-             'libxtst' 'libxp' 'libxrender' 'ca-certificates-java' 'automake>=1.13')
-             
-_hg_url="http://icedtea.classpath.org/hg/release/icedtea7-forest-${_icedtea_release:0:3}"
-_corba_changeset=3594dbde270d
-_jaxp_changeset=8fe156ad49e2
-_jaxws_changeset=32ea8b1ed91a
-_jdk_changeset=9db88c18e114
-_langtools_changeset=dabd37b7e295
-_openjdk_changeset=410eb7fef869
-_hotspot_changeset=2cb58882dac3
-_jvmdir="/usr/lib/jvm/java-${_icedtea_jdkver}-openjdk"
+             'libxtst' 'libxp' 'libxrender' 'ca-certificates-java' 'eclipse-ecj')
 
-source=("http://icedtea.classpath.org/download/source/icedtea-${_icedtea_release}.tar.gz"
-        "${_hg_url}/corba/archive/${_corba_changeset}.tar.gz"
-        "${_hg_url}/jaxp/archive/${_jaxp_changeset}.tar.gz"
-        "${_hg_url}/jaxws/archive/${_jaxws_changeset}.tar.gz"
-        "${_hg_url}/jdk/archive/${_jdk_changeset}.tar.gz"
-        "${_hg_url}/langtools/archive/${_langtools_changeset}.tar.gz"
-        "${_hg_url}/archive/${_openjdk_changeset}.tar.gz"
-        "${_hg_url}/hotspot/archive/${_hotspot_changeset}.tar.gz"
-        'archlinux-fontconfig-paths.diff'
-        'archlinux-fix_corba_cmds_path.diff'
-        'archlinux-openjdk7_fix_jdk_cmds_path.diff'
-        'archlinux-openjdk7_nonreparenting-wm.diff'
-        'openjdk.profile.sh'
-        'openjdk.profile.csh')
-sha256sums=('10c08eeffaa0602b23cb957a2595a2ad3ab474cbe47b12743bbdd79037d5883d'
-            'd1f97e143fe94ae3a56b45bb5a90f8ab10ec2be4ff770a788f0a1ac677e27a7d'
-            '0a2a40186cedfbeb8f87b0bc86bea2830943943081d4289fc74f7a783b2e1af3'
-            '08a169b6b02883759ec7a412aa91aa3e37480761cb50b95d092dbcdb2fc9a3d0'
-            '285e5b8ccbb29f3f9f9ea9ea7856d1ed97465c57d091fbcd9b2e55a1ffbb543e'
-            '86cb370ce2084c4b699d8c002ebe6c026e86206ffa82a2f3d7906aadb94ed79f'
-            '2de151c7275d91ef082e63fcc0957c5f9290404ec6e20ecfa1e752e16bfab707'
-            'd8c1681ae76e660c1888065933cedbbc1309869c7a2fb98f07c424716d5ebaf9'
-            '9ad943ceb3dbcdf45d72974fc3667886a7ed65c69ab9abc17be5412827551a7f'
-            'd57754ff320475023688bd7c7af38a9ea37e27ed8c1edd3b1572e4d8b41b78d3'
-            '10465784f111b62c9543421fe0644f98f5eff16b00dcc78ed914ad68cdb7a13d'
-            '56b919ababb13bd6afdcdaceb112b529b6e82539255f2dae9a7e5eb91645164b'
-            'a6a083d4f3247a922c9d482f43341fa048ee4353d1cc42b54d1d0b5a6255bdd0'
-            '2120d72b19df6c46e35b87e0388afdfcb694843b55ef81ecaf104d78236e8c17')
-noextract=("${_openjdk_changeset}.tar.gz"
-           "${_corba_changeset}.tar.gz"
-           "${_jaxp_changeset}.tar.gz"
-           "${_jaxws_changeset}.tar.gz"
-           "${_jdk_changeset}.tar.gz"
-           "${_langtools_changeset}.tar.gz"
-           "${_hotspot_changeset}.tar.gz")
+_url_src=http://hg.openjdk.java.net/jdk8u/jdk8u
+source=(jdk8u-${_repo_ver}.tar.gz::${_url_src}/archive/${_repo_ver}.tar.gz
+        corba-${_repo_ver}.tar.gz::${_url_src}/corba/archive/${_repo_ver}.tar.gz
+        hotspot-${_repo_ver}.tar.gz::${_url_src}/hotspot/archive/${_repo_ver}.tar.gz
+        jdk-${_repo_ver}.tar.gz::${_url_src}/jdk/archive/${_repo_ver}.tar.gz
+        jaxws-${_repo_ver}.tar.gz::${_url_src}/jaxws/archive/${_repo_ver}.tar.gz
+        jaxp-${_repo_ver}.tar.gz::${_url_src}/jaxp/archive/${_repo_ver}.tar.gz
+        langtools-${_repo_ver}.tar.gz::${_url_src}/langtools/archive/${_repo_ver}.tar.gz
+        nashorn-${_repo_ver}.tar.gz::${_url_src}/nashorn/archive/${_repo_ver}.tar.gz
+        openjdk.profile.sh
+        openjdk.profile.csh)
+md5sums=('c689ebe46c1d18bb20e5a4d2bd51aefc'
+         '5c96879a168c79647fb7b0285c51b5ac'
+         '5a9084c7b65f748c33e8fbd004f2c2dc'
+         '0644eadf94e2b9037391d3e1bd1fe8f8'
+         'dab7e3ee418301794bd55cb09fafdbe2'
+         'd5da0e97c9945a5a8502edfca79786e8'
+         'ca4d75286ebed1001499a161b1c86f15'
+         'abb8cbd2a4fce317174d60bf543c8ce4'
+         '65fecbcbadfa455f35cb6fef7d1fc553'
+         'b839efffcbdb4f630b52d92ee1565c90')
+
+_jdkname=openjdk8
+_jvmdir=/usr/lib/jvm/java-8-openjdk
+_prefix="jdk8u-${_repo_ver}/image"
+_imgdir="${_prefix}/jvm/openjdk-1.8.0_$(printf '%.2d' ${_jdk_update})"
+_nonheadless=(bin/policytool
+              lib/amd64/libjsound.so
+              lib/amd64/libjsoundalsa.so
+              lib/amd64/libsplashscreen.so)
+
+prepare() {
+  cd "${srcdir}/jdk8u-${_repo_ver}"
+
+  for subrepo in corba hotspot jdk jaxws jaxp langtools nashorn
+  do
+    ln -sf ../${subrepo}-${_repo_ver} ${subrepo}
+  done
+}
 
 build() {
-  cd "${srcdir}"
+  cd "${srcdir}/jdk8u-${_repo_ver}"
 
-  # Prepare the patches
-  cp ${srcdir}/*.diff ${srcdir}/icedtea-${_icedtea_release}/patches
-  export DISTRIBUTION_PATCHES="patches/archlinux-fontconfig-paths.diff \
-			       patches/archlinux-fix_corba_cmds_path.diff \
-			       patches/archlinux-openjdk7_fix_jdk_cmds_path.diff \
-			       patches/archlinux-openjdk7_nonreparenting-wm.diff"
+  # How many cpu's do we have?
+  export NUM_PROC=`/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :`
+  export NUM_PROC=${NUM_PROC:-1}
+  
+  unset JAVA_HOME
+  # http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1346
+  export MAKEFLAGS=${MAKEFLAGS/-j*}
 
-  rm -rf build
-  cp -r "icedtea-${_icedtea_release}" \
-        "${srcdir}/build"
+  install -d -m 755 "${srcdir}/${_prefix}/"
+  sh configure \
+    --prefix="${srcdir}/${_prefix}" \
+    --with-update-version="${_jdk_update}" \
+    --with-build-number="b${_jdk_build}" \
+    --with-milestone="fcs" \
+    --disable-zip-debug-info \
+    --enable-unlimited-crypto \
+    --with-zlib=system \
+    --with-giflib=system \
+    --with-stdc++lib=dynamic \
+    --with-num-cores="$NUM_PROC"
 
-  cd "${srcdir}/build"
+    # TODO OpenJDK does not want last version of giflib (add 'giflib' as dependency once fixed)
+    #--with-giflib=system \
 
-  [ -f /etc/profile.d/openjdk.sh ]    && source /etc/profile.d/openjdk.sh
-  [ -f /etc/profile.d/apache-ant.sh ] && source /etc/profile.d/apache-ant.sh
+  make DEBUG_BINARIES=true
+  make docs
+  # FIXME sadly 'DESTDIR' is not used here!
+  make install
 
-  # Preserve the value of JAVA_HOME before unsetting it from the environment
-  local _java_home="${JAVA_HOME}"
+  cd "${srcdir}/${_imgdir}"
 
-  # Setup the needed environmental variables
-  export USER="chakra-buildbot"
-  export ALT_BOOTDIR="${_java_home}"
-  export ALT_PARALLEL_COMPILE_JOBS="${MAKEFLAGS/-j}"
-  export HOTSPOT_BUILD_JOBS="${ALT_PARALLEL_COMPILE_JOBS}"
-  export COMPILER_WARNINGS_FATAL="false"
+  # A lot of build stuff were directly taken from
+  # http://pkgs.fedoraproject.org/cgit/java-1.8.0-openjdk.git/tree/java-1.8.0-openjdk.spec
 
-  # Unset harmful variables
-  #unset JAVA_HOME JDK_HOME CLASSPATH JAVAC JAVACFLAGS
+  # http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1437
+  find . -iname '*.jar' -exec chmod ugo+r {} \;
+  chmod ugo+r lib/ct.sym
 
-  # Start the configuration and build step
-  ./configure --prefix=/usr \
-              --with-parallel-jobs="${MAKEFLAGS/-j}" \
-              --host="${CARCH}-unknown-linux-gnu" \
-              --with-rhino \
-              --with-jdk-home="${_java_home}" \
-              --with-abs-install-dir="${_jvmdir}" \
-              --with-openjdk-src-zip="${srcdir}/${_openjdk_changeset}.tar.gz" \
-              --with-hotspot-src-zip="${srcdir}/${_hotspot_changeset}.tar.gz" \
-              --with-corba-src-zip="${srcdir}/${_corba_changeset}.tar.gz" \
-              --with-jaxp-src-zip="${srcdir}/${_jaxp_changeset}.tar.gz" \
-              --with-jaxws-src-zip="${srcdir}/${_jaxws_changeset}.tar.gz" \
-              --with-jdk-src-zip="${srcdir}/${_jdk_changeset}.tar.gz" \
-              --with-langtools-src-zip="${srcdir}/${_langtools_changeset}.tar.gz" \
-              --with-pkgversion="Chakra Linux build ${pkgver}-${pkgrel}-${CARCH}" \
-              --disable-tests \
-              --disable-bootstrap \
-              --disable-system-gtk \
-              --disable-downloading \
-              --disable-Werror \
-              --enable-nss \
-              --enable-pulse-java
-  make
+  # remove redundant *diz and *debuginfo files
+  find . -iname '*.diz' -exec rm {} \;
+  find . -iname '*.debuginfo' -exec rm {} \;
 }
 
 package_openjdk() {
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 install="openjdk.install"
-conflicts=('java-environment' 'java-runtime' 'openjdk6' 'openjdk7')
-provides=("java-environment=${_icedtea_jdkver}" "java-runtime=${_icedtea_jdkver}")
+conflicts=('openjdk6' 'openjdk7')
+provides=("java-environment=${_java_ver}" "java-runtime=${_java_ver}")
 replaces=('openjdk6' 'openjdk7')
-depends=('alsa-lib' 'libpulse' 'giflib' 'libjpeg-turbo' 'libpng' 'freetype2'
+depends=('alsa-lib' 'pulseaudio' 'giflib' 'libjpeg-turbo' 'libpng' 'freetype2'
          'ca-certificates-java')
 optdepends=('icedtea-web: web browser plugin and Java Web Start support'
             'gtk2: for the GTK+ Look And Feel')
-backup=(etc/profile.d/openjdk.sh
-	etc/profile.d/openjdk.csh)
 
-  cd "${srcdir}/build"
+  cd "${srcdir}/${_imgdir}"
 
   # Copy the built OpenJDK image to the target directory
-  install -d -m755 "${pkgdir}/${_jvmdir%/*}"
-  cp -r "openjdk.build/j2sdk-image" \
-        "${pkgdir}/${_jvmdir#/}"
-
+  install -d -m 755 "${pkgdir}${_jvmdir}"
+  cp -a * "${pkgdir}${_jvmdir}"
   # Remove the .zip file which is going to be inside openjdk-src
-  rm "${pkgdir}/${_jvmdir#/}/src.zip"
+  rm "${pkgdir}${_jvmdir}/src.zip"
 
   # Symlink the binaries into /usr/bin
   install -d -m755 "${pkgdir}/usr/bin"
-  pushd "${pkgdir}/${_jvmdir#/}/bin" >/dev/null
+  pushd bin
     for executable in *; do
       ln -s "${_jvmdir}/bin/${executable}" \
             "${pkgdir}/usr/bin"
     done
-  popd >/dev/null
+  popd
 
   # Move the manual pages in the right place
   install -d -m755 "${pkgdir}/usr/share"
@@ -172,26 +149,20 @@ backup=(etc/profile.d/openjdk.sh
                    "${pkgdir}/etc/profile.d/openjdk.csh"
 
   # Install the license file
-  install -D -m644 "openjdk/LICENSE" \
+  install -D -m644 "LICENSE" \
                    "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
 
 package_openjdk-src() {
-pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform. (Source package)"
-arch=('any')
-depends=("openjdk=${pkgver}")
+  pkgdesc='OpenJDK Java 8 sources'
 
-  cd "${srcdir}/build"
-
-  # Install the source package
-  install -D -m644 "openjdk.build/j2sdk-image/src.zip" \
-                   "${pkgdir}/${_jvmdir#/}/src.zip"
-
-  # Not installing the license file anymore, since we depend on openjdk,
-  # which already provides it.
-  #
-  # install -D -m644 "openjdk/LICENSE" \
-  #                  "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -D "${srcdir}/${_imgdir}/src.zip" "${pkgdir}${_jvmdir}/src.zip"
 }
 
-# vim:set ts=2 sw=2 et:
+package_openjdk-doc() {
+  pkgdesc='OpenJDK Java 8 documentation'
+
+  install -d -m 755 "${pkgdir}/usr/share/doc/${pkgbase}/"
+  cp -r "${srcdir}"/jdk8u-${_repo_ver}/build/linux-x86_64-normal-server-release/docs/* \
+    "${pkgdir}/usr/share/doc/${pkgbase}/"
+}
