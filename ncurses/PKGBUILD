@@ -5,24 +5,23 @@
 
 pkgname=ncurses
 pkgver=5.9
-pkgrel=4
+pkgrel=5
 pkgdesc="System V Release 4.0 curses emulation library"
 arch=('x86_64')
 url="http://www.gnu.org/software/ncurses/"
 license=('MIT')
 depends=('glibc')
-source=("ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz"
-        'gentoo-ncurses-5.9-rxvt-unicode-9.15.patch')
-md5sums=('8cb9c412e5f2d96bc6f459aa8c6282a1'
-         'da9ffd52d5826c661aa02be2bf1fa8c1')
+source=("ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('8cb9c412e5f2d96bc6f459aa8c6282a1')
 
-build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  patch -p0 -i "${srcdir}/gentoo-ncurses-5.9-rxvt-unicode-9.15.patch"
-
+prepare() {
   cd "${srcdir}"
   rm -rf ncurses{,w}-build && mkdir -p ncurses{,w}-build
+}
   
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
   cd "${srcdir}/ncursesw-build"
   "${srcdir}/${pkgname}-${pkgver}/configure" \
       --prefix=/usr \
