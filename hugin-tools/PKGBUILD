@@ -19,8 +19,9 @@ sha1sums=('7b4ae181f664b9e0a68f55f298cdaa210fa09aa9')
 
 prepare() {
   cd "${srcdir}/${_pkgname}-${pkgver}"
-  sed 's/Luk.... Jirkovsk../Lukas Jirkovsky/g' -i doc/deghosting_mask.pod
-  # pod2man limitation (makepkg uses LC_ALL=C and Unicode chars take two bytes)
+  
+  # Fix compiling against lensfun-0.3.0
+  sed '/LF_DIST_MODEL_FOV1/d' -i src/hugin_base/lensdb/LensDB.cpp
 }
 
 build() {
