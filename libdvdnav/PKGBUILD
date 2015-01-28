@@ -5,21 +5,35 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=libdvdnav
-pkgver=4.2.0
+pkgver=5.0.2
 pkgrel=1
 pkgdesc="The library for xine-dvdnav plugin."
 arch=(i686 x86_64)
 license=('GPL')
-url="http://dvdnav.mplayerhq.hu/"
+url="https://dvdnav.mplayerhq.hu/"
 depends=('libdvdread')
 options=(!libtool)
-source=(http://dvdnav.mplayerhq.hu/releases/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('53be8903f9802e101929a3451203bbf6')
+source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.bz2"
+        'Fix-reading-DVD-label.patch')
+md5sums=('d8d6c01a8273d842965bd907ebddcc5d'
+         'a92e0638a7cbe5f0e11458a05cf5fb8a')
+
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  patch -Np1 -i ../Fix-reading-DVD-label.patch
+  autoreconf -fi
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   
-  ./autogen.sh --prefix=/usr
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --sharedstatedir=/var \
+              --localstatedir=/var \
+              --disable-fast-install \
+              --disable-static
   make
 }
 
