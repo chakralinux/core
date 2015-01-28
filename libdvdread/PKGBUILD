@@ -5,7 +5,7 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=libdvdread
-pkgver=4.2.0
+pkgver=5.0.1
 pkgrel=1
 pkgdesc="Provides a simple foundation for reading DVD video disks"
 arch=(i686 x86_64)
@@ -15,13 +15,18 @@ depends=('glibc')
 makedepends=('libdvdcss')
 optdepends=('libdvdcss: for decoding encrypted DVDs')
 options=('!libtool')
-source=(http://dvdnav.mplayerhq.hu/releases/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('0bea15da842a4b04a482b009d72dcc6d9c9524ccc1bf67e5748319ec5ada8097')
+source=(http://download.videolan.org/pub/videolan/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.bz2)
+sha256sums=('65652e20f548822e8b222582f4f3a0c5cc9b70a266a476579f47f664c68f0b26')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./autogen.sh --prefix=/usr
+  ./configure --prefix=/usr \
+              --enable-static=no \
+              --sharedstatedir=/usr/share/${pkgname} \
+              --localstatedir=/var \
+              --sysconfdir=/etc \
+              --with-libdvdcss=yes
   make
 }
 
