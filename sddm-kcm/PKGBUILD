@@ -1,32 +1,39 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../plasma.conf
 
 pkgname=sddm-kcm
-pkgver=20141020
+epoch=1
+pkgver=${PVersion}
 pkgrel=1
 pkgdesc="SDDM configuration module for KDE"
 arch=('x86_64')
-url="https://github.com/sddm/sddm-kcm"
+url='https://projects.kde.org/projects/kde/workspace/sddm-kcm'
 license=("GPL")
 depends=('kcoreaddons' 'sddm' 'ki18n' 'kxmlgui' 'kauth' 'kdelibs4support' 'libx11' 'libxcb' 'libxcursor')
-makedepends=('git' 'extra-cmake-modules' 'kdoctools' 'qt5-tools')
-conflicts=('sddm-kcm')
-source=('git://anongit.kde.org/sddm-kcm')
-md5sums=('SKIP')
+makedepends=('extra-cmake-modules' 'kdoctools' 'qt5-tools')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
 
 build() {
-  mkdir -p build
   cd build
-  
-  cmake ../${pkgname} \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DLIB_INSTALL_DIR=lib \
-    -DPLUGIN_INSTALL_DIR=/usr/lib/qt5/plugins \
-    -DBUILD_TESTING=OFF 
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
+}
+
+check() {
+  cd build
+  make test
 }
 
 package() {
   cd build
-
-  make DESTDIR=${pkgdir} install
+  make DESTDIR="${pkgdir}" install
 }
