@@ -11,7 +11,7 @@ url="http://www.imagemagick.org/"
 license=('custom')
 depends=('libltdl' 'lcms' 'lcms2' 'libxt' 'gcc-libs' 'bzip2' 'freetype2' 'fontconfig'
 	 'libxext' 'fftw' 'liblqr' 'libwmf' 'librsvg' 'libxml2' 'perl' )
-makedepends=('ghostscript' 'openexr' 'jasper')
+makedepends=('ghostscript' 'openexr' 'jasper' 'subversion')
 optdepends=('ghostscript: for Ghostscript support' 
             'openexr: for OpenEXR support'  
             'jasper: for JPEG-2000 support'
@@ -20,7 +20,7 @@ optdepends=('ghostscript: for Ghostscript support'
             'libxml2: for XML support' 
             'libpng: for PNG support' 
 	    'libwebp: for WEBP support')
-options=('!makeflags' '!docs')
+options=('!makeflags' 'docs')
 source=(ftp://ftp.sunet.se/pub/multimedia/graphics/ImageMagick/ImageMagick-${pkgver%.*}-${pkgver##*.}.tar.xz{,.asc}
 	'perlmagick.rpath.patch')
 sha1sums=('3ad2deadbc7e7c6e61eb5590fcc49d71fd96b247'
@@ -38,6 +38,9 @@ build() {
 	cd ${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}
 
 	./configure --prefix=/usr \
+                --sysconfdir=/etc \
+                --localstatedir=/var \
+                --enable-fast-install=no \
 		--with-modules \
 		--disable-static \
 	    	--enable-openmp \
@@ -56,7 +59,7 @@ build() {
 	    	--without-jbig \
 		--without-fpx \
 		--without-dps \
-		--without-fftw 
+		--with-fftw 
 	make 
 }
 
