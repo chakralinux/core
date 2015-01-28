@@ -3,7 +3,7 @@
 source ../plasma.conf
 
 pkgname=breeze
-pkgver=${PVersion}
+pkgver=${PSubVersion}
 pkgrel=1
 pkgdesc='A plasma theme'
 arch=('x86_64')
@@ -14,11 +14,16 @@ makedepends=('extra-cmake-modules')
 checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
+        "maximize-window-button.patch")
+sha256sums=( $(getSum ${pkgname})
+            '694444a32cbb7cf368f9933f39083508eedb3c39028f12caeba9d5e839c0d39e')
 
 prepare() {
   mkdir -p build
+
+  cd ${pkgname}-${PSubVersion}
+  patch -Np1 -i ../maximize-window-button.patch
 }
 
 build() {
