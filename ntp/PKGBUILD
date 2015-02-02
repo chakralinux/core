@@ -3,7 +3,7 @@
 pkgname=ntp
 pkgver=4.2.8
 _realver=4.2.8
-pkgrel=1
+pkgrel=2
 pkgdesc="NTP (Network Time Protocol) tries to keep servers in sync"
 arch=('x86_64')
 license=('custom')
@@ -25,6 +25,7 @@ build() {
   cd "${srcdir}/${pkgname}-${_realver}"
   
   ./configure --prefix=/usr \
+    --libexecdir=/usr/lib \
     --mandir=/usr/share/man \
     --enable-linuxcaps \
     --enable-ntp-signd
