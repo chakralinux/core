@@ -5,7 +5,7 @@
 pkgbase=dbus
 pkgname=('dbus' 'libdbus')
 pkgver=1.8.14
-pkgrel=1
+pkgrel=2
 pkgdesc="Freedesktop.org message bus system"
 url="http://www.freedesktop.org/Software/dbus"
 arch=('x86_64')
@@ -15,6 +15,8 @@ source=(http://dbus.freedesktop.org/releases/dbus/dbus-$pkgver.tar.gz
         30-dbus)
 md5sums=('dfb810eda8780cf9debf7169b3ca5fe1'
          '3314d727fa57fc443fce25b5cbeebbcc')
+
+# note: remember to add the dbus group in the chroot, groupadd -g 81 dbus
 
 build() {
   cd dbus-$pkgver
