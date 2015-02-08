@@ -6,7 +6,7 @@
 
 pkgname=avahi
 pkgver=0.6.31
-pkgrel=12
+pkgrel=13
 pkgdesc="A multicast/unicast DNS-SD framework"
 arch=('x86_64')
 url="http://www.avahi.org/"
@@ -30,13 +30,12 @@ prepare() {
   sed '/^Libs:/s:$: -ldbus-1:' -i avahi-client.pc.in
   sed 's:netdev:network:g' -i avahi-daemon/avahi-dbus.conf
   sed 's:-DG[^ ]*_DISABLE_DEPRECATED=1::g' -i avahi-ui/Makefile.*
+
+  patch -p1 -i "${srcdir}/avahi-daemon-dbus.patch"
 }
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-
-  sed -i 's/netdev/network/g' avahi-daemon/avahi-dbus.conf
-  patch -p1 -i "${srcdir}/avahi-daemon-dbus.patch"
 
   PYTHON=python2 \
   PKG_CONFIG_PATH=/opt/qt/lib/pkgconfig \
@@ -69,6 +68,9 @@ package() {
   make DESTDIR="${pkgdir}" install
   rm -fr "${pkgdir}"/etc/rc.d
 
+  # /var/run already provided by filesystem
+  rm -fr "${pkgdir}"/var
+
   install -D -m 644 ../gnome-nettool.png "${pkgdir}"/usr/share/pixmaps/gnome-nettool.png
 
   cd "${pkgdir}"
@@ -76,5 +78,7 @@ package() {
   # howl and mdnsresponder compatability
   (cd usr/include; ln -s avahi-compat-libdns_sd/dns_sd.h dns_sd.h; ln -s avahi-compat-howl howl)
   (cd usr/lib/pkgconfig; ln -s avahi-compat-howl.pc howl.pc)
+
+  ln avahi-daemon.service -s "${pkgdir}"/usr/lib/systemd/system/dbus-org.freedesktop.Avahi.service
 }
 
