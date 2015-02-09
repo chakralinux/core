@@ -1,0 +1,21 @@
+# Maintainer: s8321414 <s8321414 at gmail.com>
+# Arch Linux maintainers and contributors:
+# Maintainer: Jan Alexander Steffens (heftig) <jan.steffens@gmail.com>
+pkgname=otf-source-code-pro
+pkgver=1.017
+pkgrel=2
+pkgdesc="A set of mono-spaced OpenType fonts designed for coding environments"
+arch=(any)
+url="http://adobe-fonts.github.io/source-code-pro/"
+license=(custom)
+depends=(fontconfig)
+install=otf.install
+source=(https://github.com/adobe-fonts/source-code-pro/archive/${pkgver}R.tar.gz)
+sha256sums=('595aa593778beded801c12975f30ff1e78516654729afd2cfd8609121c50040f')
+
+package() {
+  cd source-code-pro-${pkgver}R
+  install -d "$pkgdir/usr/share/fonts/adobe-source-code-pro"
+  install -t "$pkgdir/usr/share/fonts/adobe-source-code-pro" -m644 OTF/*.otf
+  install -Dm644 LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
