@@ -3,35 +3,17 @@
 pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse)
 pkgdesc="A featureful, general-purpose sound server"
-pkgver=5.0
-pkgrel=6
+pkgver=6.0
+pkgrel=1
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(GPL LGPL)
-makedepends=(libasyncns libcap attr libxtst libsm libsamplerate libtool rtkit
-             speex tdb systemd dbus avahi bluez intltool jack sbc
+makedepends=(libasyncns libcap attr libxtst libsm libtool rtkit
+             speex tdb systemd dbus avahi bluez-libs bluez intltool jack sbc
              lirc-utils openssl fftw orc json-c webrtc-audio-processing)
 options=(!emptydirs)
-source=("http://freedesktop.org/software/$pkgbase/releases/$pkgbase-$pkgver.tar.xz"
-        "0036-module-switch-on-port-available-Don-t-switch-profile.patch"
-        "0112-rtp-recv-fix-crash-on-empty-UDP-packets-CVE-2014-397.patch"
-        "pulseaudio-4.0-kde_autostart_phase.patch"
-        'pulse-distorted.patch')
-md5sums=('c43749838612f4860465e83ed62ca38e'
-         'ca8d776ad80578bb9464025f96ba4419'
-         'd3e60eb16d440d43793df245935e5413'
-         'f6e485048d939e681014ce87d1db6f43'
-         'e73bc9f255005de2b00b7fb44ba7ab14')
-
-prepare() {
-  cd $pkgbase-$pkgver
-
-  patch -Np1 -i ../0036-module-switch-on-port-available-Don-t-switch-profile.patch
-  patch -Np1 -i ../pulseaudio-4.0-kde_autostart_phase.patch
-  patch -Np1 -i ../0112-rtp-recv-fix-crash-on-empty-UDP-packets-CVE-2014-397.patch
-  patch -Np1 -i ../pulse-distorted.patch
-
-}
+source=("http://freedesktop.org/software/$pkgbase/releases/$pkgbase-$pkgver.tar.xz")
+md5sums=('b691e83b7434c678dffacfa3a027750e')
 
 build() {
   cd $pkgbase-$pkgver
@@ -44,7 +26,12 @@ build() {
     --with-database=tdb \
     --disable-tcpwrap \
     --disable-rpath \
-    --disable-default-build-tests
+    --disable-default-build-tests \
+    --disable-bluez5-ofono-headset \
+    --enable-bluez5-native-headset \
+    --disable-bluez4 \
+    --disable-oss-output \
+    --disable-oss-wrapper \
 
   # fight unused direct deps
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
@@ -58,6 +45,7 @@ package_pulseaudio() {
   optdepends=('pulseaudio-alsa: ALSA configuration (recommended)'
               'avahi: zeroconf support'
               'bluez: bluetooth support'
+              'bluez-libs: bluetooth headset support'
               'jack: jack support'
               'lirc-utils: infra-red support'
               'openssl: RAOP support'
@@ -69,9 +57,7 @@ package_pulseaudio() {
   make -j1 DESTDIR="$pkgdir" install \
     bashcompletiondir=/usr/share/bash-completion/completions
 
-  install -Dm644 shell-completion/pulseaudio-zsh-completion.zsh \
-    "$pkgdir/usr/share/zsh/site-functions/_pulseaudio"
-  
+
   # Disable cork-request module, can result in e.g. media players unpausing
   # when there's a Skype call incoming
   # https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/1004607
@@ -81,14 +67,10 @@ package_pulseaudio() {
   # PulseAudio is started automatically with autosawn=yes (default value)
   sed -e 's|/usr/bin/pulseaudio --start "$@"|#&|' \
       -i "$pkgdir/usr/bin/start-pulseaudio-x11"
-  sed -e 's|/usr/bin/pulseaudio --start "$@"|#&|' \
-      -i "$pkgdir/usr/bin/start-pulseaudio-kde"
   
   # Avoid kde to show the "remove unused sound devices" if bell sound is executed by an application
   sed -e '27i\    /usr/bin/pactl load-module module-x11-bell "display=$DISPLAY" "sample=bell.ogg" > /dev/null' \
       -i "$pkgdir/usr/bin/start-pulseaudio-x11"
-  sed -e '29i\    /usr/bin/pactl load-module module-x11-bell "display=$DISPLAY" "sample=bell.ogg" > /dev/null' \
-      -i "$pkgdir/usr/bin/start-pulseaudio-kde"
 
   # Python fix
   sed -i '1s:python$:&2:' "$pkgdir/usr/bin/qpaeq"
@@ -101,10 +83,11 @@ package_pulseaudio() {
       -i "$pkgdir/etc/pulse/daemon.conf"
   # Unbind main volume control to per application setting
   sed -e 's|; flat-volumes = yes|flat-volumes = no|' -i "$pkgdir/etc/pulse/daemon.conf"
+
   #### default.pa ####
   # Delay of sound notification workaround, needs to be removed once fixed in systemd
   #sed -e 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' \
-  #    -i "${pkgdir}/etc/pulse/default.pa"
+  #    -i "${pkgdir}/etc/pulse/default.pa"z
   
   # Used only for SystemWide no needed for us
   # http://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/WhatIsWrongWithSystemWide/
@@ -116,14 +99,13 @@ package_pulseaudio() {
 
   mv {"$pkgdir","$srcdir/libpulse"}/etc/pulse/client.conf
 
-  mv "$pkgdir"/usr/bin/pa{cat,ctl,dsp,mon,play,rec,record} \
+  mv "$pkgdir"/usr/bin/pa{cat,ctl,mon,play,rec,record} \
      "$srcdir/libpulse/usr/bin"
 
   mv "$pkgdir"/usr/lib/libpulse{,-simple,-mainloop-glib}.so* \
      "$srcdir/libpulse/usr/lib"
 
-  mv "$pkgdir"/usr/lib/pulseaudio/libpulsedsp.so \
-     "$pkgdir"/usr/lib/pulseaudio/libpulsecommon-*.so \
+  mv "$pkgdir"/usr/lib/pulseaudio/libpulsecommon-*.so \
      "$srcdir/libpulse/usr/lib/pulseaudio"
 
   mv {"$pkgdir","$srcdir/libpulse"}/usr/lib/cmake
@@ -131,7 +113,7 @@ package_pulseaudio() {
 
   mv {"$pkgdir","$srcdir/libpulse"}/usr/include
 
-  mv "$pkgdir"/usr/share/man/man1/pa{cat,ctl,dsp,play}.1 \
+  mv "$pkgdir"/usr/share/man/man1/pa{cat,ctl,play}.1 \
      "$srcdir/libpulse/usr/share/man/man1"
 
   mv {"$pkgdir","$srcdir/libpulse"}/usr/share/man/man5/pulse-client.conf.5
