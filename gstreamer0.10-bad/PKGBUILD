@@ -6,7 +6,7 @@
 pkgbase=gstreamer0.10-bad
 pkgname=('gstreamer0.10-bad' 'gstreamer0.10-bad-plugins')
 pkgver=0.10.23
-pkgrel=13
+pkgrel=14
 arch=('x86_64')
 license=('LGPL' 'GPL')
 makedepends=('pkgconfig' 'gstreamer0.10-base>=0.10.36' 'xvidcore' 'libdca' 'bzip2' 'libdc1394' 
@@ -15,8 +15,14 @@ makedepends=('pkgconfig' 'gstreamer0.10-base>=0.10.36' 'xvidcore' 'libdca' 'bzip
 	     'schroedinger' 'libass' 'libvpx' 'gsm' 'libgme' 'rtmpdump' 'libsndfile' 'opus')
 url="http://gstreamer.freedesktop.org/"
 options=(!libtool !emptydirs)
-source=(${url}/src/gst-plugins-bad/gst-plugins-bad-${pkgver}.tar.xz)
-md5sums=('e4822fa2cc933768e2998311a1565979')
+source=(${url}/src/gst-plugins-bad/gst-plugins-bad-${pkgver}.tar.xz "modplug_header.patch")
+md5sums=('e4822fa2cc933768e2998311a1565979'
+         '798274052c11c2d6fb56da29498df270')
+
+prepare() {
+  cd "${srcdir}/gst-plugins-bad-${pkgver}"
+  patch -p1 -i ${srcdir}/modplug_header.patch
+}
 
 build() {
   cd "${srcdir}/gst-plugins-bad-${pkgver}"
