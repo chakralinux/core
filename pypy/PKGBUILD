@@ -2,7 +2,7 @@
 # Contributor: Daniele Cocca <jmc@chakra-project.org>
 
 pkgname=pypy
-pkgver=2.2.1
+pkgver=2.5.0
 pkgrel=1
 pkgdesc="A Python implementation written in Python, JIT enabled"
 arch=('x86_64')
@@ -19,19 +19,19 @@ optdepends=('openssl: openssl module'
             'tk: tk module')
 source=("https://bitbucket.org/${pkgname}/${pkgname}/downloads/$pkgname-$pkgver-src.tar.bz2")
 options=(!buildflags)
-md5sums=('7ec9f48702323f9e93654ba73dd46720')
+md5sums=('f4700c0af45e986178b36ce91a45136e')
 
 build() {
   cd "${srcdir}"/${pkgname}-${pkgver}-src/pypy/goal
 
   # here you can boostrap with python if needed
-  python2 ../../rpython/bin/rpython -Ojit targetpypystandalone
+  pypy ../../rpython/bin/rpython -Ojit targetpypystandalone
 }
 
 package() {
   cd "${srcdir}"/${pkgname}-${pkgver}-src/pypy/tool/release
 
-  python2 package.py ../../../ pypy pypy-c "${srcdir}"/${pkgname}.tar.bz2
+  pypy package.py ../../../ pypy pypy-c "${srcdir}"/${pkgname}.tar.bz2
 
   mkdir -p "${pkgdir}"/opt
   tar x -C "${pkgdir}"/opt -f "${srcdir}"/${pkgname}.tar.bz2
