@@ -2,71 +2,91 @@
 
 pkgname=imagemagick
 pkgver=6.8.8.9
-pkgrel=4
+pkgrel=5
 pkgdesc="An image viewing/manipulation program"
 arch=('x86_64')
 url="http://www.imagemagick.org/"
 license=('custom')
-depends=('libltdl' 'lcms' 'lcms2' 'libxt' 'gcc-libs' 'bzip2' 'freetype2' 'fontconfig'
-	 'libxext' 'fftw' 'liblqr' 'libwmf' 'librsvg' 'libxml2' 'perl' )
-makedepends=('ghostscript' 'openexr' 'jasper' 'subversion' 'ttf-dejavu')
-optdepends=('ghostscript: for Ghostscript support' 
-            'openexr: for OpenEXR support'  
+depends=('perl' 'libltdl' 'lcms2' 'libxt' 'fontconfig' 'libxext' 'liblqr' 'libcl')
+makedepends=('libltdl' 'lcms2' 'libxt' 'fontconfig' 'libxext' 'ghostscript'
+             'openexr' 'libwmf' 'librsvg' 'libxml2' 'liblqr' 'fftw'
+             'opencl-headers' 'libcl' 'libwebp')
+optdepends=('ghostscript: for Ghostscript support'
+            'openexr: for OpenEXR support'
             'jasper: for JPEG-2000 support'
-            'libwmf: for WMF support' 
-            'librsvg: for SVG support' 
-            'libxml2: for XML support' 
-            'libpng: for PNG support' 
-	    'libwebp: for WEBP support')
-options=('!makeflags' '!docs')
+            'libwmf: for WMF support'
+            'librsvg: for SVG support'
+            'libxml2: for XML support'
+            'libpng: for PNG support'
+            'libwebp: for WEBP support')
+options=('libtool' '!emptydirs')
 source=(ftp://ftp.sunet.se/pub/multimedia/graphics/ImageMagick/ImageMagick-${pkgver%.*}-${pkgver##*.}.tar.xz{,.asc}
-	'perlmagick.rpath.patch')
+        'perlmagick.rpath.patch')
 sha1sums=('3ad2deadbc7e7c6e61eb5590fcc49d71fd96b247'
           'SKIP'
           '23405f80904b1de94ebd7bd6fe2a332471b8c283')
+backup=("etc/ImageMagick-${pkgver%%.*}/coder.xml"
+        "etc/ImageMagick-${pkgver%%.*}/colors.xml"
+        "etc/ImageMagick-${pkgver%%.*}/delegates.xml"
+        "etc/ImageMagick-${pkgver%%.*}/log.xml"
+        "etc/ImageMagick-${pkgver%%.*}/magic.xml"
+        "etc/ImageMagick-${pkgver%%.*}/mime.xml"
+        "etc/ImageMagick-${pkgver%%.*}/policy.xml"
+        "etc/ImageMagick-${pkgver%%.*}/quantization-table.xml"
+        "etc/ImageMagick-${pkgver%%.*}/thresholds.xml"
+        "etc/ImageMagick-${pkgver%%.*}/type.xml"
+        "etc/ImageMagick-${pkgver%%.*}/type-dejavu.xml"
+        "etc/ImageMagick-${pkgver%%.*}/type-ghostscript.xml"
+        "etc/ImageMagick-${pkgver%%.*}/type-windows.xml")
 
 prepare() {
-	cd ImageMagick-${pkgver%.*}-${pkgver##*.}
-	sed '/AC_PATH_XTRA/d' -i configure.ac
-	autoreconf --force --install
-	patch -p0 -i "${srcdir}/perlmagick.rpath.patch"
+  cd ImageMagick-${pkgver%.*}-${pkgver##*.}
+  sed '/AC_PATH_XTRA/d' -i configure.ac
+  autoreconf --force --install
+  patch -p0 -i "${srcdir}/perlmagick.rpath.patch"
 }
 
 build() {
-	cd ${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}
+  cd ${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}
 
-	./configure --prefix=/usr \
-                --sysconfdir=/etc \
-                --libdir=/usr/lib \
-                --localstatedir=/var \
-                --enable-hdri \
-		--with-modules \
-		--disable-static \
-	    	--enable-openmp \
-		--with-x \
-		--with-wmf \
-		--with-openexr \
-		--with-xml \
-	    	--with-gslib \
-		--with-gs-font-dir=/usr/share/fonts/Type1 \
-	    	--with-perl \
-		--with-perl-options="INSTALLDIRS=vendor" \
-	    	--without-gvc \
-	        --with-dejavu-font-dir=/usr/share/fonts/TTF \
-		--without-autotrace \
-		--with-jp2 \
-	    	--without-jbig \
-		--without-fpx \
-		--without-dps \
-		--with-fftw 
-	make 
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --libdir=/usr/lib \
+    --localstatedir=/var \
+    --disable-static \
+    --enable-hdri \
+    --enable-opencl \
+    --with-dejavu-font-dir=/usr/share/fonts/TTF \
+    --with-fftw \
+    --with-gs-font-dir=/usr/share/fonts/Type1 \
+    --with-gslib \
+    --with-jp2 \
+    --with-lcms2 \
+    --with-modules \
+    --with-openexr \
+    --with-perl \
+    --with-perl-options="INSTALLDIRS=vendor" \
+    --with-rsvg \
+    --with-webp \
+    --with-wmf \
+    --with-x \
+    --with-xml \
+    --without-autotrace \
+    --without-dps \
+    --without-fpx \
+    --without-gvc \
+    --without-jbig
+    # --enable-openmp \
+
+  make
 }
 
 package() {
-	cd ${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}
+  cd ${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}
 
-	make DESTDIR=${pkgdir} install 
+  make DESTDIR=${pkgdir} install
 
-	install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE 
-	install -Dm644 NOTICE ${pkgdir}/usr/share/licenses/${pkgname}/NOTICE
+  install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  install -Dm644 NOTICE ${pkgdir}/usr/share/licenses/${pkgname}/NOTICE
 }
