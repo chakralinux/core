@@ -1,5 +1,4 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kwayland
 source ../plasma.conf
 
 pkgname=kwayland
@@ -9,7 +8,7 @@ pkgdesc='Qt-style Client and Server library wrapper for the Wayland libraries'
 arch=('x86_64')
 url='http://www.kde.org'
 license=('LGPL')
-depends=("qt5-base>=${PQtVersion}" 'wayland')
+depends=('qt5-base')
 makedepends=('extra-cmake-modules')
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
 options=('debug')
@@ -21,7 +20,11 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../$pkgname-${pkgver}
+  cmake_kf5 ../$pkgname-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DBUILD_TESTING=OFF
   make
 }
 

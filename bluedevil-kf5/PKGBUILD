@@ -1,4 +1,4 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
+#Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/bluedevil-frameworks
 
 source ../plasma.conf
 
@@ -6,14 +6,12 @@ pkgname=bluedevil-kf5
 _pkgname=bluedevil
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Library for making window decoration"
+pkgdesc="Integrate the Bluetooth technology within KDE workspace and applications"
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/bluedevil'
 license=('LGPL')
-depends=('qt5-base' 'kcoreaddons' 'kdbusaddons' 'kwidgetsaddons' 'ki18n' 'kiconthemes'
-         'knotifications' 'kio' 'shared-mime-info' 'libbluedevil-kf5')
-makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
-checkdepends=("cmake")
+depends=('kio' 'libbluedevil-kf5')
+makedepends=('extra-cmake-modules')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
@@ -29,13 +27,13 @@ prepare() {
 build() {
   cd build
   cmake_kf5 ../${_pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
-  make
-}
-
-check() {
-  cd build
-  make test || return 0
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLIB_INSTALL_DIR=lib \
+    -DLIBEXEC_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
+    make
 }
 
 package() {

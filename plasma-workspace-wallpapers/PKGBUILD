@@ -1,10 +1,11 @@
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/plasma-workspace-wallpapers
 source ../plasma.conf
 
 pkgname=plasma-workspace-wallpapers
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc='Additional wallpapers for the Plasma Workspace'
-arch=('any')
+arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
 license=('LGPL')
 makedepends=('extra-cmake-modules')
@@ -19,7 +20,10 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF
   make
 }
 

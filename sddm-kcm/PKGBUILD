@@ -1,5 +1,4 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sddm-kcm
 source ../plasma.conf
 
 pkgname=sddm-kcm
@@ -10,7 +9,7 @@ pkgdesc="SDDM configuration module for KDE"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/sddm-kcm'
 license=("GPL")
-depends=('kcoreaddons' 'sddm' 'ki18n' 'kxmlgui' 'kauth' 'kdelibs4support' 'libx11' 'libxcb' 'libxcursor')
+depends=('sddm' 'libxcursor' 'kio')
 makedepends=('extra-cmake-modules' 'kdoctools' 'qt5-tools')
 groups=('plasma')
 options=("debug")
@@ -24,13 +23,13 @@ prepare() {
 build() {
   cd build
   cmake_kf5 ../${pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
-  make
-}
-
-check() {
-  cd build
-  make test
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DSYSCONF_INSTALL_DIR=/etc \
+    -DBUILD_TESTING=OFF
+    make
 }
 
 package() {

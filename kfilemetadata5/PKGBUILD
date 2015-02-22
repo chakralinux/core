@@ -1,23 +1,21 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kfilemetadata5
 source ../plasma.conf
 
 pkgname=kfilemetadata5
 _pkgname=kfilemetadata
 pkgver=${PAltSubVersion}
 pkgrel=1
-pkgdesc='Library providing Job- and Qeueinterfaces'
-arch=('i686' 'x86_64')
-url='projects.kde.org/'
+pkgdesc='A library for extracting file metadata'
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/kdelibs/kfilemetadata'
 license=('LGPL')
-depends=('qt5-base' 'karchive' 'kservice')
-makedepends=('extra-cmake-modules' 'ffmpeg' 'exiv2' 'taglib' 'poppler-qt5' 'ebook-tools')
+depends=('ki18n' 'qt5-base' 'karchive' 'kservice')
+makedepends=('extra-cmake-modules' 'python2' 'exiv2' 'poppler-qt5' 'taglib' 'ffmpeg' 'ebook-tools')
 optdepends=('ffmpeg: extract video data'
             'exiv2: extract image data'
             'taglib: extract audio data'
             'poppler-qt5: extract document data'
             'ebook-tools: extract epub file data')
-checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${_pkgname}-${PAltSubVersion}.tar.xz")
@@ -29,13 +27,13 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${_pkgname}-${pkgver} 
+  cmake_kf5 ../${_pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF  
   make
-}
-
-check() {
-  cd build
-  make test
 }
 
 package() {

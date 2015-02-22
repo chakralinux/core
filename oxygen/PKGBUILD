@@ -1,38 +1,74 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/oxygen
 source ../plasma.conf
 
-pkgname=oxygen
+pkgbase=oxygen
+pkgname=('oxygen' 'oxygen-cursors' 'oxygen-kde4')
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Oxygen"
+pkgdesc="KDE Oxygen style"
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/oxygen'
 license=('LGPL')
-depends=('frameworkintegration' 'kwin')
-makedepends=('extra-cmake-modules')
-checkdepends=("cmake")
-groups=('plasma')
+makedepends=('frameworkintegration' 'extra-cmake-modules' 'kdoctools' 'kdelibs' 'automoc4')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${pkgname} | head -n 1) )
 
 prepare() {
-  mkdir -p build
+  mkdir -p build{,-kde4}
 }
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${PSubVersion}
+  cmake_kf5 ../$pkgname-$PSubVersion \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
+  make
+  cd ..
+
+  cd build-kde4
+  cmake ../$pkgname-$PSubVersion \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=OFF \
+    -DUSE_KDE4=ON
   make
 }
 
-check() {
-  cd build
-  make test || return 0
-}
+package_oxygen() {
+  pkgdesc='KDE Oxygen style'
+  depends=('frameworkintegration')
+  optdepends=('oxygen-cursors: cursor themes for Plasma 5')
+  groups=('plasma')
 
-package() {
   cd build
   make DESTDIR="${pkgdir}" install
+
+  # Cursors conflicts with kdebase-workspace
+  rm -r "${pkgdir}"/usr/share/icons/
+}
+
+package_oxygen-cursors() {
+  pkgdesc='KDE Oxygen cursor themes for Plasma 5'
+  groups=('plasma')
+  conflicts=('kde-workspace')
+
+  cd build/cursors
+  make DESTDIR="${pkgdir}" install
+}
+
+package_oxygen-kde4() {
+  pkgdesc='KDE Oxygen style for KDE4 applications'
+  depends=('kdelibs')
+  conflicts=('kde-workspace')
+
+  cd build-kde4
+  make DESTDIR="${pkgdir}" install
+
+  # needed so that pure Qt4 apps are correctly themed
+  install -d -m755 "$pkgdir"/usr/lib/qt4/plugins/styles
+  ln -s /usr/lib/kde4/plugins/styles/oxygen.so "$pkgdir"/usr/lib/qt4/plugins/styles
 }

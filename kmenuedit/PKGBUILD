@@ -1,5 +1,4 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kmenuedit
 source ../plasma.conf
 
 pkgname=kmenuedit
@@ -11,7 +10,6 @@ url='https://projects.kde.org/projects/kde/workspace/kmenuedit'
 license=('LGPL')
 depends=('khotkeys')
 makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
-checkdepends=("cmake")
 conflicts=('kde-workspace')
 groups=('plasma')
 options=("debug")
@@ -26,13 +24,12 @@ prepare() {
 build() {
   cd build
   cmake_kf5 ../${pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
-  make
-}
-
-check() {
-  cd build
-  make test
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
+    make
 }
 
 package() {

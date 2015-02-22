@@ -1,5 +1,4 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/milou
 source ../plasma.conf
 
 pkgname=milou
@@ -9,9 +8,8 @@ pkgdesc="A dedicated search application built on top of Baloo"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/milou/'
 license=('LGPL')
-depends=('krunner')
-makedepends=('extra-cmake-modules' 'kdoctools' 'python')
-checkdepends=("cmake")
+depends=('krunner' 'baloo-kf5')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -23,13 +21,13 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
   make
-}
-
-check() {
-  cd build
-  make test
 }
 
 package() {

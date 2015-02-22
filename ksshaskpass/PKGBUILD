@@ -1,41 +1,41 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
+# Contributions from Arch: 
 
 source ../plasma.conf
 
 pkgname=ksshaskpass
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Library for making window decoration"
+pkgdesc="ssh-add helper that uses kwallet and kpassworddialog"
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/ksshaskpass'
 license=('LGPL')
-depends=('qt5-base' 'kcoreaddons' 'ki18n' 'kwallet' 'kwidgetsaddons')
-makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
-checkdepends=("cmake")
+depends=('kwallet')
+makedepends=('extra-cmake-modules')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
+        "$pkgname.sh")
+sha256sums=( $(getSum ${pkgname}) 
+            'cba50feec8b0d058d0967407e79573b225c53dc1fe5461b3b2ddfbfbb2aff809')
 
 prepare() {
   mkdir -p build
-
-  cd ${pkgname}-${pkgver}
 }
 
 build() {
   cd build
   cmake_kf5 ../${pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
-  make
-}
-
-check() {
-  cd build
-  make test || return 0
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
+    make
 }
 
 package() {
   cd build
   make DESTDIR="${pkgdir}" install
+  
+    install -Dm755 "$srcdir"/ksshaskpass.sh \
+    "${pkgdir}"/etc/profile.d/ksshaskpass.sh
 }

@@ -1,3 +1,4 @@
+#Contributiosn from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libksysguard
 source ../plasma.conf
 
 pkgname=libksysguard
@@ -7,10 +8,9 @@ pkgdesc="KSysguard library"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/libksysguard'
 license=('LGPL')
-depends=('libxres' 'kdelibs4support' 'plasma-framework')
-makedepends=('extra-cmake-modules' 'kdoctools' 'python')
+depends=('libxres' 'plasma-framework' 'qt5-webkit')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
 conflicts=('kde-workspace')
-checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -23,13 +23,12 @@ prepare() {
 build() {
   cd build
   cmake_kf5 ../${pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
-  make
-}
-
-check() {
-  cd build
-  make test || return 0
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
+    make
 }
 
 package() {

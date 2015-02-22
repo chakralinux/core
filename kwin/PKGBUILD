@@ -1,5 +1,4 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kwin
 source ../plasma.conf
 
 pkgname=kwin
@@ -11,31 +10,33 @@ arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/kwin'
 license=('LGPL')
 depends=('qt5-multimedia' 'plasma-framework' 'knewstuff' 'libxcursor' 'kinit'
-         'hicolor-icon-theme' 'libepoxy' 'kwayland' 'kdecoration' 'kactivities-frameworks'
-         'libinput' 'xcb-util-wm')
+         'hicolor-icon-theme' 'libepoxy' 'kwayland' 'kdecoration' 'libinput')
 makedepends=('extra-cmake-modules' 'qt5-tools' 'kdoctools')
-checkdepends=("cmake" "xorg-server-xvfb")
 groups=('plasma')
 install=${pkgname}.install
 conflicts=('kde-workspace')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
+       'kdebug-341971.patch')
+sha256sums=( $(getSum ${pkgname}) 
+       '88a08cb1bf34910a5d5aad161dddbc0327f55d4064b6d240753c8e7a8d059017')
 
 prepare() {
   mkdir -p build
+  cd ${pkgname}-${pkgver}
+  patch -p1 -i "${srcdir}"/kdebug-341971.patch
 }
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DLIBEXEC_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
   make
-}
-
-check() {
-  cd build
-  # some test need kwin to be installed (service type)
-  xvfb-run -s "-screen 0 640x480x24" make test || return 0
 }
 
 package() {

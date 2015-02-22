@@ -1,38 +1,33 @@
-#
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-# Contributor: Antonio Rojas <nqn1976 @ gmail.com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/polkit-kde-frameworks
 
 source ../plasma.conf
 
 pkgname=polkit-kde-agent-frameworks
+_pkgname=polkit-kde-agent-1
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc='Daemon providing a polkit authentication UI for KDE'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='https://projects.kde.org/projects/extragear/base/polkit-kde-agent-1/'
 license=('LGPL')
-depends=('kdelibs4support')
-makedepends=('extra-cmake-modules' 'git' 'kdoctools' 'python')
-source=('git://anongit.kde.org/polkit-kde-agent-1.git#commit=cecfca6'
-        'libexecpath.patch')
-md5sums=('SKIP'
-         '166213b7c620fe604f3ecbd9353f294a')
+depends=('knotifications')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+source=("${PServer}/${pkgver}/${_pkgname}-${PVersion}.tar.xz")
+sha256sums=( $(getSum ${_pkgname}) )
 
 prepare() {
   mkdir -p build
-
-  cd polkit-kde-agent-1
-  patch -Rp1 -i "${srcdir}"/libexecpath.patch
 }
 
 build() {
   cd build
-  cmake ../polkit-kde-agent-1 \
+  cmake_kf5 ../${_pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DLIB_INSTALL_DIR=lib \
     -DSYSCONF_INSTALL_DIR=/etc \
     -DLIBEXEC_INSTALL_DIR=lib/polkit-kde \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
     -DBUILD_TESTING=OFF
   make
 }

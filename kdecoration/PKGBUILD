@@ -1,17 +1,15 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kdecoration
 source ../plasma.conf
 
 pkgname=kdecoration
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Library for making window decoration"
+pkgdesc="Plugin based library to create window decorations"
 arch=('x86_64')
-url='projects.kde.org/'
+url='https://projects.kde.org/projects/kde/workspace/kdecoration'
 license=('LGPL')
 depends=('qt5-base')
-makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
-checkdepends=("cmake")
+makedepends=('extra-cmake-modules')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -19,20 +17,18 @@ sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
-
-  cd ${pkgname}-${pkgver}
 }
 
 build() {
   cd build
   cmake_kf5 ../${pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DSYSCONF_INSTALL_DIR=/etc \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
   make
-}
-
-check() {
-  cd build
-  make test || return 0
 }
 
 package() {

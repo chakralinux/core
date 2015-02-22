@@ -1,48 +1,66 @@
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/plasma-workspace
 source ../plasma.conf
 
-pkgname=plasma-workspace
+pkgbase=plasma-workspace
+pkgname=('plasma-workspace' 'drkonqi')
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
 license=('LGPL')
-depends=('knewstuff' 'baloo-kf5' 'kjsembed' 'knotifyconfig' 'libxcursor'
-         'libksysguard' 'libkscreen2' 'ktexteditor' 'libqalculate'
-         'qt5-tools' 'kded' 'kde-cli-tools' 'kio-extras' 'milou' 'breeze'
-         'xorg-xrdb' 'xorg-xsetroot' 'xorg-apps' 'kwayland')
-makedepends=('extra-cmake-modules' 'kdoctools' 'kwin' 'gpsd')
-optdepends=('plasma-workspace-wallpapers: additional wallpapers'
-            'kwin: KDE Window Manager'
-            'gpsd: GPS support for geolocation')
-conflicts=('kde-workspace')
-checkdepends=("cmake")
+depends=('knewstuff' 'kjsembed' 'knotifyconfig' 'libxdamage' 'kwayland'
+         'libksysguard' 'libkscreen-kf5' 'ktexteditor' 'libqalculate'
+         'qt5-tools' 'kded' 'kde-cli-tools' 'xorg-xrdb' 'xorg-xsetroot' 'xorg-apps' 'xorg-utils')
+makedepends=('extra-cmake-modules' 'kdoctools' 'kwin' 'gpsd' 'baloo-kf5' 'krunner')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
-        '10-kf5')
+        'kde.pam')
 sha256sums=( $(getSum ${pkgname} | head -n1)             
             '024c222ad603b0bd69886d83ad970b834de0a7dc93afda24880c4fb9002e2a03')
 
 prepare() {
   mkdir -p build
+  
+  cd ${pkgbase}-${pkgver}
+  # be sure to use the Qt5 version of qtpaths
+  sed -i 's:qtpaths:qtpaths-qt5:' startkde/startkde.cmake
 }
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 ../${pkgbase}-${pkgver} \
+     -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLIB_INSTALL_DIR=lib \
+    -DLIBEXEC_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
   make
 }
 
-check() {
-  cd build
-  make test || return 0
-}
+package_plasma-workspace() {
+  optdepends=('plasma-workspace-wallpapers: additional wallpapers'
+              'gpsd: GPS support for geolocation')
+  conflicts=('kde-workspace')
 
-package() {
   cd build
   make DESTDIR="${pkgdir}" install
-  
-  sed 's|qtpaths|qtpaths-qt5|g' -i "$pkgdir/usr/bin/startkde"
-  install -Dm755 "${srcdir}/10-kf5" "${pkgdir}/etc/X11/xinit/xinitrc.d/10-kf5"
+
+  install -D "${srcdir}"/kde.pam \
+    "${pkgdir}"/etc/pam.d/kde
+
+  # Remove conflicts with drkonqi
+  rm "${pkgdir}"/usr/lib/drkonqi
+  rm -r "${pkgdir}"/usr/share/drkonqi
+  rm "${pkgdir}"/usr/lib/libKF5XmlRpcClientPrivate.*
+}
+
+package_drkonqi() {
+  pkgdesc='KDE crash handler'
+  depends=('kdewebkit')
+
+  cd build/drkonqi
+  make DESTDIR="${pkgdir}" install
 }

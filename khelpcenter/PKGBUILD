@@ -1,3 +1,4 @@
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/khelpcenter
 source ../plasma.conf
 
 pkgname=khelpcenter
@@ -9,7 +10,6 @@ url='https://projects.kde.org/projects/kde/workspace/khelpcenter'
 license=('LGPL')
 depends=('khtml' 'kdelibs4support' 'kcmutils')
 makedepends=('extra-cmake-modules' 'kdoctools')
-checkdepends=("cmake")
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -21,13 +21,14 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DLIBEXEC_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
   make
-}
-
-check() {
-  cd build
-  make test || return 0
 }
 
 package() {

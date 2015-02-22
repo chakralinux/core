@@ -1,18 +1,16 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contribution from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kscreen-frameworks
 source ../plasma.conf
 
 pkgname=kscreen-kf5
 _pkgname=kscreen
 pkgver=${PVersion}
 pkgrel=1
-pkgdesc="Manage screen resolution"
+pkgdesc="KDE's screen management software"
 arch=('x86_64')
 url='projects.kde.org/'
 license=('LGPL')
-depends=('qt5-declarative' 'qt5-x11extras' 'libkscreen-kf5' 'kdbusaddons' 'kconfig' 'ki18n' 'kxmlgui' 'kglobalaccel')
-makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
-checkdepends=("cmake")
+depends=('qt5-declarative' 'libkscreen-kf5' 'kxmlgui' 'qt5-graphicaleffects')
+makedepends=('extra-cmake-modules' 'python3')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
@@ -28,13 +26,12 @@ prepare() {
 build() {
   cd build
   cmake_kf5 ../${_pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
   make
-}
-
-check() {
-  cd build
-  make test || return 0
 }
 
 package() {

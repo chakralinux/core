@@ -1,4 +1,4 @@
-
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kdeplasma-addons-frameworks
 source ../plasma.conf
 
 pkgname=kdeplasma-addons-kf5
@@ -11,7 +11,7 @@ url='https://projects.kde.org/projects/kde/workspace/kdeplasma-addons'
 license=('LGPL')
 depends=('krunner' 'kdelibs4support')
 makedepends=('extra-cmake-modules' 'kdoctools')
-conflicts=('kdebase-workspace')
+conflicts=('kde-workspace')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
@@ -20,20 +20,18 @@ install=${pkgname}.install
 
 prepare() {
   mkdir -p build
-
-  cd ${_pkgname}-${pkgver}
 }
 
 build() {
   cd build
   cmake_kf5 ../${_pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
-  make
-}
-
-check() {
-  cd build
-  make test || return 0
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLIB_INSTALL_DIR=lib \
+    -DLIBEXEC_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF 
+    make
 }
 
 package() {

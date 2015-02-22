@@ -1,5 +1,4 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kwrited
 source ../plasma.conf
 
 pkgname=kwrited
@@ -9,7 +8,7 @@ pkgdesc='Kwrited'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/kwrited'
 license=('LGPL')
-depends=('kpty' 'ki18n' 'knotifications' 'kcoreaddons')
+depends=('kpty' 'knotifications')
 makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
 checkdepends=("cmake")
 groups=('plasma')
@@ -24,13 +23,13 @@ prepare() {
 build() {
   cd build
   cmake_kf5 ../${pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_AS_EXECUTABLE=OFF \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DLIB_INSTALL_DIR=lib \
+    -DBUILD_TESTING=OFF
   make
-}
-
-check() {
-  cd build
-  make test || return 0
 }
 
 package() {
