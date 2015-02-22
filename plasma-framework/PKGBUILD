@@ -11,7 +11,6 @@ url='https://projects.kde.org/projects/frameworks/plasma-framework'
 license=('LGPL')
 depends=('qt5-quickcontrols' 'kactivities-frameworks' 'kpackage')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'kdoctools')
-checkdepends=("xorg-server-xvfb")
 options=("debug")
 groups=('kf5')
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
@@ -23,13 +22,14 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
-  make
-}
-
-check() {
-  cd build
-  xvfb-run -s "-screen 0 640x480x24" make test
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DQML_INSTALL_DIR=lib/qt/qml \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
+    make
 }
 
 package() {

@@ -11,7 +11,6 @@ url='https://projects.kde.org/projects/frameworks/kdelibs4support'
 license=('LGPL')
 depends=('kunitconversion' 'kdesignerplugin' 'kinit' 'kitemmodels' 'kemoticons')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools' 'qt5-tools' 'networkmanager')
-checkdeepends=("xorg-server-xvfb")
 groups=('kf5-aids')
 options=("debug")
 source=("${KFServer}/portingAids/${pkgname}-${pkgver}.tar.xz")
@@ -23,13 +22,15 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
-  make
-}
-
-check() {
-  cd build
-  xvfb-run make test
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DLIBEXEC_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DHTML_INSTAL_DIR=/usr/share/doc/kdelibs4support/html \
+    -DBUILD_TESTING=OFF
+    make
 }
 
 package() {

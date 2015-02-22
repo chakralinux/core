@@ -3,7 +3,7 @@ source ../frameworks.conf
 pkgname=kactivities-frameworks
 _pkgname=kactivities
 pkgver=${KFVersion}
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 pkgdesc="Core components for the KDE's Activities"
 url='https://projects.kde.org/projects/frameworks/kactivities'
@@ -14,28 +14,24 @@ provides=('kactivitymanagerd')
 conflicts=('kactivities<=4.13.3-3' 'kactivities4')
 options=("debug")
 groups=('kf5')
-source=("$KFServer/${_pkgname}-${pkgver}.tar.xz"
-        "activity-start-stop-fix.patch")
-sha256sums=( $(getSum ${_pkgname}) 
-             '0e18423f3143c5b01be506496eed72fa614d2fc9ec1112cb2aedccb13494cb56')
+source=("$KFServer/${_pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${_pkgname}) )
 
 prepare() {
   mkdir -p build
-  cd ${_pkgname}-${pkgver}
-
-  patch -Np1 -i ../activity-start-stop-fix.patch
 }
 
 build() {
   cd build
   cmake_kf5 ../${_pkgname}-${pkgver} \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3
+    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_INSTALL_DIR=lib \
+    -DLIBEXEC_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
   make
-}
-
-check() {
-  cd ${srcdir}/build
-  make test
 }
 
 package() {
