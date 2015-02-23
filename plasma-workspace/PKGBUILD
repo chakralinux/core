@@ -9,7 +9,7 @@ pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
 license=('LGPL')
-depends=('knewstuff' 'kjsembed' 'knotifyconfig' 'libxdamage' 'kwayland'
+depends=('knewstuff' 'kjsembed' 'knotifyconfig' 'libxdamage' 'kwayland' 'kglobalaccel>=5.7.0'
          'libksysguard' 'libkscreen-kf5' 'ktexteditor' 'libqalculate'
          'qt5-tools' 'kded' 'kde-cli-tools' 'xorg-xrdb' 'xorg-xsetroot' 'xorg-apps' 'xorg-utils')
 makedepends=('extra-cmake-modules' 'kdoctools' 'kwin' 'gpsd' 'baloo-kf5' 'krunner')
@@ -30,13 +30,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgbase}-${pkgver} \
-     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DLIB_INSTALL_DIR=lib \
-    -DLIBEXEC_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
-    -DBUILD_TESTING=OFF
+  cmake_kf5 ../${pkgbase}-${pkgver}
   make
 }
 
