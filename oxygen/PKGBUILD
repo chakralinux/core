@@ -20,12 +20,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../$pkgname-$PSubVersion \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
-    -DBUILD_TESTING=OFF
+  cmake_kf5 ../$pkgname-$PSubVersion 
   make
   cd ..
 
@@ -47,7 +42,7 @@ package_oxygen() {
   cd build
   make DESTDIR="${pkgdir}" install
 
-  # Cursors conflicts with kdebase-workspace
+  # Cursors conflicts with kde-workspace
   rm -r "${pkgdir}"/usr/share/icons/
 }
 

@@ -1,5 +1,4 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libbluedevil-frameworks
 source ../plasma.conf
 
 pkgname=libbluedevil-kf5
@@ -22,16 +21,14 @@ sha256sums=( $(getSum ${_pkgname}) )
 
 prepare() {
   mkdir -p build
-
   cd ${_pkgname}-${pkgver}
 }
 
 build() {
   cd build
   cmake_kf5 ../${_pkgname}-${pkgver} \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_LIBDIR=lib
+      -DCMAKE_INSTALL_LIBDIR=lib \
+      -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
 

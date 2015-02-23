@@ -1,5 +1,4 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/polkit-kde-frameworks
-
 source ../plasma.conf
 
 pkgname=polkit-kde-agent-frameworks
@@ -22,13 +21,7 @@ prepare() {
 build() {
   cd build
   cmake_kf5 ../${_pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DLIB_INSTALL_DIR=lib \
-    -DSYSCONF_INSTALL_DIR=/etc \
-    -DLIBEXEC_INSTALL_DIR=lib/polkit-kde \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
-    -DBUILD_TESTING=OFF
+    -DLIBEXEC_INSTALL_DIR=lib/polkit-kde 
   make
 }
 
