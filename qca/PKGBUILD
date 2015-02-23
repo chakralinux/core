@@ -5,7 +5,7 @@
 pkgbase=qca
 pkgname=("qca" "qca-qt5")
 pkgver=2.1.0.3
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://delta.affinix.com/qca/"
 license=('LGPL')
@@ -27,7 +27,9 @@ build() {
 
   cd $srcdir/build-qt5
   cmake ../${pkgbase} \
-    -DCMAKE_INSTALL_PREFIX=/usr
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DQCA_SUFFIX=qt5 \
+    -DQCA_INSTALL_IN_QT_PREFIX=ON
   make
 }
 
@@ -42,7 +44,6 @@ package_qca() {
 package_qca-qt5() {
   pkgdesc="Qt5 Cryptographic Architecture"
   depends=('qt5-base' 'ca-certificates' 'nss')
-  conflicts=('qca')
 
   cd $srcdir/build-qt5
   make DESTDIR=${pkgdir} install
