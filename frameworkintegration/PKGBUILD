@@ -9,7 +9,7 @@ pkgdesc='Framework providing components to allow applications to integrate with 
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/frameworkintegration'
 license=('LGPL')
-depends=('kio' 'ttf-oxygen')
+depends=('kio' 'ttf-oxygen') #should replace this with oxygen-fonts once plasma5 hits stable
 makedepends=("extra-cmake-modules>=${KFECMVersion}")
 options=("debug")
 groups=('kf5')
@@ -22,12 +22,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
-    -DBUILD_TESTING=OFF
+  cmake_kf5 ../${pkgname}-${pkgver} 
   make
 }
 
