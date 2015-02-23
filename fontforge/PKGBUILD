@@ -1,38 +1,54 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/fontforge
 
 pkgname=fontforge
-pkgver=20120731
-_pkgver=20120731-b
-pkgrel=2
+_pkgver=2014-11-26
+pkgver=${_pkgver//-/}
+pkgrel=1
 pkgdesc="An outline and bitmap font editor"
 arch=('x86_64')
-url="http://fontforge.sourceforge.net"
+url="http://www.fontforge.org"
 license=('BSD')
-depends=('libxkbui' 'libxi' 'libxml2' 'pango' 'giflib' 'libpng' 'libtiff' 'libjpeg-turbo' 'python2')
-options=('!libtool' '!makeflags')
-source=("http://sourceforge.net/projects/fontforge/files/fontforge-source/fontforge_full-${_pkgver}.tar.bz2")
-md5sums=('a8a90473a97da87e45f66d11007b6e7c')
+depends=('libtool' 'libxkbui' 'libxi' 'pango' 'giflib' 'libtiff' 'libspiro' 'libxml2' 'libunicodenames'
+         'zeromq' 'python2' 'desktop-file-utils' 'hicolor-icon-theme' )
+install=${pkgname}.install
+source=("http://github.com/fontforge/fontforge/releases/download/${pkgver}/fontforge-${_pkgver}-Unix-Source.tar.gz"
+        'http://fontforge.org/cidmaps.tgz')
+sha1sums=('ecd776480a47cdcbe1b30ce275172d7d52288e77'
+          'efbc7c9d3e95159f5600dc71f9cccb370e46bb94')
+
+prepare() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	rm -fr libltdl
+	for i in m4/*.m4; do
+		if [[ ! -L $i ]]; then continue; fi
+		j=$(readlink "$i")
+		ln -sf "${j/aclocal\//aclocal\/lt}" "$i"
+	done
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${_pkgver}"
-  
-  ./configure --prefix=/usr \
-              --mandir=/usr/share/man \
-              --enable-type3 \
-              --enable-double \
-              --enable-devicetables \
-              --with-regular-link \
-              --with-python2 \
-              --enable-pyextensions 
-  make 
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	export LIBZMQ_LIBS=-lzmq
+	export PYTHON=python2
+	./bootstrap --force
+	./configure \
+		--prefix=/usr \
+		--mandir=/usr/share/man \
+		--enable-python-extension
+	make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${_pkgver}"
-  
-  make DESTDIR="${pkgdir}" install 
-  install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" 
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	make DESTDIR="${pkgdir}" install
+
+	install -d "${pkgdir}/usr/share/fontforge"
+	install -m644 ../Adobe-* "${pkgdir}/usr/share/fontforge"
+
+	install -d "${pkgdir}/usr/share/icons"
+	cp -a desktop/icons "${pkgdir}/usr/share/icons/hicolor"
+	rm -fr "${pkgdir}/usr/share/icons/hicolor/src"
+
+	install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+	install -Dm644 desktop/fontforge.desktop "${pkgdir}/usr/share/applications/fontforge.desktop"
 }

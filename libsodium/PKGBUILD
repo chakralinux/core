@@ -1,0 +1,28 @@
+#contributions from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/libsodium
+
+pkgname=libsodium
+pkgver=1.0.2
+pkgrel=1
+pkgdesc="P(ortable|ackageable) NaCl-based crypto library"
+arch=('x86_64')
+url="https://github.com/jedisct1/libsodium"
+license=('custom:ISC')
+depends=('glibc')
+source=("http://download.dnscrypt.org/$pkgname/releases/$pkgname-${pkgver}.tar.gz")
+sha512sums=('15fc47516f0e35906c1c304205fa991e74a273e4e6fc2186b6c16f0e41523de24493e149262b97ef03e4adc221232372ef1f283c4c23f96e4c5d99023d361e14')
+
+build() {
+  cd "$pkgname-$pkgver"
+
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+
+  # install license
+  install -d -m 755 "$pkgdir/usr/share/licenses/$pkgname"
+  install -m 644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
