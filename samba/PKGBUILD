@@ -3,7 +3,7 @@
 
 pkgbase=samba
 pkgname=('libwbclient' 'smbclient' 'samba')
-pkgver=4.1.16
+pkgver=4.1.17
 pkgrel=1
 arch=('x86_64')
 url="http://www.samba.org"
@@ -22,7 +22,7 @@ source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${pkgver}.tar.gz
         smbd@.service
         winbindd.service
         samba.conf)
-md5sums=('9c3bc2fb98fd3bac9945b911c71fdc66'
+md5sums=('8fed0f23a672e6a8d0716d96aca88671'
          '5697da77590ec092cc8a883bae06093c'
          '96f82c38f3f540b53f3e5144900acf17'
          'ee4763a656cf00d92bfda31b6bb2c5cb'
@@ -80,9 +80,6 @@ _samba4_auth_modules=auth_unix,auth_wbc,auth_server,auth_netlogond,auth_script,a
               --with-pammodulesdir=/usr/lib/security \
               --with-shared-modules=${_samba4_idmap_modules},${_samba4_pdb_modules},${_samba4_auth_modules} \
               --disable-rpath-install
-
-              # Add this to the options once it's working...
-               #--with-system-mitkrb5 /opt/heimdal
   make
   make DESTDIR="${_pkgsrc}/" install
 
