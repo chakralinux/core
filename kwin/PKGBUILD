@@ -2,8 +2,7 @@
 source ../plasma.conf
 
 pkgname=kwin
-pkgver=5.2.0.1
-#pkgver=${PSubVersion}
+pkgver=${PSubVersion}
 pkgrel=1
 pkgdesc='KDE Window manager'
 arch=('x86_64')
@@ -16,15 +15,11 @@ groups=('plasma')
 install=${pkgname}.install
 conflicts=('kde-workspace')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
-       'kdebug-341971.patch')
-sha256sums=( $(getSum ${pkgname}) 
-       '88a08cb1bf34910a5d5aad161dddbc0327f55d4064b6d240753c8e7a8d059017')
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
-  cd ${pkgname}-${pkgver}
-  patch -p1 -i "${srcdir}"/kdebug-341971.patch
 }
 
 build() {
