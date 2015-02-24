@@ -13,13 +13,15 @@ depends=('qt5-declarative' 'libkscreen-kf5' 'kxmlgui' 'qt5-graphicaleffects')
 makedepends=('extra-cmake-modules' 'python3')
 groups=('plasma')
 options=("debug")
+replaces=('kscreen')
+conflicts=('kscreen')
+provides=('kscreen')
 source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${_pkgname}) )
 install=${pkgname}.install
 
 prepare() {
   mkdir -p build
-
   cd ${_pkgname}-${pkgver}
 }
 
