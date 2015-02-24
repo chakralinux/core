@@ -4,20 +4,18 @@
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
-pkgname=kde-baseapps-konsole
-pkgver=${_kdever}
-pkgrel=1
+pkgbase=konsole
+pkgname=('kde-baseapps-konsole'
+         'konsolepart4')
+pkgver=4.14.3
+pkgrel=2
 pkgdesc="KDE terminal emulator"
 url='http://kde.org/applications/system/konsole/'
 screenshot="http://userbase.kde.org/images.userbase/6/64/Konsole-KDE4.png"
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL')
-depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
 makedepends=('cmake' 'automoc4')
 groups=('kde' 'kde-baseapps' 'kde-uninstall')
-provides=('kdebase-konsole')
-conflicts=('kdebase-konsole')
-replaces=('kdebase-konsole')
 categories=('system')
 options=('docs' '!header' 'debug' 'log')
 source=("$_mirror/konsole-$_kdever.tar.xz"
@@ -25,17 +23,42 @@ source=("$_mirror/konsole-$_kdever.tar.xz"
 sha256sums=(`grep konsole-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`
             'ba0c40a58cf5823cb038ebfef94c0a2166b8ecac220ae68c82d8a992891f9d6a')
 
-build() {
-    cd "${srcdir}/konsole-$pkgver"
+prepare() {
+    mkdir -p "${srcdir}/build"
+    cd "${srcdir}/${pkgbase}-${pkgver}"
     patch -p1 -i ${srcdir}/Shell_new.diff
-    cmake . \
+}
+
+build() {
+    cd build
+    cmake ../${pkgbase}-${pkgver} \
         -DCMAKE_BUILD_TYPE=${_build_type} \
         -DCMAKE_INSTALL_PREFIX=${_installprefix} \
         -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed' 
     make
 }
 
-package() {
-    cd "${srcdir}/konsole-$pkgver"
+package_kde-baseapps-konsole() {
+    provides=('kdebase-konsole')
+    conflicts=('kdebase-konsole')
+    replaces=('kdebase-konsole')
+    depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}" "konsolepart4=${pkgver}")
+    splitdirs="src desktop"
+    for i in ${splitdirs} ; do
+        cd ${srcdir}/build/${i}
+        make DESTDIR=${pkgdir} install
+    done
+    rm -r "${pkgdir}"/usr/share/apps/ \
+       -r "${pkgdir}"/usr/share/kde4/
+
+    rm "${pkgdir}"/usr/lib/libkonsoleprivate.so \
+       "${pkgdir}"/usr/lib/kde4/libkonsolepart.so
+}
+
+package_konsolepart4() {
+    depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
+    cd build
     make DESTDIR="${pkgdir}" install
+    rm -r "$pkgdir"/usr/{bin,share/applications}
+    rm "${pkgdir}"/usr/lib/libkdeinit4_konsole.so
 }
