@@ -29,8 +29,8 @@ pkgname=('qt5-base'
          'qt5-websockets'
          'qt5-x11extras'
          'qt5-xmlpatterns')
-pkgver=5.4.0
-pkgrel=2
+pkgver=5.4.1
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -42,7 +42,7 @@ makedepends=('libxcb' 'xcb-proto' 'xcb-util' 'xcb-util-image' 'xcb-util-wm' 'xcb
             'openal' 'libxkbcommon' 'mtdev' 'harfbuzz' 'libwebp' 'leveldb'
             'libxcursor' 'libsm' 'libxrandr' 'libxv' 'libxi'
             'xdg-utils' 'desktop-file-utils' 'libxinerama' 'libxfixes'
-            'pciutils' 'nss'
+            'geoclue' 'pciutils' 'nss'
             'gstreamer' 'gst-plugins-base' 'gst-plugins-good'
             'gst-plugins-bad' 'gst-plugins-ugly' 'harfbuzz' 'pkg-config')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
@@ -74,8 +74,7 @@ prepare() {
   # Use python2 for Python 2.x
   find . -name '*.py' -exec sed -i \
     's|#![ ]*/usr/bin/python$|&2|;s|#![ ]*/usr/bin/env python$|&2|' {} +
-
-  # There are still a lot of relative calls which need a workaround
+  # in qtwebengine there are still a lot of relative calls which need a workaround
   mkdir -p "${srcdir}"/python2-path
   ln -sf /usr/bin/python2 "${srcdir}"/python2-path/python
 }
@@ -89,6 +88,7 @@ build() {
   export LD_LIBRARY_PATH="${QTDIR}"/qtbase/lib:"${QTDIR}"/qttools/lib:"${LD_LIBRARY_PATH}"
   export QT_PLUGIN_PATH="${QTDIR}"/qtbase/plugins
 
+  # python2 workaround
   export PATH="${srcdir}/python2-path:$PATH"
   export _xkbconfigroot=$(pkg-config --variable=xkb_base xkeyboard-config)
 
@@ -127,12 +127,19 @@ build() {
 
   make
 
-  # Fix paths
-  find "${QTDIR}" -name Makefile -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
-  find "${QTDIR}" -name Makefile.qmake-docs -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
-  find "${QTDIR}" -name Makefile -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
-  find "${QTDIR}" -name Makefile.qmake-docs -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
-  sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" qtwebkit/Source/Makefile.api
+  # Fix docs build when qt is not installed
+  sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" \
+    "${QTDIR}"/qtbase/qmake/Makefile.qmake-docs
+  find "${QTDIR}" -name Makefile \
+    -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
+  sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" \
+    "${QTDIR}"/qtbase/qmake/Makefile.qmake-docs
+  find "${QTDIR}" -name Makefile \
+    -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
+  sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" \
+    qtwebkit/Source/Makefile.api
+  find "${QTDIR}" -name Makefile \
+    -exec sed -i "s|/usr/lib/qt5/bin/qmlplugindump|${QTDIR}/qtdeclarative/bin/qmlplugindump|g" {} +
 
   make docs
 }
@@ -154,8 +161,8 @@ package_qt5-base() {
   replaces=('qt5-private-headers')
   options=("staticlibs")
 
-  cd $_pkgfqn/qtbase
-  make INSTALL_ROOT=$pkgdir install
+  cd ${_pkgfqn}/qtbase
+  make INSTALL_ROOT="${pkgdir}" install
 
   install -D -m644 LGPL_EXCEPTION.txt \
     "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
@@ -517,3 +524,10 @@ package_qt5-x11extras() {
 }
 
 
+sha1sums=('daa3373af8d6656a1066ff23bc9100b5ca004ecf'
+          '981cf376da66c8be7c7ec99866da0299114192f6'
+          'e131a17beda4625f21022981a519b5e8d8c8e6f7'
+          '62806b6696696d4ef69e4c0733fc9f1d761f08cd'
+          '2e0b6245c40c91fbb0a965724450b6d6883f2927'
+          'b0e6c61b8364eb3f7af4dae41fa7738c3181dd96'
+          '6c845b5879d2f443078e25856cf60cf53644c41b')
