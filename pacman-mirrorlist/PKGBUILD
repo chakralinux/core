@@ -1,8 +1,8 @@
 # maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=pacman-mirrorlist
-pkgver=20140509
-pkgrel=4
+pkgver=20150228
+pkgrel=1
 pkgdesc="Chakra Linux mirror list for use by pacman"
 arch=('x86_64')
 url="http://www.archlinux.org/pacman/"
@@ -11,12 +11,10 @@ depends=('mirror-check')
 groups=('base')
 backup=(etc/pacman.d/mirrorlist)
 source=('mirrorlist')
-md5sums=('80ec41743c9280835b9fca25169cdcbd')
+md5sums=('32ea347496c9dbc84f8a1cf8a163f475')
 
 build() {
   mkdir -p $pkgdir/etc/pacman.d
   install -m644 $srcdir/mirrorlist $pkgdir/etc/pacman.d/
-  # customize mirrorlist to architecture
-  sed -i -e "s/@carch@/${CARCH}/g" $pkgdir/etc/pacman.d/mirrorlist
-}
+  }
 
