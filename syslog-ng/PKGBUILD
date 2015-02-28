@@ -1,13 +1,6 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer <inkane@chakra-project.org>
-# contributor <abveritas[at]chakra-project[dot]org>
-
-
 pkgname=syslog-ng
 pkgver=3.6.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Next-generation syslogd with advanced networking and filtering capabilities"
 arch=('x86_64')
 license=('GPL2')
@@ -27,11 +20,6 @@ sha1sums=('36eeaf920383ee8cb1c17d945205b7562f9fbbb2'
           'eb2aa25737e0cb9453c7b058f0e2dcf16abf21cd'
           '949128fe3d7f77a7aab99048061f885bc758000c')
 
-prepare() {
-  cd "$pkgname-$pkgver"
-  sed -i -e 's,/bin/,/usr/bin/,' -e 's,/sbin/,/bin/,' contrib/systemd/syslog-ng.service
-}
-
 build() {
   cd "$pkgname-$pkgver"
 
@@ -45,8 +33,8 @@ build() {
     --disable-spoof-source \
     --enable-ipv6 \
     --enable-systemd \
-    --with-systemdsystemunitdir=/usr/lib/systemd/system
-
+    --with-systemdsystemunitdir=/usr/lib/systemd/system \
+    --sbindir=/usr/bin
   make
 }
 
