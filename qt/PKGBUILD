@@ -8,7 +8,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers' 'qt-docs')
 pkgver=4.8.6
-pkgrel=5
+pkgrel=6
 arch=('x86_64')
 url='http://qt.nokia.com/'
 license=('GPL3' 'LGPL')
@@ -16,7 +16,7 @@ makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'db
     'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
     'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
     'mysql' 'unixodbc' 'cups' 'libxinerama' 'libxcursor')
-options=('staticlibs')
+options=('staticlibs' 'debug')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("http://download.qt-project.org/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar.gz"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
@@ -26,7 +26,8 @@ source=("http://download.qt-project.org/official_releases/qt/4.8/${pkgver}/${_pk
         'kubuntu_14_systemtrayicon.diff'
         'glib-honor-ExcludeSocketNotifiers-flag.diff'
         'qtcore-4.8.5-qeventdispatcher-recursive.patch'
-        'l-qclipboard_delay.patch')
+        'l-qclipboard_delay.patch'
+        'add_nostrip_for_debug_packages.diff')
 md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
@@ -39,7 +40,8 @@ md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
          'a523644faa8f98a73f55c4aa23c114a6'
          '85679531c8a7310317adfb7002d9f99a'
          '009de09b4e589a7770fba74405656c99'
-         'addc5e88d538ee55e17bd49ba337ca67')
+         'addc5e88d538ee55e17bd49ba337ca67'
+         '43b13cea7241ac7ed207723881c83336')
 
 prepare() {
 	cd ${_pkgfqn}
@@ -59,6 +61,10 @@ prepare() {
 	patch -Np0 -i "${srcdir}"/qtcore-4.8.5-qeventdispatcher-recursive.patch
 	# https://bugreports.qt-project.org/browse/QTBUG-38585 (use by LibreOffice)
 	patch -Np0 -i "${srcdir}"/l-qclipboard_delay.patch
+	
+	# To include the debug symbols we should add the nostrip option
+	# http://anonscm.debian.org/gitweb/?p=pkg-kde/qt/qt4-x11.git;a=blob;f=debian/patches/12_add_nostrip_for_debug_packages.diff;h=d5f3083eff90ae0b748b6ab542aa951f4e6d0004;hb=HEAD
+	patch -Np1 -i "${srcdir}"/add_nostrip_for_debug_packages.diff
 
         sed -i "s|-O2|${CXXFLAGS}|" mkspecs/common/{g++,gcc}-base.conf
         sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" mkspecs/common/gcc-base-unix.conf
