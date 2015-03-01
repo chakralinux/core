@@ -9,7 +9,7 @@ pkgbase=boost
 pkgname=('boost-libs' 'boost')
 pkgver=1.55.0
 _boostver=${pkgver//./_}
-pkgrel=1
+pkgrel=2
 pkgdesc="Free peer-reviewed portable C++ source libraries"
 arch=('x86_64')
 url="http://www.boost.org/"
@@ -19,7 +19,7 @@ source=("http://downloads.sourceforge.net/${pkgbase}/${pkgbase}_${_boostver}.tar
         # upstream patches
         log_fix_dump_avx2.patch)
 md5sums=('93780777cfbf999a600f62883bd54b17'
-         'acbc980cd1e8c7dfdbaa380abf95bdc4')
+         '2d8c2a83421afacda0ff0192c68b2c17')
 #options=("!makeflags")
 license=('custom')
 
@@ -31,7 +31,7 @@ prepare() {
    patch -Np0 < ${srcdir}/log_fix_dump_avx2.patch
 
    # Add an extra python version. This does not replace anything and python 2.x need to be the default.
-   echo "using python : 3.3 : /usr/bin/python3 : /usr/include/python3.3m : /usr/lib ;" >> ./tools/build/v2/user-config.jam
+   echo "using python : 3.4 : /usr/bin/python3 : /usr/include/python3.4m : /usr/lib ;" >> ./tools/build/v2/user-config.jam
    # Support for OpenMPI
    echo "using mpi ;" >> ./tools/build/v2/user-config.jam
 
