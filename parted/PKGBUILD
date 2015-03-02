@@ -1,10 +1,10 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
+# maintainer almack gluca86[at]gmail[dot]com>
 
 pkgname=parted
-pkgver=3.1
+pkgver=3.2
 pkgrel=1
 pkgdesc="A program for creating, destroying, resizing, checking and copying partitions"
 arch=('x86_64')
@@ -12,10 +12,16 @@ license=('GPL3')
 url="http://www.gnu.org/software/parted/parted.html"
 depends=('device-mapper' 'e2fsprogs')
 makedepends=('pkgconfig')
-options=('!libtool')
 install=${pkgname}.install
-source=("http://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('5d89d64d94bcfefa9ce8f59f4b81bdcb')
+source=("http://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz"
+        'parted-735669-fat16-crash-v1.patch')
+md5sums=('0247b6a7b314f8edeb618159fa95f9cb'
+         '15a72be3860b9ec754dc7bff17a5afae')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i "${srcdir}/parted-735669-fat16-crash-v1.patch"
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
