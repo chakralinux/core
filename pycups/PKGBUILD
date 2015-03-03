@@ -1,26 +1,27 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer: abveritas@chakra-project.org
+#Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/pycups
 
-pkgname=pycups
-pkgver=1.9.61
+pkgname=python3-pycups
+pkgbase=pycups
+pkgver=1.9.72
 pkgrel=1
-pkgdesc="Python CUPS Bindings"
+arch=('x86_64')
+pkgdesc="Python 3 CUPS Bindings"
 url="http://cyberelk.net/tim/software/pycups/"
-arch=('i686' 'x86_64')
 license=('GPL')
-depends=('libcups' 'python2')
-source=(http://cyberelk.net/tim/data/${pkgname}/${pkgname}-${pkgver}.tar.bz2{,.asc})
-md5sums=('7464093b349b907dcdefb913674e959b'
-         'cb780142a614300792a08d462e198589')
+conflicts=('pycups')
+provides=('pycups')
+replaces=('pycups')
+depends=('libcups' 'python3')
+source=(http://cyberelk.net/tim/data/${pkgbase}/${pkgbase}-${pkgver}.tar.bz2)
+md5sums=('c790bfbf4a3e9da2412c12c860fe191f')
+
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  python2 setup.py build
+  cd ${pkgbase}-${pkgver}
+  python3 setup.py build
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  python2 setup.py install --root="${pkgdir}" --optimize=1
+  cd ${pkgbase}-${pkgver}
+  python3 setup.py install --root="${pkgdir}" --optimize=1
 }
