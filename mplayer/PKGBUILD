@@ -7,7 +7,7 @@
 pkgbase=mplayer
 pkgname=('mplayer' 'mencoder')
 pkgver=37344
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 makedepends=('subversion' 'libxxf86vm' 'libmad' 'libxinerama' 'sdl' 'lame' 'libtheora'
              'xvidcore' 'libmng' 'libxss' 'libgl' 'smbclient' 'aalib' 'jack' 'libcaca'
@@ -32,14 +32,14 @@ md5sums=('SKIP'
          '868a92bdef148df7f38bfa992b26ce9d')
 
 prepare() {
-    cd ${pkgname}
+    cd ${pkgbase}
     mv ../ffmpeg-*/ ./ffmpeg
 
     patch -p1 -i ../include-samba-4.0.patch
 }
 
 build() {
-    cd ${srcdir}/${pkgname}
+    cd ${srcdir}/${pkgbase}
 
     # Custom CFLAGS break the mplayer build
     unset CFLAGS LDFLAGS
