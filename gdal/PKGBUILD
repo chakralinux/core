@@ -1,9 +1,8 @@
-# Platform Packages for Chakra, part of chakraos.org
-# maintainer almack
+# Contributions from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/gdal
 
 pkgname=gdal
-pkgver=1.11.1
-pkgrel=2
+pkgver=1.11.2
+pkgrel=1
 pkgdesc="A translator library for raster geospatial data formats"
 arch=('x86_64')
 url="http://www.gdal.org/"
@@ -17,13 +16,17 @@ optdepends=('postgresql: postgresql database support'
             'swig:  perl binding support')
 options=('!makeflags')
 source=("http://download.osgeo.org/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.gz"
-	'gdal-1.5.1-python-install.patch')
-sha1sums=('e2c67481932ec9fb6ec3c0faadc004f715c4eef4'
-          '1c80a38f4f65cdbe3f475ad551294d657c870170')
+	'gdal-1.5.1-python-install.patch'
+	'poppler-0.31.patch')
+sha1sums=('6f3ccbe5643805784812072a33c25be0bbff00db'
+          '1c80a38f4f65cdbe3f475ad551294d657c870170'
+          '3a0c69e37bc9f886fbe0333efeb95a3cb7867310')
 
 prepare() {
   cd "${srcdir}"/$pkgname-$pkgver
   patch -Np0 -i "${srcdir}"/gdal-1.5.1-python-install.patch
+  patch -Np1 -i "${srcdir}"/poppler-0.31.patch
+
 
 # python2 fixes
   sed -i 's_python python1.5_python2 python python1.5_' configure
