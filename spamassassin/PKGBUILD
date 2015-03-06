@@ -1,11 +1,9 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Contributor: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: Chaoting Liu <brli@users.sourceforge.net>
 
 pkgname=spamassassin
-pkgver=3.3.2
-pkgrel=4
+pkgver=3.4.0
+pkgrel=1
 pkgdesc="A mail filter to identify spam."
 arch=('x86_64')
 license=('APACHE')
@@ -23,18 +21,24 @@ backup=('etc/mail/spamassassin/local.cf'
         'etc/mail/spamassassin/v330.pre')
 install="${pkgname}.install"
 options=('!emptydirs')
-source=("http://mirrors.devlib.org/apache/${pkgname}/source/Mail-SpamAssassin-${pkgver}.tar.gz"
-        'spamassassin.service'
-        'perl-5.18-fixes.patch')
-md5sums=('d1d62cc5c6eac57e88c4006d9633b81e'
-         'b8dcea016fb73b074b941e832cfae5c9'
-         '6cf63928eeeaea25967c2ffd875d106a')
+source=("http://www.us.apache.org/dist/${pkgname}/source/Mail-SpamAssassin-${pkgver}.tar.gz"
+        'net-dns.patch'
+        'spamassassin.service')
+md5sums=('5d0b50cee3bfa905cca35c33296c8c2a'
+         '0bcf0419608ec4ac200e794563620f31'
+         'b8dcea016fb73b074b941e832cfae5c9')
 
-build() {
+prepare() {
   cd "${srcdir}/Mail-SpamAssassin-${pkgver}"
 
-  patch -p0 -d lib -i "$srcdir/perl-5.18-fixes.patch"
+  sed -i t/sa_compile.t \
+	  -e 's#/foo/bin/spamassassin#/foo/bin/site_perl/spamassassin#' \
+	  -e 's#/foo/bin/sa-compile#/foo/bin/site_perl/sa-compile#'
 
+  patch -p1 -i "$srcdir/net-dns.patch"
+}
+
+build() {
   cd "${srcdir}/Mail-SpamAssassin-${pkgver}"
 
   # install module in vendor directories.
@@ -45,9 +49,6 @@ build() {
 
 check() {
   cd "${srcdir}/Mail-SpamAssassin-${pkgver}"
-
-  # SSLv2 is disabled by upstream so this test would fail
-  rm -rf t/spamd_ssl_v2.t
 
   # parallel tests cause lots of failures; disable for now
   #export HARNESS_OPTIONS="j$(echo $MAKEFLAGS | sed 's/.*-j\([0-9][0-9]*\).*/\1/')"
@@ -60,4 +61,5 @@ package() {
   make DESTDIR="${pkgdir}" install
 
   install -D -m644 "${srcdir}/spamassassin.service" "${pkgdir}/usr/lib/systemd/system/spamassassin.service"
+  install -d -o 182 -g 182 -m 755 "$pkgdir/var/lib/spamassassin"
 }
