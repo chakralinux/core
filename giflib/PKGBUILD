@@ -1,36 +1,26 @@
-# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 # Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/giflib/
+
 pkgname=giflib
-pkgver=4.1.6
-pkgrel=4
+pkgver=5.1.1
+pkgrel=1
 pkgdesc="A library for reading and writing gif images"
 url="http://sourceforge.net/projects/giflib/"
 arch=('x86_64')
 license=('MIT')
-depends=('libx11' 'libsm')
-provides=("libungif=${pkgver}")
-conflicts=('libungif')
-replaces=('libungif')
-options=('!libtool')
+depends=('glibc')
+makedepends=('xmlto' 'docbook-xml' 'docbook-xsl')
 source=(http://downloads.sourceforge.net/sourceforge/giflib/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('7125644155ae6ad33dbc9fc15a14735f')
+md5sums=('1c39333192712788c6568c78a949f13e')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  ./configure --prefix=/usr
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr --disable-static
   make
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install
-  install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
 
-  # libungif compatibility - instructions taken from Redhat specfile
-  MAJOR=`echo ${pkgver} | sed 's/\([0-9]\+\)\..*/\1/'`
-  gcc -shared -Wl,-soname,libungif.so.${MAJOR} -Llib/.libs -lgif -o libungif.so.${pkgver}
-  install -m755 libungif.so.${pkgver} ${pkgdir}/usr/lib/
-  ln -sf libungif.so.${pkgver} ${pkgdir}/usr/lib/libungif.so.4
-  ln -sf libungif.so.4 ${pkgdir}/usr/lib/libungif.so
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
 }

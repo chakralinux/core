@@ -2,7 +2,7 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/openresolv
 
 pkgname=openresolv
-pkgver=3.5.6
+pkgver=3.6.1
 pkgrel=1
 pkgdesc="resolv.conf management framework (resolvconf)"
 arch=(any)
@@ -13,14 +13,13 @@ provides=(resolvconf)
 depends=(bash)
 makedepends=(systemd)
 source=("http://roy.marples.name/downloads/openresolv/${pkgname}-${pkgver}.tar.bz2"
-        fix-dnsmasq.patch)
-md5sums=('ac03b7a52cf0f2040cc70df641f1baff'
-         'f2e6207621b284d1879bd004f8784b1e')
+        fs33801.patch)
+md5sums=('f385e26ec0f9cd06d8ccd45fc219002e'
+         'b6d3c06bd806de87497cb249bea954d0')
 
 prepare() {
   cd $pkgname-$pkgver
-  
-  patch -Np1 -i ../fix-dnsmasq.patch
+  patch -Np1 -i ../fs33801.patch
   sed -n '2,25{s:^# \?::;p}' resolvconf.in >LICENSE 
 }
 
