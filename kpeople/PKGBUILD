@@ -1,0 +1,33 @@
+
+source ../frameworks.conf
+
+pkgname=kxmlrpcclient
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='A contact aggregation library for KDE'
+arch=('x86_64')
+url='http://community.kde.org/KTp/libkpeople'
+license=('LGPL')
+depends=('baloo' 'kcoreaddons' 'kservice' 'kwidgetsaddons' 'ki18n' 'kitemviews')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'boost')
+groups=('kf5')
+install=kio.install
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
+ 
