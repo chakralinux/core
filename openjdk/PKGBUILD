@@ -32,6 +32,7 @@ source=(jdk8u-${_repo_ver}.tar.gz::${_url_src}/archive/${_repo_ver}.tar.gz
         nashorn-${_repo_ver}.tar.gz::${_url_src}/nashorn/archive/${_repo_ver}.tar.gz
         openjdk.profile.sh
         openjdk.profile.csh
+        make4-compatibility.diff
         giflib5.diff)
 md5sums=('c689ebe46c1d18bb20e5a4d2bd51aefc'
          '5c96879a168c79647fb7b0285c51b5ac'
@@ -43,6 +44,7 @@ md5sums=('c689ebe46c1d18bb20e5a4d2bd51aefc'
          'abb8cbd2a4fce317174d60bf543c8ce4'
          '65fecbcbadfa455f35cb6fef7d1fc553'
          'b839efffcbdb4f630b52d92ee1565c90'
+         '87eb620b7813f6f843ad6491239ceb66'
          '86b2c5980594a977333a128c0e288bd6')
 
 _jdkname=openjdk8
@@ -62,9 +64,13 @@ prepare() {
     ln -sf ../${subrepo}-${_repo_ver} ${subrepo}
   done
 
-  #Fix the giflib5 issues with splashscreen_gif.c
-  cd "${srcdir}/jdk8u-jdk8u40-b19/jdk/src/share/native/sun/awt/splashscreen"
-  patch -N -i "${srcdir}/giflib5.diff" 
+  #Fix the giflib5 issues with splashscreen_gif.c, kind regards to the Beyond LFS team
+  cd "${srcdir}/"
+  sed -e 's/DGifCloseFile(gif/&, NULL/' \
+      -e '/DGifOpen/s/c)/c, NULL)/'     \
+      -i ./jdk-jdk8u40-b19/src/share/native/sun/awt/splashscreen/splashscreen_gif.c
+  cd jdk8u-jdk8u40-b19
+  patch -p1 -i ${srcdir}/make4-compatibility.diff
 }
 
 
