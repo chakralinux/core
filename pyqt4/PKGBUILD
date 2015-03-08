@@ -10,8 +10,8 @@
 
 pkgbase=pyqt4
 pkgname=('python-pyqt4-common' 'python3-pyqt4' 'python2-pyqt4')
-pkgver=4.11.1
-pkgrel=2
+pkgver=4.11.3
+pkgrel=1
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
 license=('GPL')
@@ -19,13 +19,13 @@ makedepends=('python2-dbus'
              'python3-dbus'
              'mesa'
              'phonon'
-             'python-opengl'
+             'python2-opengl'
              'qt-assistant-compat'
              'qtwebkit'
              'python2-sip' 
              'python3-sip')
 source=("http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-${pkgver}/PyQt-x11-gpl-${pkgver}.tar.gz")
-md5sums=('9d0203c46ad8c838abd5d33b814ca659')
+md5sums=('997c3e443165a89a559e0d96b061bf70')
 
 build() {
     cp -r ${srcdir}/PyQt-x11-gpl-${pkgver} ${srcdir}/python2-PyQt-x11-gpl-${pkgver}
@@ -35,6 +35,7 @@ build() {
     msg "Configuring the Python 3 version"
     python3 configure.py \
         --confirm-license \
+        --no-sip-files \
         --qsci-api \
         --verbose \
         --enable QtAssistant \
@@ -66,7 +67,7 @@ build() {
     msg "Configuring the Python 2 version"
     python2 configure.py \
         --confirm-license \
-        -v /usr/share/sip \
+        --no-sip-files \
         --qsci-api \
         --verbose \
         --enable QtAssistant \
@@ -104,7 +105,11 @@ package_python-pyqt4-common() {
     msg "Packaging python-pyqt4-common"
     make -C pyrcc DESTDIR="${pkgdir}" install
     make -C pylupdate DESTDIR="${pkgdir}" install
+
     install -Dm644 PyQt4.api "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
+
+    install -d "${pkgdir}"/usr/share/sip/PyQt4
+    cp -r sip/* "${pkgdir}"/usr/share/sip/PyQt4
 }
 
 package_python3-pyqt4() {
