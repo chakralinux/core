@@ -23,17 +23,25 @@ source=(
         https://sources.archlinux.org/other/packages/${pkgname}/${pkgname}-${pkgver}.tar.xz
         "http://download.qt-project.org/official_releases/qt/4.8/${_qtver}/${_pkgfqn}.tar.gz"
         'qwebview.patch'
-	'use-python2.patch')
+        'use-python2.patch'
+        'qtwebkit-2.3-debuginfo.patch'
+        'qtwebkit-2.3-save_memory.patch')
 sha1sums=('31bc60de1cf26bb0766d539b4d564651ddbb0650'
           'ddf9c20ca8309a116e0466c42984238009525da6'
           'c3df6107233f466a032e36681cee07f16536657c'
-          '315b6ff603f35e5492a036f7082f6aa075dfb607')
+          '315b6ff603f35e5492a036f7082f6aa075dfb607'
+          '1329b1564fd70ced8be411eac275972a49502e23'
+          '6563e0e1b36a8ab28cb65edfa724aca1dbb03dfe')
 
 prepare() {
   cd ${pkgname}-${pkgver}
 
   patch -p1 -i "${srcdir}"/use-python2.patch
-
+  
+  # reduce debug info, to avoid the error "ar: libWebCore.a: File truncated" of 4GB file max exceed
+  patch -p1 -i "${srcdir}"/qtwebkit-2.3-debuginfo.patch
+  patch -p1 -i "${srcdir}"/qtwebkit-2.3-save_memory.patch
+  
   # QWebView plugin
   cd ../$_pkgfqn
   patch -p1 -i "${srcdir}"/qwebview.patch
@@ -41,14 +49,16 @@ prepare() {
 
 build() {
   cd ${pkgname}-${pkgver}
-  
-  # try with gstab to avoid the error "ar: libWebCore.a: File truncated" of 4GB file max exceed
-  #export CFLAGS="$CFLAGS -gstabs"
-  #export CXXFLAGS="$CXXFLAGS -gstabs"
 
+  # Additionally you can use --qmakearg="CONFIG+=production_build" to link with less memory.
   export QTDIR=/usr
   Tools/Scripts/build-webkit --qt \
-    --makeargs="${MAKEFLAGS}" --prefix=/usr --no-webkit2
+    --makeargs="${MAKEFLAGS}" --prefix=/usr \
+    --no-webkit2 \
+    --release \
+    --qmakearg="CONFIG+=production_build" \
+    --system-malloc
+    
 
   cd ../${_pkgfqn}/tools/designer/src/plugins/qwebview
   qmake
