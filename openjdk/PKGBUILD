@@ -1,3 +1,4 @@
+#Contributions from KaOS: https://github.com/KaOSx/main/blob/master/openjdk/PKGBUILD
 
 pkgname=('openjdk' 'openjdk-src' 'openjdk-doc')
 pkgbase='openjdk'
@@ -7,14 +8,14 @@ _jdk_build=19
 # latest release notes:
 # http://www.oracle.com/technetwork/java/javase/8train-relnotes-latest-2153846.html
 # https://www.java.com/en/download/faq/release_changes.xml
-pkgver=${_java_ver}.u${_jdk_update}
+pkgver=${_java_ver}.u${_jdk_update}	
 _repo_ver=jdk${_java_ver}u${_jdk_update}-b${_jdk_build}
-pkgrel=1
+pkgrel=2
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 arch=('x86_64')
 url="http://icedtea.classpath.org/"
 license=('GPL2 with Classpath exception')
-makedepends=('java-environment=7' 'apache-ant>=1.6.5' 'zip' 'unzip'
+makedepends=('java-environment=8' 'apache-ant>=1.6.5' 'zip' 'unzip'
              'fastjar' 'cpio' 'cups' 'orbit2' 'coreutils'
              'wget' 'gzip' 'alsa-lib' 'pulseaudio' 'zlib' 'libjpeg-turbo'
              'libpng' 'giflib' 'lcms2' 'freetype2' 'rhino' 'nss' 'libxt'
@@ -30,7 +31,8 @@ source=(jdk8u-${_repo_ver}.tar.gz::${_url_src}/archive/${_repo_ver}.tar.gz
         langtools-${_repo_ver}.tar.gz::${_url_src}/langtools/archive/${_repo_ver}.tar.gz
         nashorn-${_repo_ver}.tar.gz::${_url_src}/nashorn/archive/${_repo_ver}.tar.gz
         openjdk.profile.sh
-        openjdk.profile.csh)
+        openjdk.profile.csh
+        giflib5.diff)
 md5sums=('c689ebe46c1d18bb20e5a4d2bd51aefc'
          '5c96879a168c79647fb7b0285c51b5ac'
          '5a9084c7b65f748c33e8fbd004f2c2dc'
@@ -40,7 +42,8 @@ md5sums=('c689ebe46c1d18bb20e5a4d2bd51aefc'
          'ca4d75286ebed1001499a161b1c86f15'
          'abb8cbd2a4fce317174d60bf543c8ce4'
          '65fecbcbadfa455f35cb6fef7d1fc553'
-         'b839efffcbdb4f630b52d92ee1565c90')
+         'b839efffcbdb4f630b52d92ee1565c90'
+         '86b2c5980594a977333a128c0e288bd6')
 
 _jdkname=openjdk8
 _jvmdir=/usr/lib/jvm/java-8-openjdk
@@ -53,16 +56,21 @@ _nonheadless=(bin/policytool
 
 prepare() {
   cd "${srcdir}/jdk8u-${_repo_ver}"
-
+  
   for subrepo in corba hotspot jdk jaxws jaxp langtools nashorn
   do
     ln -sf ../${subrepo}-${_repo_ver} ${subrepo}
   done
+
+  #Fix the giflib5 issues with splashscreen_gif.c
+  cd "${srcdir}/jdk8u-jdk8u40-b19/jdk/src/share/native/sun/awt/splashscreen"
+  patch -N -i "${srcdir}/giflib5.diff" 
 }
+
 
 build() {
   cd "${srcdir}/jdk8u-${_repo_ver}"
-
+  
   # How many cpu's do we have?
   export NUM_PROC=`/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :`
   export NUM_PROC=${NUM_PROC:-1}
