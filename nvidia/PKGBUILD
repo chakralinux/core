@@ -1,5 +1,5 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 
 _extramodules=extramodules-3.18-CHAKRA
 _kver=$(cat /usr/lib/modules/${_extramodules}/version)
@@ -7,18 +7,18 @@ _kernelver=3.18.3
 
 pkgname=('nvidia' 'chd-nvidia')
 pkgver=346.35
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
-source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported_340"
+source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported_new"
         "nv-drm-343.36.patch")
 
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
-md5sums=('d0b1d8e1a8e8df2ce4e9a64575165f8f'
+md5sums=('874fc31d9a647e51ce20372d090083f5'
          'ff8a5f979e4428f8c847423fb007042c'
          '9ca9f07f91361362f304ca8317ddd453')
 
@@ -63,6 +63,6 @@ package_chd-nvidia() {
     cd "${srcdir}/${_pkg}"
 
     install -dm755 "${pkgdir}/opt/chakra/hwdb"
-    sh -e "${srcdir}/nvidia_supported_340" README.txt kernel/nv-kernel.o \
+    sh -e "${srcdir}/nvidia_supported_new" README.txt kernel/nv-kernel.o \
         > "${pkgdir}/opt/chakra/hwdb/hw_nvidia_hwdb"
 }
