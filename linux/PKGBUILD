@@ -5,15 +5,15 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel="3.18"
-pkgver=3.18.5
+_basekernel="3.19"
+pkgver=3.19.1
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'bc')
 options=('!strip')
-_aufsver=3.18.1+
+_aufsver=3.19
 source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
@@ -24,21 +24,15 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz
         "git://git.code.sf.net/p/aufs/aufs3-standalone#branch=aufs${_aufsver}"
         'config.aufs'
         'overlay-multi-layer.patch'
-        'gm450-fix.patch::https://github.com/torvalds/linux/commit/656bfa3afc14e45e2d9e1624bf60d79b3beb12f2.patch'
-        'iwlwifi-mvm1.patch::https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/patch/?id=480acbcee4e25ea3af0df3c0423dc29540551258'
-        'iwlwifi-mvm2.patch::https://git.kernel.org/cgit/linux/kernel/git/kvalo/wireless-drivers.git/patch/?id=4e6c48e0984e28d064ee8fbc292aee7b7920c507'
         )
-sha256sums=('becc413cc9e6d7f5cc52a3ce66d65c3725bc1d1cc1001f4ce6c32b69eb188cbd'
-            '9e261632e11f629705c3f1b2f07c611284e5f9972c42f6740131e8e2471c349a'
-            '31865caeb22d0e9deffcc88153394add59654620ab7bd167717e68f09c050ac5'
+sha256sums=('be42511fe5321012bb4a2009167ce56a9e5fe362b4af43e8c371b3666859806c'
+            '3dbf80df9a81a285baa5188ea8d768110f24a3e4fe8bd37e1c9d7410d60a680b'
+            '7b30b8599910a4437a05e159af518a3404b2a39a653ffc597db4861b2cdb01fa'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99'
             'SKIP'
             'dc48a541d34416272892df18dafea760717f0724b1fcded39f359655b131425f'
-            '0f8c88a20b430208ef9ed5e9e744736857ea634abfb1eff9ef8dd9635d3f9eab'
-            '4707c0eecc2e57932521d04e66579eca475c232e47c324aae20a4f3a252bbc02'
-            'a6ac122b613dde7f3deffcf14a63a063fdc1247fe847fa52501f5551194215d8'
-            '54e9a460019427f22ab69060ff992b4c734972fbb840221b9b209651765fd406')
+            '0f8c88a20b430208ef9ed5e9e744736857ea634abfb1eff9ef8dd9635d3f9eab')
 
 prepare() {
   cd "${srcdir}/linux-${_basekernel}"
@@ -75,9 +69,6 @@ prepare() {
   patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-standalone.patch"
 
   patch -p1 -i "${srcdir}/overlay-multi-layer.patch"
-  patch -p1 -i "${srcdir}/gm450-fix.patch"
-  patch -p1 -i "${srcdir}/iwlwifi-mvm1.patch"
-  patch -p1 -i "${srcdir}/iwlwifi-mvm2.patch"
 
   cat "${srcdir}/config.x86_64" > ./.config
 
