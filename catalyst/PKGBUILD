@@ -2,13 +2,13 @@
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 
-_extramodules=extramodules-3.18-CHAKRA
+_extramodules=extramodules-3.19-CHAKRA
 _kernver=$(cat /usr/lib/modules/${_extramodules}/version)
-_kernelver=3.18.3
+_kernelver=3.19.1
 
 pkgname=(catalyst chd-catalyst)
 pkgver=14.12
-pkgrel=3
+pkgrel=4
 _amdver=14.501.1003
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only. Radeons HD 2 3 4 xxx ARE NOT SUPPORTED"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
@@ -29,8 +29,9 @@ source=(
 	lano1106_kcl_agp_13_4.patch
 	lano1106_fglrx-13.8_proc.patch
 	cold-fglrx-3.14-current_euid.patch
-        fglrx_3.17rc6-no_hotplug.patch
-        fglrx_gpl_symbol.patch
+	fglrx_gpl_symbol.patch
+	fglrx_3.17rc6-no_hotplug.patch
+        kolasa-3.19-get_cpu_var.patch
 	fglrx_supported)
 
 md5sums=('ced4329274a02712406bda678ffbd743'
@@ -40,8 +41,9 @@ md5sums=('ced4329274a02712406bda678ffbd743'
          'c5156eddf81c8a1719b160d05a2e8d67'
          '2ab4837233de42332753882445373d7b'
          'ba33b6ef10896d3e1b5e4cd96390b771'
-         '67a22f624bae95a76638ce269392cb01'
          'ef97fc080ce7e5a275fe0c372bc2a418'
+         '67a22f624bae95a76638ce269392cb01'
+         '3aa45013515b724a71bbd8e01f98ad99'
          '8bd182de340d6ed8b2dfcedfd3e5a389')
 
 build() {   
@@ -75,6 +77,7 @@ build() {
     patch -Np1 -i ../cold-fglrx-3.14-current_euid.patch
     patch -Np1 -i ../fglrx_3.17rc6-no_hotplug.patch
     patch -Np1 -i ../fglrx_gpl_symbol.patch
+    patch -Np1 -i ../kolasa-3.19-get_cpu_var.patch
     
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
     cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a" . 

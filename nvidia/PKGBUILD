@@ -1,32 +1,29 @@
 #
 # Chakra Packages for Chakra, part of chakraos.org
 
-_extramodules=extramodules-3.18-CHAKRA
+_extramodules=extramodules-3.19-CHAKRA
 _kver=$(cat /usr/lib/modules/${_extramodules}/version)
-_kernelver=3.18.3
+_kernelver=3.19.1
 
 pkgname=('nvidia' 'chd-nvidia')
-pkgver=346.35
-pkgrel=3
+pkgver=346.47
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
-source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported_new"
-        "nv-drm-343.36.patch")
+source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported_new")
 
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
 md5sums=('874fc31d9a647e51ce20372d090083f5'
-         'ff8a5f979e4428f8c847423fb007042c'
-         '9ca9f07f91361362f304ca8317ddd453')
+         '115b5b2d136c4b44c658ef823b8a4bab')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
-
     cd "${_pkg}"
-    patch -p1 -i ../nv-drm-343.36.patch
+    # patches here
 }
 
 build() {
@@ -51,8 +48,8 @@ package_nvidia() {
         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-uvm.ko"
     gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
     
-    install -d -m755 "${pkgdir}/etc/modprobe.d"
-    echo "blacklist nouveau" >> "${pkgdir}/etc/modprobe.d/nouveau_blacklist.conf"
+    install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
+    echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nouveau_blacklist.conf"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
 }
 
