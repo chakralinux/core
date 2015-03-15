@@ -1,33 +1,18 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
 # Include global configuration
 source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
 
 pkgname="kfilemetadata"    
 arch=('x86_64')
-pkgver=${_kdever}
-pkgrel=2
+pkgver=${_oldkdever}
+pkgrel=3
 pkgdesc="File indexing for baloo?"
 url="http://www.kde.org"
-license=('GPL'
-         'LGPL'
-         'FDL')
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-depends=("kdelibs>=${_kdever}"
-         'poppler-qt'
-         'ffmpeg'
-         'exiv2>=0.24'
-         'ebook-tools')
-makedepends=('pkg-config'
-             'cmake'
-             'automoc4'
-             'doxygen')
-source=($_mirror/${pkgname}-$_kdever.tar.xz)
-sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d" " -f1`)
+license=('GPL' 'LGPL' 'FDL')
+options=('docs' '!header' 'debug' 'log')
+depends=("kdelibs>=${_libsver}" 'poppler-qt' 'ffmpeg' 'exiv2' 'ebook-tools')
+makedepends=('pkg-config' 'cmake' 'automoc4' 'doxygen')
+source=("http://download.kde.org/stable/${_oldkdever}/src/${pkgname}-${pkgver}.tar.xz")
+sha1sums=('6b106223b3d4ab9ba0516b8301e564af2416eaa9')
 
 build() {
     cd ${pkgname}-${pkgver}
