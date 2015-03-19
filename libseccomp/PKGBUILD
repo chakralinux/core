@@ -1,15 +1,15 @@
-# Maintainer: Daniel Micay <danielmicay@gmail.com>
-# Contributor: Patryk Kowalczyk < patryk at kowalczyk dot ws>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libseccomp
 
 pkgname=libseccomp
-pkgver=2.1.0
+pkgver=2.2.0
 pkgrel=1
 pkgdesc='Enhanced seccomp library'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('LGPL2.1')
 url="http://sourceforge.net/projects/libseccomp/"
 depends=('glibc')
-source=("http://downloads.sourceforge.net/project/$pkgname/$pkgname-$pkgver.tar.gz")
+source=("https://github.com/seccomp/$pkgname/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
+md5sums=('e9509301a1fc024cd10127ac1f31792a')
 
 build() {
   cd $pkgname-$pkgver
@@ -21,5 +21,4 @@ package() {
   cd $pkgname-$pkgver
   make DESTDIR="$pkgdir" install
 }
-md5sums=('3961103c1234c13a810f6a12e60c797f')
 
