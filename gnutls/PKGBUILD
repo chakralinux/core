@@ -1,43 +1,38 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/gnutls
 
 pkgname=gnutls
-pkgver=2.12.6.1
+pkgver=3.3.13
 pkgrel=1
 pkgdesc="A library which provides a secure layer over a reliable transport layer"
-arch=(i686 x86_64)
-license=('GPL3' 'LGPL')
-url="http://www.gnu.org/software/gnutls/"
+arch=('x86_64')
+license=('GPL3' 'LGPL2.1')
+url="http://www.gnutls.org/"
 install=gnutls.install
-options=('libtool' 'zipman')
-depends=('gcc-libs>=4.4.3' 'libtasn1>=2.5' 'readline>=6.0' 'zlib' 'libgcrypt>=1.4.5')
-source=(ftp://ftp.gnu.org/gnu/gnutls/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('e724e37f96984f3b0a215c11f03729bd')
+options=('!zipman')
+depends=('gcc-libs' 'libidn' 'libtasn1' 'readline' 'zlib' 'nettle' 'p11-kit')
+optdepends=('guile: for use with Guile bindings')
+source=(ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/${pkgname}-${pkgver}.tar.xz)
+md5sums=('a7387fe8bf3e604bf518a6da9ab2a4e6')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr \
 	--with-zlib \
-	--with-libgcrypt \
 	--disable-static \
-	--disable-guile
+	--enable-guile
   make
 }
 
 check() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  #make check # passes all  || /bin/true
-  make check || /bin/true # see https://lists.gnu.org/archive/html/gnutls-devel/2011-06/msg00007.html
+  cd ${pkgname}-${pkgver}
+  make check  || make -j1 check # || /bin/true
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
-  # lots of .png files are put into infodir and are gzipped by makepkg! this may need to be fixed by using !zipman
+
+  # lots of .png files are put into infodir and are gzipped by makepkg! this needs to be fixed by using !zipman
   # gzip -9 all files in infodir and manpages manually
   find "$pkgdir/usr/share/info" -name '*.info*' -exec gzip -9 {} \;
   find "$pkgdir/usr/share/man" -exec gzip -9 {} \;
