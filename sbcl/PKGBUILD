@@ -1,7 +1,7 @@
-# Maintainer: abveritas[at]chakra-project[dot]org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sbcl
 
 pkgname=sbcl
-pkgver=1.0.55
+pkgver=1.2.9
 pkgrel=1
 pkgdesc="Steel Bank Common Lisp"
 arch=('x86_64')
@@ -13,20 +13,19 @@ makedepends=('sbcl' 'texinfo')
 install=sbcl.install
 source=("http://downloads.sourceforge.net/project/sbcl/sbcl/$pkgver/$pkgname-$pkgver-source.tar.bz2"
         'chakra-fixes.lisp')
-md5sums=('128fb15c80e8e3f8d4024bd8e04635e0'
+md5sums=('e23592dd0e424239b0ddc40f0df44ab0'
          '7ac0c1936547f4278198b8bf7725204d')
-
-
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
 
-  export CFLAGS+=" -D_GNU_SOURCE -DSBCL_HOME=\\\"/usr/lib/sbcl\\\""
-  export GNUMAKE="make -e"
+  export CFLAGS+=" -D_GNU_SOURCE -fno-omit-frame-pointer -DSBCL_HOME=/usr/lib/sbcl"
+  export GNUMAKE="make"
 
   # build system uses LINKFLAGS and OS_LIBS to build LDFLAGS
   export LINKFLAGS="$LDFLAGS"
   unset LDFLAGS
+  unset MAKEFLAGS
 
   # Make a multi-threaded SBCL, disable LARGEFILE
   cat >customize-target-features.lisp <<EOF
@@ -37,7 +36,7 @@ build() {
   (disable :largefile)))
 EOF
 
-  sh make.sh sbcl
+  sh make.sh sbcl --prefix=/usr
   make -C doc/manual info
 }
 
