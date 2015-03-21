@@ -1,29 +1,41 @@
-# $Id: PKGBUILD 8677 2008-08-15 11:05:35Z andyrtr $
-# Contributor: Sarah Hay <sarah@archlinux.org>
-# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libmpeg2
 
 pkgname=libmpeg2
 pkgver=0.5.1
-pkgrel=2
+pkgrel=3
 pkgdesc="libmpeg2 is a library for decoding MPEG-1 and MPEG-2 video streams."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://libmpeg2.sourceforge.net/"
 depends=('glibc')
 makedepends=('sdl' 'libxv' 'libsm')
-optdepends=('sdl:	requiered for mpeg2dec'
-            'libsm:	requiered for mpeg2dec'
-            'libxv:	requiered for mpeg2dec')
-source=(http://libmpeg2.sourceforge.net/files/${pkgname}-${pkgver}.tar.gz)
+optdepends=('sdl:	required for mpeg2dec'
+            'libsm:	required for mpeg2dec'
+            'libxv:	required for mpeg2dec')
 license=('GPL2')
 options=(!libtool)
 provides=('mpeg2dec')
-md5sums=('0f92c7454e58379b4a5a378485bbd8ef')
+source=("http://libmpeg2.sourceforge.net/files/${pkgname}-${pkgver}.tar.gz"
+        'gcc4.6.patch')
+md5sums=('0f92c7454e58379b4a5a378485bbd8ef'
+         'ff73b3f77870baf8de69441f34b88fa5')
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i "${srcdir}/gcc4.6.patch"
+
+  sed '/AC_PATH_XTRA/d' -i configure.ac
+  autoreconf --force --install
+}
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  ./configure --prefix=/usr --enable-shared --disable-static || return 1
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --enable-shared --disable-static
   make	OPT_CFLAGS="${CFLAGS}" \
 	MPEG2DEC_CFLAGS="${CFLAGS}" \
-	LIBMPEG2_CFLAGS="" || return 1
-  make DESTDIR=${pkgdir} install || return 1
+	LIBMPEG2_CFLAGS=""
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }
