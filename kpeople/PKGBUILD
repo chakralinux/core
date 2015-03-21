@@ -1,17 +1,16 @@
 
 source ../frameworks.conf
 
-pkgname=kxmlrpcclient
-pkgver=${KFVersion}
+pkgname=kpeople
+pkgver=5.8.0
 pkgrel=1
-pkgdesc='A contact aggregation library for KDE'
+pkgdesc='A library that provides access to all contacts and the people who hold them'
 arch=('x86_64')
 url='http://community.kde.org/KTp/libkpeople'
-license=('LGPL')
-depends=('baloo' 'kcoreaddons' 'kservice' 'kwidgetsaddons' 'ki18n' 'kitemviews')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'boost')
-groups=('kf5')
-install=kio.install
+license=(LGPL)
+depends=('kservice' 'kwidgetsaddons' 'kitemviews' "qt5-declarative=${KFQtVersion}")
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python')
+groups=(kf5)
 options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
@@ -20,14 +19,17 @@ prepare() {
   mkdir -p build
 }
 
-build() {
+build() { 
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake ../$pkgname-$pkgver \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLIB_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
   make
 }
 
 package() {
   cd build
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="$pkgdir" install
 }
- 
