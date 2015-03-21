@@ -1,26 +1,26 @@
-#
-# Apps Packages for Chakra, part of chakra-project.org
-#
-# maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-# contributor Neo Kolokotronis <tetris4@gmail.com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/gsm
 
 pkgname=gsm
-pkgver=1.0.13
+pkgver=1.0.14
 pkgrel=1
 pkgdesc="Shared libraries for GSM 06.10 lossy speech compression"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.quut.com/gsm/"
 license=('custom')
 depends=('glibc')
 source=(http://www.quut.com/${pkgname}/${pkgname}-${pkgver}.tar.gz
         gsm.patch)
-md5sums=('c1ba392ce61dc4aff1c29ea4e92f6df4'
+md5sums=('4cbb4e7b73842de3d12d30b0d74200d4'
          '30f46c92d0a5e5654258e707a9e8b5a6')
 
+prepare(){
+  cd "${srcdir}/${pkgname}-${pkgver%.*}-pl${pkgver##*.}/"
+  patch -Np0 -i "${srcdir}/${pkgname}.patch"
+
+}
+         
 build() {
   cd "${srcdir}/${pkgname}-${pkgver%.*}-pl${pkgver##*.}/"
-
-  patch -Np0 -i "${srcdir}/${pkgname}.patch"
 
   # flags for shared lib
   CFLAGS="${CFLAGS} -fPIC"
@@ -40,5 +40,5 @@ package() {
     install
 
   # Install license
-  install -m644 COPYRIGHT ${pkgdir}/usr/share/licenses/${pkgname}/license.txt || return 1
+  install -m644 COPYRIGHT ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
 }
