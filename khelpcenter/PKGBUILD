@@ -1,9 +1,10 @@
 #contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/khelpcenter
+#              from KaOS: https://github.com/KaOSx/apps/blob/master/khelpcenter/PKGBUILD
 source ../plasma.conf
 
 pkgname=khelpcenter
 pkgver=${PVersion}
-pkgrel=2
+pkgrel=1
 pkgdesc="Application to show KDE Applications' documentation"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/khelpcenter'
@@ -18,6 +19,7 @@ sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
+  sed -e "s|add_subdirectory(pt_BR)|#add_subdirectory(pt_BR)|" -i ${srcdir}/$pkgname-$pkgver/doc/CMakeLists.txt
 }
 
 build() {
