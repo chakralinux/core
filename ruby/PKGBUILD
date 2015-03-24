@@ -1,47 +1,69 @@
-# maintainer (x86_64): AlmAck <almack[at]chakraos[dot]org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/ruby
 
-pkgname=('ruby' 'ruby-docs')
-pkgver=1.9.3_p551
-_pkgver=1.9.3-p551
+pkgname=(ruby ruby-docs)
+pkgver=2.2.1
 pkgrel=1
-pkgdesc="An object-oriented language for quick and easy programming"
-arch=('x86_64')
-url="http://www.ruby-lang.org/en/"
-license=('custom')
-makedepends=('gdbm' 'db' 'openssl' 'zlib' 'readline' 'tk' 'libffi'
-             'doxygen' 'graphviz' 'libyaml')
-options=('!emptydirs')
-source=("ftp://ftp.ruby-lang.org/pub/ruby/1.9/${pkgname}-${_pkgver}.tar.bz2")
-md5sums=('0d8b272b05c3449dc848bb7570f65bfe')
+arch=(x86_64)
+url='http://www.ruby-lang.org/en/'
+license=(BSD custom)
+makedepends=(gdbm openssl libffi doxygen graphviz libyaml ttf-dejavu tk)
+options=(!emptydirs)
+source=(http://cache.ruby-lang.org/pub/ruby/${pkgver:0:3}/ruby-${pkgver}.tar.xz
+        gemrc)
+sha1sums=('31bbdb17237863bd26b3aa32c613fe42c95ccd60'
+          '0d24837add3d7ddcecd4c565f4a4a180176d9e6d')
 
 build() {
-  cd "${srcdir}/${pkgname}-${_pkgver}"
-  ./configure --prefix=/usr \
-      --sysconfdir=/etc \
-      --enable-shared \
-      --enable-pthread \
-      --disable-rpath
+  cd ruby-${pkgver}
+
+  PKG_CONFIG=/usr/bin/pkg-config ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --sharedstatedir=/var/lib \
+    --libexecdir=/usr/lib/ruby \
+    --enable-shared \
+    --disable-rpath \
+    --with-dbm-type=gdbm_compat
+
   make
 }
 
-package_ruby() {
-  depends=('gdbm' 'db' 'openssl' 'zlib' 'readline' 'libffi' 'libyaml')
-  provides=('rubygems' 'rake')
-  conflicts=('rubygems' 'rake')
-  optdepends=('tk: for Ruby/TK')
+check() {
+  cd ruby-${pkgver}
 
-  cd "${srcdir}/${pkgname}-${_pkgver}"
+  make test
+}
+
+package_ruby() {
+  pkgdesc='An object-oriented language for quick and easy programming'
+  depends=(gdbm openssl libffi libyaml gmp zlib)
+  optdepends=(
+      'ruby-docs: Ruby documentation'
+      'tk: for Ruby/TK'
+  )
+  provides=(rubygems rake)
+  conflicts=(rake)
+  backup=(etc/gemrc)
+  install=ruby.install
+
+  cd ruby-${pkgver}
+
   make DESTDIR="${pkgdir}" install-nodoc
-  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+
+  install -D -m644 ${srcdir}/gemrc "${pkgdir}/etc/gemrc"
+
+  install -D -m644 COPYING "${pkgdir}/usr/share/licenses/ruby/LICENSE"
+  install -D -m644 BSDL "${pkgdir}/usr/share/licenses/ruby/BSDL"
 }
 
 package_ruby-docs() {
-  pkgdesc="Documentation files for ruby"
+  pkgdesc='Documentation files for ruby'
 
-  depends=('ruby')
+  cd ruby-${pkgver}
 
-  cd "${srcdir}/ruby-${_pkgver}"
-  make -j1 DESTDIR="${pkgdir}" install-doc install-capi
-  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/ruby-docs/LICENSE"
+  make DESTDIR="${pkgdir}" install-doc install-capi
+
+  install -D -m644 COPYING "${pkgdir}/usr/share/licenses/ruby-docs/LICENSE"
   install -D -m644 BSDL "${pkgdir}/usr/share/licenses/ruby-docs/BSDL"
 }
