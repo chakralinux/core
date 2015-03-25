@@ -1,0 +1,25 @@
+# $Id$
+# Maintainer: Giovanni Scafora <giovanni@archlinux.org>
+# Contributor: Alessio 'mOLOk' Bolognino <themolok@gmail.com>
+
+pkgname=man-pages-it
+pkgver=3.73
+pkgrel=1
+pkgdesc="Italian man pages"
+arch=('any')
+url="http://www.pluto.it/ildp/man/index.html"
+license=('GPL')
+depends=('man-pages')
+options=('!emptydirs')
+source=("ftp://ftp.pluto.it/pub/pluto/ildp/man/$pkgname-$pkgver.tar.xz")
+md5sums=('cce23c3463ac0d3478b6a32f2ce950a1')
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+
+  make MANDIR=${pkgdir}/usr/share/man/it
+  make MANDIR=${pkgdir}/usr/share/man/it install
+
+  # remove conflicts with other man pages
+  rm -f $pkgdir/usr/share/man/it/man5/passwd.5*
+}
