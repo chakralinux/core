@@ -1,17 +1,9 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: A Boersma (abveritas) <abveritas@chakra-project.org>
-#               F Kosmale (Inkane) <inkane@chakra-project.org>
-#               A Scarpino (ascarpino) <andrea@archlinux.org>
-#               D S de Andrade (dsa) <douglas@archlinux.org>
-#               riai <riai@bigfoot.com>
-#               Ben <ben@benmazer.net>
-#               Gerardo
 # NOTE: PyQt5 supports Qt v5. PyQt4 supports Qt v4 and will build against Qt v5.
 
 pkgbase=pyqt4
 pkgname=('python-pyqt4-common' 'python3-pyqt4' 'python2-pyqt4')
 pkgver=4.11.3
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
 license=('GPL')
@@ -28,71 +20,32 @@ source=("http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-${pkgver}/PyQt-x1
 md5sums=('997c3e443165a89a559e0d96b061bf70')
 
 build() {
-    cp -r ${srcdir}/PyQt-x11-gpl-${pkgver} ${srcdir}/python2-PyQt-x11-gpl-${pkgver}
+  cp -r ${srcdir}/PyQt-x11-gpl-${pkgver} ${srcdir}/python2-PyQt-x11-gpl-${pkgver}
 
-    # Python 3 version
-    cd ${srcdir}/PyQt-x11-gpl-${pkgver}
-    msg "Configuring the Python 3 version"
-    python3 configure.py \
-        --confirm-license \
-        --no-sip-files \
-        --qsci-api \
-        --verbose \
-        --enable QtAssistant \
-        --enable QtCore \
-        --enable QtDBus \
-        --enable QtDeclarative \
-        --enable QtDesigner \
-        --enable QtGui \
-        --enable QtHelp \
-        --enable QtMultimedia \
-        --enable QtNetwork \
-        --enable QtOpenGL \
-        --enable QtScript \
-        --enable QtScriptTools \
-        --enable QtSql \
-        --enable QtSvg \
-        --enable QtTest \
-        --enable QtWebKit \
-        --enable QtXml \
-        --enable QtXmlPatterns \
-        --enable dbus \
-        --enable phonon
-    find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
-    msg "Making the Python 3 version"
-    make
+  cd PyQt-x11-gpl-${pkgver}
+  python configure-ng.py \
+    --confirm-license \
+    --no-sip-files \
+    --qsci-api \
+    -q /usr/bin/qmake
 
-    # Python 2 version
-    cd ${srcdir}/python2-PyQt-x11-gpl-${pkgver}
-    msg "Configuring the Python 2 version"
-    python2 configure.py \
-        --confirm-license \
-        --no-sip-files \
-        --qsci-api \
-        --verbose \
-        --enable QtAssistant \
-        --enable QtCore \
-        --enable QtDBus \
-        --enable QtDeclarative \
-        --enable QtDesigner \
-        --enable QtGui \
-        --enable QtHelp \
-        --enable QtMultimedia \
-        --enable QtNetwork \
-        --enable QtOpenGL \
-        --enable QtScript \
-        --enable QtScriptTools \
-        --enable QtSql \
-        --enable QtSvg \
-        --enable QtTest \
-        --enable QtWebKit \
-        --enable QtXml \
-        --enable QtXmlPatterns \
-        --enable dbus \
-        --enable phonon
-    find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
-    msg "Making the Python 2 version"
-    make
+  # Thanks Gerardo for the rpath fix
+  find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
+
+  make
+
+  ### Python2 version ###
+  cd ../python2-PyQt-x11-gpl-${pkgver}
+  python2 configure-ng.py \
+    --confirm-license \
+    --no-sip-files \
+    --qsci-api \
+    -q /usr/bin/qmake
+
+  # Thanks Gerardo for the rpath fix
+  find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
+
+  make
 }
 
 package_python-pyqt4-common() {
