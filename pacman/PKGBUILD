@@ -4,8 +4,8 @@
 # maintainer <manutortosa[at]chakra-project[dot]org>
 
 pkgname=pacman
-pkgver=4.1.2
-pkgrel=5
+pkgver=4.2.1
+pkgrel=1
 pkgdesc="A library-based package manager with dependency support"
 arch=('x86_64')
 url="http://www.archlinux.org/pacman/"
@@ -14,7 +14,7 @@ groups=('base' 'base-devel')
 depends=('bash>=4.3.025-1' 'glibc>=2.20-2' 'libarchive=3.1.2' 'curl>=7.28.1'
          'gpgme' 'pacman-mirrorlist' )
 checkdepends=('python2' 'fakechroot')
-makedepends=('asciidoc' 'nettle')
+makedepends=('asciidoc')
 optdepends=('fakeroot: for makepkg usage as normal user')
 provides=('pacman-contrib')
 conflicts=('pacman-contrib')
@@ -22,16 +22,15 @@ replaces=('pacman-contrib')
 backup=(etc/pacman.conf etc/makepkg.conf)
 install=pacman.install
 options=(!libtool)
-source=(ftp://ftp.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz{,.sig}
+source=(https://sources.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz
         pacman.conf
         makepkg.conf)
-sha1sums=('ed9a40a9b532bc43e48680826d57518134132538'
-          'SKIP'
-          '0390fd27a62aadf0f7b5933632e858c442f2e167'
-          '3786881c265dbd90e47b793aa00b7cf9c8b01bc2')
+sha1sums=('61a87226ff3676c0c1e6c8bfadafb6d5750d1e06'
+          'ca7a9f15b16a7343af6b6a18af567ec773c438f8'
+          'bb2fe75a0e94444c5397d616988a35a51e9380a2')
 
 build() {
-  cd $srcdir/$pkgname-$pkgver
+  cd "$srcdir"/$pkgname-$pkgver
 
   ./configure --prefix=/usr --sysconfdir=/etc \
     --localstatedir=/var --enable-doc \
@@ -46,25 +45,25 @@ check() {
 }
 
 package() {
-  cd $srcdir/$pkgname-$pkgver
-  make DESTDIR=$pkgdir install
-  make DESTDIR=$pkgdir -C contrib install
+  cd "$srcdir"/$pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+  make DESTDIR="$pkgdir" -C contrib install
 
-  # install Arch specific stuff
-  install -dm755 $pkgdir/etc
-  install -m644 $srcdir/pacman.conf $pkgdir/etc/pacman.conf
-  
+  # install Chakra specific stuff
+  install -dm755 "$pkgdir"/etc
+  install -m644 "$srcdir"/pacman.conf "$pkgdir"/etc/pacman.conf
+
   mycarch="x86_64"
   mychost="x86_64-unknown-linux-gnu"
   myflags="-march=x86-64"
 
-  install -m644 $srcdir/makepkg.conf $pkgdir/etc/
+  install -m644 "$srcdir"/makepkg.conf "$pkgdir"/etc/
   # set things correctly in the default conf file
-  sed -i $pkgdir/etc/makepkg.conf \
+  sed -i "$pkgdir"/etc/makepkg.conf \
     -e "s|@CARCH[@]|$mycarch|g" \
     -e "s|@CHOST[@]|$mychost|g" \
     -e "s|@CARCHFLAGS[@]|$myflags|g"
-    
+
   # put bash_completion in the right location
   install -dm755 ${pkgdir}/usr/share/bash-completion/completions
   mv ${pkgdir}/etc/bash_completion.d/pacman \
@@ -72,6 +71,8 @@ package() {
   rmdir ${pkgdir}/etc/bash_completion.d
 
   for f in makepkg pacman-key; do
-    ln -s pacman "$pkgdir/usr/share/bash-completion/completions/$f"
+    ln -s pacman "$pkgdir"/usr/share/bash-completion/completions/$f
   done
+
+  install -Dm644 contrib/PKGBUILD.vim "$pkgdir"/usr/share/vim/vimfiles/syntax/PKGBUILD.vim
 }
