@@ -2,7 +2,7 @@
 # contributor <almack[at]chakraos[dot]org>
 
 pkgname=git
-pkgver=2.2.1
+pkgver=2.3.5
 pkgrel=1
 pkgdesc="Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 arch=('x86_64')
@@ -24,7 +24,7 @@ source=("https://www.kernel.org/pub/software/scm/git/git-$pkgver.tar.xz"
         0002-skip-RFC1991-tests-for-gnupg-2.1.patch
         git-daemon@.service
         git-daemon.socket)
-md5sums=('43e01f9d96ba8c11611e0eef0d9f9f28'
+md5sums=('be8c0bbb0c5ee6ab7cdcffd2c9375fe6'
          '5383e27f24bfd356f24b709ea27f8201'
          '9bb82b29aee1772a893cc2a0a1584b89'
          '042524f942785772d7bd52a1f02fe5ae'
@@ -32,11 +32,6 @@ md5sums=('43e01f9d96ba8c11611e0eef0d9f9f28'
 
 prepare() {
   cd "$srcdir/$pkgname-$pkgver"
-  patch -Np1 < ../0001-create-gpg-homedir-on-the-fly.patch
-  # patch utility doesn't support git binary diffs
-  rm t/lib-gpg/random_seed
-  rm t/lib-gpg/trustdb.gpg
-  patch -Np1 < ../0002-skip-RFC1991-tests-for-gnupg-2.1.patch
 }
 
 build() {
