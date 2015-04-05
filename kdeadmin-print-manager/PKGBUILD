@@ -1,5 +1,6 @@
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/kdeutils-print-manager/
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
 pkgname=print-manager
 pkgver=${_kdever}
@@ -8,9 +9,9 @@ pkgdesc="A KDE tool for managing print jobs and printers"
 url="https://projects.kde.org/projects/playground/base/print-manager"
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL')
-depends=("kde-workspace>=${_workspace_ver}" "libcups")
+depends=('kcmutils' 'libcups' 'plasma-framework')
 optdepends=('system-config-printer: auto-detect the printer driver')
-makedepends=('cmake' 'automoc4')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3' 'qt5-tools')
 install=${pkgname}.install
 groups=("kde" "kdeadmin" "kde-uninstall")
 replaces=('kdeadmin-print-manager')
@@ -20,14 +21,13 @@ options=('docs' '!header' 'debug' 'log')
 source=("$_mirror/${pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
+prepare() {
+  mkdir -p build
+}
+
 build() {
-  cd $pkgname-$pkgver
-  mkdir build
   cd build
-  cmake .. \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DKDE4_BUILD_TESTS=OFF \
-    -DCMAKE_INSTALL_PREFIX=/usr
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 
