@@ -42,7 +42,7 @@ package_kde-baseapps-konsole() {
     provides=('kdebase-konsole')
     conflicts=('kdebase-konsole')
     replaces=('kdebase-konsole')
-    depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}" "konsolepart4=${pkgver}")
+    depends=("kde-runtime" "kde-baseapps>=${_kdever}" "konsolepart4=${pkgver}")
     splitdirs="src desktop"
     for i in ${splitdirs} ; do
         cd ${srcdir}/build/${i}
@@ -56,7 +56,7 @@ package_kde-baseapps-konsole() {
 }
 
 package_konsolepart4() {
-    depends=("kde-runtime>=${_kdever}" "kde-baseapps>=${_kdever}")
+    depends=("kde-runtime" "kde-baseapps>=${_kdever}")
     cd build
     make DESTDIR="${pkgdir}" install
     rm -r "$pkgdir"/usr/{bin,share/applications}
