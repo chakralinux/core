@@ -1,11 +1,8 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/kdesdk-kompare/
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
-_pkgname="kompare"
-pkgname="kdesdk-kompare"
+pkgname="kompare"
 arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
@@ -13,26 +10,29 @@ pkgdesc="A KDE visual diff viewer"
 screenshot="http://www.kde.org/images/screenshots/kompare.png"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
-depends=("kde-runtime>=${_kdever}" 'libkomparediff2')
+depends=('ktexteditor' 'libkomparediff2')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
 groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
 categories=('programming')
-conflicts=('kdesdk-doc')
+provides=('kdesdk-kompare')
+conflicts=('kdesdk-kompare')
+replaces=('kdesdk-kompare')
 install=kdesdk.install
 options=('docs' '!header' 'debug' 'log')
-makedepends=('pkgconfig' 'cmake' 'automoc4' 'docbook-xsl')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+source=("$_mirror/${pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+prepare() {
+  mkdir -p build
+}
 
 build() {
-    cd "${srcdir}/${_pkgname}-${pkgver}"
-    cmake . \
-        -DCMAKE_BUILD_TYPE=${_build_type} \
-        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-        -DCMAKE_SKIP_RPATH=ON 
-    make
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
 }
 
 package() {
-    cd "${srcdir}/${_pkgname}-${pkgver}"
+    cd "${srcdir}/${pkgname}-${pkgver}"
     make DESTDIR=${pkgdir} install
 }

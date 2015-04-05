@@ -1,40 +1,39 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/kdesdk-lokalize/
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
-_pkgname="lokalize"
+pkgname="lokalize"
 pkgname="kdesdk-lokalize"
 arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Computer aided translation system"
 screenshot="http://www.kde.org/images/screenshots/lokalize.png"
-depends=("kde-runtime>=${_kdever}" "kdebindings-pykde4>=${_oldkdever}" "kdesdk-strigi-analyzers>=${_kdever}" "hunspell")
-makedepends=("automoc4")
-optdepends=('translate-toolkit: enable extra python script')
-conflicts=('kdesdk-doc')
+depends=('kross')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+provides=('kdesdk-lokalize')
+conflicts=('kdesdk-lokalize')
+replaces=('kdesdk-lokalize')
 groups=("kde" "kde-devel" "kde-uninstall" "kdesdk")
 categories=('programming')
-provides="lokalize"
 install=kdesdk.install
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 options=('docs' '!header' 'debug' 'log')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+source=("$_mirror/${pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+prepare() {
+  mkdir -p build
+}
 
 build() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
-    cmake . \
-        -DCMAKE_BUILD_TYPE=${_build_type} \
-        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-        -DCMAKE_SKIP_RPATH=ON 
-    make 
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
 }
 
 package() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
+    cd ${srcdir}/${pkgname}-${pkgver}
     make DESTDIR=${pkgdir} install 
 }
