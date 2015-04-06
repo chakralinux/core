@@ -1,8 +1,5 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
 _pkgname="kteatime"
 pkgname="kdetoys-kteatime"
@@ -10,25 +7,15 @@ arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 url="http://www.kde.org"
-license=('GPL'
-         'LGPL'
-         'FDL')
+license=('GPL' 'LGPL' 'FDL')
 pkgdesc="System tray applet that makes sure your tea doesn't get too strong"
-conflicts=("kdetoys-common"
-           "kdetoys-doc")
-groups=("kde"
-        "kdetoys"
-        "kde-uninstall")
+conflicts=("kdetoys-common" "kdetoys-doc")
+groups=("kde" "kdetoys" "kde-uninstall")
 categories=('accessories')
 install=kdetoys.install
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-makedepends=('pkg-config'
-             'cmake'
-             'automoc4'
-             "kde-workspace>=${_workspace_ver}")
+options=('docs' '!header' 'debug' 'log')
+depends=("kde-runtime")
+makedepends=('pkg-config' 'cmake' 'automoc4')
 source=($_mirror/${_pkgname}-$_kdever.tar.xz)
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
