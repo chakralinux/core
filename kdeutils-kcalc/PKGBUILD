@@ -1,51 +1,37 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/kdeutils-kcalc/
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
-pkgname="kdeutils-kcalc"
-_pkgname="kcalc"
+pkgname="kcalc"
 arch=('x86_64')
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Scientific calculator"
 url="http://www.kde.org"
-license=('GPL'
-         'LGPL'
-         'FDL')
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-depends=("kde-runtime"
-         "kde-baseapps>=${_kdever}")
-makedepends=('pkg-config'
-             'cmake'
-             'automoc4'
-             "kdelibs>=${_libsver}")
-conflicts=("kdeutils-doc"
-           "kdeutils-common")
-provides=("kcalc")
-groups=("kde"
-        "kdeutils"
-        "kde-uninstall")
+license=('GPL' 'LGPL' 'FDL')
+options=('docs' '!header' 'debug' 'log')
+depends=('kinit')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+conflicts=('kdeutils-kcalc')
+provides=('kdeutils-kcalc')
+replaces=('kdeutils-kcalc')
+groups=("kde" "kdeutils" "kde-uninstall")
 categories=('utils')
 install=kdeutils.install
-source=($_mirror/${_pkgname}-$_kdever.tar.xz)
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+source=($_mirror/${pkgname}-$_kdever.tar.xz)
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+prepare() {
+  mkdir -p build
+}
 
 build() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
-    cmake . \
-        -DCMAKE_BUILD_TYPE=${_build_type} \
-        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-        -DCMAKE_SKIP_RPATH=ON \
-        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-    make
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
 }
 
 package() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
+    cd ${srcdir}/${pkgname}-${pkgver}
     make DESTDIR=${pkgdir} install
 }
