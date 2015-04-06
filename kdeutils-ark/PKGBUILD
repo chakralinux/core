@@ -1,8 +1,5 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
 pkgname="kdeutils-ark"
 _pkgname="ark"
@@ -11,42 +8,18 @@ pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Archiver for various compression formats"
 url="http://www.kde.org"
-license=('GPL'
-         'LGPL'
-         'FDL')
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-depends=("kde-runtime"
-         "kde-baseapps>=${_kdever}"
-         'libarchive=3.1.2'
-         'qjson')
-optdepends=('p7zip'
-            'zip'
-            'unzip'
-            'unrar')
-conflicts=("kdeutils-common"
-           "kdeutils-doc")
-groups=("kde"
-        "kdeutils"
-        "kde-uninstall")
+license=('GPL' 'LGPL' 'FDL')
+options=('docs' '!header' 'debug' 'log')
+depends=("kde-runtime" "kde-baseapps>=${_kdever}" 'libarchive=3.1.2' 'qjson')
+optdepends=('p7zip' 'zip' 'unzip' 'unrar')
+conflicts=("kdeutils-common" "kdeutils-doc")
+groups=("kde" "kdeutils" "kde-uninstall")
 categories=('utils')
 provides=('ark')
 install=kdeutils.install
-makedepends=('pkg-config'
-             'cmake'
-             'automoc4'
-             "kdelibs>=${_libsver}"
-             "kde-baseapps>=${_kdever}"
-             "kde-workspace>=${_workspace_ver}" 
-             'libarchive'
-             'p7zip'
-             'zip'
-             'unzip'
-             'unrar'
-             'qjson'
-             'docbook-xsl')
+makedepends=('pkg-config' 'cmake' 'automoc4' "kdelibs>=${_libsver}"
+             "kde-baseapps>=${_kdever}" "kde-workspace>=${_workspace_ver}" 
+             'libarchive' 'p7zip' 'zip' 'unzip' 'unrar' 'qjson' 'docbook-xsl')
 source=($_mirror/${_pkgname}-$_kdever.tar.xz)
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 

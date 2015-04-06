@@ -1,8 +1,5 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
 pkgname="kdeutils-kwallet"
 _pkgname="kwalletmanager"
@@ -11,24 +8,13 @@ pkgver=${_kdever}
 pkgrel=1
 pkgdesc="The KDE wallet system"
 url="http://www.kde.org"
-license=('GPL'
-         'LGPL'
-         'FDL')
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-depends=("kde-runtime"
-         "kde-baseapps>=${_kdever}")
+license=('GPL' 'LGPL' 'FDL')
+options=('docs' '!header' 'debug' 'log')
+depends=("kde-runtime" "kde-baseapps>=${_kdever}")
+makedepends=('pkg-config' 'cmake' 'automoc4' "kdelibs>=${_libsver}")
 conflicts=("kdeutils-common")
-groups=("kde"
-        "kdeutils"
-        "kde-uninstall")
+groups=("kde" "kdeutils" "kde-uninstall")
 install=kdeutils.install
-makedepends=('pkg-config'
-             'cmake'
-             'automoc4'
-             "kdelibs>=${_libsver}")
 categories=('utils')
 source=($_mirror/${_pkgname}-$_kdever.tar.xz)
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)

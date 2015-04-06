@@ -1,8 +1,5 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
 pkgname="kdeutils-kcharselect"
 _pkgname="kcharselect"
@@ -11,27 +8,15 @@ pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Character selector"
 url="http://www.kde.org"
-license=('GPL'
-         'LGPL'
-         'FDL')
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-depends=("kde-runtime"
-         "kde-baseapps>=${_kdever}")
-conflicts=("kdeutils-common"
-           "kdeutils-doc")
-groups=("kde"
-        "kdeutils"
-        "kde-uninstall")
+license=('GPL' 'LGPL' 'FDL')
+options=('docs' '!header' 'debug' 'log')
+depends=("kde-runtime" "kde-baseapps>=${_kdever}")
+makedepends=('pkg-config' 'cmake' 'automoc4' "kdelibs>=${_libsver}")
+conflicts=("kdeutils-common" "kdeutils-doc")
+groups=("kde" "kdeutils" "kde-uninstall")
 provides=("kcharselect")
 categories=('utils')
 install=kdeutils.install
-makedepends=('pkg-config'
-             'cmake'
-             'automoc4'
-             "kdelibs>=${_libsver}")
 source=($_mirror/${_pkgname}-$_kdever.tar.xz)
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
