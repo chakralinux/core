@@ -1,8 +1,5 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
 pkgname=kdegames-picmi
 _pkgname=picmi
@@ -10,21 +7,12 @@ pkgver=${_kdever}
 pkgrel=1
 pkgdesc="A nonogram logic game for KDE"
 arch=('x86_64')
-url='http://kde.org/applications/games/picmi/'
-license=('GPL'
-         'LGPL'
-         'FDL')
-depends=("kdegames-libkdegames>=${_kdever}")
-makedepends=('pkg-config'
-             'cmake'
-             'automoc4')
-groups=("kde"
-        "kdegames"
-        "kde-uninstall")
-options=('docs'
-         '!header'
-         'debug'
-         'log')
+url='http://www.kde.org'
+license=('GPL' 'LGPL' 'FDL')
+depends=("kdegames-libkdegames")
+makedepends=('pkg-config' 'cmake' 'automoc4')
+groups=("kde" "kdegames" "kde-uninstall")
+options=('docs' '!header' 'debug' 'log')
 source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
