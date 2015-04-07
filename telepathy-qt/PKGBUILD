@@ -1,37 +1,59 @@
-# maintainer abveritas@chakra-project.org
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/telepathy-qt
 
-pkgname=telepathy-qt
+pkgbase=telepathy-qt
+pkgname=('telepathy-qt4' 'telepathy-qt5')
 pkgver=0.9.5
 pkgrel=1
-pkgdesc="A library for Qt-based Telepathy clients."
 arch=('x86_64')
-url="http://telepathy.freedesktop.org"
-groups=('telepathy')
+url="http://telepathy.freedesktop.org/wiki/"
 license=('LGPL')
-depends=('qt' 'telepathy-farstream' 'python2-dbus')
-makedepends=('libxslt' 'python2' 'cmake' 'doxygen')
+makedepends=('qt4' 'telepathy-farstream' 'libxslt' 'python2' 'cmake' 'doxygen' 'qt5-base')
 options=('staticlibs')
-conflicts=('telepathy-qt4')
-provides=('telepathy-qt4')
-source=("http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz")
-sha256sums=('93474858efe55bf45ee9352f88b852d4a24505939dc81a3a3c6fa5a686809c8e')
+source=("http://telepathy.freedesktop.org/releases/${pkgbase}/${pkgbase}-${pkgver}.tar.gz")
+md5sums=('22c0daa7e4f7e48e779f703c9b27b816')
 
 prepare() {
- mkdir build
-
-  cd ${pkgname}-${pkgver}
+  mkdir build{,-qt4}
 }
 
 build() {
-    cd build
-    cmake ../${pkgname}-${pkgver} \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DPYTHON_EXECUTABLE=/usr/bin/python2 \
-        -DCMAKE_INSTALL_PREFIX=/usr
-    make
+  cd build
+  cmake ../${pkgbase}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DPYTHON_EXECUTABLE=/usr/bin/python2 \
+    -DENABLE_EXAMPLES=OFF \
+    -DENABLE_TESTS=OFF \
+    -DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt5 \
+  make
+  cd ..
+
+  cd build-qt4
+  cmake ../${pkgbase}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DPYTHON_EXECUTABLE=/usr/bin/python2 \
+    -DDESIRED_QT_VERSION=4 \
+    -DENABLE_EXAMPLES=OFF \
+    -DENABLE_TESTS=OFF
+  make
 }
 
-package() {
-    cd "${srcdir}"/build
-    make DESTDIR="$pkgdir" install
+package_telepathy-qt4() {
+  pkgdesc="A library for Qt4-based Telepathy clients"
+  depends=('qt4' 'telepathy-farstream')
+  conflicts=('telepathy-qt')
+  replaces=('telepathy-qt')
+  provides=('telepathy-qt')
+
+  cd build-qt4
+  make DESTDIR="$pkgdir" install
+}
+
+package_telepathy-qt5() {
+  pkgdesc="A library for Qt5-based Telepathy clients"
+  depends=('qt5-base' 'telepathy-farstream')
+
+  cd build
+  make DESTDIR="$pkgdir" install
 }
