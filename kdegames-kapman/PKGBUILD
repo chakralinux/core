@@ -1,45 +1,35 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/kdegames-kapman/
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
-pkgname=kdegames-kapman
-_pkgname=kapman
+pkgname=kapman
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Eat pills while escaping ghosts"
 arch=('x86_64')
-url='http://www.kde.org'
-license=('GPL'
-         'LGPL'
-         'FDL')
-depends=("kdegames-libkdegames>=${_kdever}")
-makedepends=('pkg-config'
-             'cmake'
-             'automoc4')
-groups=("kde"
-        "kdegames"
-        "kde-uninstall")
-provides=('kapman')
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+url='http://kde.org/applications/games/kapman/'
+license=('GPL' 'LGPL' 'FDL')
+depends=('knotifyconfig' "libkdegames>=${_kdever}")
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+provides=('kdegames-kapman')
+replaces=('kdegames-kapman')
+conflicts=('kdegames-kapman')
+groups=("kde" "kdegames" "kde-uninstall")
+options=('docs' '!header' 'debug' 'log')
+source=("$_mirror/${pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+prepare() {
+  mkdir -p build
+}
 
 build() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
-    cmake . \
-        -DCMAKE_BUILD_TYPE=${_build_type} \
-        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-        -DCMAKE_SKIP_RPATH=ON \
-        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-    make
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
 }
 
 package() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
+    cd ${srcdir}/${pkgname}-${pkgver}
     make DESTDIR=${pkgdir} install
 }
