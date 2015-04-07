@@ -1,47 +1,37 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/kdeedu-kgeography/
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
-pkgname=kdeedu-kgeography
-_pkgname=kgeography
+pkgname=kgeography
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Geography trainer"
 url="http://kde.org/applications/education/kgeography/"
+screenshot='https://www.kde.org/images/screenshots/kgeography.png'
 arch=('x86_64')
-url='http://www.kde.org'
-license=('GPL'
-         'LGPL'
-         'FDL')
-depends=("kde-runtime")
-makedepends=('cmake'
-             'automoc4')
-provides=('kgeography')
-groups=("kde"
-        "kdeedu"
-        "kde-uninstall")
+license=('GPL' 'LGPL' 'FDL')
+depends=('kxmlgui')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+groups=("kde" "kdeedu" "kde-uninstall")
 categories=('education')
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-install=${pkgname}.install
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+provides=('kdeedu-')
+replaces=('kdeedu-')
+conflicts=('kdeedu-')
+options=('docs' '!header' 'debug' 'log')
+source=("$_mirror/${pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+prepare() {
+  mkdir -p build
+}
 
 build() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
-    cmake . \
-        -DCMAKE_BUILD_TYPE=${_build_type} \
-        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-        -DCMAKE_SKIP_RPATH=ON \
-        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-    make
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
 }
 
 package() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
+    cd ${srcdir}/${pkgname}-${pkgver}
     make DESTDIR=${pkgdir} install
 }

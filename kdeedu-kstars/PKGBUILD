@@ -1,60 +1,37 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/kdeedu-kstars/
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
-pkgname=kdeedu-kstars
-_pkgname=kstars
+pkgname=kstars
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Desktop planetarium"
 url="http://kde.org/applications/education/kstars/"
 arch=('x86_64')
-url='http://www.kde.org'
-license=('GPL'
-         'LGPL'
-         'FDL')
-depends=("kde-runtime"
-         'eigen3'
-         'cfitsio'
-         'indilib>=0.9.6'
-         'wcslib'
-         'xplanet')
-makedepends=('cmake'
-             'automoc4')
-provides=('kstars')
-groups=("kde"
-        "kdeedu"
-        "kde-uninstall")
+screenshot='https://www.kde.org/images/screenshots/kstars.png'
+license=('GPL' 'LGPL' 'FDL')
+depends=('kinit' 'knewstuff' 'kplotting' 'ktexteditor' 'qt5-multimedia' 'indilib' 'wcslib')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3' 'eigen3')
+groups=("kde" "kdeedu" "kde-uninstall")
 categories=('education')
-options=('docs'
-         '!header'
-         'debug'
-         'log')
-install=${pkgname}.install
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+provides=('kdeedu-kstars')
+replaces=('kdeedu-kstars')
+conflicts=('kdeedu-kstars')
+options=('docs' '!header' 'debug' 'log')
+source=("$_mirror/${pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
 prepare() {
-  # add min cmake version to kstars
-  cd ${srcdir}/${_pkgname}-${pkgver}
-  local old_cmake=$(<./CMakeLists.txt)
-  echo "cmake_minimum_required(VERSION 2.8)" > ./CMakeLists.txt
-  echo -e "${old_cmake}" >> ./CMakeLists.txt
+  mkdir -p build
 }
 
 build() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
-    cmake . \
-        -DCMAKE_BUILD_TYPE=${_build_type} \
-        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-        -DCMAKE_SKIP_RPATH=ON \
-        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-    make
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
 }
 
 package() {
-    cd ${srcdir}/${_pkgname}-${pkgver}
+    cd ${srcdir}/${pkgname}-${pkgver}
     make DESTDIR=${pkgdir} install
 }

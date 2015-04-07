@@ -1,49 +1,37 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Manuel Tortosa <manutortosa@chakra-project.org>
-
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/kdeedu-blinken/
 # Include global configuration
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+source ../kdeapps.conf
 
-pkgname=kdeedu-blinken
-_pkgname=blinken
+pkgname=blinken
 pkgver=${_kdever}
 pkgrel=1
 pkgdesc="Memory enhancement game"
 url="http://kde.org/applications/education/blinken/"
+screenshot='https://www.kde.org/images/screenshots/blinken.png'
 arch=('x86_64')
-url='http://www.kde.org'
-license=('GPL'
-         'LGPL'
-         'FDL')
-depends=("kde-runtime")
-makedepends=('cmake'
-             'automoc4')
-provides=('blinken')
-groups=("kde"
-        "kdeedu"
-        "kde-uninstall")
-options=('docs'
-         '!header'
-         'debug'
-         'log')
+license=('GPL' 'LGPL' 'FDL')
+depends=('kxmlgui' 'phonon-qt5')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+groups=("kde" "kdeedu" "kde-uninstall")
 categories=('education')
-install=${pkgname}.install
-source=("$_mirror/${_pkgname}-$_kdever.tar.xz")
-sha256sums=(`grep ${_pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+provides=('kdeedu-blinken')
+replaces=('kdeedu-blinken')
+conflicts=('kdeedu-blinken')
+options=('docs' '!header' 'debug' 'log')
+source=("$_mirror/${pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
-build()
-{
-    cd ${srcdir}/${_pkgname}-${pkgver}
-    cmake . \
-        -DCMAKE_BUILD_TYPE=${_build_type} \
-        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
-        -DCMAKE_SKIP_RPATH=ON \
-        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
-    make
+prepare() {
+  mkdir -p build
 }
 
-package()
-{
-    cd ${srcdir}/${_pkgname}-${pkgver}
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+    cd ${srcdir}/${pkgname}-${pkgver}
     make DESTDIR=${pkgdir} install
 }
