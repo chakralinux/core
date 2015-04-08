@@ -1,7 +1,5 @@
-# Maintainer: Francesco Marinucci <franzmari[at]chakra-project[dot]it>
-
 pkgname=libnm-qt
-pkgver=0.9.8.3
+pkgver=0.9.8.4
 pkgrel=1
 pkgdesc='Qt-only wrapper for NetworkManager DBus API'
 arch=('x86_64')
@@ -10,12 +8,12 @@ license=('LGPL')
 depends=('libmm-qt' 'networkmanager')
 makedepends=('cmake' 'modemmanager' 'doxygen')
 conflicts=('libnm-qt-git')
-source="http://download.kde.org/unstable/networkmanager-qt/${pkgver}/src/${pkgname}-${pkgver}.tar.xz"
-md5sums=('a463e9c59982255f6122a3e047a84fce')
+source="http://download.kde.org/unstable/networkmanager-qt/${pkgver}/src/networkmanager-qt-${pkgver}.tar.xz"
+md5sums=('d9fbdeef3e4ebe871a9d29d12d09f2f7')
 
 build() {
-  cd $srcdir/${pkgname}-${pkgver}
-  mkdir build
+  cd ${srcdir}/networkmanager-qt-${pkgver}
+  mkdir -p build
   cd build
   cmake .. \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -25,7 +23,7 @@ build() {
 }
  
 package() {
-  cd $srcdir/${pkgname}-${pkgver}
+  cd ${srcdir}/networkmanager-qt-${pkgver}
   cd build
   make DESTDIR="${pkgdir}" install
 } 
