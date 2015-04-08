@@ -1,29 +1,20 @@
-# Maintainer: Francesco Marinucci <franzmari[at]chakra-project[dot]it>
-
 pkgname=kdeplasma-applets-plasma-nm
 _pkgname=plasma-nm
-pkgver=0.9.3.4
-pkgrel=2
+pkgver=0.9.3.6
+pkgrel=1
 pkgdesc='Plasma applet written in QML for managing network connections'
 arch=('x86_64')
 url='https://projects.kde.org/projects/playground/network/plasma-nm'
 license=('GPL2')
-depends=('kde-workspace'
-         'libnm-qt>=0.9.8.2'
-         'openconnect')
-makedepends=('cmake'
-             'automoc4')
+depends=('kde-workspace' 'libnm-qt')
+makedepends=('cmake' 'automoc4' 'openconnect' 'mobile-broadband-provider-info')
+optdepends=('mobile-broadband-provider-info: Database of mobile broadband service providers'
+            'openconnect: Cisco AnyConnect VPN plugin')
 conflicts=('kdeplasma-applets-plasma-nm-git'
            'kdeplasma-applets-networkmanagement')
 screenshot="http://grulja.files.wordpress.com/2013/06/nm1.png?w=268&h=300"
-source=("http://download.kde.org/stable/${_pkgname}/${_pkgname}-${pkgver}.tar.xz" "fix-request-scan.patch")
-sha512sums=('40563d94dffda8e74c6df68fcbd5cdb85391a1ab2f49e8b21a015509f3a92ac69e45f99987eb899aeb62a41f3b9c985d4722ef0c2c99a1805da45e02d548fef9'
-            '3a8b6ce64bfc5c8fe37e57c700e1f2a610c782ca769a7ee86234390f7bc66f8d7fef05d4ca5bd5a733c5b7cd0417722fc5ade1968b1678ecca97b43928f42204')
-
-prepare() {
-  cd $srcdir/${_pkgname}-${pkgver}
-  patch -i "../fix-request-scan.patch" -p1
-}
+source=("http://download.kde.org/stable/${_pkgname}/${_pkgname}-${pkgver}.tar.xz")
+sha512sums=('50f3e5020f4437d710709a301b981f888898c293a71dff3aee809255207a0f97caf5d3811b453da2338df93238ef33a79e85cb3598ee38d8a41255d8a572e256')
  
 build() {
   cd $srcdir/${_pkgname}-${pkgver}
