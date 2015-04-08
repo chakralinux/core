@@ -24,7 +24,8 @@ build() {
     -DPYTHON_EXECUTABLE=/usr/bin/python2 \
     -DENABLE_EXAMPLES=OFF \
     -DENABLE_TESTS=OFF \
-    -DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt5 \
+    -DDESIRED_QT_VERSION=5 \
+    -DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt5 
   make
   cd ..
 
@@ -54,6 +55,6 @@ package_telepathy-qt5() {
   pkgdesc="A library for Qt5-based Telepathy clients"
   depends=('qt5-base' 'telepathy-farstream')
 
-  cd build
+  cd $srcdir/build
   make DESTDIR="$pkgdir" install
 }

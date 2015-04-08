@@ -5,7 +5,7 @@ pkgdesc="Telepathy framework logging daemon"
 arch=('x86_64')
 url="http://telepathy.freedesktop.org/wiki/Logger"
 license=('LGPL2.1')
-depends=('telepathy-glib' 'sqlite3' 'libxml2')
+depends=('telepathy-glib' 'sqlite3' 'libxml2' 'python2')
 makedepends=('intltool' 'gobject-introspection' 'libxslt')
 install=${pkgname}.install
 options=('!libtool')
@@ -19,6 +19,8 @@ build() {
     --sysconfdir=/etc \
     --libexecdir=/usr/lib/telepathy \
     --disable-static \
+    --disable-scrollkeeper \
+    --enable-call \
     --disable-schemas-compile
   make
 }
