@@ -1,11 +1,6 @@
-#
-# Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dot]org>
-
 pkgname=cyrus-sasl
 pkgver=2.1.26
-pkgrel=1
+pkgrel=2
 pkgdesc="SASL authentication daemon"
 arch=('x86_64')
 license=('custom')
@@ -32,7 +27,7 @@ build() {
   make testsaslauthd 
   install -m755 testsaslauthd "${pkgdir}/usr/sbin" 
 
-  install -dm766 "${pkgdir}/var/run/saslauthd"
+  install -dm766 "${pkgdir}/run/saslauthd"
   install -Dm644 "${srcdir}/saslauthd.conf.d" "${pkgdir}/etc/conf.d/saslauthd"
   install -Dm644 "${srcdir}/saslauthd.service" "${pkgdir}/usr/lib/systemd/system/saslauthd.service"
   install -Dm644 "${srcdir}/tmpfiles.conf" "${pkgdir}/usr/lib/tmpfiles.d/saslauthd.conf"
