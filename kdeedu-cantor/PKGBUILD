@@ -7,10 +7,10 @@ pkgver=${_kdever}
 pkgrel=1
 pkgdesc="KDE frontend to mathematical software"
 url="http://kde.org/applications/education/cantor/"
+screenshot="https://www.kde.org/images/screenshots/cantor.png"
 arch=('x86_64')
-url='http://www.kde.org'
 license=('GPL' 'LGPL' 'FDL')
-depends=('analitza' 'kdelibs4-support' 'knewstuff' 'kpty' 'ktexteditor' 'libqalculate' 'libspectre')
+depends=('analitza' 'kdelibs4support' 'knewstuff' 'kpty' 'ktexteditor' 'libqalculate' 'libspectre')
 optdepends=('luajit: LUA backend'
             'maxima: Maxima backend'
 	    'octave: Octave backend'
@@ -29,13 +29,18 @@ install=${pkgname}.install
 source=("$_mirror/${pkgname}-$_kdever.tar.xz")
 sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
 
+prepare() {
+  mkdir -p build
+}
+
 build() {
-    cd ${srcdir}/${pkgname}-${pkgver}
-    cmake_kf5 ../${pkgname}-${pkgver}
-    make
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
 }
 
 package() {
     cd build
     make DESTDIR=${pkgdir} install
 }
+
