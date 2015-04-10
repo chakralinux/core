@@ -1,11 +1,5 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer : almack <almack[at]chakra-project[dot]org>
-# contributor : Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
 pkgname=apache
-pkgver=2.4.10
+pkgver=2.4.12
 pkgrel=1
 pkgdesc='A high performance Unix-based HTTP server'
 arch=('x86_64')
@@ -32,12 +26,12 @@ source=(http://www.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2{,.asc}
         chakra.layout
         httpd.service
         httpd-tmpfile.conf)
-md5sums=('44543dff14a4ebc1e9e2d86780507156'
+md5sums=('b8dc8367a57a8d548a9b4ce16d264a13'
          'SKIP'
          '6382331e9700ed9e8cc78ea51887b537'
          '9404bc261cffce7ad88850f0569e9067'
          '3494dece165bda4f207135e53655a9ec'
-         '110a056408252de4356be7f53872b11d')
+         'e5894af20fee1d64fdaba35c2a10be9d')
 
 build() {
   cd httpd-${pkgver}
@@ -94,7 +88,7 @@ package() {
 
   # symlinks for /etc/httpd
   ln -fs /var/log/httpd "${pkgdir}/etc/httpd/logs"
-  ln -fs /var/run/httpd "${pkgdir}/etc/httpd/run"
+  ln -fs /run/httpd "${pkgdir}/etc/httpd/run"
   ln -fs /usr/lib/httpd/modules "${pkgdir}/etc/httpd/modules"
   ln -fs /usr/lib/httpd/build "${pkgdir}/etc/httpd/build"
 
