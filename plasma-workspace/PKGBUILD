@@ -10,9 +10,9 @@ arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
 license=('LGPL')
 depends=('knewstuff' 'kjsembed' 'knotifyconfig' 'libxdamage' 'kwayland' 'kglobalaccel>=5.7.0'
-         'libksysguard' 'libkscreen-kf5' 'ktexteditor' 'libqalculate'
+         'libksysguard' 'libkscreen-kf5' 'ktexteditor' 'kxmlrpcclient' 'libqalculate' 'networkmanager-qt'
          'qt5-tools' 'kded' 'kde-cli-tools' 'xorg-xrdb' 'xorg-xsetroot' 'xorg-apps' 'xorg-utils')
-makedepends=('extra-cmake-modules' 'kdoctools' 'kwin' 'gpsd' 'baloo-kf5' 'krunner')
+makedepends=('extra-cmake-modules' 'kdoctools' 'kwin' 'gpsd' 'baloo-kf5' 'krunner' 'kdewebkit')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
@@ -47,7 +47,6 @@ package_plasma-workspace() {
   # Remove conflicts with drkonqi
   rm "${pkgdir}"/usr/lib/drkonqi
   rm -r "${pkgdir}"/usr/share/drkonqi
-  rm "${pkgdir}"/usr/lib/libKF5XmlRpcClientPrivate.*
 }
 
 package_drkonqi() {
