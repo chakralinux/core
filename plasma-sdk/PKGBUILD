@@ -1,0 +1,41 @@
+source ../plasma.conf
+
+pkgname=plasma-sdk
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='Plasma development tools'
+url="https://projects.kde.org/"
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/workspace/khotkeys'
+license=('GPL')
+# find_package(Qt5 REQUIRED NO_MODULE COMPONENTS Core DBus Gui Qml Quick Svg WebKit WebKitWidgets Widgets Xml)
+# find_package(KF5 REQUIRED COMPONENTS
+#    Archive Completion Config ConfigWidgets CoreAddons Declarative I18n IconThemes
+#    KIO NewStuff Parts Plasma PlasmaQuick Service TextEditor WidgetsAddons XmlGui WindowSystem)
+
+depends=('qt5-base' 'qt5-svg' 'qt5-webkit' 'qt5-xmlpatterns'
+         'karchive' 'kcompletion' 'kconfig' 'kconfigwidgets'
+         'kcoreaddons' 'kdeclarative' 'ki18n' 'kiconthemes'
+         'kio' 'knewstuff' 'kparts' 'plasma-framework' 'kservice'
+         'ktexteditor' 'kwidgetsaddons' 'kxmlgui' 'kwindowsystem')
+
+makedepends=('extra-cmake-modules' 'kdoctools')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} 
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
