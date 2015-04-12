@@ -3,7 +3,7 @@ source ../plasma.conf
 
 pkgname=plasma-desktop
 pkgver=${PVersion}
-pkgrel=3
+pkgrel=4
 pkgdesc='KDE Plasma Desktop'
 arch=('x86_64')
 url='https://www.kde.org/workspaces/plasmadesktop/'
@@ -12,11 +12,13 @@ depends=('qt5-graphicaleffects' 'powerdevil' 'polkit-kde-agent-frameworks' 'libc
          'kwin' 'kpeople' 'libusb-compat' 'libxkbfile' 'kmenuedit' 'systemsettings' 'ksysguard' 'breeze' 'krunner'
          #sddm can be removed as a dependency in the future, only added here to automate the switch to Plasma 5
          'sddm-kcm')
-makedepends=('extra-cmake-modules' 'kdoctools' 'boost' 'baloo-kf5')
-optdepends=('plasma-nm: Network manager applet')
+makedepends=('extra-cmake-modules' 'kdoctools' 'boost' 'baloo-kf5' 'xf86-input-synaptics' 'xorg-server-devel')
+optdepends=('plasma-nm: Network manager applet'
+            'xf86-input-synaptics: Manage touchpad')
 checkdepends=("cmake")
-replaces=('kde-workspace')
-conflicts=('kde-workspace' 'kde-baseapps-kdepasswd')
+provides=("kcm-touchpad-kf5=${pkgver}")
+replaces=('kde-workspace' 'kcm-touchpad-kf5<=5.2.0')
+conflicts=('kde-workspace' 'kde-baseapps-kdepasswd' 'kcm-touchpad-kf5<=5.2.0')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
