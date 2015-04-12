@@ -2,16 +2,16 @@
 # Platform Packages for Chakra, part of chakraos.org
 #
 
-pkgbase=qca
+pkgbase=qca-qt5
 pkgname=("qca" "qca-qt5")
 pkgver=2.1.0.3
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 url="http://delta.affinix.com/qca/"
 license=('LGPL')
 makedepends=('qt' 'qt5-base' 'cmake' 'git' 'nss')
-source=("git://anongit.kde.org/qca.git")
-md5sums=('SKIP')
+source=("http://download.kde.org/stable/$pkgbase/$pkgver/src/$pkgbase-$pkgver.tar.xz")
+md5sums=('e29cc1d8f0292eb28e20b216f52d60fc')
 
 prepare(){
   mkdir $srcdir/build
@@ -20,13 +20,13 @@ prepare(){
 
 build() {
   cd $srcdir/build
-  cmake ../${pkgbase} \
+  cmake ../${pkgbase}-${pkgver} \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DQT4_BUILD=true
   make
 
   cd $srcdir/build-qt5
-  cmake ../${pkgbase} \
+  cmake ../${pkgbase}-${pkgver} \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DQCA_SUFFIX=qt5 \
     -DQCA_INSTALL_IN_QT_PREFIX=ON
