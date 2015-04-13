@@ -1,0 +1,40 @@
+# $Id$
+# Contributor: John Proctor <jproctor@prium.net>
+# Maintainer: juergen <juergen@archlinux.org>
+
+pkgname=ecl
+pkgver=15.3.7
+_pkgver=15.3
+pkgrel=1
+pkgdesc="Embeddable Common Lisp"
+arch=('i686' 'x86_64')
+url="http://sourceforge.net/projects/ecls/"
+license=('LGPL')
+depends=('bash' 'gmp')
+makedepends=('texinfo')
+provides=('common-lisp' 'cl-asdf')
+options=('!makeflags')
+source=(http://downloads.sourceforge.net/project/ecls/ecls/${_pkgver}/ecl-${pkgver}.tgz)
+md5sums=('39f4fb924c88e47ce31e6d57ac2a6de8')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+  sed -i 's|-Wl,--rpath,~A|-Wl,--rpath,/usr/lib/ecl|' src/configure 
+  ./configure \
+    --build=$CHOST \
+    --prefix=/usr \
+    --with-tcp \
+    --with-clos-streams \
+    --enable-shared \
+    --enable-boehm=included \
+    --with-system-gmp \
+    --without-x \
+    --enable-threads \
+    --without-clx
+
+  make
+}
+
+package() {
+  make -C $srcdir/$pkgname-$pkgver DESTDIR=$pkgdir install
+}
