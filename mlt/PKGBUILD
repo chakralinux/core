@@ -4,18 +4,21 @@
 pkgbase=mlt
 pkgname=(mlt mlt-python-bindings)
 pkgver=0.9.6
-pkgrel=3
+pkgrel=4
 pkgdesc="An open source multimedia framework"
 arch=('x86_64')
 url="http://www.mltframework.org"
 license=(GPL)
 makedepends=(ladspa frei0r-plugins-qt5 libdv sdl_image libsamplerate sox ffmpeg vid.stab qt5-svg jack libexif python2 swig)
-source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('92bcc95af44ff086df0a0ce17a201d1c')
+source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz"
+        "frei0r.patch")
+md5sums=('92bcc95af44ff086df0a0ce17a201d1c'
+         '7c3fdf6671f0595a59f8ed27bfa8c0e3')
 
 prepare() {
   cd "$srcdir/mlt-$pkgver"
   sed -i 's|freetype/|freetype2/|' src/modules/gtk2/producer_pango.c
+  patch -Np1 -i ../frei0r.patch
 }
 
 build() {
