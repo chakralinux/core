@@ -2,34 +2,37 @@
 # Contributors: AlmAck
 
 pkgbase=mlt
-pkgname=('mlt' 'mlt-python-bindings')
+pkgname=(mlt mlt-python-bindings)
 pkgver=0.9.6
-pkgrel=1
+pkgrel=2
 pkgdesc="An open source multimedia framework"
 arch=('x86_64')
 url="http://www.mltframework.org"
-license=('GPL')
-makedepends=('sdl_image' 'libsamplerate' 'libdv' 'qt' 'sox' 'libxml2' 'libexif' 'ffmpeg'
-             'frei0r-plugins' 'swig' 'python2' 'jack' 'ladspa' 'vid.stab')
+license=(GPL)
+makedepends=(ladspa frei0r-plugins libdv sdl_image libsamplerate sox ffmpeg vid.stab qt5-svg jack libexif python2 swig)
 source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz")
 md5sums=('92bcc95af44ff086df0a0ce17a201d1c')
 
+prepare() {
+  cd "$srcdir/mlt-$pkgver"
+  sed -i 's|freetype/|freetype2/|' src/modules/gtk2/producer_pango.c
+}
+
 build() {
   # mlt
-  cd "${srcdir}/mlt-${pkgver}"
+  cd "$srcdir/mlt-$pkgver"
 
   ./configure --prefix=/usr \
-              --enable-gpl \
-              --enable-gpl3 \
-              --qimage-libdir=/usr/lib/ \
-              --qimage-includedir=/usr/include/Qt \
+              --avformat-swscale \
+              --enable-gpl --enable-gpl3 \
               --avformat-vdpau \
-              --disable-gtk2 \
-              --avformat-swscale
+              --qt-includedir=/usr/include/qt5 \
+              --qt-libdir=/usr/lib \
+              --disable-gtk2
   make
 
   # mlt python bindings
-  cd "${srcdir}/mlt-${pkgver}/src/swig/python"
+  cd "$srcdir/mlt-$pkgver/src/swig/python"
   sed -i 's_path=`which python_path=`which python2_' build
   sed -i 's_`python -c_`python2 -c_' build
   sed -i 's#python-config#python2-config#' build
@@ -37,19 +40,27 @@ build() {
 }
 
 package_mlt() {
-  depends=('sdl_image' 'libsamplerate' 'libdv' 'sox' 'libxml2' 'ffmpeg' 'frei0r-plugins' 'vid.stab')
-  optdepends=('jack' 'libexif' 'qt' 'ladspa')
+  optdepends=('sdl_image: for SDL plugin'
+            'libsamplerate: for libavresample plugin'
+            'sox: for SOX (Audio Swiss Army Knife) plugin'
+            'ffmpeg: for ffmpeg plugin'
+            'vid.stab: for video stabilize plugin'
+	    'gtk2: Gtk plugin'
+            'qt5-svg: for Qt5 plugins'
+            'jack2: for JACK sound output plugin'
+            'libexif: for auto rotate plugin')
+  conflicts=('mlt++<=0.3.8')
 
-  cd "${srcdir}/mlt-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  cd "$srcdir/mlt-$pkgver"
+  make DESTDIR="$pkgdir" install
 }
 
 package_mlt-python-bindings() {
   depends=('python2' 'mlt>=0.8')
 
   cd "$srcdir/mlt-$pkgver/src/swig/python"
-  mkdir -p "${pkgdir}/usr/lib/python2.7/"
-  install -m0755 mlt.py "${pkgdir}/usr/lib/python2.7/"
-  install -m0755 _mlt.so "${pkgdir}/usr/lib/python2.7/"
-  install -m0755 mlt_wrap.o "${pkgdir}/usr/lib/python2.7/"
+  mkdir -p "$pkgdir/usr/lib/python2.7/"
+  install -m755 mlt.py "$pkgdir/usr/lib/python2.7/"
+  install -m755 _mlt.so "$pkgdir/usr/lib/python2.7/"
+  install -m755 mlt_wrap.o "$pkgdir/usr/lib/python2.7/"
 }
