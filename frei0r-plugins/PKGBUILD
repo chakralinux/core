@@ -3,7 +3,7 @@
 
 pkgname=frei0r-plugins
 pkgver=1.4
-pkgrel=3
+pkgrel=4
 pkgdesc="frei0r is a minimalistic plugin API for video sources and filters."
 arch=('x86_64')
 url="http://www.piksel.org/frei0r"
@@ -11,8 +11,15 @@ license=('GPL')
 depends=('gcc-libs' 'gavl' 'opencv')
 makedepends=('doxygen')
 options=('!emptydirs')
-source="https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz"
-md5sums=('202375d1bcb545c1b6eb8f34e0260ec5')
+source=(https://distfiles.macports.org/frei0r-plugins/frei0r-plugins-1.4.tar.gz
+        as-needed.patch)
+md5sums=('202375d1bcb545c1b6eb8f34e0260ec5'
+         '49bab3a8700da8d8ffb6369423fa356d')
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+  patch -Np0 -i ../as-needed.patch
+}
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"

@@ -6,7 +6,7 @@
 pkgbase=opencv
 pkgname=('opencv' 'opencv-samples')
 pkgver=2.4.10
-pkgrel=1
+pkgrel=2
 pkgdesc="Open Source Computer Vision Library"
 arch=('x86_64')
 license=('BSD')
@@ -45,7 +45,7 @@ _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
             '-D INSTALL_PYTHON_EXAMPLES=ON'
             '-D WITH_XINE=ON'
             '-D WITH_OPENGL=ON'
-            '-D WITH_QT=ON'
+            '-D WITH_QT=4'
             '-D WITH_GTK=OFF'
             '-D WITH_GSTREAMER_1_X=ON'
             '-D ENABLE_SSE3=OFF'
@@ -53,6 +53,9 @@ _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
 
 prepare() {
   cd "$srcdir/$pkgname-$pkgver"
+
+  sed -i 's|HAVE_OPENCV_HIGHGUI|HAVE_NO_OPENCV_HIGHGUI|g' modules/objdetect/src/precomp.hpp
+  sed -i 's|HAVE_OPENCV_HIGHGUI|HAVE_NO_OPENCV_HIGHGUI|g' modules/objdetect/src/latentsvm.cpp
 
   msg2 "Applying backported fix for x86 ASM breakage"
   # see https://github.com/Itseez/opencv/pull/3331
