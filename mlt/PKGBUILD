@@ -4,12 +4,12 @@
 pkgbase=mlt
 pkgname=(mlt mlt-python-bindings)
 pkgver=0.9.6
-pkgrel=2
+pkgrel=3
 pkgdesc="An open source multimedia framework"
 arch=('x86_64')
 url="http://www.mltframework.org"
 license=(GPL)
-makedepends=(ladspa frei0r-plugins libdv sdl_image libsamplerate sox ffmpeg vid.stab qt5-svg jack libexif python2 swig)
+makedepends=(ladspa frei0r-plugins-qt5 libdv sdl_image libsamplerate sox ffmpeg vid.stab qt5-svg jack libexif python2 swig)
 source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz")
 md5sums=('92bcc95af44ff086df0a0ce17a201d1c')
 
@@ -21,6 +21,8 @@ prepare() {
 build() {
   # mlt
   cd "$srcdir/mlt-$pkgver"
+
+  export PKG_CONFIG_PATH=/opt/opencv-qt5/lib/pkgconfig
 
   ./configure --prefix=/usr \
               --avformat-swscale \
