@@ -4,12 +4,12 @@ source ../plasma.conf
 pkgbase=oxygen
 pkgname=('oxygen' 'oxygen-cursors' 'oxygen-kde4')
 pkgver=${PVersion}
-pkgrel=3
+pkgrel=1
 pkgdesc="KDE Oxygen style"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/oxygen'
 license=('LGPL')
-makedepends=('frameworkintegration' 'extra-cmake-modules' 'kdoctools' 'kdelibs' 'automoc4' 'kdecoration' 'kde-workspace')
+makedepends=('frameworkintegration' 'extra-cmake-modules' 'kdoctools' 'kdelibs' 'automoc4' 'kdecoration' 'kwin')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
 sha256sums=( $(getSum ${pkgname} | head -n 1) )
@@ -44,10 +44,6 @@ package_oxygen() {
 
   # Cursors conflicts with kde-workspace
   rm -r "${pkgdir}"/usr/share/icons/
-
-  # oxygen ships translations for breeze?
-  # for now, remove the one from oxygen, but wait for upstream
-  rm -r ${pkgdir}/usr/share/locale/*/LC_MESSAGES/breeze_kwin_deco.mo
 }
 
 package_oxygen-cursors() {
