@@ -1,11 +1,5 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
-# contributor: Vinzenz Vietzke <vinz@vinzv.de>
-
 pkgname=augeas
-pkgver=0.10.0
+pkgver=1.3.0
 pkgrel=1
 pkgdesc="A configuration editing tool that parses config files and transforms them into a tree"
 arch=('i686' 'x86_64')
@@ -13,13 +7,15 @@ url="http://augeas.net"
 license=('LGPL')
 depends=('libxml2' 'gcc-libs')
 options=('!libtool')
-source=("http://augeas.net/download/$pkgname-$pkgver.tar.gz")
-md5sums=('fe1834e90a066c3208ac0214622c7352')
-#         'efb3f1a90ff31320dcc4c499eba5a555')
+source=("http://download.augeas.net/$pkgname-$pkgver.tar.gz")
+md5sums=('c8890b11a04795ecfe5526eeae946b2d')
 
-build() {
+prepare() {
   cd "$srcdir/$pkgname-$pkgver"
   sed -i 's|Requires:.*|Requires: libxml-2.0|' augeas.pc.in
+}
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
   ./configure --prefix=/usr
   make
 }
