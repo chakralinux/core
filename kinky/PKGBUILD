@@ -1,27 +1,29 @@
-# Maintainer: Radu Andries <admiral0@chakra-project.org>
+# Maintainer: AlmAck
+
 pkgname=kinky
-pkgver=1.0.0alpha2
+pkgver=1.2.0
 pkgrel=1
-epoch=
 pkgdesc="Builds packages inside chroots"
 arch=(any)
-url="http://chakra-project.org/wiki/index.php?title=Kinky"
+url="http://chakraos.org/wiki/index.php?title=Kinky"
 license=('GPL2')
 groups=('chakra-devel')
 depends=('python2' 'pacman' 'tar' 'pigz' 'python2-parched' 'python2-decoratortools')
-source=("https://gitorious.org/chakra-packages/kinky/archive-tarball/kinky-alpha2")
-md5sums=('b79ab8ebf14a09eb6c2ba2d6c056450c')
 install=kinky.install
 
+gitsha=3caa285
+source=("$pkgname"::"git://git.chakraos.org/${pkgname}.git#commit=${gitsha}")
+md5sums=('SKIP')
+
 build() {
-    cd ${srcdir}/chakra-packages-kinky
+    cd "${srcdir}/${pkgname}"
     ./autogen.sh
-	./configure --prefix=/usr --sysconfdir=/etc
+    ./configure --prefix=/usr --sysconfdir=/etc
     make
 }
 
 package() {
-    cd ${srcdir}/chakra-packages-kinky
+    cd "${srcdir}/${pkgname}"
     make DESTDIR="$pkgdir/" install
     ln -s chakra-apps-x86_64.cfg $pkgdir/etc/kinky/default.cfg
     
@@ -31,5 +33,4 @@ package() {
     # create default temporary directories
     mkdir -p $pkgdir/var/lib/kinky
     mkdir -p $pkgdir/var/cache/kinky
-
 }
