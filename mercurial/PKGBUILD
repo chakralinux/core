@@ -1,9 +1,5 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-
 pkgname=mercurial
-pkgver=3.2.3
+pkgver=3.4
 pkgrel=1
 pkgdesc="A scalable distributed SCM tool"
 arch=('x86_64')
@@ -11,17 +7,20 @@ url="http://www.selenic.com/mercurial"
 license=('GPL')
 depends=('python2')
 optdepends=('tk: for the hgk GUI')
+backup=('etc/mercurial/hgrc')
 source=("http://www.selenic.com/mercurial/release/${pkgname}-${pkgver}.tar.gz"
         'mercurial.profile')
-md5sums=('ca6d1a0b0fd255fb1b9fb3fa46a856b8'
+md5sums=('4a2dcf2bd9fa11e758d44e481136eab7'
          '43e1d36564d4c7fbe9a091d3ea370a44')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  sed -i -e 's#env python#env python2#' mercurial/lsprof.py
+}         
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  python2 setup.py install --root="${pkgdir}" --optimize=1 
-
-  sed -i -e 's#env python#env python2#' \
-    "${pkgdir}"/usr/lib/python2.7/site-packages/mercurial/lsprof.py
+  python2 setup.py install --root="${pkgdir}" --optimize=1
     
   install -d ${pkgdir}/usr/share/man/{man1,man5}
   install -m644 doc/hg.1 "${pkgdir}/usr/share/man/man1" 
