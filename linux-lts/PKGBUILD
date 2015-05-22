@@ -1,33 +1,32 @@
 #
-# Core Packages for Chakra, part of chakra-project.org
+# Core Packages for Chakra, part of chakraos.org
+#
 
-# ToDo remove the " from "linux-lts" and add on all lts pkgs "extramodules-3.2-CHAKRA-LTS" instead of extramodules-3.2-lts
 pkgbase="linux-lts"
-pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs') # Build stock -CHAKRA-LTS kernel
-# pkgname=linux-custom       # Build kernel with a different name
-_kernelname=${pkgname#linux}
-_basekernel=3.2
-pkgver=3.2.63
+pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs')
+_kernelname="-CHAKRA-LTS"
+_basekernel=3.14
+pkgver=3.14.43
 pkgrel=1
-makedepends=('xmlto' 'docbook-xsl')
+makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 arch=('x86_64')
 license=('GPL2')
 url="http://www.kernel.org"
 options=(!strip)
-source=("ftp://ftp.kernel.org/pub/linux/kernel/v3.x/linux-$_basekernel.tar.bz2"
-        "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
+source=("https://www.kernel.org/pub/linux/kernel/v3.x/linux-$_basekernel.tar.xz"
+        "https://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config.x86_64'
         # standard config files for mkinitcpio ramdisk
         'linux-lts.preset'
         'change-default-console-loglevel.patch')
-md5sums=('7ceb61f87c097fc17509844b71268935'
-         'b0415bfb76e94590e3d0ab68884af8c9'
-         'd73da01f9e20687abda70c10e7e5ea71'
+md5sums=('b621207b3f6ecbb67db18b13258f8ea8'
+         'd32d6ea8aafb86fc163d5601b06f11e3'
+         '9847f68028ea7bc5e249cda4d6d8f1d9'
          '232b52576a62c7a333e9fe7a1e1ca359'
-         '9d3c56a4b999c8bfbd4018089a62f662')
+         '98beb36f9b8cf16e58de2483ea9985e3')
 
-build() {
+prepare() {
   cd ${srcdir}/linux-$_basekernel
 
   # add upstream patch
@@ -46,10 +45,14 @@ build() {
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
+    sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
   fi
 
   # set extraversion to pkgrel
   sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
+  
+  # don't run depmod on 'make install'. We'll do this ourselves in packaging
+  sed -i '2iexit 0' scripts/depmod.sh
 
   # get kernel version
   make prepare
@@ -70,23 +73,26 @@ build() {
   ####################
 
   yes "" | make config
+}
 
-  # build!
-  make ${MAKEFLAGS} bzImage modules
+build() {
+  cd ${srcdir}/linux-$_basekernel
+
+  make ${MAKEFLAGS} LOCALVERSION= bzImage modules
 }
 
 package_linux-lts() {
   pkgdesc="The Linux LTS-Kernel and modules"
   groups=('lts')
-  depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7.5')
+  depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio')
   optdepends=('crda: to set the correct wireless channels of your country')
-  replaces=('kernel26-lts' 'linux-scsi'
+  replaces=('linux-scsi'
             'squashfs' 'unionfs' 'ivtv'
             'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs'
             'gspcav1' 'atl2' 'wlan-ng26' 'rt2500'
             'aufs3' 'nouveau-drm')
-  provides=("aufs3=$_aufs" 'nouveau-drm-lts' 'kernel26-lts' 'acerhk-lts=0.5.35')
-  conflicts=('kernel26-lts' 'acerhk-lts')
+  provides=("aufs3=$_aufs" 'nouveau-drm-lts' 'acerhk-lts=0.5.35')
+  conflicts=('acerhk-lts')
   backup=("etc/mkinitcpio.d/${pkgname}.preset")
   install=${pkgname}.install
 
@@ -95,7 +101,7 @@ package_linux-lts() {
   KARCH=x86
 
   # get kernel version
-  _kernver="$(make kernelrelease)"
+  _kernver="$(make LOCALVERSION= kernelrelease)"
 
   mkdir -p "${pkgdir}"/{lib/modules,lib/firmware,boot}
   make INSTALL_MOD_PATH="${pkgdir}" modules_install
@@ -140,9 +146,6 @@ package_linux-lts() {
 
 package_linux-lts-headers() {
   pkgdesc="Header files and scripts for building modules for linux lts-kernel"
-  provides=('kernel26-lts-headers')
-  conflicts=('kernel26-lts-headers')
-  replaces=('kernel26-lts-headers')
 
   install -dm755 "${pkgdir}/usr/lib/modules/${_kernver}"
 
@@ -160,7 +163,7 @@ package_linux-lts-headers() {
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/include"
 
   for i in acpi asm-generic config crypto drm generated linux math-emu \
-    media mtd net pcmcia scsi sound trace video xen; do
+    media net pcmcia scsi sound trace uapi video xen; do
     cp -a include/${i} "${pkgdir}/usr/src/linux-${_kernver}/include/"
   done
 
@@ -182,16 +185,6 @@ package_linux-lts-headers() {
 
   cp arch/${KARCH}/kernel/asm-offsets.s "${pkgdir}/usr/src/linux-${_kernver}/arch/${KARCH}/kernel/"
 
-  # add headers for lirc package
-  mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video"
-
-  cp drivers/media/video/*.h  "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/"
-
-  for i in bt8xx cpia2 cx25840 cx88 em28xx et61x251 pwc saa7134 sn9c102; do
-    mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/${i}"
-    cp -a drivers/media/video/${i}/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/${i}"
-  done
-
   # add docbook makefile
   install -D -m644 Documentation/DocBook/Makefile \
     "${pkgdir}/usr/src/linux-${_kernver}/Documentation/DocBook/Makefile"
@@ -209,24 +202,31 @@ package_linux-lts-headers() {
   cp net/mac80211/*.h "${pkgdir}/usr/src/linux-${_kernver}/net/mac80211/"
 
   # add dvb headers for external modules
-  mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-core"
-  cp drivers/media/dvb/dvb-core/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-core/"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-core"
+  cp drivers/media/dvb-core/*.h \
+    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-core/"
   # and...
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/"
   cp include/config/dvb/*.h "${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/"
 
   # add dvb headers for http://mcentral.de/hg/~mrec/em28xx-new
-  mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/"
-  cp drivers/media/dvb/frontends/lgdt330x.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/"
-  cp drivers/media/video/msp3400-driver.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
+  cp drivers/media/dvb-frontends/lgdt330x.h \
+    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/i2c/"
+  cp drivers/media/i2c/msp3400-driver.h \
+    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/i2c/"
 
   # add dvb headers
-  mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-usb"
-  cp drivers/media/dvb/dvb-usb/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-usb/"
-  mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends"
-  cp drivers/media/dvb/frontends/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/"
-  mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/common/tuners"
-  cp drivers/media/common/tuners/*.h "${pkgdir}/usr/src/linux-${_kernver}/drivers/media/common/tuners/"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/usb/dvb-usb"
+  cp drivers/media/usb/dvb-usb/*.h \
+    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/usb/dvb-usb/"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends"
+  cp drivers/media/dvb-frontends/*.h \
+    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/tuners"
+  cp drivers/media/tuners/*.h \
+    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/tuners/"
 
   # add xfs and shmem for aufs building
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/fs/xfs"
@@ -255,14 +255,11 @@ package_linux-lts-headers() {
   done
 
   # remove unneeded architectures
-  rm -rf "${pkgdir}"/usr/src/linux-${_kernver}/arch/{alpha,arm,arm26,avr32,blackfin,cris,frv,h8300,ia64,m32r,m68k,m68knommu,mips,microblaze,mn10300,parisc,powerpc,ppc,s390,sh,sh64,sparc,sparc64,um,v850,xtensa}
+  rm -rf "${pkgdir}"/usr/lib/modules/${_kernver}/build/arch/{alpha,arc,arm,arm26,arm64,avr32,blackfin,c6x,cris,frv,h8300,hexagon,ia64,m32r,m68k,m68knommu,metag,mips,microblaze,mn10300,openrisc,parisc,powerpc,ppc,s390,score,sh,sh64,sparc,sparc64,tile,unicore32,um,v850,xtensa}
 }
 
 package_linux-lts-docs() {
   pkgdesc="Kernel hackers manual - HTML documentation that comes with the Linux lts-kernel."
-  provides=('kernel26-lts-docs')
-  conflicts=('kernel26-lts-docs')
-  replaces=('kernel26-lts-docs')
 
   cd "${srcdir}/linux-${_basekernel}"
 

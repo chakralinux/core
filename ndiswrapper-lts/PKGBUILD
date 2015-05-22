@@ -1,15 +1,15 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 # contributor: abveritas@chakra-project.org
 
-# Find the kernel name inside the chroot
-_extramodules=extramodules-3.2-lts
+_extramodules=extramodules-3.14-CHAKRA-LTS
 _kver="$(cat /lib/modules/${_extramodules}/version)"
-_kernelver=3.2.63
+_kernelver=3.14.43
+_rootOfSourceTree=/usr/src/linux-${_kver}
 
 pkgname=ndiswrapper-lts
 _pkgname=ndiswrapper
 pkgver=1.59
-pkgrel=4
+pkgrel=5
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
@@ -17,25 +17,32 @@ url="http://ndiswrapper.sourceforge.net"
 install="ndiswrapper.install"
 depends=("linux-lts=${_kernelver}")
 makedepends=("linux-lts-headers=${_kernelver}")
-source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
-md5sums=('e26a7213468ccd6b0bb4c211c7aadeaa')
+source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
+        "ndiswrapper-1.59.patch")
+sha1sums=('75fbbda677fe91ee07a6f6a8e19b1f3e2479540f'
+          'f120e96fa9abab45e1c724aaac29da7b892820f0')
+
+prepare() {
+  [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
+  msg "Found kernel version: $_kver"
+
+  cd "$srcdir/$_pkgname-$pkgver" 
+  patch -p1 -i ../ndiswrapper-1.59.patch
+  sed -i "/modinfo/s/s/usr\//" driver/Makefile
+}
 
 build() {
-  cd "$srcdir/$_pkgname-$pkgver"
-
-  sed -i "/modinfo/s/s/usr\//" driver/Makefile
-  
-  make KBUILD=/usr/src/linux-$_kver KVERS=$_kver
+  cd "$srcdir/$_pkgname-$pkgver"        
+  make -C driver KVERS_UNAME=${_kver}
+  make -C utils
 }
 
 package() {
   cd "$srcdir/$_pkgname-$pkgver"
 
-  make KBUILD=/usr/src/linux-$_kver INST_DIR="usr/lib/modules/$_extramodules" \
-    KVERS=$_kver DESTDIR="$pkgdir/" install
+  make sbindir=/usr/sbin usrsbindir=/usr/sbin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
+        KVERS=$_kver DESTDIR="$pkgdir/" install
 
-  # rm ndiswrapper
-  rm -r "$pkgdir/usr/share" "$pkgdir/usr/sbin" "$pkgdir/sbin"
-
-  gzip "$pkgdir/usr/lib/modules/$_extramodules/$_pkgname.ko"
+  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
+          "${startdir}/ndiswrapper.install"
 }
