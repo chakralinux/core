@@ -1,0 +1,12 @@
+--- ./firegl_public.c.orig	2014-05-25 11:15:02.198520000 +0900
++++ ./firegl_public.c	2014-05-25 11:15:46.289501864 +0900
+@@ -1784,7 +1784,8 @@
+ #else 
+ 
+ #ifdef current_euid
+-    return current_euid();
++//    return current_euid();
++    return __kuid_val(current_euid());
+ #else
+     return current->euid;
+ #endif
