@@ -3,7 +3,7 @@
 #
 
 _extramodules=extramodules-3.19-CHAKRA
-_kernver=$(cat /usr/lib/modules/${_extramodules}/version)
+_kver=$(cat /usr/lib/modules/${_extramodules}/version)
 _kernelver=3.19.4
 
 pkgname=(catalyst chd-catalyst)
@@ -87,7 +87,7 @@ build() {
     # Compile module using _ati_check variables
     CFLAGS_MODULE="-DMODULE -DATI -DFGL -DPAGE_ATTR_FIX=$PAGE_ATTR_FIX -DCOMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE $def_smp $def_modversions"
     
-    make -C /usr/lib/modules/${_kernver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} \
+    make -C /usr/lib/modules/${_kver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} \
     MODFLAGS="$CFLAGS_MODULE" \
     CFLAGS_MODULE="$CFLAGS_MODULE" \
     PAGE_ATTR_FIX=$PAGE_ATTR_FIX COMPAT_ALLOC_USER_SPACE=$COMPAT_ALLOC_USER_SPACE modules 
@@ -104,12 +104,12 @@ package_catalyst() {
     for r in /usr/lib/modules/*; do
       s=${r:17}
       if [[ ${s:0:3} = "ext" ]]; then
-	if [[ `cat ${r}/version | grep -c ${_kernver}` != 0 ]]; then
+	if [[ `cat ${r}/version | grep -c ${_kver}` != 0 ]]; then
 	  _destidir=${s}
 	  sed -i -e "s/EXTRAMODULES=.*/EXTRAMODULES=${s}/" $startdir/catalyst.install
 	fi
-	elif [[ ${s} = ${_kernver} ]] && [[ ! -e ${r}/extramodules ]]; then
-	  _destidir=${_kernver}/video
+	elif [[ ${s} = ${_kver} ]] && [[ ! -e ${r}/extramodules ]]; then
+	  _destidir=${_kver}/video
 	  sed -i -e "s/EXTRAMODULES=.*/EXTRAMODULES=null/" $startdir/catalyst.install
       fi
     done
@@ -119,7 +119,7 @@ package_catalyst() {
     install -m755 -d "${pkgdir}/usr/lib/modules/${_destidir}/" 
     install -m644 fglrx.ko "${pkgdir}/usr/lib/modules/${_destidir}/" 
     find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
-    sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/catalyst.install
+    sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kver}/" $startdir/catalyst.install
 
     # License
     install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
