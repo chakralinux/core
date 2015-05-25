@@ -1,34 +1,27 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=tzdata
-pkgver=2014g
+pkgver=2015d
 pkgrel=1
 pkgdesc="Sources for time zone and daylight saving time data"
 arch=('any')
 url="http://www.iana.org/time-zones"
 license=('GPL')
 options=('!emptydirs')
-source=(http://www.iana.org/time-zones/repository/releases/${pkgname}${pkgver}.tar.gz
-        # tzcodes is required for leapseconds.awk file that is not yet part of tzdata
-        http://www.iana.org/time-zones/repository/releases/tzcode${pkgver}.tar.gz)
+source=(http://www.iana.org/time-zones/repository/releases/${pkgname}${pkgver}.tar.gz)
 
 timezones=('africa' 'antarctica' 'asia' 'australasia'
            'europe' 'northamerica' 'southamerica'
            'pacificnew' 'etcetera' 'backward'
            'systemv' 'factory')
-md5sums=('f9f59425e55b21d2e52bb3a95fc17b8d'
-         'f154679d48b724fe191efc19b55abd24')
+md5sums=('b595bdc4474b8fc1a15cffc67c66025b')
 
 package() {
   cd ${srcdir}
   zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo ${timezones[@]}
   zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo/posix ${timezones[@]}
-  
-  # generate leapseconds file
-  awk -f leapseconds.awk leap-seconds.list > leapseconds && echo "leapseconds file generated"
   zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo/right -L leapseconds ${timezones[@]}
   
   zic -y ./yearistype -d ${pkgdir}/usr/share/zoneinfo -p America/New_York
   install -m444 -t ${pkgdir}/usr/share/zoneinfo iso3166.tab zone1970.tab zone.tab # zone.tab is depricated and will go soon
 }
-
