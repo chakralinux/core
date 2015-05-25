@@ -1,16 +1,17 @@
 # Maintainer: Neophytos Kolokotronis <tetris4ATgmailDOTcom>
 
 pkgname=apr
-pkgver=1.5.1
+pkgver=1.5.2
 pkgrel=1
 pkgdesc="The Apache Portable Runtime"
 arch=('x86_64')
 url="http://apr.apache.org/"
 depends=('util-linux')
-options=('!libtool')
 license=('APACHE')
-source=("http://www.apache.org/dist/apr/apr-${pkgver}.tar.bz2")
-md5sums=('5486180ec5a23efb5cae6d4292b300ab')
+source=(http://www.apache.org/dist/apr/apr-$pkgver.tar.bz2{,.asc})
+md5sums=('4e9769f3349fe11fc0a5e1b224c236aa'
+         'SKIP')
+validpgpkeys=('5B5181C2C0AB13E59DA3F7A3EC582EB639FF092C') # Jeff Trawick
 
 build() {
   cd "${srcdir}/apr-${pkgver}"
@@ -19,7 +20,7 @@ build() {
   ./configure --prefix=/usr --includedir=/usr/include/apr-1 \
     --with-installbuilddir=/usr/share/apr-1/build \
     --enable-nonportable-atomics \
-    --with-devrandom=/dev/urandom
+    --with-devrandom=/dev/urandom --disable-static
   make
 }
 
