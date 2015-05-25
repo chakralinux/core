@@ -1,12 +1,8 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dog]org>
-# maintainer Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=util-linux
-pkgver=2.25.1
-pkgrel=2
+pkgver=2.26.2
+pkgrel=1
 pkgdesc="Miscellaneous system utilities for Linux"
 url="http://www.kernel.org/pub/linux/utils/util-linux/"
 arch=('x86_64')
@@ -17,23 +13,18 @@ conflicts=('util-linux-ng' 'eject')
 provides=("util-linux-ng=${pkgver}" 'eject')
 license=('GPL2')
 options=('strip' 'debug')
-source=("ftp://ftp.kernel.org/pub/linux/utils/${pkgname}/v2.25/${pkgname}-${pkgver}.tar.xz"
+source=("https://www.kernel.org/pub/linux/utils/util-linux/v2.26/$pkgname-$pkgver.tar."{xz,sign}
         uuidd.tmpfiles
-        pam-login
-        pam-common
-        pam-su
-        system-auth
-        system-local-login
-        system-login
-        system-remote-login
-        system-services)
+        pam-{login,common,su}
+        system-{auth,local-login,login,remote-login,services})
 backup=(etc/pam.d/chfn
         etc/pam.d/chsh
         etc/pam.d/login
         etc/pam.d/su
         etc/pam.d/su-l)
 install=util-linux.install
-md5sums=('2ff36a8f8ede70f66c5ad0fb09e40e79'
+md5sums=('9bdf368c395f1b70325d0eb22c7f48fb'
+         'SKIP'
          'a39554bfd65cccfd8254bb46922f4a67'
          '4368b3f98abd8a32662e094c54e7f9b1'
          'a31374fef2cba0ca34dfc7078e2969e4'
@@ -43,6 +34,7 @@ md5sums=('2ff36a8f8ede70f66c5ad0fb09e40e79'
          '17c691f2da319df8fe851bc47cc1d662'
          '477237985820117a0e6e1b13a86eb599'
          '30fe7d41e054ee43fab7855bf88a07e5')
+validpgpkeys=('B0C64D14301CC6EFAEDF60E4E4B71D5EEC39C284')  # Karel Zak
 
 prepare() {
   cd "$pkgname-$pkgver"
@@ -63,6 +55,7 @@ build() {
               --enable-chfn-chsh \
               --enable-write \
               --enable-mesg \
+              --enable-libmount-force-mountinfo \
               --enable-socket-activation \
               --with-python=3
 
