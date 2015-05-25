@@ -1,25 +1,28 @@
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=sdparm
-pkgver=1.08
+pkgver=1.09
 pkgrel=1
 pkgdesc="An utility similar to hdparm but for SCSI devices"
 arch=('x86_64')
 url="http://sg.danny.cz/sg/sdparm.html"
 license=('BSD')
-depends=('glibc')
+depends=('glibc' 'bash')
 source=("http://sg.danny.cz/sg/p/$pkgname-$pkgver.tar.xz")
-md5sums=('d290e6b45d690bfa2cc05700ec119073')
+md5sums=('76b53e2be4c5b85e4af0887ce838c955')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr
   make
 }
 
-package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir}/ install
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
+}
 
-  install -Dm644 COPYING $pkgdir/usr/share/licenses/${pkgname}/LICENSE
+package() {
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
