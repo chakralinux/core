@@ -3,8 +3,8 @@
 
 
 pkgname=linux-firmware
-_rev=b794c50
-pkgver=20150127.${_rev}
+_rev=8e18132
+pkgver=20150511.${_rev}
 _b43=5.100.138
 _legacy=3.130.20.0
 pkgrel=1
@@ -70,4 +70,9 @@ package() {
 
   # remove asc file from amd-ucode
   rm "${pkgdir}"/usr/lib/firmware/amd-ucode/*.asc
+  
+  # Trigger a microcode reload for configurations not using early updates
+  install -d "${pkgdir}/usr/lib/tmpfiles.d"
+  echo 'w /sys/devices/system/cpu/microcode/reload - - - - 1' \
+    >"${pkgdir}/usr/lib/tmpfiles.d/${pkgname}.conf"
 }
