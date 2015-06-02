@@ -1,23 +1,18 @@
-#
-# Platform Packages for Chakra, part of chakraos.org
-#
-
 pkgname=octave
-pkgver=3.8.2
-pkgrel=2
+pkgver=4.0.0
+pkgrel=1
 pkgdesc="A high-level language, primarily intended for numerical computations."
 arch=('x86_64')
 url="http://www.octave.org"
 license=('GPL')
-depends=('fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'qhull' 'fltk' 'suitesparse' 'arpack' 'pcre')
-makedepends=('texlive-core' 'gcc-fortran')
+depends=('fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'qhull' 'fltk' 'suitesparse' 'arpack' 'pcre' 'qt')
+makedepends=('texlive-core' 'gcc-fortran' 'texinfo' 'gnuplot')
 optdepends=('texinfo: for help-support in octave'
-	    'gnuplot: alternative plotting'
-	    'qscintilla: experimental gui')
-source=(ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.bz2{,.sig})
+	    'gnuplot: alternative plotting')
+source=(ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.xz{,.sig})
 options=('!emptydirs')
 install='octave.install'
-sha1sums=('02c38e0f69bce4e6dd7be7d301898347085d9c2d'
+sha1sums=('795c7ef1fb8d92f4cf9cae9eabba374a0328b1a9'
           'SKIP')
 
 prepare() {
@@ -31,7 +26,6 @@ build() {
   ./configure --prefix=/usr \
     --libexecdir=/usr/lib \
     --enable-shared \
-    --enable-docs=no \
     --disable-static \
     --with-umfpack="-lumfpack -lsuitesparseconfig" 
 
