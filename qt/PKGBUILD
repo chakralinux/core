@@ -7,10 +7,10 @@
 
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers' 'qt-docs')
-pkgver=4.8.6
-pkgrel=7
+pkgver=4.8.7
+pkgrel=1
 arch=('x86_64')
-url='http://qt.nokia.com/'
+url='http://www.qt.io'
 license=('GPL3' 'LGPL')
 makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
     'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
@@ -18,17 +18,17 @@ makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'db
     'mysql' 'unixodbc' 'cups' 'libxinerama' 'libxcursor')
 options=('staticlibs' 'debug')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
-source=("http://download.qt-project.org/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar.gz"
+source=("http://download.qt.io/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar.gz"
         'assistant.desktop' 'designer.desktop' 'linguist.desktop'
         'qtconfig.desktop' 'improve-cups-support.patch' 'qt_no_debug.patch'
         'moc-boost-workaround.patch'
-        'CVE-2014-0190.patch'
         'kubuntu_14_systemtrayicon.diff'
         'glib-honor-ExcludeSocketNotifiers-flag.diff'
         'qtcore-4.8.5-qeventdispatcher-recursive.patch'
         'l-qclipboard_delay.patch'
-        'add_nostrip_for_debug_packages.diff')
-md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
+        'add_nostrip_for_debug_packages.diff'
+        'kde4-settings.patch')
+md5sums=('d990ee66bf7ab0c785589776f35ba6ad'
          'fc211414130ab2764132e7370f8e5caa'
          '85179f5e0437514f8639957e1d8baf62'
          'f11852b97583610f3dbb669ebc3e21bc'
@@ -36,12 +36,12 @@ md5sums=('2edbe4d6c2eff33ef91732602f3518eb'
          'b9fb6b953cec428d59c026b1ef370e86'
          '742bfebaebc44c26f6cabe654f702cc8'
          'da387bde22ae1c446f12525d2a31f070'
-         '34ed257109afb83342cfe514c8abe027'
          'a523644faa8f98a73f55c4aa23c114a6'
          '85679531c8a7310317adfb7002d9f99a'
          '009de09b4e589a7770fba74405656c99'
          'addc5e88d538ee55e17bd49ba337ca67'
-         '41587e01bb0ca6d0c52fcf39eb737459')
+         '41587e01bb0ca6d0c52fcf39eb737459'
+         '66dfea63916c8dbf47b23cb012ffdccc')
 
 prepare() {
 	cd ${_pkgfqn}
@@ -53,7 +53,9 @@ prepare() {
 
 	patch -p1 -i "${srcdir}"/improve-cups-support.patch
 	patch -Np1 -i "${srcdir}"/moc-boost-workaround.patch
-	patch -Np1 -i "${srcdir}"/CVE-2014-0190.patch
+	
+	# FS#45106
+        patch -p0 -i "${srcdir}"/kde4-settings.patch
 	
 	# https://bugreports.qt-project.org/browse/QTBUG-37380 (use by LibreOffice)
 	patch -Np1 -i "${srcdir}"/glib-honor-ExcludeSocketNotifiers-flag.diff
