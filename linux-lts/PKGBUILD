@@ -6,7 +6,7 @@ pkgbase="linux-lts"
 pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs')
 _kernelname="-CHAKRA-LTS"
 _basekernel=3.14
-pkgver=3.14.43
+pkgver=3.14.44
 pkgrel=1
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 arch=('x86_64')
@@ -21,7 +21,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v3.x/linux-$_basekernel.tar.xz"
         'linux-lts.preset'
         'change-default-console-loglevel.patch')
 md5sums=('b621207b3f6ecbb67db18b13258f8ea8'
-         'd32d6ea8aafb86fc163d5601b06f11e3'
+         'd522100449d8c3428e2f2fbc0082b045'
          '9847f68028ea7bc5e249cda4d6d8f1d9'
          '232b52576a62c7a333e9fe7a1e1ca359'
          '98beb36f9b8cf16e58de2483ea9985e3')
@@ -65,14 +65,18 @@ prepare() {
   #make oldconfig # using old config from previous kernel version
   # ... or manually edit .config
 
+  # rewrite configuration
+  yes "" | make config >/dev/null
+
+  # save configuration for later reuse
+  cat .config > "${startdir}/config.x86_64.last"
+
   ####################
   # stop here
   # this is useful to configure the kernel
   #msg "Stopping build"
   #return 1
   ####################
-
-  yes "" | make config
 }
 
 build() {
