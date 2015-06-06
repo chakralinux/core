@@ -5,28 +5,28 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel="3.19"
-pkgver=3.19.4
+_basekernel="4.0"
+pkgver=4.0.5
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'bc')
 options=('!strip')
-_aufsver=3.19
-source=("http://www.kernel.org/pub/linux/kernel/v3.x/linux-${_basekernel}.tar.xz"
-        "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
+_aufsver=4.0
+source=("http://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
+        "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config.x86_64'
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch'
-        "git://git.code.sf.net/p/aufs/aufs3-standalone#branch=aufs${_aufsver}"
+        "git://github.com/sfjro/aufs4-standalone.git#branch=aufs${_aufsver}"
         'config.aufs'
         'overlay-multi-layer.patch'
         )
-sha256sums=('be42511fe5321012bb4a2009167ce56a9e5fe362b4af43e8c371b3666859806c'
-            '2b086341154af3e8fd0cb5ded954c239a66ffefb9a8c2bd639249b3786dc52d2'
+sha256sums=('0f2f7d44979bc8f71c4fc5d3308c03499c26a824dd311fdf6eef4dee0d7d5991'
+            '60b691210a9e412710e29eac6468d64b6c4d1efc53a6e22878dd51044001adf0'
             '7b30b8599910a4437a05e159af518a3404b2a39a653ffc597db4861b2cdb01fa'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99'
@@ -55,20 +55,20 @@ prepare() {
 
   #aufs patches for Live:
   msg "starting aufs patches"
-  cp -va "${srcdir}/aufs3-standalone/"{Documentation,fs} .
-  cp -va "${srcdir}/aufs3-standalone/include/uapi/linux/aufs_type.h" ./include/uapi/linux
+  cp -va "${srcdir}/aufs4-standalone/"{Documentation,fs} .
+  cp -va "${srcdir}/aufs4-standalone/include/uapi/linux/aufs_type.h" ./include/uapi/linux
   msg "starting aufs patches: kbuild"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-kbuild.patch"
+  patch -p1 -i "${srcdir}/aufs4-standalone/aufs4-kbuild.patch"
   msg "starting aufs patches: base"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-base.patch"
+  patch -p1 -i "${srcdir}/aufs4-standalone/aufs4-base.patch"
   msg "starting aufs patches: loopback"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-loopback.patch"
+  patch -p1 -i "${srcdir}/aufs4-standalone/aufs4-loopback.patch"
   msg "starting aufs patches: mmap"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-mmap.patch"
+  patch -p1 -i "${srcdir}/aufs4-standalone/aufs4-mmap.patch"
   msg "starting aufs patches: standalone"
-  patch -p1 -i "${srcdir}/aufs3-standalone/aufs3-standalone.patch"
+  patch -p1 -i "${srcdir}/aufs4-standalone/aufs4-standalone.patch"
 
-  patch -p1 -i "${srcdir}/overlay-multi-layer.patch"
+  #patch -p1 -i "${srcdir}/overlay-multi-layer.patch"
 
   cat "${srcdir}/config.x86_64" > ./.config
 
