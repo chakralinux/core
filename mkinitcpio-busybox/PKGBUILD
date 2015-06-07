@@ -1,36 +1,33 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dog]org>
-# maintainer Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=mkinitcpio-busybox
-pkgver=1.19.4
-pkgrel=2
+pkgver=1.23.2
+pkgrel=1
 pkgdesc="base initramfs tools"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.busybox.net/"
 license=('GPL')
 depends=('glibc')
 options=('!buildflags')
 source=("http://busybox.net/downloads/busybox-$pkgver.tar.bz2"
         'config')
-sha256sums=('9b853406da61ffb59eb488495fe99cbb7fb3dd29a31307fcfa9cf070543710ee'
-            '28dc775e12c40718b48e1dd6a63544ca9d8aa128f786577b27e4df73e1e8766a')
+sha256sums=('05a6f9e21aad8c098e388ae77de7b2361941afa7157ef74216703395b14e319a'
+            '240c9ab805fbf5eb3347b2a42f62d840f160c4999d0f172b28ba50dadad09ada')
+
+prepare() {
+  cd "busybox-$pkgver"
+
+  local safeflags="-march=${CARCH/_/-} -mtune=generic -Os -pipe -fno-strict-aliasing"
+
+  sed 's|^\(CONFIG_EXTRA_CFLAGS\)=.*|\1="'"$safeflags"'"|' "$srcdir/config" >.config
+}
 
 build() {
-  cd "$srcdir/busybox-$pkgver"
-
-  local safeflags="${CARCH/_/-} -mtune=generic -Os -pipe -fno-strict-aliasing"
-
-  sed 's|^\(CONFIG_EXTRA_CFLAGS\)=.*|\1="-march='"$safeflags"'"|' \
-    "$srcdir/config" > .config
-
-  make
+  make -C "busybox-$pkgver"
+  
+  # save configuration for later reuse
+  cat busybox-$pkgver/.config > "${startdir}/config.last"
 }
 
 package() {
   install -Dm755 "$srcdir/busybox-$pkgver/busybox" "$pkgdir/usr/lib/initcpio/busybox"
 }
-
-# vim:set ts=2 sw=2 et:
