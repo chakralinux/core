@@ -1,24 +1,26 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
-_extramodules=extramodules-3.19-CHAKRA
-_kver=$(cat /usr/lib/modules/${_extramodules}/version)
-_kernelver=3.19.4
+_extramodules=extramodules-4.0-CHAKRA
+_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
+_kernelver=4.0.5
 
 pkgname=('nvidia-340xx' 'chd-nvidia-340xx')
 pkgver=340.76
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 source=("https://gitorious.org/chakra/chakra-hardware-detection/blobs/raw/master/hwdb/nvidia_supported"
-        nv-drm.patch)
+        nv-drm.patch
+        nvidia-4.0.patch)
 
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
          '79671a27131da619a33eb02ed0c2c031'
+         'f42bdf589f52d4e6c38baa5bef15eef8'
          '440df290e213280d6e20d4d4be6f8b4c')
 
 prepare() {
@@ -26,6 +28,7 @@ prepare() {
     cd "${_pkg}"
     # patches here
     patch -p0 -i ../nv-drm.patch
+    patch -p0 -i ../nvidia-4.0.patch
 }
 
 build() {
