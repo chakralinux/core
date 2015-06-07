@@ -1,13 +1,13 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
-_extramodules=extramodules-3.19-CHAKRA
+_extramodules=extramodules-4.0-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=3.19.4
+_kernelver=4.0.5
 _rootOfSourceTree=/usr/src/linux-${_kver}
 
 pkgname=ndiswrapper
 pkgver=1.59
-pkgrel=17
+pkgrel=18
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
@@ -20,32 +20,35 @@ replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
-        "ndiswrapper-1.59.patch"
-)
+        "ndiswrapper-1.59.patch")
 
 sha1sums=('75fbbda677fe91ee07a6f6a8e19b1f3e2479540f'
           'f120e96fa9abab45e1c724aaac29da7b892820f0')
 
 
 prepare() {
-	[ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
-	msg "Found kernel version: $_kver"
+  [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
+  msg "Found kernel version: $_kver"
+
+  cd "$srcdir/$pkgname-$pkgver" 
+  patch -p1 -i ../ndiswrapper-1.59.patch
+
+  sed -i -e 's|strnicmp|strncasecmp|' driver/ndis.c
+  sed -i "/modinfo/s/s/usr\//" driver/Makefile
 }
 
 build() {
-	cd "$srcdir/$pkgname-$pkgver"
-	patch -p1 -i ../ndiswrapper-1.59.patch
-        sed -i "/modinfo/s/s/usr\//" driver/Makefile
-	make -C driver KVERS_UNAME=${_kver}
-	make -C utils
+  cd "$srcdir/$pkgname-$pkgver"        
+  make -C driver KVERS_UNAME=${_kver}
+  make -C utils
 }
 
 package() {
-	cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/$pkgname-$pkgver"
 
-        make sbindir=/usr/sbin usrsbindir=/usr/sbin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
-             KVERS=$_kver DESTDIR="$pkgdir/" install
+  make sbindir=/usr/sbin usrsbindir=/usr/sbin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
+        KVERS=$_kver DESTDIR="$pkgdir/" install
 
-        sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
-               "${startdir}/ndiswrapper.install"
+  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
+          "${startdir}/ndiswrapper.install"
 }
