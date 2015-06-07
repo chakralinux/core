@@ -1,19 +1,19 @@
 pkgname=octave
 pkgver=4.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A high-level language, primarily intended for numerical computations."
 arch=('x86_64')
 url="http://www.octave.org"
 license=('GPL')
-depends=('fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'qhull' 'fltk' 'suitesparse' 'arpack' 'pcre' 'qt')
+depends=('atlas-lapack' 'readline' 'mesa' 'fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'qhull' 'fltk' 'suitesparse' 'arpack' 'pcre' 'qt' 'fontconfig' 'zlib' 'qrupdate' 'freetype2' 'qscintilla')
 makedepends=('texlive-core' 'gcc-fortran' 'texinfo' 'gnuplot')
 optdepends=('texinfo: for help-support in octave'
-	    'gnuplot: alternative plotting')
-source=(ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.xz{,.sig})
+	    'gnuplot: alternative plotting'
+	    'openjdk: to call Java functions')
+source=(ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.xz)
 options=('!emptydirs')
 install='octave.install'
-sha1sums=('795c7ef1fb8d92f4cf9cae9eabba374a0328b1a9'
-          'SKIP')
+sha1sums=('795c7ef1fb8d92f4cf9cae9eabba374a0328b1a9')
 
 prepare() {
   cd ${srcdir}/${pkgname}-${pkgver}
@@ -22,7 +22,9 @@ prepare() {
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-
+  
+  export MOC=moc
+  export UIC=uic
   ./configure --prefix=/usr \
     --libexecdir=/usr/lib \
     --enable-shared \
