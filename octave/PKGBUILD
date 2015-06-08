@@ -1,36 +1,32 @@
 pkgname=octave
 pkgver=4.0.0
-pkgrel=2
+pkgrel=4
 pkgdesc="A high-level language, primarily intended for numerical computations."
 arch=('x86_64')
 url="http://www.octave.org"
 license=('GPL')
-depends=('atlas-lapack' 'readline' 'mesa' 'fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'qhull' 'fltk' 'suitesparse' 'arpack' 'pcre' 'qt' 'fontconfig' 'zlib' 'qrupdate' 'freetype2' 'qscintilla')
+depends=('atlas-lapack' 'readline' 'glu' 'fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'qhull' 'fltk' 'suitesparse' 'arpack' 'pcre' 'qt' 'fontconfig' 'zlib' 'qrupdate' 'freetype2' 'qscintilla' 'gl2ps')
 makedepends=('texlive-core' 'gcc-fortran' 'texinfo' 'gnuplot')
 optdepends=('texinfo: for help-support in octave'
-	    'gnuplot: alternative plotting'
-	    'openjdk: to call Java functions')
+	    'gnuplot: alternative plotting')
 source=(ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.xz)
 options=('!emptydirs')
 install='octave.install'
 sha1sums=('795c7ef1fb8d92f4cf9cae9eabba374a0328b1a9')
 
-prepare() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  autoreconf -vfi
-}
-
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
   
-  export MOC=moc
-  export UIC=uic
+  autoreconf -vfi
+  
   ./configure --prefix=/usr \
     --libexecdir=/usr/lib \
     --enable-shared \
     --disable-static \
+    --enable-64\
     --with-umfpack="-lumfpack -lsuitesparseconfig" 
-
+  MOC=moc UIC=uic
+  
   LANG=C make
 }
 
