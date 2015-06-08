@@ -1,15 +1,14 @@
-
 source ../frameworks.conf
 
 pkgname=kpeople
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='A library that provides access to all contacts and the people who hold them'
 arch=('x86_64')
 url='http://community.kde.org/KTp/libkpeople'
 license=(LGPL)
 depends=('kservice' 'kwidgetsaddons' 'kitemviews' "qt5-declarative=${KFQtVersion}")
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python3')
 conflicts=('libkpeople')
 groups=(kf5)
 options=("debug")
@@ -22,11 +21,7 @@ prepare() {
 
 build() { 
   cd build
-  cmake ../$pkgname-$pkgver \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 }
 
