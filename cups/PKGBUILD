@@ -1,14 +1,12 @@
-# maintainer almack <gluca86 at gmail dot com>
-
 pkgbase="cups"
 pkgname=('libcups' 'cups')
-pkgver=2.0.2
-pkgrel=2
+pkgver=2.0.3
+pkgrel=1
 arch=('x86_64')
 license=('GPL')
 url="http://www.cups.org/"
 makedepends=('libtiff>=4.0.0' 'libpng>=1.5.7' 'acl' 'pam' 'xdg-utils' 'krb5' 'gnutls'
-             'cups-filters' 'bc' 'colord' 'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus-core'
+             'cups-filters' 'bc' 'colord' 'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus'
              'avahi'  'hicolor-icon-theme' 'systemd' 'inetutils' 'libpaper' 'valgrind')
 source=(http://www.cups.org/software/${pkgver}/cups-${pkgver}-source.tar.bz2{,.sig}
         cups.logrotate cups.pam
@@ -18,7 +16,7 @@ source=(http://www.cups.org/software/${pkgver}/cups-${pkgver}-source.tar.bz2{,.s
         cups-no-gzip-man.patch
         cups-1.6.2-statedir.patch
         cups-1.6.0-fix-install-perms.patch)
-md5sums=('6e0ea72dbafcf5baaa1cf4178e71096d'
+md5sums=('8d98b85edbdab7ab03739c9622f570e8'
          'SKIP'
          'fc8286f185e2cc5f7e1f6843bf193e2b'
          '96f82c38f3f540b53f3e5144900acf17'
@@ -44,7 +42,12 @@ prepare() {
   # fix permissions on some files (by Gentoo) - alternative: cups-0755.patch by FC
   patch -Np0 -i ${srcdir}/cups-1.6.0-fix-install-perms.patch
 
-  # bug fixes 
+  # bug fixes
+  
+  # set MaxLogSize to 0 to prevent using cups internal log rotation
+  sed -i -e '5i\ ' conf/cupsd.conf.in
+  sed -i -e '6i# Disable cups internal logging - use logrotate instead' conf/cupsd.conf.in
+  sed -i -e '7iMaxLogSize 0' conf/cupsd.conf.in
   
   # Rebuild configure script for not zipping man-pages.
   aclocal -I config-scripts
@@ -72,11 +75,6 @@ build() {
      --with-php=/usr/bin/php-cgi \
      --with-optim="$CFLAGS"
   make
-}
-
-check() {
-  cd ${pkgbase}-${pkgver}
-  #make -k check || /bin/true
 }
 
 package_libcups() {
@@ -157,5 +155,7 @@ optdepends=('xdg-utils: xdg .desktop file support')
   rm -v ${pkgdir}/usr/share/cups/data/testprint
   # comment out all conversion rules which use any of the removed filters
   perl -p -i -e 's:^(.*\s+bannertops\s*)$:#\1:' $pkgdir/usr/share/cups/mime/mime.convs
-
+  
+  # comment out unnecessary PageLogFormat entry
+  sed -i -e 's:PageLogFormat:#PageLogFormat:' $pkgdir/etc/cups/cupsd.conf*
 }
