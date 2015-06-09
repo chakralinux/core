@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=bluez-qt
 pkgver=${KFVersion}
-pkgrel=2
+pkgrel=3
 pkgdesc='Qt wrapper for Bluez 5 DBus API'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/bluez-qt'
@@ -24,7 +24,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 -DUDEV_RULES_INSTALL_DIR=/usr/lib/udev/rules.d ../${pkgname}-${pkgver}
   make
 }
 
