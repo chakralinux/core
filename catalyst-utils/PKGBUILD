@@ -1,13 +1,12 @@
 #
-# Chakra Packages for Chakra, part of chakra-project.org
+# Chakra Packages for Chakra, part of chakraos.org
 #
 
 pkgbase=catalyst-utils
 pkgname=('catalyst-utils' 'catalyst-libgl' 'opencl-catalyst')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 1x.x
-pkgver=14.12
+pkgver=15.5
 pkgrel=1
-_amdver=14.501.1003
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('x86_64')
 url="http://www.amd.com"
@@ -29,7 +28,7 @@ source=(
     temp_links_catalyst
     temp-links-catalyst.service)
 
-md5sums=('ced4329274a02712406bda678ffbd743'
+md5sums=('979f9f2e0948fa6e92ff0125f5c6b575'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '9d9ea496eadf7e883d56723d65e96edf'
          '90a37e010f4e5f45e270cd000894d553'
@@ -43,13 +42,7 @@ md5sums=('ced4329274a02712406bda678ffbd743'
          '2c22bb4d4f828cb8b024f670c1ae7e45')
 
 build() {
-  ## Unpack archive
-#      /bin/sh ./amd-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
-     /bin/sh ./fglrx-${_amdver}/amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
-#mkdir common
-#mv etc lib usr common
-#mkdir archive_files
-#mv arch common xpic xpic_64a archive_files
+     /bin/sh ./amd-catalyst-omega-${pkgver}-linux-run-installers.run --extract archive_files
 }
 
 package_catalyst-libgl() {
