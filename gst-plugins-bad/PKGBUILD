@@ -1,12 +1,8 @@
-#
-# Platform packages of Chakra Project, part of chakra-project.org
-#
-# maintainer almack
-# contributor Jan de Groot <jgc@archlinux.org>
+#contributions from Arch; https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/gst-plugins-bad
 
 pkgname=gst-plugins-bad
-pkgver=1.4.4
-pkgrel=2
+pkgver=1.4.5
+pkgrel=1
 pkgdesc="GStreamer Multimedia Framework Bad Plugins"
 arch=('x86_64')
 license=('LGPL')
@@ -19,11 +15,10 @@ makedepends=('schroedinger' 'libexif' 'libdvdread' 'libvdpau' 'libmpeg2'
 	     'rtmpdump' 'xvidcore' 'gobject-introspection' 'python2' 'python3')
 options=('!emptydirs')
 source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
-md5sums=('972c6e22dd2e44fcf0b04b9d810a56be')
+md5sums=('e0bb39412cf4a48fe0397bcf3a7cd451')
 
 build() {
   cd $pkgname-$pkgver
-  sed -i '/AC_PATH_XTRA/d' configure.ac
   autoreconf
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
@@ -32,6 +27,10 @@ build() {
     --enable-experimental \
     --with-package-name="GStreamer (Chakra GNU/Linux)" \
     --with-package-origin="http://www.chakraos.org/"
+    
+  # https://bugzilla.gnome.org/show_bug.cgi?id=655517
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+
   make
 }
 
