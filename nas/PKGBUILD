@@ -1,10 +1,5 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# Maintainer: Giuseppe Calà <jiveaxe@gmail.com>
-
 pkgname=nas
-pkgver=1.9.3
+pkgver=1.9.4
 pkgrel=1
 pkgdesc='Network Audio System is a network transparent, client/server audio transport system'
 arch=('i686' 'x86_64')
@@ -13,9 +8,13 @@ license=('custom')
 depends=('libxaw')
 makedepends=('imake')
 source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.src.tar.gz"
-        'license.txt')
-md5sums=('ecd01a3b4e17a9d464efa83a03618025'
-         'f11eb8c3fb83946e66e60f7532e8d5da')
+        'license.txt'
+        'nasd.service'
+        'nasd')
+md5sums=('dac0e6cd3e5d6a37ae1dff364236a752'
+         'f11eb8c3fb83946e66e60f7532e8d5da'
+         '3bd8268d3655509b6e10475060dfbf10'
+         'fb0acd5e3fae362a55d2fbeeb9be0dbb')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -29,6 +28,14 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   make DESTDIR="${pkgdir}" USRLIBDIR=/usr/lib install
+  chmod 644 ${pkgdir}/usr/include/audio/*
 
+  # Remove static libraries
+  rm ${pkgdir}/usr/lib/*.a
+  # Rename config file
+  mv ${pkgdir}/etc/nas/nasd.conf{.eg,}
+
+  install -D -m644 ${srcdir}/nasd.service ${pkgdir}/usr/lib/systemd/system/nasd.service
+  install -D -m644 ${srcdir}/nasd ${pkgdir}/etc/conf.d/nasd
   install -D -m644 "${srcdir}/license.txt" "${pkgdir}/usr/share/licenses/${pkgname}/license"
 }
