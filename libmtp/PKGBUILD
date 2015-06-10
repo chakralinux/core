@@ -2,30 +2,29 @@
 # Contributor: abveritas@chakra-project.org
 
 pkgname=libmtp
-pkgver=1.1.8
-pkgrel=2
+pkgver=1.1.9
+pkgrel=1
 pkgdesc="Library implementation of the Media Transfer Protocol"
 arch=('x86_64')
 url="http://libmtp.sourceforge.net"
 license=('LGPL')
-depends=('libusbx' 'libgcrypt')
+depends=('libusb' 'libgcrypt')
 source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('f76abc22fdbe96e96f0066e0f2dc0efd')
-
-prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-}
+md5sums=('d515b38a5b5d5ef235b01ebba47412df')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr --with-udev=/usr/lib/udev
   make
 }
 
+check() {
+  cd $pkgname-$pkgver
+  make -k check
+}
+
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
 
   # fix broken udev rule
