@@ -8,7 +8,7 @@ _kernelver=4.0.5
 
 pkgname=(catalyst chd-catalyst)
 pkgver=15.5
-pkgrel=1
+pkgrel=2
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only. Radeons HD 2 3 4 xxx ARE NOT SUPPORTED"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 arch=('x86_64')
@@ -101,12 +101,16 @@ package_catalyst() {
 
     # here we are checking kernel's extramodules dir
     for r in /usr/lib/modules/*; do
-        if [[ ${r:17:3} = "ext" ]]; then
-          if [[ `cat ${r}/version | grep -c ${_kernver}` != 0 ]]; then
-            _destidir=${r}
-            sed -i -e "s/EXTRAMODULES=.*/EXTRAMODULES=${r:17}/" $startdir/catalyst.install
-          fi
-        fi
+      s=${r:17}
+      if [[ ${s:0:3} = "ext" ]]; then
+       if [[ `cat ${r}/version | grep -c ${_kver}` != 0 ]]; then
+         _destidir=${s}
+         sed -i -e "s/EXTRAMODULES=.*/EXTRAMODULES=${s}/" $startdir/catalyst.install
+       fi
+       elif [[ ${s} = ${_kver} ]] && [[ ! -e ${r}/extramodules ]]; then
+         _destidir=${_kver}/video
+         sed -i -e "s/EXTRAMODULES=.*/EXTRAMODULES=null/" $startdir/catalyst.install
+      fi
     done
 
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
