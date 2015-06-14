@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=218
-pkgrel=3
+pkgver=220
+pkgrel=1
 _fedora_patch=ea19761321f4e7f5e2cbdd66fe38388c93790c20
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
@@ -9,7 +9,7 @@ url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
 depends=('acl' 'bash' 'glibc' 'glib2' 'hwids' 'util-linux' 'kbd' 'kmod>=19' 'libcap' 'libxslt'
          'linux-api-headers' 'lz4' 'pam' 'xz' 'libgcrypt' 'dbus-core' 'libidn' 'quota-tools' 'elfutils' 'curl') 
-makedepends=('docbook-xsl' 'cryptsetup' 'gobject-introspection' 'python2' 'python2-lxml' 'gperf' 'intltool' 'libmicrohttpd')
+makedepends=('docbook-xsl' 'cryptsetup' 'gobject-introspection' 'python2' 'python2-lxml' 'gperf' 'intltool' 'libmicrohttpd' 'gnu-efi-libs' 'git')
 optdepends=('python: systemd library bindings'
             'cryptsetup: required for encrypted block devices'
             'libmicrohttpd: remote journald capabilities'
@@ -21,10 +21,14 @@ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/dbus-1/system.d/org.freedesktop.locale1.conf
         etc/dbus-1/system.d/org.freedesktop.machine1.conf
         etc/dbus-1/system.d/org.freedesktop.timedate1.conf
+        etc/dbus-1/system.d/org.freedesktop.import1.conf
+        etc/dbus-1/system.d/org.freedesktop.network1.conf
         etc/pam.d/systemd-user
         etc/systemd/bootchart.conf
         etc/systemd/coredump.conf
         etc/systemd/journald.conf
+        etc/systemd/journal-remote.conf
+        etc/systemd/journal-upload.conf
         etc/systemd/logind.conf
         etc/systemd/system.conf
         etc/systemd/timesyncd.conf
@@ -35,70 +39,50 @@ provides=("udev=$pkgver")
 conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
 replaces=('udev')
 install="systemd.install"
-source=("http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz"
-#        "git://pkgs.fedoraproject.org/systemd.git#commit=${_fedora_patch}"
+source=("git://github.com/systemd/systemd.git#tag=v$pkgver"
         'initcpio-hook-udev'
         'initcpio-install-systemd'
         'initcpio-install-udev'
-        '99-default.preset')
-md5sums=('4e2c511b0a7932d7fc9d79822273aac6'
+        '99-default.preset'
+        'chakra.conf'
+        'chakra_fallback.conf'
+        'loader.conf'
+        'splash-chakra.bmp')
+md5sums=('SKIP'
          '7a79eb3e4ce19906cfebfea75fb9f8bb'
          'a736284f0c8e549dd988522e75628ec0'
          'bde43090d4ac0ef048e3eaee8202a407'
-         'a1bf25da736d3719e9720b2e4caea341')
+         'a1bf25da736d3719e9720b2e4caea341'
+         '0fdb041cc891292162f6c2f7d1af830c'
+         'bfccc8b2a9da47823e4dcef2206d4b1b'
+         '88949acaf49231fd01e9f0733c5dd812'
+         '3f1e033e9334e33d6e15f3bf7ce076e3')
 
 prepare() {
-  cd "$pkgname-$pkgver"
-  
-#  git init
-#  git config user.email "chakra-devel@googlegroups.com"
-#  git config user.name "Chakra Packager"
-#  git add .
-#  git commit -a -q -m "${pkgver}} baseline."
-#
-#  git am \
-#        --exclude .gitignore \
-#        --exclude docs/.gitignore \
-#        --exclude docs/gudev/.gitignore \
-#        --exclude docs/libudev/.gitignore \
-#        --exclude docs/sysvinit/.gitignore \
-#        --exclude docs/var-log/.gitignore \
-#        --exclude hwdb/.gitignore \
-#        --exclude m4/.gitignore \
-#        --exclude man/.gitignore \
-#        --exclude po/.gitignore \
-#        --exclude rules/.gitignore \
-#        --exclude src/.gitignore \
-#        --exclude src/analyze/.gitignore \
-#        --exclude src/core/.gitignore \
-#        --exclude src/gudev/.gitignore \
-#        --exclude src/hostname/.gitignore \
-#        --exclude src/journal/.gitignore \
-#        --exclude src/libsystemd-daemon/.gitignore \
-#        --exclude src/libsystemd-id128/.gitignore \
-#        --exclude src/libudev/.gitignore \
-#        --exclude src/locale/.gitignore \
-#        --exclude src/login/.gitignore \
-#        --exclude src/python-systemd/.gitignore \
-#        --exclude src/python-systemd/docs/.gitignore \
-#        --exclude src/timedate/.gitignore \
-#        --exclude src/udev/.gitignore \
-#        --exclude src/udev/scsi_id/.gitignore \
-#        --exclude sysctl.d/.gitignore \
-#        --exclude test/.gitignore \
-#        --exclude units/.gitignore \
-#        --exclude units/user/.gitignore \
-#        --exclude src/libsystemd/sd-bus/PORTING-DBUS1 \
-#        --exclude CODING_STYLE \
-#        --exclude src/readahead/Makefile \
-#        --exclude src/libsystemd-terminal/unifont-def.h \
-#        ../systemd/00*-*.patch
-#
-#  autoreconf -i
+  cd "$pkgname"
+
+  # udevd: event - fix event queue in daemenozied mode
+  # https://github.com/systemd/systemd/commit/040e689654ef
+  git cherry-pick -n 040e689654ef
+
+  # udevd: fix SIGCHLD handling in --daemon mode
+  # https://github.com/systemd/systemd/commit/86c3bece38bc
+  git cherry-pick -n 86c3bece38bc
+
+  # libudev: enumerate - accept NULL parameters in add_match()
+  # https://github.com/systemd/systemd/commit/54f0b4d9a3e3
+  git cherry-pick -n 54f0b4d9a3e3
+
+  # core/namespace: Protect /usr instead of /home with ProtectSystem=yes
+  # https://github.com/systemd/systemd/commit/d38e01dc96c5
+  git cherry-pick -n d38e01dc96c5
+
+  ./autogen.sh
 }
 
+
 build() {
-  cd "$pkgname-$pkgver"
+  cd "$pkgname"
 
   ./configure \
       PYTHON=python2 \
@@ -110,17 +94,17 @@ build() {
       --disable-gtk-doc \
       --enable-lz4 \
       --enable-compat-libs \
+      --enable-gnuefi \
       --disable-audit \
       --disable-ima \
       --disable-kdbus \
       --with-sysvinit-path= \
-      --with-sysvrcnd-path= \
-      --with-firmware-path="/usr/lib/firmware/updates:/usr/lib/firmware"
+      --with-sysvrcnd-path=
    make
 }
 
 package() {
-  make -C "$pkgname-$pkgver" DESTDIR="$pkgdir" install
+  make -C "$pkgname" DESTDIR="$pkgdir" install
 
   install -dm755 "$pkgdir/usr/bin"
   ln -s ../../usr/lib/systemd/systemd "$pkgdir/usr/bin/systemd"
@@ -140,19 +124,13 @@ package() {
 
   # don't write units to /etc by default. some of these will be re-enabled on
   # post_install.
-  rm "$pkgdir/etc/systemd/system/getty.target.wants/getty@tty1.service" \
-      "$pkgdir/etc/systemd/system/multi-user.target.wants/systemd-networkd.service" \
-      "$pkgdir/etc/systemd/system/multi-user.target.wants/systemd-resolved.service" \
-      "$pkgdir/etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service" \
-      "$pkgdir/etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service"
-  rmdir "$pkgdir/etc/systemd/system/getty.target.wants" \
-      "$pkgdir/etc/systemd/system/network-online.target.wants"
+  rm -r "$pkgdir/etc/systemd/system/"*.wants
 
   # get rid of RPM macros
   rm -r "$pkgdir/usr/lib/rpm"
 
   # add back tmpfiles.d/legacy.conf
-  install -m644 "systemd-$pkgver/tmpfiles.d/legacy.conf" "$pkgdir/usr/lib/tmpfiles.d"
+  install -m644 "$pkgname/tmpfiles.d/legacy.conf" "$pkgdir/usr/lib/tmpfiles.d"
 
   # Replace dialout/tape/cdrom group in rules with uucp/storage/optical group
   sed -i 's#GROUP="dialout"#GROUP="uucp"#g;
@@ -179,4 +157,10 @@ package() {
   # Make journalctl persistent
   install -dm755 "$pkgdir/var/log/journal"
   sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
+  
+  # add example bootctl configuration
+  install -Dm644 "$srcdir/chakra.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra.conf
+  install -Dm644 "$srcdir/chakra_fallback.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra_fallback.conf
+  install -Dm644 "$srcdir/loader.conf" "$pkgdir"/usr/share/systemd/bootctl/loader.conf
+  install -Dm644 "$srcdir/splash-chakra.bmp" "$pkgdir"/usr/share/systemd/bootctl/splash-chakra.bmp
 }
