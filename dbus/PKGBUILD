@@ -4,7 +4,7 @@
 
 pkgbase=dbus
 pkgname=('dbus' 'libdbus')
-pkgver=1.8.16
+pkgver=1.8.18
 pkgrel=1
 pkgdesc="Freedesktop.org message bus system"
 url="http://www.freedesktop.org/Software/dbus"
@@ -12,9 +12,9 @@ arch=('x86_64')
 license=('GPL' 'custom')
 makedepends=('libx11' 'systemd' 'xmlto' 'docbook-xsl')
 source=(http://dbus.freedesktop.org/releases/dbus/dbus-$pkgver.tar.gz
-        30-dbus)
-md5sums=('020824a38850501e7d6ba8307a7c5ac3'
-         '3314d727fa57fc443fce25b5cbeebbcc')
+        30-dbus.sh)
+md5sums=('83e607e9ccb1c921d5b6bbea2376a36c'
+         '6683a05bd749929ef9442816c22c3268')
 
 # note: remember to add the dbus group in the chroot, groupadd -g 81 dbus
 
@@ -52,7 +52,7 @@ package_dbus(){
   rm -rf "${pkgdir}/var/run"
   rm -rf "${pkgdir}/usr/lib/pkgconfig"
 
-  install -Dm755 ../30-dbus "$pkgdir/etc/X11/xinit/xinitrc.d/30-dbus"
+  install -Dm755 ../30-dbus.sh "$pkgdir/etc/X11/xinit/xinitrc.d/30-dbus.sh"
   install -Dm644 COPYING "$pkgdir/usr/share/licenses/dbus/COPYING"
 }
 
