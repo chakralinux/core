@@ -7,7 +7,7 @@ pkgname=('linux' 'linux-headers' 'linux-docs')
 _kernelname=${pkgname#linux}
 _basekernel="4.0"
 pkgver=4.0.5
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -27,7 +27,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz
         )
 sha256sums=('0f2f7d44979bc8f71c4fc5d3308c03499c26a824dd311fdf6eef4dee0d7d5991'
             '60b691210a9e412710e29eac6468d64b6c4d1efc53a6e22878dd51044001adf0'
-            '7b30b8599910a4437a05e159af518a3404b2a39a653ffc597db4861b2cdb01fa'
+            'd64ff4dab41da86ac3fd7323ee17a7b52a7bdcc9ec49571e825b838966dae17a'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99'
             'SKIP'
@@ -163,6 +163,7 @@ package_linux() {
   # remove build and source links
   rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
   # remove the firmware
+  # we'll get it from the linux-firmware package and we don't want conflicts
   rm -rf "${pkgdir}/lib/firmware"
   # gzip -9 all modules to save 100MB of space
   find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
