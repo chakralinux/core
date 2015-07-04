@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.20
-pkgrel=6
+pkgrel=7
 pkgdesc="GNU C Library"
 arch=('x86_64')
 url="http://www.gnu.org/software/libc"
@@ -47,6 +47,9 @@ prepare() {
 
   # disable tsx to avoid crashes on fw update (see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=762195#20, https://bbs.archlinux.org/viewtopic.php?id=188879)
   patch -p1 -i $srcdir/glibc-2.20-disable-tsx.patch
+
+  # http://chakraos.org/bugtracker/index.php?do=details&task_id=1060&project=8
+  sed -i "s/#define DTV_SURPLUS    (14)/#define DTV_SURPLUS    (32)/g" ./sysdeps/generic/ldsodefs.h
 
   mkdir ${srcdir}/glibc-build
 }
