@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.20
-pkgrel=7
+pkgrel=8
 pkgdesc="GNU C Library"
 arch=('x86_64')
 url="http://www.gnu.org/software/libc"
@@ -21,6 +21,7 @@ source=(http://ftp.gnu.org/gnu/libc/${pkgname}-${pkgver}.tar.xz{,.sig}
 	glibc-2.20-linux-3.16-additions.patch
 	glibc-2.20-do_ftell_wide-memleak.patch
         glibc-2.20-disable-tsx.patch
+        dtv_surplus.patch
         locale.gen.txt
         locale-gen)
 md5sums=('948a6e06419a01bd51e97206861595b0'
@@ -29,6 +30,7 @@ md5sums=('948a6e06419a01bd51e97206861595b0'
          '8f1059f431b842e54b12bde689620df8'
          'b50feeab78fa6ce0a8cfb41ee8dc1fd8'
          'd7fd951fd0b7d891eefb6b14e5dd2d28'
+         '6469cba12e2252e16e32db0353ed3f21'
          '07ac979b6ab5eeb778d55f041529d623'
          '476e9113489f93b348b21e144b6a8fcf')
 
@@ -49,7 +51,7 @@ prepare() {
   patch -p1 -i $srcdir/glibc-2.20-disable-tsx.patch
 
   # http://chakraos.org/bugtracker/index.php?do=details&task_id=1060&project=8
-  sed -i "s/#define DTV_SURPLUS    (14)/#define DTV_SURPLUS    (32)/g" ./sysdeps/generic/ldsodefs.h
+  patch -p1 -i $srcdir/dtv_surplus.patch
 
   mkdir ${srcdir}/glibc-build
 }
