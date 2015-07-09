@@ -1,6 +1,6 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=220
+pkgver=222
 pkgrel=1
 _fedora_patch=ea19761321f4e7f5e2cbdd66fe38388c93790c20
 pkgdesc="A system and service manager for Linux"
@@ -49,9 +49,9 @@ source=("git://github.com/systemd/systemd.git#tag=v$pkgver"
         'loader.conf'
         'splash-chakra.bmp')
 md5sums=('SKIP'
-         '7a79eb3e4ce19906cfebfea75fb9f8bb'
-         'a736284f0c8e549dd988522e75628ec0'
-         'bde43090d4ac0ef048e3eaee8202a407'
+         '90ea67a7bb237502094914622a39e281'
+         '976c5511b6493715e381f43f16cdb151'
+         '1b3aa3a0551b08af9305d33f85b5c2fc'
          'a1bf25da736d3719e9720b2e4caea341'
          '0fdb041cc891292162f6c2f7d1af830c'
          'bfccc8b2a9da47823e4dcef2206d4b1b'
@@ -61,25 +61,8 @@ md5sums=('SKIP'
 prepare() {
   cd "$pkgname"
 
-  # udevd: event - fix event queue in daemenozied mode
-  # https://github.com/systemd/systemd/commit/040e689654ef
-  git cherry-pick -n 040e689654ef
-
-  # udevd: fix SIGCHLD handling in --daemon mode
-  # https://github.com/systemd/systemd/commit/86c3bece38bc
-  git cherry-pick -n 86c3bece38bc
-
-  # libudev: enumerate - accept NULL parameters in add_match()
-  # https://github.com/systemd/systemd/commit/54f0b4d9a3e3
-  git cherry-pick -n 54f0b4d9a3e3
-
-  # core/namespace: Protect /usr instead of /home with ProtectSystem=yes
-  # https://github.com/systemd/systemd/commit/d38e01dc96c5
-  git cherry-pick -n d38e01dc96c5
-
   ./autogen.sh
 }
-
 
 build() {
   cd "$pkgname"
@@ -147,7 +130,10 @@ package() {
 
   # ensure proper permissions for /var/log/journal. This is only to placate
   chown root:systemd-journal "$pkgdir/var/log/journal"
-  chmod 2755 "$pkgdir/var/log/journal"{,/remote}
+  chmod 2755 "$pkgdir/var/log/journal"
+
+  # we'll create this on installation
+  rmdir "$pkgdir/var/log/journal/remote"
 
   # fix pam file
   sed 's|system-auth|system-login|g' -i "$pkgdir/etc/pam.d/systemd-user"
