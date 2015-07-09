@@ -39,6 +39,17 @@ post_common() {
   systemd-sysusers
   udevadm hwdb --update
   journalctl --update-catalog
+  if which mkinitcpio >/dev/null 2>&1; then
+    echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
+    echo ">>> If you are using non-default kernel, you should update kernel"
+    echo ">>> manually"
+    if [ -f etc/mkinitcpio.d/linux.preset ]; then
+      mkinitcpio -p linux
+    fi
+    if [ -f etc/mkinitcpio.d/linux-lts.preset ]; then
+      mkinitcpio -p linux-lts
+    fi
+  fi
 }
 
 _208_changes() {
