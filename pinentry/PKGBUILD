@@ -1,33 +1,33 @@
-# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
-# Contributor: Tobias Powalowski <tpowa@archlinux.org>
-
 pkgname=pinentry
-pkgver=0.9.0
+pkgver=0.9.5
 pkgrel=1
 pkgdesc="a collection of simple PIN or passphrase entry dialogs which utilize the Assuan protocol"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL')
 url="http://gnupg.org/related_software/pinentry/"
 depends=('ncurses' 'libcap>=2.16')
 makedepends=('qt')
-optdepends=('gtk2: for gtk2 backend'
-            'qt: for qt4 backend')  
+optdepends=('qt: for qt4 backend'
+	    'emacs: emacs integration')  
 source=(ftp://ftp.gnupg.org/gcrypt/$pkgname/$pkgname-$pkgver.tar.bz2)
 install=pinentry.install
-md5sums=('40a05856cb3accf6679987b7899b0f5a')
+md5sums=('55439c4436b59573a29e144916ee5b61')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
 
-  for file in qt4/*.moc; do
-    moc ${file/.moc/.h} > ${file}
-  done
+  #for file in qt4/*.moc; do
+  #  moc ${file/.moc/.h} > ${file}
+  #done
   ./configure --prefix=/usr \
 	--enable-pinentry-curses \
+	--enable-pinentry-tty \
         --disable-pinentry-gtk \
-        --disable-pinentry-qt \
 	--disable-pinentry-gtk2 \
         --enable-pinentry-qt4 \
+        --enable-pinentry-qt4-clipboard \
+        --enable-pinentry-emacs \
+        --enable-inside-emacs \
 	--enable-fallback-curses
   make
 }
