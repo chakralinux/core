@@ -2,15 +2,20 @@
 pkgname=systemd
 pkgver=222
 pkgrel=1
-_fedora_patch=ea19761321f4e7f5e2cbdd66fe38388c93790c20
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
 license=('GPL2' 'LGPL2.1' 'MIT')
-depends=('acl' 'bash' 'glibc' 'glib2' 'hwids' 'util-linux' 'kbd' 'kmod>=19' 'libcap' 'libxslt'
-         'linux-api-headers' 'lz4' 'pam' 'xz' 'libgcrypt' 'dbus-core' 'libidn' 'quota-tools' 'elfutils' 'curl') 
-makedepends=('docbook-xsl' 'cryptsetup' 'gobject-introspection' 'python2' 'python2-lxml' 'gperf' 'intltool' 'libmicrohttpd' 'gnu-efi-libs' 'git')
+depends=('acl' 'bash' 'dbus' 'iptables' 'kbd' 'kmod' 'hwids' 'libcap'
+         'libgcrypt' 'glibc' 'libidn' 'lz4' 'pam' 'libseccomp' 'util-linux'
+         'xz'
+         'libxkbcommon>=0.5.0-2' 'gnutls' 'elfutils') 
+makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam'
+             'intltool' 'iptables' 'kmod' 'libcap' 'libidn' 'libgcrypt'
+             'libmicrohttpd' 'libxslt' 'util-linux' 'linux-api-headers'
+             'python' 'python2-lxml' 'quota-tools' 'shadow' 'gnu-efi-libs' 'git' 'curl')
 optdepends=('python: systemd library bindings'
+            'curl: upload journal and pull image'
             'cryptsetup: required for encrypted block devices'
             'libmicrohttpd: remote journald capabilities'
             'quota-tools: kernel-level quota management'
