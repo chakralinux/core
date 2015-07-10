@@ -1,9 +1,10 @@
 # Maintainer: abveritas@chakra-project.org
 # Contributor: Mladen Pejakovic <pejakm@gmail.com>
 
-pkgname=libxkbcommon
+pkgbase=libxkbcommon
+pkgname=(libxkbcommon libxkbcommon-x11)
 pkgver=0.5.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Keyboard handling library using XKB data"
 arch=('x86_64')
 url="http://xkbcommon.org/"
@@ -14,8 +15,12 @@ makedepends=(libxcb doxygen xorg-util-macros)
 source=("http://xkbcommon.org/download/$pkgname-$pkgver.tar.xz")
 md5sums=('2e1faeafcc609c30af3a561a91e84158')
 
+prepare() {
+  mkdir -p x11/usr/{include/xkbcommon,lib/pkgconfig}
+}
+
 build() {
-  cd $srcdir/$pkgname-$pkgver
+  cd $pkgbase-$pkgver
   ./configure --prefix=/usr --disable-static
   make
 }
@@ -25,8 +30,25 @@ check() {
   xvfb-run -a make -k check
 }
 
-package() {
-  cd "$pkgname-$pkgver"
+package_libxkbcommon() {
+  cd $pkgbase-$pkgver
   make DESTDIR="$pkgdir" install
-  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/libxkbcommon/LICENSE"
+
+### Split libxkbcommon-x11
+
+  mv "$pkgdir"/usr/lib/*x11* "$srcdir/x11/usr/lib"
+  mv "$pkgdir"/usr/lib/pkgconfig/*x11* "$srcdir/x11/usr/lib/pkgconfig"
+  mv "$pkgdir"/usr/include/xkbcommon/*x11* "$srcdir/x11/usr/include/xkbcommon"
+}
+
+package_libxkbcommon-x11() {
+  pkgdesc="Keyboard handling library using XKB data for X11 XCB clients"
+  depends=(libxkbcommon libxcb)
+  conflicts=('libxkbcommon<=0.5.0-1')
+  replaces=('libxkbcommon<=0.5.0-1')
+
+  mv x11/* "$pkgdir"
+
+  install -Dm644 $pkgbase-$pkgver/COPYING "$pkgdir/usr/share/licenses/libxkbcommon-x11/LICENSE"
 }

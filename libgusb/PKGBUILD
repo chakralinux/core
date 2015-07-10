@@ -4,25 +4,25 @@
 # maintainer almack[at]chakra-project[dot]org>
 
 pkgname=libgusb
-pkgver=0.1.6
-pkgrel=2
+pkgver=0.2.6
+pkgrel=1
 pkgdesc="GLib wrapper around libusb1"
 arch=('x86_64')
-url="https://gitorious.org/gusb/"
+url="https://github.com/hughsie/libgusb"
 license=('LGPL2.1')
-depends=('udev' 'libusbx')
-makedepends=('gobject-introspection')
+depends=('libgudev' 'libusbx')
+makedepends=('gobject-introspection' 'python2')
 source=(http://people.freedesktop.org/~hughsient/releases/$pkgname-$pkgver.tar.xz)
-sha1sums=('ecd6d1254d456f2046ce6110607b1e2c7921c377')
+sha256sums=('6f638bdbc4e77643c0a198a300e50b592ad326e56bddf359de15e04689209c06')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
   ./configure --prefix=/usr --disable-static
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
   make DESTDIR="$pkgdir" install
 }
 

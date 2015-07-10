@@ -4,27 +4,23 @@
 # maintainer almack <gluca86 at gmail dot com>
 
 pkgname=colord
-pkgver=1.2.7
+pkgver=1.2.9
 pkgrel=1
 pkgdesc="System daemon for managing color devices"
 arch=('x86_64')
 url="http://www.freedesktop.org/software/colord"
 license=('GPL2')
-depends=('lcms2' 'polkit' 'sqlite3' 'systemd' 'libgusb' 'dbus')
+depends=('lcms2' 'polkit' 'sqlite3' 'systemd' 'libgusb' 'dbus' 'libgudev')
 makedepends=('intltool' 'gobject-introspection' 'vala' 'docbook-xsl' 'sane' 'bash-completion')
 optdepends=('sane: UseSANE support [/etc/colord.conf]')
 install=colord.install
 backup=(etc/colord.conf)
 source=($url/releases/$pkgname-$pkgver.tar.xz{,.asc})
-sha1sums=('fee7271a9acfd6c7e78c0820407d574d5172c40c'
+sha1sums=('1b6319812b12ab7f906983959bbaaf2e5b78bdb7'
           'SKIP')
 
 build() {
-  cd "$pkgname-$pkgver"
-  
-  # put udev files in /usr/lib
-  sed -i "/slashlibdir=/s#/lib#/usr/lib#" configure
-  
+  cd $pkgname-$pkgver
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --libexecdir=/usr/lib/$pkgname --disable-static \
     --with-systemdsystemunitdir=/usr/lib/systemd/system \
@@ -36,5 +32,8 @@ build() {
 package() {
   cd "$pkgname-$pkgver"
   make DESTDIR="$pkgdir" install
+
+  # the build system has no colord user, so the chown fails
+  chown -R 124:124 "$pkgdir/var/lib/colord"
 }
 

@@ -1,0 +1,30 @@
+# Contributor: Jan Alexander Steffens (heftig) <jan.steffens@gmail.com>
+
+pkgname=libqmi
+pkgver=1.12.6
+pkgrel=1
+pkgdesc="QMI modem protocol helper library"
+arch=(i686 x86_64)
+url="http://www.freedesktop.org/wiki/Software/libqmi/"
+license=(GPL2)
+depends=(glib2 bash)
+makedepends=(python)
+source=(http://www.freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz)
+sha256sums=('0857bffece4e8ddfa7f721dd9ca63b4c78de345ac9ae2faebf04062cacba3780')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+    --libexecdir=/usr/lib/$pkgname --disable-static
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+}
