@@ -1,12 +1,12 @@
 #maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
-_extramodules=extramodules-3.19-CHAKRA
-_kernver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=3.19.4
+_extramodules=extramodules-4.0-CHAKRA
+_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
+_kernelver=4.0.5
 
 pkgname=broadcom-wl
 pkgver=6.30.223.248
-pkgrel=12
+pkgrel=14
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 arch=('x86_64')
@@ -15,18 +15,19 @@ depends=("linux=${_kernelver}")
 makedepends=("linux-headers=${_kernelver}")
 source=("http://www.broadcom.com/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz"
          #"http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" "http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
-        'modprobe.d'
-        'license.patch'
-        'gcc.patch'
-        'linux-recent.patch')
+        modprobe.d
+        license.patch
+        gcc.patch
+        linux-recent.patch
+        support-for-Linux-4.0.patch)
 sha1sums=('bd55f1fdc6b0a4d0a70dc4ba4bb4169a824e238c'
           'a37c5dd9ab279372f0c68595bb2a8f1fe694cd13'
           '81c05d48b234d56ad2e18eaee5ce89b79550ef20'
           '8a940675e8c0baa65494c378e6155543b26a9a58'
-          '758cb8ed0448aeedae18c64c25ddf330ac1a5177')
+          '758cb8ed0448aeedae18c64c25ddf330ac1a5177'
+          'bc38818662f50418c7b4e2588f84b8d7cafcd56c')
 
 install=install
-
 
 prepare() {
 	cd "${srcdir}"
@@ -34,6 +35,9 @@ prepare() {
 	patch -p1 -i linux-recent.patch
 	patch -p1 -i license.patch
         patch -p1 -i gcc.patch
+        
+        # based on https://bugs.launchpad.net/ubuntu/+source/bcmwl/+bug/1424676
+        patch -p1 -i support-for-Linux-4.0.patch
 
         sed -e "/BRCM_WLAN_IFNAME/s:eth:wlan:" \
             -i src/wl/sys/wl_linux.c
@@ -42,7 +46,7 @@ prepare() {
 build() {
 	cd "${srcdir}"
 
-	make -C /usr/lib/modules/"${_kernver}"/build M=`pwd`
+	make -C /usr/lib/modules/"${_kver}"/build M=`pwd`
 }
 
 package() {

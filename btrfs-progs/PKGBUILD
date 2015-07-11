@@ -6,7 +6,7 @@
 # Contributor: Tobias Powalowski <tpowa@archlinux.org>
 
 pkgname=btrfs-progs
-pkgver=3.18.2
+pkgver=4.0.1
 pkgrel=1
 pkgdesc='Btrfs filesystem utilities'
 arch=('x86_64')
@@ -28,8 +28,9 @@ md5sums=('SKIP'
 
 build() {
    cd $pkgname
-   make CFLAGS="$CFLAGS"
-   make CFLAGS="$CFLAGS" btrfs-select-super
+   ./autogen.sh
+   ./configure --prefix=/usr
+   make
 }
 
 check() {
@@ -41,7 +42,9 @@ package() {
    cd $pkgname
 
    make prefix="$pkgdir"/usr install
-   install -Dm755 btrfs-select-super "$pkgdir"/usr/bin
+   
+   # install bash completion (FS#44618)
+   install -Dm644 btrfs-completion "$pkgdir/usr/share/bash-completion/completions/btrfs"
 
    # install mkinitcpio hooks
    cd "$srcdir"

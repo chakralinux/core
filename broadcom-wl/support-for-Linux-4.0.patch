@@ -1,0 +1,20 @@
+--- a/src/wl/sys/wl_cfg80211_hybrid.c	2015-02-25 16:48:03.117609023 -0500
++++ b/src/wl/sys/wl_cfg80211_hybrid.c	2015-02-25 17:00:43.073595414 -0500
+@@ -1441,7 +1441,7 @@
+ 		WL_DBG(("Could not get rate (%d)\n", err));
+ 	} else {
+ 		rate = dtoh32(rate);
+-		sinfo->filled |= STATION_INFO_TX_BITRATE;
++		sinfo->filled |= BIT(NL80211_STA_INFO_TX_BITRATE);
+ 		sinfo->txrate.legacy = rate * 5;
+ 		WL_DBG(("Rate %d Mbps\n", (rate / 2)));
+ 	}
+@@ -1454,7 +1454,7 @@
+ 			return err;
+ 		}
+ 		rssi = dtoh32(scb_val.val);
+-		sinfo->filled |= STATION_INFO_SIGNAL;
++		sinfo->filled |= BIT(NL80211_STA_INFO_SIGNAL);
+ 		sinfo->signal = rssi;
+ 		WL_DBG(("RSSI %d dBm\n", rssi));
+ 	}

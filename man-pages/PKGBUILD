@@ -1,10 +1,9 @@
 #
-# Core Packages for Chakra, part of chakra-project.org
+# Core Packages for Chakra, part of chakra.org
 #
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=man-pages
-pkgver=3.70
+pkgver=4.00
 _posixver=2003-a
 pkgrel=1
 pkgdesc="Linux man pages"
@@ -15,7 +14,7 @@ groups=('base')
 depends=()
 source=(http://www.kernel.org/pub/linux/docs/man-pages/$pkgname-$pkgver.tar.xz
         http://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/$pkgname-posix-${_posixver}.tar.bz2)
-md5sums=('e5a3fc1d7ae4f03a27676d7bad725416'
+md5sums=('3401eb0020c56639070d199c3e59a4f8'
          '7c78aff03c0a6767ba483d34f19e4b09')
 
 build() {
@@ -51,4 +50,6 @@ package() {
   rm -f man1/diff.1
   # this is included in xf86-input-mouse
   rm -f man4/mouse.4
+  # this is included in attr
+  rm -f man5/attr.5 
 }

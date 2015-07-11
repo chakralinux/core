@@ -1,10 +1,6 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=tcl
-pkgver=8.6.1
+pkgver=8.6.4
 pkgrel=1
 pkgdesc="The Tcl scripting language"
 arch=('x86_64')
@@ -13,7 +9,7 @@ license=('custom')
 depends=('zlib')
 options=('staticlibs')
 source=("http://downloads.sourceforge.net/sourceforge/tcl/tcl${pkgver}-src.tar.gz")
-md5sums=('aae4b701ee527c6e4e1a6f9c7399882e')
+sha1sums=('33c5a083a23cf54f15e25a9e787dc39ef3fa0a2b')
 
 build() {
   cd tcl${pkgver}/unix
@@ -46,14 +42,16 @@ package()
       -e "s#${srcdir}/tcl${pkgver}#/usr/include#" \
       -i "${pkgdir}/usr/lib/tclConfig.sh"
 
-  sed -e "s#${srcdir}/tcl${pkgver}/unix/pkgs/tdbc1.0.0#/usr/lib/tdbc1.0.0#" \
-      -e "s#${srcdir}/tcl${pkgver}/pkgs/tdbc1.0.0/generic#/usr/include#" \
-      -e "s#${srcdir}/tcl${pkgver}/pkgs/tdbc1.0.0/library#/usr/lib/tcl${pkgver%.*}#" \
-      -e "s#${srcdir}/tcl${pkgver}/pkgs/tdbc1.0.0#/usr/include#" \
-      -i "${pkgdir}/usr/lib/tdbc1.0.0/tdbcConfig.sh"
+  tdbcver=tdbc1.0.3
+  sed -e "s#${srcdir}/tcl${pkgver}/unix/pkgs/$tdbcver#/usr/lib/$tdbcver#" \
+      -e "s#${srcdir}/tcl${pkgver}/pkgs/$tdbcver/generic#/usr/include#" \
+      -e "s#${srcdir}/tcl${pkgver}/pkgs/$tdbcver/library#/usr/lib/tcl${pkgver%.*}#" \
+      -e "s#${srcdir}/tcl${pkgver}/pkgs/$tdbcver#/usr/include#" \
+      -i "${pkgdir}/usr/lib/$tdbcver/tdbcConfig.sh"
 
-  sed -e "s#${srcdir}/tcl${pkgver}/unix/pkgs/itcl4.0.0#/usr/lib/itcl4.0.0#" \
-      -e "s#${srcdir}/tcl${pkgver}/pkgs/itcl4.0.0/generic#/usr/include#" \
-      -e "s#${srcdir}/tcl${pkgver}/pkgs/itcl4.0.0#/usr/include#" \
-      -i "${pkgdir}/usr/lib/itcl4.0.0/itclConfig.sh"
+  itclver=itcl4.0.3
+  sed -e "s#${srcdir}/tcl${pkgver}/unix/pkgs/$itclver#/usr/lib/$itclver#" \
+      -e "s#${srcdir}/tcl${pkgver}/pkgs/$itclver/generic#/usr/include#" \
+      -e "s#${srcdir}/tcl${pkgver}/pkgs/$itclver#/usr/include#" \
+      -i "${pkgdir}/usr/lib/$itclver/itclConfig.sh"
 }

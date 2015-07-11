@@ -1,30 +1,26 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=run-parts
-pkgver=4.3.4
+pkgver=4.5
 pkgrel=1
 pkgdesc='run scripts or programs in a directory'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='http://packages.qa.debian.org/d/debianutils.html'
 license=('GPL')
 depends=('glibc')
-source=("ftp://ftp.archlinux.org/other/run-parts/debianutils_${pkgver}.tar.gz")
-sha256sums=('1739976cb62b85e641ee36859a87dfb8e4c3214e1043b6bb00b56b87e96a19f5')
+source=("https://sources.archlinux.org/other/run-parts/debianutils_${pkgver}.tar.xz")
+sha256sums=('7cfaa53caaaaf36dad16fa69b30dd2b78b8dafebd766aacd53a3c7c78a9d441f')
 
 build() {
-	cd $srcdir/debianutils-$pkgver
-	./configure --prefix=/usr
-	make run-parts
+        cd $srcdir/debianutils-$pkgver
+        ./configure --prefix=/usr
+        make run-parts
 }
 
 package() {
-	cd $srcdir/debianutils-$pkgver
-	install -D -m755 run-parts $pkgdir/usr/bin/run-parts
-	install -D -m644 run-parts.8 $pkgdir/usr/share/man/man8/run-parts.8
-	for l in po4a/*/run-parts.8; do
-		install -D -m644  ${l} $pkgdir/usr/share/man/${l:5:2}/man8/run-parts.8
-	done
+        cd $srcdir/debianutils-$pkgver
+        install -D -m755 run-parts $pkgdir/usr/bin/run-parts
+        install -D -m644 run-parts.8 $pkgdir/usr/share/man/man8/run-parts.8
+        for l in po4a/*/run-parts.8; do
+                install -D -m644  ${l} $pkgdir/usr/share/man/${l:5:2}/man8/run-parts.8
+        done
 }

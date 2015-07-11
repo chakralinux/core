@@ -1,9 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 sd_booted() {
   [[ -d run/systemd/system && ! -L run/systemd/system ]]
 }
-   
 
 add_privs() {
   if ! setcap "$2" "$1" 2>/dev/null; then
@@ -14,7 +13,7 @@ add_privs() {
 
 add_journal_acls() {
   # ignore errors, since the filesystem might not support ACLs
-  setfacl -Rnm g:wheel:rx,d:g:wheel:rx,g:adm:rx,d:g:adm:rx /var/log/journal/ 2>/dev/null
+  setfacl -Rnm g:wheel:rx,d:g:wheel:rx,g:adm:rx,d:g:adm:rx var/log/journal/ 2>/dev/null
   :
 }
 
@@ -38,19 +37,31 @@ _dir_empty() {
 
 post_common() {
   systemd-sysusers
-  systemd-tmpfiles --create
   udevadm hwdb --update
   journalctl --update-catalog
+  if which mkinitcpio >/dev/null 2>&1; then
+    echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
+    echo ">>> If you are using non-default kernel, you should update kernel"
+    echo ">>> manually"
+    if [ -f etc/mkinitcpio.d/linux.preset ]; then
+      mkinitcpio -p linux
+    fi
+    if [ -f etc/mkinitcpio.d/linux-lts.preset ]; then
+      mkinitcpio -p linux-lts
+    fi
+  fi
 }
 
 _208_changes() {
-  if [ -e var/lib/backlight ] && [ ! -e var/lib/systemd/backlight ]; then
+  if [[ -e var/lib/backlight && ! -e var/lib/systemd/backlight ]]; then
     mv -T var/lib/backlight var/lib/systemd/backlight
   fi
 
-  if [ -e var/lib/random-seed ] && [ ! -e var/lib/systemd/random-seed ]; then
+  if [[ -e var/lib/random-seed && ! -e var/lib/systemd/random-seed ]]; then
     mv -T var/lib/random-seed var/lib/systemd/random-seed
   fi
+
+  add_journal_acls
 }
 
 _209_changes() {
@@ -60,8 +71,7 @@ _209_changes() {
   local new_rule=etc/udev/rules.d/80-net-setup-link.rules
 
   echo ":: Network device naming is now controlled by udev's net_setup_link"
-  echo "   builtin. Refer to the NETWORK LINK CONFIGURATION section of the"
-  echo "   udev manpage for a full description."
+  echo "   builtin. Refer to the systemd.link manpage for a full description."
 
   # not clear what action we can take here, so don't do anything
   [[ -e $new_rule ]] && return 0
@@ -103,6 +113,10 @@ _214_changes() {
       fi
     fi
   fi
+
+  echo ':: coredumps are no longer sent to the journal by default. To re-enable:'
+  echo '   echo >/etc/sysctl.d/50-coredump.conf \'
+  echo '       "kernel.core_pattern=|/usr/lib/systemd/systemd-coredump %p %u %g %s %t %e"'
 }
 
 _216_changes() {
@@ -113,15 +127,29 @@ _216_changes() {
   echo '   tuned in /etc/systemd/coredump.conf.'
 }
 
+_219_changes() {
+  if mkdir -m2755 var/log/journal/remote 2>/dev/null; then
+    chgrp systemd-journal-remote var/log/journal/remote
+  fi
+
+  if ! systemctl is-enabled -q remote-fs.target; then
+    systemctl enable -q remote-fs.target
+  fi
+}
+
 post_install() {
-  systemd-firstboot --setup-machine-id
-  
+  systemd-machine-id-setup
+
   post_common "$@"
 
   add_journal_acls
 
-  # enable getty@tty1 by default, but don't track the file
-  systemctl enable getty@tty1.service
+  # enable some services by default, but don't track them
+  systemctl enable getty@tty1.service remote-fs.target
+
+  # group 'systemd-journal-remote' is created by systemd-sysusers
+  mkdir -m2755 var/log/journal/remote
+  chgrp systemd-journal-remote var/log/journal/remote
 }
 
 post_upgrade() {
@@ -129,24 +157,16 @@ post_upgrade() {
 
   maybe_reexec "$@"
 
-  if [ "$(vercmp 210-1 "$2")" -eq 1 ]; then
-    printf '==> systemd >= 205 restructures the cgroup hierarchy and changes internal\n'
-    printf '    protocols. You should reboot at your earliest convenience.\n'
+  local v upgrades=(208
+                    209
+                    213
+                    214
+                    216
+                    219)
 
-    _208_changes
-
-    add_journal_acls
-
-    _209_changes
-  fi
-  
-  if [ "$(vercmp 212-2 "$2")" -eq 1 ]; then
-    _213_changes
-    _214_changes
-  fi
-  
-  if [ "$(vercmp 214-1 "$2")" -eq 1 ]; then
-    _216_changes
-  fi
-
+  for v in "${upgrades[@]}"; do
+    if [[ $(vercmp "$v" "$2") -eq 1 ]]; then
+      "_${v//-/_}_changes"
+    fi
+  done
 }

@@ -1,24 +1,23 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
 
 pkgname=sudo
-_sudover=1.8.12
+_sudover=1.8.13
 pkgver=${_sudover/p/.p}
 pkgrel=1
 pkgdesc="Give certain users the ability to run some commands as root."
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.sudo.ws/sudo/"
 license=('custom')
 depends=('glibc' 'pam' 'libldap')
 backup=('etc/sudoers' 'etc/pam.d/sudo')
-source=("ftp://ftp.sudo.ws/pub/sudo/${pkgname}-${_sudover}.tar.gz"
-        sudo.tmpfiles.conf
+source=(http://www.sudo.ws/sudo/dist/$pkgname-$_sudover.tar.gz{,.sig}
+        'sudo.tmpfiles.conf'
         'sudo.pam')
-sha1sums=('b91ce01ab4da549b14df86d011f30e23815df22b'
+sha1sums=('6ee1ceaeeb7baee6340f5f5b44aa2b4253931a19'
+          'SKIP'
           'b2a8594916f6920568cf6d7eada5684109cf5510'
           '2388e362dc31cc3d7270fe1c86b6be9e6d28470d')
+
+validpgpkeys=('CCB24BE9E9481B15D34159535A89DFA27EE470C4')
 
 
 build() {
@@ -55,6 +54,7 @@ package() {
   rmdir "$pkgdir/run/sudo"
   rmdir "$pkgdir/run"
 
+  # http://bugzilla.sudo.ws/show_bug.cgi?id=689
   install -Dm644 "$srcdir/sudo.tmpfiles.conf" \
     "$pkgdir/usr/lib/tmpfiles.d/sudo.conf"
 
