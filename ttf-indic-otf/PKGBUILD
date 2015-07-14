@@ -1,6 +1,6 @@
 pkgname=ttf-indic-otf
 pkgver=0.2
-pkgrel=1
+pkgrel=2
 pkgdesc='Indic Opentype Fonts collection'
 url='http://www.indlinux.org/wiki/index.php/Downloads'
 license=('GPL')
@@ -14,4 +14,12 @@ package() {
 	cd "${srcdir}"/indic/OpenType
 	install -d "${pkgdir}"/usr/share/fonts/TTF
 	install -m644 *.ttf "${pkgdir}"/usr/share/fonts/TTF
+	
+	# Remove those fonts are already included in ttf-indic-fonts.
+	rm -f ${pkgdir}/usr/share/fonts/TTF/LikhanNormal.ttf
+	rm -f ${pkgdir}/usr/share/fonts/TTF/MuktiNarrow.ttf
+	rm -f ${pkgdir}/usr/share/fonts/TTF/MuktiNarrowBold.ttf
+	rm -f ${pkgdir}/usr/share/fonts/TTF/Pothana2000.ttf
+	rm -f ${pkgdir}/usr/share/fonts/TTF/ani.ttf
+	rm -f ${pkgdir}/usr/share/fonts/TTF/padmaa-Medium-0.5.ttf
 }
