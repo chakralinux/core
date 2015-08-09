@@ -2,13 +2,13 @@
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 
-_extramodules=extramodules-4.0-CHAKRA
+_extramodules=extramodules-4.1-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.0.5
+_kernelver=4.1.4
 
 pkgname=(catalyst chd-catalyst)
 pkgver=15.5
-pkgrel=2
+pkgrel=3
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only. Radeons HD 2 3 4 xxx ARE NOT SUPPORTED"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 arch=('x86_64')
@@ -76,7 +76,7 @@ build() {
     patch -Np1 -i ../fglrx_gpl_symbol.patch
     patch -Np1 -i ../kolasa-3.19-get_cpu_var.patch
     patch -Np1 -i ../kolasa_4.0-cr4-strn.patch
-    #patch -Np1 -i ../kolasa_4.1_remove-IRQF_DISABLED.patch
+    patch -Np1 -i ../kolasa_4.1_remove-IRQF_DISABLED.patch
     
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
     cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a" . 
