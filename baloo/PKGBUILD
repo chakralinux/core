@@ -1,0 +1,35 @@
+
+source ../frameworks.conf
+
+pkgname=baloo
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc="A framework for searching and managing metadata"
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/baloo'
+license=('LGPL')
+depends=('xapian-core' 'kfilemetadata5' 'kidletime' 'kcmutils' 'kdelibs4support' 'lmdb')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+groups=('frameworks')
+options=("debug")
+replaces=('baloo5' 'kf5-baloo' 'baloo-kf5')
+provides=('baloo5' 'kf5-baloo' 'baloo_file' 'baloo-kf5')
+conflicts=('baloo5' 'kf5-baloo' 'baloo<=4.14.3-1' 'baloo4' 'baloo-kf5')
+install=${pkgname}.install
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} 
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
