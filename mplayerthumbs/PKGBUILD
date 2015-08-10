@@ -1,0 +1,29 @@
+
+pkgname=mplayerthumbs
+pkgver=${_kdever}
+pkgrel=1
+pkgdesc="MPlayer based thumbnail generator for video files"
+url='https://projects.kde.org/projects/kde/kdemultimedia/mplayerthumbs'
+arch=('x86_64')
+groups=('kde-applications' 'kdemultimedia')
+license=('GPL' 'LGPL' 'FDL')
+depends=('kdebase-runtime' 'mplayer')
+makedepends=('cmake' 'automoc4')
+options=('debug')
+source=("$_mirror/${pkgname}-$_kdever.tar.xz")
+sha256sums=(`grep ${pkgname}-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`)
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR=${pkgdir} install
+}
