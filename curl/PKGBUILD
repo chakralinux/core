@@ -1,48 +1,48 @@
 pkgname=curl
-pkgver=7.42.1
+pkgver=7.43.0
 pkgrel=1
-pkgdesc="An URL retrival utility and library"
+pkgdesc="An URL retrieval utility and library"
 arch=('x86_64')
 url="http://curl.haxx.se"
 license=('MIT')
 depends=('ca-certificates' 'krb5' 'libssh2' 'libidn' 'openssl' 'zlib')
-source=("http://curl.haxx.se/download/${pkgname}-${pkgver}.tar.bz2"
-        'curlbuild.h')
-md5sums=('296945012ce647b94083ed427c1877a8'
+source=("http://curl.haxx.se/download/$pkgname-$pkgver.tar.gz"{,.asc}
+        curlbuild.h)
+md5sums=('3037f0b6ce03d434618e9db5506ae6be'
+         'SKIP'
          '751bd433ede935c8fae727377625a8ae')
+validpgpkeys=('914C533DF9B2ADA2204F586D78E11C6B279D5C91')  # Daniel Stenberg
 
 build() {
-    cd ${pkgname}-${pkgver}
+  cd "$pkgname-$pkgver"
 
-    ./configure \
-        --prefix=/usr \
-        --mandir=/usr/share/man \
-        --disable-ldap \
-        --disable-ldaps \
-        --enable-ipv6 \
-        --enable-manual \
-        --enable-threaded-resolver \
-        --enable-versioned-symbols \
-        --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
-        --with-gssapi \
-        --with-libidn \
-        --with-random=/dev/urandom
-    make
+  ./configure \
+      --prefix=/usr \
+      --mandir=/usr/share/man \
+      --disable-ldap \
+      --disable-ldaps \
+      --enable-ipv6 \
+      --enable-manual \
+      --enable-versioned-symbols \
+      --enable-threaded-resolver \
+      --with-gssapi \
+      --with-libidn \
+      --with-random=/dev/urandom \
+      --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
+
+  make
 }
 
 package() {
-    cd ${pkgname}-${pkgver}
+  cd "$pkgname-$pkgver"
 
-    make DESTDIR=${pkgdir} install
+  make DESTDIR="$pkgdir" install
 
-    # license
-    install -Dm644 COPYING \
-        ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
+  # license
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
 
-    # devel
-    local _curlbuild=curlbuild-64.h
-    mv "${pkgdir}/usr/include/curl/curlbuild.h" \
-        "${pkgdir}/usr/include/curl/${_curlbuild}"
-    install -m 644 ${srcdir}/curlbuild.h \
-        "${pkgdir}/usr/include/curl/curlbuild.h"
+  # devel
+  local _curlbuild=curlbuild-64.h
+  mv "${pkgdir}/usr/include/curl/curlbuild.h" "${pkgdir}/usr/include/curl/${_curlbuild}"
+  install -m 644 "${srcdir}/curlbuild.h" "${pkgdir}/usr/include/curl/curlbuild.h"
 }
