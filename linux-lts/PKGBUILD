@@ -7,7 +7,7 @@ pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs')
 _kernelname="-CHAKRA-LTS"
 _basekernel=3.14
 pkgver=3.14.44
-pkgrel=2
+pkgrel=3
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 arch=('x86_64')
 license=('GPL2')
@@ -22,7 +22,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v3.x/linux-$_basekernel.tar.xz"
         'change-default-console-loglevel.patch')
 md5sums=('b621207b3f6ecbb67db18b13258f8ea8'
          'd522100449d8c3428e2f2fbc0082b045'
-         '9847f68028ea7bc5e249cda4d6d8f1d9'
+         '9fd7a4e21d3f8f31fb5baa91c43937f7'
          '232b52576a62c7a333e9fe7a1e1ca359'
          '98beb36f9b8cf16e58de2483ea9985e3')
 
@@ -97,7 +97,7 @@ package_linux-lts() {
             'aufs3' 'nouveau-drm')
   provides=("aufs3=$_aufs" 'nouveau-drm-lts' 'acerhk-lts=0.5.35')
   conflicts=('acerhk-lts')
-  backup=("etc/mkinitcpio.d/${pkgname}.preset")
+  backup=("etc/mkinitcpio.d/${pkgbase}.preset")
   install=${pkgname}.install
 
   cd "${srcdir}/linux-${_basekernel}"
@@ -115,7 +115,7 @@ package_linux-lts() {
   install -D -m644 vmlinux "${pkgdir}/usr/src/linux-${_kernver}/vmlinux"
 
   # install fallback mkinitcpio.conf file and preset file for kernel
-  install -D -m644 "${srcdir}/${pkgname}.preset" "${pkgdir}/etc/mkinitcpio.d/${pkgname}.preset"
+  install -D -m644 "${srcdir}/${pkgbase}.preset" "${pkgdir}/etc/mkinitcpio.d/${pkgbase}.preset"
 
   # set correct depmod command for install
   sed \
@@ -126,7 +126,7 @@ package_linux-lts() {
     -e "s|ALL_kver=.*|ALL_kver=\"/boot/vmlinuz-${pkgname}\"|g" \
     -e "s|default_image=.*|default_image=\"/boot/initramfs-${pkgname}.img\"|g" \
     -e "s|fallback_image=.*|fallback_image=\"/boot/initramfs-${pkgname}-fallback.img\"|g" \
-    -i "${pkgdir}/etc/mkinitcpio.d/${pkgname}.preset"
+    -i "${pkgdir}/etc/mkinitcpio.d/${pkgbase}.preset"
 
   # remove build and source links
   rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
