@@ -9,16 +9,16 @@ arch=('x86_64')
 url='https://www.kde.org/workspaces/plasmadesktop/'
 license=('LGPL')
 depends=('qt5-graphicaleffects' 'powerdevil' 'polkit-kde-agent-frameworks' 'libcanberra'
-         'kwin' 'kpeople' 'libusb-compat' 'libxkbfile' 'kmenuedit' 'systemsettings' 'ksysguard' 'breeze' 'krunner'
+         'kwin' 'kpeople' 'libusb-compat' 'libxkbfile' 'kmenuedit' 'systemsettings' 'ksysguard' 'breeze' 'krunner' 'baloo' 'kfilemetadata'
          #sddm can be removed as a dependency in the future, only added here to automate the switch to Plasma 5
          'sddm-kcm')
-makedepends=('extra-cmake-modules' 'kdoctools' 'boost' 'baloo-kf5' 'xf86-input-synaptics' 'xorg-server-devel')
+makedepends=('extra-cmake-modules' 'kdoctools' 'boost' 'xf86-input-synaptics' 'xorg-server-devel')
 optdepends=('plasma-nm: Network manager applet'
             'xf86-input-synaptics: Manage touchpad')
 checkdepends=("cmake")
 provides=("kcm-touchpad-kf5=${pkgver}")
 replaces=('kde-workspace' 'kcm-touchpad-kf5<=5.2.0')
-conflicts=('kde-workspace' 'kde-baseapps-kdepasswd' 'kcm-touchpad-kf5<=5.2.0')
+conflicts=('kde-workspace' 'kcm-touchpad-kf5<=5.2.0')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -27,6 +27,9 @@ install=${pkgname}.install
 
 prepare() {
   mkdir -p build
+  
+  #sed -i 's/KF5Baloo "5.1.90"/KF5Baloo/g' ${pkgname}-${pkgver}/CMakeLists.txt
+  #sed -i 's/DBusAddons/DBusAddons Baloo/g' ${pkgname}-${pkgver}/CMakeLists.txt
 }
 
 build() {

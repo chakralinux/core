@@ -10,9 +10,11 @@ url='http://www.kde.org'
 license=('LGPL')
 depends=('qt5-base')
 makedepends=('extra-cmake-modules')
+groups=('plasma')
+options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-options=('debug')
-sha256sums=( $(getSum ${pkgname}) )
+#sha256sums=( $(getSum ${pkgname}) )
+sha256sums=(`grep ${pkgname}-$pkgver.tar.xz  ../plasma.sums | cut -d " " -f1`)
 
 prepare() {
   mkdir -p build

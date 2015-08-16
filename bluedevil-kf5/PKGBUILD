@@ -4,7 +4,7 @@ source ../plasma.conf
 pkgname=bluedevil-kf5
 _pkgname=bluedevil
 pkgver=${PVersion}
-pkgrel=2
+pkgrel=1
 pkgdesc="Integrate the Bluetooth technology within KDE workspace and applications"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/bluedevil'
@@ -17,19 +17,14 @@ options=("debug")
 replaces=('bluedevil')
 provides=('bluedevil')
 conflicts=('bluedevil')
-source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz"
-        'bluezqt5.11.patch')
-sha256sums=( $(getSum ${_pkgname}) 
-            '4571d8fec90cdd83029b6cfd1d04184084a48b164f11ce19686c7c3d5355f23b')
+source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${_pkgname}) )
 install=bluedevil.install
 
 prepare() {
   mkdir -p build
 
   cd ${_pkgname}-${pkgver}
-  
-  # compile against the newest bluez-qt from kde frameworks
-  patch -p1 -i $srcdir/bluezqt5.11.patch
 }
 
 build() {
