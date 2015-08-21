@@ -3,20 +3,15 @@
 
 pkgbase=mlt
 pkgname=(mlt mlt-python-bindings)
-pkgver=0.9.6
-pkgrel=5
+pkgver=0.9.8
+pkgrel=1
 pkgdesc="An open source multimedia framework"
 arch=('x86_64')
 url="http://www.mltframework.org"
 license=(GPL)
 makedepends=(ladspa frei0r-plugins libdv sdl_image libsamplerate sox ffmpeg vid.stab qt5-svg jack libexif python2 swig)
-source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz")
-md5sums=('92bcc95af44ff086df0a0ce17a201d1c')
-
-prepare() {
-  cd "$srcdir/mlt-$pkgver"
-  sed -i 's|freetype/|freetype2/|' src/modules/gtk2/producer_pango.c
-}
+source=("https://github.com/mltframework/mlt/archive/v${pkgver}.tar.gz")
+md5sums=('57397f2f0fa0545c248c5e9b59c140d5')
 
 build() {
   # mlt
