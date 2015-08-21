@@ -1,8 +1,8 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=binutils
-pkgver=2.25
-pkgrel=2
+pkgver=2.25.1
+pkgrel=1
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('x86_64')
 url="http://www.gnu.org/software/binutils/"
@@ -15,16 +15,17 @@ replaces=('binutils-multilib')
 options=('!distcc' '!ccache' 'staticlibs')
 install=binutils.install
 source=(ftp://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.bz2{,.sig}
-        binutils-${pkgver}-roundup.patch)
-md5sums=('d9f3303f802a5b6b0bb73a335ab89d66'
+        binutils-e9c1bdad.patch)
+md5sums=('ac493a78de4fee895961d025b7905be4'
          'SKIP'
-         'e7046b004c975a7c3765b8f6758aeb76')
+         'eb3aceaab8ed26e06d505f82beb30f8f')
 
 prepare() {
   cd ${srcdir}/binutils-${pkgver}
 
-  # binutils-2_25..6c1c6764
-  patch -p1 -i $srcdir/binutils-${pkgver}-roundup.patch
+
+  # https://sourceware.org/bugzilla/show_bug.cgi?id=16992
+  patch -p1 -i ${srcdir}/binutils-e9c1bdad.patch
   
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
   sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
@@ -40,7 +41,7 @@ build() {
     --with-bugurl=http://chakraos.org/bugtracker \
     --enable-threads --enable-shared --with-pic \
     --enable-ld=default --enable-gold --enable-plugins \
-    --disable-werror
+    --disable-werror --disable-gdb # we have an extra gdb package, so we do not build gdb from binutils
 
   # check the host environment and makes sure all the necessary tools are available
   make configure-host
