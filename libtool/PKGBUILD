@@ -4,23 +4,32 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 # NOTE: requires rebuilt with each new gcc version
+# https://projects.archlinux.org/svntogit/packages.git/commit/trunk?h=packages/libtool&id=7f6118409d3eae438a6d501cd7ae4e907582fbe9
+# has some info about the libtool libltdl merge
 
-pkgname=('libtool' 'libltdl')
-pkgver=2.4.2
-_gccver=4.9.1
-pkgrel=17
+pkgname=libtool
+pkgver=2.4.6
+pkgrel=3
+_gccver=5.2.0
 pkgdesc="A generic library support script"
-arch=('x86_64')
+arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/libtool"
 license=('GPL')
-makedepends=("gcc=${_gccver}")
+groups=('base-devel')
+depends=('sh' 'tar' 'glibc')
+makedepends=("gcc=$_gccver")
+provides=("libltdl=$pkgver" "libtool-multilib=$pkgver")
+conflicts=('libltdl' 'libtool-multilib')
+replaces=('libltdl' 'libtool-multilib')
+install=libtool.install
 source=(ftp://ftp.gnu.org/pub/gnu/libtool/${pkgname}-${pkgver}.tar.xz{,.sig})
-md5sums=('2ec8997e0c07249eb4cbd072417d70fe'
-         '1e6ba57420c82c663c85e745d11c7eed')
+md5sums=('1bfb9b923f2c1339b4d2ce1807064aa5'
+         'SKIP')
+validpgpkeys=('CFE2BE707B538E8B26757D84151308092983D606')   # Gary Vaughan
 
 build() {
   cd ${srcdir}/${pkgbase}-${pkgver}
-  ./configure --prefix=/usr
+  ./configure --prefix=/usr lt_cv_sys_lib_dlsearch_path_spec="/usr/lib /usr/lib32"
   make
 }
 
@@ -29,23 +38,8 @@ check() {
   make check
 }
 
-package_libtool() {
-  depends=('sh' "libltdl=$pkgver" 'tar' "gcc=${_gccver}")
-  groups=('base-devel')
-  install=libtool.install
-
+package() {
   cd ${srcdir}/${pkgbase}-${pkgver}
-  
-  make DESTDIR=${pkgdir} install-binSCRIPTS install-man install-info \
-                         install-data-local
-  rm -r ${pkgdir}/usr/share/libtool/libltdl/
+  make DESTDIR=${pkgdir} install
 }
 
-package_libltdl() {
-  pkgdesc="A system independent dlopen wrapper for GNU libtool"
-
-  cd ${srcdir}/${pkgbase}-${pkgver}
-  make DESTDIR=${pkgdir} install-libLTLIBRARIES install-includeHEADERS \
-                         install-ltdlincludeHEADERS install-data-local
-  rm -r ${pkgdir}/usr/share/{aclocal,libtool/config}
-}
