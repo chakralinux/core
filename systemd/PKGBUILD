@@ -1,6 +1,6 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=222
+pkgver=224
 pkgrel=1
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
@@ -14,12 +14,12 @@ makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam'
              'intltool' 'iptables' 'kmod' 'libcap' 'libidn' 'libgcrypt'
              'libmicrohttpd' 'libxslt' 'util-linux' 'linux-api-headers'
              'python' 'python2-lxml' 'quota-tools' 'shadow' 'gnu-efi-libs' 'git' 'curl')
-optdepends=('python: systemd library bindings'
-            'curl: upload journal and pull image'
+optdepends=('curl: upload journal and pull image'
             'cryptsetup: required for encrypted block devices'
             'libmicrohttpd: remote journald capabilities'
             'quota-tools: kernel-level quota management'
             'polkit: allow administration as unprivileged user')
+options=('debug')
 backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/dbus-1/system.d/org.freedesktop.hostname1.conf
         etc/dbus-1/system.d/org.freedesktop.login1.conf
@@ -66,15 +66,19 @@ md5sums=('SKIP'
 prepare() {
   cd "$pkgname"
 
+  # networkd: fix neworkd crash
+  # https://github.com/systemd/systemd/commit/49f6e11e89b4
+  git cherry-pick -n 49f6e11e89b4
+
   ./autogen.sh
 }
 
 build() {
   cd "$pkgname"
 
+  local timeservers=({0..3}.pool.ntp.org) # WARNING: this needs to change before the package can move to testing
+
   ./configure \
-      PYTHON=python2 \
-      PYTHON_CONFIG=python2-config \
       --libexecdir=/usr/lib \
       --localstatedir=/var \
       --sysconfdir=/etc \
@@ -87,7 +91,8 @@ build() {
       --disable-ima \
       --disable-kdbus \
       --with-sysvinit-path= \
-      --with-sysvrcnd-path=
+      --with-sysvrcnd-path= \
+      --with-ntp-servers="${timeservers[*]}"
    make
 }
 
