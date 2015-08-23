@@ -4,7 +4,7 @@ pkgname=('gcc' 'gcc-libs' 'lib32-gcc-libs' 'gcc-fortran' 'gcc-objc' 'gcc-ada' 'g
 pkgver=5.2.0
 _pkgver=5
 _islver=0.14.1
-pkgrel=4
+pkgrel=6
 #_snapshot=4.9-20140903
 pkgdesc="The GNU Compiler Collection"
 arch=('x86_64')
@@ -196,7 +196,8 @@ package_lib32-gcc-libs()
 package_gcc()
 {
   pkgdesc="The GNU Compiler Collection - C and C++ frontends"
-  depends=("gcc-libs=$pkgver-$pkgrel" 'binutils>=2.24' 'libmpc')
+  depends=("gcc-libs=$pkgver-$pkgrel" 'binutils>=2.24' 'libmpc' 'isl')
+  optdepends=("lib32-gcc-libs: to compile with -m32")
   conflicts=('gcc-multilib')
   provides=('gcc-multilib=${pkgver}')
   replaces=('gcc-multilib')
