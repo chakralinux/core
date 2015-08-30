@@ -4,7 +4,7 @@
 
 pkgname=rust
 pkgver=1.2.0
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 pkgdesc='Systems programming language focused on safety, speed and concurrency'
 url='http://www.rust-lang.org/'
@@ -40,4 +40,5 @@ package() {
   cd "$pkgdir/usr/lib"
   rm rustlib/{components,manifest-rustc,rust-installer-version}
   ln -sf rustlib/$CARCH-unknown-linux-gnu/lib/*.so .
+  rm rustlib/uninstall.sh # remove uninstall.sh, pacman manages the files anyway
 }
