@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
 pkgver=225
-pkgrel=1
+pkgrel=2
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -40,9 +40,9 @@ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
         etc/systemd/resolved.conf
         etc/systemd/user.conf
         etc/udev/udev.conf)
-provides=("udev=$pkgver")
-conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd')
-replaces=('udev')
+provides=("udev=$pkgver" 'gummiboot')
+conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'gummiboot')
+replaces=('udev' 'gummiboot')
 install="systemd.install"
 source=("git://github.com/systemd/systemd.git#tag=v$pkgver"
         'initcpio-hook-udev'
