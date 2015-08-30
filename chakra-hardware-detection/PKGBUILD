@@ -3,34 +3,25 @@
 #
 
 pkgname=chakra-hardware-detection
-pkgver=20150311
+pkgver=20150830
 pkgrel=1
 branch="master"
 pkgdesc="Hardware detection scripts for Chakra"
 arch=('any')
 url="http://www.chakraos.org"
-depends=('bc' 'util-linux' 'chd-nvidia>=346' 'chd-nvidia<347' 'chd-nvidia-340xx' 'chd-nvidia-304xx'
+depends=('bc' 'util-linux' 'chd-nvidia' 'chd-nvidia-340xx' 'chd-nvidia-304xx'
          'chd-catalyst' 'dmidecode') 
 license=('GPL')
-source=("${pkgname}-${pkgver}.tar.gz"::"http://gitorious.org/chakra/chakra-hardware-detection/archive-tarball/${branch}")
-md5sums=('fd755b33afcb8a25f383824e484045e7')
+
+_gitname=$pkgname
+_gitsha=a14d7a
+source=("$pkgname"::"git://git.chakraos.org/${_gitname}.git#commit=${_gitsha}")
+md5sums=('SKIP')
 
 # create tarball: source PKGBUILD && mksource
 
-mksource() {
-	if [ "${1}" == "" ] ; then
-	  git clone https://gitorious.org//chakra/${pkgname}.git ${pkgname}-${pkgver}
-	else
-	  git clone -b "${1}" https://gitorious.org//chakra/${pkgname}.git ${pkgname}-${pkgver}
-	fi
-	pushd ${pkgname}-${pkgver}
-	popd
-	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}-${pkgver}/*
-	md5sum ${pkgname}-${pkgver}.tar.xz
-}
 package(){
-	cd "${srcdir}/chakra-${pkgname}"
-
+	cd "$srcdir/$_gitname/"
 	make install DESTDIR="${pkgdir}"
 }
 
