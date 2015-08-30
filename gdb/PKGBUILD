@@ -2,7 +2,7 @@
 
 pkgname=gdb
 pkgver=7.10
-pkgrel=1
+pkgrel=2
 pkgdesc="The GNU Debugger"
 arch=('x86_64')
 url="http://www.gnu.org/software/gdb/"
@@ -45,4 +45,7 @@ package() {
   # resolve conflicts with binutils
   rm ${pkgdir}/usr/include/{ansidecl,bfd,bfdlink,dis-asm,symcat}.h
   rm ${pkgdir}/usr/share/info/bfd.info
+  rm "${pkgdir}/usr/include/plugin-api.h"
+  rm "${pkgdir}/usr/lib/libbfd.a"
+  rm "${pkgdir}/usr/lib/libopcodes.a"
 }
