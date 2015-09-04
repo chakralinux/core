@@ -4,7 +4,7 @@
 
 pkgname=xf86-video-intel
 pkgver=2.99.917
-pkgrel=1
+pkgrel=3
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
@@ -21,10 +21,18 @@ optdepends=('libxrandr: for intel-virtual-output'
 conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19')
 groups=('xorg-drivers' 'xorg')
 source=(${url}/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2
-        20-intel.conf)
+        fix-sna-fstat-include.patch
+        fix-uxa-fstat-include.patch)
 sha256sums=('00b781eea055582820a123c47b62411bdf6aabf4f03dc0568faec55faf9667c9'
-            'a1fdde7f081b74436a71addee42268af00c900156be1f696f661ee8f7e7646aa')
+            '643a1862d417da53ce6612a4a77e5f54b8efd84bb250c7bcecc1578244979529'
+            '2c718c6ebf81001d9f30d50cfa9090dc0ca36b81391d5dc3cb812306c894007d')
 
+prepare(){
+  cd ${pkgname}-${pkgver}
+  
+  patch -Np1 -i ${srcdir}/fix-sna-fstat-include.patch
+  patch -Np1 -i ${srcdir}/fix-uxa-fstat-include.patch
+}
 build() {
   cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr \
@@ -46,6 +54,5 @@ package() {
 
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
-  install -Dm644 ${srcdir}/20-intel.conf ${pkgdir}/etc/X11/xorg.conf.d/20-intel.conf
 }
 
