@@ -2,7 +2,7 @@ source ../plasma.conf
 
 pkgname=kwallet-pam
 pkgver=${PVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='KWallet PAM integration'
 arch=(x86_64)
 url='https://projects.kde.org/kwallet-pam'
@@ -11,11 +11,15 @@ depends=(kwallet)
 makedepends=(extra-cmake-modules)
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
+        "install-path.patch")
+sha256sums=( $(getSum ${pkgname})
+             "861428b4ec11c08c623e390f4ac97282b18125d84591821cbd6f742db70163d3")
 
 prepare() {
   mkdir -p build
+  cd ${pkgname}-${pkgver}
+  patch -i ../install-path.patch -Np0
 }
 
 build() {
