@@ -18,16 +18,23 @@ sha256sums=( $(getSum ${pkgname})
 
 prepare() {
   mkdir -p build
+  mkdir -p build4
   cd ${pkgname}-${pkgver}
   patch -i ../install-path.patch -Np0
 }
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 ../${pkgname}-${pkgver} -DCMAKE_INSTALL_LIBDIR=lib
+  make
+
+  cd ../build4
+  cmake_kf5 ../${pkgname}-${pkgver} -DCMAKE_INSTALL_LIBDIR=lib -DKWALLET4=1
   make
 }
 package() {
   cd build
+  make DESTDIR="$pkgdir" install
+  cd ../build4
   make DESTDIR="$pkgdir" install
 }
