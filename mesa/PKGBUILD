@@ -4,7 +4,7 @@
 pkgbase=mesa
 pkgname=('opencl-mesa' 'libva-mesa-driver' 'mesa-vdpau' 'mesa' 'mesa-libgl')
 pkgver=10.5.0
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 conflics=('mesa-libtool')
 provides=('mesa-libtool')
@@ -14,11 +14,18 @@ makedepends=('python2-mako' 'libxml2' 'libx11' 'glproto' 'libdrm' 'dri2proto' 'd
 url="http://mesa3d.sourceforge.net"
 license=('custom')
 source=(ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/mesa-${pkgver}.tar.xz{,.sig}
+        "loader_missing_fstat.patch"
         LICENSE)
 sha256sums=('d7ca9f9044bbdd674377e3eebceef1fae339c8817b9aa435c2053e4fea44e5d3'
             'SKIP'
+            '67e020f13aa237f8e10b7354affb027d5f8ba8402eedad20a259a8ee8a47cff9'
             '7fdc119cf53c8ca65396ea73f6d10af641ba41ea1dd2bd44a824726e01c8b3f2')
 validpgpkeys=('8703B6700E7EE06D7A39B8D6EDAE37B02CEB490D') # Emil Velikov <emil.l.velikov@gmail.com>
+
+prepare() {
+  cd ${srcdir}/?esa-*
+  patch -p1 -i "${srcdir}"/loader_missing_fstat.patch
+}
 
 build() {
   cd ${srcdir}/?esa-*
