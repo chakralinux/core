@@ -3,7 +3,7 @@
 pkgbase=xorg-server
 pkgname=('xorg-server' 'xorg-server-xephyr' 'xorg-server-xdmx' 'xorg-server-xvfb' 'xorg-server-xnest' 'xorg-server-xwayland' 'xorg-server-common' 'xorg-server-devel')
 pkgver=1.16.4
-pkgrel=1 # build first with 0.1 and then rebuild it after xf86-input-evdev rebuild
+pkgrel=2 # build first with 0.1 and then rebuild it after xf86-input-evdev rebuild
 arch=('x86_64')
 license=('custom')
 url="http://xorg.freedesktop.org"
@@ -16,6 +16,7 @@ makedepends=('pixman' 'libx11' 'mesa' 'mesa-libgl' 'xf86driproto' 'xcmiscproto' 
 source=(${url}/releases/individual/xserver/${pkgbase}-${pkgver}.tar.bz2{,.sig}
         autoconfig-nvidia.patch
         autoconfig-sis.patch
+        gcc5.patch
         10-quirks.conf
         10-nvidia-drm-outputclass.conf
         xvfb-run
@@ -25,6 +26,7 @@ sha256sums=('abb6e1cc9213a9915a121f48576ff6739a0b8cdb3d32796f9a7743c9a6efc871'
             'SKIP'
             '66e25f76a7496c429e0aff4b0670f168719bb0ceaeb88c6f2272f2bf3ed21162'
             'd027776fac1f7675b0a9ee817502290b1c45f9c09b0f0a6bb058c35f92361e84'
+            'c9250d7a9a5d447b08ab441c4dc5cf565e8c2be865e5f58441c994d3d5249145'
             '94612f5c0d34a3b7152915c2e285c7b462e9d8e38d3539bd551a339498eac166'
             'af1c3d2ea5de7f6a6b5f7c60951a189a4749d1495e5462f3157ae7ac8fe1dc56'
             'ff0156309470fc1d378fd2e104338020a884295e285972cc88e250e031cc35b9'
@@ -38,6 +40,7 @@ prepare() {
   # this means that older drivers (304xx and before) aren't currently supported
   # Use nouveau/nv/nvidia drivers for nvidia devices
   patch -Np1 -i ../autoconfig-nvidia.patch
+  patch -Np1 -i ../gcc5.patch
 }
 
 build() {
