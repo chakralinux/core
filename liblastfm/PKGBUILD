@@ -1,12 +1,12 @@
 pkgname=liblastfm
 pkgver=1.0.9
-pkgrel=1
+pkgrel=2
 pkgdesc='A Qt C++ library for the Last.fm webservices'
 url="https://github.com/lastfm/liblastfm/"
 license=('GPL3')
 arch=('x86_64')
-depends=('qt' 'fftw' 'libsamplerate')
-makedepends=('cmake')
+depends=('qt5-base')
+makedepends=('cmake' 'qt5-tools')
 source=("https://github.com/lastfm/liblastfm/archive/${pkgver}.tar.gz")
 sha1sums=('4a6323538a26c5ea2080a8ebe58e4407dbc42397')
 
@@ -17,7 +17,7 @@ build() {
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DCMAKE_INSTALL_LIBDIR=/usr/lib \
         -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_TESTS=OFF
+        -DBUILD_FINGERPRINT=OFF
   make
 }
 
