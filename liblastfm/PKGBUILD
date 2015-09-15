@@ -1,27 +1,23 @@
-# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
-# contributor abveritas@chakra-project.org
-
 pkgname=liblastfm
-pkgver=1.0.8
-pkgrel=2
+pkgver=1.0.9
+pkgrel=1
 pkgdesc='A Qt C++ library for the Last.fm webservices'
 url="https://github.com/lastfm/liblastfm/"
 license=('GPL3')
 arch=('x86_64')
 depends=('qt' 'fftw' 'libsamplerate')
-makedepends=('lsb-release' 'cmake')
+makedepends=('cmake')
 source=("https://github.com/lastfm/liblastfm/archive/${pkgver}.tar.gz")
-md5sums=('5f7c1d15c0be57d73ec480f74c1d4592')
+sha1sums=('4a6323538a26c5ea2080a8ebe58e4407dbc42397')
 
 build() {
-  mkdir build
-  cd build
+  mkdir -p build && cd build
 
   cmake ../${pkgname}-${pkgver} \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DCMAKE_INSTALL_LIBDIR=/usr/lib \
         -DCMAKE_BUILD_TYPE=Release \
-        
+        -DBUILD_TESTS=OFF
   make
 }
 
@@ -29,4 +25,3 @@ package() {
   cd build
   make DESTDIR=${pkgdir} install
 }
-
