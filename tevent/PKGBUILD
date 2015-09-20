@@ -2,7 +2,7 @@
 # Contributions from Arch Linux: https://www.archlinux.org/packages/extra/x86_64/tevent/
 
 pkgname=tevent
-pkgver=0.9.18
+pkgver=0.9.25
 pkgrel=1
 pkgdesc="An event system based on the talloc memory management library"
 arch=('x86_64')
@@ -12,7 +12,7 @@ license=('GPL3')
 depends=('talloc')
 makedepends=('python2')
 optdepends=('python2: for python bindings')
-md5sums=('952535f0bcf002eee5a8db68deb6374b')
+md5sums=('8d01a2076cb8cd30cab40393d27043df')
 
 build() {
 	cd ${srcdir}/${pkgname}-${pkgver}
@@ -21,13 +21,14 @@ build() {
 	sed -i -e "s|/usr/bin/env python$|/usr/bin/env python2|" buildtools/bin/waf
 	export PYTHON=/usr/bin/python2
 
-	./configure --prefix=/usr
-	make
+	./configure --prefix=/usr \
+                    --bundled-libraries=NONE \
+                    --builtin-libraries=replace
 }
 
 package() {
 	cd ${srcdir}/${pkgname}-${pkgver}
 	
-	
+	make
 	make DESTDIR=${pkgdir}/ install
 }

@@ -3,15 +3,16 @@
 
 pkgbase=samba
 pkgname=('libwbclient' 'smbclient' 'samba')
-pkgver=4.1.17
+pkgver=4.3.0
 pkgrel=1
 arch=('x86_64')
 url="http://www.samba.org"
 license=('GPL3')
 makedepends=('python2' 'docbook-xsl' 'pkg-config' 'libbsd' 'db' 'popt' 'libcups' 
-             'readline' 'tevent' 'acl' 'libldap' 'libcap' 'ldb' 'krb5' 'pam' 
-             'gamin' 'gnutls' 'talloc' 'tdb' 'dbus')
+             'readline' 'tevent' 'acl' 'libldap' 'libcap' 'ldb>=1.1.15' 'krb5' 'pam' 'systemd' 
+             'gamin' 'gnutls>=2.4.1' 'talloc' 'tdb' 'dbus')
 source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${pkgver}.tar.gz
+        http://us1.samba.org/samba/ftp/stable/${pkgbase}-${pkgver}.tar.asc
         samba.logrotate
         samba.pam
         samba.service
@@ -22,7 +23,9 @@ source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${pkgver}.tar.gz
         smbd@.service
         winbindd.service
         samba.conf)
-md5sums=('8fed0f23a672e6a8d0716d96aca88671'
+validpgpkeys=('52FBC0B86D954B0843324CDC6F33915B6568B7EA') #Samba Distribution Verification Key <samba-bugs@samba.org>
+md5sums=('8f6452eca69f8b38f97bb8d8a738180a'
+         'SKIP'
          '5697da77590ec092cc8a883bae06093c'
          '96f82c38f3f540b53f3e5144900acf17'
          'ee4763a656cf00d92bfda31b6bb2c5cb'
@@ -78,8 +81,12 @@ _samba4_auth_modules=auth_unix,auth_wbc,auth_server,auth_netlogond,auth_script,a
               --enable-gnutls \
               --with-pam \
               --with-pammodulesdir=/usr/lib/security \
+              --bundled-libraries=!tdb,!talloc,!pytalloc-util,!tevent,!popt,!ldb,!pyldb-util \
               --with-shared-modules=${_samba4_idmap_modules},${_samba4_pdb_modules},${_samba4_auth_modules} \
               --disable-rpath-install
+
+              # Add this to the options once it's working...
+               #--with-system-mitkrb5 /opt/heimdal
   make
   make DESTDIR="${_pkgsrc}/" install
 
@@ -101,7 +108,7 @@ depends=('glibc' 'libbsd')
 
   install -d -m755 ${pkgdir}/usr/lib/samba
   mv ${_pkgsrc}/usr/lib/samba/libwinbind-client*.so* ${pkgdir}/usr/lib/samba/
-  mv ${_pkgsrc}/usr/lib/samba/libreplace.so* ${pkgdir}/usr/lib/samba/
+  #mv ${_pkgsrc}/usr/lib/samba/libreplace.so* ${pkgdir}/usr/lib/samba/
 
   install -d -m755 ${pkgdir}/usr/lib/pkgconfig
   mv ${_pkgsrc}/usr/lib/pkgconfig/wbclient.pc ${pkgdir}/usr/lib/pkgconfig/
@@ -116,9 +123,9 @@ depends=('popt' 'cifs-utils' 'tdb' "libwbclient>=$pkgver" 'ldb'
          'tevent' 'libgcrypt' 'python2' 'talloc' 'readline' 'gnutls' 
          'libbsd' 'libldap' 'libcups')
 
-    _smbclient_bins=('smbclient' 'smbclient4' 'rpcclient' 'smbspool'
+    _smbclient_bins=('smbclient' 'rpcclient' 'smbspool'
                      'smbtree' 'smbcacls' 'smbcquotas' 'smbget' 'net'
-                     'nmblookup' 'nmblookup4' 'smbtar')
+                     'nmblookup' 'smbtar')
     # Use samba-pkg as a staging directory for the split packages
     # (This is so RPATHS and symlinks are generated correctly via
     # make install, but the otherwise unsplit pieces can be split)
@@ -170,7 +177,7 @@ depends=('popt' 'cifs-utils' 'tdb' "libwbclient>=$pkgver" 'ldb'
 package_samba() {
 pkgdesc="SMB Fileserver and AD Domain server"
 depends=('db>=4.7' 'popt' 'libcups' 'libcap>=2.16' 'gamin' 'gnutls>=2.4.1'
-         'talloc' 'ldb' 'libbsd' 'python2' 'tdb' 'iniparser' 'libaio' "smbclient>=$pkgver")
+         'talloc' 'ldb' 'libbsd' 'python2' 'iniparser' 'tdb' 'libaio' "smbclient>=$pkgver")
 backup=(etc/logrotate.d/samba
         etc/pam.d/samba
         etc/samba/smb.conf
@@ -236,11 +243,4 @@ sys.path.insert(0, '/usr/lib/python${_pyver}/site-packages')" \
   
   # copy ldap example
   install -D -m644 ${srcdir}/samba-${pkgver}/examples/LDAP/samba.schema ${pkgdir}/usr/share/doc/samba/examples/LDAP/samba.schema
-
-
-  # FIXME: the fact that we need to remove those files probably means that packages in the stack are outdated, and it's likely that something will break
-  rm ${pkgdir}/usr/bin/{ldbadd,ldbdel,ldbedit,ldbmodify,ldbrename,ldbsearch}
-  rm ${pkgdir}/usr/lib/python2.7/site-packages/ldb.so
-  rm ${pkgdir}/usr/share/man/man1/{ldbadd.1,ldbdel.1,ldbedit.1,ldbmodify.1,ldbrename.1,ldbsearch.1}
-  rm ${pkgdir}/usr/share/man/man3/ldb.3
 }
