@@ -5,29 +5,30 @@
 # contributor <abveritas[at]chakra-project[dot]org>
 
 pkgname=libssh2
-pkgver=1.4.3
-pkgrel=2
+pkgver=1.6.0
+pkgrel=1
 pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts"
 url="http://www.libssh2.org/"
 arch=('x86_64')
 license=('BSD')
 depends=('openssl')
 makedepends=('zlib')
-options=('!libtool')
+provides=('libssh2.so')
+validpgpkeys=('914C533DF9B2ADA2204F586D78E11C6B279D5C91')  # Daniel Stenberg
 source=("http://www.libssh2.org/download/$pkgname-$pkgver.tar.gz"{,.asc})
-md5sums=('071004c60c5d6f90354ad1b701013a0b'
-         'bd01eca1e58c15233d69dae411dd2656')
+md5sums=('00aabd6e714a5f42a4fb82ace20db1dd'
+         'SKIP')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  ./configure --prefix=/usr 
-  make 
+  cd "$pkgname-$pkgver"
+
+  ./configure --prefix=/usr
+  make
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install 
-  
-  install -Dm644 COPYING \
-    ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE 
+  cd "$pkgname-$pkgver"
+
+  make DESTDIR="$pkgdir" install
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
