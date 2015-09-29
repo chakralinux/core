@@ -1,23 +1,25 @@
 pkgname=libssh
-pkgver=0.6.5
+pkgver=0.7.2
 pkgrel=1
-_pkgver=121
 pkgdesc="Library for accessing ssh client services through C libraries"
 url="http://www.libssh.org/"
 license=('LGPL')
 arch=('x86_64')
 depends=('openssl')
 makedepends=('cmake' 'doxygen')
-source=("https://red.libssh.org/attachments/download/${_pkgver}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('fdf107011ae1847d86620b39ae37d4f3')
+source=(https://red.libssh.org/attachments/download/177/${pkgname}-${pkgver}.tar.xz
+        https://red.libssh.org/attachments/download/168/${pkgname}-${pkgver}.tar.asc)
+md5sums=('5d7d468937649a6dfc6186edfff083db'
+         'SKIP')
+validpgpkeys=('8DFF53E18F2ABC8D8F3C92237EE0FC4DCC014E3D') # Andreas Schneider <asn@cryptomilk.org>
 
 build() {
-  cd "${srcdir}"
-  mkdir build
+  mkdir -p build
   cd build
   cmake ../${pkgname}-${pkgver} \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_BUILD_TYPE=Release \
+    -DWITH_GSSAPI=Off
   make
 }
 
