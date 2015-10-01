@@ -2,7 +2,7 @@
 
 pkgname=gst-plugins-bad
 pkgver=1.4.5
-pkgrel=3
+pkgrel=4
 pkgdesc="GStreamer Multimedia Framework Bad Plugins"
 arch=('x86_64')
 license=('LGPL')
@@ -16,8 +16,14 @@ makedepends=('schroedinger' 'libexif' 'libdvdread' 'libvdpau' 'libmpeg2' 'librsv
 	     'x264' 'bluez' 'opencore-amr' 'libshairport' 'libcdaudio' 'libdc1394' 'libwebp' 'lv2' 'librsvg' 'timidity++'
 	     'rtmpdump' 'xvidcore' 'gobject-introspection' 'python2' 'python3')
 options=('!emptydirs')
-source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
-md5sums=('e0bb39412cf4a48fe0397bcf3a7cd451')
+source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz gcc5.patch)
+md5sums=('e0bb39412cf4a48fe0397bcf3a7cd451'
+         'dfa7e5723542d0fabebf509cb321535b')
+
+prepare() {
+  cd $pkgname-$pkgver
+  patch -i ../gcc5.patch -Np1
+}
 
 build() {
   cd $pkgname-$pkgver
