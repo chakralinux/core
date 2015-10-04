@@ -1,8 +1,5 @@
-# Contributor: abveritas@chakra-project.org
-# Maintainer: Bruce Liu <brli@users.sourceforge.net>
-
 pkgname=laptop-mode-tools
-pkgver=1.66
+pkgver=1.68.1
 pkgrel=1
 pkgdesc="Laptop mode is a kernel mode that allows you to extend the battery life of your laptop"
 arch=('x86_64')
@@ -37,7 +34,6 @@ backup=(etc/laptop-mode/conf.d/ac97-powersave.conf
         etc/laptop-mode/conf.d/sched-smt-power-savings.conf
         etc/laptop-mode/conf.d/start-stop-programs.conf
         etc/laptop-mode/conf.d/terminal-blanking.conf
-        etc/laptop-mode/conf.d/usb-autosuspend.conf
         etc/laptop-mode/conf.d/video-out.conf
         etc/laptop-mode/conf.d/wireless-ipw-power.conf
         etc/laptop-mode/conf.d/wireless-iwl-power.conf
@@ -46,13 +42,13 @@ backup=(etc/laptop-mode/conf.d/ac97-powersave.conf
         etc/laptop-mode/lm-profiler.conf)
 install=laptop-mode.install
 source=("http://www.samwel.tk/laptop_mode/tools/downloads/${pkgname}_${pkgver}.tar.gz")
-md5sums=('0cb2acff6419ba31eae045bc7feaad4d')
+md5sums=('0b75e5be95daff3c954e61e2168a15d5')
 
 package() {
   cd ${pkgname}_${pkgver}
   make DESTDIR="${pkgdir}" INIT_D=none MAN_D=/usr/share/man LIB_D=/usr/lib install
+
   cd ${srcdir}/${pkgname}_${pkgver}/gui/
   sed -i '1s|^|#!/usr/bin/python \n|' LMT.py
-  install -Dm755 LMT.py ${pkgdir}/usr/sbin/${pkgname}-gui
-  
+  install -Dm755 LMT.py ${pkgdir}/usr/sbin/${pkgname}-gui  
 }
