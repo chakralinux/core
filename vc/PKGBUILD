@@ -1,23 +1,16 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
-# contributor Andrea Scarpino <andrea@archlinux.org>
-
 pkgname=vc
-pkgver=0.7.0
+pkgver=0.7.5
 pkgrel=1
 pkgdesc="A library to ease explicit vectorization of C++ code"
 url='http://code.compeng.uni-frankfurt.de/projects/vc/'
 arch=('x86_64')
-license=('LGPL3')
+license=('BSD')
 makedepends=('cmake')
-source=("http://code.compeng.uni-frankfurt.de/attachments/download/158/Vc-${pkgver}.tar.gz")
-md5sums=('8b92e140e0a8c474f5b7c7c98c175a8c')
+source=("https://github.com/VcDevel/Vc/releases/download/${pkgver}/Vc-${pkgver}.tar.gz")
+md5sums=('59854e2381b78d602b4a00e459e3d333')
  
 build() {
-  mkdir build 
-  cd build
+  mkdir -p build && cd build
   cmake ../Vc-${pkgver} \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_BUILD_TYPE=Release
@@ -33,4 +26,3 @@ package() {
   cd build
   make DESTDIR="${pkgdir}" install
 }
-
