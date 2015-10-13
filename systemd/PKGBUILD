@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=225
-pkgrel=2
+pkgver=227
+pkgrel=1
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -66,17 +66,13 @@ md5sums=('SKIP'
 prepare() {
   cd "$pkgname"
 
-  # networkd: fix neworkd crash
-  # https://github.com/systemd/systemd/commit/49f6e11e89b4
-  git cherry-pick -n 49f6e11e89b4
-
   ./autogen.sh
 }
 
 build() {
   cd "$pkgname"
 
-  local timeservers=({0..3}.arch.pool.ntp.org) # WARNING: this needs to change before the package can move to stable
+  local timeservers=({0..3}.chakra.pool.ntp.org)
 
   ./configure \
       --libexecdir=/usr/lib \
@@ -89,7 +85,6 @@ build() {
       --enable-gnuefi \
       --disable-audit \
       --disable-ima \
-      --disable-kdbus \
       --with-sysvinit-path= \
       --with-sysvrcnd-path= \
       --with-ntp-servers="${timeservers[*]}"

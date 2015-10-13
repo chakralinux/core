@@ -1,10 +1,10 @@
 #
 
 pkgname=util-linux
-pkgver=2.26.2
+pkgver=2.27
 pkgrel=1
 pkgdesc="Miscellaneous system utilities for Linux"
-url="http://www.kernel.org/pub/linux/utils/util-linux/"
+url="https://www.kernel.org/pub/linux/utils/util-linux/"
 arch=('x86_64')
 groups=('base')
 depends=('pam' 'shadow' 'coreutils' 'glibc')
@@ -13,31 +13,26 @@ conflicts=('util-linux-ng' 'eject')
 provides=("util-linux-ng=${pkgver}" 'eject')
 license=('GPL2')
 options=('strip' 'debug')
-source=("https://www.kernel.org/pub/linux/utils/util-linux/v2.26/$pkgname-$pkgver.tar."{xz,sign}
-        uuidd.tmpfiles
-        pam-{login,common,su}
-        system-{auth,local-login,login,remote-login,services})
+validpgpkeys=('B0C64D14301CC6EFAEDF60E4E4B71D5EEC39C284')  # Karel Zak
+source=("https://www.kernel.org/pub/linux/utils/util-linux/v2.27/$pkgname-$pkgver.tar."{xz,sign}
+        "0001-libmount-monitor-don-t-check-for-regular-mtab.patch"
+        pam-{login,common,su})
 backup=(etc/pam.d/chfn
         etc/pam.d/chsh
         etc/pam.d/login
         etc/pam.d/su
         etc/pam.d/su-l)
-install=util-linux.install
-md5sums=('9bdf368c395f1b70325d0eb22c7f48fb'
+md5sums=('5b06bbda9309624ee7add15bc8d8ca22'
          'SKIP'
-         'a39554bfd65cccfd8254bb46922f4a67'
+         'f9e06605db9107b9c4bb1c48059fe18e'
          '4368b3f98abd8a32662e094c54e7f9b1'
          'a31374fef2cba0ca34dfc7078e2969e4'
-         'fa85e5cce5d723275b14365ba71a8aad'
-         '5f169a4ffe7ed69f58e106cdd2d760df'
-         '477237985820117a0e6e1b13a86eb599'
-         '17c691f2da319df8fe851bc47cc1d662'
-         '477237985820117a0e6e1b13a86eb599'
-         '30fe7d41e054ee43fab7855bf88a07e5')
-validpgpkeys=('B0C64D14301CC6EFAEDF60E4E4B71D5EEC39C284')  # Karel Zak
+         'fa85e5cce5d723275b14365ba71a8aad')
 
 prepare() {
   cd "$pkgname-$pkgver"
+
+  patch -Np1 <../0001-libmount-monitor-don-t-check-for-regular-mtab.patch
 }
 
 build() {
@@ -56,7 +51,6 @@ build() {
               --enable-write \
               --enable-mesg \
               --enable-libmount-force-mountinfo \
-              --enable-socket-activation \
               --with-python=3
 
   make
@@ -82,11 +76,7 @@ package() {
   install -m644 "$srcdir/pam-login" "$pkgdir/etc/pam.d/login"
   install -m644 "$srcdir/pam-su" "${pkgdir}/etc/pam.d/su"
   install -m644 "$srcdir/pam-su" "${pkgdir}/etc/pam.d/su-l"
-  install -m644 "$srcdir/system-auth" "${pkgdir}/etc/pam.d/system-auth"
-  install -m644 "$srcdir/system-local-login" "${pkgdir}/etc/pam.d/system-local-login"
-  install -m644 "$srcdir/system-login" "${pkgdir}/etc/pam.d/system-login"
-  install -m644 "$srcdir/system-remote-login" "${pkgdir}/etc/pam.d/system-remote-login"
-  install -m644 "$srcdir/system-services" "${pkgdir}/etc/pam.d/system-services"
 
-  install -Dm644 "$srcdir/uuidd.tmpfiles" "$pkgdir/usr/lib/tmpfiles.d/uuidd.conf"
+  # TODO(dreisner): offer this upstream?
+  sed -i '/ListenStream/ aRuntimeDirectory=uuidd' "$pkgdir/usr/lib/systemd/system/uuidd.socket"
 }
