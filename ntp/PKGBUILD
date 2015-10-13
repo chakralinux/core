@@ -1,26 +1,30 @@
 pkgname=ntp
-pkgver=4.2.8.p2
-_realver=4.2.8p2
+_pkgname=ntp #-dev
+_pkgver=4.2.8p3
+pkgver=${_pkgver/p/.p}
 pkgrel=1
-pkgdesc="NTP (Network Time Protocol) tries to keep servers in sync"
-arch=('x86_64')
-license=('custom')
+pkgdesc='Network Time Protocol reference implementation'
 url="http://www.ntp.org/"
-depends=('openssl' 'libedit' 'libcap')
+license=('custom')
+arch=('x86_64')
+depends=('openssl' 'libcap' 'libedit')
 makedepends=('perl-html-parser')
 backup=('etc/ntp.conf')
-install=install
-source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-${_realver}.tar.gz"
+#source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/${_pkgname}/${_pkgname}-${_pkgver}.tar.gz"
+source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/${_pkgname}-${_pkgver}.tar.gz"
         'ntp.conf'
-        'ntpdate.service'
-        'ntpd.service')
-md5sums=('fa37049383316322d060ec9061ac23a9'
-         'ac884ad959850731d8f27667681bbdf8'
-         '11c7dea7e35034ffc370dafae49f1d45'
-         '77d51b701d417aeb2e8911e24287496e')
+        'ntpd.service'
+        'ntpdate.service')
+sha1sums=('fc624396f8d9f9bc282da30c8e8e527ade7d420f'
+          '76045019df8182c8b759828549dbd957e26c4d6e'
+          '0cccca872385e0142888ab48d273fec0669b30a8'
+          '059b382d1af0c55202e2d17f2ae065a2cbfec9ee')
+
+options=('!emptydirs')
+install=install
 
 build() {
-  cd "${srcdir}/${pkgname}-${_realver}"
+  cd "${srcdir}/${pkgname}-${_pkgver}"
   
   ./configure --prefix=/usr \
     --libexecdir=/usr/lib \
@@ -32,7 +36,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-$_realver"
+  cd "${srcdir}/${pkgname}-${_pkgver}"
   
   make DESTDIR="${pkgdir}" install
   
