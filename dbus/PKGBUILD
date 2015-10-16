@@ -4,33 +4,30 @@
 
 pkgbase=dbus
 pkgname=('dbus' 'libdbus')
-pkgver=1.8.18
+pkgver=1.10.0
 pkgrel=1
 pkgdesc="Freedesktop.org message bus system"
 url="http://www.freedesktop.org/Software/dbus"
 arch=('x86_64')
 license=('GPL' 'custom')
 makedepends=('libx11' 'systemd' 'xmlto' 'docbook-xsl')
-source=(http://dbus.freedesktop.org/releases/dbus/dbus-$pkgver.tar.gz
-        30-dbus.sh)
-md5sums=('83e607e9ccb1c921d5b6bbea2376a36c'
-         '6683a05bd749929ef9442816c22c3268')
-
-# note: remember to add the dbus group in the chroot, groupadd -g 81 dbus
+source=(http://dbus.freedesktop.org/releases/dbus/dbus-$pkgver.tar.gz{,.asc})
+md5sums=('5af6297348107a906c8449817a728b3b'
+         'SKIP')
+validpgpkeys=('DA98F25C0871C49A59EAFF2C4DE8FF2A63C7CC90') # Simon McVittie <simon.mcvittie@collabora.co.uk>
 
 build() {
   cd dbus-$pkgver
-  # Note, group dbus is defined in the pkg filesystem, under the gourp file
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
       --libexecdir=/usr/lib/dbus-1.0 --with-dbus-user=dbus \
       --with-system-pid-file=/run/dbus/pid \
       --with-system-socket=/run/dbus/system_bus_socket \
       --with-console-auth-dir=/run/console/ \
-      --enable-inotify --with-x --enable-x11-autolaunch\
+      --enable-inotify \
       --disable-verbose-mode --disable-static \
       --disable-tests --disable-asserts \
       --with-systemdsystemunitdir=/usr/lib/systemd/system \
-      --enable-systemd
+      --enable-systemd --enable-user-session
   make
 }
 
@@ -48,11 +45,9 @@ package_dbus(){
 
   make DESTDIR="$pkgdir" install
 
-  # Remove libdbus files
   rm -rf "${pkgdir}/var/run"
   rm -rf "${pkgdir}/usr/lib/pkgconfig"
 
-  install -Dm755 ../30-dbus.sh "$pkgdir/etc/X11/xinit/xinitrc.d/30-dbus.sh"
   install -Dm644 COPYING "$pkgdir/usr/share/licenses/dbus/COPYING"
 }
 
