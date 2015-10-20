@@ -3,8 +3,8 @@
 
 pkgbase=mesa
 pkgname=('opencl-mesa' 'libva-mesa-driver' 'mesa-vdpau' 'mesa' 'mesa-libgl')
-pkgver=10.5.0
-pkgrel=2
+pkgver=11.0.3
+pkgrel=1
 arch=('x86_64')
 conflics=('mesa-libtool')
 provides=('mesa-libtool')
@@ -14,23 +14,28 @@ makedepends=('python2-mako' 'libxml2' 'libx11' 'glproto' 'libdrm' 'dri2proto' 'd
 url="http://mesa3d.sourceforge.net"
 license=('custom')
 source=(ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/mesa-${pkgver}.tar.xz{,.sig}
-        "loader_missing_fstat.patch"
-        LICENSE)
-sha256sums=('d7ca9f9044bbdd674377e3eebceef1fae339c8817b9aa435c2053e4fea44e5d3'
+        LICENSE
+        0001-i965-Remove-early-release-of-DRI2-miptree.patch)
+sha256sums=('ab2992eece21adc23c398720ef8c6933cb69ea42e1b2611dc09d031e17e033d6'
             'SKIP'
-            '67e020f13aa237f8e10b7354affb027d5f8ba8402eedad20a259a8ee8a47cff9'
-            '7fdc119cf53c8ca65396ea73f6d10af641ba41ea1dd2bd44a824726e01c8b3f2')
+            '7fdc119cf53c8ca65396ea73f6d10af641ba41ea1dd2bd44a824726e01c8b3f2'
+            'a3f520ea13c923841c646a5b1627927744938ff691aa08e1aeaf14cce12bd1f7')
 validpgpkeys=('8703B6700E7EE06D7A39B8D6EDAE37B02CEB490D') # Emil Velikov <emil.l.velikov@gmail.com>
 
 prepare() {
   cd ${srcdir}/?esa-*
-  patch -p1 -i "${srcdir}"/loader_missing_fstat.patch
+
+  # Should fix FS#45750, tested by heftig - Not merged upstream
+  patch -Np1 -i ../0001-i965-Remove-early-release-of-DRI2-miptree.patch
+
+  # Fix detection of libLLVM when built with CMake
+  sed -i 's/LLVM_SO_NAME=.*/LLVM_SO_NAME=LLVM/' configure
 }
 
 build() {
   cd ${srcdir}/?esa-*
 
-  autoreconf -vfi # our automake is far too new for their build system :)
+  #autoreconf -vfi # our automake is far too new for their build system :)
 
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
@@ -69,7 +74,7 @@ build() {
 
 package_opencl-mesa() {
   pkgdesc="OpenCL support for AMD/ATI Radeon mesa drivers"
-  depends=('expat' 'libdrm' 'elfutils' 'libxfixes' 'libxext' 'libcl' 'libclc' 'nettle' 'clang')
+  depends=('expat' 'libdrm' 'elfutils' 'libxfixes' 'libxext' 'opencl-icd-loader' 'libclc' 'nettle' 'clang')
   optdepends=('opencl-headers: headers necessary for OpenCL development')
   
   install -m755 -d ${pkgdir}/etc
@@ -85,7 +90,7 @@ package_opencl-mesa() {
 
 package_libva-mesa-driver() {
   pkgdesc="VA-API implementation for gallium"
-  depends=('libdrm' 'libx11' 'llvm-libs' 'expat' 'elfutils' 'nettle')
+  depends=('libdrm' 'libx11' 'llvm-libs>=3.7' 'expat' 'elfutils' 'nettle')
 
   install -m755 -d ${pkgdir}/usr/lib
   mv -v ${srcdir}/fakeinstall/usr/lib/dri ${pkgdir}/usr/lib
