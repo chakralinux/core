@@ -1,0 +1,33 @@
+#Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/ksysguard
+source ../plasma.conf
+
+pkgname=ksysguard
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="KSysguard"
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/workspace/ksysguard'
+license=('LGPL')
+depends=('knewstuff' 'libksysguard' 'lm_sensors' 'xdg-utils' 'hicolor-icon-theme' 'kdelibs4support')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname} | head -n 1) )
+install=${pkgname}.install
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+       -DPYTHON_EXECUTABLE=/usr/bin/python3  
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

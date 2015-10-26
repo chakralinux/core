@@ -1,0 +1,45 @@
+#Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/bluedevil-frameworks
+source ../plasma.conf
+
+pkgname=bluedevil-kf5
+_pkgname=bluedevil
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="Integrate the Bluetooth technology within KDE workspace and applications"
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/workspace/bluedevil'
+license=('LGPL')
+depends=('bluez-qt' 'bluez' 'kcoreaddons' 'kwidgetsaddons' 'kdbusaddons' 'ki18n' 'kinit' 'kio'
+         'kiconthemes' 'knotifications' 'plasma-framework' 'kded' 'python3')
+makedepends=('extra-cmake-modules' 'kdoctools')
+groups=('plasma')
+options=("debug")
+replaces=('bluedevil')
+provides=('bluedevil')
+conflicts=('bluedevil')
+source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${_pkgname}) )
+install=bluedevil.install
+
+prepare() {
+  mkdir -p build
+
+  cd ${_pkgname}-${pkgver}
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${_pkgname}-${pkgver} \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLIB_INSTALL_DIR=lib \
+    -DLIBEXEC_INSTALL_DIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
+    make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

@@ -1,0 +1,33 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kwin
+source ../plasma.conf
+
+pkgname=kwin
+pkgver=${PSubVersion}
+pkgrel=1
+pkgdesc='KDE Window manager'
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/workspace/kwin'
+license=('LGPL')
+depends=('qt5-multimedia' 'plasma-framework' 'knewstuff' 'libxcursor' 'kinit'
+         'hicolor-icon-theme' 'libepoxy' 'kwayland' 'kdecoration' 'libinput' 'python3' 'xcb-util-cursor')
+makedepends=('extra-cmake-modules' 'qt5-tools' 'kdoctools')
+groups=('plasma')
+install=${pkgname}.install
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

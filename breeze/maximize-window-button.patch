@@ -1,0 +1,29 @@
+diff --git a/kdecoration/breezebutton.cpp b/kdecoration/breezebutton.cpp
+index 25aa273..0f20346 100644
+--- a/kdecoration/breezebutton.cpp
++++ b/kdecoration/breezebutton.cpp
+@@ -87,11 +87,13 @@ namespace Breeze
+         // translate from offset
+         if( m_flag == FlagFirstInList ) painter->translate( m_offset );
+         else painter->translate( 0, m_offset.y() );
++        painter->translate( geometry().topLeft() );
+ 
+         if (type() == KDecoration2::DecorationButtonType::Menu)
+         {
+-            const QPixmap pixmap = decoration()->client().data()->icon().pixmap(size().toSize());
+-            painter->drawPixmap(geometry().center() - QPoint(pixmap.width()/2, pixmap.height()/2), pixmap);
++            const qreal width( geometry().width() - m_offset.x() );
++            const QPixmap pixmap = decoration()->client().data()->icon().pixmap(QSizeF(width, width).toSize());
++            painter->drawPixmap(0, 0, pixmap);
+ 
+         } else {
+ 
+@@ -114,8 +116,6 @@ namespace Breeze
+         this makes all further rendering and scaling simpler
+         all further rendering is preformed inside QRect( 0, 0, 18, 18 )
+         */
+-        painter->translate( geometry().topLeft() );
+-
+         const qreal width( geometry().width() - m_offset.x() );
+         painter->scale( width/20, width/20 );
+         painter->translate( 1, 1 );

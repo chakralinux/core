@@ -1,0 +1,32 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sddm-kcm
+source ../plasma.conf
+
+pkgname=sddm-kcm
+epoch=1
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="SDDM configuration module for KDE"
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/workspace/sddm-kcm'
+license=("GPL")
+depends=('sddm' 'libxcursor' 'kio')
+makedepends=('extra-cmake-modules' 'kdoctools' 'qt5-tools' 'python3')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

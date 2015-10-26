@@ -1,0 +1,34 @@
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/plasma-nm
+source ../plasma.conf
+
+pkgname=plasma-nm
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='Plasma applet written in QML for managing network connections'
+arch=('x86_64')
+url="https://projects.kde.org/projects/playground/network/plasma-nm"
+license=('GPL2')
+depends=('plasma-framework' 'modemmanager-qt' 'networkmanager-qt')
+makedepends=('extra-cmake-modules' 'kdoctools' 'openconnect' 'mobile-broadband-provider-info' 'python3'
+             'kdelibs4support')
+optdepends=('mobile-broadband-provider-info: Database of mobile broadband service providers'
+            'openconnect: Cisco AnyConnect VPN plugin')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${PSubVersion}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

@@ -1,0 +1,37 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/ksshaskpass
+
+source ../plasma.conf
+
+pkgname=ksshaskpass
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="ssh-add helper that uses kwallet and kpassworddialog"
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/workspace/ksshaskpass'
+license=('LGPL')
+depends=('kwallet')
+makedepends=('extra-cmake-modules' 'python3')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
+        "$pkgname.sh")
+sha256sums=( $(getSum ${pkgname}) 
+            'cba50feec8b0d058d0967407e79573b225c53dc1fe5461b3b2ddfbfbb2aff809')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} 
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+  
+    install -Dm755 "$srcdir"/ksshaskpass.sh \
+    "${pkgdir}"/etc/profile.d/ksshaskpass.sh
+}

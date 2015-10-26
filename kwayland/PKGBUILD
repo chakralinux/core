@@ -1,0 +1,32 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kwayland
+source ../plasma.conf
+
+pkgname=kwayland
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='Qt-style Client and Server library wrapper for the Wayland libraries'
+arch=('x86_64')
+url='http://www.kde.org'
+license=('LGPL')
+depends=('qt5-base')
+makedepends=('extra-cmake-modules')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+#sha256sums=( $(getSum ${pkgname}) )
+sha256sums=(`grep ${pkgname}-$pkgver.tar.xz  ../plasma.sums | cut -d " " -f1`)
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../$pkgname-${pkgver} 
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="$pkgdir" install
+}

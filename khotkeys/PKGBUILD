@@ -1,0 +1,32 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/khotkeys
+source ../plasma.conf
+
+pkgname=khotkeys
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='KHotKeys'
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/workspace/khotkeys'
+license=('LGPL')
+depends=('plasma-workspace' 'kdelibs4support')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+     -DPYTHON_EXECUTABLE=/usr/bin/python3
+    make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

@@ -1,0 +1,35 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libkscreen-frameworks
+source ../plasma.conf
+
+pkgname=libkscreen-kf5
+_pkgname=libkscreen
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='KDE screen management software'
+arch=('x86_64')
+url='https://projects.kde.org/projects/extragear/libs/libkscreen'
+license=('LGPL')
+depends=('qt5-x11extras' 'libxrandr')
+makedepends=('extra-cmake-modules')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${_pkgname}) )
+replaces=('libkscreen')
+provides=('libkscreen')
+conflicts=('libkscreen')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${_pkgname}-${pkgver} 
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

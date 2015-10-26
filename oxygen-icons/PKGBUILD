@@ -1,0 +1,52 @@
+# Include global configuration
+source ../kdeapps.conf
+
+pkgbase=oxygen-icons
+pkgname=('oxygen-icons' 'oxygen-icons-svg')
+arch=('x86_64')
+pkgver=${_kdever}
+pkgrel=1
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+install=oxygen-icons.install
+options=()
+makedepends=('pkg-config' 'cmake' 'automoc4')
+source=("$_mirror/$pkgbase-$_kdever.tar.xz"
+        'install_svg_icons_too.patch')
+sha256sums=(`grep $pkgbase-$_kdever.tar.xz  ../checksums.txt | cut -d " " -f1`
+            '4dd5a9ab2b204c4f7826ede8831099d7f4bb47c21c2eaaea11851eb0d3ed87de')
+
+prepare() {
+    mkdir -p "${srcdir}/svg"
+    cd "${srcdir}/$pkgbase-$pkgver"
+    patch -Np0 -i "${srcdir}/install_svg_icons_too.patch"
+}
+
+build() {
+    cd "${srcdir}/$pkgbase-$pkgver"
+    cmake . \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix}
+    make
+}
+
+package_oxygen-icons() {
+    pkgdesc="Oxygen icons"
+    groups=("kde" "kde-minimal" "kde-uninstall")
+
+    cd "${srcdir}/$pkgbase-$pkgver"
+    make DESTDIR=${pkgdir} install
+    
+    # Move SVG files
+    mv "${pkgdir}/usr/share/icons/oxygen/scalable" "${srcdir}/svg"
+}
+
+package_oxygen-icons-svg() {
+    pkgdesc="Oxygen icons (SVG sources)"
+    groups=("kde-uninstall")
+    depends=("oxygen-icons")
+
+    mkdir -p "${pkgdir}/usr/share/icons/oxygen"
+    mv "${srcdir}/svg/scalable" "${pkgdir}/usr/share/icons/oxygen"
+    rm -rf "$pkgdir/usr/share/icons/oxygen/scalable/apps/clock.svgz"
+}
