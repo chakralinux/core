@@ -1,0 +1,47 @@
+# maintainer abveritas@chakra-project.org
+# contributor Jan de Groot <jgc@archlinux.org>
+
+pkgname=gst-plugins-base
+pkgver=1.4.5
+pkgrel=1
+pkgdesc="GStreamer Multimedia Framework Base Plugins"
+arch=('x86_64')
+license=('LGPL')
+depends=('gstreamer' 'orc' 'libxv' 'alsa-lib' 'cdparanoia' 'libvisual'
+         'libvorbis' 'libtheora' 'pango')
+makedepends=('pkgconfig' 'gobject-introspection')
+options=('!emptydirs')
+url="http://gstreamer.freedesktop.org/"
+source=(${url}/src/$pkgname/$pkgname-${pkgver}.tar.xz)
+md5sums=('357165af625c0ca353ab47c5d843920e')
+
+build() {
+  cd $pkgname-$pkgver
+
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static \
+    --enable-experimental \
+    --with-package-name="GStreamer Base Plugins (Chakra GNU/Linux)" \
+    --with-package-origin="http://www.chakraos.org/" 
+  
+  # https://bugzilla.gnome.org/show_bug.cgi?id=655517
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  
+  make
+  sed -e 's/^SUBDIRS_EXT =.*/SUBDIRS_EXT =/' -i Makefile
+}
+
+check() {
+  cd $pkgname-$pkgver
+ 
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  
+  make DESTDIR="${pkgdir}" install
+}
+

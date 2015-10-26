@@ -1,35 +1,41 @@
-# Maintainer: almack[at]chakraos[dot]org>
- 
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/gnutls
+
 pkgname=gnutls
-pkgver=3.3.11
+pkgver=3.4.4.1
 pkgrel=1
 pkgdesc="A library which provides a secure layer over a reliable transport layer"
 arch=('x86_64')
 license=('GPL3' 'LGPL2.1')
-url="http://www.gnu.org/software/gnutls/"
+url="http://www.gnutls.org/"
 install=gnutls.install
+options=('!zipman')
 depends=('gcc-libs' 'libidn' 'libtasn1' 'readline' 'zlib' 'nettle' 'p11-kit')
-source=(ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/${pkgname}-${pkgver}.tar.xz{,.sig})
-md5sums=('b657e3010c10cae2244e7ce79ee3d446'
-         'SKIP')
- 
+optdepends=('guile: for use with Guile bindings')
+source=(ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/${pkgname}-${pkgver}.tar.xz)
+md5sums=('474efaba6fd6c6c6c0ebac2a3f431946')
+
 build() {
   cd ${pkgname}-${pkgver}
- 
   ./configure --prefix=/usr \
-              --with-zlib \
-              --disable-guile \
-              --disable-static
+	--with-zlib \
+	--without-idn \
+	--disable-static \
+	--enable-guile \
+	--with-default-trust-store-pkcs11="pkcs11:model=p11-kit-trust;manufacturer=PKCS%2311%20Kit"
   make
 }
- 
+
 check() {
   cd ${pkgname}-${pkgver}
-  make check
+  make -j1 check | true
 }
- 
+
 package() {
   cd ${pkgname}-${pkgver}
- 
   make DESTDIR="${pkgdir}" install
+
+  # lots of .png files are put into infodir and are gzipped by makepkg! this needs to be fixed by using !zipman
+  # gzip -9 all files in infodir and manpages manually
+  find "$pkgdir/usr/share/info" -name '*.info*' -exec gzip -9 {} \;
+  find "$pkgdir/usr/share/man" -exec gzip -9 {} \;
 }

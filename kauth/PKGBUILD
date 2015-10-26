@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kauth
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Abstraction to system policy and authentication features'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kauth'
+license=('LGPL')
+depends=('kcoreaddons' 'polkit-qt5')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
+checkdepends=('cmake')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+echo ${KFBuildType}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+# check() {
+#   cd build
+#   eval `dbus-launch --sh-syntax `
+#   make test
+#   kill $DBUS_SESSION_BUS_PID
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

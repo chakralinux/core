@@ -1,0 +1,92 @@
+# maintainer  inkane@chara-project.org
+# contributor abveritas@chakra-project.org
+
+pkgname=libvirt
+pkgver=1.2.11
+pkgrel=1
+pkgdesc="API for controlling virtualization engines (openvz,kvm,qemu,virtualbox,xen,etc)"
+arch=('x86_64')
+url="http://libvirt.org/"
+license=('LGPL')
+depends=('e2fsprogs' 'gnutls' 'iptables' 'libxml2' 'parted' 'polkit' 'python2'
+	 'avahi' 'yajl' 'libpciaccess' 'systemd' 'dbus-core' 'libxau' 'libxdmcp' 'libpcap'
+	 'curl' 'libsasl' 'libgcrypt' 'libgpg-error' 'openssl' 'libxcb' 'gcc-libs'
+	 'iproute2' 'netcf' 'libnl' 'libx11')
+makedepends=('pkgconfig' 'lvm2' 'linux-api-headers' 'audit' 'perl-xml-xpath' 'dnsmasq' 'perl-xml-xpath')
+optdepends=('dnsmasq: required for default NAT/DHCP for guests'
+            'bridge-utils: for briged networking (default)'
+	    'openbsd-netcat: for remote management over ssh'
+	    'qemu'
+	    'dmidecode')
+options=('emptydirs')
+backup=('etc/conf.d/libvirtd'
+	'etc/conf.d/libvirtd-guests'
+	'etc/libvirt/libvirtd.conf'
+	'etc/libvirt/libvirt.conf'
+	'etc/libvirt/lxc.conf'
+	'etc/libvirt/qemu.conf'
+	'etc/libvirt/virt-login-shell.conf'
+        'etc/libvirt/virtlockd.conf'
+	'etc/logrotate.d/libvirtd'
+	'etc/logrotate.d/libvirtd.lxc'
+	'etc/logrotate.d/libvirtd.qemu'
+	'etc/logrotate.d/libvirtd.uml'
+	'etc/sasl2/libvirt.conf')
+install="libvirt.install"
+source=("http://libvirt.org/sources/$pkgname-$pkgver.tar.gz"
+	'libvirtd.conf.d'
+	'libvirtd-guests.conf.d'
+	'libvirt.tmpfiles.d')
+md5sums=('616ad039f212c02f7e055c5cf28c0a76'
+         '3ed0e24f5b5e25bf553f5427d64915e6'
+         'bc2971dacdbac967fc3474e50affc345'
+         '8d98e62915785686b0b6c8c070628392')
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  for file in $(find . -name '*.py' -print); do
+    sed -i 's_#!.*/usr/bin/python_#!/usr/bin/python2_' $file
+    sed -i 's_#!.*/usr/bin/env.*python_#!/usr/bin/env python2_' $file
+  done
+
+  sed -i 's|/sysconfig/|/conf.d/|g' \
+    daemon/libvirtd.service.in \
+    tools/{libvirt-guests.service,libvirt-guests.sh,virt-pki-validate}.in \
+    src/locking/virtlockd.service.in
+  sed -i 's|@sbindir@|/usr/bin|g' src/locking/virtlockd.service.in
+  sed -i 's|#group =.*|group="kvm"|' src/qemu/qemu.conf
+  sed -i 's|/usr/libexec/qemu-bridge-helper|/usr/lib/qemu/qemu-bridge-helper|g' \
+    src/qemu/qemu{.conf,_conf.c} \
+    src/qemu/test_libvirtd_qemu.aug.in
+}
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  export PYTHON=`which python2`
+  export LDFLAGS=-lX11
+  export RADVD=/usr/bin/radvd
+  [ -f Makefile ] || ./configure --prefix=/usr --libexec=/usr/lib/"$pkgname" --sbindir=/usr/bin \
+	--with-storage-lvm --without-xen --with-udev --without-hal --disable-static \
+	--with-init-script=systemd --with-audit \
+	--with-qemu-user=nobody --with-qemu-group=nobody \
+	--without-netcf --with-interface --with-lxc
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  make DESTDIR="$pkgdir" install
+
+  install -D -m644 "$srcdir"/libvirtd.conf.d "$pkgdir"/etc/conf.d/libvirtd
+  install -D -m644 "$srcdir"/libvirtd-guests.conf.d "$pkgdir"/etc/conf.d/libvirtd-guests
+  install -D -m644 "$srcdir"/libvirt.tmpfiles.d "$pkgdir"/usr/lib/tmpfiles.d/libvirt.conf
+
+  rm -rf \
+	"$pkgdir"/var/run \
+	"$pkgdir"/etc/sysconfig \
+	"$pkgdir"/etc/rc.d
+}
+

@@ -1,0 +1,30 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas[at]chakra-project[dot]org>
+
+pkgname=libgnome-keyring
+pkgver=3.12.0
+pkgrel=1
+pkgdesc="GNOME keyring client library"
+arch=('x86_64')
+license=('GPL' 'LGPL')
+depends=('dbus' 'libgcrypt' 'glib2')
+makedepends=('intltool' 'gobject-introspection' 'python2' 'vala')
+options=('!emptydirs')
+url="http://www.gnome.org"
+source=(http://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver%.*}/$pkgname-$pkgver.tar.xz)
+md5sums=('6696e4f2e9aed4625cdc3af30bd8c238')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc \
+      --localstatedir=/var --disable-static \
+      --libexecdir=/usr/lib/gnome-keyring
+  make
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+}

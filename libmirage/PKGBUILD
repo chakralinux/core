@@ -1,0 +1,38 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# Contributor: abveritas@chakra-project.org
+# Maintainer: BrLi <rainman59118[at]Gmail.com> 
+
+pkgname=libmirage
+pkgver=3.0.3
+pkgrel=1
+pkgdesc="CD-ROM image (B6T/CCD/CDI/CUE/ISO/MDS/NRG/TOC) access library"
+arch=('x86_64')
+url="http://cdemu.sourceforge.net/"
+license=('GPL')
+depends=('glib2' 'libsndfile' 'zlib' 'xz' 'bzip2' 'libsamplerate')
+makedepends=('bison' 'flex' 'cmake')
+optdepends=('gobject-introspection')
+source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2")
+md5sums=('fd0009ced98ef47c94d2919eafcaa099')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+
+  mkdir build
+  cd build
+  
+  cmake .. \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DPOST_INSTALL_HOOKS:BOOL=OFF \
+    -DWITH_GTKDOC=OFF
+  make
+}
+
+package() {
+  cd $srcdir/$pkgname-$pkgver/build
+  make DESTDIR=$pkgdir install
+}

@@ -1,0 +1,47 @@
+# $Id$
+# Maintainer:
+
+pkgbase=isodate
+pkgname=('python2-isodate' 'python3-isodate')
+pkgver=0.5.0
+pkgrel=1
+pkgdesc="An ISO 8601 date/time/duration parser and formater"
+arch=('any')
+url="http://pypi.python.org/pypi/isodate"
+license=('BSD')
+makedepends=('python2' 'python3')
+checkdepends=('python2-setuptools' 'python3-setuptools')
+source=(http://pypi.python.org/packages/source/i/isodate/$pkgbase-$pkgver.tar.gz)
+sha1sums=('1174aeb482567df02933bdc6f6e7c2a9a72eb31e')
+
+build() {
+  cp -r "$pkgbase-$pkgver" "$srcdir/python2"
+}
+
+check() {
+  cd "$srcdir/python2"
+  python2 setup.py test
+  cd "$srcdir/$pkgbase-$pkgver"
+  python3 setup.py test
+}
+
+package_python2-isodate() {
+  depends=('python2')
+
+  cd "$srcdir/python2"
+  python2 setup.py install --root="$pkgdir/" --optimize=0
+  find "$pkgdir/" -name '*.pyc' -delete
+  install -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  head -26 src/isodate/isodates.py > "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
+
+package_python3-isodate() {
+  depends=('python3')
+
+  cd "$srcdir/$pkgbase-$pkgver"
+  python3 setup.py install --root="$pkgdir/" --optimize=0
+  find "$pkgdir/" -name '*.pyc' -delete
+  find "$pkgdir/" -type d -empty -delete
+  install -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  head -26 src/isodate/isodates.py > "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

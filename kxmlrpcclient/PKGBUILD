@@ -1,0 +1,32 @@
+
+source ../frameworks.conf
+
+pkgname=kxmlrpcclient
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Interaction with XMLRPC services'
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/pim/kxmlrpcclient'
+license=('LGPL')
+depends=('kio')
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
+ 

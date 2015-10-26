@@ -1,0 +1,44 @@
+# Originally imported from Arch Linux with
+# Arch Maintainer: Alexander Rødseth <rodseth@gmail.com>
+# Arch Contributor: Daniel Micay <danielmicay@gmail.com>
+
+pkgname=rust
+pkgver=1.3.0
+pkgrel=1
+arch=('x86_64')
+pkgdesc='Systems programming language focused on safety, speed and concurrency'
+url='http://www.rust-lang.org/'
+license=('MIT' 'Apache')
+makedepends=('libffi' 'perl' 'python2' 'curl')
+source=("http://static.rust-lang.org/dist/rustc-$pkgver-src.tar.gz")
+sha256sums=('ea02d7bc9e7de5b8be3fe6b37ea9b2bd823f9a532c8e4c47d02f37f24ffa3126')
+install="$pkgname.install"
+options=('staticlibs' '!strip')
+
+prepare() {
+  cd "rustc-$pkgver"
+
+  sed -i 's/^PYTHONVERSION.*/PYTHONVERSION := 3/' src/llvm/Makefile.rules
+}
+
+build() {
+  cd "rustc-$pkgver"
+
+  ./configure --prefix=/usr --disable-docs --release-channel=stable
+  make
+}
+
+package() {
+  cd "rustc-$pkgver"
+
+  make DESTDIR="$pkgdir" install
+
+  install -Dm644 LICENSE-APACHE \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE-APACHE"
+  install -Dm644 LICENSE-MIT "$pkgdir/usr/share/licenses/$pkgname/LICENSE-MIT"
+
+  cd "$pkgdir/usr/lib"
+  rm rustlib/{components,manifest-rustc,rust-installer-version}
+  ln -sf rustlib/$CARCH-unknown-linux-gnu/lib/*.so .
+  rm rustlib/uninstall.sh # remove uninstall.sh, pacman manages the files anyway
+}

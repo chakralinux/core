@@ -1,0 +1,25 @@
+# Part of X.org group
+# Maintainer: Bruce Liu <brli@users.sourceforge.net>
+
+pkgname=xineramaproto
+pkgver=1.2.1
+pkgrel=3
+pkgdesc="X11 Xinerama extension wire protocol"
+arch=('x86_64')
+url="http://xorg.freedesktop.org/"
+license=('custom')
+makedepends=('xorg-util-macros')
+source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('818bffc16139d6e3de4344c83f00c495d3536753')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

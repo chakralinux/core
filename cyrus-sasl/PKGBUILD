@@ -1,0 +1,36 @@
+pkgname=cyrus-sasl
+pkgver=2.1.26
+pkgrel=2
+pkgdesc="SASL authentication daemon"
+arch=('x86_64')
+license=('custom')
+url="http://asg.web.cmu.edu/cyrus/download/"
+depends=('pam' 'krb5' 'libldap' 'cyrus-sasl-plugins' 'db')
+backup=(etc/conf.d/saslauthd)
+md5sums=('a7f4e5e559a0e37b3ffc438c9456e425'
+         '3499dcd610ad1ad58e0faffde2aa7a23'
+         '96d8a2f6189501f8044838e04d5cae7f'
+         '45bb0192d2f188066240b9a66ee6365f')
+source=("ftp://ftp.cyrusimap.org/cyrus-sasl/cyrus-sasl-${pkgver}.tar.gz"
+	'saslauthd.service'
+	'saslauthd.conf.d'
+	'tmpfiles.conf') 
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  ./configure --prefix=/usr --mandir=/usr/share/man \
+    --with-ldap=/usr --with-saslauthd=/var/run/saslauthd
+  cd saslauthd
+  make 
+  make DESTDIR="${pkgdir}" install 
+  make testsaslauthd 
+  install -m755 testsaslauthd "${pkgdir}/usr/sbin" 
+
+  install -dm766 "${pkgdir}/run/saslauthd"
+  install -Dm644 "${srcdir}/saslauthd.conf.d" "${pkgdir}/etc/conf.d/saslauthd"
+  install -Dm644 "${srcdir}/saslauthd.service" "${pkgdir}/usr/lib/systemd/system/saslauthd.service"
+  install -Dm644 "${srcdir}/tmpfiles.conf" "${pkgdir}/usr/lib/tmpfiles.d/saslauthd.conf"
+
+  install -Dm644 ../COPYING "${pkgdir}/usr/share/licenses/cyrus-sasl/COPYING"
+}

@@ -1,0 +1,32 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kconfigwidgets
+source ../frameworks.conf
+
+pkgname=kconfigwidgets
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Widgets for KConfig'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kconfigwidgets'
+license=('LGPL')
+depends=('kauth' 'kcodecs' 'kconfig' 'kguiaddons' 'ki18n' 'kwidgetsaddons')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" "kdoctools" "python3")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

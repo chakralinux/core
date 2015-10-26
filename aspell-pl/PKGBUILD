@@ -1,0 +1,23 @@
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+
+pkgname=aspell-pl
+pkgver=20131025
+pkgrel=1
+pkgdesc="Polish dictionary for aspell"
+arch=('i686' 'x86_64')
+url="http://www.sjp.pl/slownik/en/"
+license=('GPL' 'LGPL' 'MPL')
+depends=('aspell')
+source=("http://sjp.pl/slownik/ort/sjp-aspell6-pl-6.0_${pkgver}-0.tar.bz2")
+md5sums=('da1b7a2fb60023215f747a83f61910cb')
+ 
+build() {
+  cd "$srcdir/aspell6-pl-6.0_$pkgver-0"
+   ./configure
+  make
+}
+
+package() {
+  cd "$srcdir/aspell6-pl-6.0_$pkgver-0"
+  make DESTDIR="$pkgdir" install
+}

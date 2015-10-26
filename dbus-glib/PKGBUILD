@@ -1,0 +1,36 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer: inkane@chakra-project.org
+# contributor: abveritas@chakra-project.org
+
+pkgname=dbus-glib
+pkgver=0.102
+pkgrel=3
+pkgdesc="GLib bindings for DBUS"
+arch=('x86_64')
+license=('GPL')
+url="http://www.freedesktop.org/wiki/Software/DBusBindings"
+depends=('dbus' 'glib2')
+makedepends=('pkgconfig')
+options=('!emptydirs')
+source=("http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('f76b8558fd575d0106c3a556eaa49184')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --localstatedir=/var \
+              --enable-static=no \
+              --enable-bash-completion=no
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
+
+# vim:set ts=2 sw=2 et:

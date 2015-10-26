@@ -1,0 +1,107 @@
+pkgbase=jack2
+pkgname=('jack2' 'jack2-dbus')
+_tarname=jack
+pkgver=1.9.10
+pkgrel=1
+arch=('x86_64')
+url="http://jackaudio.org/"
+backup=(etc/security/limits.d/99-audio.conf)
+license=('GPL')
+makedepends=('python2-dbus' 'libffado' 'celt' 'opus' 'libsamplerate')
+source=("https://dl.dropbox.com/u/28869550/jack-$pkgver.tar.bz2"
+        '99-audio.conf'
+        '40-hpet-permissions.rules')
+md5sums=('4aeb91d7ae0cabce98355436ed4f217a'
+         '4d928a76e3f3d77d037c42ab75ac0f0b'
+         '23eba69d2dbbb800f68176e5d38b9af5')
+
+_isbuild() {
+  printf "%s\n" ${pkgname[@]} | grep -qx $1
+}
+
+_pyfix() {
+  sed -i 's:bin/env python:bin/env python2:' \
+    "$pkgdir/usr/bin/jack_control"
+}
+
+_wafconf() {
+  python2 waf configure --prefix=/usr \
+                        --alsa \
+                        --firewire $@
+}
+
+prepare() {
+  cd "$srcdir"
+
+  # we may do 2 different builds
+  cp -r $_tarname-$pkgver $_tarname-dbus-$pkgver
+}
+
+build() {
+  cd "$srcdir"
+
+  # mixed dbus/classic build
+  if _isbuild jack2; then
+    cd $_tarname-$pkgver
+    msg2 "Running Mixed D-Bus/Classic build"
+    _wafconf --classic --dbus
+    python2 waf build $MAKEFLAGS
+    cd ..
+  fi
+
+  # dbus-ONLY build
+  if _isbuild jack2-dbus; then
+    cd $_tarname-dbus-$pkgver
+    msg2 "Running D-Bus-only build"
+    _wafconf --dbus
+    python2 waf build $MAKEFLAGS
+    cd ..
+  fi
+}
+
+package_jack2() {
+  ! _isbuild jack2 && return 0
+
+  pkgdesc="The next-generation JACK with SMP support"
+  depends=('libsamplerate' 'celt' 'opus' 'libffado')
+  optdepends=('python2-dbus: jack_control')
+  conflicts=('jack')
+  provides=('jack' 'jackmp' 'jackdmp' 'jackdbus')
+
+  cd "$srcdir/$_tarname-$pkgver"
+
+  python2 waf install --destdir="$pkgdir"
+
+  # fix for major python transition
+  _pyfix
+
+  # configure realtime access/scheduling
+  # see https://bugs.archlinux.org/task/26343
+  install -Dm644 "$srcdir/99-audio.conf" \
+    "$pkgdir/etc/security/limits.d/99-audio.conf"
+
+  install -Dm644 "$srcdir/40-hpet-permissions.rules" \
+    "$pkgdir/usr/lib/udev/rules.d/40-hpet-permissions.rules"
+}
+
+package_jack2-dbus() {
+  ! _isbuild jack2-dbus && return 0
+
+  pkgdesc="The next-generation JACK with SMP support (for D-BUS interaction only)"
+  depends=('libsamplerate' 'celt' 'opus' 'libffado')
+  optdepends=('python2-dbus: jack_control')
+  conflicts=('jack' 'jack2')
+  provides=('jack' 'jack2' 'jackmp' 'jackdmp' 'jackdbus')
+
+  cd "$srcdir/$_tarname-dbus-$pkgver"
+
+  python2 waf install --destdir="$pkgdir"
+
+  _pyfix
+
+  install -Dm644 "$srcdir/99-audio.conf" \
+    "$pkgdir/etc/security/limits.d/99-audio.conf"
+
+  install -Dm644 "$srcdir/40-hpet-permissions.rules" \
+    "$pkgdir/usr/lib/udev/rules.d/40-hpet-permissions.rules"
+}

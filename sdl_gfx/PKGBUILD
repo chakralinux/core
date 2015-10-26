@@ -1,0 +1,27 @@
+#
+# Platform Packages for Chakra, part of chakraos.org
+#
+# maintainer (x86_64): AlmAck
+
+pkgname=sdl_gfx
+pkgver=2.0.25
+pkgrel=1
+pkgdesc="SDL Graphic Primitives"
+arch=('x86_64')
+license=('LGPL')
+url="http://cms.ferzkopp.net/index.php/software/13-sdl-gfx"
+source=(http://www.ferzkopp.net/Software/SDL_gfx-2.0/SDL_gfx-${pkgver}.tar.gz)
+depends=('sdl')
+md5sums=('ea24ed4b82ff1304809c363494fa8e16')
+
+build() {
+  cd ${srcdir}/SDL_gfx-${pkgver}
+  ./configure --prefix=/usr --disable-mmx
+
+  make
+}
+
+package() {
+  cd ${srcdir}/SDL_gfx-${pkgver}
+  make DESTDIR=${pkgdir} install
+}

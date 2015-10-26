@@ -1,0 +1,58 @@
+# maintainer abveritas@chakra-project.org
+
+pkgname=cairo
+pkgver=1.12.16
+pkgrel=5
+_ubuntu_diff_version=${pkgver}-0ubuntu2
+pkgdesc="Cairo vector graphics library"
+arch=('x86_64')
+license=('LGPL' 'MPL')
+url="http://cairographics.org/"
+depends=('libpng>=1.6.0' 'libxrender' 'libxext' 'fontconfig>=2.8.0' 'pixman' 'glib2' 'sh' 'mesa>=9.0' 'libgl' 'lzo2')
+makedepends=('librsvg' 'poppler-glib' 'libspectre' 'valgrind' 'ttf-dejavu' 'gsfonts' 'xorg-server')
+source=("http://cairographics.org/releases/${pkgname}-${pkgver}.tar.xz"
+        "http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_${_ubuntu_diff_version}.debian.tar.gz")
+sha1sums=('4f6e337d5d3edd7ea79d1426f575331552b003ec'
+          '95d873fda436a1cc29cda1310f155ef0e3258c05')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  # apply ubuntu patches
+  for _f in $(cat "$srcdir/debian/patches/series" | grep -v '#') ; do    
+    patch -Np1 -i "$srcdir/debian/patches/$_f"
+  done
+
+  autoreconf -vfi
+}
+  
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  # --enable-qt? interesting feature, but still experimental (2014)
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --localstatedir=/var \
+              --disable-static \
+              --enable-tee \
+              --enable-gl \
+              --enable-egl \
+              --enable-svg \
+              --enable-ps \
+              --enable-pdf \
+              --enable-gobject
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make -k test || /bin/true
+  
+  # results:
+  # 2014-02-11: 154 Passed, 352 Failed [2 crashed, 9 expected], 29 Skipped
+
+}
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+}

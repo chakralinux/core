@@ -1,0 +1,38 @@
+# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+
+pkgname=prelink
+pkgver=20130503
+pkgrel=1
+pkgdesc="ELF prelinking utility to speed up dynamic linking"
+arch=('x86_64')
+url="http://people.redhat.com/jakub/prelink/"
+license=('GPL')
+depends=('elfutils' 'libtool')
+backup=('etc/prelink.conf')
+source=("http://people.redhat.com/jakub/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
+        'prelink.conf')
+md5sums=('4cab1571718a9b25665bd025069a02c7'
+         '0a5c9cd85df0c44966de78febf9299e4')
+build() {
+  cd "${srcdir}/${pkgname}"
+  ./configure --prefix=/usr \
+              --mandir=/usr/share/man \
+              --disable-static \
+              --localstatedir=/var \
+              --sysconfdir=/etc \
+              --infodir=/usr/share/info 
+  make
+}
+
+check() {
+  make -C "$pkgname" check
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+  make DESTDIR=$pkgdir install
+  install -Dm644 ${srcdir}/prelink.conf "${pkgdir}/etc/prelink.conf"
+}
+

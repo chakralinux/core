@@ -1,0 +1,56 @@
+# Contributor: abveritas@chakra-project.org
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+pkgbase=phonon-backend-vlc
+pkgname=('phonon-backend-vlc' 'phonon-qt5-backend-vlc')
+pkgver=0.8.2
+pkgrel=2
+arch=('x86_64')
+url='http://phonon.kde.org'
+license=('LGPL')
+makedepends=('qt' 'pkgconfig' 'cmake' 'automoc4' 'vlc' 'phonon' 'phonon-qt5')
+groups=("kde-complete" "kde-uninstall")
+source=("http://download.kde.org/stable/phonon/phonon-backend-vlc/${pkgver}/src/phonon-backend-vlc-${pkgver}.tar.xz")
+md5sums=('3937517ce4929dea4398ad9834507f97')
+
+prepare() {
+  mkdir build-qt4
+  mkdir build-qt5
+}
+
+build() {
+  cd build-qt4
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DPLUGIN_INSTALL_DIR=/usr/lib/kde4
+  make
+
+  cd ../build-qt5
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DPHONON_BUILD_PHONON4QT5=ON
+  make
+}
+
+package_phonon-backend-vlc() {
+  pkgdesc="Phonon VLC backend for Qt4"
+  depends=('vlc')
+  provides=('phonon-backend')
+
+  cd build-qt4
+  make DESTDIR="${pkgdir}" install
+}
+
+package_phonon-qt5-backend-vlc() {
+  pkgdesc="Phonon VLC backend for Qt5"
+  depends=('vlc')
+  provides=('phonon-qt5-backend')
+
+  cd build-qt5
+  make DESTDIR="${pkgdir}" install
+}

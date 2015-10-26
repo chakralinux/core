@@ -1,0 +1,33 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kconfig
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Offers functionality around reading and writing configuration'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kconfig'
+license=('LGPL')
+depends=("qt5-base")
+makedepends=("extra-cmake-modules>=${KFECMVersion}" "qt5-tools")
+checkdepends=("xorg-server-xvfb")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} 
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

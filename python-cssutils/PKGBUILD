@@ -1,0 +1,61 @@
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Giuseppe Calà <jiveaxe@gmail.com>
+#               Archlinux packagers
+
+pkgbase=python-cssutils
+pkgname=('python3-cssutils' 'python2-cssutils')
+pkgver=1.0
+pkgrel=1
+pkgdesc="A CSS (Cascading Style Sheets) library for Python"
+arch=('any')
+url="http://code.google.com/p/cssutils/"
+license=('LGPL3')
+makedepends=('python3-setuptools' 'python2-setuptools')
+source=(http://pypi.python.org/packages/source/c/cssutils/cssutils-${pkgver}.zip)
+md5sums=('0c0b9df329ec1461c732d0f3cba05e93')
+
+build() {
+    cd "${srcdir}"
+    cp -a cssutils-${pkgver} cssutils-python2-${pkgver}
+}
+
+package_python3-cssutils() {
+    depends=('python3')
+
+    cd "${srcdir}/cssutils-$pkgver"
+    python3 setup.py install --root="$pkgdir" --optimize=1
+    
+    # Don't install tests (FS#27567)
+    rm -rf "${pkgdir}/usr/lib/python3.4/site-packages/tests"
+
+    # Use #!/usr/bin/python3 
+    cd "${pkgdir}/usr/lib/python3.4/site-packages/cssutils"
+    find . -maxdepth 2 -mindepth 1 -type f -iname '*.py' -exec sed -i 's/env python/python3/' '{}' \;
+}
+
+package_python2-cssutils() {
+    conflicts=('python-cssutils-beta' 'python-cssutils')
+    provides=('python-cssutils-beta' 'python-cssutils')
+    replaces=('python-cssutils-beta' 'python-cssutils')
+    depends=('python2')
+
+    cd "${srcdir}/cssutils-python2-$pkgver"
+    python2 setup.py install --root="$pkgdir" --optimize=1
+    
+    # Don't install tests (FS#27567)
+    rm -rf "${pkgdir}/usr/lib/python2.7/site-packages/tests"
+
+    # Use #!/usr/bin/python2 
+    sed -i -e "s:#!/usr/bin/env python:#!/usr/bin/env python2:g" \
+             $(find "${pkgdir}" -name '*.py')
+
+    # Avoid a conflict: only keep the Python 3 executables.
+    rm -rf "${pkgdir}/usr/bin"
+}
+
+#check() {
+#  cd "${srcdir}/cssutils-${pkgver}"
+#  # Currently broken..
+##  python3 setup.py test
+##  python2 setup.py test
+#}

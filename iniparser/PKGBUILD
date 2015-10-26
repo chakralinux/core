@@ -1,0 +1,39 @@
+# Maintainer: Michael Haesel <michael[DOT]haesel[AT]gmail[DOT]com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/iniparser
+
+pkgname=iniparser
+pkgver=3.1
+pkgrel=3
+pkgdesc="A free stand-alone ini file parsing library written in portable ANSI C"
+arch=('x86_64')
+url="http://ndevilla.free.fr/iniparser/"
+license=('MIT')
+depends=()
+replaces='iniparser-legacy'
+conflicts='iniparser-legacy'
+provides='iniparser-legacy'
+source=("http://ndevilla.free.fr/iniparser/${pkgname}-${pkgver}.tar.gz"
+        'overflow-fix.diff')
+sha256sums=('aedf23881b834519aea5e861b2400606d211da049cd59d3cfb4568e0d9eff5c5'
+            '42702b588b7f557b74dfceea6767b8188371ed620f931fba5a3c5a833a636657')
+
+build() {
+  cd "${srcdir}/${pkgname}"
+
+  # Fix for a falsely diagnosed buffer overflow when EOF without newline is 
+  # reached. See
+  # https://github.com/ndevilla/iniparser/commit/d9c4bfac16b98503e64285a3a6e850a89ace6d92
+  patch -p1 -i "${srcdir}/overflow-fix.diff"
+  
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+  
+  install -Dm644 src/iniparser.h "${pkgdir}/usr/include/iniparser.h"
+  install -Dm644 src/dictionary.h "${pkgdir}/usr/include/dictionary.h"
+  install -Dm644 libiniparser.a "${pkgdir}/usr/lib/libiniparser.a"
+  install -Dm644 libiniparser.so.0 "${pkgdir}/usr/lib/libiniparser.so.0"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

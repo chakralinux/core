@@ -1,0 +1,31 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer AlmAck
+
+pkgname=testdisk
+pkgver=7.0
+pkgrel=1
+pkgdesc="Checks and undeletes partitions + PhotoRec, signature based recovery tool"
+arch=('x86_64')
+url="http://www.cgsecurity.org/index.html?testdisk.html"
+license=('GPL')
+depends=('libjpeg' 'openssl' 'progsreiserfs' 'ntfs-3g')
+makedepends=('pkgconfig')
+source=(http://www.cgsecurity.org/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('f0cfe4ca9dd35f2878b2704251665e9f')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  ./configure --prefix=/usr \
+              --without-ewf \
+              --enable-sudo
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+}
+

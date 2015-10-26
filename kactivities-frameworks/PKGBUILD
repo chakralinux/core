@@ -1,0 +1,34 @@
+source ../frameworks.conf
+
+pkgname=kactivities-frameworks
+_pkgname=kactivities
+pkgver=${KFVersion}
+pkgrel=1
+arch=('x86_64')
+pkgdesc="Core components for the KDE's Activities"
+url='https://projects.kde.org/projects/frameworks/kactivities'
+license=('LGPL')
+depends=('kcmutils' 'kdeclarative')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'boost' 'python3')
+provides=('kactivitymanagerd')
+conflicts=('kactivities<=4.13.3-3' 'kactivities4')
+options=("debug")
+groups=('kf5')
+source=("$KFServer/${_pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${_pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${_pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3 
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

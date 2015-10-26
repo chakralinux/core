@@ -1,0 +1,43 @@
+# maintainer almack
+
+pkgname=libgpod
+pkgver=0.8.3
+pkgrel=3
+pkgdesc="A shared library to access the contents of an iPod"
+arch=('x86_64')
+license=('LGPL')
+depends=('gdk-pixbuf2' 'mutagen' 'sg3_utils' 'libimobiledevice' 'libplist')
+makedepends=('intltool' 'swig' 'docbook-xsl' 'pygobject2-devel')
+url="http://www.gtkpod.org/libgpod/"
+source=("http://downloads.sourceforge.net/sourceforge/gtkpod/${pkgname}-${pkgver}.tar.bz2"
+        swig_gpod.patch)
+options=('!emptydirs')
+md5sums=('f8a0b7a34e768e33a708e8dd172bd6f8'
+         '4a748ac1275ace80728702e0903555e2')
+
+prepare(){
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np0 -i ${srcdir}/swig_gpod.patch
+  
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --with-udev-dir=/usr/lib/udev \
+              --enable-udev \
+              --with-python=/usr/bin/python2 \
+              --disable-fast-install \
+              --disable-static \
+              --without-hal
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  #copy headers
+  cp -v ${srcdir}/${pkgname}-${pkgver}/src/*.h ${pkgdir}/usr/include/gpod-1.0/gpod/
+}

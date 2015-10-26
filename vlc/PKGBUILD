@@ -1,0 +1,99 @@
+# Contributions from ArchLinux: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/vlc
+
+pkgname=vlc
+pkgver=2.2.1
+pkgrel=1
+arch=('x86_64')
+url="http://www.videolan.org/vlc/"
+pkgdesc=('A multimedia player and framework that plays most multimedia files as well as DVD, Audio CD, VCD, and various streaming protocols')
+license=('GPL')
+depends=('a52dec' 'fluidsynth' 'libdvbpsi' 'libxpm' 'libdca' 'qt' 'libproxy' 
+         'sdl_image' 'libdvdnav' 'lua' 'libmatroska' 
+         'zvbi' 'taglib' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp' 
+         'libshout' 'libmad' 'libmpeg2' 'xcb-util-keysyms')
+makedepends=('live-media' 'libnotify' 'libbluray' 'flac' 'kdelibs'
+             'libdc1394' 'libavc1394' 'lirc' 'libcaca' 
+             'librsvg' 'portaudio' 'libgme' 'aalib' 'libmtp'
+             'vcdimager' 'opus' 'libssh2' 'samba'
+             'chromaprint' 'unzip')
+optdepends=('aalib: for ASCII art plugin'
+            'avahi: for service discovery using bonjour protocol'
+            'flac: for Free Lossless Audio Codec plugin'
+            'kdelibs: KDE Solid hardware integration'
+            'libavc1394: for devices using the 1394ta AV/C'
+            'libbluray: for Blu-Ray support'
+            'libcaca: for colored ASCII art video output'
+            'libcdio: for audio CD playback support'
+            'libdc1394: for IEEE 1394 plugin'
+            'libdvdcss: for decoding encrypted DVDs'
+            'libgme: for libgme plugin'
+            'libmtp: for MTP devices support'
+            'libnotify: for notification plugin'
+            'librsvg: for SVG plugin'
+            'libssh2: for sftp support'
+            'libva-intel-driver: back-end for intel cards'
+            'libva-vdpau-driver: vdpau back-end for nvidia'
+            'lirc: for lirc plugin'
+            'ncurses: for ncurses interface support'
+            'opus: for opus support'
+            'portaudio: for portaudio support'
+            'smbclient: for SMB access plugin'
+            'ttf-dejavu: for subtitle font'
+            'ttf-freefont: for subtitle font '
+            'vcdimager: navigate VCD with libvcdinfo')
+backup=('usr/share/vlc/lua/http/.hosts'
+        'usr/share/vlc/lua/http/dialogs/.hosts')
+categories=('multimedia')
+options=('!emptydirs')
+install="vlc.install"
+source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver/.a}/${pkgname}-${pkgver/.a/a}.tar.xz")
+sha1sums=('ee8535c5966217bc2069a74c1d4e8c32609656e9')
+screenshot='http://images1.videolan.org/vlc/screenshots/0.9.2/screenshot-kde4.jpg'
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver/.a}"
+  
+  autoreconf -fi
+
+  sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
+  sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
+}
+
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver/.a}"
+  
+  CFLAGS+=" -I/usr/include/samba-4.0" CPPFLAGS+=" -I/usr/include/samba-4.0" \
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --disable-rpath \
+              --enable-faad \
+              --enable-dbus-control \
+              --enable-nls \
+              --enable-lirc \
+              --enable-pvr \
+              --enable-ncurses \
+              --enable-realrtsp \
+              --enable-aa \
+              --enable-vcdx \
+              --enable-upnp \
+              --enable-bluray \
+              --enable-opus \
+              --enable-sftp
+              LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`"
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver/.a}"
+
+  make DESTDIR="${pkgdir}" install
+
+  for res in 16 32 48 128; do
+    install -D -m644 "${srcdir}/vlc-${pkgver/.a}/share/icons/${res}x${res}/vlc.png" \
+        "${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png"
+  done
+  rm -v ${pkgdir}/usr/share/vlc/skins2/fonts/FreeSans*
+  ln -sv /usr/share/fonts/TTF/FreeSans.ttf ${pkgdir}/usr/share/vlc/skins2/fonts/FreeSans.ttf
+  ln -sv /usr/share/fonts/TTF/FreeSansBold.ttf ${pkgdir}/usr/share/vlc/skins2/fonts/FreeSansBold.ttf
+}

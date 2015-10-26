@@ -1,0 +1,27 @@
+# Contributions from AUR: https://aur.archlinux.org/packages/hunspell-ru/
+
+pkgname=hunspell-ru
+pkgver=20131101
+pkgrel=1
+pkgdesc="Russian hunspell dictionaries"
+arch=(x86_64)
+url="http://code.google.com/p/hunspell-ru/"
+license=('LGPL 3.0')
+depends=('hunspell')
+source=(https://bitbucket.org/Shaman_Alex/russian-dictionary-hunspell/downloads/ru_RU_UTF-8_20131101.zip)
+sha1sums=('4928de5a4bb82cdd7fb4a2bab2d7591dc5dc61df')
+
+build() {
+ /bin/true
+}
+
+package() {
+cd "$srcdir"
+
+install -dm755 ${pkgdir}/usr/share/hunspell
+install -m644 ru_RU.dic ru_RU.aff $pkgdir/usr/share/hunspell
+
+install -dm755 ${pkgdir}/usr/share/myspell/dicts
+ln -s /usr/share/hunspell/ru_RU.dic $pkgdir/usr/share/myspell/dicts/ru_RU.dic
+ln -s /usr/share/hunspell/ru_RU.aff $pkgdir/usr/share/myspell/dicts/ru_RU.aff
+}

@@ -1,0 +1,27 @@
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Cpmtributions from: https://www.archlinux.org/packages/extra/any/xcursor-themes/
+
+pkgname=xcursor-themes
+pkgver=1.0.4
+pkgrel=1
+pkgdesc="X.org Cursor themes"
+arch=(x86_64)
+url="http://xorg.freedesktop.org/"
+license=('MIT')
+makedepends=('pkgconfig' 'xorg-apps')
+source=(${url}/releases/individual/data/${pkgname}-${pkgver}.tar.bz2 LICENSE)
+md5sums=('fdfb0ad9cfceed60e3bfe9f18765aa0d'
+         '31eccf56949504b5ce33110068948cf2')
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
+  install -D -m644 ../LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+}

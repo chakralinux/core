@@ -1,0 +1,76 @@
+pkgname=networkmanager
+_pkgname=NetworkManager
+pkgver=1.0.6
+pkgrel=1
+_pppver=2.4.7
+pkgdesc="Network Management daemon"
+arch=('x86_64')
+license=('GPL')
+url="http://www.gnome.org/projects/NetworkManager/"
+depends=('dbus-glib' 'iproute2' 'libndp' 'libnl' 'nss' 'polkit' 'systemd' 'libgudev' 'wpa_supplicant' 
+         "ppp=${_pppver}" 'dhclient' 'libsoup' 'modemmanager' 'libnewt' 'libteam')
+makedepends=('intltool' 'iptables' 'gobject-introspection' 'rp-pppoe')
+optdepends=('dhcpcd: Alternative dhcp support'
+            'dnsmasq: connection sharing'
+            'bluez: Bluetooth support'
+            'openresolv: resolvconf support'
+            'ppp: dialup connection support'
+            'rp-pppoe: ADSL support'
+            'modemmanager: cellular network support')
+backup=('etc/NetworkManager/NetworkManager.conf')
+install=networkmanager.install
+source=("http://ftp.gnome.org/pub/gnome/sources/$_pkgname/${pkgver:0:3}/$_pkgname-$pkgver.tar.xz"
+        'NetworkManager.conf' 
+        'disable_set_hostname.patch'
+        '0001-Add-Requires.private-glib-2.0.patch')
+md5sums=('00f5f9ec69725a9f9b99366853c6f73e'
+         '1653159d6634fb62d3a5c548b7a56151'
+         '6b5415350c04304a28d29294441a07ae'
+         '0c131ffb866516af61b0401033493efb')
+
+prepare() {
+  cd $_pkgname-$pkgver
+  patch -Np1 -i ../disable_set_hostname.patch
+  patch -Np1 -i ../0001-Add-Requires.private-glib-2.0.patch
+}
+
+build() {
+  cd $_pkgname-$pkgver
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --sbindir=/usr/bin \
+    --libexecdir=/usr/lib/networkmanager \
+    --with-crypto=nss \
+    --with-dhclient=/usr/bin/dhclient \
+    --with-dhcpcd=/usr/bin/dhcpcd \
+    --with-dnsmasq=/usr/bin/dnsmasq \
+    --with-iptables=/usr/bin/iptables \
+    --with-systemdsystemunitdir=/usr/lib/systemd/system \
+    --with-udev-dir=/usr/lib/udev \
+    --with-resolvconf=/usr/bin/resolvconf \
+    --with-pppd=/usr/bin/pppd \
+    --with-pppd-plugin-dir=/usr/lib/pppd/$_pppver \
+    --with-pppoe=/usr/bin/pppoe \
+    --with-kernel-firmware-dir=/usr/lib/firmware \
+    --with-session-tracking=systemd \
+    --with-modem-manager-1 \
+    --disable-static \
+    --enable-more-warnings=no \
+    --disable-wimax \
+    --enable-modify-system 
+
+  make
+}
+
+package() {
+  cd $_pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+
+  install -m644 ../NetworkManager.conf "$pkgdir/etc/NetworkManager/"
+  install -m755 -d "$pkgdir/etc/NetworkManager/dnsmasq.d"
+ 
+  rm -r "$pkgdir/var/run"  
+}

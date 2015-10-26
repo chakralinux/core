@@ -1,0 +1,70 @@
+# Contributor: almack
+# Maintainer: Bruce Liu <brli@users.sourceforge.net>
+
+pkgname=ffmpeg
+pkgver=2.5.6
+pkgrel=2
+pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
+arch=('x86_64')
+url="http://ffmpeg.org"
+license=('GPL')
+depends=('alsa-lib' 'bzip2' 'fontconfig' 'freetype2' 'gnutls' 'harfbuzz' 'gsm' 'lame' 'libass' 'libavc1394'
+         'libbluray' 'libcaca' 'libdc1394' 'libmodplug' 'libtheora' 'libva' 'libvdpau'
+	 'libvorbis' 'libvpx>=1.1.0' 'libxfixes' 'libxv' 'openal' 'opencore-amr' 'openjpeg'
+	 'opus' 'pulseaudio' 'rtmpdump' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore'
+	 'zlib' 'x264' 'x265')
+makedepends=('yasm')
+source=("${url}/releases/${pkgname}-${pkgver}.tar.gz"
+        "${url}/releases/${pkgname}-${pkgver}.tar.gz.asc")
+md5sums=('820e450af12d0e232c6a4665ad4a0d58'
+         'SKIP')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr \
+              --disable-debug \
+              --disable-static \
+              --enable-avisynth \
+              --enable-avresample \
+              --enable-fontconfig \
+              --enable-gnutls \
+              --enable-gpl \
+              --enable-libass \
+              --enable-libbluray \
+              --enable-libfreetype \
+              --enable-libgsm \
+              --enable-libmodplug \
+              --enable-libmp3lame \
+              --enable-libopencore_amrnb \
+              --enable-libopencore_amrwb \
+              --enable-libopenjpeg \
+              --enable-libopus \
+              --enable-libpulse \
+              --enable-librtmp \
+              --enable-libschroedinger \
+              --enable-libspeex \
+              --enable-libtheora \
+              --enable-libv4l2 \
+              --enable-libvorbis \
+              --enable-libvpx \
+              --enable-libx264 \
+              --enable-libx265 \
+              --enable-libxvid \
+              --enable-runtime-cpudetect \
+              --enable-shared \
+              --enable-swresample \
+              --enable-vdpau \
+              --enable-version3 \
+              --enable-x11grab \
+
+  make
+  make tools/qt-faststart
+  make doc/ff{mpeg,play,server}.1
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install install-man
+  install -D -m755 tools/qt-faststart "${pkgdir}/usr/bin/qt-faststart"
+}

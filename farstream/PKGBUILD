@@ -1,0 +1,32 @@
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/farstream-0.1/
+
+pkgname=farstream
+pkgver=0.2.4
+pkgrel=1
+pkgdesc="Audio/Video Communications Framework (legacy version)"
+arch=('x86_64')
+url="http://www.freedesktop.org/wiki/Software/Farstream"
+license=('LGPL2.1')
+depends=('libnice' 'gstreamer' 'gst-plugins-base')
+makedepends=('gobject-introspection')
+options=('!libtool')
+source=(http://freedesktop.org/software/$pkgname/releases/$pkgname/$pkgname-$pkgver.tar.gz)
+sha256sums=('120d5b5cd79fcbe19d9e046526fc4bc059e0a3733b3de2d7e5299dc5a3a7bb30')
+
+build() {
+  cd "$pkgname-$pkgver"
+
+  ./configure \
+    --prefix=/usr \
+    --with-package-name='Chakra Farstream Package' \
+    --with-package-origin='httpw://www.chakraos.org/' \
+    --disable-static
+  make
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+
+  make DESTDIR="$pkgdir" install
+}

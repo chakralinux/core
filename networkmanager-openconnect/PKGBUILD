@@ -1,0 +1,33 @@
+#
+# Chakra Packages for Chakra, part of chakraos.org
+#
+# maintainer: almack
+
+pkgname=networkmanager-openconnect
+pkgver=1.0.2
+pkgrel=1
+pkgdesc="NetworkManager VPN integration for openconnect"
+arch=('x86_64')
+license=('GPL')
+url="http://www.gnome.org/projects/NetworkManager/"
+depends=('networkmanager' 'openconnect' 'dbus-glib')
+makedepends=('intltool') 
+install=$pkgname.install
+source=(http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-openconnect/1.0/NetworkManager-openconnect-${pkgver}.tar.xz)
+md5sums=('90e5bdbcf976558a6eb4756fb62b641e')
+
+build() {
+  cd "${srcdir}/NetworkManager-openconnect-${pkgver}"
+  ./configure --prefix=/usr \
+  	--sysconfdir=/etc \
+	--localstatedir=/var \
+	--libexecdir=/usr/lib/networkmanager \
+        --without-gnome \
+	--disable-static 
+  make 
+}
+
+package() {
+  cd "${srcdir}/NetworkManager-openconnect-${pkgver}"
+  make DESTDIR="${pkgdir}" install 
+}

@@ -1,0 +1,37 @@
+# Maintainer: AlmAck <gluca86@gmail.com>
+
+pkgbase=python-jedi
+pkgname=('python2-jedi' 'python3-jedi')
+pkgver=0.8.1
+pkgrel=1
+arch=('any')
+url="https://github.com/davidhalter/jedi"
+license=('MIT')
+depends=('python2')
+makedepends=('python2-setuptools' 'python3-setuptools')
+source=("https://pypi.python.org/packages/source/j/jedi/jedi-${pkgver}.tar.gz")
+md5sums=('0e4b205e05290b00ebabe19f351cddf7')
+
+check() {
+   cd "$srcdir/jedi-${pkgver}"
+    python3 setup.py test
+    python2 setup.py test
+}
+
+package_python3-jedi() {
+    pkgdesc="Awesome autocompletion for python"
+    depends=('python3')
+    cd "$srcdir/jedi-${pkgver}"
+    python3 setup.py install --root="$pkgdir/" --optimize=1
+
+    install -D -m644 "$srcdir/jedi-${pkgver}/LICENSE.txt" $pkgdir/usr/share/licenses/$pkgname/LICENSE
+}
+
+package_python2-jedi() {
+    pkgdesc="Awesome autocompletion for python2"
+    depends=('python2')
+    cd "$srcdir/jedi-${pkgver}"
+    python2 setup.py install --root="$pkgdir/" --optimize=1
+
+    install -D -m644 "$srcdir/jedi-${pkgver}/LICENSE.txt" $pkgdir/usr/share/licenses/$pkgname/LICENSE
+}

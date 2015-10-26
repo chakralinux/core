@@ -1,0 +1,35 @@
+# Contributor: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+pkgname=sword
+pkgver=1.7.1
+pkgrel=1
+pkgdesc="SWORD libraries for Bible programs"
+arch=('x86_64')
+url="http://www.crosswire.org/sword/index.jsp"
+license=('GPL')
+depends=('curl' 'swig' 'clucene')
+makedepends=('cmake')
+backup=('etc/sword.conf')
+source=("http://www.crosswire.org/ftpmirror/pub/${pkgname}/source/v1.7/${pkgname}-${pkgver}.tar.gz" )
+md5sums=('6fd4a19d1e82d9ba471e0cbce7649b9d')
+
+build() {
+  cd "${srcdir}"/$pkgname-$pkgver
+  [[ -d build ]] || mkdir build
+  cd build
+  cmake .. \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  make 
+}
+
+package() {
+  cd "${srcdir}/$pkgname-$pkgver/"build
+  make DESTDIR="${pkgdir}" install
+
+  cd ../samples
+  install -Dm644 mods.d/globals.conf "${pkgdir}"/usr/share/sword/mods.d/globals.conf
+  install -Dm644 recommended/sword.conf "${pkgdir}"/etc/sword.conf
+}
+
+

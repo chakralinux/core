@@ -1,0 +1,31 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kcrash
+source ../frameworks.conf
+
+pkgname=kcrash
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Support for application crash analysis and bug report from apps'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kcrash'
+license=('LGPL')
+depends=('kcoreaddons' 'kwindowsystem')
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

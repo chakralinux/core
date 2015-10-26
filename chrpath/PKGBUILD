@@ -1,0 +1,23 @@
+pkgname=chrpath
+pkgver=0.16
+pkgrel=1
+pkgdesc="Allows you to modify the dynamic library load path"
+arch=('x86_64')
+url="http://directory.fsf.org/project/chrpath/"
+license=('GPL2')
+depends=('glibc')
+source=("https://alioth.debian.org/frs/download.php/file/3979/${pkgname}-${pkgver}.tar.gz")
+sha1sums=('174bb38c899229f4c928734b20e730f61191795a')
+
+build() {
+  cd "${srcdir}"/$pkgname-$pkgver
+  
+  ./configure --prefix=/usr --mandir=/usr/share/man
+  make
+}
+
+package() {
+  cd "${srcdir}"/$pkgname-$pkgver
+  
+  make DESTDIR="${pkgdir}" docdir=/usr/share/doc/chrpath install
+}

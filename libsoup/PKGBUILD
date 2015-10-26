@@ -1,0 +1,34 @@
+# maintainer almack
+
+pkgname=libsoup
+pkgver=2.48.1
+pkgrel=1
+pkgdesc="GNOME HTTP Library - base library"
+arch=('x86_64')
+license=('LGPL')
+depends=('glib2' 'libxml2' 'gnutls' 'sqlite3' )
+makedepends=('intltool' 'gobject-introspection' 'python2' 'libgnome-keyring')
+url="http://www.gnome.org"
+source=(http://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver%.*}/$pkgname-$pkgver.tar.xz)
+options=('!emptydirs')
+md5sums=('0a8d96e317c29a1fd711687931f8c10c')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  sed -i -e 's/env python/python2/' libsoup/tld-parser.py
+  
+  ./configure --prefix=/usr \
+      --sysconfdir=/etc \
+      --localstatedir=/var \
+      --disable-static \
+      --disable-tls-check \
+      --without-gnome 
+  make 
+}
+
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  make DESTDIR="${pkgdir}" install 
+}

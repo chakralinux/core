@@ -1,0 +1,27 @@
+# Maintainer: Giuseppe Calà <jiveaxe@gmail.com>
+# Contributor: jensp <jens@jenux.homelinux.org>
+# Credit to encelo for updating the PKGBUILD
+ 
+pkgname=libaio
+pkgver=0.3.109
+pkgrel=1
+pkgdesc="The Linux-native asynchronous I/O facility (aio) library"
+arch=('i686' 'x86_64')
+url="http://lse.sourceforge.net/io/aio.html"
+license=('LGPL')
+source=(http://ftp.de.debian.org/debian/pool/main/liba/${pkgname}/${pkgname}_${pkgver}.orig.tar.gz)
+sha256sums=('bf4a457253cbaab215aea75cb6e18dc8d95bbd507e9920661ff9bdd288c8778d')
+ 
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make
+}
+ 
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make prefix="$pkgdir/usr" install
+}
+ 
+ 
+
+

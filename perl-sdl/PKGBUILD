@@ -1,0 +1,32 @@
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# contributor: abveritas@chakra-project.org
+
+pkgname=perl-sdl
+pkgver=2.540
+pkgrel=3
+pkgdesc="Simple DirectMedia Layer for Perl."
+arch=('x86_64')
+license=(LGPL)
+url="http://sdl.perl.org"
+depends=('perl-alien-sdl' 'perl-tie-simple' 'sdl_net' 'sdl_ttf' 'sdl_image'
+         'sdl_mixer' 'sdl_gfx' 'sdl_pango' 'mesa' 'smpeg')
+makedepends=('perl-module-build>=0.40')
+options=('!emptydirs')
+replaces=(sdl_perl)
+conflicts=(sdl_perl)
+provides=("sdl_perl=${pkgver}")
+source=(http://search.cpan.org/CPAN/authors/id/J/JT/JTPALMER/SDL-${pkgver}.tar.gz)
+md5sums=('1a5d7849cbdfde4982b28458e38ab172')
+
+build() {
+  cd "${srcdir}/SDL-${pkgver}"
+  #unset CFLAGS
+  perl Build.PL installdirs=vendor 
+  perl Build
+}
+
+package() {
+  cd "${srcdir}/SDL-${pkgver}"
+  
+  perl Build install destdir="${pkgdir}"
+}

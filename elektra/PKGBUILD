@@ -1,0 +1,32 @@
+# maintainer abveritas[at]chakra-project[dot]org>
+
+pkgname=elektra
+pkgver=0.8.9
+pkgrel=1
+pkgdesc="Elektra is a universal hierarchical configuration store"
+url="http://www.libelektra.org/"
+license="BSD"
+arch=('x86_64')
+depends=('libxml2' 'doxygen')
+makedepends=('docbook-xsl' 'texlive-latexextra')
+source=("ftp://ftp.libelektra.org/elektra/releases/$pkgname-$pkgver.tar.gz")
+md5sums=('001c4ec67229046509a0cb9eda223dc6')
+
+prepare() {
+  cd ${srcdir}/$pkgname-$pkgver
+  [[ -e build ]] && rm -rf build
+  mkdir build
+}
+
+build() {
+  cd ${srcdir}/$pkgname-$pkgver/build
+  
+  cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  make
+}
+
+package() {
+  cd ${srcdir}/$pkgname-$pkgver/build
+  
+  make DESTDIR=${pkgdir} install
+}

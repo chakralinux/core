@@ -1,0 +1,20 @@
+pkgname=dosfstools
+pkgver=3.0.28
+pkgrel=1
+pkgdesc="DOS filesystem utilities."
+arch=('x86_64')
+depends=('glibc')
+url="https://github.com/dosfstools/dosfstools"
+license=('GPL2')
+source=("https://github.com/${pkgname}/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('6a047a6c65186b9ebb1853709adb36db')
+
+build() {
+  cd "${pkgname}-${pkgver}"
+  make
+}
+
+package() {
+  cd "${pkgname}-${pkgver}"
+  make DESTDIR=$pkgdir PREFIX=/usr SBINDIR=/usr/bin MANDIR=/usr/share/man DOCDIR=/usr/share/doc install
+}

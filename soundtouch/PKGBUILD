@@ -1,0 +1,35 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# Maintainer: franzmari@chakra-project.it
+
+pkgname=soundtouch
+pkgver=1.7.1
+pkgrel=2
+pkgdesc="SoundTouch is an open-source audio processing library for changing the Tempo, Pitch and Playback Rates of audio streams or audio files."
+arch=('x86_64')
+url="http://www.surina.net/soundtouch/"
+license=('LGPL')
+depends=('gcc-libs')
+options=('!libtool')
+source=("http://www.surina.net/soundtouch/${pkgname}-${pkgver}.tar.gz")
+md5sums=('957500b90593cd6c7d8adc62a64a1851')
+
+build() {
+  cd "${srcdir}/${pkgname}"
+
+  if [ ! -x ./configure ]; then
+    ./bootstrap
+  fi
+
+  ./configure --prefix=/usr --enable-shared --with-pic 
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+
+  make DESTDIR="${pkgdir}" pkgdocdir=/usr/share/doc/soundtouch install
+}
+

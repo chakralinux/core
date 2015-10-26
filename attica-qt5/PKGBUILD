@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=attica-qt5
+_pkgname=attica
+pkgver=${KFVersion}
+pkgrel=1
+arch=('x86_64')
+url='https://projects.kde.org/projects/kdesupport/${_pkgname}'
+pkgdesc='A Qt5 library that implements the Open Collaboration Services API'
+license=('LGPL')
+depends=("qt5-base")
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
+checkdepends=("cmake")
+options=("debug")
+source=("${KFServer}/${_pkgname}-${pkgver}.tar.xz")
+replaces=("kf5-attica")
+provides=("kf5-attica")
+conflicts=("kf5-attica")
+sha256sums=($(getSum $_pkgname))
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${_pkgname}-${pkgver}
+  make
+}
+
+# check() {
+#   cd build
+#   make test
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

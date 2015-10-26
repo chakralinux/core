@@ -1,0 +1,51 @@
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Renan Biegelmeyer (RenanBS) <renan.biegel@gmail.com>
+#               Archlinux
+
+pkgbase=python-markupsafe
+pkgname=('python3-markupsafe' 'python2-markupsafe')
+pkgver=0.23
+pkgrel=1
+pkgdesc="Implements an XML/HTML/XHTML Markup safe string for Python"
+arch=('x86_64')
+url="http://pypi.python.org/pypi/MarkupSafe"
+license=('custom')
+makedepends=('python3-setuptools' 'python2-setuptools')
+source=(http://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-${pkgver}.tar.gz)
+md5sums=('f5ab3deee4c37cd6a922fb81e730da6e')
+
+build() {
+  cp -r MarkupSafe-${pkgver} python2-MarkupSafe-${pkgver}
+  cd "${srcdir}/MarkupSafe-${pkgver}"
+  python3 setup.py build
+
+  cd "${srcdir}/python2-MarkupSafe-${pkgver}"
+  python2 setup.py build
+}
+
+check() {
+  cd "${srcdir}/MarkupSafe-${pkgver}"
+  python3 setup.py test
+
+  cd "${srcdir}/python2-MarkupSafe-${pkgver}"
+  python2 setup.py test
+}
+
+package_python3-markupsafe() {
+    depends=('python3')
+
+    cd MarkupSafe-${pkgver}
+    python3 setup.py install --root="${pkgdir}" --optimize=1
+    install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
+
+package_python2-markupsafe() {
+    depends=('python2')
+    replaces=('python-markupsafe')
+    provides=('python-markupsafe')
+    conflicts=('python-markupsafe')
+
+    cd python2-MarkupSafe-${pkgver}
+    python2 setup.py install --root="${pkgdir}" --optimize=1
+    install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

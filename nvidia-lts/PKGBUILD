@@ -1,0 +1,44 @@
+
+_extramodules=extramodules-3.14-CHAKRA-LTS
+_kver="$(cat /lib/modules/${_extramodules}/version)"
+_kernelver=3.14.44
+
+pkgname=nvidia-lts
+pkgver=346.59
+pkgrel=2
+pkgdesc="NVIDIA drivers for linux."
+arch=('x86_64')
+url="http://www.nvidia.com/"
+depends=("linux-lts=${_kernelver}" "nvidia-libgl" "nvidia-utils=${pkgver}")
+makedepends=("linux-lts-headers=${_kernelver}")
+conflicts=('nvidia-304xx-lts''nvidia-340xx-lts' 'nvidia-bumblebee')
+replaces=('nvidia-bumblebee')
+provides=('nvidia-bumblebee')
+license=('custom')
+install=nvidia.install
+_pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
+source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
+md5sums=('db1cebc2a78eac85777bb4c7c2c8c70c')
+
+prepare() {
+    sh ${_pkg}.run --extract-only
+}
+build() {
+  cd "${_pkg}/kernel"
+  make SYSSRC=/usr/lib/modules/"${_kver}/build" module
+  
+  cd uvm
+  make SYSSRC=/usr/lib/modules/"${_kver}/build" module
+}
+
+package() {  
+  install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
+      "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
+  install -D -m644 "${srcdir}/${_pkg}/kernel/uvm/nvidia-uvm.ko" \
+      "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-uvm.ko"
+  gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
+  
+  install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
+  echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nouveau_blacklist.conf"
+  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
+}

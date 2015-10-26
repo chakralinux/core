@@ -1,0 +1,53 @@
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com
+
+_pkgbase='pidgin'
+pkgname='libpurple'
+pkgver=2.10.11
+pkgrel=2
+pkgdesc="IM library extracted from Pidgin"
+arch=('x86_64')
+url="http://pidgin.im/"
+license=('GPL')
+makedepends=('startup-notification' 'libxss' 'nss' 'libsasl' 'python2' 'silc-toolkit'
+             'avahi' 'tk' 'ca-certificates' 'intltool' 'networkmanager' 'farstream' 'gstreamer')
+depends=('libsasl' 'dbus-glib' 'silc-toolkit' 'nss>=3.17.1' 'nspr>=4.10.7' 'cyrus-sasl-plugins')
+optdepends=('dbus-python: for purple-remote and purple-url-handler')
+source=("http://downloads.sourceforge.net/${_pkgbase}/${_pkgbase}-${pkgver}.tar.bz2"
+        'libpurple-gst1.patch')
+md5sums=('7c8bb6f997e05e7929104439872c2844'
+         '99164fd9fbca352cae70ae43bae47546')
+
+prepare() {
+   cd "${srcdir}/${_pkgbase}-${pkgver}"
+   patch -Np1 -i $srcdir/libpurple-gst1.patch
+   autoreconf -vi
+   
+   # Use Python 2
+   sed -i "s#env python#env python2#" */plugins/*.py
+   sed -i "s#env python#env python2#" libpurple/purple-{remote,notifications-example,url-handler}
+}
+
+build() {
+    cd "${srcdir}/${_pkgbase}-${pkgver}"
+    ./configure --prefix=/usr \
+                --sysconfdir=/etc \
+                --disable-schemas-install \
+                --disable-meanwhile \
+                --disable-gtkui \
+                --disable-screensaver \
+                --disable-sm \
+                --disable-gtkspell \
+                --disable-gnutls \
+                --enable-cyrus-sasl \
+                --disable-doxygen \
+                --with-python=/usr/bin/python2 \
+                --with-system-ssl-certs=/etc/ssl/certs
+    make
+}
+
+package() {
+    cd "${srcdir}/${_pkgbase}-${pkgver}"
+    for dir in libpurple share/sounds share/ca-certs m4macros po
+    do  make -C "${dir}" DESTDIR="${pkgdir}" install
+    done
+}

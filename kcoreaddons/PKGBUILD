@@ -1,0 +1,38 @@
+# Contributor : Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kcoreaddons
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Addons to QtCore'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kcoreaddons'
+license=('LGPL')
+depends=("qt5-base" 'shared-mime-info' 'gamin')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
+groups=('kf5')
+install=${pkgname}.install
+source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -D_KDE4_DEFAULT_HOME_POSTFIX=4
+  make
+}
+
+# check() {
+#   cd build
+#   make test
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

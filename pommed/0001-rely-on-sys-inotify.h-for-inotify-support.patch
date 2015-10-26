@@ -1,0 +1,318 @@
+From 45c48507e138755f76810da0b1f2626bb7805000 Mon Sep 17 00:00:00 2001
+From: Adrian Bunk <bunk@stusta.de>
+Date: Mon, 9 Apr 2012 15:51:09 +0300
+Subject: rely on sys/inotify.h for inotify support
+
+sys/inotify.h was added to glibc in version 2.4 in 2006,
+and workarounds for older glibc versions are no longer required.
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+---
+ gpomme/Makefile           |    4 +-
+ gpomme/conffile.c         |    7 +---
+ gpomme/gpomme.c           |    7 +---
+ gpomme/inotify-syscalls.h |   98 ---------------------------------------------
+ pommed/Makefile           |    4 +-
+ pommed/evdev.c            |    7 +---
+ pommed/inotify-syscalls.h |   98 ---------------------------------------------
+ 7 files changed, 5 insertions(+), 220 deletions(-)
+ delete mode 100644 gpomme/inotify-syscalls.h
+ delete mode 100644 pommed/inotify-syscalls.h
+
+diff --git a/gpomme/Makefile b/gpomme/Makefile
+index b8a6d94..d7e05d5 100644
+--- a/gpomme/Makefile
++++ b/gpomme/Makefile
+@@ -12,9 +12,7 @@ DBUSGLIB_LIBS = $(shell pkg-config dbus-glib-1 --libs)
+ CONFUSE_CFLAGS = $(shell pkg-config libconfuse --cflags)
+ CONFUSE_LIBS = $(shell pkg-config libconfuse --libs)
+ 
+-INOTIFY_CFLAGS =
+-
+-CFLAGS = -g -O2 -Wall $(DBUS_CFLAGS) $(DBUSGLIB_CFLAGS) $(GTK_CFLAGS) $(CONFUSE_CFLAGS) $(INOTIFY_CFLAGS)
++CFLAGS = -g -O2 -Wall $(DBUS_CFLAGS) $(DBUSGLIB_CFLAGS) $(GTK_CFLAGS) $(CONFUSE_CFLAGS)
+ LDLIBS = -lpthread -lX11 $(DBUS_LIBS) $(DBUSGLIB_LIBS) $(GTK_LIBS) $(CONFUSE_LIBS)
+ 
+ SOURCES = gpomme.c theme.c conffile.c \
+diff --git a/gpomme/conffile.c b/gpomme/conffile.c
+index aca25e9..f62fd1b 100644
+--- a/gpomme/conffile.c
++++ b/gpomme/conffile.c
+@@ -31,12 +31,7 @@
+ #include <dirent.h>
+ #include <libintl.h>
+ 
+-#ifndef NO_SYS_INOTIFY_H
+-# include <sys/inotify.h>
+-#else
+-# include <linux/inotify.h>
+-# include "inotify-syscalls.h"
+-#endif
++#include <sys/inotify.h>
+ 
+ #include <confuse.h>
+ 
+diff --git a/gpomme/gpomme.c b/gpomme/gpomme.c
+index c0839cd..53ca4df 100644
+--- a/gpomme/gpomme.c
++++ b/gpomme/gpomme.c
+@@ -31,12 +31,7 @@
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ 
+-#ifndef NO_SYS_INOTIFY_H
+-# include <sys/inotify.h>
+-#else
+-# include <linux/inotify.h>
+-# include "inotify-syscalls.h"
+-#endif
++#include <sys/inotify.h>
+ 
+ #include <libintl.h>
+ 
+diff --git a/gpomme/inotify-syscalls.h b/gpomme/inotify-syscalls.h
+deleted file mode 100644
+index a1d5408..0000000
+--- a/gpomme/inotify-syscalls.h
++++ /dev/null
+@@ -1,98 +0,0 @@
+-/*
+- * Inotify syscall numbers
+- * Taken from the Linux kernel source tree
+- *
+- * Licensed under the terms of the GNU General Public License Version 2.
+- *
+- * Copyright (c) 2006 Tobias Klauser <tklauser@distanz.ch>
+- */
+-
+-#ifndef _LINUX_INOTIFY_SYSCALLS_H
+-#define _LINUX_INOTIFY_SYSCALLS_H
+-
+-#include <sys/syscall.h>
+-
+-#if defined(__i386__)
+-# define __NR_inotify_init	291
+-# define __NR_inotify_add_watch	292
+-# define __NR_inotify_rm_watch	293
+-#elif defined(__x86_64__)
+-# define __NR_inotify_init	253
+-# define __NR_inotify_add_watch	254
+-# define __NR_inotify_rm_watch	255
+-#elif defined(__powerpc__) || defined(__powerpc64__)
+-# define __NR_inotify_init	275
+-# define __NR_inotify_add_watch	276
+-# define __NR_inotify_rm_watch	277
+-#elif defined (__ia64__)
+-# define __NR_inotify_init	1277
+-# define __NR_inotify_add_watch	1278
+-# define __NR_inotify_rm_watch	1279
+-#elif defined (__s390__)
+-# define __NR_inotify_init	284
+-# define __NR_inotify_add_watch	285
+-# define __NR_inotify_rm_watch	286
+-#elif defined (__alpha__)
+-# define __NR_inotify_init	444
+-# define __NR_inotify_add_watch	445
+-# define __NR_inotify_rm_watch	446
+-#elif defined (__sparc__) || defined (__sparc64__)
+-# define __NR_inotify_init	151
+-# define __NR_inotify_add_watch	152
+-# define __NR_inotify_rm_watch	156
+-#elif defined (__arm__)
+-# define __NR_OABI_SYSCALL_BASE	0x900000
+-# if defined(__thumb__) || defined(__ARM_EABI__)
+-#  define __NR_SYSCALL_BASE	0
+-# else
+-#  define __NR_SYSCALL_BASE	__NR_OABI_SYSCALL_BASE
+-# endif
+-# define __NR_inotify_init	(__NR_SYSCALL_BASE + 316)
+-# define __NR_inotify_add_watch	(__NR_SYSCALL_BASE + 317)
+-# define __NR_inotify_rm_watch	(__NR_SYSCALL_BASE + 318)
+-#elif defined (__sh__)
+-# define __NR_inotify_init	290
+-# define __NR_inotify_add_watch	291
+-# define __NR_inotify_rm_watch	292
+-#elif defined (__hppa__)
+-# define __NR_inotify_init	269
+-# define __NR_inotify_add_watch	270
+-# define __NR_inotify_rm_watch	271
+-#elif defined (__mips__)
+-# include <sgidefs.h>
+-# if _MIPS_SIM == _MIPS_SIM_ABI32
+-#  define __NR_Linux			4000
+-#  define __NR_inotify_init		(__NR_Linux + 284)
+-#  define __NR_inotify_add_watch	(__NR_Linux + 285)
+-#  define __NR_inotify_rm_watch		(__NR_Linux + 286)
+-# elif _MIPS_SIM == _MIPS_SIM_ABI64
+-#  define __NR_Linux			5000
+-#  define __NR_inotify_init		(__NR_Linux + 243)
+-#  define __NR_inotify_add_watch	(__NR_Linux + 244)
+-#  define __NR_inotify_rm_watch		(__NR_Linux + 245)
+-# elif _MIPS_SIM == _MIPS_SIM_NABI32
+-#  define __NR_Linux			6000
+-#  define __NR_inotify_init		(__NR_Linux + 247)
+-#  define __NR_inotify_add_watch	(__NR_Linux + 248)
+-#  define __NR_inotify_rm_watch		(__NR_Linux + 249)
+-# endif
+-#else
+-# error "inotify not supported on this architecture!"
+-#endif
+-
+-static inline int inotify_init (void)
+-{
+-	return syscall (__NR_inotify_init);
+-}
+-
+-static inline int inotify_add_watch (int fd, const char *name, __u32 mask)
+-{
+-	return syscall (__NR_inotify_add_watch, fd, name, mask);
+-}
+-
+-static inline int inotify_rm_watch (int fd, __u32 wd)
+-{
+-	return syscall (__NR_inotify_rm_watch, fd, wd);
+-}
+-
+-#endif /* _LINUX_INOTIFY_SYSCALLS_H */
+diff --git a/pommed/Makefile b/pommed/Makefile
+index 4f7450b..7178bc3 100644
+--- a/pommed/Makefile
++++ b/pommed/Makefile
+@@ -14,11 +14,9 @@ AUDIOFILE_LIBS = $(shell pkg-config audiofile --libs)
+ CONFUSE_CFLAGS = $(shell pkg-config libconfuse --cflags)
+ CONFUSE_LIBS = $(shell pkg-config libconfuse --libs)
+ 
+-INOTIFY_CFLAGS =
+-
+ TIMERFD_CFLAGS =
+ 
+-CFLAGS = -g -O2 -Wall $(DBUS_CFLAGS) $(ALSA_CFLAGS) $(AUDIOFILE_CFLAGS) $(CONFUSE_CFLAGS) $(INOTIFY_CFLAGS) $(TIMERFD_CFLAGS)
++CFLAGS = -g -O2 -Wall $(DBUS_CFLAGS) $(ALSA_CFLAGS) $(AUDIOFILE_CFLAGS) $(CONFUSE_CFLAGS) $(TIMERFD_CFLAGS)
+ 
+ LDLIBS = -pthread -lrt $(DBUS_LIBS) $(ALSA_LIBS) $(AUDIOFILE_LIBS) $(CONFUSE_LIBS)
+ 
+diff --git a/pommed/evdev.c b/pommed/evdev.c
+index 7c9524b..fab0c94 100644
+--- a/pommed/evdev.c
++++ b/pommed/evdev.c
+@@ -31,12 +31,7 @@
+ 
+ #include <sys/epoll.h>
+ 
+-#ifndef NO_SYS_INOTIFY_H
+-# include <sys/inotify.h>
+-#else
+-# include <linux/inotify.h>
+-# include "inotify-syscalls.h"
+-#endif
++#include <sys/inotify.h>
+ 
+ #include <linux/input.h>
+ 
+diff --git a/pommed/inotify-syscalls.h b/pommed/inotify-syscalls.h
+deleted file mode 100644
+index a1d5408..0000000
+--- a/pommed/inotify-syscalls.h
++++ /dev/null
+@@ -1,98 +0,0 @@
+-/*
+- * Inotify syscall numbers
+- * Taken from the Linux kernel source tree
+- *
+- * Licensed under the terms of the GNU General Public License Version 2.
+- *
+- * Copyright (c) 2006 Tobias Klauser <tklauser@distanz.ch>
+- */
+-
+-#ifndef _LINUX_INOTIFY_SYSCALLS_H
+-#define _LINUX_INOTIFY_SYSCALLS_H
+-
+-#include <sys/syscall.h>
+-
+-#if defined(__i386__)
+-# define __NR_inotify_init	291
+-# define __NR_inotify_add_watch	292
+-# define __NR_inotify_rm_watch	293
+-#elif defined(__x86_64__)
+-# define __NR_inotify_init	253
+-# define __NR_inotify_add_watch	254
+-# define __NR_inotify_rm_watch	255
+-#elif defined(__powerpc__) || defined(__powerpc64__)
+-# define __NR_inotify_init	275
+-# define __NR_inotify_add_watch	276
+-# define __NR_inotify_rm_watch	277
+-#elif defined (__ia64__)
+-# define __NR_inotify_init	1277
+-# define __NR_inotify_add_watch	1278
+-# define __NR_inotify_rm_watch	1279
+-#elif defined (__s390__)
+-# define __NR_inotify_init	284
+-# define __NR_inotify_add_watch	285
+-# define __NR_inotify_rm_watch	286
+-#elif defined (__alpha__)
+-# define __NR_inotify_init	444
+-# define __NR_inotify_add_watch	445
+-# define __NR_inotify_rm_watch	446
+-#elif defined (__sparc__) || defined (__sparc64__)
+-# define __NR_inotify_init	151
+-# define __NR_inotify_add_watch	152
+-# define __NR_inotify_rm_watch	156
+-#elif defined (__arm__)
+-# define __NR_OABI_SYSCALL_BASE	0x900000
+-# if defined(__thumb__) || defined(__ARM_EABI__)
+-#  define __NR_SYSCALL_BASE	0
+-# else
+-#  define __NR_SYSCALL_BASE	__NR_OABI_SYSCALL_BASE
+-# endif
+-# define __NR_inotify_init	(__NR_SYSCALL_BASE + 316)
+-# define __NR_inotify_add_watch	(__NR_SYSCALL_BASE + 317)
+-# define __NR_inotify_rm_watch	(__NR_SYSCALL_BASE + 318)
+-#elif defined (__sh__)
+-# define __NR_inotify_init	290
+-# define __NR_inotify_add_watch	291
+-# define __NR_inotify_rm_watch	292
+-#elif defined (__hppa__)
+-# define __NR_inotify_init	269
+-# define __NR_inotify_add_watch	270
+-# define __NR_inotify_rm_watch	271
+-#elif defined (__mips__)
+-# include <sgidefs.h>
+-# if _MIPS_SIM == _MIPS_SIM_ABI32
+-#  define __NR_Linux			4000
+-#  define __NR_inotify_init		(__NR_Linux + 284)
+-#  define __NR_inotify_add_watch	(__NR_Linux + 285)
+-#  define __NR_inotify_rm_watch		(__NR_Linux + 286)
+-# elif _MIPS_SIM == _MIPS_SIM_ABI64
+-#  define __NR_Linux			5000
+-#  define __NR_inotify_init		(__NR_Linux + 243)
+-#  define __NR_inotify_add_watch	(__NR_Linux + 244)
+-#  define __NR_inotify_rm_watch		(__NR_Linux + 245)
+-# elif _MIPS_SIM == _MIPS_SIM_NABI32
+-#  define __NR_Linux			6000
+-#  define __NR_inotify_init		(__NR_Linux + 247)
+-#  define __NR_inotify_add_watch	(__NR_Linux + 248)
+-#  define __NR_inotify_rm_watch		(__NR_Linux + 249)
+-# endif
+-#else
+-# error "inotify not supported on this architecture!"
+-#endif
+-
+-static inline int inotify_init (void)
+-{
+-	return syscall (__NR_inotify_init);
+-}
+-
+-static inline int inotify_add_watch (int fd, const char *name, __u32 mask)
+-{
+-	return syscall (__NR_inotify_add_watch, fd, name, mask);
+-}
+-
+-static inline int inotify_rm_watch (int fd, __u32 wd)
+-{
+-	return syscall (__NR_inotify_rm_watch, fd, wd);
+-}
+-
+-#endif /* _LINUX_INOTIFY_SYSCALLS_H */
+-- 
+1.7.10.4
+

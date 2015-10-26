@@ -1,0 +1,28 @@
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+
+pkgname=telepathy-glib
+pkgver=0.24.0
+pkgrel=1
+pkgdesc="GLib bindings for the Telepathy D-Bus protocol"
+arch=('x86_64')
+url="http://telepathy.freedesktop.org"
+groups=('telepathy')
+license=('LGPL2.1')
+options=('!libtool' '!emptydirs')
+depends=('dbus-glib')
+makedepends=('libxslt' 'vala' 'gobject-introspection')
+source=("http://telepathy.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+sha256sums=('ae0002134991217f42e503c43dea7817853afc18863b913744d51ffa029818cf')
+
+build() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    PYTHON=/usr/bin/python2 ./configure --prefix=/usr \
+        --libexecdir=/usr/lib/telepathy \
+        --enable-static=no
+    make
+}
+
+package() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    make DESTDIR=${pkgdir} install
+}

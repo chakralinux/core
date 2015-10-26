@@ -1,0 +1,66 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sbcl
+
+pkgname=sbcl
+pkgver=1.2.9
+pkgrel=1
+pkgdesc="Steel Bank Common Lisp"
+arch=('x86_64')
+license=('custom')
+url="http://www.sbcl.org/"
+depends=('glibc')
+provides=('common-lisp' 'cl-asdf')
+makedepends=('sbcl' 'texinfo')
+install=sbcl.install
+source=("http://downloads.sourceforge.net/project/sbcl/sbcl/$pkgver/$pkgname-$pkgver-source.tar.bz2"
+        'chakra-fixes.lisp')
+md5sums=('e23592dd0e424239b0ddc40f0df44ab0'
+         '7ac0c1936547f4278198b8bf7725204d')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  export CFLAGS+=" -D_GNU_SOURCE -fno-omit-frame-pointer -DSBCL_HOME=/usr/lib/sbcl"
+  export GNUMAKE="make"
+
+  # build system uses LINKFLAGS and OS_LIBS to build LDFLAGS
+  export LINKFLAGS="$LDFLAGS"
+  unset LDFLAGS
+  unset MAKEFLAGS
+
+  # Make a multi-threaded SBCL, disable LARGEFILE
+  cat >customize-target-features.lisp <<EOF
+(lambda (features)
+  (flet ((enable (x) (pushnew x features))
+         (disable (x) (setf features (remove x features))))
+  (enable :sb-thread)
+  (disable :largefile)))
+EOF
+
+  sh make.sh sbcl --prefix=/usr
+  make -C doc/manual info
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  INSTALL_ROOT="$pkgdir/usr" sh install.sh
+
+  src/runtime/sbcl --core output/sbcl.core --script ${srcdir}/chakra-fixes.lisp
+  mv sbcl-new.core ${pkgdir}/usr/lib/sbcl/sbcl.core
+
+  # sources
+  mkdir -p "$pkgdir/usr/share/sbcl-source"
+  cp -R -t "$pkgdir/usr/share/sbcl-source" "$srcdir/$pkgname-$pkgver/"{src,contrib}
+
+  # license
+  install -D -m644 "$srcdir/$pkgname-$pkgver/COPYING" \
+                   "$pkgdir/usr/share/licenses/$pkgname/license.txt"
+
+  # drop unwanted files
+  find "$pkgdir" \( -name Makefile -o -name .cvsignore \) -delete
+  find "$pkgdir/usr/share/sbcl-source" -type f \
+    \( -name \*.fasl -o -name \*.o -o -name \*.log -o -name \*.so -o -name a.out \) -delete
+
+  rm "$pkgdir/usr/share/sbcl-source/src/runtime/sbcl"{,.nm}
+
+}

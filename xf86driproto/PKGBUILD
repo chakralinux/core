@@ -1,0 +1,26 @@
+# Part of X.org group
+# Contributor: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: Bruce Liu <brli@users.sourceforge.net)
+
+pkgname=xf86driproto
+pkgver=2.1.1
+pkgrel=2
+pkgdesc="X11 DRI extension wire protocol"
+arch=(x86_64)
+makedepends=('xorg-util-macros')
+url="http://xorg.freedesktop.org/"
+license=('custom')
+source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('23e861f40ba0f0cbbfd7db7ba2ef623762ffca17')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+}

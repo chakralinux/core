@@ -1,0 +1,32 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kwindowsystem
+source ../frameworks.conf
+
+pkgname=kwindowsystem
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KWindowSystem'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kwindowsystem'
+license=('LGPL')
+depends=("qt5-x11extras" 'libxfixes')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
+checkdepends=('cmake' 'xorg-server-xvfb' 'openbox')
+groups=('kf5')
+options=('debug')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

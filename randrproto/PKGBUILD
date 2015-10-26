@@ -1,0 +1,26 @@
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+pkgname=randrproto
+pkgver=1.4.0
+pkgrel=1
+pkgdesc="X11 RandR extension wire protocol"
+arch=('x86_64')
+license=('custom')
+url="http://xorg.freedesktop.org/"
+makedepends=('xorg-util-macros')
+source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('65d2fc4440adf1557cde2b36901a3de21ab189c1')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  install -d -m755 "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

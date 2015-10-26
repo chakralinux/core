@@ -1,0 +1,34 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Martín González kote[at]chakra-project[dot]org>
+
+pkgname=nss-mdns
+pkgver=0.10
+pkgrel=6
+pkgdesc="glibc plugin providing host name resolution via mDNS"
+arch=('i686' 'x86_64')
+url="http://0pointer.de/lennart/projects/nss-mdns/"
+license=('lgpl')
+depends=('glibc')
+makedepends=('pkgconfig')
+install=nss-mdns.install
+source=("http://pkgs.fedoraproject.org/repo/pkgs/nss-mdns/nss-mdns-$pkgver.tar.gz/03938f17646efbb50aa70ba5f99f51d7/nss-mdns-$pkgver.tar.gz")
+md5sums=('03938f17646efbb50aa70ba5f99f51d7')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-lynx \
+    --enable-avahi
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR=${pkgdir} install
+}
+

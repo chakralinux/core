@@ -1,0 +1,37 @@
+pkgname=gst-libav
+pkgver=1.4.5
+pkgrel=1
+pkgdesc="Gstreamer libav Plugin"
+arch=('x86_64')
+license=('GPL')
+url="http://gstreamer.freedesktop.org/"
+depends=('gst-plugins-base' 'bzip2')
+makedepends=('python' 'yasm')
+options=(!emptydirs)
+provides=("gst-ffmpeg=$pkgver-$pkgrel")
+source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
+sha256sums=('605c62624604f3bb5c870844cc1f2711779cc533b004c2aa1d8c0d58557afbbc')
+
+build() {
+  cd $pkgname-$pkgver
+
+  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+    --disable-static --with-libav-extra-configure="--enable-runtime-cpudetect" \
+    --with-package-name="GStreamer libav Plugin (Chakra Linux)" \
+    --with-package-origin="http://www.chakraos.org/"
+
+  # https://bugzilla.gnome.org/show_bug.cgi?id=655517
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="${pkgdir}" install
+}

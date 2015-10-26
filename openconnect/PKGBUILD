@@ -1,0 +1,27 @@
+# maintainer: abveritas@chakra-project.org
+
+pkgname=openconnect
+pkgver=7.06
+pkgrel=1
+pkgdesc="Open client for Cisco AnyConnect VPN"
+arch=('x86_64')
+license=('GPL')
+url="http://www.infradead.org/openconnect.html"
+depends=('libxml2' 'gnutls' 'libproxy' 'vpnc')
+makedepends=('intltool' 'python2')
+options=('!libtool' '!emptydirs')
+source=("ftp://ftp.infradead.org/pub/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('80f397911e1fed43d897d99be3d5f1a1')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --disable-static --with-gnutls
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install  -Dm0644 openconnect.8 "${pkgdir}"/usr/share/man/man8/openconnect.8
+}

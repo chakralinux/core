@@ -1,0 +1,32 @@
+source ../frameworks.conf
+
+pkgname=kpeople
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='A library that provides access to all contacts and the people who hold them'
+arch=('x86_64')
+url='http://community.kde.org/KTp/libkpeople'
+license=(LGPL)
+depends=('kservice' 'kwidgetsaddons' 'kitemviews' "qt5-declarative")
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python3')
+conflicts=('libkpeople')
+#replaces=('libkpeople') # enable only when we switch to P5
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() { 
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="$pkgdir" install
+}

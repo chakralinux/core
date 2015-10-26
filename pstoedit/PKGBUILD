@@ -1,0 +1,31 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer AlmAck
+
+pkgname=pstoedit
+pkgver=3.62
+pkgrel=3
+pkgdesc="Translates PostScript and PDF graphics into other vector formats"
+arch=('x86_64')
+url="http://www.pstoedit.net/"
+license=('GPL')
+depends=('gcc-libs' 'plotutils' 'gd' 'imagemagick')
+makedepends=('ghostscript')
+options=('!makeflags')
+source=("http://downloads.sourceforge.net/sourceforge/pstoedit/pstoedit-${pkgver}.tar.gz")
+sha1sums=('50d5a4e2fe0e0ff2f73cb094cb945b221083e742')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  sed -i 's/-pedantic//' configure
+
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}

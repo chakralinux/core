@@ -1,0 +1,33 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+
+pkgname=ilmbase
+pkgver=2.0.1
+pkgrel=1
+depends=('gcc-libs')
+pkgdesc="IlmThread is a thread abstraction library for use with OpenEXR"
+arch=(i686 x86_64)
+license=('custom')
+options=('!libtool')
+source=(http://savannah.nongnu.org/download/openexr/$pkgname-$pkgver.tar.gz)
+md5sums=('74c0d0d2873960bd0dc1993f8e03f0ae')
+url="http://www.openexr.com"
+
+build() {
+  cd ${srcdir}/$pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+  cd ${srcdir}/$pkgname-$pkgver
+  # one of the tests fails randomly for an unknown reason
+  make check || true
+}
+
+package() {
+  cd ${srcdir}/$pkgname-$pkgver
+  make DESTDIR=${pkgdir} install
+  install -D -m644 COPYING $pkgdir/usr/share/licenses/$pkgname/COPYING
+}

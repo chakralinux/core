@@ -1,0 +1,67 @@
+#
+# Platform Packages for Chakra, part of chakraos.org
+#
+# maintainer (x86_64): AlmAck <gluca86[at]gmail[dot]com>
+# contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
+
+pkgname=jasper
+pkgver=1.900.1
+pkgrel=7
+pkgdesc="A software-based implementation of the codec specified in the emerging JPEG-2000 Part-1 standard"
+arch=('x86_64')
+url="http://www.ece.uvic.ca/~mdadams/jasper/"
+license=('custom:JasPer2.0')
+depends=('libjpeg' 'freeglut' 'libxi' 'libxmu' 'mesa')
+makedepends=('unzip')
+source=("http://www.ece.uvic.ca/~mdadams/${pkgname}/software/${pkgname}-${pkgver}.zip"
+        jpc_dec.c.patch
+        patch-libjasper-stepsizes-overflow.diff
+        jasper-1.900.1-CVE-2008-3520.patch
+        jasper-1.900.1-CVE-2008-3522.patch
+        jasper-1.900.1-CVE-2014-9029.patch
+        jasper-1.900.1-CVE-2014-8137.patch
+        jasper-avoid-assert-abort.diff
+        jasper-1.900.1-CVE-2014-8138.patch
+        jasper-1.900.1-CVE-2011-4516-and-CVE-2011-4517.patch
+        jasper-1.900.1-fix-filename-buffer-overflow.patch)
+md5sums=('a342b2b4495b3e1394e161eb5d85d754'
+         '36de7128eea6f701c1e2e13ce5bd8d37'
+         '24785d8eb3eea19eec7e77d59f3e6a25'
+         '911bb13529483c093d12c15eed4e9243'
+         'ed441f30c4231f319d9ff77d86db2ef9'
+         '82ad4b6391ad1c244e687846cac2210c'
+         '54d15ea7a5e7c7712d0a3a50c5173d2c'
+         '645a2d53b2e6b093c9d8ff54f9d2c887'
+         '1ec04bd2483a3ad2186b2178c237fd3b'
+         'c0e3ad1b78a79b4a76d24beff1dcc6cd'
+         '38403f9c82a18547beca16c9c6f4ce7a')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+
+  patch -p1 -i "${srcdir}/jpc_dec.c.patch"
+  patch -p1 -i "${srcdir}/patch-libjasper-stepsizes-overflow.diff"
+  patch -p1 -i "${srcdir}/jasper-1.900.1-CVE-2008-3520.patch"
+  patch -p1 -i "${srcdir}/jasper-1.900.1-CVE-2008-3522.patch"
+  patch -p1 -i "${srcdir}/jasper-1.900.1-CVE-2014-9029.patch"
+  patch -p1 -i "${srcdir}/jasper-1.900.1-CVE-2014-8137.patch"
+  patch -p1 -i "${srcdir}/jasper-avoid-assert-abort.diff"
+  patch -p1 -i "${srcdir}/jasper-1.900.1-CVE-2014-8138.patch"
+  patch -p1 -i "${srcdir}/jasper-1.900.1-CVE-2011-4516-and-CVE-2011-4517.patch"
+  patch -p1 -i "${srcdir}/jasper-1.900.1-fix-filename-buffer-overflow.patch"
+}
+
+build() {
+  cd ${pkgname}-${pkgver}
+
+  ./configure --prefix=/usr --mandir=/usr/share/man --enable-shared
+  make
+}
+
+package() {
+  cd ${pkgname}-${pkgver}
+
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 LICENSE \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

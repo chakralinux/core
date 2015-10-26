@@ -1,0 +1,33 @@
+#
+# Platform Packages for Chakra, part of chakraos.org
+#
+# maintainer almack
+
+pkgname=v4l-utils
+pkgver=1.6.0
+pkgrel=1
+pkgdesc="Userspace tools and conversion library for Video 4 Linux"
+arch=('x86_64')
+url="http://linuxtv.org/"
+provides=("libv4l=$pkgver")
+replaces=('libv4l')
+conflicts=('libv4l')
+license=('LGPL')
+makedepends=('qt')
+optdepends=('qt')
+depends=('glibc' 'gcc-libs' 'sysfsutils' 'libjpeg-turbo')
+source=(http://linuxtv.org/downloads/v4l-utils/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('921dab41b8d950fb7d1412e39f48703e')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr --sysconfdir=/etc
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  MAKEFLAGS="-j1" make install DESTDIR="${pkgdir}/"
+  rm "${pkgdir}/usr/bin/ivtv-ctl"
+}

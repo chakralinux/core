@@ -1,0 +1,54 @@
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# See https://groups.google.com/forum/?hl=en&fromgroups#!topic/chakra-devel/7F1Ze0zChnM
+# & packaging guidelines on http://cdemu.sourceforge.net/about/daemon/
+#
+# Contributor: abveritas@chakra-project.org
+# Maintainer: BrLi <rainman59118[at]Gmail.com>
+
+pkgname=cdemu-daemon
+pkgver=3.0.2
+pkgrel=2
+pkgdesc=("CD/DVD-ROM device emulator daemon")
+arch=('x86_64')
+backup=('etc/conf.d/cdemu-daemon'
+	'etc/dbus-1/system.d/cdemu-daemon-dbus.conf')
+url="http://cdemu.sourceforge.net/"
+license=('GPL')
+depends=('glib2' 'dbus' 'dbus-glib' 'libdaemon' 'vhba-module' "libmirage>=$pkgver" 'libao')
+makedepends=('cmake')
+optdepends=('alsa-lib: to enable the ALSA audio driver'
+            'pulseaudio: to enable the PA audio driver')
+install=$pkgname.install
+source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2"
+        'system-arch.patch')
+md5sums=('ada2ec2ff2e1bbbc10c596414b4ba77d'
+         'fd50ba1c66c95337044db494fba887c4')
+
+prepare() {
+  mkdir build
+  cd $pkgname-$pkgver
+
+  # Patch system daemon for Arch-friendlyness
+  # It's disabled by default. Should we even ship it?
+  patch -Np1 -i ../system-arch.patch
+}
+
+build() {
+  cd build
+  cmake ../$pkgname-$pkgver \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DCMAKE_INSTALL_SYSCONFDIR=/etc \
+    -DCMAKE_INSTALL_LIBEXECDIR=lib/$pkgname
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="$pkgdir" install
+
+  install -d "$pkgdir/usr/lib/modules-load.d"
+  echo vhba > "$pkgdir/usr/lib/modules-load.d/cdemu.conf"
+}

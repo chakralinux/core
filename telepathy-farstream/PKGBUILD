@@ -1,0 +1,35 @@
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/telepathy-farstream/
+
+pkgname=telepathy-farstream
+pkgver=0.6.2
+pkgrel=1
+pkgdesc="A telepathy-backend to use stream engine."
+arch=(x86_64)
+url="http://telepathy.freedesktop.org"
+license=('LGPL2.1')
+depends=('telepathy-glib' 'farstream' 'gst-python' )
+makedepends=('dbus-glib' 'python2-gobject')
+conflicts=('telepathy-farsight')
+replaces=('telepathy-farsight')
+provides=('telepathy-farsight')
+groups=('telepathy')
+options=('!libtool')
+source=(http://telepathy.freedesktop.org/releases/$pkgname/$pkgname-$pkgver.tar.gz)
+sha256sums=('6fa099f22d13a2a49240445a13e918928aef097675d76e5cc9f98ab496087e0a')
+
+build() {
+  cd "$pkgname-$pkgver"
+
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --libexecdir=/usr/lib/telepathy \
+    --disable-static
+  make
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+}
+

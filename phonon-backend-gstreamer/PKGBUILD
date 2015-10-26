@@ -1,0 +1,64 @@
+# maintainer abveritas@chakra-project.org
+
+pkgbase=phonon-backend-gstreamer
+pkgname=('phonon-backend-gstreamer' 'phonon-qt5-backend-gstreamer')
+pkgver=4.8.2
+pkgrel=1
+pkgdesc="Phonon GStreamer backend"
+arch=('x86_64')
+url='http://phonon.kde.org'
+license=('LGPL')
+makedepends=('pkg-config' 'cmake' 'automoc4' 'phonon' 'phonon-qt5')
+optdepends=('gst-plugins-good: For media format support'
+            'gst-plugins-bad: For media format support'
+            'gst-plugins-ugly: For media format support'
+            'gst-libav: For media format support')
+groups=("kde-complete" "kde-uninstall")
+source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.xz")
+sha256sums=('20e0f71f2beb4f859db8385079a13aef5473863ee6f27aad7b065aa7bfe931e0')
+
+prepare() {
+  mkdir build-qt4
+  mkdir build-qt5
+}
+
+
+build() {
+  cd build-qt4
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib
+  make
+
+  cd ../build-qt5
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DPHONON_BUILD_PHONON4QT5=ON
+  make
+}
+
+package_phonon-backend-gstreamer() {
+  pkgdesc="Phonon GStreamer backend for Qt4"
+  depends=('gst-plugins-base')
+  provides=('phonon-backend')
+
+  cd build-qt4
+  make DESTDIR="${pkgdir}" install
+}
+
+package_phonon-qt5-backend-gstreamer() {
+  pkgdesc="Phonon GStreamer backend for Qt5"
+  depends=('gst-plugins-base')
+  provides=('phonon-qt5-backend')
+
+  cd build-qt5
+  make DESTDIR="${pkgdir}" install
+
+  # Those are not needed
+  rm -rf "${pkgdir}"/usr/share
+}

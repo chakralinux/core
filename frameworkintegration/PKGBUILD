@@ -1,0 +1,33 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=frameworkintegration
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Framework providing components to allow applications to integrate with a KDE Workspace'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/frameworkintegration'
+license=('LGPL')
+depends=('python3' 'kio' 'ttf-oxygen') #should replace this with oxygen-fonts once plasma5 hits 
+stable
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
+options=("debug")
+groups=('kf5')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} 
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

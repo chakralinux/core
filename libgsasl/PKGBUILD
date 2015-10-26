@@ -1,0 +1,29 @@
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+
+pkgname=libgsasl
+pkgver=1.8.0
+pkgrel=2
+pkgdesc="GNU SASL is an implementation of the Simple Authentication and Security Layer framework and a few common SASL mechanisms."
+arch=('x86_64')
+license=('LGPL')
+depends=('libidn')
+options=('!libtool' '!emptydirs')
+depends=('libidn')
+categories=('games')
+conflicts=('gsasl')
+url="http://www.gnu.org/software/gsasl"
+source=("ftp://ftp.gnu.org/gnu/gsasl/${pkgname}-${pkgver}.tar.gz")
+md5sums=('5dbdf859f6e60e05813370e2b193b92b')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}

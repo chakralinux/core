@@ -1,0 +1,40 @@
+source ../frameworks.conf
+
+pkgname=modemmanager-qt
+_pkgname=modemmanager-qt
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc="Plasma Workspace"
+arch=('x86_64')
+url='http://projects.kde.org'
+license=('LGPL')
+depends=('qt5-base' 'networkmanager')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kapidox')
+checkdepends=("cmake")
+provides=("libmm-qt5=${pkgver}")
+replaces=("libmm-qt5<=5.2.2")
+conflicts=("libmm-qt5<=5.2.2")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) ) 
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

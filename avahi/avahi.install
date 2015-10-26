@@ -1,0 +1,17 @@
+post_install() {
+  getent group avahi &>/dev/null || groupadd -r -g 84 avahi >/dev/null
+  getent passwd avahi &>/dev/null || useradd -r -u 84 -g avahi -d / -s /bin/false -c avahi avahi >/dev/null
+  
+  echo "Enabling systemd service"
+         systemctl enable avahi-daemon.service
+}
+
+pre_remove() {
+   echo "Disabling systemd service"
+         systemctl disable avahi-daemon.service
+}
+
+post_remove() {
+  getent passwd avahi &>/dev/null && userdel avahi >/dev/null
+  getent group avahi &>/dev/null && groupdel avahi >/dev/null
+}

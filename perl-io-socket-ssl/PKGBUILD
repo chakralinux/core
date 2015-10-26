@@ -1,0 +1,31 @@
+# Platform Packages for Chakra, part of chakra-project.org
+
+pkgname=perl-io-socket-ssl
+_cpanname=IO-Socket-SSL
+pkgver=1.988
+pkgrel=1
+pkgdesc="Nearly transparent SSL encapsulation for IO::Socket::INET"
+arch=('any')
+license=('GPL' 'PerlArtistic')
+url="http://search.cpan.org/dist/${_cpanname}/"
+depends=('perl-net-ssleay' 'perl>=5.14.2' 'perl-uri')
+checkdepends=('perl-io-socket-inet6')
+options=('!emptydirs')
+source=(http://www.cpan.org/authors/id/S/SU/SULLR/${_cpanname}-${pkgver}.tar.gz)
+sha1sums=('f2f7927d79634f8318c53cf97187618bd8412a64')
+
+build() {
+  cd "${srcdir}/${_cpanname}-${pkgver}"
+  yes | perl Makefile.PL INSTALLDIRS=vendor
+  make
+}
+
+check() {
+  cd "${srcdir}/${_cpanname}-${pkgver}"
+  make test
+}
+
+package() {
+  cd "${srcdir}/${_cpanname}-${pkgver}"
+  make install DESTDIR="${pkgdir}"
+}

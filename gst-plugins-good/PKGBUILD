@@ -1,0 +1,49 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# Maintainer: Francesco Marinucci < franzmari[at]chakra-project[dot]it>
+# contributor Jan de Groot <jgc@archlinux.org>
+
+pkgname=gst-plugins-good
+pkgver=1.4.5
+pkgrel=2
+pkgdesc="GStreamer Multimedia Framework Good Plugins"
+arch=('x86_64')
+license=('LGPL')
+url="http://gstreamer.freedesktop.org/"
+depends=('pulseaudio' 'jack' 'libsoup' 'gst-plugins-base' 'wavpack'
+         'aalib' 'taglib' 'libdv' 'libshout' 'libvpx' 'gdk-pixbuf2' 'libcaca'
+         'libavc1394' 'libiec61883' 'libxdamage' 'v4l-utils' 'libgudev')
+makedepends=('gstreamer' 'speex' 'flac' 'libraw1394')
+options=('!emptydirs')
+source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
+md5sums=('eaf1a6daf73749bc423feac301d60038')
+
+build() {
+  cd $pkgname-$pkgver
+
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static \
+    --enable-experimental \
+    --with-package-name="GStreamer Good Plugins (Chakra GNU/Linux)" \
+    --with-package-origin="http://www.chakraos.org/"
+  
+  # https://bugzilla.gnome.org/show_bug.cgi?id=655517
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  
+  make GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1 DESTDIR="${pkgdir}" install
+}

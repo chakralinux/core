@@ -1,0 +1,31 @@
+# Maintainer: Bruce Liu <brli@users.sourceforge.net>
+
+pkgname=cairo-perl
+pkgver=1.104
+pkgrel=2
+pkgdesc="Perl wrappers for cairo"
+arch=('x86_64')
+license=('LGPL')
+url="http://gtk2-perl.sourceforge.net/"
+options=('!emptydirs')
+depends=('cairo' 'perl' 'libxxf86vm' 'libxdamage')
+makedepends=('perl-extutils-depends' 'perl-extutils-pkgconfig')
+source=("http://sourceforge.net/projects/gtk2-perl/files/Cairo/${pkgver}/Cairo-${pkgver}.tar.gz")
+md5sums=('c7d2eee6c319588c04a6b95efe39b0ae')
+
+build() {
+  export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+  cd "${srcdir}/Cairo-${pkgver}"
+  perl Makefile.PL INSTALLDIRS=vendor
+  make
+}
+
+check() {
+  cd "${srcdir}/Cairo-${pkgver}"
+  make test
+}
+
+package() {
+  cd "${srcdir}/Cairo-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}

@@ -1,0 +1,26 @@
+#maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+
+pkgname=diffstat
+pkgver=1.57
+pkgrel=1
+pkgdesc="Display a histogram of diff changes"
+arch=('x86_64')
+url="http://invisible-island.net/diffstat"
+depends=('glibc')
+license=('GPL')
+source=(ftp://invisible-island.net/${pkgname}/${pkgname}-${pkgver}.tgz)
+md5sums=('a70ae35e479ab91da7eb6023a4e9240a')
+
+build () {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr \
+              --mandir=/usr/share/man
+  make 
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR=${pkgdir}/ install
+  install -Dm644 package/debian/copyright "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

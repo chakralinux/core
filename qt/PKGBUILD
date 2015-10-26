@@ -1,0 +1,187 @@
+#
+# QT Packages for Chakra, part of chakra-project.org
+#
+# maintainer: inkane@chakra-project.org
+# contributor: abveritas@chakra-project.org
+## rebuild on icu update
+
+pkgbase=qt
+pkgname=('qt' 'qt-private-headers' 'qt-docs')
+pkgver=4.8.7
+pkgrel=1
+arch=('x86_64')
+url='http://www.qt.io'
+license=('GPL3' 'LGPL')
+makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
+    'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
+    'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
+    'mysql' 'unixodbc' 'cups' 'libxinerama' 'libxcursor')
+options=('staticlibs' 'debug')
+_pkgfqn="qt-everywhere-opensource-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar.gz"
+        'assistant.desktop' 'designer.desktop' 'linguist.desktop'
+        'qtconfig.desktop' 'improve-cups-support.patch' 'qt_no_debug.patch'
+        'moc-boost-workaround.patch'
+        'kubuntu_14_systemtrayicon.diff'
+        'glib-honor-ExcludeSocketNotifiers-flag.diff'
+        'qtcore-4.8.5-qeventdispatcher-recursive.patch'
+        'l-qclipboard_delay.patch'
+        'add_nostrip_for_debug_packages.diff'
+        'kde4-settings.patch')
+md5sums=('d990ee66bf7ab0c785589776f35ba6ad'
+         'fc211414130ab2764132e7370f8e5caa'
+         '85179f5e0437514f8639957e1d8baf62'
+         'f11852b97583610f3dbb669ebc3e21bc'
+         '6b771c8a81dd90b45e8a79afa0e5bbfd'
+         'b9fb6b953cec428d59c026b1ef370e86'
+         '742bfebaebc44c26f6cabe654f702cc8'
+         'da387bde22ae1c446f12525d2a31f070'
+         'a523644faa8f98a73f55c4aa23c114a6'
+         '85679531c8a7310317adfb7002d9f99a'
+         '009de09b4e589a7770fba74405656c99'
+         'addc5e88d538ee55e17bd49ba337ca67'
+         '41587e01bb0ca6d0c52fcf39eb737459'
+         '66dfea63916c8dbf47b23cb012ffdccc')
+
+prepare() {
+	cd ${_pkgfqn}
+
+	# tray icon with sni
+        patch -Np1 -i "${srcdir}"/kubuntu_14_systemtrayicon.diff
+        # from Fedora, removing "QDBusConnection:..." message for qt apps
+	patch -p1 -i "${srcdir}"/qt_no_debug.patch
+
+	patch -p1 -i "${srcdir}"/improve-cups-support.patch
+	patch -Np1 -i "${srcdir}"/moc-boost-workaround.patch
+	
+	# FS#45106
+        patch -p0 -i "${srcdir}"/kde4-settings.patch
+	
+	# https://bugreports.qt-project.org/browse/QTBUG-37380 (use by LibreOffice)
+	patch -Np1 -i "${srcdir}"/glib-honor-ExcludeSocketNotifiers-flag.diff
+	# https://bugreports.qt-project.org/browse/QTBUG-34614 (use by LibreOffice)
+	patch -Np0 -i "${srcdir}"/qtcore-4.8.5-qeventdispatcher-recursive.patch
+	# https://bugreports.qt-project.org/browse/QTBUG-38585 (use by LibreOffice)
+	patch -Np0 -i "${srcdir}"/l-qclipboard_delay.patch
+	
+	# To include the debug symbols we should add the nostrip option
+	# http://anonscm.debian.org/gitweb/?p=pkg-kde/qt/qt4-x11.git;a=blob;f=debian/patches/12_add_nostrip_for_debug_packages.diff;h=d5f3083eff90ae0b748b6ab542aa951f4e6d0004;hb=HEAD
+	patch -Np1 -i "${srcdir}"/add_nostrip_for_debug_packages.diff
+
+        sed -i "s|-O2|${CXXFLAGS}|" mkspecs/common/{g++,gcc}-base.conf
+        sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" mkspecs/common/gcc-base-unix.conf
+        sed -i "/^QMAKE_LFLAGS\s/s|+=|+= ${LDFLAGS}|g" mkspecs/common/gcc-base.conf
+}
+
+build() {
+	cd $srcdir/$_pkgfqn
+
+        export QT4DIR="${srcdir}"/${_pkgfqn}
+        export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
+
+
+	./configure -confirm-license -opensource \
+                -release \
+                -fast  \
+		-prefix /usr \
+		-docdir /usr/share/doc/qt \
+		-plugindir /usr/lib/qt/plugins \
+		-importdir /usr/lib/qt/imports \
+		-datadir /usr/share/qt \
+		-translationdir /usr/share/qt/translations \
+		-sysconfdir /etc/xdg \
+		-examplesdir /usr/share/doc/qt/examples \
+		-demosdir /usr/share/doc/qt/demos \
+		-plugin-sql-{psql,mysql,sqlite,odbc} \
+		-system-sqlite \
+		-no-phonon \
+		-no-phonon-backend \
+		-no-webkit \
+		-graphicssystem raster \
+                 -openssl-linked \
+                 -nomake demos \
+                 -nomake examples \
+                 -nomake docs \
+                 -silent \
+                 -no-rpath \
+                 -optimized-qmake \
+                 -reduce-relocations \
+                 -dbus-linked \
+                 -no-openvg \
+                 -xcursor
+	 make
+}
+
+package_qt() {
+    pkgdesc='A cross-platform application and UI framework'
+    depends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
+      'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
+      'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'libxinerama' 'libxcursor')
+    optdepends=('postgresql-libs: PostgreSQL driver'
+	  'libmysqlclient: MySQL driver'
+	  'unixodbc: ODBC driver'
+	  'libxinerama: Xinerama support'
+	  'libxfixes: Xfixes support'
+	  'icu: Unicode support')
+    provides=('qt4')
+    install='qt.install'
+	
+    cd $srcdir/$_pkgfqn
+    make INSTALL_ROOT=$pkgdir install
+   
+    # install missing icons and desktop files
+    for icon in tools/linguist/linguist/images/icons/linguist-*-32.png ; do
+        size=$(echo $(basename ${icon}) | cut -d- -f2)
+        install -p -D -m644 ${icon} ${pkgdir}/usr/share/icons/hicolor/${size}x${size}/apps/linguist.png
+    done
+    install -p -D -m644 src/gui/dialogs/images/qtlogo-64.png ${pkgdir}/usr/share/icons/hicolor/64x64/apps/qtlogo.png
+    install -p -D -m644 tools/assistant/tools/assistant/images/assistant.png ${pkgdir}/usr/share/icons/hicolor/32x32/apps/assistant.png
+    install -p -D -m644 tools/designer/src/designer/images/designer.png ${pkgdir}/usr/share/icons/hicolor/128x128/apps/designer.png
+    install -d ${pkgdir}/usr/share/applications
+    install -m644 ${srcdir}/{linguist,designer,assistant,qtconfig}.desktop ${pkgdir}/usr/share/applications/
+    
+    # install license addition
+    install -D -m644 LGPL_EXCEPTION.txt ${pkgdir}/usr/share/licenses/qt/LGPL_EXCEPTION.txt
+    
+    # Fix wrong path in pkgconfig files
+    find ${pkgdir}/usr/lib/pkgconfig -type f -name '*.pc' \
+        -exec perl -pi -e "s, -L${srcdir}/?\S+,,g" {} \;
+    # Fix wrong path in prl files
+    find ${pkgdir}/usr/lib -type f -name '*.prl' \
+        -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
+}
+
+package_qt-private-headers() {
+    pkgdesc="Qt private headers for development"
+    provides=('qt4-private-headers')
+    depends=("qt=${pkgver}")
+
+    install -d ${pkgdir}/usr/include/{QtCore,QtDeclarative,QtGui,QtScript}
+    install -d ${pkgdir}/usr/src/{corelib,declarative,gui,script}
+    
+    for i in QtCore QtDeclarative QtGui QtScript; do
+      cp -r ${srcdir}/$_pkgfqn/include/${i}/private/ \
+        ${pkgdir}/usr/include/${i}/
+    done
+
+    for i in corelib declarative gui script; do
+      cp -r ${srcdir}/$_pkgfqn/src/${i} ${pkgdir}/usr/src/
+    done
+
+    find ${pkgdir} -name \*.o -type f -delete 
+}
+
+package_qt-docs() {
+    pkgdesc='The Qt gui toolkit documentation'
+    arch=('any')
+    options=('docs')
+    depends=('qt')
+    replaces=('qt-doc')
+    conflicts=("qt-doc=${pkgver}")
+    categories=('documentation')
+    cd ${srcdir}/${_pkgfqn}
+    install -d ${pkgdir}/usr/share/doc/qt
+    cp -r doc/* ${pkgdir}/usr/share/doc/qt
+    cp -r demos ${pkgdir}/usr/share/doc/qt
+    cp -r examples ${pkgdir}/usr/share/doc/qt
+}

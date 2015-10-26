@@ -1,0 +1,34 @@
+# Platform Packages for Chakra, part of chakra-project.org
+# Maintainer: franzmari@chakra-project.it
+
+pkgname=mpg123
+pkgver=1.21.0
+pkgrel=1
+pkgdesc="A console based real time MPEG Audio Player for Layer 1, 2 and 3"
+arch=('x86_64')
+url="http://sourceforge.net/projects/mpg123"
+license=('GPL2' 'LGPL2.1')
+depends=('glibc' 'libltdl' 'alsa-lib' 'pulseaudio')
+makedepends=('sdl' 'jack')
+optdepends=('sdl: for sdl audio support'
+            'jack: for jack audio support')
+conflicts=('mpg321')
+provides=('mpg321')
+replaces=('mpg321')
+categories=('multimedia')
+source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
+sha1sums=('a2fd84078632b7ab73ae4cd64c3f941d140167a8')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr \
+              --enable-int-quality \
+              --with-audio="alsa oss sdl jack pulse" \
+              --with-module-suffix=.so
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}

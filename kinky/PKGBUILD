@@ -1,0 +1,36 @@
+# Maintainer: AlmAck
+
+pkgname=kinky
+pkgver=1.2.0
+pkgrel=1
+pkgdesc="Builds packages inside chroots"
+arch=(any)
+url="http://chakraos.org/wiki/index.php?title=Kinky"
+license=('GPL2')
+groups=('chakra-devel')
+depends=('python2' 'pacman' 'tar' 'pigz' 'python2-parched' 'python2-decoratortools')
+install=kinky.install
+
+gitsha=3caa285
+source=("$pkgname"::"git://git.chakraos.org/${pkgname}.git#commit=${gitsha}")
+md5sums=('SKIP')
+
+build() {
+    cd "${srcdir}/${pkgname}"
+    ./autogen.sh
+    ./configure --prefix=/usr --sysconfdir=/etc
+    make
+}
+
+package() {
+    cd "${srcdir}/${pkgname}"
+    make DESTDIR="$pkgdir/" install
+    ln -s chakra-apps-x86_64.cfg $pkgdir/etc/kinky/default.cfg
+    
+    # link kinky to consolehelper (deps: usermode)
+    #ln -s consolehelper $pkgdir/usr/bin/kinky
+    
+    # create default temporary directories
+    mkdir -p $pkgdir/var/lib/kinky
+    mkdir -p $pkgdir/var/cache/kinky
+}

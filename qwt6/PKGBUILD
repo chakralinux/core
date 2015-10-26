@@ -1,0 +1,48 @@
+# Platform packages for Chakra
+
+pkgname=qwt6
+_pkgname=qwt
+pkgver=6.0.2
+pkgrel=1
+pkgdesc="Qt Widgets for Technical Applications"
+arch=('x86_64')
+url="http://qwt.sourceforge.net/"
+depends=('qt')
+options=('!makeflags')
+license=("custom:$_pkgname")
+source=("http://downloads.sourceforge.net/sourceforge/qwt/$_pkgname-$pkgver.tar.bz2" \
+        "qwtconfig-chakra.pri")
+md5sums=('845837320328e3c92d049cc45c7bdbc2'
+         'cbac25877964dc18533cb24a8ea707bf')
+
+build() {
+  cd ${srcdir}/${_pkgname}-${pkgver}
+
+  # copy our config file to the right place
+  install -Dm644 ${srcdir}/qwtconfig-chakra.pri \
+	${srcdir}/${_pkgname}-${pkgver}/qwtconfig.pri
+
+  # build qwt:
+  qmake qwt.pro
+  make
+}
+
+package() {
+  cd ${srcdir}/${_pkgname}-${pkgver}
+
+  make INSTALL_ROOT=${pkgdir} QTDIR=/usr install
+  
+ # rename conflicting symlinks
+  mv ${pkgdir}/usr/lib/libqwt.so ${pkgdir}/usr/lib/libqwt6.so
+  
+# Currently designer plugin not enabled in qwt 5 package
+#  mv ${pkgdir}/usr/lib/qt/plugins/designer/libqwt_designer_plugin.so \
+#     ${pkgdir}/usr/lib/qt/plugins/designer/libqwt_designer_plugin6.so
+
+ # Currently no man pages exist
+ # mv "${pkgdir}"/usr/share/doc/qwt/man/ "${pkgdir}"/usr/share/doc/${pkgname}
+ 
+  # install licence
+  install -Dm644 ${srcdir}/${_pkgname}-${pkgver}/COPYING \
+	${pkgdir}/usr/share/licenses/${pkgname}/license.txt
+}

@@ -1,0 +1,45 @@
+pkgname=libteam
+pkgver=1.14
+pkgrel=1
+pkgdesc="Library for controlling team network device"
+arch=('x86_64')
+url="http://libteam.org/"
+license=(LGPL2.1)
+depends=(libnl libdaemon jansson dbus bash)
+makedepends=(python2 python3 swig)
+source=($url/files/$pkgname-$pkgver.tar.gz)
+sha256sums=('294cdabd85cddfeac304ecbd4f331ef3f9afbf03f8b8ef7bb3a9c5827ab22d97')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+    --disable-static --libexecdir=/usr/lib
+  make
+
+  cp -aT binding/python binding/python2
+
+  cd binding/python
+  python3  ./setup.py build
+  cd ../python2
+  python2 ./setup.py build
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+
+  install -Dm644 teamd/redhat/systemd/teamd@.service \
+    "$pkgdir/usr/lib/systemd/system/teamd@.service"
+  install -Dm644 teamd/dbus/teamd.conf \
+    "$pkgdir/etc/dbus-1/system.d/teamd.conf"
+
+  cd binding/python
+  python3  ./setup.py install --root "$pkgdir" -O1
+  cd ../python2
+  python2 ./setup.py install --root "$pkgdir" -O1
+}

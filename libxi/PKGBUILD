@@ -1,0 +1,30 @@
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+pkgname=libxi
+pkgver=1.7.2
+pkgrel=1
+pkgdesc="X11 Input extension library"
+arch=('x86_64')
+url="http://xorg.freedesktop.org"
+depends=('libxext' 'inputproto' 'libxfixes')
+makedepends=('pkgconfig' 'xorg-util-macros')
+options=(!libtool)
+license=('custom')
+source=(${url}/releases/individual/lib/libXi-${pkgver}.tar.bz2)
+sha1sums=('53c90cd52e40065e04886f046383c1e5c507e0c4')
+
+
+build() {
+  cd "${srcdir}/libXi-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc --disable-static
+  make
+}
+
+package() {
+  cd "${srcdir}/libXi-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

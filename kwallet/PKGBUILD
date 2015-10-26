@@ -1,0 +1,38 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kwallet
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Secure and unified container for user passwords'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kwallet'
+license=('LGPL')
+depends=('knotifications' 'gpgmepp')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python3' 'kdoctools')
+checkdepends=('cmake')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+# check() {
+#   cd build
+#   make test
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

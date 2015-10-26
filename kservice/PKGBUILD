@@ -1,0 +1,41 @@
+# Contributor : Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kservice
+pkgver=${KFVersion}
+pkgrel=2
+pkgdesc='Advanced plugin and service introspection'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kservice'
+license=('LGPL')
+depends=('ki18n' 'kconfig' 'kcrash' 'kdbusaddons')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools' 'python3')
+checkdepends=('xorg-server-xvfb' 'kded')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+# check() {
+#   cd build
+#   eval `dbus-launch --sh-syntax `
+#   xvfb-run make test
+#   kill $DBUS_SESSION_BUS_PID
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

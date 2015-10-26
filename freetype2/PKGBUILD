@@ -1,0 +1,49 @@
+# Platform Packages for Chakra, part of chakraos.org
+#
+# freetype2 and harfbuzz update
+# build freetype2 with old harfbuzz -> harfbuzz with new freetype -> build freetype2 with new harfbuzz.
+pkgname=freetype2
+pkgver=2.5.5
+_ubuntu_ver=2.5.2
+pkgrel=1
+_ubuntu_diff_version=${_ubuntu_ver}-1ubuntu2
+pkgdesc="TrueType font rendering library"
+arch=('x86_64')
+license=('GPL')
+url="http://freetype.sourceforge.net"
+# DO NOT remove harfbuzz from dependency
+depends=('zlib' 'sh' 'bzip2' 'libpng' 'harfbuzz')
+checkdepends=('valgrind')
+source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2"
+        "http://archive.ubuntu.com/ubuntu/pool/main/f/freetype/freetype_${_ubuntu_diff_version}.diff.gz")
+
+md5sums=('2a7a314927011d5030903179cf183be0'
+         'eda9c925032709bbd7463edcded05881')
+
+prepare() {
+  cd "${srcdir}/freetype-${pkgver}"  
+  # apply ubuntu patches
+  patch -Np1 -i ../freetype_${_ubuntu_diff_version}.diff
+  patch -p0 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/freetype-2.1.7-backwards.compat.patch"
+  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/enable-subpixel-rendering.patch"
+  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/enable-gxvalid-otvalid.patch"
+  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/revert_scalable_fonts_metric.patch"
+}
+
+build() {
+  cd "${srcdir}/freetype-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+  cd "${srcdir}/freetype-${pkgver}"
+  make -k check
+}
+
+package() {
+  cd "${srcdir}/freetype-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
+
+

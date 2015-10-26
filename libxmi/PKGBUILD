@@ -1,0 +1,27 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer (x86_64): Almack <almack[at]chakraos[dot]org>
+
+pkgname=libxmi
+pkgver=1.2
+pkgrel=2
+pkgdesc="library for rasterizing 2-D vector graphics"
+arch=('x86_64')
+url="http://www.gnu.org/software/libxmi/libxmi.html"
+license=('GPL')
+depends=('glibc')
+source=(http://mirrors.usc.edu/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz)
+md5sums=('4e6935484f0ad71b531920bf4c546b47')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  autoreconf --force --install
+  ./configure --prefix=/usr --infodir=/usr/share/info
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}

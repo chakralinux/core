@@ -1,0 +1,17 @@
+pkgname=rpmextract
+pkgver=1.0
+pkgrel=6
+pkgdesc="Script to convert or extract RPM archives (contains rpm2cpio)"
+arch=('x86_64')
+license=('GPL')
+url="http://www.archlinux.org"
+depends=('bash' 'libarchive' 'coreutils')
+source=('rpmextract.sh' 'rpm2cpio')
+md5sums=('5626272c0b22437f9200d2d2b718a642'
+         '57a4e99bedcefadc2f89006ce98d2e60')
+
+package() {
+  install -d ${pkgdir}/usr/bin
+  install -m755 ${srcdir}/rpmextract.sh ${pkgdir}/usr/bin/ 
+  install -m755 ${srcdir}/rpm2cpio ${pkgdir}/usr/bin/ 
+}

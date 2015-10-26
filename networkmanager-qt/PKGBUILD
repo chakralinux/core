@@ -1,0 +1,41 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=networkmanager-qt
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Qt wrapper for NetworkManager API'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/networkmanager-qt'
+license=('LGPL')
+depends=('networkmanager' 'qt5-base')
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
+checkdepends=("cmake")
+groups=('kf5')
+replaces=('libnm-qt5')
+conflicts=('libnm-qt5')
+provides=("libnm-qt5=${pkgver}")
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+check() {
+  cd build
+  make test || return 0
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

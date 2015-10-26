@@ -1,0 +1,63 @@
+#
+# Platform Packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer:   None
+# Contributors: H W Tovetjärn (totte) <totte@tott.es>
+#               Phil Miller <philm@chakra-project.org>
+#               Manuel Tortosa <manutortosa@chakra-project.org>
+
+pkgbase=antlr2
+pkgname=('antlr2' 'python2-antlr2')
+pkgver=2.7.7
+pkgrel=5
+arch=('x86_64')
+url="http://www.antlr2.org/"
+license=('custom')
+makedepends=('java-environment' 'python2' 'sh')
+source=("http://www.antlr2.org/download/antlr-${pkgver}.tar.gz"
+        'runantlr2.sh'
+        'gcc4.4.patch')
+sha512sums=('faa72d2ddcba434ef1233e70c1549e63eba67c00793966322e821cf7f015cccb804448cb92d8fbef0429f59928fad65ec954f8ffbda0acbb8e983de0806d349d'
+            '703c2c0ba3c14fc3268d068d039dc55dbb8191ac1a1786be9c733f95cedc42cdab9dd1052ba6f63f9f629331e65785dda3e5feda4063081471501edcb4efa34c'
+            'f44fd917142260756033bd7a1bcf5049df7914f4c0ab934b63974fd05491bce883f8b11f55c2864174495ff5de0e1ab3956d52dd4d68980fd592490d7a681d6a')
+
+build() {
+    cd "${srcdir}/antlr-${pkgver}"
+    patch -Np0 -i ${srcdir}/gcc4.4.patch
+    ./configure \
+        --prefix=/usr \
+        --disable-examples \
+        --disable-csharp
+    make
+}
+
+package_antlr2() {
+    pkgdesc="ANother Tool for Language Recognition, (formerly PCCTS) is a language tool that provides a framework for constructing recognizers, compilers, and translators from grammatical descriptions containing C++ or Java actions"
+    depends=('java-runtime' 'sh')
+    replaces=('antlr')
+    conflicts=('antlr')
+    provides=("antlr=${pkgver}")
+
+    cd ${srcdir}/antlr-${pkgver}/lib/cpp
+    make prefix="${pkgdir}/usr" install
+
+    install -Dm644 ${srcdir}/antlr-${pkgver}/antlr/antlr.jar \
+        "${pkgdir}/usr/share/java/antlr2.jar"
+    install -Dm755 ${srcdir}/runantlr2.sh ${pkgdir}/usr/bin/runantlr2
+    install -Dm644 ${srcdir}/antlr-${pkgver}/LICENSE.txt \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
+
+package_python2-antlr2() {
+    pkgdesc="ANother Tool for Language Recognition, (formerly PCCTS) is a language tool that provides a framework for constructing recognizers, compilers, and translators from grammatical descriptions containing C++ or Java actions (Python version)"
+    depends=('antlr2' 'python2')
+    replaces=('python-antlr' 'python-antlr2')
+    conflicts=('python-antlr' 'python-antlr2')
+    provides=("python-antlr=${pkgver}")
+
+    cd ${srcdir}/antlr-${pkgver}/lib/python
+    python2 setup.py install --root="${pkgdir}" --optimize=1
+
+    install -d ${pkgdir}/usr/share/licenses
+    ln -s /usr/share/licenses/antlr2 ${pkgdir}/usr/share/licenses/${pkgname}
+}

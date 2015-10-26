@@ -1,0 +1,57 @@
+pkgname=spamassassin
+pkgver=3.4.1
+pkgrel=1
+pkgdesc="A mail filter to identify spam."
+arch=('x86_64')
+license=('APACHE')
+url="http://spamassassin.apache.org"
+depends=('openssl' 'zlib' 're2c' 'perl-net-dns' 'perl-io-socket-ssl'
+         'perl-libwww' 'perl-mail-spf' 'perl-http-message' 'perl-net-http'
+         'perl-io-socket-inet6' 'perl-mail-dkim' 'perl-net-ssleay')
+makedepends=('razor' 'perl-dbi')
+optdepends=('razor: to identify collaborately-flagged spam')
+backup=('etc/mail/spamassassin/local.cf'
+        'etc/mail/spamassassin/init.pre'
+        'etc/mail/spamassassin/v310.pre'
+        'etc/mail/spamassassin/v312.pre'
+        'etc/mail/spamassassin/v320.pre'
+        'etc/mail/spamassassin/v330.pre')
+install="${pkgname}.install"
+options=('!emptydirs')
+source=("http://www.us.apache.org/dist/${pkgname}/source/Mail-SpamAssassin-${pkgver}.tar.gz"
+        'spamassassin.service')
+md5sums=('76eca1f38c11635d319e62c26d5b034b'
+         'b8dcea016fb73b074b941e832cfae5c9')
+
+prepare() {
+  cd "${srcdir}/Mail-SpamAssassin-${pkgver}"
+
+  sed -i t/sa_compile.t \
+	  -e 's#^my $temp_binpath = $Config{sitebinexp};#my $temp_binpath = "/bin/site_perl/";#'
+}
+
+build() {
+  cd "${srcdir}/Mail-SpamAssassin-${pkgver}"
+
+  # install module in vendor directories.
+  PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor \
+      CONTACT_ADDRESS=root@localhost ENABLE_SSL=yes PERL_TAINT=no
+  make 
+}
+
+check() {
+  cd "${srcdir}/Mail-SpamAssassin-${pkgver}"
+
+  # parallel tests cause lots of failures; disable for now
+  #export HARNESS_OPTIONS="j$(echo $MAKEFLAGS | sed 's/.*-j\([0-9][0-9]*\).*/\1/')"
+
+  make test
+}
+
+package() {
+  cd "${srcdir}/Mail-SpamAssassin-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -D -m644 "${srcdir}/spamassassin.service" "${pkgdir}/usr/lib/systemd/system/spamassassin.service"
+  install -d -o 182 -g 182 -m 755 "$pkgdir/var/lib/spamassassin"
+}

@@ -1,0 +1,26 @@
+pkgname=augeas
+pkgver=1.3.0
+pkgrel=1
+pkgdesc="A configuration editing tool that parses config files and transforms them into a tree"
+arch=('i686' 'x86_64')
+url="http://augeas.net"
+license=('LGPL')
+depends=('libxml2' 'gcc-libs')
+options=('!libtool')
+source=("http://download.augeas.net/$pkgname-$pkgver.tar.gz")
+md5sums=('c8890b11a04795ecfe5526eeae946b2d')
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+  sed -i 's|Requires:.*|Requires: libxml-2.0|' augeas.pc.in
+}
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+}

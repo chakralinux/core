@@ -1,0 +1,39 @@
+#
+# Platform Packages for Chakra, part of chakraos.org
+#
+# maintainer almack <gluca86 at gmail dot com>
+
+pkgname=colord
+pkgver=1.2.9
+pkgrel=1
+pkgdesc="System daemon for managing color devices"
+arch=('x86_64')
+url="http://www.freedesktop.org/software/colord"
+license=('GPL2')
+depends=('lcms2' 'polkit' 'sqlite3' 'systemd' 'libgusb' 'dbus' 'libgudev')
+makedepends=('intltool' 'gobject-introspection' 'vala' 'docbook-xsl' 'sane' 'bash-completion')
+optdepends=('sane: UseSANE support [/etc/colord.conf]')
+install=colord.install
+backup=(etc/colord.conf)
+source=($url/releases/$pkgname-$pkgver.tar.xz{,.asc})
+sha1sums=('1b6319812b12ab7f906983959bbaaf2e5b78bdb7'
+          'SKIP')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+    --libexecdir=/usr/lib/$pkgname --disable-static \
+    --with-systemdsystemunitdir=/usr/lib/systemd/system \
+    --enable-vala --enable-sane --with-daemon-user=colord \
+    --disable-gtk-doc-html --disable-argyllcms-sensor
+  make
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+
+  # the build system has no colord user, so the chown fails
+  chown -R 124:124 "$pkgdir/var/lib/colord"
+}
+

@@ -1,0 +1,25 @@
+# Part of X.org group
+# Contributor: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+# Maintainer: Bruce Liu <brli@users.sourceforge.net>
+
+pkgname=dri2proto
+pkgver=2.8
+pkgrel=2
+pkgdesc="X11 DRI protocol"
+arch=('x86_64')
+license=('custom')
+url="http://xorg.freedesktop.org/"
+depends=('xorg-util-macros')
+source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
+md5sums=('b2721d5d24c04d9980a0c6540cb5396a')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+}

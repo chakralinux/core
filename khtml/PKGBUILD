@@ -1,0 +1,32 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/khtml
+source ../frameworks.conf
+
+pkgname=khtml
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='KHTML APIs'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/khtml'
+license=('LGPL')
+depends=('giflib' 'kparts' 'kjs')
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
+checkdepends=("xorg-server-xvfb")
+groups=('kf5-aids')
+options=("debug")
+source=("${KFServer}/portingAids/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

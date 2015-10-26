@@ -1,0 +1,44 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# maintainer (x86_64): Martín González <kote[at]chakra-project[dot]org>
+
+pkgname=geoip
+pkgver=1.6.2
+pkgrel=1
+pkgdesc="Non-DNS IP-to-country resolver C library & utils"
+arch=(i686 x86_64)
+license=('GPL')
+url="http://www.maxmind.com/app/c"
+depends=('zlib' 'geoip-database')
+backup=(etc/geoip/GeoIP.conf)
+options=('!emptydirs')
+source=($pkgname-$pkgver.tar.gz::https://github.com/maxmind/${pkgname}-api-c/archive/v${pkgver}.tar.gz)
+sha256sums=('72562fc10792eea6cfa662d93ef40c6541b73619df8057a6e411144e671a9174')
+
+
+prepare() {
+  cd geoip-api-c-$pkgver
+  autoreconf -vi
+}
+
+build() {
+  cd geoip-api-c-$pkgver
+
+  ./configure \
+    --prefix=/usr \
+    --mandir=/usr/share/man \
+    --sysconfdir=/etc/geoip
+  make
+}
+
+check() {
+  cd geoip-api-c-$pkgver
+  ln -sf /usr/share/GeoIP data
+  make check
+}
+
+package() {
+  cd geoip-api-c-$pkgver
+  make DESTDIR="$pkgdir" install
+}

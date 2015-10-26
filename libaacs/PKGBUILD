@@ -1,0 +1,25 @@
+pkgname=libaacs
+pkgver=0.8.1
+pkgrel=1
+pkgdesc="Advanced Access Content System"
+arch=('x86_64')
+license=('LGPL')
+url="http://www.videolan.org/developers/libaacs.html"
+depends=('libgcrypt')
+source=("ftp://ftp.videolan.org/pub/videolan/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+conflicts=('libaacs-git')
+sha256sums=('95c344a02c47c9753c50a5386fdfb8313f9e4e95949a5c523a452f0bcb01bbe8')
+
+build() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    ./bootstrap
+    ./configure --prefix=/usr
+    make
+}
+
+package() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    make DESTDIR="${pkgdir}" install
+    install -Dm644 KEYDB.cfg "${pkgdir}/usr/share/doc/${pkgname}"/KEYDB.cfg
+    install -Dm644 README.txt "${pkgdir}/usr/share/doc/${pkgname}"/README.txt
+}

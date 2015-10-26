@@ -1,0 +1,28 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas@chakra-project.org
+# contributor Giuseppe Calà <jiveaxe@gmail.com>
+
+pkgname=libexosip2
+pkgver=4.0.0
+pkgrel=1
+pkgdesc="A library that hides the complexity of using SIP for multimedia session establishement"
+arch=('x86_64')
+url="http://savannah.nongnu.org/projects/exosip/"
+license=('GPL')
+depends=('libosip2>=4.0.0' 'openssl')
+md5sums=('aa385b85f6a17876763a0a860fe2afbf')
+options=(!libtool)
+source=("http://download.savannah.nongnu.org/releases/exosip/libeXosip2-${pkgver/_/-}.tar.gz")
+
+build() {
+  cd "$srcdir/libeXosip2-${pkgver/_/-}"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "$srcdir/libeXosip2-${pkgver/_/-}"
+  make DESTDIR="$pkgdir" install
+}

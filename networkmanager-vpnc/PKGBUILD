@@ -1,0 +1,28 @@
+pkgname=networkmanager-vpnc
+pkgver=1.0.6
+pkgrel=1
+pkgdesc="NetworkManager VPN plugin for vpnc"
+arch=('x86_64')
+license=('GPL')
+url="http://www.gnome.org/projects/NetworkManager/"
+depends=('networkmanager' 'vpnc')
+makedepends=('intltool')
+source=("http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-vpnc/1.0/NetworkManager-vpnc-${pkgver}.tar.xz")
+sha256sums=('538298d72845863bf16435940333d30a32a3b28b03b67f9f46c8a0c32cbdcc43')
+
+build() {
+  cd "${srcdir}/NetworkManager-vpnc-${pkgver}"
+  ./configure --prefix=/usr \
+  	--sysconfdir=/etc \
+	--localstatedir=/var \
+	--libexecdir=/usr/lib/networkmanager \
+        --without-gnome \
+	--disable-static \
+        --disable-more-warnings
+  make 
+}
+
+package() {
+  cd "${srcdir}/NetworkManager-vpnc-${pkgver}"
+  make DESTDIR="${pkgdir}" install 
+}

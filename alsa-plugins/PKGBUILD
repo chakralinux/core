@@ -1,0 +1,36 @@
+# Maintainer: almack
+
+pkgname=alsa-plugins
+pkgver=1.0.28
+pkgrel=2
+pkgdesc="Extra alsa plugins"
+arch=('x86_64')
+url="http://www.alsa-project.org"
+license=(GPL)
+depends=('alsa-lib')
+makedepends=('pulseaudio' 'jack' 'ffmpeg')
+optdepends=('jack: Jack plugin'
+            'ffmpeg: libavcodec resampling plugin'
+            'libsamplerate: libsamplerate resampling plugin'
+            'speex: libspeexdsp resampling plugin')
+source=("ftp://ftp.alsa-project.org/pub/plugins/$pkgname-$pkgver.tar.bz2")
+md5sums=('6fcbbb31e96f8ebc5fb926184a717aa4')
+
+prepare() {
+  cd $pkgname-$pkgver
+  sed -i 's/ && LIBAVCODEC_VERSION_MINOR >= 34//' a52/pcm_a52.c
+}
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" install
+
+  install -d "$pkgdir/usr/share/doc/$pkgname"
+  install -m644 doc/README* doc/*.txt "$pkgdir/usr/share/doc/$pkgname/"
+}

@@ -1,0 +1,42 @@
+pkgname=octave
+pkgver=4.0.0
+pkgrel=4
+pkgdesc="A high-level language, primarily intended for numerical computations."
+arch=('x86_64')
+url="http://www.octave.org"
+license=('GPL')
+depends=('atlas-lapack' 'readline' 'glu' 'fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'qhull' 'fltk' 'suitesparse' 'arpack' 'pcre' 'qt' 'fontconfig' 'zlib' 'qrupdate' 'freetype2' 'qscintilla' 'gl2ps')
+makedepends=('texlive-core' 'gcc-fortran' 'texinfo' 'gnuplot' 'openjdk')
+optdepends=('texinfo: for help-support in octave'
+	    'gnuplot: alternative plotting'
+	    'openjdk: to call Java functions')
+source=(ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.xz)
+options=('!emptydirs')
+install='octave.install'
+sha1sums=('795c7ef1fb8d92f4cf9cae9eabba374a0328b1a9')
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  
+  autoreconf -vfi
+    # --enable-64 needs atlas-lapack/blas support to be enabled first, check FS#174 comments:
+    
+  ./configure --prefix=/usr \
+    --libexecdir=/usr/lib \
+    --enable-shared \
+    --disable-static \
+    --with-umfpack="-lumfpack -lsuitesparseconfig" 
+  MOC=moc UIC=uic
+  
+  LANG=C make
+}
+
+package(){
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+
+  # add path to ld.so.conf.d
+  install -d "${pkgdir}/etc/ld.so.conf.d"
+  echo "/usr/lib/${pkgname}/${pkgver}" > "${pkgdir}/etc/ld.so.conf.d/${pkgname}.conf"
+}

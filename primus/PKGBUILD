@@ -1,0 +1,35 @@
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# Contributions from Arch:  https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/primus
+# If you update this package,please remember to update lib32-primus!
+pkgname=primus
+pkgver=20141228
+pkgrel=1
+pkgdesc="Faster OpenGL offloading for Bumblebee (git sources)"
+arch=('x86_64')
+url="https://github.com/amonakov/primus"
+license=('custom:ISC')
+depends=('bumblebee')
+makedepends=('git')
+provides=('primus')
+source=("git://github.com/amonakov/primus.git#commit=7e21554eb2")
+sha1sums=('SKIP')
+
+build() {
+  cd "${srcdir}/${pkgname}"
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+
+  install -D "lib/libGL.so.1" "$pkgdir/usr/lib/primus/libGL.so.1"
+  sed -e "s#^PRIMUS_libGL=.*#PRIMUS_libGL='/usr/\$LIB/primus'#" primusrun > primusrun.dist
+  install -D "primusrun.dist" "$pkgdir/usr/bin/primusrun"
+  
+  install -D "primus.bash-completion" "$pkgdir/etc/bash_completion.d/primusrun"
+  
+  gzip -9 "primusrun.1"
+  install -D "primusrun.1.gz" "$pkgdir/usr/share/man/man1/primusrun.1.gz"
+
+  install -D -m644 LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

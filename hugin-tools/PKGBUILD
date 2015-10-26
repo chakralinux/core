@@ -1,0 +1,53 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+
+pkgname=hugin-tools
+_pkgname=hugin
+pkgver=2014.0.0
+pkgrel=2
+pkgdesc="Hugin libs and tools to be used by Kipi-plugins"
+arch=('x86_64')
+url="http://hugin.sourceforge.net/"
+license=('LGPL')
+depends=('boost-libs' 'enblend-enfuse' 'exiv2>=0.24' 'perl-exiftool' 'openexr' 'libpano13>=2.9.19'
+         'lapack' 'desktop-file-utils' 'icu' 'libxt' 'lensfun' 'libpng' 'libxrandr' 'openexr')
+makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap')
+source=("http://downloads.sourceforge.net/${_pkgname}/${_pkgname}-${pkgver}.tar.bz2")
+sha1sums=('7b4ae181f664b9e0a68f55f298cdaa210fa09aa9')
+
+prepare() {
+  cd "${srcdir}/${_pkgname}-${pkgver}"
+  
+  # Fix compiling against lensfun-0.3.0
+  sed '/LF_DIST_MODEL_FOV1/d' -i src/hugin_base/lensdb/LensDB.cpp
+}
+
+build() {
+  cd "${srcdir}"
+
+  mkdir -p build 
+  cd build
+
+  # this makes possible to compile all the hugin tools without GUis
+  sed -i -e "s~FIND_PACKAGE(wxWidgets REQUIRED)~~g" ${srcdir}/${_pkgname}-${pkgver}/CMakeLists.txt
+  mkdir -p ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
+  cp ${srcdir}/${_pkgname}-${pkgver}/src/hugin1/PT/*.h ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
+
+  cmake "${srcdir}/${_pkgname}-${pkgver}" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_EXE_LINKER_FLAGS="-lpthread" \
+    -DENABLE_LAPACK=yes \
+    -DBUILD_HSI=no
+  make
+}
+
+package() {
+  cd "${srcdir}/build"
+  make DESTDIR="${pkgdir}" install
+
+  # Remove frontend files
+  rm -rf -v "${pkgdir}"/usr/share/applications
+  rm -rf -v "${pkgdir}"/usr/share/man
+  rm -rf -v "${pkgdir}"/usr/share/locale
+}

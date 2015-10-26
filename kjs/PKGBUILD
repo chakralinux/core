@@ -1,0 +1,37 @@
+
+source ../frameworks.conf
+
+pkgname=kjs
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Support for JS scripting in applications'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kjs'
+license=('LGPL')
+depends=("qt5-base")
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools')
+checkdepends=('cmake')
+groups=('kf5-aids')
+options=('debug')
+source=("${KFServer}/portingAids/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+# check() {
+#   cd build
+#   make test
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

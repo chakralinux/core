@@ -1,0 +1,93 @@
+#
+# Software packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: R Biegelmeyer (RenanBS) <renan.biegel@gmail.com>
+#               Sébastien Luttringer
+#               Angel Velasquez <angvp@archlinux.org>
+#               Fabio Volpe <volpefabio@gmail.com>
+
+pkgbase=python-sphinx
+pkgname=('python3-sphinx' 'python2-sphinx')
+pkgver=1.2.3
+pkgrel=2
+arch=('any')
+url='http://sphinx.pocoo.org/'
+license=('GPL')
+makedepends=(
+  'python3-setuptools'
+  'python3-docutils'
+  'python3-jinja'
+  'python3-pygments'
+  'python2-setuptools'
+  'python2-docutils'
+  'python2-jinja'
+  'python2-pygments'
+)
+checkdepends=(
+  'python3-nose'
+  'python2-nose'
+  'texlive-latexextra'
+)
+source=("http://pypi.python.org/packages/source/S/Sphinx/Sphinx-$pkgver.tar.gz")
+md5sums=('a98c93124035b4cd7183604aec656cb3')
+
+prepare() {
+  # souce duplication is required because makefile modify source code
+  # setyp.py --build tricks don't works well
+  cp -a Sphinx-$pkgver Sphinx-${pkgver}2
+
+  # change python3 interpreter
+  find Sphinx-${pkgver} -type f -exec \
+    sed -i '1s,^#! \?/usr/bin/\(env \|\)python$,#!/usr/bin/python3,' {} \;
+
+  # change python2 interpreter
+  find Sphinx-${pkgver}2 -type f -exec \
+    sed -i '1s,^#! \?/usr/bin/\(env \|\)python$,#!/usr/bin/python2,' {} \;
+
+  # change sphinx-binaries name in source code
+  find Sphinx-${pkgver}2 -type f -name '*.py' -exec \
+    sed -ri 's,(sphinx-(:?build|apidoc|autogen|quickstart)),\12,' {} \;
+}
+
+build() {
+  cd Sphinx-$pkgver
+
+  msg2 'Python 3 version'
+  cd "$srcdir"/Sphinx-$pkgver
+  make PYTHON=python3 build
+  
+  msg2 'Python 2 version'
+  cd "$srcdir"/Sphinx-${pkgver}2
+  make PYTHON=python2 build
+}
+
+check() {
+  msg2 'Python 3 version'
+  cd "$srcdir"/Sphinx-$pkgver
+  make PYTHON=python3 test
+  rm -r build/lib/tests
+
+  msg2 'Python 2 version'
+  cd "$srcdir"/Sphinx-${pkgver}2
+  make PYTHON=python2 test
+  rm -r build/lib/tests
+}
+
+package_python3-sphinx() {
+  pkgdesc='Python 3 documentation generator'
+  depends=('python3' 'python3-jinja' 'python3-pygments' 'python3-docutils')
+  optdepends=('texlive-latexextra: for generation of PDF documentation')
+
+  cd Sphinx-$pkgver
+  python3 setup.py install --root="$pkgdir" --optimize=1
+}
+
+package_python2-sphinx() {
+  pkgdesc='Python 2 documentation generator'
+  depends=('python2' 'python2-jinja' 'python2-pygments' 'python2-docutils')
+  optdepends=('texlive-latexextra: for generation of PDF documentation')
+
+  cd Sphinx-${pkgver}2
+  python2 setup.py install --root="$pkgdir" --optimize=1
+}

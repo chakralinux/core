@@ -1,0 +1,35 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# Maintainer: AlmAck  <almack[at]chakra-project[dot]org>
+
+pkgname=apache2-mpm-itk
+_pkgname=mpm-itk
+pkgver=2.4.7
+_pkgver=${pkgver}-01
+pkgrel=2
+pkgdesc="The ITK MPM (Multi-Processing Module) is experimental and NOT officially
+endorsed by the Apache Software Foundation"
+arch=('x86_64')
+url="http://mpm-itk.sesse.net/"
+license=('Apache')
+depends=('apache')
+makedepends=()
+optdepends=()
+source=(http://mpm-itk.sesse.net/mpm-itk-${_pkgver}.tar.gz)
+md5sums=('3d7a14aef93bb5c1eb1c01081585c4bc')
+
+build() {
+  cd $srcdir/$_pkgname-$_pkgver
+
+  ./configure --with-apxs=/usr/bin/apxs
+  make
+}
+
+package() {
+  cd $srcdir/$_pkgname-$_pkgver
+  #make DESTDIR=$pkgdir install  --> DESTDIR not implemented
+
+  install -D -m644 ".libs/mpm_itk.so" \
+                   "${pkgdir}/usr/lib/httpd/modules/mpm_itk.so" 
+} 

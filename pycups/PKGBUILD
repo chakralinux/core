@@ -1,0 +1,27 @@
+#Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/pycups
+
+pkgname=python3-pycups
+pkgbase=pycups
+pkgver=1.9.72
+pkgrel=1
+arch=('x86_64')
+pkgdesc="Python 3 CUPS Bindings"
+url="http://cyberelk.net/tim/software/pycups/"
+license=('GPL')
+conflicts=('pycups')
+provides=('pycups')
+replaces=('pycups')
+depends=('libcups' 'python3')
+source=(http://cyberelk.net/tim/data/${pkgbase}/${pkgbase}-${pkgver}.tar.bz2)
+md5sums=('c790bfbf4a3e9da2412c12c860fe191f')
+
+
+build() {
+  cd ${pkgbase}-${pkgver}
+  python3 setup.py build
+}
+
+package() {
+  cd ${pkgbase}-${pkgver}
+  python3 setup.py install --root="${pkgdir}" --optimize=1
+}

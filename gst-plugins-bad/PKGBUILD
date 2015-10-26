@@ -1,0 +1,55 @@
+#contributions from Arch; https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/gst-plugins-bad
+
+pkgname=gst-plugins-bad
+pkgver=1.4.5
+pkgrel=4
+pkgdesc="GStreamer Multimedia Framework Bad Plugins"
+arch=('x86_64')
+license=('LGPL')
+url="http://gstreamer.freedesktop.org/"
+depends=('mjpegtools' 'gst-plugins-base' 'curl' 'chromaprint' 'libmms' 'faad2'
+         'mpg123' 'faac' 'celt' 'libdca' 'soundtouch' 'spandsp' 'libdvdnav'
+         'libmodplug' 'libgme' 'opus' 'wayland' 'neon' 'libofa' 'fluidsynth'
+         'openjpeg' 'libwebp' 'libsrtp' 'gnutls' 'wildmidi' 'glu' 'sbc'
+         'rtmpdump' 'libgudev')
+makedepends=('schroedinger' 'libexif' 'libdvdread' 'libvdpau' 'libmpeg2' 'librsvg' 'openexr'
+	     'x264' 'bluez' 'opencore-amr' 'libshairport' 'libcdaudio' 'libdc1394' 'libwebp' 'lv2' 'librsvg' 'timidity++'
+	     'rtmpdump' 'xvidcore' 'gobject-introspection' 'python2' 'python3')
+options=('!emptydirs')
+source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz gcc5.patch)
+md5sums=('e0bb39412cf4a48fe0397bcf3a7cd451'
+         'dfa7e5723542d0fabebf509cb321535b')
+
+prepare() {
+  cd $pkgname-$pkgver
+  patch -i ../gcc5.patch -Np1
+}
+
+build() {
+  cd $pkgname-$pkgver
+  autoreconf
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static \
+    --enable-experimental \
+    --with-package-name="GStreamer Bad Plugins (Chakra GNU/Linux)" \
+    --with-package-origin="http://www.chakraos.org/"
+    
+  # https://bugzilla.gnome.org/show_bug.cgi?id=655517
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  
+  make -k check || :
+}
+
+package() {
+  cd $pkgname-$pkgver
+  
+  make DESTDIR="${pkgdir}" install
+}

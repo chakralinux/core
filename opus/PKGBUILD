@@ -1,0 +1,26 @@
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/opus
+
+pkgname=opus
+pkgver=1.1
+pkgrel=3
+pkgdesc="codec designed for interactive speech and audio transmission over the Internet"
+arch=('x86_64')
+url="http://www.opus-codec.org/"
+license=('custom')
+depends=('glibc')
+source=("http://downloads.xiph.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('c5a8cf7c0b066759542bc4ca46817ac6')
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  ./configure --prefix=/usr --enable-custom-modes --disable-static
+  make
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
+  install -m755 -d "${pkgdir}/usr/share/licenses/opus"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/opus/"
+}

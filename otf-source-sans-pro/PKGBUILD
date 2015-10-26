@@ -1,0 +1,29 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Giuseppe Calà <jiveaxe@gmail.com>
+
+pkgname=otf-source-sans-pro
+_pkgname=SourceSansPro_FontsOnly
+pkgver=2.010
+_pkgsuffix=2.010roman-1.065-italic
+pkgrel=1
+pkgdesc="Adobe Source Sans Pro OTF Fonts"
+arch=('any')
+url="http://sourceforge.net/projects/sourcesans.adobe/"
+license=('custom')
+install=otf.install
+source=("http://downloads.sourceforge.net/project/sourcesans.adobe/${_pkgname}-${_pkgsuffix}.zip")
+noextract=()
+depends=('fontconfig' 'xorg-font-utils')
+md5sums=('b98305cb885ac19be8bcdb8e8ec46dd1')
+screenshot=('http://wstaw.org/m/2013/04/10/source-sans-pro.png')
+
+package() {
+  cd $srcdir/source-sans-pro-2.010R-ro-1.065R-it/OTF
+  mkdir -p $pkgdir/usr/share/fonts/OTF
+  install -Dm644 *.otf "$pkgdir/usr/share/fonts/OTF"
+  mkdir -p $pkgdir/usr/share/licenses/${pkgname}
+  install -Dm644 ../LICENSE.txt $pkgdir/usr/share/licenses/${pkgname}
+}
+

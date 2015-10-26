@@ -1,0 +1,27 @@
+# Part of Xorg group
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+
+pkgname=libxau
+pkgver=1.0.8
+pkgrel=2
+pkgdesc="X11 authorisation library"
+arch=(x86_64)
+url="http://xorg.freedesktop.org/"
+depends=('glibc')
+makedepends=('pkgconfig' 'xproto')
+license=('custom')
+options=('!libtool')
+source=(${url}/releases/individual/lib/libXau-${pkgver}.tar.bz2)
+sha1sums=('d9512d6869e022d4e9c9d33f6d6199eda4ad096b')
+
+build() {
+  cd "${srcdir}/libXau-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc
+  make
+}
+
+package () {
+  cd "${srcdir}/libXau-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+}

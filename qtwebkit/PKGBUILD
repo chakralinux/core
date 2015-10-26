@@ -1,0 +1,74 @@
+# maintainer almack
+
+pkgname=qtwebkit
+pkgver=2.3.4
+_pkgver=23
+pkgrel=1
+_qtver=4.8.6
+arch=('x86_64')
+url='http://trac.webkit.org/wiki/QtWebKit'
+pkgdesc='An open source web browser engine (Qt port)'
+license=('LGPL2.1' 'GPL3')
+#options=("debug")
+depends=('qt' 'gstreamer' 'gst-plugins-base' 'systemd')
+makedepends=('gperf' 'python2' 'mesa' 'ruby' 'git')
+optdepends=('gst-plugins-good: For media format support'
+            'gst-plugins-bad: For media format support'
+            'gst-plugins-ugly: For media format support'
+            'gst-libav: For media format support')
+_pkgfqn="qt-everywhere-opensource-src-${_qtver}"
+# edit this source later, sf won't let us dl files that big
+source=(
+        #"http://download.kde.org/stable/qtwebkit-2.3/${pkgver}/src/qtwebkit-${pkgver}.tar.gz"
+        https://sources.archlinux.org/other/packages/${pkgname}/${pkgname}-${pkgver}.tar.xz
+        "http://download.qt-project.org/official_releases/qt/4.8/${_qtver}/${_pkgfqn}.tar.gz"
+        'qwebview.patch'
+        'use-python2.patch'
+        'qtwebkit-2.3-debuginfo.patch'
+        'qtwebkit-2.3-save_memory.patch')
+sha1sums=('31bc60de1cf26bb0766d539b4d564651ddbb0650'
+          'ddf9c20ca8309a116e0466c42984238009525da6'
+          'c3df6107233f466a032e36681cee07f16536657c'
+          '315b6ff603f35e5492a036f7082f6aa075dfb607'
+          '1329b1564fd70ced8be411eac275972a49502e23'
+          '6563e0e1b36a8ab28cb65edfa724aca1dbb03dfe')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+
+  patch -p1 -i "${srcdir}"/use-python2.patch
+  
+  # reduce debug info, to avoid the error "ar: libWebCore.a: File truncated" of 4GB file max exceed
+  patch -p1 -i "${srcdir}"/qtwebkit-2.3-debuginfo.patch
+  patch -p1 -i "${srcdir}"/qtwebkit-2.3-save_memory.patch
+  
+  # QWebView plugin
+  cd ../$_pkgfqn
+  patch -p1 -i "${srcdir}"/qwebview.patch
+}
+
+build() {
+  cd ${pkgname}-${pkgver}
+
+  # Additionally you can use --qmakearg="CONFIG+=production_build" to link with less memory.
+  export QTDIR=/usr
+  Tools/Scripts/build-webkit --qt \
+    --makeargs="${MAKEFLAGS}" --prefix=/usr \
+    --no-webkit2 \
+    --release \
+    --qmakearg="CONFIG+=production_build" \
+    --system-malloc
+    
+
+  cd ../${_pkgfqn}/tools/designer/src/plugins/qwebview
+  qmake
+  make
+}
+
+package() {
+  cd ${pkgname}-${pkgver}
+  make INSTALL_ROOT="${pkgdir}" -C WebKitBuild/Release install
+
+  cd ../$_pkgfqn/tools/designer/src/plugins/qwebview
+  make INSTALL_ROOT="${pkgdir}" install
+}

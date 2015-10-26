@@ -1,0 +1,29 @@
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+pkgname=libxtst
+pkgver=1.2.2
+pkgrel=1
+pkgdesc="X11 Testing -- Resource extension library"
+arch=(x86_64)
+url="http://xorg.freedesktop.org/"
+license=('custom')
+depends=('libxext' 'libxi' 'recordproto' 'inputproto')
+makedepends=('xorg-util-macros')
+options=('!libtool')
+source=(${url}/releases/individual/lib/libXtst-${pkgver}.tar.bz2)
+sha1sums=('7fd92a3c865c3c5e1cc724646babc3e1cdc799bc')
+
+build() {
+  cd "${srcdir}/libXtst-${pkgver}"
+  ./configure --prefix=/usr --disable-static
+  make
+}
+
+package() {
+  cd "${srcdir}/libXtst-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

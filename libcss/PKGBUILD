@@ -1,0 +1,30 @@
+# maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+# contributions from Arch: https://www.archlinux.org/packages/community/x86_64/libcss/
+
+pkgname=libcss
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="A CSS parser and selection engine."
+arch=('x86_64')
+url="http://www.netsurf-browser.org/projects/libcss/"
+license=('MIT')
+depends=('libparserutils' 'libwapcaplet')
+makedepends=('netsurf-buildsystem')
+source=("http://download.netsurf-browser.org/libs/releases/libcss-$pkgver-src.tar.gz")
+sha256sums=('31b08f6f2259366ccad8b455440f364dc33e7dc78cdb0cf4905da56d5372f613')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  
+  export CFLAGS="-Wno-error=unused-but-set-variable"
+  make PREFIX=/usr COMPONENT_TYPE="lib-shared"
+  make PREFIX=/usr COMPONENT_TYPE="lib-static"
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  
+  make install PREFIX=/usr DESTDIR="$pkgdir" COMPONENT_TYPE="lib-shared"
+  make install PREFIX=/usr DESTDIR="$pkgdir" COMPONENT_TYPE="lib-static"
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
+}

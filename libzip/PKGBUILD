@@ -1,0 +1,31 @@
+#maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+#contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/libzip/
+
+pkgname=libzip
+pkgver=0.11.2
+pkgrel=1
+pkgdesc="A C library for reading, creating, and modifying zip archives"
+url="http://www.nih.at/libzip/index.html"
+license=('BSD')
+arch=('x86_64')
+depends=('zlib')
+options=('!libtool')
+source=("http://www.nih.at/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('c5437df15e4825d40cdc3ec8b9b7516c')
+
+build() {
+  cd ${pkgname}-${pkgver}
+
+  ./configure --prefix=/usr
+  make 
+}
+
+package() {
+  cd ${pkgname}-${pkgver}
+
+  make DESTDIR=${pkgdir} install
+
+  # preserve old header path for compatibility
+  ln -s /usr/lib/libzip/include/zipconf.h "${pkgdir}/usr/include/zipconf.h"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

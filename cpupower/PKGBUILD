@@ -1,0 +1,56 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas@chakra-project.org
+
+pkgname=cpupower
+pkgver=3.18
+pkgrel=1
+pkgdesc='Linux kernel tool to examine and tune power saving related features of your processor'
+license=('GPL2')
+arch=('x86_64')
+url='http://www.kernel.org'
+depends=('pciutils')
+makedepends=('asciidoc' 'xmlto')
+conflicts=('cpufrequtils')
+replaces=('cpufrequtils')
+backup=('etc/default/cpupower')
+options=('!strip')
+source=("http://ftp.kernel.org/pub/linux/kernel/v3.x/linux-$pkgver.tar.xz"
+        "http://ftp.kernel.org/pub/linux/kernel/v3.x/patch-$pkgver.1.xz"
+        'cpupower.conf'
+        'cpupower.service'
+        'cpupower.systemd')
+md5sums=('9e854df51ca3fef8bfe566dbd7b89241'
+         '82864000fde42252dd5e80cceb971479'
+         'fb4b3d184850f5972c5a1bba3ead4e05'
+         '2450e8ff41b30eb58d43b5fffbfde1f4'
+         'e02e88977fbdde29a2ae38aa064a367d')
+
+build() {
+  if (( NOEXTRACT == 0 )) && [[ -e "$srcdir"/patch-* ]]; then
+    msg2 'Applying stable patch set'
+    patch -N -p1 -i "$srcdir"/patch-*
+  fi
+
+  pushd linux-$pkgver/tools/power/cpupower
+  
+  LDFLAGS=${LDFLAGS:+"$LDFLAGS,--no-as-needed"}
+  make VERSION=$pkgver-$pkgrel
+  popd
+}
+
+package() {
+  pushd linux-$pkgver/tools/power/cpupower
+  make \
+    DESTDIR="$pkgdir" \
+    mandir='/usr/share/man' \
+    docdir='/usr/share/doc/cpupower' \
+    install install-man
+  popd
+
+  install -Dm 644 cpupower.conf "$pkgdir/etc/default/cpupower"
+  install -Dm 644 cpupower.service "$pkgdir/usr/lib/systemd/system/cpupower.service"
+  install -Dm 755 cpupower.systemd "$pkgdir/usr/lib/systemd/scripts/cpupower"
+}
+

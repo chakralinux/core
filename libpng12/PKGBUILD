@@ -1,0 +1,46 @@
+# $Id: PKGBUILD 58551 2009-11-08 22:37:12Z eric $
+# Maintainer: dorphell <dorphell@archlinux.org>
+# Maintainer: Travis Willard <travis@archlinux.org>
+# Maintainer: Douglas Soares de Andrade <douglas@archlinux.org>
+
+pkgname=libpng12
+_realname=libpng
+pkgver=1.2.50
+pkgrel=2
+pkgdesc="A collection of routines used to create PNG format graphics files"
+arch=('i686' 'x86_64')
+url="http://www.libpng.org/pub/png/libpng.html"
+license=('custom')
+depends=('zlib' 'perl')
+options=('!libtool')
+source=("http://downloads.sourceforge.net/sourceforge/${_realname}/${_realname}-${pkgver}.tar.bz2"
+        "http://downloads.sourceforge.net/sourceforge/${_realname}-apng/${_realname}-${pkgver}-apng.patch.gz")
+md5sums=('717caa58e9c71a80820eb38c4f4d6ec3'
+         '3d3d078b031b23a9e1d95f9822185740')
+
+
+build() {
+  cd "${srcdir}/${_realname}-${pkgver}"
+
+  # Add animated PNG (apng) support
+  # see http://hp.vector.co.jp/authors/VA013651/freeSoftware/apng.html
+  patch -Np1 -i "${srcdir}/libpng-${pkgver}-apng.patch" || return 1
+
+  libtoolize --force --copy || return 1
+  aclocal || return 1
+  autoconf || return 1
+  automake --add-missing || return 1
+
+  ./configure --prefix=/usr || return 1
+  make ECHO=echo || return 1
+  make ECHO=echo DESTDIR="${pkgdir}" install || return 1
+
+  #cd contrib/pngminus
+  #make ECHO=echo PNGLIB="-L${pkgdir}/usr/lib -lpng" -f makefile.std png2pnm pnm2png
+  #install -m755 png2pnm pnm2png "${pkgdir}/usr/bin/"
+  #install -D -m644 ../../LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
+  # only libs and includes needed
+  rm -rf ${pkgdir}/usr/lib/{libpng.so,libpng.a,pkgconfig}
+  rm -rf ${pkgdir}/usr/include/{png.h,pngconf.h}
+  rm -rf ${pkgdir}/usr/{share,bin}
+}

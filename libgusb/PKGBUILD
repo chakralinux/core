@@ -1,0 +1,28 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer almack[at]chakra-project[dot]org>
+
+pkgname=libgusb
+pkgver=0.2.6
+pkgrel=1
+pkgdesc="GLib wrapper around libusb1"
+arch=('x86_64')
+url="https://github.com/hughsie/libgusb"
+license=('LGPL2.1')
+depends=('libgudev' 'libusbx')
+makedepends=('gobject-introspection' 'python2')
+source=(http://people.freedesktop.org/~hughsient/releases/$pkgname-$pkgver.tar.xz)
+sha256sums=('6f638bdbc4e77643c0a198a300e50b592ad326e56bddf359de15e04689209c06')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr --disable-static
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+}
+

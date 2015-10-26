@@ -1,0 +1,48 @@
+
+whisperer(){
+    echo -e "\e[31;46m WARNING"
+    echo -e "\e[31;46m For ATI HD 4xxxx and below graphics users:"
+    echo -e "\e[31;46m This driver is not compatible, install catalyst-legacy before rebooting."
+    echo -e "\e[31;46m sudo pacman -S catalyst-legacy"
+    echo -e "\e[31;46m You can use the tool 'aticonfig' to regenerate an xorg.conf file."
+    echo -e "\e[31;46m Further reading:"
+    echo -e "\e[31;46m http://chakraos.org/forum/viewtopic.php?pid=56704#p56704"
+    echo -e "\e[31;46m http://chakraos.org/wiki/index.php?title=Catalyst"
+    echo -e "\e[0m"
+}
+
+split(){
+    echo -e "\e[1;31m-------------------------- SPLIT -------------------------------\e[0m"
+    echo "catalyst-utils is now splitted into:"
+    echo "catalyst-utils"
+    echo "catalyst-libgl"
+    echo "opencl-catalyst"
+    echo ""
+    echo -e "You MOST probably want to also install \e[1;31mcatalyst-libgl\e[0m"
+    echo -e "\e[1;31m----------------------------------------------------------------\e[0m"
+}
+
+post_install() {
+    echo "----------------------------------------------------------------"
+    echo "PLEASE NOTE:"
+    echo "----------------------------------------------------------------"
+    echo "You can use the tool 'aticonfig' to generate an xorg.conf file."
+    echo "--------------------- ^^^^^^^^^ --------------------------------"
+    echo "IMPORTANT:"
+    echo "fglrx was added into /etc/modules-load.d/catalyst.conf"
+    echo "----------------------------------------------------------------"
+    echo "    atieventsd (needs acpid pkg) on systemd:"
+    echo "systemctl enable atieventsd"
+    echo "systemctl start atieventsd"
+    echo "----------------------------------------------------------------"
+    whisperer
+    split
+}
+
+post_upgrade(){
+    split
+}
+
+post_remove(){
+     echo "NOTE: Don't forget to recover your original xorg.conf file."
+}

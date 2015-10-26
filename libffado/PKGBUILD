@@ -1,0 +1,51 @@
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Contributor: abveritas[at]chakra-project[dot]org>
+
+pkgname=libffado
+pkgver=2.2.1
+pkgrel=1
+pkgdesc="Driver for FireWire audio devices"
+arch=('x86_64')
+url="http://www.ffado.org/"
+license=('GPL')
+depends=('libiec61883' 'libavc1394' 'libsigc++' 'libxml++' 'alsa-lib'
+         'dbus' 'libconfig' 'dbus-c++')
+makedepends=('scons' 'python2-pyqt4' 'python2')
+optdepends=('python2-pyqt4: mixer applet'
+            'python2: ffado-diag')
+source=("http://www.ffado.org/files/libffado-$pkgver.tgz"
+	'python2-qt.patch')
+md5sums=('e113d828835051f835fb4a329cb0cbd4'
+         'acb6e0dca1239850c7862bf2e1443fd7')
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  msg2 "Applying Python 2 compatibility patch (downstream)"
+  patch -Np1 -i "$srcdir/python2-qt.patch"
+}
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  scons DEBUG=False \
+        ENABLE_OPTIMIZATIONS=true \
+        PREFIX=/usr \
+        MANDIR=/usr/share/man \
+        UDEVDIR=/usr/lib/udev/rules.d \
+        COMPILE_FLAGS="$CFLAGS"
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  scons DESTDIR="$pkgdir" WILL_DEAL_WITH_XDG_MYSELF="True" install
+
+  # desktop files & icons
+  install -Dm644 support/xdg/ffado.org-ffadomixer.desktop \
+    "$pkgdir/usr/share/applications/ffadomixer.desktop"
+
+  install -Dm644 support/xdg/hi64-apps-ffado.png \
+    "$pkgdir/usr/share/pixmaps/ffado.png"
+}
+

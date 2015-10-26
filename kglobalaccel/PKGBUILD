@@ -1,0 +1,38 @@
+# Contributor : Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kglobalaccel
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Add support for global workspace shortcuts'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kglobalaccel'
+license=('LGPL')
+depends=("qt5-base" "qt5-x11extras" 'kconfig' 'kcoreaddons' 'kcrash' 'kdbusaddons' 'ki18n' 'kwindowsystem')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'python2')
+checkdepends=('xorg-server-xvfb')
+options=('debug')
+groups=('kf5')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+# check() {
+#   cd build
+#   xvfb-run make test
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

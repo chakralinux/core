@@ -1,0 +1,26 @@
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+pkgname=fixesproto
+pkgver=5.0
+pkgrel=2
+pkgdesc="X11 Fixes extension wire protocol"
+arch=(x86_64)
+url="http://xorg.freedesktop.org/"
+license=('custom')
+depends=('xproto' 'xextproto')
+source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('ab605af5da8c98c0c2f8b2c578fed7c864ee996a')
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
+  install -D -m644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+}
+

@@ -1,0 +1,36 @@
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Contributions from: https://www.archlinux.org/packages/extra/x86_64/mcpp/
+
+pkgname=mcpp
+pkgver=2.7.2
+pkgrel=3
+pkgdesc="Matsui's CPP implementation precisely conformed to standards"
+arch=(x86_64)
+license=('custom')
+url="http://mcpp.sourceforge.net"
+depends=(glibc)
+options=(!libtool)
+source=(http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz
+        namlen.patch
+        comments.patch)
+md5sums=('512de48c87ab023a69250edc7a0c7b05'
+         '0bfc6177a58e912a9e23e368578dd3fe'
+         'ba668fc6996e538f2e0c096f9eb282ce')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -Np1 -i "${srcdir}/namlen.patch"
+  #Fix https://bugs.archlinux.org/task/28284
+  patch -Np1 -i "${srcdir}/comments.patch"
+  ./configure --prefix=/usr --enable-mcpplib --disable-static
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  ln -sf ../../doc/${pkgname}/LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

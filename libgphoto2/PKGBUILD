@@ -1,0 +1,64 @@
+# Maintainer:  
+# Contributors: H W Tovetjärn (totte) <totte@tott.es>
+#               Anke Boersma (abveritas) <abveritas@chakra-project.org>
+#               Damir Perisa <damir.perisa@bluewin.ch>
+#               Eduardo Romero <eduardo@archlinux.org>
+#               Jan de Groot <jgc@archlinux.org>
+#               Tom Gundersen <teg@jklm.no>
+
+pkgname=libgphoto2
+pkgver=2.5.4
+pkgrel=3
+pkgdesc='The core library of gphoto2, designed to allow access to digital camera by external programs'
+arch=('x86_64')
+url='http://www.gphoto.org'
+license=('LGPL')
+depends=('libexif>=0.6.21'
+         'libjpeg-turbo>=1.3.0'
+         'gd'
+         'libtool>=2.4.2'
+         'libusb-compat')
+conflicts=('libgphoto2-nolimit')
+replaces=('libgphoto2-nolimit')
+provides=('libgphoto2-nolimit')
+install=libgphoto2.install
+options=('libtool')
+source=(http://downloads.sourceforge.net/gphoto/${pkgname}-${pkgver}.tar.gz)
+sha512sums=('8f5b5b5c8d6e7380da6b3d6cb6bba5d913bf0daf1cf9a47f9b8089bb01c0e82824bb1db1c6d002f1dbdb5c2c6797ccd4a5b9142691560545d8b6a53020612b24')
+
+build() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+
+    # Change the limit which cause "Fixed limit exceeded"
+    sed -i -e "s|MAX_ENTRIES 1024|MAX_ENTRIES 8192|" libgphoto2/gphoto2-list.c
+
+    udevscriptdir=/usr/lib/udev ./configure \
+        --prefix=/usr \
+        --with-drivers=all \
+        --disable-static \
+        --disable-rpath
+    LD_PRELOAD="" make
+}
+
+package() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+    make DESTDIR="${pkgdir}" install
+
+    # udev helpers not used here.
+    rm ${pkgdir}/usr/lib/udev/check-ptp-camera
+
+    # Remove la files
+    rm -rf ${pkgdir}/usr/lib/libgphoto2/${pkgver}/*a
+    rm -rf ${pkgdir}/usr/lib/libgphoto2_port/*/*a
+    rm -rf ${pkgdir}/usr/lib/*.la
+    rm -rf ${pkgdir}/usr/lib/*.la
+
+    install -m755 -d "${pkgdir}/usr/lib/udev/rules.d"
+    LD_LIBRARY_PATH="${pkgdir}/usr/lib${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH" \
+    CAMLIBS="${pkgdir}/usr/lib/libgphoto2/${pkgver}" \
+        "${pkgdir}/usr/lib/libgphoto2/print-camera-list" udev-rules version 175 > \
+        "${pkgdir}/usr/lib/udev/rules.d/54-gphoto.rules"
+
+    # Remove recursive symlink
+    rm -fv "${pkgdir}/usr/include/gphoto2/gphoto2"
+}

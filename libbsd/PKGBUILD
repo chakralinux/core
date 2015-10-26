@@ -1,0 +1,34 @@
+# Contributions from Arch Linux: https://www.archlinux.org/packages/extra/x86_64/libbsd/
+
+pkgname=libbsd
+pkgver=0.7.0
+pkgrel=1
+pkgdesc="Provides useful functions commonly found on BSD systems like strlcpy()"
+arch=('x86_64')
+url="http://libbsd.freedesktop.org"
+license=('custom')
+depends=('glibc')
+options=('staticlibs')
+source=(http://libbsd.freedesktop.org/releases/$pkgname-$pkgver.tar.xz)
+md5sums=('fcceb4e66fd448ca4ed42ba22a8babb0')
+
+build() {
+  cd $pkgname-$pkgver
+
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+
+  make DESTDIR="$pkgdir" install
+  rm "${pkgdir}"/usr/lib/libbsd.a
+  install -D -m644 COPYING "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

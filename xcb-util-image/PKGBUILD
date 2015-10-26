@@ -1,0 +1,33 @@
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+pkgname=xcb-util-image
+pkgver=0.4.0
+pkgrel=1
+pkgdesc="Utility libraries for XC Binding - Port of Xlib's XImage and XShmImage functions"
+arch=('x86_64')
+url="http://xcb.freedesktop.org"
+license=('custom')
+depends=('libxcb' 'xcb-util')
+makedepends=('xorg-util-macros')
+source=("http://xcb.freedesktop.org/dist/${pkgname}-${pkgver}.tar.bz2")
+sha256sums=('2db96a37d78831d643538dd1b595d7d712e04bdccf8896a5e18ce0f398ea2ffc')
+
+build() {
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr --disable-static
+  make
+}
+
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
+}
+
+package() { 
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+
+  install -D -m644 COPYING \
+    ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
+}

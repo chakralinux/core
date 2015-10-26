@@ -1,0 +1,37 @@
+# Maintainer:
+# Contributors: H W Tovetjärn (totte) <totte@tott.es>
+#               Anke Boersma <abveritas@chakra-project.org>
+
+pkgname=gd
+pkgver=2.1.0
+pkgrel=1
+pkgdesc='Library for the dynamic creation of images by programmers'
+arch=('x86_64')
+url='http://www.libgd.org/'
+license=('custom')
+depends=('libpng'
+         'fontconfig'
+         'libjpeg-turbo')
+optdepends=('perl: bdftogd script')
+options=('!libtool')
+source=("https://bitbucket.org/libgd/gd-libgd/downloads/libgd-${pkgver}.tar.xz")
+sha512sums=('66c56fc07246b66ba649c83e996fd2085ea2f9e2')
+
+build() {
+    cd ${srcdir}/libgd-${pkgver}
+    ./configure \
+        --prefix=/usr\
+        --without-xpm
+    make
+}
+
+check() {
+    cd ${srcdir}/libgd-${pkgver}
+    make check
+}
+
+package() {
+    cd ${srcdir}/libgd-${pkgver}
+    make DESTDIR="${pkgdir}" install
+    install -D -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

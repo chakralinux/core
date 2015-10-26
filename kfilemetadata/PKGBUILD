@@ -1,0 +1,39 @@
+
+source ../frameworks.conf
+
+pkgname=kfilemetadata
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='A library for extracting file metadata'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kfilemetadata'
+license=('LGPL')
+depends=('ki18n' 'qt5-base' 'karchive' 'kservice')
+makedepends=('extra-cmake-modules' 'python3' 'exiv2' 'poppler-qt5' 'taglib' 'ffmpeg' 'ebook-tools')
+optdepends=('ffmpeg: extract video data'
+            'exiv2: extract image data'
+            'taglib: extract audio data'
+            'poppler-qt5: extract document data'
+            'ebook-tools: extract epub file data')
+groups=('frameworks')
+options=("debug")
+replaces=('kfilemetadata5' 'kfilemetadata<5')
+provides=('kfilemetadata5')
+conflics=('kfilemetadata5' 'kfilemetadata<5' 'kfilemetadata4')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

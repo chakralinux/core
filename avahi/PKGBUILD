@@ -1,0 +1,84 @@
+#
+# Platform Packages for Chakra, part of chakraos.org
+#
+# maintainer almack <gluca86 at gmail dot com>
+# contributor: Martín González kote[at]chakra-project[dot]org>
+
+pkgname=avahi
+pkgver=0.6.31
+pkgrel=13
+pkgdesc="A multicast/unicast DNS-SD framework"
+arch=('x86_64')
+url="http://www.avahi.org/"
+license=('LGPL')
+depends=('dbus' 'libcap' 'libdaemon' 'gdbm' 'glib2' 'expat')
+optdepends=('qt: qt bindings'
+	    'nss-mdns: NSS support for mDNS'
+	    'python2-dbus: avahi-discover'
+            'python2-twisted: avahi-bookmarks')
+makedepends=('qt' 'python2-dbus' 'gobject-introspection' 'intltool')
+backup=(etc/avahi/avahi-daemon.conf etc/avahi/services/{sftp-,}ssh.service)
+install=avahi.install
+source=("http://www.avahi.org/download/avahi-${pkgver}.tar.gz"
+        'gnome-nettool.png' 'avahi-daemon-dbus.patch')
+sha1sums=('7e05bd78572c9088b03b1207a0ad5aba38490684'
+          'cf56387c88aed246b9f435efc182ef44de4d52f3'
+          'd81f472ebb5b6635f5b2621933e7eae45878ca14')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  sed '/^Libs:/s:$: -ldbus-1:' -i avahi-client.pc.in
+  sed 's:netdev:network:g' -i avahi-daemon/avahi-dbus.conf
+  sed 's:-DG[^ ]*_DISABLE_DEPRECATED=1::g' -i avahi-ui/Makefile.*
+
+  patch -p1 -i "${srcdir}/avahi-daemon-dbus.patch"
+}
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+
+  PYTHON=python2 \
+  PKG_CONFIG_PATH=/opt/qt/lib/pkgconfig \
+    ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static \
+    --disable-qt3 \
+    --enable-qt4 \
+    --disable-mono \
+    --disable-monodoc \
+    --disable-doxygen-doc \
+    --disable-xmltoman \
+    --disable-gtk \
+    --disable-gtk3 \
+    --disable-pygtk \
+    --enable-compat-libdns_sd \
+    --enable-compat-howl \
+    --with-distro=archlinux \
+    --with-avahi-priv-access-group=network \
+    --with-autoipd-user=avahi \
+    --with-autoipd-group=avahi \
+    --with-systemdsystemunitdir=/usr/lib/systemd/system
+
+  make 
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  rm -fr "${pkgdir}"/etc/rc.d
+
+  # /var/run already provided by filesystem
+  rm -fr "${pkgdir}"/var
+
+  install -D -m 644 ../gnome-nettool.png "${pkgdir}"/usr/share/pixmaps/gnome-nettool.png
+
+  cd "${pkgdir}"
+  sed -i '1c #!/usr/bin/python2' usr/bin/avahi-bookmarks
+  # howl and mdnsresponder compatability
+  (cd usr/include; ln -s avahi-compat-libdns_sd/dns_sd.h dns_sd.h; ln -s avahi-compat-howl howl)
+  (cd usr/lib/pkgconfig; ln -s avahi-compat-howl.pc howl.pc)
+
+  ln avahi-daemon.service -s "${pkgdir}"/usr/lib/systemd/system/dbus-org.freedesktop.Avahi.service
+}
+

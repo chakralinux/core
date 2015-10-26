@@ -1,0 +1,28 @@
+#
+# Moved from CCR
+#
+# maintainer (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
+
+pkgname=xdg-user-dirs
+pkgver=0.15
+pkgrel=1
+pkgdesc="Tool to help manage 'well known' user directories like the desktop folder and the music folder. It also handles localization (i.e. translation) of the filenames."
+arch=('x86_64')
+depends=('sh')
+makedepends=('docbook-xsl')
+url="http://www.freedesktop.org/wiki/Software/xdg-user-dirs"
+license=('GPL')
+source=(http://user-dirs.freedesktop.org/releases/$pkgname-$pkgver.tar.gz)
+md5sums=('f5aaf5686ad7d8809a664bfb4566a54d')
+backup=('etc/xdg/user-dirs.conf' 'etc/xdg/user-dirs.defaults')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr --sysconfdir=/etc
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR=$pkgdir install
+}

@@ -1,0 +1,28 @@
+# Neoophytos Kolokotronis <tetris4@gmail.com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/libinfinity
+
+pkgname=libinfinity
+pkgver=0.5.5
+pkgrel=1
+pkgdesc="An implementation of the Infininote protocol written in GObject-based C"
+arch=('x86_64')
+url="http://gobby.0x539.de"
+license=('GPL')
+depends=('gnutls' 'libgsasl' 'glib2' 'libxml2')
+makedepends=('pkgconfig')
+optdepends=('avahi: zeroconf support'
+            'gtk2: gtk support')
+source=("http://releases.0x539.de/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('93a0cd2b73c9298aa77ee37503d2bc5f')
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  ./configure --prefix=/usr --localstatedir=/var
+  make
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  rm -rf $pkgdir/var
+}

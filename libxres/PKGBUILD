@@ -1,0 +1,29 @@
+# Part of the X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+pkgname=libxres
+pkgver=1.0.7
+pkgrel=1
+pkgdesc="X11 Resource extension library"
+arch=(x86_64)
+url="http://xorg.freedesktop.org"
+license=('custom')
+depends=('libxext')
+makedepends=('resourceproto' 'damageproto' 'compositeproto' 'scrnsaverproto' 'xorg-util-macros')
+options=(!libtool)
+source=(${url}/releases/individual/lib/libXres-${pkgver}.tar.bz2)
+sha1sums=('45e09c6b771af5d8c448ce31de65d15bf83b7579')
+
+build() {
+  cd "${srcdir}/libXres-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc --disable-static
+  make
+}
+
+package() {
+  cd "${srcdir}/libXres-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

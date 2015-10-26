@@ -1,0 +1,53 @@
+#
+# Platform packages for Chakra, part of www.chakra-project.org
+#
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: Renan Biegelmeyer (RenanBS) <renan.biegel@gmail.com>
+#               Archlinux
+
+pkgbase=python-jinja
+pkgname=('python3-jinja' 'python2-jinja')
+pkgver=2.7.3
+pkgrel=1
+pkgdesc="A simple pythonic template language written in Python"
+arch=('any')
+url="http://jinja.pocoo.org"
+license=('BSD')
+makedepends=('python3-setuptools'
+             'python2-setuptools'
+             'python3-markupsafe'
+             'python2-markupsafe')
+source=(http://pypi.python.org/packages/source/J/Jinja2/Jinja2-$pkgver.tar.gz)
+md5sums=('b9dffd2f3b43d673802fe857c8445b1a')
+
+build() {
+    cd "${srcdir}/Jinja2-$pkgver"
+
+    cd "${srcdir}"
+    rm -rf python{2,3}-build
+    for builddir in python{2,3}-build; do
+        cp -r Jinja2-$pkgver $builddir
+        pushd $builddir
+        ${builddir%-build} setup.py build
+        popd
+    done
+}
+
+package_python3-jinja() {
+    depends=('python3-setuptools' 'python3-markupsafe')
+
+    cd "${srcdir}/python3-build"
+    python3 setup.py install --root="$pkgdir" -O1
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
+
+package_python2-jinja() {
+    depends=('python2-setuptools' 'python2-markupsafe')
+    replaces=('python-jinja')
+    provides=('python-jinja')
+    conflicts=('python-jinja')
+
+    cd "${srcdir}/python2-build"
+    python2 setup.py install --root="$pkgdir" -O1
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

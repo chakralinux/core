@@ -1,0 +1,43 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer: Fabian Kosmale <inkane@chakra-project.org>
+# contributor (i686): Phil Miller <philm[at]chakra-project[dog]org>
+# contributor (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
+
+pkgname=obexftp
+pkgver=0.24
+pkgrel=1
+pkgdesc="A tool for transfer files to/from any OBEX enabled device"
+arch=('i686' 'x86_64')
+url="http://openobex.triq.net/obexftp/obexftp"
+license=('GPL')
+depends=('openobex>=1.5' 'python2')
+makedepends=('cmake' 'asciidoc' 'xmlto' 'fuse' 'swig' 'ruby' 'tk' 'python2')
+options=('!libtool' '!makeflags')
+source=(http://downloads.sourceforge.net/sourceforge/openobex/${pkgname}-${pkgver}-Source.tar.gz)
+md5sums=('31a50dbbd09c63cbb5399772aaff7936')
+
+build() {
+  cd "${srcdir}/"
+
+  mkdir build
+  cd build
+  cmake ../${pkgname}-${pkgver}-Source \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_SBINDIR=bin \
+    -DENABLE_PERL=YES \
+    -DENABLE_PYTHON=YES \
+    -DENABLE_RUBY=YES \
+    -DENABLE_TCL=YES
+  make doc
+}
+
+package() {
+  cd "${srcdir}/build"
+
+  make DESTDIR="${pkgdir}" install
+}

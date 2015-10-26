@@ -1,0 +1,37 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=karchive
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Qt 5 addon providing access to numerous types of archives'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/karchive'
+license=('LGPL')
+depends=("qt5-base")
+makedepends=("extra-cmake-modules>=${KFECMVersion}")
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum $pkgname) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+# check() {
+#   cd build
+#   make test
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

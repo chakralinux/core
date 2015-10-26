@@ -1,0 +1,30 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# contributor (x86_64): Martín González <kote[at]chakra-project[dot]org>
+
+
+pkgname=sshfs
+pkgver=2.5
+pkgrel=1
+pkgdesc="FUSE client based on the SSH File Transfer Protocol"
+arch=('x86_64')
+url="http://fuse.sourceforge.net/sshfs.html"
+license=('GPL')
+depends=('fuse' 'glib2' 'openssh')
+makedepends=('pkgconfig')
+source=(http://downloads.sourceforge.net/sourceforge/fuse/${pkgname}-fuse-${pkgver}.tar.gz)
+sha256sums=('e9171452e5d0150b9c6a2158fd2e2dcefb5d5d03ba4d208949e00a3a46c6e63e')
+
+build() {
+  cd "${srcdir}/${pkgname}-fuse-${pkgver}"
+
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-fuse-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}

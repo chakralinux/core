@@ -1,0 +1,30 @@
+pkgname=xdg-utils
+pkgver=1.1.1
+pkgrel=1
+pkgdesc='Command line tools that assist applications with a variety of desktop integration tasks.'
+arch=('any')
+url='http://portland.freedesktop.org/'
+depends=('sh' 'xorg-xset') # xset needed inside xdg-screensaver
+makedepends=('docbook-xsl' 'lynx' 'xmlto' 'git')
+optdepends=('kdebase-runtime: for KDE4 support in xdg-open'
+            'kde-cli-tools: for KDE Plasma5 support in xdg-open')
+license=('MIT')
+source=("http://portland.freedesktop.org/download/${pkgname}-${pkgver}.tar.gz")
+md5sums=('2d0aec6037769a5f138ff404b1bb4b15')
+
+build() {
+	cd ${srcdir}/${pkgname}-${pkgver}
+	
+	./configure --prefix=/usr --mandir=/usr/share/man
+	make 
+}
+
+package() {
+	cd ${srcdir}/${pkgname}-${pkgver}
+	
+	make DESTDIR="${pkgdir}" install
+	install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+	
+	# install empty directory to prevent xdg-desktop-menu install *.desktop to fail, see Arch's FS#33316
+	install -dm755 $pkgdir/usr/share/desktop-directories
+}

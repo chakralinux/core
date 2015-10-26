@@ -1,0 +1,35 @@
+
+source ../frameworks.conf
+
+pkgname=bluez-qt
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Qt wrapper for Bluez 5 DBus API'
+arch=('x86_64')
+url='https://projects.kde.org/projects/kde/workspace/bluez-qt'
+license=(GPL2)
+depends=('qt5-declarative' 'bluez')
+makedepends=('extra-cmake-modules')
+replaces=('libbluedevil-kf5')
+conflicts=('libbluedevil-kf5')
+provides=('libbluedevil-kf5')
+groups=(kf5)
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 -DUDEV_RULES_INSTALL_DIR=/usr/lib/udev/rules.d ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="$pkgdir" install
+}
+

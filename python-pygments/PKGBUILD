@@ -1,0 +1,56 @@
+pkgbase=python-pygments
+pkgname=('python3-pygments' 'python2-pygments' 'pygmentize')
+pkgver=2.0.2
+pkgrel=1
+pkgdesc="Python syntax highlighter"
+arch=('any')
+url="http://pygments.org/"
+license=('BSD')
+makedepends=('python3-setuptools' 'python2-setuptools')
+options=(!emptydirs)
+source=(https://pypi.python.org/packages/source/P/Pygments/Pygments-$pkgver.tar.gz)
+md5sums=('238587a1370d62405edabd0794b3ec4a')
+
+package_python3-pygments() {
+  depends=('python3-setuptools')
+  install=python3-pygments.install
+
+  cd "$srcdir/Pygments-$pkgver"
+
+  python3 setup.py install --root="$pkgdir" -O1
+
+  # pygmentize is shipped in its own package
+  rm "$pkgdir/usr/bin/pygmentize"
+
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
+
+package_python2-pygments() {
+  depends=('python2-setuptools')
+  install=python2-pygments.install
+
+  cd "$srcdir/Pygments-$pkgver"
+
+  python2 setup.py install --root="$pkgdir" -O1
+
+  # pygmentize is shipped in its own package
+  rm "$pkgdir/usr/bin/pygmentize"
+
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
+
+package_pygmentize() {
+  depends=('python3-pygments')
+
+  cd "$srcdir/Pygments-$pkgver"
+
+  python3 setup.py install --root="$pkgdir" -O1
+
+  # Remove all files except for usr/bin/pygmentize
+  find "$pkgdir" -type f -not -name pygmentize -delete
+
+  install -Dm644 external/pygments.bashcomp \
+    "$pkgdir/usr/share/bash-completion/completions/pygmentize"
+
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

@@ -1,0 +1,107 @@
+pkgname=apache
+pkgver=2.4.17
+pkgrel=1
+pkgdesc='A high performance Unix-based HTTP server'
+arch=('x86_64')
+url='http://www.apache.org/dist/httpd'
+license=('Apache')
+backup=(etc/httpd/conf/httpd.conf
+        etc/httpd/conf/extra/httpd-{autoindex,dav,default,info,languages}.conf
+        etc/httpd/conf/extra/httpd-{manual,mpm,multilang-errordoc}.conf
+        etc/httpd/conf/extra/httpd-{ssl,userdir,vhosts}.conf
+        etc/httpd/conf/extra/proxy-html.conf
+        etc/httpd/conf/{mime.types,magic}
+        etc/logrotate.d/httpd)
+depends=('zlib' 'apr-util' 'pcre' 'systemd')
+makedepends=('libxml2' 'lua' 'openssl')
+optdepends=(
+    'lua: for mod_lua module'
+    'openssl: for mod_ssl module'
+    'libxml2: for mod_proxy_html, mod_xml2enc modules' 
+    'lynx: apachectl status'
+)
+install=${pkgname}.install
+source=(http://www.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2
+        httpd.logrotate
+        chakra.layout
+        httpd.service
+        httpd-tmpfile.conf)
+md5sums=('cf4dfee11132cde836022f196611a8b7'
+         '13dbaaf949c5bc36cfcf5718b95cb020'
+         'a53ea863aab5714e39ebc8bbce6218ca'
+         '3494dece165bda4f207135e53655a9ec'
+         'e5894af20fee1d64fdaba35c2a10be9d')
+
+build() {
+  cd httpd-${pkgver}
+
+  # set default user
+  sed -e 's#User daemon#User http#' \
+      -e 's#Group daemon#Group http#' \
+      -i docs/conf/httpd.conf.in 
+
+  cat "${srcdir}/chakra.layout" >> config.layout
+
+  # enable-mpms-shared=all -- all possible MPMs for the platform will be installed.
+  ./configure \
+      --enable-layout=Chakra \
+      --enable-mpms-shared=all \
+      --enable-modules=all \
+      --enable-mods-shared=all \
+      --enable-so \
+      --enable-suexec \
+      --with-suexec-caller=http \
+      --with-suexec-docroot=/srv/http \
+      --with-suexec-logfile=/var/log/httpd/suexec.log \
+      --with-suexec-bin=/usr/sbin/suexec \
+      --with-suexec-uidmin=99 --with-suexec-gidmin=99 \
+      --enable-ldap --enable-authnz-ldap \
+      --enable-cache --enable-disk-cache --enable-mem-cache --enable-file-cache \
+      --enable-ssl --with-ssl \
+      --enable-deflate --enable-cgi --enable-cgid \
+      --enable-proxy --enable-proxy-connect \
+      --enable-proxy-http --enable-proxy-ftp \
+      --enable-dbd --enable-imagemap --enable-ident --enable-cern-meta \
+      --enable-lua --enable-xml2enc \
+      --with-apr=/usr/bin/apr-1-config \
+      --with-apr-util=/usr/bin/apu-1-config \
+      --with-pcre=/usr \
+      --with-mpm=prefork
+  make
+
+}
+
+package() {
+  cd httpd-${pkgver}
+
+  make DESTDIR="${pkgdir}" install
+
+  install -D -m644 "${srcdir}/httpd.logrotate" \
+                   "${pkgdir}/etc/logrotate.d/httpd" 
+
+  install -D -m644 "${srcdir}/httpd-tmpfile.conf" \
+                   "${pkgdir}/usr/lib/tmpfiles.d/httpd.conf"
+
+  install -D -m644 "${srcdir}/httpd.service" \
+                   "${pkgdir}/usr/lib/systemd/system/httpd.service"
+
+  # symlinks for /etc/httpd
+  ln -fs /var/log/httpd "${pkgdir}/etc/httpd/logs"
+  ln -fs /run/httpd "${pkgdir}/etc/httpd/run"
+  ln -fs /usr/lib/httpd/modules "${pkgdir}/etc/httpd/modules"
+  ln -fs /usr/lib/httpd/build "${pkgdir}/etc/httpd/build"
+
+  # set sane defaults
+  sed -e 's#/usr/lib/httpd/modules/#modules/#' \
+      -e 's|#\(LoadModule negotiation_module \)|\1|' \
+      -e 's|#\(LoadModule include_module \)|\1|' \
+      -e 's|#\(LoadModule userdir_module \)|\1|' \
+      -e 's|#\(LoadModule slotmem_shm_module \)|\1|' \
+      -e 's|#\(Include conf/extra/httpd-multilang-errordoc.conf\)|\1|' \
+      -e 's|#\(Include conf/extra/httpd-autoindex.conf\)|\1|' \
+      -e 's|#\(Include conf/extra/httpd-languages.conf\)|\1|' \
+      -e 's|#\(Include conf/extra/httpd-userdir.conf\)|\1|' \
+      -e 's|#\(Include conf/extra/httpd-default.conf\)|\1|' \
+      -e 's|#\(Include conf/extra/httpd-mpm.conf\)|\1|' \
+      -i "${pkgdir}/etc/httpd/conf/httpd.conf"
+}

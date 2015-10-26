@@ -1,0 +1,65 @@
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+_extramodules=extramodules-4.1-CHAKRA
+_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
+_kernelver=4.1.4
+
+pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
+pkgver=304.125
+pkgrel=8
+arch=('x86_64')
+url="http://www.nvidia.com/"
+makedepends=("linux-headers=${_kernelver}")
+license=('custom')
+source=("http://git.chakraos.org/chakra-hardware-detection.git/blob_plain/HEAD:/hwdb/nvidia_supported")
+_pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
+source+=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run")
+md5sums=('62d0cdb856cfae64753c0f3acf729d47'
+         '291d41ccdbcc08f752a38f9e0a7eeea0')
+
+source+=(nv-drm.patch
+         nvidia-3.19.patch
+         nvidia-4.0.patch)
+md5sums+=('79671a27131da619a33eb02ed0c2c031'
+          'd14e651d20054d18e0360c157ae60ae4'
+          '7ff6828d2ad73364d528b69e2a14ab67')
+
+prepare() {
+    cd "${srcdir}"
+    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
+    sh "${_pkg}.run" --extract-only
+    cd "${_pkg}"
+    # patches here
+    patch -p0 -i "$srcdir/nv-drm.patch"
+    patch -p1 -i "$srcdir/nvidia-3.19.patch"
+    patch -p0 -i "$srcdir/nvidia-4.0.patch"
+}
+
+build() {
+    cd "${_pkg}/kernel"
+    make SYSSRC=/usr/lib/modules/"${_kver}/build" module
+}
+
+package_nvidia-304xx() {
+    pkgdesc="NVIDIA drivers for linux."
+    depends=("linux=${_kernelver}" "nvidia-304xx-libgl"  "nvidia-304xx-utils=${pkgver}")
+    conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia')
+    install=nvidia.install
+    
+    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
+        "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
+    install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
+    echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nouveau_blacklist.conf"
+    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
+}
+
+package_chd-nvidia-304xx() {
+    pkgdesc="CHD ids for nvidia $pkgver"
+    arch=('x86_64')
+
+    cd "${srcdir}/${_pkg}"
+
+    install -dm755 "${pkgdir}/opt/chakra/hwdb"
+    sh -e "${srcdir}/nvidia_supported" README.txt kernel/nv-kernel.o \
+        > "${pkgdir}/opt/chakra/hwdb/hw_nvidia304xx_hwdb"
+}

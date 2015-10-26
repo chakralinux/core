@@ -1,0 +1,39 @@
+# Maintainer (i686): Phil Miller <philm@chakra-project[dog]org>
+# Maintainer (x86_64): Manuel Tortosa <manutortosa@chakra-project@org>
+
+# Include global configuration
+source ../frameworks.conf
+
+pkgname=prison-kf5
+pkgver=1.1.1.r22.g8f25e5a
+pkgrel=1
+arch=('x86_64')
+pkgdesc="A barcode api to produce QRCode barcodes and DataMatrix barcode"
+url="https://projects.kde.org/projects/kdesupport/prison"
+license=('GPL' 'LGPL' 'FDL')
+makedepends=('cmake')
+depends=('qt5-base' 'libdmtx' 'qrencode')
+options=('debug')
+source=("git://anongit.kde.org/prison.git#branch=frameworks")
+md5sums=('SKIP')
+
+pkgver() {
+  cd prison
+  git describe --long | sed 's/^v\([^-]*-\)\([^-]*-g.*\)/\1r\2/;s/-/./g'
+}
+
+build() {
+	msg "starting build ..."
+	cd ${srcdir}
+	mkdir -p build-qt5
+	cd build-qt5
+
+	cmake_kf5 ../prison
+
+	make 
+}
+
+package() {
+  cd "${srcdir}"/build-qt5
+  make DESTDIR="${pkgdir}" install
+}

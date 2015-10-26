@@ -1,0 +1,36 @@
+# Neophytos Kolokotronis <tetris4@gmail.com>
+
+pkgname=junit
+pkgver=4.11
+pkgrel=4
+pkgdesc="Automated testing framework for Java"
+arch=('any')
+url="http://www.junit.org/"
+license=('CPL')
+depends=('java-runtime' 'java-hamcrest')
+makedepends=('apache-ant')
+source=(https://github.com/junit-team/junit/archive/r${pkgver}.tar.gz
+        Manifest.txt)
+md5sums=('bf62095e510f50baf0962af329438647'
+         '165500a4fcda0cdd6cff5256301d3702')
+
+build() {
+  cd ${srcdir}/${pkgname}-r${pkgver}
+
+  ant dist -Dversion-status=''
+  
+  # FS#34273
+  jar ufm ${pkgname}${pkgver}/${pkgname}-dep-${pkgver}.jar ${srcdir}/Manifest.txt
+}
+
+check() {
+  cd ${srcdir}/${pkgname}-r${pkgver}
+
+  ant test
+}
+
+package() {
+  install -Dm644 ${srcdir}/${pkgname}-r${pkgver}/${pkgname}${pkgver}/${pkgname}-dep-${pkgver}.jar \
+                 ${pkgdir}/usr/share/java/${pkgname}-${pkgver}.jar
+  ln -s ${pkgname}-${pkgver}.jar ${pkgdir}/usr/share/java/${pkgname}.jar
+}

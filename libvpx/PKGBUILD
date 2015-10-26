@@ -1,0 +1,33 @@
+# Maintainer: almack[at]chakraos[dot]org>
+
+pkgname=libvpx
+pkgver=1.3.0
+pkgrel=1
+pkgdesc="The VP8 Codec SDK"
+arch=('x86_64')
+url="http://www.webmproject.org/"
+license=('BSD')
+depends=('glibc')
+makedepends=('yasm' 'git')
+source=("$pkgname-v$pkgver"::git+http://code.google.com/p/webm.libvpx#tag=v$pkgver)
+md5sums=('SKIP')
+
+build() {
+    cd "${srcdir}/${pkgname}-v${pkgver}"
+    ./configure --prefix=/usr \
+        --enable-vp8 \
+        --enable-vp9 \
+        --enable-runtime-cpu-detect \
+        --enable-shared \
+        --enable-postproc \
+        --enable-pic \
+        --disable-install-docs \
+        --disable-install-srcs
+    make
+}
+
+package() {
+    cd "${srcdir}/${pkgname}-v${pkgver}"
+    make DIST_DIR="$pkgdir/usr" install
+    install -Dm 0644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

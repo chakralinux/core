@@ -1,0 +1,33 @@
+# maintainer almack
+
+pkgname=harfbuzz
+pkgver=0.9.37
+pkgrel=1
+pkgdesc="OpenType text shaping engine."
+arch=('x86_64')
+url="http://www.freedesktop.org/wiki/Software/HarfBuzz"
+license=('MIT')
+depends=('icu' 'glib2' 'freetype2' 'graphite')
+makedepends=('icu' 'cairo')
+optdepends=('cairo: hb-view program')
+source=("http://www.freedesktop.org/software/harfbuzz/release/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('bfe733250e34629a188d82e3b971bc1e')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr \
+	--with-glib \
+	--with-freetype \
+	--with-cairo \
+	--with-icu \
+	--with-graphite2
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/harfbuzz/COPYING"
+}

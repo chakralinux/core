@@ -1,0 +1,36 @@
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas@chakra-project.org
+
+pkgname=librsvg
+pkgver=2.37.0
+pkgrel=1
+pkgdesc="SAX-based renderer for SVG files into a GdkPixbuf"
+arch=('x86_64')
+license=('LGPL')
+depends=('gdk-pixbuf2' 'pango' 'libcroco')
+makedepends=('intltool' 'gobject-introspection')
+optdepends=('python: rsvg commandline utility')
+options=('!libtool')
+url="http://librsvg.sourceforge.net/"
+source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+install=librsvg.install
+sha256sums=('06c57dbcb29369d147b4e6ff4257c42ae5120c504c30fb567a27034ee30fd835')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  ./configure --prefix=/usr \
+              --libexecdir=/usr/lib/${pkgname} \
+              --with-croco \
+              --disable-static \
+	      --with-svgz \
+	      --disable-gtk-theme 
+  make 
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  make DESTDIR="${pkgdir}" install 
+}

@@ -1,0 +1,48 @@
+pkgname=ntp
+_pkgname=ntp #-dev
+_pkgver=4.2.8p3
+pkgver=${_pkgver/p/.p}
+pkgrel=1
+pkgdesc='Network Time Protocol reference implementation'
+url="http://www.ntp.org/"
+license=('custom')
+arch=('x86_64')
+depends=('openssl' 'libcap' 'libedit')
+makedepends=('perl-html-parser')
+backup=('etc/ntp.conf')
+#source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/${_pkgname}/${_pkgname}-${_pkgver}.tar.gz"
+source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/${_pkgname}-${_pkgver}.tar.gz"
+        'ntp.conf'
+        'ntpd.service'
+        'ntpdate.service')
+sha1sums=('fc624396f8d9f9bc282da30c8e8e527ade7d420f'
+          '76045019df8182c8b759828549dbd957e26c4d6e'
+          '0cccca872385e0142888ab48d273fec0669b30a8'
+          '059b382d1af0c55202e2d17f2ae065a2cbfec9ee')
+
+options=('!emptydirs')
+install=install
+
+build() {
+  cd "${srcdir}/${pkgname}-${_pkgver}"
+  
+  ./configure --prefix=/usr \
+    --libexecdir=/usr/lib \
+    --mandir=/usr/share/man \
+    --enable-linuxcaps \
+    --enable-ntp-signd
+    
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${_pkgver}"
+  
+  make DESTDIR="${pkgdir}" install
+  
+  install -d -o 87 "${pkgdir}/var/lib/ntp"
+  install -Dm644 ../ntp.conf "${pkgdir}"/etc/ntp.conf
+  install -Dm644 ../ntpd.service "${pkgdir}"/usr/lib/systemd/system/ntpd.service
+  install -Dm644 ../ntpdate.service "${pkgdir}"/usr/lib/systemd/system/ntpdate.service
+  install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

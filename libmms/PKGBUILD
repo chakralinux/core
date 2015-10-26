@@ -1,0 +1,28 @@
+#
+# Platform Packages for Chakra, part of chakraos.org
+#
+# maintainer almack
+
+pkgname=libmms
+pkgver=0.6.4
+pkgrel=1
+pkgdesc="MMS stream protocol library"
+arch=('x86_64')
+url="http://sourceforge.net/projects/libmms/"
+license=(LGPL)
+depends=('glib2')
+source=("http://download.sourceforge.net/libmms/${pkgname}-${pkgver}.tar.gz")
+md5sums=('d6b665b335a6360e000976e770da7691')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --disable-static
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
+
+

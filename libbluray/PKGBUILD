@@ -1,0 +1,23 @@
+# maintainer (x86_64): almack
+
+pkgname=libbluray
+pkgver=0.7.0
+pkgrel=1
+pkgdesc="Library to access Blu-Ray disks for video playback"
+arch=('x86_64')
+url="http://www.videolan.org/developers/libbluray.html"
+license=('LGPL2.1')
+depends=('libxml2' 'freetype2' 'fontconfig')
+source=(ftp://ftp.videolan.org/pub/videolan/$pkgname/$pkgver/$pkgname-$pkgver.tar.bz2)
+md5sums=('efad766330164f0c7c7cb18f66389870')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  ./configure --prefix=/usr --disable-static
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make DESTDIR="$pkgdir/" install
+} 

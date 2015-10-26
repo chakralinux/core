@@ -1,0 +1,35 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kapidox
+pkgver=$KFVersion
+pkgrel=1
+pkgdesc='Frameworks API Documentation Tools'
+arch=('any')
+url='https://projects.kde.org/projects/frameworks/kapidox'
+license=('LGPL')
+depends=('python3-jinja' 'python3-yaml')
+makedepends=("extra-cmake-modules>=$KFECMVersion" 'qt5-base')
+groups=('kf5')
+options=("debug")
+source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
+sha256sums=($(getSum ${pkgname}))
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=${KFBuildType} \
+    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

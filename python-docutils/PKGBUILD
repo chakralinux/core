@@ -1,0 +1,103 @@
+#
+# Chakra Packages for Chakra, part of chakra-project.org
+#
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: P Miller <philm@chakra-project.org>
+#               M Tortosa <manutortosa@chakra-project.org>
+
+pkgbase=docutils
+pkgname=('python3-docutils' 'python2-docutils')
+pkgver=0.12
+pkgrel=1
+pkgdesc="Set of tools for processing plaintext docs into formats such as HTML, XML, or LaTeX"
+arch=('any')
+url="http://docutils.sourceforge.net"
+license=('custom')
+makedepends=('python3' 'python2')
+source=("http://downloads.sourceforge.net/$pkgbase/$pkgbase-$pkgver.tar.gz")
+md5sums=('4622263b62c5c771c03502afa3157768')
+
+build() {
+    cd ${pkgbase}-${pkgver}
+
+    python3 setup.py build --build-lib=build/python3
+    find build/python3 -type f -exec \
+        sed -i '1s,^#! \?/usr/bin/\(env \|\)python$,#!/usr/bin/python3,' {} \;
+
+    python2 setup.py build --build-lib=build/python2
+    find build/python2 -type f -exec \
+        sed -i '1s,^#! \?/usr/bin/\(env \|\)python$,#!/usr/bin/python2,' {} \;
+}
+
+check() {
+    cd $pkgbase-$pkgver
+    
+    # UTF8 locale needed for valid UTF8 tests
+    export LANG=en_US.UTF-8
+    
+    # Disable python3 check
+    #msg2 'Python 3 checks'
+    #PYTHONPATH="$PWD/build/python3/" python3 test3/alltests.py
+    
+    msg2 'Python 2 checks'
+    PYTHONPATH="$PWD/build/python2/" python2 test/alltests.py
+}
+
+package_python3-docutils() {
+    depends=('python3')
+    conflicts=('docutils')
+
+    cd $pkgbase-$pkgver
+    python3 setup.py build --build-lib=build/python3 \
+        install --root="$pkgdir" --optimize=1
+
+    # Symlink without .py
+    for f in "$pkgdir"/usr/bin/*.py; do
+        ln -s "$(basename $f)" "$pkgdir/usr/bin/$(basename $f .py)"
+    done
+
+    # License
+    install -D -m644 COPYING.txt "$pkgdir/usr/share/licenses/$pkgname/COPYING.txt"
+    install -D -m644 licenses/python* "$pkgdir/usr/share/licenses/$pkgname/"
+}
+
+package_python2-docutils() {
+    depends=('python2')
+    #provides=("docutils=$pkgver")
+    conflicts=('docutils')
+    replaces=('docutils')
+    install=python2-docutils.install
+
+    cd $pkgbase-$pkgver
+    python2 setup.py build --build-lib=build/python2 \
+        install --root="$pkgdir" --optimize=1
+
+    # Fix python3-docutils conflict
+    for _f in "$pkgdir"/usr/bin/*.py; do
+        mv -v "$_f" "${_f%.py}2.py"
+    done
+    
+    # Symlink without .py
+    for _f in "$pkgdir"/usr/bin/*.py; do
+        ln -s "$(basename $_f)" "$pkgdir/usr/bin/$(basename $_f .py)"
+    done
+
+    # License
+    install -D -m644 COPYING.txt "$pkgdir/usr/share/licenses/$pkgname/COPYING.txt"
+    install -D -m644 licenses/python* "$pkgdir/usr/share/licenses/$pkgname/"
+    
+    #for f in ${pkgdir}/usr/bin/*.py; do
+    #    ln -s $(basename $f) $pkgdir/usr/bin/$(basename $f .py)
+    #done
+
+    #sed -e 's|#!/usr/bin/env python|#!/usr/bin/env python2|' \
+    #    -i ${pkgdir}/usr/lib/python2.7/site-packages/docutils/_string_template_compat.py
+    #sed -e 's|#!/usr/bin/env python|#!/usr/bin/env python2|' \
+    #    -i ${pkgdir}/usr/lib/python2.7/site-packages/docutils/writers/xetex/__init__.py
+    #sed -e 's|#! /usr/bin/env python|#!/usr/bin/env python2|' \
+    #    -i ${pkgdir}/usr/lib/python2.7/site-packages/docutils/math/math2html.py
+    #sed -e 's|#!/usr/bin/env python|#!/usr/bin/env python2|' \
+    #    -i ${pkgdir}/usr/lib/python2.7/site-packages/docutils/math/latex2mathml.py
+    #sed -e 's|#!/usr/bin/env python|#!/usr/bin/env python2|' \
+    #    -i ${pkgdir}/usr/lib/python2.7/site-packages/docutils/error_reporting.py
+}

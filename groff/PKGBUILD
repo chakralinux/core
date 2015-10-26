@@ -1,0 +1,45 @@
+# maintainer: abveritas[at]chakra-project[dot]org>
+
+pkgname=groff
+pkgver=1.22.2
+pkgrel=1
+pkgdesc="GNU troff text-formatting system"
+arch=('x86_64')
+url="http://www.gnu.org/software/groff/groff.html"
+license=('GPL')
+depends=('perl' 'gcc-libs' 'texinfo')
+makedepends=('netpbm' 'psutils' 'ghostscript')
+optdepends=('netpbm: for use together with man -H command interaction in browsers'
+            'psutils: for use together with man -H command interaction in browsers')
+source=("ftp://ftp.gnu.org/gnu/groff/groff-$pkgver.tar.gz"
+        'site.tmac')
+options=('!docs' '!emptydirs')
+install=groff.install
+md5sums=('9f4cd592a5efc7e36481d8d8d8af6d16'
+         'a1fedafd7863b37968d32ad9ae1d8c13')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+  
+  ./configure --prefix=/usr --without-x
+  make
+}
+
+package() {
+  cd $srcdir/$pkgname-$pkgver
+  make prefix=$pkgdir/usr install
+  
+  mkdir -p $pkgdir/usr
+  cd $pkgdir/usr/bin
+  # needed for xman
+  ln -s eqn geqn
+  ln -s tbl gtbl
+  ln -s soelim zsoelim
+
+  # Fix some issues when encoding to utf8 man pages
+  #  The output chars don't match keyboard chars...
+  cat $srcdir/site.tmac >> \
+    $pkgdir/usr/share/groff/site-tmac/man.local
+  cat $srcdir/site.tmac >> \
+    $pkgdir/usr/share/groff/site-tmac/mdoc.local
+}

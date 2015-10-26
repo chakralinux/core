@@ -1,0 +1,37 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=kdesignerplugin
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Integration of Frameworks widgets in Qt Designer/Creator'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/kdesignerplugin'
+license=('LGPL')
+depends=('kplotting' 'kdewebkit')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'kdoctools')
+checkdepends=('cmake' "xorg-server-xvfb")
+groups=('kf5')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+# check() {
+#   cd build
+#   xvfb-run make test
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

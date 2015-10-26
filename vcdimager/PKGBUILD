@@ -1,0 +1,29 @@
+# 
+# Platform packages for Chakra, part of chakra-project.org
+#
+# Contributor: damir <damir@archlinux.org>
+# Maintainer: Bruce Liu <rainman59118@gmail.com>
+
+pkgname=vcdimager
+pkgver=0.7.24
+pkgrel=2
+pkgdesc="GNU VCDImager is a full-featured mastering suite for authoring disassembling and analyzing Video CD's and Super Video CD's"
+arch=('x86_64')
+license=('GPL')
+url="http://www.vcdimager.org/"
+depends=('libcdio' 'libxml2' 'popt')
+options=('!libtool')
+install=vcdimager.install
+source=("ftp://ftp.gnu.org/gnu/vcdimager/${pkgname}-${pkgver}.tar.gz")
+md5sums=('3af22978fd79c79d5fda6513b6811145')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}

@@ -1,0 +1,26 @@
+diff --git a/parched.py b/parched.py
+index 3cd3259..0efca0d 100644
+--- a/parched.py
++++ b/parched.py
+@@ -389,7 +389,7 @@ class PKGBUILD(Package):
+             if token is None or token == '':
+                 break
+             # Skip escaped newlines and functions
+-            if token == '\n' or in_function:
++            if token == '\n':
+                 continue
+             # Special case:
+             # Array elements are dispersed among tokens, we have to join
+@@ -437,6 +437,12 @@ class PKGBUILD(Package):
+             value = self._symbols[symbol]
+         except KeyError:
+             value = ''
++
++        if not isinstance(value, str):
++	  # FIXME: This is even more icky
++	  # TODO: manage splitted PKGBUILD
++	  # in case of an array here, like multiple pkgnames
++	  value = ''
+         # BUG: Might result in an infinite loop, oops!
+         return self._symbol_regex.sub(self._replace_symbol, value)
+ 

@@ -1,0 +1,31 @@
+#
+# Chakra Packages for Chakra, part of chakraos.org
+#
+# maintainer almack@chakraos.org
+# contributor abveritas@chakra-project.org
+
+pkgname=libva
+pkgver=1.5.0
+pkgrel=1
+pkgdesc='Video Acceleration (VA) API for Linux'
+arch=('x86_64')
+url="http://freedesktop.org/wiki/Software/vaapi"
+license=('MIT')
+depends=('libgl' 'libdrm' 'libxfixes')
+makedepends=('mesa')
+optdepends=('libva-vdpau-driver: backend for Nvidia and AMD cards'
+            'libva-intel-driver: backend for Intel cards')
+source=(http://freedesktop.org/software/vaapi/releases/$pkgname/$pkgname-$pkgver.tar.bz2)
+md5sums=('ad0b55794308ec397d249a0a2a6df27a')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+  install -Dm644 COPYING "$pkgdir"/usr/share/licenses/$pkgname/COPYING
+}

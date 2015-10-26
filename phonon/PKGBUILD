@@ -1,0 +1,57 @@
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/phonon
+
+pkgbase=phonon
+pkgname=("phonon" "phonon-qt5")
+pkgver=4.8.3
+pkgrel=1
+arch=('x86_64')
+url="http://phonon.kde.org"
+license=('LGPL')
+makedepends=('cmake' 'automoc4' 'qt5-base' 'qt5-tools' 'qt5-quick1' 'qt5-base' 'qt5-tools' 'qt5-quick1')
+options=("debug" "!emptydirs")
+source=("http://download.kde.org/stable/${pkgname}/${pkgver}/src/${pkgname}-${pkgver}.tar.xz"
+	     'pulsesupport.patch')
+sha256sums=('a1149c961ca1570968d070bbd23671e614aa506f847ca93748960e309f85da16'
+            'bc3b4cc3ac171462adc3730e5f80a65bcfc082f04282ad605765f0db5954d4c7')
+
+prepare(){
+  mkdir "${srcdir}"/build
+  mkdir "${srcdir}"/build-qt5
+  # patch form Comment#38 at https://bugs.kde.org/show_bug.cgi?id=324975#c38
+  patch -uN ${srcdir}/${pkgname}-${pkgver}/phonon/pulsesupport.cpp ${srcdir}/pulsesupport.patch
+}
+
+build() {
+  cd "${srcdir}"/build
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DPHONON_INSTALL_QT_EXTENSIONS_INTO_SYSTEM_QT=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib
+  make
+  cd "${srcdir}"/build-qt5
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DPHONON_INSTALL_QT_EXTENSIONS_INTO_SYSTEM_QT=ON \
+    -DPHONON_BUILD_PHONON4QT5=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib
+  make
+}
+
+package_phonon(){
+  pkgdesc="The multimedia framework for KDE4"
+  depends=('pulseaudio' 'libqzeitgeist' 'qtwebkit' 'phonon-backend')
+  cd "${srcdir}"/build
+  make DESTDIR="${pkgdir}" install
+}
+
+package_phonon-qt5(){
+  depends=('libpulse' 'qt5-base' 'phonon-qt5-backend')
+  pkgdesc="The multimedia framework for KF5"
+  cd "${srcdir}"/build-qt5
+  make DESTDIR="${pkgdir}" install
+}

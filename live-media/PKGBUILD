@@ -1,0 +1,36 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/live-media
+
+pkgname=live-media
+pkgver=2015.03.19
+pkgrel=1
+pkgdesc="A set of C++ libraries for multimedia streaming"
+arch=('x86_64')
+license=('LGPL')
+url="http://live555.com/liveMedia"
+depends=('gcc-libs')
+source=("http://live555.com/liveMedia/public/live.${pkgver}.tar.gz")
+md5sums=('ca7d152d7a70f59410460d7056e30111')
+
+build() {
+  cd ${srcdir}/live
+
+  sed \
+      -e 's/$(INCLUDES) -I. -O2 -DSOCKLEN_T/$(INCLUDES) -I. -O2 -I. -fPIC -DRTSPCLIENT_SYNCHRONOUS_INTERFACE=1 -DSOCKLEN_T/g' \
+      -i config.linux
+  ./genMakefiles linux
+  make
+}
+
+package() {
+  cd ${srcdir}/live
+
+  for dir in BasicUsageEnvironment UsageEnvironment groupsock liveMedia; do
+    install -dm755 ${pkgdir}/usr/{bin,lib,include/${dir}}
+    install -m644 ${dir}/*.a "${pkgdir}/usr/lib"
+    install -m644 ${dir}/include/*.h* "${pkgdir}/usr/include/${dir}"
+  done
+
+  for testprog in `find testProgs -type f -perm 755`; do
+    install ${testprog} "${pkgdir}/usr/bin"
+  done
+}

@@ -1,0 +1,27 @@
+#
+# Platform Packages for Chakra, part of chakra-project.org
+#
+# maintainer abveritas@chakra-project.org
+
+pkgname=atk
+pkgver=2.15.4
+pkgrel=1
+pkgdesc="A library providing a set of interfaces for accessibility"
+arch=('x86_64')
+license=('LGPL')
+depends=('glib2')
+makedepends=('gobject-introspection')
+source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+url='http://www.gtk.org/'
+md5sums=('430879fbffe433af118a2eb9c3bd69bf')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}

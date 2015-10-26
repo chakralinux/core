@@ -1,0 +1,41 @@
+# Platform Packages for Chakra, part of chakra-project.org
+# Contributor: abveritas@chakra-project.org
+# Maintainer: BrLi <rainman59118[at]gmail.com>
+
+pkgname=cdemu-client
+pkgver=3.0.0
+pkgrel=2
+pkgdesc="Simple command-line client for controlling cdemu-daemon"
+arch=('x86_64')
+url=("http://cdemu.sourceforge.net/")
+license=('GPL')
+depends=('python2' 'dbus-python' 'cdemu-daemon')
+makedepends=('intltool' 'cmake')
+source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2")
+md5sums=('4e188ec42b1db005ed96b81db52a20ed')
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  msg 'python2 fix'
+  sed -i 's_#!/usr/bin/env python_#!/usr/bin/env python2_' src/cdemu
+
+  msg 'bash completion fix'
+  sed -i CMakeLists.txt -e "s|DESTINATION \${CMAKE_INSTALL_SYSCONFDIR}/bash_completion.d|DESTINATION \${CMAKE_INSTALL_DATADIR}/bash-completion/completions|"
+}
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  [[ -d build ]] && rm -rf build ; mkdir build
+  cd build
+  cmake .. \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver/build"
+  make DESTDIR="$pkgdir" install
+  rm -f "${pkgdir}"/usr/share/applications/cdemu-client.desktop
+}

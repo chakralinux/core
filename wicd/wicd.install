@@ -1,0 +1,16 @@
+PKGNAME=wicd
+
+pre_remove () {
+    for pyo in $(pacman -Qql $PKGNAME  | grep \.py$ | sed 's|.py$|.pyo|g'); do
+        if [ -f "$pyo" ]; then
+            rm "$pyo"
+        fi
+    done
+}
+
+post_install() {
+  echo
+  echo "==> You need to enable the wicd systemd service"
+  echo "==> Please run:"
+  echo "==> sudo systemctl enable wicd"    
+}

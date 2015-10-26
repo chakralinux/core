@@ -1,0 +1,39 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+source ../frameworks.conf
+
+pkgname=ktextwidgets
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='Advanced text editing widgets'
+arch=('x86_64')
+url='https://projects.kde.org/projects/frameworks/ktextwidgets'
+license=('LGPL')
+depends=('kcompletion' 'kservice' 'kiconthemes' 'sonnet')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python3')
+checkdepends=('xorg-server-xvfb')
+groups=('kf5')
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3
+  make
+}
+
+# check() {
+#   cd build
+#   xvfb-run make test
+# }
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

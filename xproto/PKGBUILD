@@ -1,0 +1,24 @@
+# Part of X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
+
+pkgname=xproto
+pkgver=7.0.26
+pkgrel=1
+pkgdesc="X11 core wire protocol and auxiliary headers"
+arch=(x86_64)
+license=('custom')
+url="http://xorg.freedesktop.org/"
+source=(${url}/releases/individual/proto/${pkgname}-${pkgver}.tar.bz2)
+sha1sums=('81101b78052fa0f652982081f9328f912b71a948')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+}

@@ -1,0 +1,28 @@
+# Part of X.org group
+# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+
+pkgname=xorg-fonts-encodings
+pkgver=1.0.4
+pkgrel=2
+pkgdesc="X.org font encoding files"
+arch=(x86_64)
+url="http://xorg.freedesktop.org/"
+license=('custom')
+depends=('xorg-font-utils')
+install=xorg-fonts-encodings.install
+source=(${url}/releases/individual/font/encodings-${pkgver}.tar.bz2)
+sha1sums=('24ace2470403f85a0d393769204029bd8247992a')
+
+build() {
+  cd "${srcdir}/encodings-${pkgver}"
+  ./configure --prefix=/usr \
+      --with-encodingsdir=/usr/share/fonts/encodings
+  make
+}
+
+package() {
+  cd "${srcdir}/encodings-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}
