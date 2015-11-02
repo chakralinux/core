@@ -1,23 +1,21 @@
-# maintainer AlmAck
-
 pkgname=maxima
-pkgver=5.35.1
-pkgrel=2
+pkgver=5.37.2
+pkgrel=1
 pkgdesc="Maxima - a sophisticated Computer Algebra System."
 arch=('x86_64')
 license=('GPL')
 url="http://maxima.sourceforge.net"
 # needs rebuild when bash and sbcl changes version
 depends=('sbcl' 'texinfo' 'sh')
+makedepends=('python2' 'emacs-nox')
 optdepends=('gnuplot: plotting capabilities' \
             'rlwrap: readline support via /usr/bin/rmaxima' \
             'tk: graphical xmaxima interface')
-
 options=('!makeflags' '!zipman') # don't zip info pages or they won't work inside maxima
 install="maxima.install"
 source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.gz"
         "${pkgname}.desktop")
-md5sums=('4bb0b999645ec2b20b7e301d36f83a4c'
+md5sums=('1038d68116a9b516e046a76f68ba5115'
          '24aa81126fbb8b726854e5a80d4c2415')
 
 build() {
@@ -29,14 +27,17 @@ build() {
               --libexecdir=/usr/lib \
               --enable-sbcl \
               --with-default-lisp=sbcl
-
+  
+  # help avoid (re)running makeinfo/tex
+  touch doc/info/maxima.info
+  
   make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" emacsdir=/usr/share/emacs/site-lisp/maxima install
 
   # install some freedesktop.org compatibility
   install -Dm644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
