@@ -1,33 +1,31 @@
 # Contribution from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kscreen-frameworks
 source ../plasma.conf
 
-pkgname=kscreen-kf5
-_pkgname=kscreen
+pkgname=kscreen
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc="KDE's screen management software"
 arch=('x86_64')
 url='projects.kde.org/'
 license=('LGPL')
-depends=('qt5-declarative' 'libkscreen-kf5' 'kxmlgui' 'qt5-graphicaleffects')
+depends=('qt5-declarative' 'libkscreen' 'kxmlgui' 'qt5-graphicaleffects')
 makedepends=('extra-cmake-modules' 'python3')
 groups=('plasma')
 options=("debug")
-replaces=('kscreen')
-conflicts=('kscreen')
+replaces=('kscreen-kf5')
+conflicts=('kscreen-kf5')
 provides=('kscreen')
-source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${_pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 install=${pkgname}.install
 
 prepare() {
-  mkdir -p build
-  cd ${_pkgname}-${pkgver}
+  mkdir -p ${srcdir}/build
 }
 
 build() {
-  cd build
-  cmake_kf5 ../${_pkgname}-${pkgver} \
+  cd ${srcdir}/build
+  cmake_kf5 ../${pkgname}-${pkgver} \
      -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
