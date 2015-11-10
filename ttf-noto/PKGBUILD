@@ -1,28 +1,24 @@
 pkgbase=ttf-noto
 pkgname=('ttf-noto' 'otf-noto')
-pkgver=20150616
+pkgver=20150929
 pkgrel=1
-pkgdesc="Fonts support all languages/characters in Unicode"
+pkgdesc="Google Noto TTF fonts"
 arch=('any')
 url="http://www.google.com/get/noto"
 license=('apache')
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+depends=(fontconfig)
 makedepends=()
-conflicts=()
-provides=('ttf-font')
 source=("http://storage.googleapis.com/noto-website/pkgs/Noto-hinted.zip")
-md5sums=('133aa18ea3ed161f331ee51594d92f5c')
+md5sums=('70cb627abadc32f66de34cfb6f2a65db')
 install=${pkgbase}.install
 
 package_ttf-noto() {
-    for file in *.ttf
-    do
-        install -Dm644 $file $pkgdir/usr/share/fonts/TTF/$file
-    done
+    provides=('ttf-font')
+
+    mkdir -p "$pkgdir"/usr/share/fonts/TTF
+    install -m644 *.ttf "$pkgdir"/usr/share/fonts/TTF
 }
 package_otf-noto() {
-    for file in *.otf
-    do
-        install -Dm644 $file $pkgdir/usr/share/fonts/OTF/$file
-    done
+    mkdir -p "$pkgdir"/usr/share/fonts/OTF
+    install -m644 *.otf "$pkgdir"/usr/share/fonts/OTF
 }
