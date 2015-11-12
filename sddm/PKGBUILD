@@ -1,8 +1,8 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sddm
 
 pkgname=sddm
-pkgver=0.12.0
-pkgrel=7
+pkgver=0.13.0
+pkgrel=1
 pkgdesc='QML based X11 and Wayland display manager'
 arch=('x86_64')
 url='http://github.com/sddm/sddm'
@@ -17,27 +17,9 @@ backup=('usr/share/sddm/scripts/Xsetup'
         'etc/sddm.conf'
         'etc/pam.d/sddm')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/${pkgname}/${pkgname}/archive/v${pkgver}.tar.gz"
-        'sddm.conf'
-        fix-segfault.patch::"https://github.com/davispuh/sddm/commit/671c11d0.patch"
-        CVE-2015-0856.patch::"https://github.com/sddm/sddm/commit/4cfed6b0.patch"
-        multi-monitor.patch::"https://patch-diff.githubusercontent.com/raw/sddm/sddm/pull/511.patch")
-md5sums=('e3261ac93a50c71c973cc79b85387765'
-         '542926387bb8ac496c90684a6a3febc6'
-         '208f3b1b49792984989172dd809a03bf'
-         '80eb7eddd8d3d259a6c28e83b9394575'
-         '1704e84c68e6935923d223b6a4c4b198')
-
-prepare() {
-  cd ${srcdir}
-
-  # Fix segfault https://github.com/sddm/sddm/issues/489
-  cd ${pkgname}-${pkgver}
-  patch -p1 -i ../fix-segfault.patch
-  # Fix CVE-2015-0856
-  patch -p1 -i ../CVE-2015-0856.patch
-  # Fix multi-monitor support https://github.com/sddm/sddm/issues/496
-  patch -p1 -i ../multi-monitor.patch
-}
+        'sddm.conf')
+md5sums=('ecfd285a463eb6490da1333bb2e304a7'
+         '96523ffbb85aa1d833e5eaddd08cde6c')
          
 build() {
   mkdir -p build && cd build
@@ -46,6 +28,7 @@ build() {
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBEXECDIR=/usr/lib/sddm \
         -DDBUS_CONFIG_FILENAME=sddm_org.freedesktop.DisplayManager.conf \
+        -DENABLE_PAM=ON \
         -DBUILD_MAN_PAGES=ON
   make
 }
