@@ -4,7 +4,7 @@ source ../plasma.conf
 pkgbase=breeze
 pkgname=('breeze' 'breeze-kde4')
 pkgver=${PSubVersion}
-pkgrel=2
+pkgrel=3
 pkgdesc='Artwork, styles and assets for the Breeze visual style for the Plasma Desktop'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/breeze'
@@ -41,6 +41,9 @@ package_breeze() {
 
   cd build
   make DESTDIR="${pkgdir}" install
+  
+  # split off icons
+  rm -r "$pkgdir"/usr/share/icons/{breeze,breeze-dark}
 
   # make QtCurve preset and color scheme available for KDE4 too
   install -d "$pkgdir"/usr/share/apps/{QtCurve,color-schemes}
