@@ -4,7 +4,7 @@
 # Note: don't forget lib32 part
 
 pkgname=libpng
-pkgver=1.6.17
+pkgver=1.6.19
 _apngver=${pkgver}
 pkgrel=1
 pkgdesc="A collection of routines used to create PNG format graphics files"
@@ -13,18 +13,19 @@ url="http://www.libpng.org/pub/png/libpng.html"
 license=('custom')
 depends=('zlib' 'sh')
 source=(http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.xz{,.asc}
-        http://downloads.sourceforge.net/sourceforge/libpng-apng/libpng-$_apngver-apng.patch.gz)
+        http://downloads.sourceforge.net/sourceforge/apng/libpng-$_apngver-apng.patch.gz)
 # Change checksums to SF-avalible format
-sha1sums=('6394f3c0847c3b9ea69f4f972dddae3786592050'
+sha1sums=('483d72ced11c9258f9d1119105273d9af9ff151c'
           'SKIP'
-          '98df31fa0b035ba102913fb72c4c56b44673841c')
+          '36f3c95f587cf9b01a7254051efb1e37e7629b9e')
+validpgpkeys=('8048643BA2C840F4F92A195FF54984BFA16C640F')
 
 prepare() {
   cd ${pkgname}-${pkgver}
 
   # Add animated PNG (apng) support
   # see http://sourceforge.net/projects/libpng-apng/
-  patch -Np1 -i "../libpng-${_apngver}-apng.patch"
+  patch -Np0 -i "../libpng-${_apngver}-apng.patch"
 }
 
 build() {
