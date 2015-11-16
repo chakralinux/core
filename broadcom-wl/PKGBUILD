@@ -1,12 +1,12 @@
 #maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
-_extramodules=extramodules-4.1-CHAKRA
+_extramodules=extramodules-4.2-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.1.4
+_kernelver=4.2.6
 
 pkgname=broadcom-wl
-pkgver=6.30.223.248
-pkgrel=15
+pkgver=6.30.223.271
+pkgrel=1
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 arch=('x86_64')
@@ -15,46 +15,39 @@ depends=("linux=${_kernelver}")
 makedepends=("linux-headers=${_kernelver}")
 source=("http://www.broadcom.com/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz"
          #"http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" "http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
-        modprobe.d
-        license.patch
-        gcc.patch
-        linux-recent.patch
-        support-for-Linux-4.0.patch)
-sha1sums=('bd55f1fdc6b0a4d0a70dc4ba4bb4169a824e238c'
+        'modprobe.d'
+        'license.patch'
+        'wl_linux.c.patch')
+sha1sums=('1f568bb989d175813c5631c6629d9479eae6f3be'
           'a37c5dd9ab279372f0c68595bb2a8f1fe694cd13'
           '81c05d48b234d56ad2e18eaee5ce89b79550ef20'
-          '8a940675e8c0baa65494c378e6155543b26a9a58'
-          '758cb8ed0448aeedae18c64c25ddf330ac1a5177'
-          'bc38818662f50418c7b4e2588f84b8d7cafcd56c')
+          '94e12ef9e64fde04a5bfb04858dd5be86a70e902')
+
 
 install=install
 
 prepare() {
-	cd "${srcdir}"
+    cd "${srcdir}"
 
-	patch -p1 -i linux-recent.patch
-	patch -p1 -i license.patch
-        patch -p1 -i gcc.patch
-        
-        # based on https://bugs.launchpad.net/ubuntu/+source/bcmwl/+bug/1424676
-        patch -p1 -i support-for-Linux-4.0.patch
+    patch -p1 -i license.patch
+    patch -p1 -i wl_linux.c.patch
 
-        sed -e "/BRCM_WLAN_IFNAME/s:eth:wlan:" \
-            -i src/wl/sys/wl_linux.c
+    sed -e "/BRCM_WLAN_IFNAME/s:eth:wlan:" \
+        -i src/wl/sys/wl_linux.c
 }
 
 build() {
-	cd "${srcdir}"
+    cd "${srcdir}"
 
-	make -C /usr/lib/modules/"${_kver}"/build M=`pwd`
+    make -C /usr/lib/modules/"${_kver}"/build M=`pwd`
 }
 
 package() {
-	cd "${srcdir}"
+    cd "${srcdir}"
 
-	install -Dm644 wl.ko "${pkgdir}/usr/lib/modules/${_extramodules}/wl.ko"
-	gzip "${pkgdir}/usr/lib/modules/${_extramodules}/wl.ko"
+    install -Dm644 wl.ko "${pkgdir}/usr/lib/modules/${_extramodules}/wl.ko"
+    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/wl.ko"
 
-	install -Dm644 lib/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-	install -Dm644 modprobe.d "${pkgdir}/usr/lib/modprobe.d/broadcom-wl.conf"
+    install -Dm644 lib/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 modprobe.d "${pkgdir}/usr/lib/modprobe.d/broadcom-wl.conf"
 }

@@ -1,12 +1,12 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
-_extramodules=extramodules-4.1-CHAKRA
+_extramodules=extramodules-4.2-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.1.4
+_kernelver=4.2.6
 
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
-pkgver=304.125
-pkgrel=8
+pkgver=304.128
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
@@ -17,12 +17,10 @@ source+=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run"
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
          '291d41ccdbcc08f752a38f9e0a7eeea0')
 
-source+=(nv-drm.patch
-         nvidia-3.19.patch
-         nvidia-4.0.patch)
-md5sums+=('79671a27131da619a33eb02ed0c2c031'
-          'd14e651d20054d18e0360c157ae60ae4'
-          '7ff6828d2ad73364d528b69e2a14ab67')
+source+=(nv-drm.patch)
+md5sums=('62d0cdb856cfae64753c0f3acf729d47'
+         '6478e40ed87d9177cbfc3d0b6e39a051'
+         '79671a27131da619a33eb02ed0c2c031')
 
 prepare() {
     cd "${srcdir}"
@@ -31,8 +29,6 @@ prepare() {
     cd "${_pkg}"
     # patches here
     patch -p0 -i "$srcdir/nv-drm.patch"
-    patch -p1 -i "$srcdir/nvidia-3.19.patch"
-    patch -p0 -i "$srcdir/nvidia-4.0.patch"
 }
 
 build() {
