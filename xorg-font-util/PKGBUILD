@@ -2,7 +2,7 @@
 # Maintainer: AlmAck <almack@chakraos.org>
 
 pkgname=xorg-font-util
-pkgver=1.3.0
+pkgver=1.3.1
 pkgrel=1
 pkgdesc='X.Org font utilities'
 url='http://xorg.freedesktop.org/'
@@ -10,23 +10,23 @@ arch=('x86_64')
 license=('custom')
 makedepends=('xorg-util-macros')
 source=("${url}/releases/individual/font/font-util-${pkgver}.tar.bz2")
-sha1sums=('a015f4c5a35d98af72835797293697e0eb9cd506')
+sha1sums=('0b16add3637c64b0bbaf1dd223b71b0421100c20')
 groups=('xorg-fonts' 'xorg')
 
 build() {
-	cd "${srcdir}/font-util-${pkgver}"
+    cd "${srcdir}/font-util-${pkgver}"
 
-	./configure \
-		--prefix=/usr \
-		--mandir=/usr/share/man \
-		--with-mapdir=/usr/share/fonts/util \
-		--with-fontrootdir=/usr/share/fonts \
+    ./configure \
+            --prefix=/usr \
+            --mandir=/usr/share/man \
+            --with-mapdir=/usr/share/fonts/util \
+            --with-fontrootdir=/usr/share/fonts \
 
-	make
+    make
 }
 
 package() {
-	cd "${srcdir}/font-util-${pkgver}"
-	make DESTDIR="${pkgdir}" install
-	install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+    cd "${srcdir}/font-util-${pkgver}"
+    make DESTDIR="${pkgdir}" install
+    install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
 }

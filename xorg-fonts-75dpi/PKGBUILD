@@ -1,9 +1,10 @@
 # Part of X.org group
 # Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 # Contribution from Arch: https://www.archlinux.org/packages/extra/any/xorg-fonts-75dpi/
+
 pkgname=xorg-fonts-75dpi
-pkgver=1.0.1
-pkgrel=4
+pkgver=1.0.3
+pkgrel=1
 pkgdesc="X.org 75dpi fonts"
 arch=(x86_64)
 url="http://xorg.freedesktop.org/"
@@ -24,15 +25,25 @@ md5sums=('6c9f26c92393c0756f3e8d614713495b'
 
 build() {
   cd "${srcdir}"
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   for dir in *; do
     if [ -d "${dir}" ]; then
       pushd "${dir}"
       ./configure --prefix=/usr \
-          --with-fontdir=/usr/share/fonts/75dpi || return 1
-      make || return 1
-      make DESTDIR="${pkgdir}" install || return 1
-      install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.${dir%-75dpi-*}" || return 1
+          --with-fontdir=/usr/share/fonts/75dpi
+      make
+      popd
+    fi
+  done
+}
+
+package() {
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  for dir in *; do
+    if [ -d "${dir}" ]; then
+      pushd "${dir}"
+      make DESTDIR="${pkgdir}" install
+      install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.${dir%-75dpi-*}"
       popd
     fi
   done

@@ -1,7 +1,7 @@
 # Maintainer: Drake Justice <djustice@gmail.com>
 
 pkgname=xorg-sessreg
-pkgver=1.0.8
+pkgver=1.1.0
 pkgrel=1
 pkgdesc="Register X sessions in system utmp/utmpx databases"
 arch=(x86_64)
@@ -10,8 +10,15 @@ license=('custom')
 depends=('glibc')
 makedepends=('xorg-util-macros' 'xproto')
 groups=('xorg-apps' 'xorg')
-source=(http://xorg.freedesktop.org/archive/individual/app/sessreg-${pkgver}.tar.bz2)
-sha256sums=('0e2accc6272fcc2321aef7370f4ccf0df0fe259b2e942938264e2aaedee6c4c3')
+source=(http://xorg.freedesktop.org/archive/individual/app/sessreg-${pkgver}.tar.bz2
+        'sessreg-1.1.0-gcc-5.patch')
+sha256sums=('551177657835e0902b5eee7b19713035beaa1581bbd3c6506baa553e751e017c'
+            '27490e86ba74607a57dd3cb29e90c96fac00481fd0b7c46c47139ff644913dee')
+prepare(){
+  cd "${srcdir}/sessreg-${pkgver}"
+  
+  patch -Np0 -i ${srcdir}/sessreg-1.1.0-gcc-5.patch
+}
 
 build() {
   cd "${srcdir}/sessreg-${pkgver}"

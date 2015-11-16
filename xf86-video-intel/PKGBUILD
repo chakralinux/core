@@ -3,52 +3,51 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xf86-video-intel
-pkgver=2.99.917
-pkgrel=3
+pkgver=2.99.917+478+gdf72bc5
+pkgrel=1
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 install=$pkgname.install
 pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
 depends=('mesa-dri' 'libxvmc' 'pixman' 'xcb-util>=0.3.9')
-makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=18' 'libx11' 'libxrender'
+makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=19' 'libx11' 'libxrender'
              # additional deps for intel-virtual-output
-            'libxrandr' 'libxinerama' 'libxcursor' 'libxtst')
+            'libxrandr' 'libxinerama' 'libxcursor' 'libxtst' 'git')
 optdepends=('libxrandr: for intel-virtual-output'
             'libxinerama: for intel-virtual-output'
             'libxcursor: for intel-virtual-output'
             'libxtst: for intel-virtual-output')
-conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<18' 'X-ABI-VIDEODRV_VERSION>=19')
+conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<19' 'X-ABI-VIDEODRV_VERSION>=20')
 groups=('xorg-drivers' 'xorg')
-source=(${url}/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2
-        fix-sna-fstat-include.patch
-        fix-uxa-fstat-include.patch)
-sha256sums=('00b781eea055582820a123c47b62411bdf6aabf4f03dc0568faec55faf9667c9'
-            '643a1862d417da53ce6612a4a77e5f54b8efd84bb250c7bcecc1578244979529'
-            '2c718c6ebf81001d9f30d50cfa9090dc0ca36b81391d5dc3cb812306c894007d')
+source=(${url}/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2)
+source=('git://anongit.freedesktop.org/xorg/driver/xf86-video-intel#commit=df72bc5')
+sha256sums=('SKIP')
 
-prepare(){
-  cd ${pkgname}-${pkgver}
-  
-  patch -Np1 -i ${srcdir}/fix-sna-fstat-include.patch
-  patch -Np1 -i ${srcdir}/fix-uxa-fstat-include.patch
+pkgver() {
+  cd $pkgname
+  git describe --long | sed 's/-/+/g'
 }
+
+prepare() {
+  cd $pkgname
+  NOCONFIGURE=1 ./autogen.sh
+}
+
 build() {
-  cd ${pkgname}-${pkgver}
-  ./configure --prefix=/usr \
-    --libexecdir=/usr/lib \
-    --enable-glamor \
-    --disable-dri3
+  cd $pkgname
+  # DRI3 is disabled by default and Glamor has been removed
+  ./configure --prefix=/usr --libexecdir=/usr/lib
   make
 }
 
 check() {
-  cd $pkgname-$pkgver
+  cd $pkgname
   make check
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd $pkgname
 
   make DESTDIR="${pkgdir}" install
 
