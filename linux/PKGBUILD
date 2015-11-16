@@ -5,15 +5,15 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs') 
 _kernelname=${pkgname#linux}
-_basekernel="4.1"
-pkgver=4.1.4
+_basekernel="4.2"
+pkgver=4.2.6
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'bc')
 options=('!strip')
-_aufsver=4.1
+_aufsver=4.2
 source=("http://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         # the main kernel config files
@@ -25,8 +25,8 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz
         'config.aufs'
         'overlay-multi-layer.patch'
         )
-sha256sums=('caf51f085aac1e1cea4d00dbbf3093ead07b551fc07b31b2a989c05f8ea72d9f'
-            '0976127a60a950acf2796f642ac647e5231573b9a0f25703a37a50b988bf3b88'
+sha256sums=('cf20e044f17588d2a42c8f2a450b0fd84dfdbd579b489d93e9ab7d0e8b45dbeb'
+            '419f91fa4a6bb0d2c160ef6812341e5aac7e776550efe1d0958ae3b1ce0ea8ce'
             '021932236a8531bcfd79347e2487b798f368db1eac25c25adb90a64eb306a19a'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99'
@@ -125,9 +125,9 @@ package_linux() {
   groups=('base')
   depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7')
   optdepends=('crda: to set the correct wireless channels of your country')
-  provides=('nouveau-drm' 'kernel26' 'acerhk=0.5.35' 'aufs3')
-  conflicts=('kernel26' 'nvidia-96xx=96.43.20-9' 'acerhk' 'tiacx')
-  replaces=('kernel26' 'nouveau-drm' 'aufs3')
+  provides=('nouveau-drm' 'acerhk=0.5.35' 'aufs3')
+  conflicts=('nvidia-96xx=96.43.20-9' 'acerhk' 'tiacx')
+  replaces=('nouveau-drm' 'aufs3')
   backup=("etc/mkinitcpio.d/${pkgname}.preset")
   install=linux.install
 
@@ -183,9 +183,6 @@ package_linux() {
 
 package_linux-headers() {
   pkgdesc="Header files and scripts for building modules for linux kernel"
-  provides=('kernel26-headers')
-  conflicts=('kernel26-headers')
-  replaces=('kernel26-headers')
 
   install -dm755 "${pkgdir}/usr/lib/modules/${_kernver}"
 
@@ -314,9 +311,6 @@ package_linux-headers() {
 
 package_linux-docs() {
   pkgdesc="Kernel hackers manual - HTML documentation that comes with the Linux kernel."
-  provides=('kernel26-docs')
-  conflicts=('kernel26-docs')
-  replaces=('kernel26-docs')
 
   cd "${srcdir}/linux-${_basekernel}"
 
