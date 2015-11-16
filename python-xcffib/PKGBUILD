@@ -1,23 +1,43 @@
-# $Id$
-# Maintainer: Felix Yan <felixonmars@archlinux.org>
-# Contributor: Roger Duran <rogerduran@gmail.com>
+
+# Maintainer: AlmAck <almack@chakraos.org>
 
 pkgbase=python-xcffib
 pkgname=(python3-xcffib python2-xcffib)
-pkgver=0.2.2
+pkgver=0.3.6
 pkgrel=1
 pkgdesc="Python3 drop in replacement for xpyb, an XCB python binding"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="https://pypi.python.org/pypi/xcffib"
 license=('Apache')
 makedepends=('python3-setuptools' 'python2-setuptools' 'python3-cffi' 'python2-cffi'
-             'python3-six' 'python2-six' 'libxcb')
-source=("https://pypi.python.org/packages/source/x/xcffib/xcffib-$pkgver.tar.gz")
-md5sums=('b398d5c6d8b190848c45287715da1383')
+             'python3-six' 'python2-six' 'libxcb' 'git' 'ghc' 'haskell-xcb-types'
+             'haskell-language-python' 'haskell-filemanip' 'haskell-split'
+             'haskell-mtl' 'haskell-attoparsec' 'haskell-hunit' 'cabal-install'
+             'haskell-test-framework' 'haskell-test-framework-hunit'
+             'haskell-optparse-applicative')
+source=("git+https://github.com/tych0/xcffib.git#tag=v$pkgver")
+md5sums=('SKIP')
 
 prepare() {
   cp -a xcffib-$pkgver{,-py2}
 }
+
+build() {
+  cd "$srcdir/xcffib"
+  make xcffib
+
+  cd "$srcdir/xcffib-py2"
+  make xcffib
+}
+
+check() {
+  cd "$srcdir/xcffib"
+  make check
+
+  cd "$srcdir/xcffib-py2"
+  make check
+}
+
 
 package_python3-xcffib() {
   depends=('python3-six' 'python3-cffi' 'libxcb')

@@ -2,8 +2,8 @@
 # Arch Contributor AndyRTR <andyrtr@archlinux.org>
 
 pkgname=libxshmfence
-pkgver=1.1
-pkgrel=2
+pkgver=1.2
+pkgrel=1
 pkgdesc="a library that exposes a event API on top of Linux futexes"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
@@ -12,26 +12,26 @@ license=('GPL')
 depends=('glibc')
 makedepends=('xorg-util-macros' 'xproto')
 source=(${url}/releases/individual/lib/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('dbc2db2925ca9f216fd1e9c63d0974db9f4d49aaf5877ffb606d2d8d7e58cebe')
+sha256sums=('d21b2d1fd78c1efbe1f2c16dae1cb23f8fd231dcf891465b8debe636a9054b0c')
 
 build() {
-	cd $pkgname-$pkgver
-	
-	# fix some libtools errors
-	#autoreconf -vfi
-	
-	./configure --prefix=/usr
-	make
+    cd $pkgname-$pkgver
+    
+    # fix some libtools errors
+    #autoreconf -vfi
+    
+    ./configure --prefix=/usr
+    make
 }
 
 check() {
-	cd $pkgname-$pkgver
-	make -k check
+    cd $pkgname-$pkgver
+    make -k check
 }
 
 package() {
-	cd $pkgname-$pkgver
-	make DESTDIR="$pkgdir/" install
-	install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-	install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+    cd $pkgname-$pkgver
+    make DESTDIR="$pkgdir/" install
+    install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+    install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
