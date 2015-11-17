@@ -1,7 +1,7 @@
 pkgname=json-c
 pkgver=0.12
-pkgrel=1
-pkgdesc="JSON-C implements a reference counting object model that allows you to easily construct JSON objects in C, output them as JSON formatted strings and parse JSON formatted strings back into the C representation of JSON objects."
+pkgrel=2
+url="https://github.com/json-c/json-c/wiki"
 arch=('x86_64')
 url="https://github.com/json-c/json-c/wiki"
 license=('MIT')
@@ -16,8 +16,13 @@ build() {
   make
 }
 
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
   install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
 }
