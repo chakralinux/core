@@ -1,12 +1,8 @@
-# $Id: PKGBUILD 77813 2010-04-18 07:47:31Z allan $
-# Contributor: orelien <aurelien.foret@wanadoo.fr>
-# Maintainer:
-
 pkgname=rp-pppoe
-pkgver=3.11
+pkgver=3.12
 pkgrel=1
 pkgdesc="Roaring Penguin's Point-to-Point Protocol over Ethernet client"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.roaringpenguin.com/pppoe/"
 license=('GPL')
 groups=('base')
@@ -16,7 +12,7 @@ backup=(etc/ppp/{pppoe.conf,firewall-standalone,firewall-masq,pppoe-server-optio
 source=("http://www.roaringpenguin.com/files/download/rp-pppoe-${pkgver}.tar.gz"
         'adsl.service')
 install=${pkgname}.install
-sha256sums=('86a1a4d92fcea74fa6dd45516c5975933fa978b36fafe71f76ea70b4b4747720'
+sha256sums=('00794e04031546b0e9b8cf286f2a6d1ccfc4a621b2a3abb2d7ef2a7ab7cc86c2'
             '0247cd38b933da5033cf5229e695b29514dfc13f4c65ebd8ba03da65f4b2cff0')
 
 build() {
@@ -30,5 +26,5 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}/src"
   make PLUGIN_DIR="/usr/lib/rp-pppoe" DESTDIR="${pkgdir}" install
   
-  install -Dm755 "${srcdir}/adsl.service" "${pkgdir}/usr/lib/systemd/system/adsl.service"
+  install -Dm644 "${srcdir}/adsl.service" "${pkgdir}/usr/lib/systemd/system/adsl.service"
 }
