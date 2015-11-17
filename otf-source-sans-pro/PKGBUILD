@@ -1,29 +1,21 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer: Giuseppe Calà <jiveaxe@gmail.com>
-
 pkgname=otf-source-sans-pro
-_pkgname=SourceSansPro_FontsOnly
-pkgver=2.010
-_pkgsuffix=2.010roman-1.065-italic
+pkgver=2.020
+_relver=2.020R-ro/1.075R-it
+_tarver=${_relver//\//-}
 pkgrel=1
 pkgdesc="Adobe Source Sans Pro OTF Fonts"
 arch=('any')
-url="http://sourceforge.net/projects/sourcesans.adobe/"
+url="http://adobe-fonts.github.io/source-sans-pro/"
 license=('custom')
 install=otf.install
-source=("http://downloads.sourceforge.net/project/sourcesans.adobe/${_pkgname}-${_pkgsuffix}.zip")
-noextract=()
-depends=('fontconfig' 'xorg-font-utils')
-md5sums=('b98305cb885ac19be8bcdb8e8ec46dd1')
+source=("${_tarver}.tar.gz::https://github.com/adobe-fonts/source-sans-pro/archive/${_relver}.tar.gz")
+depends=('fontconfig')
+md5sums=('45f993d5134b13ed82ba7db2b146efe9')
 screenshot=('http://wstaw.org/m/2013/04/10/source-sans-pro.png')
 
 package() {
-  cd $srcdir/source-sans-pro-2.010R-ro-1.065R-it/OTF
-  mkdir -p $pkgdir/usr/share/fonts/OTF
-  install -Dm644 *.otf "$pkgdir/usr/share/fonts/OTF"
-  mkdir -p $pkgdir/usr/share/licenses/${pkgname}
-  install -Dm644 ../LICENSE.txt $pkgdir/usr/share/licenses/${pkgname}
+  cd source-sans-pro-${_tarver}
+  install -d "${pkgdir}/usr/share/fonts/OTF"
+  install -t "${pkgdir}/usr/share/fonts/OTF" -m644 OTF/*.otf
+  install -Dm644 LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
-
