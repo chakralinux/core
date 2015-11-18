@@ -1,0 +1,37 @@
+From eec808554936ae068b23df07ab54d4dc6302a695 Mon Sep 17 00:00:00 2001
+From: jzmaddock <jzmaddock@gmail.com>
+Date: Sat, 23 Aug 2014 09:38:02 +0100
+Subject: [PATCH] Fix BOOST_NO_CXX11_VARIADIC_TEMPLATES definition - the
+ feature was introduced in GCC 4.4.
+
+---
+ include/boost/config/compiler/gcc.hpp | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+Index: boost1.55-1.55.0+dfsg/boost/config/compiler/gcc.hpp
+===================================================================
+--- boost1.55-1.55.0+dfsg.orig/boost/config/compiler/gcc.hpp
++++ boost1.55-1.55.0+dfsg/boost/config/compiler/gcc.hpp
+@@ -151,13 +151,6 @@
+ #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+ #  define BOOST_NO_CXX11_STATIC_ASSERT
+ 
+-// Variadic templates compiler:
+-//   http://www.generic-programming.org/~dgregor/cpp/variadic-templates.html
+-#  if defined(__VARIADIC_TEMPLATES) || (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 4) && defined(__GXX_EXPERIMENTAL_CXX0X__))
+-#    define BOOST_HAS_VARIADIC_TMPL
+-#  else
+-#    define BOOST_NO_CXX11_VARIADIC_TEMPLATES
+-#  endif
+ #endif
+ 
+ // C++0x features in 4.4.n and later
+@@ -170,6 +163,7 @@
+ #  define BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+ #  define BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+ #  define BOOST_NO_CXX11_DELETED_FUNCTIONS
++#  define BOOST_NO_CXX11_VARIADIC_TEMPLATES
+ #  define BOOST_NO_CXX11_TRAILING_RESULT_TYPES
+ #  define BOOST_NO_CXX11_INLINE_NAMESPACES
+ #endif
+

@@ -9,7 +9,7 @@ pkgbase=boost
 pkgname=('boost-libs' 'boost')
 pkgver=1.55.0
 _boostver=${pkgver//./_}
-pkgrel=2
+pkgrel=3
 pkgdesc="Free peer-reviewed portable C++ source libraries"
 arch=('x86_64')
 url="http://www.boost.org/"
@@ -17,9 +17,11 @@ license=('custom')
 makedepends=('icu' 'python2' 'python3' 'bzip2' 'zlib' 'openmpi') 
 source=("http://downloads.sourceforge.net/${pkgbase}/${pkgbase}_${_boostver}.tar.gz"
         # upstream patches
-        log_fix_dump_avx2.patch)
+        log_fix_dump_avx2.patch
+        gcc5.patch)
 md5sums=('93780777cfbf999a600f62883bd54b17'
-         '2d8c2a83421afacda0ff0192c68b2c17')
+         '2d8c2a83421afacda0ff0192c68b2c17'
+         '39c9d2165dc2a3d9df50292a5509b270')
 #options=("!makeflags")
 license=('custom')
 
@@ -29,6 +31,7 @@ prepare() {
    cd "${srcdir}/${pkgbase}_${_boostver}"
 
    patch -Np0 < ${srcdir}/log_fix_dump_avx2.patch
+   patch -Np1 < ${srcdir}/gcc5.patch
 
    # Add an extra python version. This does not replace anything and python 2.x need to be the default.
    echo "using python : 3.4 : /usr/bin/python3 : /usr/include/python3.4m : /usr/lib ;" >> ./tools/build/v2/user-config.jam
@@ -113,6 +116,7 @@ package_boost-libs() {
 
    install -d -m 755 "${pkgdir}"/usr
    cp -a "${_stagedir}"/lib "${pkgdir}"/usr
+   rm -f "${pkgdir}"/usr/lib/*.a
 
    install -D -m 644 "${srcdir}/"${pkgbase}_${_boostver}/LICENSE_1_0.txt \
       "${pkgdir}"/usr/share/licenses/boost-libs/LICENSE_1_0.txt
