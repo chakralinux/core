@@ -1,9 +1,6 @@
-# Contributor: abveritas@chakra-project.org
-# Maintainer: Bruce Liu <brli [AT] users.sourceforge.net>
-
 pkgname=udisks2
 pkgver=2.1.6
-pkgrel=1
+pkgrel=2
 pkgdesc="Disk Management Service"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/udisks"
@@ -15,17 +12,19 @@ optdepends=('parted: partition management'
             'ntfs-3g: NTFS filesystem management support'
             'dosfstools: VFAT filesystem management support')
 source=("http://udisks.freedesktop.org/releases/udisks-$pkgver.tar.bz2"
-        "http://udisks.freedesktop.org/releases/udisks-$pkgver.tar.bz2.sign"
         '50-udisks.rules')
 md5sums=('ea181c13c43af039fded88f0ef546e24'
-         'SKIP'
          '6b69afb6a0e0bcd325006af2bafc25f6')
 
 build() {
   cd "${srcdir}/udisks-${pkgver}"
   
-  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
-      --with-systemdsystemunitdir=/usr/lib/systemd/system --disable-static
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --localstatedir=/var \
+              --libexecdir=/usr/lib \
+              --with-systemdsystemunitdir=/usr/lib/systemd/system \
+              --disable-static
   make
 }
 
