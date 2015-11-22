@@ -3,11 +3,10 @@
 pkgname=('openjdk' 'openjdk-src' 'openjdk-doc')
 pkgbase='openjdk'
 _java_ver=8
-_jdk_update=40
-_jdk_build=19
+_jdk_update=65
+_jdk_build=17
 # latest release notes:
-# http://www.oracle.com/technetwork/java/javase/8train-relnotes-latest-2153846.html
-# https://www.java.com/en/download/faq/release_changes.xml
+# http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 pkgver=${_java_ver}.u${_jdk_update}	
 _repo_ver=jdk${_java_ver}u${_jdk_update}-b${_jdk_build}
 pkgrel=2
@@ -31,21 +30,17 @@ source=(jdk8u-${_repo_ver}.tar.gz::${_url_src}/archive/${_repo_ver}.tar.gz
         langtools-${_repo_ver}.tar.gz::${_url_src}/langtools/archive/${_repo_ver}.tar.gz
         nashorn-${_repo_ver}.tar.gz::${_url_src}/nashorn/archive/${_repo_ver}.tar.gz
         openjdk.profile.sh
-        openjdk.profile.csh
-        make4-compatibility.diff
-        giflib5.diff)
-md5sums=('c689ebe46c1d18bb20e5a4d2bd51aefc'
-         '5c96879a168c79647fb7b0285c51b5ac'
-         '5a9084c7b65f748c33e8fbd004f2c2dc'
-         '0644eadf94e2b9037391d3e1bd1fe8f8'
-         'dab7e3ee418301794bd55cb09fafdbe2'
-         'd5da0e97c9945a5a8502edfca79786e8'
-         'ca4d75286ebed1001499a161b1c86f15'
-         'abb8cbd2a4fce317174d60bf543c8ce4'
+        openjdk.profile.csh)
+md5sums=('bcf1c494a0c5a8b9d1f6f83e19f7e3a1'
+         '3e68b84178f4f0e3efa69735271381b3'
+         'cfb7a9573daaee3785467cdef36f2467'
+         '289ff839a7e4c06ac38e53d311575967'
+         'b35bf76d5ebe17634badc4e31fc7bf07'
+         '171475611d4b9d8cf9821d654980fe84'
+         '975763c3342886eb3b5626d845c57fde'
+         '0652b368594ce4a9c338b50c9a7e3284'
          '65fecbcbadfa455f35cb6fef7d1fc553'
-         'b839efffcbdb4f630b52d92ee1565c90'
-         '87eb620b7813f6f843ad6491239ceb66'
-         '86b2c5980594a977333a128c0e288bd6')
+         'b839efffcbdb4f630b52d92ee1565c90')
 
 _jdkname=openjdk8
 _jvmdir=/usr/lib/jvm/java-8-openjdk
@@ -63,23 +58,12 @@ prepare() {
   do
     ln -sf ../${subrepo}-${_repo_ver} ${subrepo}
   done
-
-  #Fix the giflib5 issues with splashscreen_gif.c, kind regards to the Beyond LFS team
-  cd "${srcdir}/"
-  sed -e 's/DGifCloseFile(gif/&, NULL/' \
-      -e '/DGifOpen/s/c)/c, NULL)/'     \
-      -i ./jdk-jdk8u40-b19/src/share/native/sun/awt/splashscreen/splashscreen_gif.c
-  cd jdk8u-jdk8u40-b19
-  patch -p1 -i ${srcdir}/make4-compatibility.diff
 }
 
 
 build() {
   cd "${srcdir}/jdk8u-${_repo_ver}"
   
-  # How many cpu's do we have?
-  export NUM_PROC=`/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :`
-  export NUM_PROC=${NUM_PROC:-1}
   
   unset JAVA_HOME
   # http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1346
@@ -94,14 +78,12 @@ build() {
     --disable-zip-debug-info \
     --enable-unlimited-crypto \
     --with-zlib=system \
-    --with-giflib=system \
-    --with-stdc++lib=dynamic \
-    --with-num-cores="$NUM_PROC"
+    --with-stdc++lib=dynamic
 
     # TODO OpenJDK does not want last version of giflib (add 'giflib' as dependency once fixed)
     #--with-giflib=system \
 
-  make DEBUG_BINARIES=true
+  make DEBUG_BINARIES=false
   make docs
   # FIXME sadly 'DESTDIR' is not used here!
   make install
