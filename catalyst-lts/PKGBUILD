@@ -2,15 +2,15 @@
 
 _extramodules=extramodules-3.14-CHAKRA-LTS
 _kver="$(cat /lib/modules/${_extramodules}/version)"
-_kernelver=3.14.44
+_kernelver=3.14.57
 
 url_ref="http://support.amd.com/en-us/download/desktop?os=Linux+x86"
 DLAGENTS="http::/usr/bin/curl --referer ${url_ref} -o %o %u"
 
 pkgname=catalyst-lts
-pkgver=14.12
-pkgrel=2
-_amdver=14.501.1003
+pkgver=15.9
+pkgrel=1
+_amdver=15.201.1151
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only"
 arch=('x86_64')
 url="http://www.amd.com"
@@ -24,9 +24,7 @@ install=catalyst.install
 url_ref="http://support.amd.com/en-us/download/desktop?os=Linux+x86"
 DLAGENTS="http::/usr/bin/curl --referer ${url_ref} -o %o %u"
 
-source=(
-        http://www2.ati.com/drivers/linux/amd-catalyst-omega-${pkgver}-linux-run-installers.zip
-#        http://archive.ubuntu.com/ubuntu/pool/restricted/f/fglrx-installer/fglrx-installer_14.201.orig.tar.gz
+source=(http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-installer-${_amdver}-x86.x86_64.zip
         ati_make.sh
         ati-compat_alloc_user_space.patch
         lano1106_fglrx_intel_iommu.patch
@@ -35,7 +33,7 @@ source=(
         kolasa_fglrx_312.patch
         cold-fglrx-3.14-current_euid.patch)
 
-md5sums=('ced4329274a02712406bda678ffbd743'
+md5sums=('d2de2df6946b452c266a3c892e6e46ff'
          'fd98b7e486d7fd4cad8de7b95b5b031e'
          '21013e49598edfffa7f37b62b2d6a930'
          '5184b94a2a40216a67996999481dd9ee'
@@ -45,13 +43,9 @@ md5sums=('ced4329274a02712406bda678ffbd743'
          'ba33b6ef10896d3e1b5e4cd96390b771')
 
 build() {   
-  ## Unpack archive
-#      /bin/sh ./amd-catalyst-${pkgver}-linux-x86.x86_64.run --extract archive_files
-     /bin/sh ./fglrx-${_amdver}/amd-driver-installer-${_amdver}-x86.x86_64.run --extract archive_files
-   #mkdir common
-   #mv etc lib usr common
-   #mkdir archive_files
-   #mv arch common xpic xpic_64a archive_files
+    ## Unpack archive
+    /bin/sh ./AMD-Catalyst-${pkgver}-Linux-installer-${_amdver}-x86.x86_64.run --extract archive_files
+    
     
     msg "Setting compilation variables ..."
     # include ati_make.sh and use _ati_check function from it
