@@ -5,7 +5,8 @@
 pkgbase=catalyst-utils
 pkgname=('catalyst-utils' 'catalyst-libgl' 'opencl-catalyst')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 1x.x
-pkgver=15.5
+pkgver=15.9
+_amdver=15.201.1151
 pkgrel=1
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('x86_64')
@@ -14,8 +15,7 @@ license=('custom')
 options=('staticlibs' 'libtool' '!strip' '!upx')
 
 source=(
-    http://www2.ati.com/drivers/linux/amd-catalyst-omega-${pkgver}-linux-run-installers.zip
-    # http://archive.ubuntu.com/ubuntu/pool/restricted/f/fglrx-installer/fglrx-installer_14.201.orig.tar.gz
+    http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-installer-${_amdver}-x86.x86_64.zip
     catalyst.sh
     atieventsd.sh
     atieventsd.service
@@ -28,7 +28,7 @@ source=(
     temp_links_catalyst
     temp-links-catalyst.service)
 
-md5sums=('979f9f2e0948fa6e92ff0125f5c6b575'
+md5sums=('d2de2df6946b452c266a3c892e6e46ff'
          'bdafe749e046bfddee2d1c5e90eabd83'
          '9d9ea496eadf7e883d56723d65e96edf'
          '90a37e010f4e5f45e270cd000894d553'
@@ -42,7 +42,9 @@ md5sums=('979f9f2e0948fa6e92ff0125f5c6b575'
          '2c22bb4d4f828cb8b024f670c1ae7e45')
 
 build() {
-     /bin/sh ./amd-catalyst-omega-${pkgver}-linux-run-installers.run --extract archive_files
+    ## Unpack archive
+    /bin/sh ./AMD-Catalyst-${pkgver}-Linux-installer-${_amdver}-x86.x86_64.run --extract archive_files
+    
 }
 
 package_catalyst-libgl() {
@@ -116,7 +118,7 @@ package_opencl-catalyst() {
 
 package_catalyst-utils() {
       pkgdesc="AMD/ATI drivers. Utilities and libraries. Radeons HD 2 3 4 xxx ARE NOT SUPPORTED"
-      depends=('xorg-server>=1.7.0' 'xorg-server<1.17.0' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs' 'libxinerama')
+      depends=('xorg-server>=1.7.0' 'xorg-server<1.18.0' 'libxrandr' 'libsm' 'fontconfig' 'libxcursor' 'libxi' 'gcc-libs' 'libxinerama')
       optdepends=('qt4: to run ATi Catalyst Control Center (amdcccle)'
 		  'libxxf86vm: to run ATi Catalyst Control Center (amdcccle)'
 		  'acpid: acpi event support  / atieventsd'
