@@ -7,7 +7,7 @@ _kernelver=4.2.6
 
 pkgname=('nvidia' 'chd-nvidia')
 pkgver=358.16
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
@@ -42,6 +42,8 @@ package_nvidia() {
         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-uvm.ko" \
         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-uvm.ko"
+    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-modeset.ko" \
+         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-modeset.ko"
     gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
     
     install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
