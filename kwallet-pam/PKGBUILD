@@ -11,16 +11,13 @@ depends=(kwallet)
 makedepends=(extra-cmake-modules)
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
-        "install-path.patch")
-sha256sums=( $(getSum ${pkgname})
-             "861428b4ec11c08c623e390f4ac97282b18125d84591821cbd6f742db70163d3")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}))
 
 prepare() {
   mkdir -p build
   mkdir -p build4
   cd ${pkgname}-${pkgver}
-  patch -i ../install-path.patch -Np0
 }
 
 build() {
@@ -35,6 +32,7 @@ build() {
 package() {
   cd build
   make DESTDIR="$pkgdir" install
+
   cd ../build4
   make DESTDIR="$pkgdir" install
 }

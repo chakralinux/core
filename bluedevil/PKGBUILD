@@ -1,8 +1,7 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/bluedevil-frameworks
 source ../plasma.conf
 
-pkgname=bluedevil-kf5
-_pkgname=bluedevil
+pkgname=bluedevil
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc="Integrate the Bluetooth technology within KDE workspace and applications"
@@ -14,22 +13,22 @@ depends=('bluez-qt' 'bluez' 'kcoreaddons' 'kwidgetsaddons' 'kdbusaddons' 'ki18n'
 makedepends=('extra-cmake-modules' 'kdoctools')
 groups=('plasma')
 options=("debug")
-replaces=('bluedevil')
-provides=('bluedevil')
-conflicts=('bluedevil')
-source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${_pkgname}) )
+replaces=('bluedevil<5.4' 'bluedevil-kf5')
+provides=('bluedevil-kf5')
+conflicts=('bluedevil<5.4' 'bluedevil-kf5')
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 install=bluedevil.install
 
 prepare() {
   mkdir -p build
 
-  cd ${_pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
 }
 
 build() {
   cd build
-  cmake_kf5 ../${_pkgname}-${pkgver} \
+  cmake_kf5 ../${pkgname}-${pkgver} \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_BUILD_TYPE=Release \
     -DLIB_INSTALL_DIR=lib \

@@ -1,0 +1,34 @@
+source ../plasma.conf
+
+pkgname=breeze-gtk
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="Breeze port for GTK. (GIT version)"
+arch=('x86_64')
+url='https://quickgit.kde.org/?p=breeze-gtk.git'
+license=('LGPL')
+depends=('qt5-base')
+optdepends=('gtk2: GTK+2 theme'
+            'gtk3: GTK+3 theme')
+makedepends=('git' 'cmake' 'extra-cmake-modules' 'gtk2')
+conflicts=('gnome-breeze')
+replaces=('gnome-breeze')
+group=('gtk-integration') # groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="$pkgdir" install
+} 

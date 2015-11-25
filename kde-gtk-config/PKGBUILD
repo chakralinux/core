@@ -1,8 +1,7 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kde-gtk-config-frameworks
 source ../plasma.conf
 
-pkgname=kde-gtk-config-kf5
-_pkgname=kde-gtk-config
+pkgname=kde-gtk-config
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc="GTK2 and GTK3 Configuration for KDE"
@@ -14,13 +13,13 @@ depends=('qt5-base' 'ki18n' 'kio' 'kconfigwidgets' 'knewstuff' 'karchive' 'kcmut
 makedepends=('extra-cmake-modules' 'gtk2' 'gtk3' 'python3')
 optdepends=('gtk2: GTK2 Theme Preview'
             'gtk3: GTK3 Theme Preview')
-conflicts=('kde-gtk-config')
-provides=('kde-gtk-config')
-replaces=('kde-gtk-config')
+conflicts=('kde-gtk-config<5.4' 'kde-gtk-config-kf5')
+provides=('kde-gtk-config-kf5')
+replaces=('kde-gtk-config-kf5')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${_pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 install=${pkgname}.install
 
 prepare() {
@@ -29,7 +28,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${_pkgname}-${pkgver}
+  cmake_kf5 ../${pkgname}-${pkgver}
     make
 }
 

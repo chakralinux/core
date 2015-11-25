@@ -3,17 +3,16 @@ source ../plasma.conf
 
 pkgbase=breeze
 pkgname=('breeze' 'breeze-kde4')
-pkgver=${PSubVersion}
-pkgrel=3
+pkgver=${PVersion}
+pkgrel=1
 pkgdesc='Artwork, styles and assets for the Breeze visual style for the Plasma Desktop'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/breeze'
 license=('LGPL')
-depends=()
-makedepends=('extra-cmake-modules' 'frameworkintegration' 'kdecoration' 'kdelibs' 'automoc4')
+makedepends=('extra-cmake-modules' 'frameworkintegration' 'kdecoration' 'kdelibs' 'automoc4' 'kcmutils' 'plasma-framework')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}))
+source=("${PServer}/${pkgver}/${pkgbase}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgbase} | head -n 1))
 
 prepare() {
   mkdir -p build{,-kde4}
@@ -21,11 +20,11 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgbase}-${PSubVersion}
+  cmake_kf5 ../${pkgbase}-${pkgver}
   make
 
   cd ../build-kde4
-  cmake ../${pkgbase}-${PSubVersion} \
+  cmake ../${pkgbase}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DUSE_KDE4=ON \
@@ -36,14 +35,13 @@ build() {
 package_breeze() {
   depends=('frameworkintegration' 'kdecoration' 'breeze-icons')
   pkgdesc='Artwork, styles and assets for the Breeze visual style for the Plasma Desktop'
-  optdepends=('breeze-kde4: Breeze widget style for KDE4 applications')
+  optdepends=('breeze-kde4: Breeze widget style for KDE4 applications'
+              'breeze-gtk: Breeze widget style for GTK applications'
+              'kcmutils: for breeze-settings')
   groups=('plasma')
 
   cd build
   make DESTDIR="${pkgdir}" install
-  
-  # split off icons
-  rm -r "$pkgdir"/usr/share/icons/{breeze,breeze-dark}
 
   # make QtCurve preset and color scheme available for KDE4 too
   install -d "$pkgdir"/usr/share/apps/{QtCurve,color-schemes}

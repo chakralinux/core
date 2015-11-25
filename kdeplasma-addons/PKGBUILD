@@ -1,23 +1,26 @@
 #contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/kdeplasma-addons-frameworks
 source ../plasma.conf
 
-pkgname=kdeplasma-addons-kf5
-_pkgname=kdeplasma-addons
+pkgname=kdeplasma-addons
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc='A series of addons to enhance your Plasma 5 experience'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/kdeplasma-addons'
 license=('LGPL')
-depends=('qt5-base' 'qt5-declarative' 'qt5-x11extras'  'kconfigwidgets' 'kcoreaddons'
-         'ki18n' 'kio' 'kcmutils' 'plasma-framework' 'krunner' 'kservice' 'kunitconversion'
-         'kdelibs4support' 'knewstuff' 'kross')
-makedepends=('extra-cmake-modules' 'kdoctools')
-conflicts=('kde-workspace')
+depends=('plasma-workspace')
+makedepends=('extra-cmake-modules' 'kdoctools' 'kross' 'purpose' 'ibus')
+optdepends=('ibus: kimpanel IBUS support'
+            'kross: comic applet'
+            'purpose: Quickshare applet'
+            'quota-tools: disk quota applet')
+conflicts=('kde-workspace' 'kdeplasma-addons-kf5')
+replaces=('kdeplasma-addons-kf5')
+provides=('kdeplasma-addons-kf5')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${_pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${_pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 install=${pkgname}.install
 
 prepare() {
@@ -26,7 +29,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${_pkgname}-${pkgver} \
+  cmake_kf5 ../${pkgname}-${pkgver} \
      -DPYTHON_EXECUTABLE=/usr/bin/python3
     make
 }
