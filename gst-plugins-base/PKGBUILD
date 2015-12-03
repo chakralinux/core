@@ -1,15 +1,12 @@
-# maintainer abveritas@chakra-project.org
-# contributor Jan de Groot <jgc@archlinux.org>
-
 pkgname=gst-plugins-base
 pkgver=1.4.5
-pkgrel=1
+pkgrel=2
 pkgdesc="GStreamer Multimedia Framework Base Plugins"
 arch=('x86_64')
 license=('LGPL')
 depends=('gstreamer' 'orc' 'libxv' 'alsa-lib' 'cdparanoia' 'libvisual'
          'libvorbis' 'libtheora' 'pango')
-makedepends=('pkgconfig' 'gobject-introspection')
+makedepends=('pkgconfig' 'gobject-introspection' 'python2')
 options=('!emptydirs')
 url="http://gstreamer.freedesktop.org/"
 source=(${url}/src/$pkgname/$pkgname-${pkgver}.tar.xz)
@@ -30,7 +27,6 @@ build() {
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   
   make
-  sed -e 's/^SUBDIRS_EXT =.*/SUBDIRS_EXT =/' -i Makefile
 }
 
 check() {
