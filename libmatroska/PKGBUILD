@@ -1,8 +1,7 @@
-# Maintainer: abveritas[at]chakra-project[dot]org>
-# Maintainer: BrLi <rainman59118[at]Gmail.com>
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libmatroska
 
 pkgname=libmatroska
-pkgver=1.4.1
+pkgver=1.4.4
 pkgrel=1
 pkgdesc="Matroska library"
 arch=('x86_64')
@@ -10,16 +9,18 @@ url="http://dl.matroska.org/downloads/libmatroska/"
 license=('LGPL')
 depends=('libebml')
 source=("http://dl.matroska.org/downloads/libmatroska/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('f61b2e5086f4bb9d24a43cc8af43a719')
+md5sums=('6a8e4528f713ec33faf4d793e61f883c')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}/make/linux"
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr \
+              --disable-static
 
-  make sharedlib
+  make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}/make/linux"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   make prefix="${pkgdir}/usr" install
 }
