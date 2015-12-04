@@ -1,0 +1,41 @@
+
+pkgname=libkscreen4
+_pkgname=libkscreen
+pkgver=1.0.5
+pkgrel=1
+pkgdesc="KDE's screen management library"
+arch=('x86_64')
+url='https://projects.kde.org/libkscreen'
+license=('GPL')
+depends=('kdelibs' 'qjson')
+makedepends=('cmake' 'automoc4')
+conflicts=('libkscreen<5')
+replaces=('libkscreen<5')
+source=("http://download.kde.org/stable/${_pkgname}/${pkgver}/src/${_pkgname}-${pkgver}.tar.xz"
+        "libkscreen-1.0.5-VERSION_RELEASE.patch")
+md5sums=('b1cc2805cd5ff468d534d75cbab69426'
+         'da776706f259201d41ce508e18a17e7f')
+
+prepare() {
+  [ -d build ] && rm -r build
+  mkdir build
+  
+  cd $_pkgname-$pkgver
+  patch -Np1 -i ${srcdir}/libkscreen-1.0.5-VERSION_RELEASE.patch
+  
+  # remove tests
+  sed -i 's/add_subdirectory(tests)//g' CMakeLists.txt
+}
+
+build() {
+  cd build
+  cmake ../$_pkgname-$pkgver \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
