@@ -1,25 +1,22 @@
 pkgname=hplip
-pkgver=3.15.9
+pkgver=3.15.11
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('x86_64')
 url="http://hplipopensource.com"
 license=('GPL')
-depends=('python3' 'ghostscript>=8.64-6' 'net-snmp>=5.7.1' 'wget' 'foomatic-db-engine')
-makedepends=('python3-pyqt4' 'python3-gobject' 'sane' 'rpcbind' 'cups' 'libusb')
-optdepends=('cups: for printing support'
-            'python3-dbus: for dbus support'
-            'sane: for scanner support'
+depends=('python3' 'ghostscript>=8.64-6' 'net-snmp>=5.7.1' 'wget' 'foomatic-db-engine'
+         #dependencies added by default to run the GUI and other services
+         'python3-pyqt4' 'python3-gobject' 'cups' 'libusb' 'python3-dbus')
+makedepends=('sane' 'rpcbind' )
+optdepends=('sane: for scanner support'
             'python3-pillow: for commandline scanning support'
             'python3-reportlab: for pdf output in hp-scan'
-            'rpcbind: for network support'
-            'python3-pyqt4: for running GUI and hp-toolbox'
-            'python3-gobject: for running hp-toolbox'
-            'libusb: for advanced usb support')
+            'rpcbind: for network support')
 install=hplip.install
 source=(http://downloads.sourceforge.net/${pkgname}/$pkgname-$pkgver.tar.gz
         disable_upgrade.patch)
-md5sums=('8188653d1e65ae1c4850da78319007ee'
+md5sums=('a2d8134ab15a1d67d4c3b3c11f85ba1c'
          '4ebb9377a989b4fb776e37f5968bb7b0')
 
 prepare() {
