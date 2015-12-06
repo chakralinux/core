@@ -1,23 +1,16 @@
-# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
-# Contributors: Anke Boersma (abveritas) abveritas@chakra-project.org>
-#               Dan McGee <dan@archlinux.org>
+#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/postgresql
 
 pkgbase=postgresql
 pkgname=('postgresql-libs'
          'postgresql-docs'
          'postgresql')
-pkgver=9.3.5
+pkgver=9.4.5
 _majorver=${pkgver%.*}
 pkgrel=1
 arch=('x86_64')
 url='http://www.postgresql.org/'
 license=('custom:PostgreSQL')
-makedepends=('krb5'
-             'libxml2'
-             'openssl>=1.0.0'
-             'perl'
-             'python3'
-             'tcl>=8.6.0')
+makedepends=('krb5' 'libxml2' 'openssl' 'perl' 'python3' 'tcl')
 source=("ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar.bz2"
         'postgresql-check-db-dir'
         'postgresql-run-socket.patch'
@@ -26,7 +19,7 @@ source=("ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar
         'postgresql.pam'
         'postgresql.service'
         'postgresql.tmpfiles.conf')
-sha512sums=('a49bc8ea7635be5082044f5ebd6b81de7198583aedb072dffec8425521af90f2cb8e9f6e7b55b361ff24cbebc0670afefe365e8f5b80b8248ddf492b8092a746'
+sha512sums=('01ad4b5a097efa70f74a9e96b764c32953a9df57d6bf81b893a1e552475f6aba0381580dcd1f27b2c443ce89fecc429eeeb0219af60a0b2f84798f76eb1757f5'
             '464073b8745dafa2ab222cb827068cb33bee3d597e43097e619396d4ed40218af9366cf61e1d8a4cfe0f8079d5df10126a34acc2deced8778c2ba80617b40c97'
             '031efe12d18ce386989062327cdbbe611c5ef1f94e4e1bead502304cb3e2d410af533d3c7f1109d24f9da9708214fe32f9a10ba373a3ca8d507bdb521fbb75f7'
             'a60faeca09e6a4e8b2ada06b16768a8f4db39710af4c47aab82842a085b80d6be4252c8d030de90e3d8f2b2a0c8317bcb1b891316358079d807501544745a4cf'
@@ -42,7 +35,6 @@ build() {
         --prefix=/usr \
         --mandir=/usr/share/man \
         --datadir=/usr/share/postgresql \
-        --with-krb5 \
         --with-libxml \
         --with-openssl \
         --with-perl \
@@ -58,8 +50,8 @@ build() {
 package_postgresql-libs() {
     pkgdesc="Libraries for use with PostgreSQL"
     depends=('krb5'
-             'openssl>=1.0.0'
-             'readline>=6.0.0')
+             'openssl'
+             'readline')
     provides=('postgresql-client')
     conflicts=('postgresql-client')
 
@@ -119,11 +111,7 @@ package_postgresql() {
     pkgdesc="A sophisticated object-relational DBMS"
     backup=('etc/pam.d/postgresql'
             'etc/logrotate.d/postgresql')
-    depends=("postgresql-libs>=${pkgver}"
-             'krb5'
-             'libxml2'
-             'openssl>=1.0.0'
-             'readline>=6.0')
+    depends=("postgresql-libs>=${pkgver}" 'krb5' 'libxml2' 'openssl' 'readline')
     optdepends=('python3: for PL/Python support'
                 'perl: for PL/Perl support'
                 'tcl: for PL/Tcl support'
