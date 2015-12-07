@@ -1,27 +1,43 @@
 
 pkgname=rpcbind
 pkgver=0.2.3
-pkgrel=1
+pkgrel=3
 pkgdesc="portmap replacement which supports RPC over various protocols"
 arch=('x86_64')
-depends=('bash' 'glibc' 'libtirpc')
+backup=('etc/conf.d/rpcbind')
+depends=('bash' 'glibc' 'libtirpc' 'systemd')
 url="http://rpcbind.sourceforge.net"
 license=('custom')
-source=("http://downloads.sourceforge.net/sourceforge/rpcbind/rpcbind-${pkgver}.tar.bz2" 
-	'rpcbind-sunrpc.patch'
-	'rpcbind.service'
-	'rpcbind.socket'
-	'rpcbind.conf')
+replaces=('portmap')
+# see also http://git.infradead.org/users/steved/rpcbind.git
+source=(http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.bz2
+        bug-940191.patch
+        do_not_use_the_xp_auth_pointer_directly.diff
+        rpcbind-sunrpc.patch
+        rpcbind.service
+        rpcbind.socket
+        rpcbind.conf)
 install=rpcbind.install
-md5sums=('c8875246b2688a1adfbd6ad43480278d'
-         '68f403f51b72619fecdc3d57550a2fdb'
-         '0f493a590c250267034e230e7bf1f894'
-         'e5a205cd7402fedaf74a744b2a22f0ad'
-         'd4c74d1be9f98344af138a15ad3b6f8c')
+sha1sums=('e79974a99d09b6d6fff9d86bf00225dc33723ce2'
+          '717e2700510b1b40f452eddb929a7be00df4292b'
+          '3fa6138b6a559b5b3a5610686ec1de045a0b8d1d'
+          '1b997ce76f9727efc8c72fc5f97189591c9a60e2'
+          '3534c7bcdecebda90182fe2328a16137353cb1ad'
+          'c52f8396cd05181b788fbdf74898730343c03c9a'
+          '08246ff18d12cee01e5c9391c6ba8f5597cac936')
 
 prepare() {
-  cd $pkgname-$pkgver
-  patch -p1 -i ../rpcbind-sunrpc.patch
+  cd $srcdir/$pkgname-$pkgver
+  # patch for iana services file # FS#20273
+  patch -Np1 -i ../rpcbind-sunrpc.patch
+  
+  # fix a memory corruption crash when remote scanning
+  # https://bugs.archlinux.org/task/46341
+  # http://seclists.org/oss-sec/2015/q3/581
+  patch -Np1 -i ../bug-940191.patch
+  
+  # upstream fix for libtirpc 1.0.1
+  patch -Np1 -i ../do_not_use_the_xp_auth_pointer_directly.diff
 }
 
 build() {
@@ -31,14 +47,13 @@ build() {
     --with-rpcuser=rpc \
     --enable-warmstarts \
     --with-statedir=/var/lib/rpcbind
-  make 
+  make
 }
 
 package() {
   cd $pkgname-$pkgver
   
   make DESTDIR=$pkgdir install
-
   # install rpcbind config file
   install -D -m644 $srcdir/rpcbind.conf $pkgdir/etc/conf.d/rpcbind
   # install missing man page - https://bugs.archlinux.org/task/21271
