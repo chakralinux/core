@@ -2,7 +2,7 @@
 
 pkgname=sddm
 pkgver=0.13.0
-pkgrel=1
+pkgrel=2
 pkgdesc='QML based X11 and Wayland display manager'
 arch=('x86_64')
 url='http://github.com/sddm/sddm'
@@ -39,4 +39,19 @@ package() {
   
   # set the default configuration, with heritage as theme
   install -m 644 -p ${srcdir}/sddm.conf ${pkgdir}/etc/
+
+
+  # auto unlock the kwallet when the user password
+  # and the kwallet password match (FS#1253)
+
+  echo "
+# Chakra custom settings
+# auto unlock the kwallet when the user password
+# and the kwallet password match (FS#1253)
+
+auth		optional	pam_kwallet.so  kdehome=.kde4
+session		optional	pam_kwallet.so  kdehome=.kde4
+auth		optional	pam_kwallet5.so
+session		optional	pam_kwallet5.so" >> ${pkgdir}/etc/pam.d/sddm
+
 }
