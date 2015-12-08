@@ -4,7 +4,7 @@ source ../plasma.conf
 pkgbase=plasma-workspace
 pkgname=('plasma-workspace' 'drkonqi')
 pkgver=${PVersion}
-pkgrel=2
+pkgrel=3
 pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
@@ -43,6 +43,9 @@ build() {
 package_plasma-workspace() {
   optdepends=('plasma-workspace-wallpapers: additional wallpapers'
               'gpsd: GPS based geolocation' 'networkmanager-qt: IP based geolocation')
+  replaces=('xembed-sni-proxy' 'xembed-sni-proxy-git')
+  provides=('xembed-sni-proxy' 'xembed-sni-proxy-git')
+  conflicts=('xembed-sni-proxy' 'xembed-sni-proxy-git')
 
   cd build
   make DESTDIR="${pkgdir}" install
