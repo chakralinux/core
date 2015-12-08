@@ -8,98 +8,123 @@
 #               Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgbase=vim
-pkgname=('vim' 'vim-tiny' 'vim-runtime')
-_topver=7-4
-_patchlevel=417
-_versiondir="vim${_topver//-/}"
-pkgver=${_topver//-/.}.${_patchlevel}
-pkgrel=1
+pkgname=(vim vim-tiny vim-python3 vim-runtime)
+pkgver=7.4.944
+_versiondir=74
+pkgrel=2
 arch=('x86_64')
 license=('custom:vim')
 url="http://www.vim.org"
-makedepends=('desktop-file-utils'
-             'gettext'
-             'gpm'
-             'libxext'
-             'libxmu'
-             'libxpm'
-             'libxt'
-             'lua'
-             'mercurial'
-             'pkgconfig'
-             'python2'
-             'python3'
-             'rsync'
-             'sed')
-source=("hg+https://code.google.com/p/vim#tag=v$_topver-$_patchlevel"
+makedepends=(gpm python2 python3 ruby libxt desktop-file-utils lua)
+source=(vim-$pkgver.tar.gz::http://github.com/vim/vim/archive/v$pkgver.tar.gz
         'chakra.vim'
         'default.vim'
         'vimrc'
         'https://raw.github.com/tomasr/molokai/master/colors/molokai.vim')
-sha512sums=('SKIP'
+sha512sums=('4bfe12b4bb5f79a018c0ba1d4235ec68a5da03e7dae905e32743e26de1b883aed45b27abd005dacc3e39364f3b8900a453bed1fde3287ba9d96fc191f25d53a9'
             '493b95e83bd6fb6ce2ebec17994af0bf8e6b209383979d9a1cda58c9af947acda04f8917d39e4e4a4a5db414043c7b44a5347f9bbbb0fb1fb7ca2674387b638a'
             'd698b5a800929bb7b37cf82955c162429684754f377239c0364ff3c31cd46e0c506276d36d253a07ec15ae728ba5fc3226f66f593614e656ee8176b6929bcb5d'
             'd8a088ac2f486e47d4f5f91e21ec79486503b2bbd4ce10b923d6aead0c73d260c88b6159704ed47c54885c67c9484f12f032f15dbb4060c88b2e851306138a17'
             'a8bffc4461363ffc6edf9c13223e23a334817b1a0bd82b32f55b4014fbe63c4b59490b2f1744e93e21f5dd80fe4131c41f2e7cc716878fc9563017ef59dbf297')
 
 prepare() {
-  # Define the place for the global (g)vimrc file to /etc/vimrc
-  sed -i 's|^.*\(#define SYS_.*VIMRC_FILE.*"\) .*$|\1|' $srcdir/$pkgbase/src/feature.h
-  sed -i 's|^.*\(#define VIMRC_FILE.*"\) .*$|\1|' $srcdir/$pkgbase/src/feature.h
-  cp -a $pkgbase{,-tiny}
+  cd vim-$pkgver/src
+  # Define the place for the global vimrc file to /etc/vimrc
+  sed -i 's|^.*\(#define SYS_.*VIMRC_FILE.*"\) .*$|\1|' feature.h
+  sed -i 's|^.*\(#define VIMRC_FILE.*"\) .*$|\1|' feature.h
+
+  autoconf
+
+  cd "$srcdir"
+  for pkg in ${pkgname[@]}
+  do
+    cp -a vim-$pkgver ${pkg}-build
+  done
 }
 
 
 build() {
-# Build tiny version
-  cd "$srcdir/$pkgbase-tiny/src"
-  autoconf
-  export CFLAGS="-g -O0"
-  export CXXFLAGS="-g -O0"
+  cd "$srcdir"/$pkgbase-runtime-build
+
   ./configure \
+    --prefix=/usr \
+    --localstatedir=/var/lib/vim \
+    --with-compiledby='Chakra' \
+    --with-features=huge \
+    --enable-acl \
+    --enable-cscope \
+    --enable-gpm \
     --disable-gui \
+    --disable-luainterp \
+    --enable-multibyte \
     --disable-netbeans \
+    --enable-perlinterp \
+    --disable-python3interp \
     --disable-pythoninterp \
     --disable-rubyinterp \
-    --disable-acl \
-    --disable-cscope \
-    --disable-gpm \
-    --disable-luainterp \
-    --disable-multibyte \
-    --disable-perlinterp \
-    --disable-python3interp \
-    --localstatedir=/var/lib/vim \
-    --mandir=/usr/share/man \
-    --prefix=/usr \
-    --with-compiledby='Chakra' \
-    --with-features=tiny \
-    --with-tlib=ncurses \
     --with-x=no
   make
 
-  # Build huge version
-  cd "$srcdir/$pkgbase/src"
-  autoconf
-  export CFLAGS="-g -O0"
-  export CXXFLAGS="-g -O0"
+  cd "$srcdir"/$pkgbase-tiny-build
+
   ./configure \
+    --prefix=/usr \
+    --localstatedir=/var/lib/vim \
+    --with-compiledby='Chakra' \
+    --with-features=tiny \
+    --disable-acl \
+    --disable-cscope \
+    --enable-gpm \
     --disable-gui \
+    --disable-luainterp \
+    --disable-multibyte \
     --disable-netbeans \
+    --disable-perlinterp \
+    --disable-python3interp \
+    --disable-pythoninterp \
     --disable-rubyinterp \
+    --with-x=no
+  make
+
+  cd "$srcdir"/$pkgbase-build
+
+  ./configure \
+    --prefix=/usr \
+    --localstatedir=/var/lib/vim \
+    --with-compiledby='Chakra' \
+    --with-features=huge \
+    --disable-gui \
     --enable-acl \
     --enable-cscope \
     --enable-gpm \
     --enable-luainterp \
     --enable-multibyte \
+    --enable-netbeans \
     --enable-perlinterp \
     --enable-pythoninterp \
-    --enable-python3interp \
-    --localstatedir=/var/lib/vim \
-    --mandir=/usr/share/man \
+    --disable-python3interp \
+    --enable-rubyinterp \
+    --with-x=yes
+  make
+
+  cd "$srcdir"/$pkgbase-python3-build
+
+  ./configure \
     --prefix=/usr \
+    --localstatedir=/var/lib/vim \
     --with-compiledby='Chakra' \
     --with-features=huge \
-    --with-tlib=ncurses \
+    --disable-gui \
+    --enable-acl \
+    --enable-cscope \
+    --enable-gpm \
+    --enable-luainterp \
+    --enable-multibyte \
+    --enable-netbeans \
+    --enable-perlinterp \
+    --disable-pythoninterp \
+    --enable-python3interp \
+    --enable-rubyinterp \
     --with-x=yes
   make
 }
@@ -117,11 +142,11 @@ package_vim() {
            'lua'
            'perl'
            'python2'
-           'python3')
-  conflicts=('gvim' 'vim-tiny')
+           'ruby')
+  conflicts=('gvim' 'vim-tiny' 'vim-python3')
   provides=("vim=$pkgver-$pkgrel")
 
-  cd "$srcdir/$pkgbase"
+  cd $pkgbase-build
 
   make -j1 VIMRCLOC=/etc DESTDIR="$pkgdir" install
 
@@ -136,12 +161,45 @@ package_vim() {
     rm -f evim.1      # This doesn't make sense if we have no GUI
   done
 
-  # Move the runtime for later packaging
-  msg2 "MOVING THE RUNTIME! $pkgdir"
-  mv -v "$pkgdir"/usr/share/vim "$srcdir"/runtime-install
+  # Runtime provided by runtime package
+  rm -r "${pkgdir}"/usr/share/vim
 
   # License
-  install -Dm644 "$srcdir/$pkgbase"/runtime/doc/uganda.txt \
+  install -Dm644 runtime/doc/uganda.txt \
+    "$pkgdir"/usr/share/licenses/$pkgbase/license.txt
+}
+
+package_vim-python3() {
+  pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor'
+  depends=("vim-runtime=$pkgver-$pkgrel"
+           'gpm'
+           'libxt'
+           'lua'
+           'perl'
+           'python3')
+  conflicts=('gvim' 'vim' 'vim-tiny')
+  provides=("vim=$pkgver-$pkgrel")
+
+  cd $pkgbase-python3-build
+
+  make -j1 VIMRCLOC=/etc DESTDIR="$pkgdir" install
+
+  # Provided by (n)vi in core
+  rm "$pkgdir"/usr/bin/{ex,view}
+
+  # Delete some manpages
+  find "$pkgdir"/usr/share/man -type d -name 'man1' 2>/dev/null | \
+    while read _mandir; do
+    cd "$_mandir"
+    rm -f ex.1 view.1 # Provided by (n)vi
+    rm -f evim.1      # This doesn't make sense if we have no GUI
+  done
+
+  # Runtime provided by runtime package
+  rm -r "${pkgdir}"/usr/share/vim
+
+  # License
+  install -Dm644 runtime/doc/uganda.txt \
     "$pkgdir"/usr/share/licenses/$pkgbase/license.txt
 }
 
@@ -150,19 +208,15 @@ package_vim-tiny() {
   depends=("vim-runtime=$pkgver-$pkgrel"
            'gpm'
            'libxt')
-  conflicts=('gvim' 'vim-tiny')
+  conflicts=('gvim' 'vim' 'vim-python3')
   provides=("vim=$pkgver-$pkgrel")
 
-  cd "$srcdir/$pkgbase-tiny"
+  cd $pkgbase-tiny-build
 
   make -j1 VIMRCLOC=/etc DESTDIR="$pkgdir" install
 
   # Provided by (n)vi in core
   rm "$pkgdir"/usr/bin/{ex,view}
-
-  # Remove the runtime
-  msg2 "REMOVING THE RUNTIME! $pkgdir"
-  rm -rv "$pkgdir"/usr/share/vim
 
   # Delete some manpages
   find "$pkgdir"/usr/share/man -type d -name 'man1' 2>/dev/null | \
@@ -171,6 +225,13 @@ package_vim-tiny() {
     rm -f ex.1 view.1 # Provided by (n)vi
     rm -f evim.1      # This doesn't make sense if we have no GUI
   done
+
+  # Remove the runtime
+  rm -r "$pkgdir"/usr/share/vim
+
+  # license
+  install -Dm644 runtime/doc/uganda.txt \
+    "$pkgdir"/usr/share/licenses/$pkgname/license.txt
 }
 
 package_vim-runtime() {
@@ -180,23 +241,25 @@ package_vim-runtime() {
            'gawk')
   backup=('etc/vimrc')
 
-  # Install the runtime split from Vim
-  install -dm755 "$pkgdir"/usr/share
-  mv "$srcdir"/runtime-install "$pkgdir"/usr/share/vim
+  cd vim-runtime-build
+
+  (cd src && make -j1 VIMRCLOC=/etc DESTDIR="$pkgdir" installruntime install-languages installtools)
+  # man and bin files belong to 'vim'
+  rm -r "${pkgdir}"/usr/share/man/ "${pkgdir}"/usr/bin/
 
   # Don't forget logtalk.dict
-  install -Dm644 "$srcdir/$pkgbase"/runtime/ftplugin/logtalk.dict \
-    "$pkgdir"/usr/share/vim/$_versiondir/ftplugin/logtalk.dict
+  install -Dm644 runtime/ftplugin/logtalk.dict \
+    "$pkgdir"/usr/share/vim/vim$_versiondir/ftplugin/logtalk.dict
 
   # Fix FS#17216
   sed -i 's|messages,/var|messages,/var/log/messages.log,/var|' \
-    "$pkgdir"/usr/share/vim/$_versiondir/filetype.vim
+    "$pkgdir"/usr/share/vim/vim$_versiondir/filetype.vim
 
   # Patch filetype.vim for better handling of pacman related files
   sed -i "s/rpmsave/pacsave/;s/rpmnew/pacnew/;s/,\*\.ebuild/\0,PKGBUILD*,*.install/" \
-    "$pkgdir"/usr/share/vim/$_versiondir/filetype.vim
+    "$pkgdir"/usr/share/vim/vim$_versiondir/filetype.vim
   sed -i "/find the end/,+3{s/changelog_date_entry_search/changelog_date_end_entry_search/}" \
-    "$pkgdir"/usr/share/vim/$_versiondir/ftplugin/changelog.vim
+    "$pkgdir"/usr/share/vim/vim$_versiondir/ftplugin/changelog.vim
 
   # rc files
   install -Dm644 "$srcdir"/vimrc "$pkgdir"/etc/vimrc
@@ -206,16 +269,16 @@ package_vim-runtime() {
     "$pkgdir"/usr/share/vim/vimfiles/chakra.vim
 
   # rgb.txt file
-  install -Dm644 "$srcdir/$pkgbase"/runtime/rgb.txt \
-    "$pkgdir"/usr/share/vim/$_versiondir/rgb.txt
+  install -Dm644 runtime/rgb.txt \
+    "$pkgdir"/usr/share/vim/vim$_versiondir/rgb.txt
 
   # Colourscheme
   install -Dm644 "$srcdir"/molokai.vim \
-    "$pkgdir"/usr/share/vim/$_versiondir/colors/molokai.vim
+    "$pkgdir"/usr/share/vim/vim$_versiondir/colors/molokai.vim
 
   # License
   install -dm755 "$pkgdir"/usr/share/licenses/vim-runtime
-  ln -s /usr/share/vim/$_versiondir/doc/uganda.txt \
+  ln -s /usr/share/vim/vim$_versiondir/doc/uganda.txt \
     "$pkgdir"/usr/share/licenses/vim-runtime/license.txt
 }
 
