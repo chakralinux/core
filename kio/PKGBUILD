@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=kio
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Resource and network access abstraction'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kio'
@@ -15,11 +15,17 @@ checkdepends=('xorg-server-xvfb' 'openbox')
 groups=('kf5')
 install=kio.install
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
+        'kurlnavigator.diff')
+sha256sums=( $(getSum ${pkgname}) 
+            '0f8175caaa4d27e8ab0bb8c6c00c06969e0673c23e72cede1b8dabb654e6a2b5')
 
 prepare() {
   mkdir -p build
+  
+  cd ${pkgname}-${pkgver}
+  # patch from demm
+  patch -p1 -R -i ${srcdir}/kurlnavigator.diff
 }
 
 build() {
