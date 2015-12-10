@@ -9,15 +9,15 @@ _kernelver=4.2.6
 pkgname=(catalyst chd-catalyst)
 pkgver=15.9
 _amdver=15.201.1151
-pkgrel=1
+pkgrel=2
 pkgdesc="AMD/ATI Catalyst drivers for linux. fglrx kernel module only. Radeons HD 2 3 4 xxx ARE NOT SUPPORTED"
 screenshot="http://linuxtation3.files.wordpress.com/2007/03/pantallazo.jpg"
 arch=('x86_64')
 url="http://www.amd.com"
 license=('custom')
-makedepends=('gcc-libs' 'gcc>4.0.0' 'make' "linux-headers=${_kernelver}")
+makedepends=('gcc-libs' 'gcc>4.0.0' 'gcc49' 'make' "linux-headers=${_kernelver}")
 
-url_ref="http://support.amd.com/en-us/download/desktop?os=Linux+x86"
+url_ref="http://support.amd.com/en-us/kb-articles/Pages/latest-linux-beta-driver.aspx"
 DLAGENTS="http::/usr/bin/curl --referer ${url_ref} -o %o %u"
 
 source=(http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-installer-${_amdver}-x86.x86_64.zip
@@ -79,6 +79,10 @@ build() {
     cp 2.6.x/Makefile . 
 
     msg "Compiling fglrx module ..."
+    
+    # force use of the gcc 4.9 version
+    export CC="gcc-4.9"
+    
     # Compile module using _ati_check variables
     CFLAGS_MODULE="-DMODULE -DATI -DFGL -DPAGE_ATTR_FIX=$PAGE_ATTR_FIX $def_smp $def_modversions"
     
