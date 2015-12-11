@@ -2,7 +2,7 @@
 
 pkgname=vlc
 pkgver=2.2.1
-pkgrel=2
+pkgrel=6
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
 pkgdesc=('A multimedia player and framework that plays most multimedia files as well as DVD, Audio CD, VCD, and various streaming protocols')
@@ -55,8 +55,8 @@ prepare() {
   
   autoreconf -fi
 
-  sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
-  sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
+  #sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
+  #sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
 }
 
 
@@ -68,18 +68,18 @@ build() {
               --sysconfdir=/etc \
               --disable-rpath \
               --enable-faad \
-              --enable-dbus-control \
               --enable-nls \
               --enable-lirc \
-              --enable-pvr \
               --enable-ncurses \
               --enable-realrtsp \
-              --enable-aa \
+              --enable-gles2 \
+              --enable-gles1 \
               --enable-vcdx \
               --enable-upnp \
               --enable-bluray \
               --enable-opus \
-              --enable-sftp
+              --enable-sftp \
+              --with-x
               LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`"
   make
 }
@@ -97,3 +97,4 @@ package() {
   ln -sv /usr/share/fonts/TTF/FreeSans.ttf ${pkgdir}/usr/share/vlc/skins2/fonts/FreeSans.ttf
   ln -sv /usr/share/fonts/TTF/FreeSansBold.ttf ${pkgdir}/usr/share/vlc/skins2/fonts/FreeSansBold.ttf
 }
+ 	
