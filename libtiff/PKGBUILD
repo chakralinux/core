@@ -1,70 +1,30 @@
-# Maintainer:
-# Contributors: H W Tovetjärn (totte) <totte@tott.es>
-#               Anke Boersma (abveritas) <abveritas@chakra-project.org>
-
 pkgname=libtiff
-pkgver=4.0.3
-pkgrel=2
+pkgver=4.0.6
+pkgrel=1
 pkgdesc='Library for manipulation of TIFF images'
 arch=('x86_64')
 url="http://www.remotesensing.org/libtiff/"
 license=('custom')
-depends=('libjpeg-turbo'
-         'zlib'
-         'xz')
-makedepends=('freeglut'
-             'glu'
-             'mesa')
+depends=('libjpeg-turbo' 'zlib' 'xz')
+makedepends=('freeglut' 'glu' 'mesa' 'jbigkit')
 optdepends=('freeglut: for using tiffgt')
 options=('!libtool')
-source=("ftp://ftp.remotesensing.org/pub/libtiff/tiff-${pkgver}.tar.gz"
-        'tiff-3.9.7-CVE-2012-4447.patch'
-        'tiff-3.9.7-CVE-2012-4564.patch'
-        'tiff-4.0.3-CVE-2013-1960.patch'
-        'tiff-4.0.3-CVE-2013-1961.patch'
-        'tiff-4.0.3-libjpeg-turbo.patch'
-        'tiff-4.0.3-tiff2pdf-colors.patch'
-        'tiff-4.0.3-CVE-2013-4231.patch'
-        'tiff-4.0.3-CVE-2013-4232.patch'
-        'libtiff-CVE-2013-4244.patch')
-sha512sums=('d80e18b00e9e696a30b954c0d92e5f2f773fd9a7a0a944cf6cabb69c1798e671506580daa1cd2ebf493ae922000170c2491dfc6d4c0a9cd0b865684070595a73'
-            '88254ef9bf82a6611313b1ccdc30b434910650ba9590a8063ee80172da9cdb6ee1964d0b7dee879d93db5b3eca305d79f6565f09e40c1ed92ed3e5ec3e710a2c'
-            '24ebe60ce6361561c15c8c5fb46b47942e58912de5efbf128374defc4382a7e800fae3dc0a9fe04876a5e2f61a109edc1c9533be2f8a15b4b0ed7215d7b08c9b'
-            'db160c93453db8f4b611028bca48622eebfa54b320b780b7491bdc9c3385d227928a7e9016073a64cdd85388284aa2bb0f0af04daa235d45cdb28e4e6fcf82fa'
-            'c9870c7b85d2a3c666e2c9f932c815a1b4c9fb0bf2485c7cfff3ab3435222214fa7900adc0ded0f49866f28db2124121012bac7186b675955613fa983dbf45d7'
-            '7cab63b47b2f67412dd8fa1a65231be17516e5f2a27820b3232b4f49c08be10c0899d3a238eedd9b8781d0304fc285202fc4e41726d8b99009cfc575af298cf9'
-            '8de845a18412db883177753b5deef70e4ad9c2eecf72ce47df0383e3007a26ae1d9798d676c6f3d92e2a48c5074fbca6b19f7620bd9620e9f93e8d662062d925'
-            'f313c2d1ea8b6138ab662ca839069d7b39a907f1cda91c0fea7e27c368bd226eadfab64d975893edee4ae03cfb1e008b3f7d9f48bb14fafdb417e30593cd2098'
-            'c929bbc6c8e51c84ebd02f8210b8d509196cfa54013eeb5683f447105f30cbcba4e3bc701cad504ae552cae8ba7c4d9b6bf87e54e5beeda003bf15c40f3a430e'
-            '0d4b0470710ec300e9d41df1c5d50eee13a105580e2f216ab0468d0613b3cab69e8ee5ff88cfdbb1cc81a1ccf301002ae96fe4e72755cf6f611efc566b1efff1')
-
-prepare() {
-    cd "${srcdir}/tiff-${pkgver}"
-    patch -p0 -i "${srcdir}/tiff-4.0.3-tiff2pdf-colors.patch"
-    patch -p1 -i "${srcdir}/tiff-3.9.7-CVE-2012-4447.patch"
-    patch -p1 -i "${srcdir}/tiff-3.9.7-CVE-2012-4564.patch"
-    patch -p1 -i "${srcdir}/tiff-4.0.3-CVE-2013-1960.patch"
-    patch -p1 -i "${srcdir}/tiff-4.0.3-CVE-2013-1961.patch"
-    patch -p1 -i "${srcdir}/tiff-4.0.3-libjpeg-turbo.patch"
-    patch -p1 -i "${srcdir}/libtiff-CVE-2013-4244.patch"
-    cd "${srcdir}/tiff-${pkgver}/tools"
-    patch -p0 -i "${srcdir}/tiff-4.0.3-CVE-2013-4231.patch"
-    patch -p0 -i "${srcdir}/tiff-4.0.3-CVE-2013-4232.patch"
-}
+source=("ftp://ftp.remotesensing.org/pub/libtiff/tiff-${pkgver}.tar.gz")
+sha1sums=('280e27704eaca5f592b82e71ac0c78b87395e2de')
 
 build() {
-    cd "${srcdir}/tiff-${pkgver}"
+    cd tiff-${pkgver}
     ./configure --prefix=/usr
     make
 }
 
 check() {
-    cd "${srcdir}/tiff-${pkgver}"
+    cd tiff-${pkgver}
     make check
 }
 
 package() {
-    cd "${srcdir}/tiff-${pkgver}"
+    cd tiff-${pkgver}
     make DESTDIR="${pkgdir}" install
     install -D -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
