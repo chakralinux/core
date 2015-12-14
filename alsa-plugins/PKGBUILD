@@ -1,20 +1,21 @@
 # Maintainer: almack
 
 pkgname=alsa-plugins
-pkgver=1.0.28
-pkgrel=2
+pkgver=1.1.0
+pkgrel=1
 pkgdesc="Extra alsa plugins"
 arch=('x86_64')
 url="http://www.alsa-project.org"
 license=(GPL)
 depends=('alsa-lib')
 makedepends=('pulseaudio' 'jack' 'ffmpeg')
-optdepends=('jack: Jack plugin'
-            'ffmpeg: libavcodec resampling plugin'
+optdepends=('pulseaudio: PulseAudio plugin'
+            'jack: Jack plugin'
+            'ffmpeg: libavcodec resampling plugin, a52 plugin'
             'libsamplerate: libsamplerate resampling plugin'
             'speex: libspeexdsp resampling plugin')
 source=("ftp://ftp.alsa-project.org/pub/plugins/$pkgname-$pkgver.tar.bz2")
-md5sums=('6fcbbb31e96f8ebc5fb926184a717aa4')
+md5sums=('b123e42ed881b9adbc99e4040f257c39')
 
 prepare() {
   cd $pkgname-$pkgver
@@ -23,12 +24,13 @@ prepare() {
 
 build() {
   cd $pkgname-$pkgver
+  CFLAGS+=' -DHAVE_STDINT_H' # We have issue similar to this one https://code.google.com/p/cantata/issues/detail?id=627
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
   make DESTDIR="$pkgdir" install
 
   install -d "$pkgdir/usr/share/doc/$pkgname"
