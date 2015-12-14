@@ -1,11 +1,5 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
-# maintainer BrLi <rainman59118[at]Gmail.com>
-
 pkgname=alsa-firmware
-pkgver=1.0.27
+pkgver=1.0.29
 pkgrel=1
 pkgdesc="ALSA firmware package"
 arch=('i686' 'x86_64')
@@ -13,7 +7,7 @@ url="http://alsa-project.org/"
 license=('GPL')
 options=(!strip)
 source=(ftp://ftp.alsa-project.org/pub/firmware/$pkgname-$pkgver.tar.bz2)
-md5sums=('b373b350d5151dd7d64db2fc12936b04')
+md5sums=('9a1182f8a6ac44cb9af5774cc045565f')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
@@ -25,9 +19,9 @@ package() {
   cd $srcdir/$pkgname-$pkgver
   make DESTDIR=$pkgdir install
   # remove files which conflicts with linux-firmware
-  rm -rf ${pkgdir}/usr/lib/firmware/{ess,korg,sb16,yamaha,ctefx.bin,ctspeq.bin}
+  rm -rfv ${pkgdir}/usr/lib/firmware/{ess,korg,sb16,yamaha,ctefx.bin,ctspeq.bin}
   # remove broken symlinks (broken upstream)
-  rm -rf ${pkgdir}/usr/lib/firmware/turtlebeach
+  rm -rfv ${pkgdir}/usr/lib/firmware/turtlebeach
   # remove empty dir
-  rm -rf ${pkgdir}/usr/bin
+  #rm -rf ${pkgdir}/usr/bin
 }
