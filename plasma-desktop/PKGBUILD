@@ -3,7 +3,7 @@ source ../plasma.conf
 
 pkgname=plasma-desktop
 pkgver=${PVersion}
-pkgrel=2
+pkgrel=1
 pkgdesc='KDE Plasma Desktop'
 arch=('x86_64')
 url='https://www.kde.org/workspaces/plasmadesktop/'
@@ -21,20 +21,12 @@ replaces=('kde-workspace' 'kcm-touchpad-kf5<=5.2.0')
 conflicts=('kde-workspace' 'kcm-touchpad-kf5<=5.2.0')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
-        'kickoffrc.patch')
-sha256sums=( $(getSum ${pkgname}) 
-            '265013591ef26870057f1eee6bdc67d0a4c3bef370005f4b64e61b2c1f4c0525')
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}))
 install=${pkgname}.install
 
 prepare() {
   mkdir -p build
-  
-  cd $pkgname-$pkgver
-  # patch to do a smoth migration of the favorites #356398
-  # http://quickgit.kde.org/?p=plasma-desktop.git&a=commitdiff&h=97ced66da372737ae5d36d86c9bc0c6fe684d842
-  patch -p1 -i $srcdir/kickoffrc.patch
-
 }
 
 build() {
