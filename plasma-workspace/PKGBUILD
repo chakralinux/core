@@ -2,36 +2,38 @@
 source ../plasma.conf
 
 pkgbase=plasma-workspace
-pkgname=('plasma-workspace' 'drkonqi')
+pkgname=('plasma-workspace' 'drkonqi' 'plasma-wayland-session')
 pkgver=${PVersion}
-pkgrel=5
+pkgrel=6
 pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
 license=('LGPL')
-depends=('knewstuff' 'kjsembed' 'knotifyconfig' 'libxdamage' 'kwayland' 'kglobalaccel'
-         'libksysguard' 'libkscreen' 'ktexteditor' 'kxmlrpcclient' 'libqalculate' 'networkmanager-qt' 'kfilemetadata'
-         'qt5-tools' 'kded' 'kde-cli-tools' 'xorg-xrdb' 'xorg-xsetroot' 'xorg-apps' 'xorg-utils'
-         'prison-kf5' 'milou' 'chakra-common')
-makedepends=('extra-cmake-modules' 'kdoctools' 'kwin' 'gpsd' 'baloo' 'krunner' 'kdewebkit')
+# note on libxdamage:
+# not detected by namcap because libgl depends on it
+# but nvidia providing libgl does not depend on libxdamage
+depends=('kjsembed' 'knotifyconfig' 'libxdamage' 'libksysguard' 'libkscreen' 'ktexteditor' 'libqalculate'
+         'qt5-tools' 'kded' 'kde-cli-tools' 'xorg-xrdb' 'xorg-xsetroot'
+         'xorg-apps' 'xorg-utils' 'milou' 'breeze' 'prison-kf5' 'kwin' 'chakra-common')
+makedepends=('extra-cmake-modules' 'kdoctools' 'gpsd' 'baloo'
+             'krunner' 'kxmlrpcclient' 'networkmanager-qt' 'kdewebkit')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
-        'kde.pam'
-        'panelview_edge_events.diff')
-sha256sums=( $(getSum ${pkgname} | head -n1)
-            '44a7c7acee30547dd41d0a593486b29df4eaa5c3707287b87e23b1104de3964a'
-            '7ea3b330f23b7ca5307255abb5ff22c3c74757eb2a39603a660e1d818b0bf301')
+        "kde.pam"
+        "systemtray.patch")
+sha256sums=( $(getSum ${pkgname} | head -n1) 
+            "44a7c7acee30547dd41d0a593486b29df4eaa5c3707287b87e23b1104de3964a"
+            "744bac202c5f877d043be6d36498d3126eec52d473c4116f7140d977e9a4893a")
 
 prepare() {
   mkdir -p build
   
   cd ${pkgbase}-${pkgver}
   # be sure to use the Qt5 version of qtpaths
-  sed -i 's:qtpaths:qtpaths-qt5:' startkde/startkde.cmake
-  
-  # revert patch: https://bugs.kde.org/show_bug.cgi?id=354651 
-  patch -p1 -R -i $srcdir/panelview_edge_events.diff
+  sed -e 's:qtpaths:qtpaths-qt5:' -i startkde/start*.cmake
+
+  patch -Np1 -i ../systemtray.patch 
 }
 
 build() {
@@ -56,6 +58,9 @@ package_plasma-workspace() {
   # Remove conflicts with drkonqi
   rm "${pkgdir}"/usr/lib/drkonqi
   rm -r "${pkgdir}"/usr/share/drkonqi
+
+  # Split plasma-wayland scripts
+  rm -r "$pkgdir"/usr/share/wayland-sessions
 }
 
 package_drkonqi() {
@@ -64,4 +69,11 @@ package_drkonqi() {
 
   cd build/drkonqi
   make DESTDIR="${pkgdir}" install
+}
+
+package_plasma-wayland-session() {
+  pkgdesc='Plasma Wayland session'
+  depends=('plasma-workspace' 'qt5-wayland' 'kwayland-integration' 'xorg-server-xwayland')
+
+  install -Dm644 build/plasmawayland.desktop "$pkgdir"/usr/share/wayland-sessions/plasmawayland.desktop
 }
