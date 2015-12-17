@@ -2,33 +2,41 @@
 # Chakra Packages for Chakra, part of chakra-project.org
 #
 
-pkgname=gobject-introspection
-pkgver=1.42.0
+pkgbase=gobject-introspection
+pkgname=('gobject-introspection' 'gobject-introspection-runtime')
+pkgver=1.46.0
 pkgrel=1
-pkgdesc="Introspection system for GObject-based libraries"
-url="https://live.gnome.org/GObjectInstrospection"
+url="https://live.gnome.org/GObjectIntrospection"
 arch=('x86_64')
 license=('LGPL' 'GPL')
-depends=('glib2')
 makedepends=('cairo' 'python2' 'python2-mako')
-optdepends=('python2: gir development tools'
-            'python2-mako: g-ir-doc-tool')
-source=(http://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver::4}/$pkgname-$pkgver.tar.xz)
-md5sums=('4fa52f6b67367d9c1b99b98683ced202')
+source=(http://ftp.gnome.org/pub/gnome/sources/$pkgbase/${pkgver:0:4}/$pkgbase-$pkgver.tar.xz)
+sha256sums=('6658bd3c2b8813eb3e2511ee153238d09ace9d309e4574af27443d87423e4233')
 
 prepare() {
-  cd $pkgname-$pkgver
+  cd $pkgbase-$pkgver
   sed -i '1s|#!/usr/bin/env python$|&2|' giscanner/*.py
 }
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd $pkgbase-$pkgver
   PYTHON=/usr/bin/python2 ./configure --prefix=/usr --disable-static --enable-doctool
   make
 }
 
-package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+package_gobject-introspection-runtime() {
+  pkgdesc="Introspection system for GObject-based libraries - runtime files"
+  depends=('glib2')
+  cd $pkgbase-$pkgver
+  make DESTDIR="$pkgdir" install-libLTLIBRARIES install-typelibsDATA
 }
 
+package_gobject-introspection() {
+  pkgdesc="Introspection system for GObject-based libraries"
+  depends=("gobject-introspection-runtime=$pkgver" 'python2-mako' 'python2')
+  options=('!emptydirs')
+
+  cd $pkgbase-$pkgver
+  make DESTDIR="$pkgdir" install
+  make DESTDIR="$pkgdir" uninstall-libLTLIBRARIES uninstall-typelibsDATA
+}

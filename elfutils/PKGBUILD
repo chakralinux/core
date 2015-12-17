@@ -3,33 +3,48 @@
 #
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-pkgname=elfutils
-pkgver=0.161
+pkgbase=elfutils
+pkgname=(elfutils libelf)
+pkgver=0.164
 pkgrel=1
-pkgdesc="Collection of libraries and utilities for working with ELF object files and DWARF debugging information."
+pkgdesc="Utilities to handle ELF object files and DWARF debugging information"
 arch=('x86_64')
 url="https://fedorahosted.org/elfutils/"
-license=('GPL2')
-depends=('glibc')
-source=("https://fedorahosted.org/releases/e/l/elfutils/${pkgver}/elfutils-${pkgver}.tar.bz2")
-md5sums=('e1b9847c9a6a1ad340de8d47a863ec52')
+license=('LGPL3' 'GPL' 'GPL3')
+depends=('gcc-libs' 'zlib' 'bzip2' 'xz')
+options=('staticlibs')
+source=(https://fedorahosted.org/releases/e/l/elfutils/${pkgver}/elfutils-${pkgver}.tar.bz2{,.sig})
+sha1sums=('55a951f909267db76d506f61752508a86589aa37'
+          'SKIP')
+validpgpkeys=('47CC0331081B8BC6D0FD4DA08370665B57816A6A')  # Mark J. Wielaard <mark@klomp.org>
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  # make check requires that we have dwarf information; it should be stripped away later
+  cd ${pkgbase}-${pkgver}
+
   CFLAGS+=" -g"  # required for test-suite success
-  ./configure --prefix=/usr --program-prefix="eu-"
+  ./configure --prefix=/usr --program-prefix="eu-" --enable-deterministic-archives
+
   make
 }
 
 check() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgbase}-${pkgver}
+
   make check
 }
 
-package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make install DESTDIR="${pkgdir}"
+package_elfutils() {
+  depends=("libelf=$pkgver-$pkgrel")
+
+  cd ${pkgbase}-${pkgver}
+
+  make DESTDIR="${pkgdir}" install
+
+  mkdir "${srcdir}"/libelf
+  mv "${pkgdir}"/usr/{lib,include} "${srcdir}/libelf"
 }
 
-# vim:set ts=2 sw=2 et:
+package_libelf() {
+  pkgdesc="Libraries to handle ELF object files and DWARF debugging information"
+  mv libelf "${pkgdir}/usr"
+}

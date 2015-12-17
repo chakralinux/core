@@ -3,36 +3,46 @@
 # freetype2 and harfbuzz update
 # build freetype2 with old harfbuzz -> harfbuzz with new freetype -> build freetype2 with new harfbuzz.
 pkgname=freetype2
-pkgver=2.5.5
-_ubuntu_ver=2.5.2
+pkgver=2.6.2
 pkgrel=1
-_ubuntu_diff_version=${_ubuntu_ver}-1ubuntu2
 pkgdesc="TrueType font rendering library"
 arch=('x86_64')
 license=('GPL')
-url="http://freetype.sourceforge.net"
-# DO NOT remove harfbuzz from dependency
-depends=('zlib' 'sh' 'bzip2' 'libpng' 'harfbuzz')
-checkdepends=('valgrind')
-source=("http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2"
-        "http://archive.ubuntu.com/ubuntu/pool/main/f/freetype/freetype_${_ubuntu_diff_version}.diff.gz")
-
-md5sums=('2a7a314927011d5030903179cf183be0'
-         'eda9c925032709bbd7463edcded05881')
+url="http://www.freetype.org/"
+# adding harfbuzz for improved OpenType features auto-hinting
+# introduces a cycle dep to harfbuzz depending on freetype wanted by upstream
+depends=('zlib' 'bzip2' 'sh' 'libpng' 'harfbuzz')
+provides=('libfreetype.so')
+install=freetype2.install
+source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2{,.sig}
+        0001-Enable-table-validation-modules.patch
+        0002-Enable-subpixel-rendering.patch
+        0003-Enable-subpixel-hinting.patch
+        0004-Mask-subpixel-hinting-with-an-env-var.patch)
+sha1sums=('29c22b85b77cb22cf95c13e7062e21f39fe6b17a'
+          'SKIP'
+          '1c7bc438df0428a63f881e7e4343b22c5b09ecb1'
+          'e2d2b8c4847ab9cfd497179c7140835e99ece711'
+          'ebe3d7a6fc41304a77c23cb56e94dc718146d963'
+          'f50c70080f3fbee45b9c4264d8ae37eb4f1ac335')
+validpgpkeys=('58E0C111E39F5408C5D3EC76C1A60EACE707FDA5')
 
 prepare() {
-  cd "${srcdir}/freetype-${pkgver}"  
-  # apply ubuntu patches
-  patch -Np1 -i ../freetype_${_ubuntu_diff_version}.diff
-  patch -p0 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/freetype-2.1.7-backwards.compat.patch"
-  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/enable-subpixel-rendering.patch"
-  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/enable-gxvalid-otvalid.patch"
-  patch -p1 -i "${srcdir}/freetype-${pkgver}/debian/patches-freetype/revert_scalable_fonts_metric.patch"
+  cd "${srcdir}/freetype-${pkgver}"
+  patch -Np1 -i "${srcdir}/0001-Enable-table-validation-modules.patch"
+  patch -Np1 -i "${srcdir}/0002-Enable-subpixel-rendering.patch"
+
+  # https://bugs.archlinux.org/task/35274
+  patch -Np1 -i "${srcdir}/0003-Enable-subpixel-hinting.patch"
+  # Provide a way to enable the above patch at runtime.
+  # Hopefully just a temporary measure until fontconfig picks up
+  # the necessary configurables.
+  patch -Np1 -i "${srcdir}/0004-Mask-subpixel-hinting-with-an-env-var.patch"
 }
 
 build() {
   cd "${srcdir}/freetype-${pkgver}"
-  ./configure --prefix=/usr
+  ./configure --prefix=/usr --disable-static
   make
 }
 
@@ -45,5 +55,3 @@ package() {
   cd "${srcdir}/freetype-${pkgver}"
   make DESTDIR="${pkgdir}" install
 }
-
-
