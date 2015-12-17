@@ -3,14 +3,14 @@
 # Contributor: flying sheep <flying-sheep@web.de>
 
 pkgbase=python-fonttools
-pkgname=('python2-fonttools' 'python-fonttools')
+pkgname=('python2-fonttools' 'python3-fonttools')
 pkgver=3.0
 pkgrel=1
 pkgdesc="Converts OpenType and TrueType fonts to and from XML"
 url="https://github.com/behdad/fonttools"
 license=("BSD")
 arch=('any')
-makedepends=("python2-setuptools" "python-numpy" "python2-numpy")
+makedepends=("python2-setuptools" "python2-numpy" "python3-numpy")
 source=($pkgbase-$pkgver.tar.gz::https://github.com/behdad/fonttools/archive/${pkgver}.tar.gz)
 md5sums=('e5de6f32a3db235a5adce4f456e8826b')
 
@@ -33,7 +33,7 @@ build() {
 
   msg "Building Python3"
   cd "$srcdir"/fonttools-${pkgver}
-  python setup.py build
+  python3 setup.py build
 }
 
 package_python2-fonttools() {
@@ -54,12 +54,12 @@ package_python2-fonttools() {
   chmod oga+r "$pkgdir"/usr/share/man/man1/ttx2.1
 }
 
-package_python-fonttools() {
-  depends=("python-numpy")
+package_python3-fonttools() {
+  depends=("python3-numpy")
 
   cd "$srcdir"/fonttools-${pkgver}
 
-  python setup.py install --skip-build --root="$pkgdir" --optimize=1
+  python3 setup.py install --skip-build --root="$pkgdir" --optimize=1
 
   install -D -m755 LICENSE.txt "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
   chmod oga+r "$pkgdir"/usr/share/man/man1/ttx.1
