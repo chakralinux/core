@@ -1,8 +1,7 @@
-# Maintainer: Martín Cigorraga <{name}{surname}@gmail.com>
 # Contributions from Arch Linux: https://www.archlinux.org/packages/extra/x86_64/ldb/
 
 pkgname=ldb
-pkgver=1.1.21
+pkgver=1.1.24
 pkgrel=1
 pkgdesc="A schema-less, ldap like, API and database"
 arch=('x86_64')
@@ -11,8 +10,10 @@ source=(http://samba.org/ftp/${pkgname}/${pkgname}-${pkgver}.tar.gz
         http://samba.org/ftp/${pkgname}/${pkgname}-${pkgver}.tar.asc)
 license=('GPL3')
 depends=('talloc' 'tevent' 'tdb' 'popt')
-makedepends=('python2')
+makedepends=('python2' 'docbook-xsl')
 optdepends=('python2: for python bindings')
+md5sums=('152f061422de5b90f8ce51e0ea316292'
+         'SKIP')
 validpgpkeys=('9147A339719518EE9011BCB54793916113084025') # Samba Library Distribution Key <samba-bugs@samba.org> 
 
 build() {
@@ -37,5 +38,3 @@ package() {
 
 	make DESTDIR=${pkgdir}/ install
 }
-md5sums=('94ba09c7452fff68df3481686c56677e'
-         'SKIP')
