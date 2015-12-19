@@ -3,16 +3,17 @@
 
 
 pkgname=linux-firmware
-_rev=8e18132
+# Commit date + git rev-parse --short origin/master
+_rev=bbe4917
 pkgver=20150511.${_rev}
 _b43=5.100.138
 _legacy=3.130.20.0
 pkgrel=1
 pkgdesc="Firmware files for Linux"
+makedepends=('b43-fwcutter' 'git')
 arch=('any')
 url="http://git.kernel.org/?p=linux/kernel/git/firmware/linux-firmware.git;a=summary"
 license=('GPL2' 'GPL3' 'custom')
-makedepends=('b43-fwcutter')
 provides=('kernel26-firmware=3.1.99' 'linux-firmware=3.1.99' 'amd-ucode')
 conflicts=('linux-firmware-git'
            'kernel26-firmware'
@@ -31,22 +32,22 @@ conflicts=('linux-firmware-git'
            'b43-firmware-legacy'
            'amd-ucode')
 replaces=('kernel26-firmware'
-           'ar9170-fw'
-           'carl9170'
-           'iwlwifi-1000-ucode'
-           'iwlwifi-3945-ucode'
-           'iwlwifi-4965-ucode'
-           'iwlwifi-5000-ucode'
-           'iwlwifi-5150-ucode'
-           'iwlwifi-6000-ucode'
-           'rt2870usb-fw'
-           'rt2x00-rt61-fw'
-           'rt2x00-rt71w-fw'
-           'b43-firmware'
-           'b43-firmware-legacy'
-           'amd-ucode')
+          'ar9170-fw'
+          'carl9170'
+          'iwlwifi-1000-ucode'
+          'iwlwifi-3945-ucode'
+          'iwlwifi-4965-ucode'
+          'iwlwifi-5000-ucode'
+          'iwlwifi-5150-ucode'
+          'iwlwifi-6000-ucode'
+          'rt2870usb-fw'
+          'rt2x00-rt61-fw'
+          'rt2x00-rt71w-fw'
+          'b43-firmware'
+          'b43-firmware-legacy'
+          'amd-ucode')
 options=(!strip emptydirs)
-source=("git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git#commit=${_rev}"
+source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git#commit=${_rev}"
         "http://mirror2.openwrt.org/sources/broadcom-wl-${_b43}.tar.bz2"
         "http://downloads.openwrt.org/sources/wl_apsta-${_legacy}.o")
 sha256sums=('SKIP'
@@ -76,3 +77,4 @@ package() {
   echo 'w /sys/devices/system/cpu/microcode/reload - - - - 1' \
     >"${pkgdir}/usr/lib/tmpfiles.d/${pkgname}.conf"
 }
+# vim:set ts=2 sw=2 et:
