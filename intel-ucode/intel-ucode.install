@@ -1,14 +1,20 @@
 ## arg 1:  the new package version
 ## arg 2:  the old package version
 post_upgrade() {
-  if [ $(vercmp $2 20140913) -lt 0 ]; then
-    echo "Intel CPU ucode upgrades are no longer performed by the firmware loader."
-    echo "If you want to update the Intel CPU ucode on boot, add the file"
-    echo " /boot/intel-ucode.img"
-    echo "as the first initrd to your bootloader."
-    echo "For grub, you only have to run"
-    echo "grub-mkconfig -o /boot/grub/grub.cfg"
-    echo
-    echo "For other bootloaders, see https://wiki.archlinux.org/index.php/Microcode#Enabling_Intel_Microcode_Updates"
+  echo "Intel CPU ucode upgrades are no longer performed by the firmware loader."
+  echo "If you want to update the Intel CPU ucode on boot, add the file"
+  echo "Make sure you enable the 'microcode' hook in /etc/mkinitcpio.conf"
+  echo "And regenerate kernel image with mkinitcpio"
+
+  if which mkinitcpio >/dev/null 2>&1; then
+    echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
+    echo ">>> If you are using non-default kernel, you should update kernel"
+    echo ">>> manually"
+    if [ -f etc/mkinitcpio.d/linux.preset ]; then
+      mkinitcpio -p linux
+    fi
+    if [ -f etc/mkinitcpio.d/linux-lts.preset ]; then
+      mkinitcpio -p linux-lts
+    fi
   fi
 }
