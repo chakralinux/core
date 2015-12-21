@@ -13,8 +13,18 @@ post_upgrade() {
   if [ -f /boot/grub/grub.cfg ]; then
     if grep -q intel-ucode.img /boot/grub/grub.cfg; then
        printf "\e[01;31mYour grub.cfg contains intel-ucode.img\n"
-       printf "Make sure you regenerate it with:\n"
-       printf "  grub-mkconfig -o /boot/grub/grub.cfg\n\e[00m"
+       if which grub-mkconfig >/dev/null 2>&1; then
+         printf "Trying to automatically update grub.cfg...\n"
+         printf "Backup current grub.cfg at /boot/grub/grub.cfg.bak\n"
+         cp /boot/grub/grub.cfg /boot/grub/grub.cfg.bak
+         if grub-mkconfig -o /boot/grub/grub.cfg.new; then
+            mv /boot/grub/grub.cfg.new /boot/grub/grub.cfg
+	    printf "\e[01;32mgrub.cfg successfully updated. You can check it at /boot/grub/grub.cfg.\n\e[00m"
+         else
+	    printf "Failed to update grub.cfg. Make sure you regenerate it with:\n"
+	    printf "  grub-mkconfig -o /boot/grub/grub.cfg\n\e[00m"
+         fi
+       fi
     fi
   fi
 
