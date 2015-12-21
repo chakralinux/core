@@ -5,6 +5,18 @@ post_upgrade() {
   echo "If you want to update the Intel CPU ucode on boot, add the file"
   echo "Make sure you enable the 'microcode' hook in /etc/mkinitcpio.conf"
   echo "And regenerate kernel image with mkinitcpio"
+  echo ""
+  if [ "$(vercmp $2 20151106)" -lt 0 ]; then
+    echo "If you're previously using grub, make sure you generate the new grub config file."
+  fi
+
+  if [ -f /boot/grub/grub.cfg ]; then
+    if grep -q intel-ucode.img /boot/grub/grub.cfg; then
+       printf "\e[01;31mYour grub.cfg contains intel-ucode.img\n"
+       printf "Make sure you regenerate it with:\n"
+       printf "  grub-mkconfig -o /boot/grub/grub.cfg\n\e[00m"
+    fi
+  fi
 
   if which mkinitcpio >/dev/null 2>&1; then
     echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
