@@ -1,18 +1,13 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer almack
-
 pkgname=('x264' 'libx264' 'libx264-10bit')
-pkgver=20141218
-pkgrel=2
+pkgver=20151224
+pkgrel=1
 arch=('x86_64')
 url="http://www.videolan.org/developers/x264.html"
 license=('GPL')
 depends=('glibc')
 makedepends=('yasm' 'ffmpeg' 'libvpx>=1.1.0')
 source=("ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-$pkgver-2245-stable.tar.bz2")
-md5sums=('f82e4f39453ba8f25a9b614a96741ee3')
+md5sums=('1c4460009614e32410bec056af7da380')
 
 prepare() {
   cp -r "$srcdir/$pkgname-snapshot-$pkgver-2245-stable" $pkgbase
@@ -50,6 +45,8 @@ package_libx264() {
 
 package_libx264-10bit() {
   pkgdesc='Library for encoding H264/AVC video streams. 10bit-depth.'
+  provides=('libx264')
+  conflicts=('libx264')
 
   install -d "$pkgdir"/usr/lib
   make -C $pkgbase-10bit DESTDIR="$pkgdir" install-lib-shared
