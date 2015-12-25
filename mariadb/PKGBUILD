@@ -7,8 +7,8 @@ pkgrel=1
 arch=('x86_64')
 license=('GPL')
 url='http://mariadb.org/'
-makedepends=('cmake' 'openssl' 'zlib' 'libaio' 'libxml2' 'openssl' 'pcre'
-             'jemalloc' 'lz4' 'boost')
+makedepends=('cmake' 'openssl' 'zlib' 'libaio' 'libxml2' 'openssl' 'pcre' 'snappy'
+             'jemalloc' 'lz4' 'lzo2' 'boost')
 source=(http://ftp.heanet.ie/mirrors/mariadb/mariadb-$pkgver/source/mariadb-$pkgver.tar.gz mariadb.service
         mariadb-post.sh
         mariadb-tmpfiles.conf)
@@ -18,7 +18,7 @@ sha256sums=('d2c26fc76ff7397bdf25924161174c30a2b7fbd59893048f50145fc0a8278f76'
             '8ef799553c04aad69f8585496b5fa149f7809ff38147ae0bb294a45530e4686c')
 
 prepare() {
-  [ -d build ] && rm -r build
+  [ -d build ] && rm -rf build
   mkdir build
 }
 
@@ -72,7 +72,7 @@ build() {
 
 package_libmariadbclient() {
   pkgdesc='MariaDB client libraries'
-  depends=('openssl' 'libaio' 'zlib' 'pcre' 'lz4' 'lzo' 'xz')
+  depends=('openssl' 'libaio' 'zlib' 'pcre' 'lz4' 'lzo2' 'xz' 'snappy')
   conflicts=('libmysqlclient')
   provides=("libmysqlclient=$pkgver")
   options=('staticlibs')
@@ -124,7 +124,7 @@ package_mariadb() {
   backup=('etc/mysql/my.cnf')
   install=mariadb.install
   depends=('mariadb-clients' 'inetutils' 'libaio' 'libxml2' 'pcre' 'jemalloc'
-           'lz4' 'boost-libs' 'lzo')
+           'lz4' 'boost-libs' 'lzo2')
   optdepends=('perl-dbd-mysql: for mysqlhotcopy, mysql_convert_table_format and mysql_setpermission')
   conflicts=('mysql')
   provides=("mysql=${pkgver}" 'akonadi-backend')
