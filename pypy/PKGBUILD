@@ -23,8 +23,7 @@ package() {
   cd "${srcdir}"/${pkgname}-${pkgver}-src/pypy/tool/release
 
   python2 package.py --archive-name pypy --targetdir .
-  cd ../..
-  mkdir unpacked
+  mkdir -p unpacked
   tar xf pypy.tar.bz2 -C unpacked
 
   cd unpacked
@@ -36,7 +35,7 @@ package() {
   mkdir -p "${pkgdir}"/usr/bin
   ln -s /opt/pypy/bin/pypy "${pkgdir}"/usr/bin/pypy
 
-  install -Dm644 LICENSE "${pkgdir}"/opt/pypy/LICENSE
-  install -Dm644 README.rst "${pkgdir}"/opt/pypy/README.rst
-  install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/pypy/LICENSE
+  install -Dm644 ${srcdir}/${pkgname}-${pkgver}-src/LICENSE "${pkgdir}"/opt/pypy/LICENSE
+  install -Dm644 ${srcdir}/${pkgname}-${pkgver}-src/README.rst "${pkgdir}"/opt/pypy/README.rst
+  install -Dm644 ${srcdir}/${pkgname}-${pkgver}-src/LICENSE "${pkgdir}"/usr/share/licenses/pypy/LICENSE
 }
