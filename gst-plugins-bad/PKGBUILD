@@ -1,33 +1,30 @@
 #contributions from Arch; https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/gst-plugins-bad
 
 pkgname=gst-plugins-bad
-pkgver=1.4.5
-pkgrel=4
+pkgver=1.6.2
+pkgrel=1
 pkgdesc="GStreamer Multimedia Framework Bad Plugins"
 arch=('x86_64')
 license=('LGPL')
 url="http://gstreamer.freedesktop.org/"
-depends=('mjpegtools' 'gst-plugins-base' 'curl' 'chromaprint' 'libmms' 'faad2'
-         'mpg123' 'faac' 'celt' 'libdca' 'soundtouch' 'spandsp' 'libdvdnav'
-         'libmodplug' 'libgme' 'opus' 'wayland' 'neon' 'libofa' 'fluidsynth'
-         'openjpeg' 'libwebp' 'libsrtp' 'gnutls' 'wildmidi' 'glu' 'sbc'
-         'rtmpdump' 'libgudev')
-makedepends=('schroedinger' 'libexif' 'libdvdread' 'libvdpau' 'libmpeg2' 'librsvg' 'openexr'
-	     'x264' 'bluez' 'opencore-amr' 'libshairport' 'libcdaudio' 'libdc1394' 'libwebp' 'lv2' 'librsvg' 'timidity++'
-	     'rtmpdump' 'xvidcore' 'gobject-introspection' 'python2' 'python3')
-options=('!emptydirs')
-source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz gcc5.patch)
-md5sums=('e0bb39412cf4a48fe0397bcf3a7cd451'
-         'dfa7e5723542d0fabebf509cb321535b')
+depends=('mjpegtools' 'gst-plugins-base-libs' 'curl' 'chromaprint' 'libmms' 'faad2' 'mpg123' 'faac' 'celt' 'libdca'
+         'soundtouch' 'spandsp' 'libdvdnav' 'libmodplug' 'libgme' 'opus' 'wayland' 'neon' 'libofa' 'fluidsynth'
+         'openjpeg' 'libwebp' 'libsrtp' 'gnutls' 'wildmidi' 'glu' 'sbc' 'rtmpdump' 'libgudev' 'graphene')
+makedepends=('schroedinger' 'libexif' 'libdvdread' 'libvdpau' 'libmpeg2' 'python' 'valgrind' 'wildmidi' 'librsvg'
+             'gobject-introspection' 'opencv' 'libtiger' 'ladspa' 'openal' 'libusb'
+             'qt5-declarative' 'qt5-x11extras' 'qt5-wayland')
+options=(!emptydirs)
+source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
+sha256sums=('650855e39ff56a8bb6cb0c192109c5926ce12f536d06e19ebf829de71ef396fe')
 
 prepare() {
   cd $pkgname-$pkgver
-  patch -i ../gcc5.patch -Np1
+  autoreconf -vi
 }
 
 build() {
   cd $pkgname-$pkgver
-  autoreconf
+  
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
@@ -44,12 +41,11 @@ build() {
 
 check() {
   cd $pkgname-$pkgver
-  
+  # don't have a camera for the camerabin test
   make -k check || :
 }
 
 package() {
   cd $pkgname-$pkgver
-  
   make DESTDIR="${pkgdir}" install
 }
