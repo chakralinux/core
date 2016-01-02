@@ -2,61 +2,71 @@
 # Maintainer: Bruce Liu <brli@users.sourceforge.net>
 
 pkgname=ffmpeg
-pkgver=2.5.6
-pkgrel=2
-pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
-arch=('x86_64')
-url="http://ffmpeg.org"
-license=('GPL')
-depends=('alsa-lib' 'bzip2' 'fontconfig' 'freetype2' 'gnutls' 'harfbuzz' 'gsm' 'lame' 'libass' 'libavc1394'
-         'libbluray' 'libcaca' 'libdc1394' 'libmodplug' 'libtheora' 'libva' 'libvdpau'
-	 'libvorbis' 'libvpx>=1.1.0' 'libxfixes' 'libxv' 'openal' 'opencore-amr' 'openjpeg'
-	 'opus' 'pulseaudio' 'rtmpdump' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore'
-	 'zlib' 'x264' 'x265')
-makedepends=('yasm')
-source=("${url}/releases/${pkgname}-${pkgver}.tar.gz"
-        "${url}/releases/${pkgname}-${pkgver}.tar.gz.asc")
-md5sums=('820e450af12d0e232c6a4665ad4a0d58'
-         'SKIP')
+pkgver=2.8.4
+pkgrel=1
+pkgdesc='Complete solution to record, convert and stream audio and video'
+arch=('i686' 'x86_64')
+url='http://ffmpeg.org/'
+license=('GPL3')
+depends=('alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'gnutls' 'gsm' 'lame'
+         'libass' 'libbluray' 'libmodplug' 'libpulse' 'libsoxr' 'libssh'
+         'libtheora' 'libva' 'libvdpau' 'libwebp' 'opencore-amr' 'openjpeg'
+         'opus' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore' 'zlib'
+         'libdcadec.so' 'libvidstab.so' 'libvorbis.so' 'libvorbisenc.so'
+         'libvpx.so' 'libx264.so' 'libx265.so')
+makedepends=('hardening-wrapper' 'ladspa' 'libvdpau' 'yasm')
+optdepends=('ladspa: LADSPA filters')
+provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
+          'libavresample.so' 'libavutil.so' 'libpostproc.so' 'libswresample.so'
+          'libswscale.so')
+source=(http://ffmpeg.org/releases/${pkgname}-${pkgver}.tar.bz2{,.asc})
+validpgpkeys=('FCF986EA15E6E293A5644F10B4322F04D67658D8')
+sha256sums=('83cc8136a7845546062a43cda9ae3cf0a02f43ef5e434d2f997f055231a75f8e'
+            'SKIP')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
 
-  ./configure --prefix=/usr \
-              --disable-debug \
-              --disable-static \
-              --enable-avisynth \
-              --enable-avresample \
-              --enable-fontconfig \
-              --enable-gnutls \
-              --enable-gpl \
-              --enable-libass \
-              --enable-libbluray \
-              --enable-libfreetype \
-              --enable-libgsm \
-              --enable-libmodplug \
-              --enable-libmp3lame \
-              --enable-libopencore_amrnb \
-              --enable-libopencore_amrwb \
-              --enable-libopenjpeg \
-              --enable-libopus \
-              --enable-libpulse \
-              --enable-librtmp \
-              --enable-libschroedinger \
-              --enable-libspeex \
-              --enable-libtheora \
-              --enable-libv4l2 \
-              --enable-libvorbis \
-              --enable-libvpx \
-              --enable-libx264 \
-              --enable-libx265 \
-              --enable-libxvid \
-              --enable-runtime-cpudetect \
-              --enable-shared \
-              --enable-swresample \
-              --enable-vdpau \
-              --enable-version3 \
-              --enable-x11grab \
+  ./configure \
+    --prefix='/usr' \
+    --disable-debug \
+    --disable-static \
+    --disable-stripping \
+    --enable-avisynth \
+    --enable-avresample \
+    --enable-fontconfig \
+    --enable-gnutls \
+    --enable-gpl \
+    --enable-ladspa \
+    --enable-libass \
+    --enable-libbluray \
+    --enable-libdcadec \
+    --enable-libfreetype \
+    --enable-libfribidi \
+    --enable-libgsm \
+    --enable-libmodplug \
+    --enable-libmp3lame \
+    --enable-libopencore_amrnb \
+    --enable-libopencore_amrwb \
+    --enable-libopenjpeg \
+    --enable-libopus \
+    --enable-libpulse \
+    --enable-libschroedinger \
+    --enable-libsoxr \
+    --enable-libspeex \
+    --enable-libssh \
+    --enable-libtheora \
+    --enable-libv4l2 \
+    --enable-libvidstab \
+    --enable-libvorbis \
+    --enable-libvpx \
+    --enable-libwebp \
+    --enable-libx264 \
+    --enable-libx265 \
+    --enable-libxvid \
+    --enable-shared \
+    --enable-version3 \
+    --enable-x11grab
 
   make
   make tools/qt-faststart
@@ -64,7 +74,10 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
+
   make DESTDIR="${pkgdir}" install install-man
-  install -D -m755 tools/qt-faststart "${pkgdir}/usr/bin/qt-faststart"
+  install -Dm 755 tools/qt-faststart "${pkgdir}"/usr/bin/
 }
+
+# vim: ts=2 sw=2 et:
