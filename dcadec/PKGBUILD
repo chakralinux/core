@@ -9,12 +9,15 @@ url='https://github.com/foo86/dcadec.git'
 license=('LGPL2.1')
 depends=('glibc')
 provides=('libdcadec.so')
-install='dcadec.install'
-source=("dcadec-${pkgver}.tar.gz::https://github.com/foo86/dcadec/archive/v${pkgver}.tar.gz")
-sha256sums=('52a68a63f79ae50e5e5fd9c631a715e9feeed5d2b4a8442f0b9208692012a43f')
+source=("dcadec-${pkgver}.tar.gz::https://github.com/foo86/dcadec/archive/v${pkgver}.tar.gz"
+        "https://github.com/foo86/dcadec/commit/5bc00958d64463483f9c875d2eaa851666a68d20.patch")
+sha256sums=('52a68a63f79ae50e5e5fd9c631a715e9feeed5d2b4a8442f0b9208692012a43f'
+            '6afe176afbec3ab955c47d3d9a06d45b2996335bad54f397b3dc605b1278d9d9')
 
 build() {
   cd dcadec-${pkgver}
+
+  patch -Np1 -i ../5bc00958d64463483f9c875d2eaa851666a68d20.patch
 
   export CONFIG_SHARED='TRUE'
 
