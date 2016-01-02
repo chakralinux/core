@@ -3,7 +3,7 @@
 pkgbase=phonon-backend-gstreamer
 pkgname=('phonon-backend-gstreamer' 'phonon-qt5-backend-gstreamer')
 pkgver=4.8.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Phonon GStreamer backend"
 arch=('x86_64')
 url='http://phonon.kde.org'
@@ -14,14 +14,20 @@ optdepends=('gst-plugins-good: For media format support'
             'gst-plugins-ugly: For media format support'
             'gst-libav: For media format support')
 groups=("kde-complete" "kde-uninstall")
-source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.xz")
-sha256sums=('20e0f71f2beb4f859db8385079a13aef5473863ee6f27aad7b065aa7bfe931e0')
+source=("http://download.kde.org/stable/phonon/phonon-backend-gstreamer/${pkgver}/src/phonon-backend-gstreamer-${pkgver}.tar.xz"
+        "phonon-gstreamer-gst15_include_dirs.patch")
+md5sums=('ce441035dc5a00ffaac9a64518ab5c62'
+         'c4a3d5230b07d4d84a8f05a8575c69aa')
 
 prepare() {
   mkdir build-qt4
   mkdir build-qt5
-}
 
+  cd ${pkgname}-${pkgver}
+
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1239790
+  patch -Np1 -i ../phonon-gstreamer-gst15_include_dirs.patch
+}
 
 build() {
   cd build-qt4
@@ -29,6 +35,7 @@ build() {
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_SKIP_RPATH=ON \
+    -D__KDE_HAVE_GCC_VISIBILITY=NO \
     -DCMAKE_INSTALL_LIBDIR=lib
   make
 
@@ -37,6 +44,7 @@ build() {
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_SKIP_RPATH=ON \
+    -D__KDE_HAVE_GCC_VISIBILITY=NO \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DPHONON_BUILD_PHONON4QT5=ON
   make

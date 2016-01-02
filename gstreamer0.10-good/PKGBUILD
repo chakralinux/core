@@ -6,44 +6,56 @@
 pkgbase=gstreamer0.10-good
 pkgname=('gstreamer0.10-good' 'gstreamer0.10-good-plugins')
 pkgver=0.10.31
-pkgrel=9
+pkgrel=10
 arch=('x86_64')
 license=('LGPL')
-makedepends=('intltool' 'pkgconfig' 'gstreamer0.10-base>=0.10.36' 'libavc1394' 'libiec61883' 'aalib' 'libshout' 'libdv' 
-'flac' 
-'wavpack' 'taglib' 'libsoup' 'libcaca' 'bzip2' 'gdk-pixbuf2' 'pulseaudio' 'jack' 'systemd')
+makedepends=('intltool' 'pkgconfig' 'gstreamer0.10-base' 'libavc1394' 'libiec61883' 'aalib' 'libshout' 'libdv' 'flac' 'gconf' 'wavpack' 'taglib' 'libsoup' 'v4l-utils' 'libcaca' 'bzip2' 'gdk-pixbuf2' 'libpulse' 'jack' 'git' 'cairo' 'libgudev')
 url="http://gstreamer.freedesktop.org/"
-options=(!libtool !emptydirs)
-source=("${url}/src/gst-plugins-good/gst-plugins-good-${pkgver}.tar.xz")
-sha256sums=('77a8436a7c0a15f876bad29616835046890df2bcaf72da02151bd91e3d292b64')
+options=(!emptydirs)
+source=("git://anongit.freedesktop.org/gstreamer-sdk/gst-plugins-good#commit=e28fd8886f05bb51c147f871f3a1db2fc2b735a9"
+        test-rtp-payloading.patch
+        souptest.patch)
+sha256sums=('SKIP'
+            'c2f7f07f9bf5ca3afddc81d0a44665d2d54b1e9aea0ef1b25d219cf34bf7bb29'
+            '3a74492c3d2939efabe7e22211c2350084e0a8cc3af23f553130f1e774c5f1e1')
 
-build() {
-  cd "${srcdir}/gst-plugins-good-${pkgver}"
+prepare() {
+  cd gst-plugins-good
 
   sed -i '/AC_PATH_XTRA/d' configure.ac
-  sed "13 i CXXFLAGS=${CXXFLAGS} -w -Wno-error" configure.ac
-  autoreconf
+  sed -i 's/AM_CONFIG_HEADER/AC_CONFIG_HEADERS/' configure.ac
+
+  patch -Np1 -i ../test-rtp-payloading.patch
+  patch -Np1 -i ../souptest.patch
+}
+
+build() {
+  cd gst-plugins-good
+  NOCONFIGURE=1 ./autogen.sh
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --disable-static --enable-experimental \
     --disable-schemas-install \
     --disable-hal \
-    --disable-gconf \
     --disable-esd \
-    --disable-gst_v4l2 \
+    --disable-gtk-doc \
     --with-package-name="GStreamer Good Plugins (Chakra GNU/Linux)" \
     --with-package-origin="http://www.chakra-project.org/"
 
-  make 
-  sed -e 's/gst sys ext/gst/' -i Makefile 
+  make
+  sed -e 's/gst sys ext/gst/' -i Makefile
+}
+
+check() {
+  cd gst-plugins-good
+  make check
 }
 
 package_gstreamer0.10-good() {
   depends=('gstreamer0.10-base' 'bzip2')
   pkgdesc="GStreamer Multimedia Framework Good plugin libraries"
 
-  cd "${srcdir}/gst-plugins-good-${pkgver}"
-
-  make GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1 DESTDIR="${pkgdir}" install 
+  cd gst-plugins-good
+  make GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1 DESTDIR="${pkgdir}" install
   rm -rf "${pkgdir}/etc/gconf"
 }
 
@@ -53,10 +65,9 @@ package_gstreamer0.10-good-plugins() {
   pkgdesc="GStreamer Multimedia Framework Good Plugins (gst-plugins-good)"
   groups=('gstreamer0.10-plugins')
 
-  cd "${srcdir}/gst-plugins-good-${pkgver}"
-
-  make -C sys DESTDIR="${pkgdir}" install 
-  make -C ext GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1 DESTDIR="${pkgdir}" install 
+  cd gst-plugins-good
+  make -C sys DESTDIR="${pkgdir}" install
+  make -C ext GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1 DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/usr/share/gconf/schemas"
   install -m644 gconf/gstreamer-0.10.schemas "${pkgdir}/usr/share/gconf/schemas/gstreamer0.10-good-plugins.schemas"
 }
