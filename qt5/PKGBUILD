@@ -6,9 +6,9 @@
 
 pkgbase=qt5
 pkgname=('qt5-base'
-         'qt5-qt3d'
-         'qt5-connectivity'
+         'qt5-3d'
          'qt5-canvas3d'
+         'qt5-connectivity'
          'qt5-declarative'
          'qt5-doc'
          'qt5-enginio'
@@ -32,7 +32,7 @@ pkgname=('qt5-base'
          'qt5-x11extras'
          'qt5-xmlpatterns')
 pkgver=5.5.1
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -46,7 +46,8 @@ makedepends=('libxcb' 'xcb-proto' 'xcb-util' 'xcb-util-image' 'xcb-util-wm' 'xcb
             'xdg-utils' 'desktop-file-utils' 'libxinerama' 'libxfixes'
             'geoclue' 'pciutils' 'nss'
             'gstreamer' 'gst-plugins-base' 'gst-plugins-good'
-            'gst-plugins-bad' 'gst-plugins-ugly' 'harfbuzz' 'pkg-config')
+            'gst-plugins-bad' 'gst-plugins-ugly' 'harfbuzz' 'pkg-config'
+            'libinput' 'yasm' 'git')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("http://download.qt-project.org/official_releases/qt/${pkgver%.*}/${pkgver}/single/${_pkgfqn}.tar.xz"
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
@@ -79,6 +80,11 @@ prepare() {
   # in qtwebengine there are still a lot of relative calls which need a workaround
   mkdir -p "${srcdir}"/python2-path
   ln -sf /usr/bin/python2 "${srcdir}"/python2-path/python
+
+  # Try to enable proprietary_codecs and use some system yasm
+  sed -e 's/contains(WEBENGINE_CONFIG, proprietary_codecs): //' \
+      -e '/use_system_ffmpeg=0"/a GYP_ARGS += "-Duse_system_yasm=1"' \
+      -i qtwebengine/src/core/gyp_run.pro
 }
 
 build() {
@@ -118,6 +124,7 @@ build() {
     -dbus-linked \
     -system-harfbuzz \
     -journald \
+    -libinput \
     -reduce-relocations \
     -no-gtkstyle \
     -opengl desktop \
@@ -147,6 +154,18 @@ build() {
   make docs
 }
 
+package_qt5-3d() {
+  pkgdesc='Provides functionality for near-realtime simulation systems with support for 2D and 3D rendering in both Qt C++ and Qt Quick applications'
+  depends=('qt5-base' 'qt5-declarative')
+  provides=("qt5-qt3d=${pkgver}")
+  options=("debug")
+
+  cd ${_pkgfqn}/qt3d
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
+}
+
 package_qt5-base() {
   pkgdesc='A cross-platform application and UI framework'
   depends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
@@ -154,7 +173,7 @@ package_qt5-base() {
            'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'libxinerama' 'libxcursor'
            'pulseaudio' 'gstreamer' 'gst-plugins-base' 'gst-plugins-ugly' 'gst-plugins-good'
            'xcb-util-image' 'xcb-util-keysyms'
-           'xcb-util-renderutil' 'xcb-util-wm' 'libxkbcommon-x11')
+           'xcb-util-renderutil' 'xcb-util-wm' 'libxkbcommon-x11' 'libinput')
   optdepends=('postgresql-libs: PostgreSQL driver'
               'libmariadbclient: MariaDB driver'
               'unixodbc: ODBC driver'
@@ -182,18 +201,6 @@ package_qt5-base() {
       ln -s /usr/lib/qt5/bin/${i} ${pkgdir}/usr/bin/${i}-qt5
   done
 }
-
-package_qt5-qt3d() {
-  pkgdesc='Provides functionality for near-realtime simulation systems with support for 2D and 3D rendering in both Qt C++ and Qt Quick applications'
-  depends=('qt5-base' 'qt5-declarative')
-  options=("debug")
-
-  cd ${_pkgfqn}/qt3d
-  make INSTALL_ROOT="${pkgdir}" install
-
-  _prlfix
-}
-
 
 package_qt5-canvas3d() {
   pkgdesc='Provides a way to make OpenGL-like 3D drawing calls from Qt Quick JavaScript'
