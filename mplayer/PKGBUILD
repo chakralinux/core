@@ -1,7 +1,7 @@
 pkgbase=mplayer
 pkgname=('mplayer' 'mencoder')
 pkgver=37379
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 makedepends=(
   'subversion' 'libxxf86vm' 'libmad' 'libxinerama' 'sdl' 'lame' 'libtheora'
@@ -9,30 +9,32 @@ makedepends=(
   'faac' 'faad2' 'lirc'  'libxvmc' 'enca' 'libvdpau' 'opencore-amr'
   'libdca' 'a52dec' 'schroedinger' 'libvpx' 'libpulse' 'fribidi' 'unzip' 'mesa'
   'live-media' 'yasm' 'git' 'fontconfig' 'mpg123' 'ladspa' 'libass' 'libbluray'
-  'libcdio-paranoia' 'opus' 'subversion' 'x264' 'rtmpdump' 'gnutls'
-  'gsm' 'libdvdcss' 'libdvdread' 'libdvdnav' 'libmpeg2' 'libdv'
+  'libcdio-paranoia' 'opus' 'subversion' 'x264' 'libx264' 'rtmpdump' 'gnutls'
+  'gsm' 'libdvdcss' 'libdvdread' 'libdvdnav'
 )
 license=('GPL')
 url='http://www.mplayerhq.hu/'
 categories=('multimedia')
 screenshot=("http://www.mplayerhq.hu/images/screenshots/gui-preview-01.jpg")
 options=('!buildflags' '!emptydirs')
-source=("${pkgbase}-${pkgver}::svn://svn.mplayerhq.hu/mplayer/trunk#revision=${pkgver}"
-        "http://ffmpeg.org/releases/ffmpeg-2.6.2.tar.bz2"
+source=($pkgbase-$pkgver::svn://svn.mplayerhq.hu/mplayer/trunk#revision=$pkgver
+        http://ffmpeg.org/releases/ffmpeg-2.6.2.tar.bz2
         mplayer.desktop
         cdio-includes.patch
         include-samba-4.0.patch
+        ffmpeg-libvpxenc-remove-some-unused-ctrl-id-mappings.patch
         revert-icl-fixes.patch)
 md5sums=('SKIP'
          'e75d598921285d6775f20164a91936ac'
          '62f44a58f072b2b1a3c3d3e4976d64b3'
          '7b5be7191aafbea64218dc4916343bbc'
          '868a92bdef148df7f38bfa992b26ce9d'
+         '71be9bcd297cb9ce833bbc5d425c0470'
          '3579402002b7302fdf2d146639333efd')
 
 pkgver() {
   cd $pkgbase-$pkgver
-  svnversion | sed 's/M//g'
+  svnversion
 }
 
 prepare() {
@@ -40,10 +42,10 @@ prepare() {
   rm -rf ./ffmpeg
   mv ../ffmpeg-*/ ./ffmpeg
 
-  svn revert -R .
-  patch -p0 -i ../cdio-includes.patch
-  patch -p1 -i ../include-samba-4.0.patch
+  patch -Np0 -i ../cdio-includes.patch
+  patch -Np1 -i ../include-samba-4.0.patch
   patch -Np0 -i ../revert-icl-fixes.patch
+  patch -d ffmpeg -Np1 <../ffmpeg-libvpxenc-remove-some-unused-ctrl-id-mappings.patch
 
   ./version.sh
 }
@@ -75,12 +77,12 @@ build() {
 }
 
 package_mplayer() {
-  pkgdesc="A movie player for linux"
+  pkgdesc='Media player for Linux'
   install=mplayer.install
   backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
   depends=(
     'desktop-file-utils' 'ttf-dejavu' 'enca' 'libxss' 'a52dec' 'libvpx'
-    'lirc' 'x264' 'libmng' 'libdca' 'aalib' 'lame' 'fontconfig'
+    'lirc' 'libx264' 'libmng' 'libdca' 'aalib' 'lame' 'fontconfig'
     'libgl' 'libxinerama' 'libvdpau' 'libpulse' 'smbclient' 'xvidcore'
     'opencore-amr' 'jack' 'libmad' 'sdl' 'libtheora' 'libcaca' 'libxxf86dga'
     'fribidi' 'libjpeg' 'faac' 'faad2' 'libxvmc' 'schroedinger' 'mpg123'
@@ -92,14 +94,10 @@ package_mplayer() {
   conflicts=('mplayer2')
 
   cd $pkgbase-$pkgver
-  make DESTDIR=${pkgdir} install-mplayer install-mplayer-man
+  make DESTDIR="$pkgdir" install-mplayer install-mplayer-man
 
   install -Dm644 etc/{codecs.conf,input.conf,example.conf} \
-    "${pkgdir}/etc/mplayer/"
-
-  install -dm755 ${pkgdir}/usr/share/mplayer/
-  ln -s /usr/share/fonts/TTF/DejaVuSans.ttf ${pkgdir}/usr/share/mplayer/subfont.ttf
-  rm -rf ${pkgdir}/usr/share/mplayer/font
+    "$pkgdir/etc/mplayer/"
 
   # Desktop Integration.
   install -Dm644 ../mplayer.desktop \
@@ -111,13 +109,13 @@ package_mplayer() {
 package_mencoder() {
   pkgdesc='Free command line video decoding, encoding and filtering tool'
   depends=(
-    'enca' 'a52dec' 'libvpx' 'x264' 'libmng' 'libdca' 'bzip2' 'lame'
+    'enca' 'a52dec' 'libvpx' 'libx264' 'libmng' 'libdca' 'bzip2' 'lame'
     'alsa-lib' 'fontconfig' 'giflib' 'libpng' 'smbclient' 'xvidcore'
     'opencore-amr' 'libmad' 'libtheora' 'fribidi' 'libjpeg' 'faac' 'faad2'
     'schroedinger' 'mpg123' 'libass' 'libbluray' 'libcdio-paranoia'
-    'libvorbis' 'opus' 'rtmpdump' 'gsm' 'libdvdnav' 'libmpeg2' 'libdv'
-  ) 
+    'libvorbis' 'opus' 'rtmpdump' 'gsm' 'libdvdnav'
+  )
 
   make -C $pkgbase-$pkgver DESTDIR="$pkgdir" install-mencoder install-mencoder-man
-  find "$pkgdir/usr/share/man" -name mplayer.1 -exec rename mplayer.1 mencoder.1 {} +
+  find "$pkgdir"/usr/share/man -name mplayer.1 -exec rename mplayer.1 mencoder.1 {} +
 }
