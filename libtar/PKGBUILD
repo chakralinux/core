@@ -1,0 +1,39 @@
+# Arch contributor: https://projects.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/libtar
+
+pkgname=libtar
+pkgver=1.2.20
+pkgrel=1
+pkgdesc="C library for manipulating POSIX tar files"
+arch=('i686' 'x86_64')
+url="http://repo.or.cz/w/libtar.git/"
+license=('BSD')
+depends=('zlib')
+source=("http://pkgbuild.com/~giovanni/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('c8507795b3d461ed10566a61fb4cad9b')
+
+prepare() {
+  cd "${srcdir}/${pkgname}"
+
+  sed -i \
+      -e '/INSTALL_PROGRAM/s:-s::' {doc,lib{,tar}}/Makefile.in
+}
+
+build() {
+  cd "${srcdir}/${pkgname}"
+  export CFLAGS+=" -fPIC"
+
+  autoreconf -fi
+  ./configure --prefix=/usr \
+              --mandir=/usr/share/man \
+              --disable-static \
+              --disable-encap \
+              --disable-epkg-install
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+
+  make DESTDIR="${pkgdir}" install
+  install -D -m644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
