@@ -5,19 +5,17 @@
 # contributor Jan de Groot <jgc@archlinux.org>
 
 pkgname=gst-plugins-good
-pkgver=1.4.5
-pkgrel=2
+pkgver=1.6.2
+pkgrel=1
 pkgdesc="GStreamer Multimedia Framework Good Plugins"
 arch=('x86_64')
 license=('LGPL')
 url="http://gstreamer.freedesktop.org/"
-depends=('pulseaudio' 'jack' 'libsoup' 'gst-plugins-base' 'wavpack'
-         'aalib' 'taglib' 'libdv' 'libshout' 'libvpx' 'gdk-pixbuf2' 'libcaca'
-         'libavc1394' 'libiec61883' 'libxdamage' 'v4l-utils' 'libgudev')
-makedepends=('gstreamer' 'speex' 'flac' 'libraw1394')
-options=('!emptydirs')
+depends=('libpulse' 'jack' 'libsoup' 'gst-plugins-base-libs' 'wavpack' 'aalib' 'taglib' 'libdv' 'libshout' 'libvpx' 'gdk-pixbuf2' 'libcaca' 'libavc1394' 'libiec61883' 'libxdamage' 'v4l-utils' 'cairo' 'libgudev')
+makedepends=('gstreamer' 'speex' 'flac' 'libraw1394' 'python3')
+options=(!emptydirs)
 source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
-md5sums=('eaf1a6daf73749bc423feac301d60038')
+sha256sums=('876e54dfce93274b98e024f353258d35fa4d49d1f9010069e676c530f6eb6a92')
 
 build() {
   cd $pkgname-$pkgver
@@ -36,14 +34,13 @@ build() {
   make
 }
 
-check() {
-  cd $pkgname-$pkgver
-  
-  make check
-}
+# Disabled for now: souphttpsrc times out, and takes a damn long time to do so
+#check() {
+#  cd $pkgname-$pkgver
+#  make check
+#}
 
 package() {
   cd $pkgname-$pkgver
-  
-  make GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1 DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" install
 }

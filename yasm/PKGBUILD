@@ -4,31 +4,32 @@
 # maintainer abveritas[at]chakra-project[dot]org>
 
 pkgname=yasm
-pkgver=1.2.0
+pkgver=1.3.0
 pkgrel=1
 pkgdesc="A rewrite of NASM to allow for multiple syntax supported (NASM, TASM, GAS, etc.)"
 arch=('x86_64')
-license=('custom')
 url="http://www.tortall.net/projects/yasm/"
+license=('BSD' 'GPL2' 'LGPL2.1' 'PerlArtistic')
 depends=('glibc')
-source=("http://www.tortall.net/projects/yasm/releases/${pkgname}-${pkgver}.tar.gz")
-options=('!libtool')
-md5sums=('4cfc0686cf5350dd1305c4d905eb55a6')
+options=('staticlibs')
+source=(http://www.tortall.net/projects/yasm/releases/${pkgname}-${pkgver}.tar.gz)
+sha1sums=('b7574e9f0826bedef975d64d3825f75fbaeef55e')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr
   make
 }
 
 check() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
   make check
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install
-  install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 BSD.txt "${pkgdir}/usr/share/licenses/${pkgname}/BSD.txt"
 }
 

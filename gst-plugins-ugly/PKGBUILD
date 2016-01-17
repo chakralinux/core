@@ -5,17 +5,17 @@
 # contributor Jan de Groot <jgc@archlinux.org>
 
 pkgname=gst-plugins-ugly
-pkgver=1.4.5
+pkgver=1.6.2
 pkgrel=1
 pkgdesc="GStreamer Multimedia Framework Ugly Plugins"
 arch=('x86_64')
 license=('LGPL')
 url="http://gstreamer.freedesktop.org/"
-depends=('gst-plugins-base' 'libdvdread' 'lame' 'libmpeg2' 'a52dec'
-         'libmad' 'libsidplay' 'libcdio' 'x264' 'opencore-amr')
-options=('!emptydirs')
+depends=('gst-plugins-base-libs' 'libdvdread' 'lame' 'libmpeg2' 'a52dec' 'libmad' 'libsidplay' 'libcdio' 'libx264' 'opencore-amr')
+makedepends=('python' 'gtk-doc' 'x264')
+options=(!emptydirs)
 source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
-md5sums=('6954beed7bb9a93e426dee543ff46393')
+sha256sums=('e7f1b6321c8667fabc0dedce3998a3c6e90ce9ce9dea7186d33dc4359f9e9845')
 
 build() {
   cd $pkgname-$pkgver
@@ -30,18 +30,16 @@ build() {
   
   # https://bugzilla.gnome.org/show_bug.cgi?id=655517
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
-  
+
   make
 }
 
 check() {
   cd $pkgname-$pkgver
-  # FAIL: elements/x264enc
-  make check | true
+  make check
 }
 
 package() {
   cd $pkgname-$pkgver
-  
   make DESTDIR="${pkgdir}" install
 }

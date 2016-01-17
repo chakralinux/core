@@ -2,23 +2,23 @@
 
 pkgbase=mariadb
 pkgname=('libmariadbclient' 'mariadb-clients' 'mytop' 'mariadb')
-pkgver=10.1.8
+pkgver=10.1.10
 pkgrel=1
 arch=('x86_64')
 license=('GPL')
-url="http://mariadb.org/"
-makedepends=('cmake' 'openssl' 'zlib' 'libaio' 'libxml2' 'openssl' 'pcre' 'jemalloc' 'lz4')
-source=(http://ftp.heanet.ie/mirrors/mariadb/mariadb-$pkgver/source/mariadb-$pkgver.tar.gz
-        mariadb.service
+url='http://mariadb.org/'
+makedepends=('cmake' 'openssl' 'zlib' 'libaio' 'libxml2' 'openssl' 'pcre' 'snappy'
+             'jemalloc' 'lz4' 'lzo2' 'boost')
+source=(http://ftp.heanet.ie/mirrors/mariadb/mariadb-$pkgver/source/mariadb-$pkgver.tar.gz mariadb.service
         mariadb-post.sh
         mariadb-tmpfiles.conf)
-sha256sums=('7cbf6a4649aa6dc9cd1dc24424ade7b994de78582ce4d47ca0f4cd1c4c003bfa'
+sha256sums=('d2c26fc76ff7397bdf25924161174c30a2b7fbd59893048f50145fc0a8278f76'
             'a6cf5446159fff16598d0d787dd3a3c30a53a656a5f876ddb608bc60e234d334'
             '368f9fd2454d80eb32abb8f29f703d1cf9553353fb9e1ae4529c4b851cb8c5dd'
             '8ef799553c04aad69f8585496b5fa149f7809ff38147ae0bb294a45530e4686c')
 
 prepare() {
-  [ -d build ] && rm -r build
+  [ -d build ] && rm -rf build
   mkdir build
 }
 
@@ -30,6 +30,7 @@ build() {
     -DCMAKE_RANLIB=/usr/bin/gcc-ranlib \
     -DBUILD_CONFIG=mysql_release \
     -DCMAKE_INSTALL_PREFIX=/usr \
+    -DSYSCONFDIR=/etc/mysql \
     -DMYSQL_DATADIR=/var/lib/mysql \
     -DMYSQL_UNIX_ADDR=/run/mysqld/mysqld.sock \
     -DDEFAULT_CHARSET=utf8 \
@@ -37,7 +38,7 @@ build() {
     -DENABLED_LOCAL_INFILE=ON \
     -DINSTALL_INFODIR=share/mysql/docs \
     -DINSTALL_MANDIR=share/man \
-    -DINSTALL_PLUGINDIR=/usr/lib/mysql/plugin \
+    -DINSTALL_PLUGINDIR=lib/mysql/plugin \
     -DINSTALL_SCRIPTDIR=bin \
     -DINSTALL_INCLUDEDIR=include/mysql \
     -DINSTALL_DOCREADMEDIR=share/mysql \
@@ -69,12 +70,13 @@ build() {
   make
 }
 
-package_libmariadbclient(){
-  pkgdesc="MariaDB client libraries"
-  depends=('openssl' 'libaio' 'zlib' 'pcre')
+package_libmariadbclient() {
+  pkgdesc='MariaDB client libraries'
+  depends=('openssl' 'libaio' 'zlib' 'pcre' 'lz4' 'lzo2' 'xz' 'snappy')
   conflicts=('libmysqlclient')
-  provides=("libmysqlclient=${pkgver}")
-  
+  provides=("libmysqlclient=$pkgver")
+  options=('staticlibs')
+
   cd build
   for dir in include libmysql libmysqld libservices; do
     make -C $dir DESTDIR="$pkgdir" install
@@ -90,11 +92,11 @@ package_libmariadbclient(){
 }
 
 package_mariadb-clients() {
-  pkgdesc="MariaDB client tools"
+  pkgdesc='MariaDB client tools'
   depends=('libmariadbclient' 'zlib' 'openssl' 'jemalloc')
   conflicts=('mysql-clients')
-  provides=("mysql-clients=${pkgver}")
-  
+  provides=("mysql-clients=$pkgver")
+
   cd build
   make -C client DESTDIR="$pkgdir" install
 
@@ -106,6 +108,7 @@ package_mariadb-clients() {
 
   # provided by mariadb
   rm "$pkgdir"/usr/bin/{mysql_{plugin,upgrade},mysqlbinlog,mysqltest}
+
 }
 
 package_mytop() {
@@ -117,16 +120,16 @@ package_mytop() {
 }
 
 package_mariadb() {
-  pkgdesc="A fast SQL database server, drop-in replacement for MySQL"
+  pkgdesc='Fast SQL database server, drop-in replacement for MySQL'
   backup=('etc/mysql/my.cnf')
   install=mariadb.install
   depends=('mariadb-clients' 'inetutils' 'libaio' 'libxml2' 'pcre' 'jemalloc'
-           'lz4')
+           'lz4' 'boost-libs' 'lzo2')
+  optdepends=('perl-dbd-mysql: for mysqlhotcopy, mysql_convert_table_format and mysql_setpermission')
   conflicts=('mysql')
   provides=("mysql=${pkgver}" 'akonadi-backend')
-  optdepends=('perl-dbi' 'perl-dbd-mysql')
   options=('emptydirs')
-  
+
   cd build
   make DESTDIR="${pkgdir}" install
 
@@ -135,23 +138,23 @@ package_mariadb() {
   install -Dm644 "$srcdir"/mariadb.service "$pkgdir"/usr/lib/systemd/system/mysqld.service
   install -Dm644 "$srcdir"/mariadb-tmpfiles.conf "$pkgdir"/usr/lib/tmpfiles.d/mysql.conf
 
-  install -dm700 var/lib/mysql
-  chown -R 89:89 var/lib/mysql &>/dev/null
-  
+  install -dm700 "$pkgdir"/var/lib/mysql
+  chown -R 89:89 "$pkgdir"/var/lib/mysql &>/dev/null
+
   # provided by libmariadbclient
   cd "$pkgdir"
   rm usr/bin/{mysql_config,mysql_client_test_embedded,mysqltest_embedded}
   rm usr/lib/libmysql*
   rm -r usr/include/
   rm usr/share/man/man1/{mysql_config,mysql_client_test_embedded,mysqltest_embedded}.1
-  
+
   # provided by mariadb-clients
   rm usr/bin/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}
   rm usr/share/man/man1/{mysql,mysqladmin,mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap}.1
 
   # provided by mytop
   rm usr/bin/mytop
-  
+
   # not needed
   rm -r usr/{data,mysql-test,sql-bench}
   rm usr/share/man/man1/mysql-test-run.pl.1

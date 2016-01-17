@@ -1,27 +1,20 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
 pkgname=libdvdnav
-pkgver=5.0.2
+pkgver=5.0.3
 pkgrel=1
 pkgdesc="The library for xine-dvdnav plugin."
-arch=(i686 x86_64)
+arch=('x86_64')
 license=('GPL')
 url="https://dvdnav.mplayerhq.hu/"
 depends=('libdvdread')
-options=(!libtool)
 source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.bz2"
-        'Fix-reading-DVD-label.patch')
-md5sums=('d8d6c01a8273d842965bd907ebddcc5d'
-         'a92e0638a7cbe5f0e11458a05cf5fb8a')
+        'fix-crash-describe_title.patch')
+md5sums=('e9ea4de3bd8f204e61301d407d09f033'
+         'a23f89f9175a36f04b5e202bd4e35baa')
 
 
 prepare() {
   cd ${pkgname}-${pkgver}
-  patch -Np1 -i ../Fix-reading-DVD-label.patch
+  patch -Np1 -i ../fix-crash-describe_title.patch
   autoreconf -fi
 }
 

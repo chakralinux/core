@@ -2,7 +2,7 @@
 # contributor Jan de Groot <jgc@archlinux.org>
 
 pkgname=gstreamer
-pkgver=1.4.5
+pkgver=1.6.2
 pkgrel=1
 pkgdesc="GStreamer Multimedia Framework"
 arch=('x86_64')
@@ -10,9 +10,9 @@ license=('LGPL')
 url="http://gstreamer.freedesktop.org/"
 depends=('libxml2' 'glib2')
 optdepends=('sh: feedback script')
-makedepends=('intltool' 'pkgconfig' 'gobject-introspection')
+makedepends=('intltool' 'pkgconfig' 'gobject-introspection' 'python2')
 source=(${url}/src/gstreamer/gstreamer-${pkgver}.tar.xz)
-md5sums=('88a9289c64a4950ebb4f544980234289')
+md5sums=('5e610b5a94c209487310739b39b6c464')
 
 build() {
   cd "${srcdir}/gstreamer-${pkgver}"
@@ -23,17 +23,19 @@ build() {
       --with-package-name="GStreamer (Chakra GNU/Linux)" \
       --with-package-origin="http://www.chakraos.org/" \
       --disable-static
+
+  # https://bugzilla.gnome.org/show_bug.cgi?id=655517
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+
   make
 }
 
 check() {
   cd "${srcdir}/gstreamer-${pkgver}"
-  
   make check
 }
 
 package() {
   cd "${srcdir}/gstreamer-${pkgver}"
-  
   make DESTDIR="${pkgdir}" install
 }

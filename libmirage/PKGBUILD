@@ -1,11 +1,5 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# Contributor: abveritas@chakra-project.org
-# Maintainer: BrLi <rainman59118[at]Gmail.com> 
-
 pkgname=libmirage
-pkgver=3.0.3
+pkgver=3.0.4
 pkgrel=1
 pkgdesc="CD-ROM image (B6T/CCD/CDI/CUE/ISO/MDS/NRG/TOC) access library"
 arch=('x86_64')
@@ -15,13 +9,12 @@ depends=('glib2' 'libsndfile' 'zlib' 'xz' 'bzip2' 'libsamplerate')
 makedepends=('bison' 'flex' 'cmake')
 optdepends=('gobject-introspection')
 source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2")
-md5sums=('fd0009ced98ef47c94d2919eafcaa099')
+sha256sums=('cc05370f0cc15348910a149207384f03b48b204a19215c1510924244996a3f3f')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
 
-  mkdir build
-  cd build
+  mkdir -p build && cd build
   
   cmake .. \
     -DCMAKE_BUILD_TYPE=Release \

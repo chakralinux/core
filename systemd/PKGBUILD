@@ -1,6 +1,6 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=227
+pkgver=228
 pkgrel=1
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
@@ -44,7 +44,7 @@ provides=("udev=$pkgver" 'gummiboot')
 conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'gummiboot')
 replaces=('udev' 'gummiboot')
 install="systemd.install"
-source=("git://github.com/systemd/systemd.git#tag=v$pkgver"
+source=("git+https://github.com/systemd/systemd.git#tag=v$pkgver"
         'initcpio-hook-udev'
         'initcpio-install-systemd'
         'initcpio-install-udev'
@@ -57,7 +57,7 @@ md5sums=('SKIP'
          '90ea67a7bb237502094914622a39e281'
          '976c5511b6493715e381f43f16cdb151'
          '1b3aa3a0551b08af9305d33f85b5c2fc'
-         'a1bf25da736d3719e9720b2e4caea341'
+         '34c0e45a4c7b598d57a5efcf63ecee2f'
          '0fdb041cc891292162f6c2f7d1af830c'
          'bfccc8b2a9da47823e4dcef2206d4b1b'
          '88949acaf49231fd01e9f0733c5dd812'
@@ -65,6 +65,16 @@ md5sums=('SKIP'
 
 prepare() {
   cd "$pkgname"
+
+  # sd-ndisc: drop RA packets from non-link-local addresses
+  # https://github.com/systemd/systemd/commit/3ccd31635353
+  # https://github.com/systemd/systemd/issues/1866
+  git cherry-pick -n 3ccd31635353
+
+  # networkd: link - do not drop config for loopback device
+  # https://github.com/systemd/systemd/commit/e5d44b34cca3
+  # https://github.com/systemd/systemd/issues/2023
+  git cherry-pick -n e5d44b34cca3
 
   ./autogen.sh
 }

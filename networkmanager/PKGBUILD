@@ -1,6 +1,6 @@
 pkgname=networkmanager
 _pkgname=NetworkManager
-pkgver=1.0.8
+pkgver=1.0.10
 pkgrel=1
 _pppver=2.4.7
 pkgdesc="Network Management daemon"
@@ -21,13 +21,16 @@ backup=('etc/NetworkManager/NetworkManager.conf')
 install=networkmanager.install
 source=("http://ftp.gnome.org/pub/gnome/sources/$_pkgname/${pkgver:0:3}/$_pkgname-$pkgver.tar.xz"
         'NetworkManager.conf' 
-        'disable_set_hostname.patch')
-md5sums=('968197dc881ffa36d45042214071baa6'
+        'disable_set_hostname.patch'
+        '0001-core-fix-failure-to-configure-routes-due-to-wrong-de.patch')
+md5sums=('a8f54460a4708efd840358f32d0968fd'
          '1653159d6634fb62d3a5c548b7a56151'
-         '6b5415350c04304a28d29294441a07ae')
+         '6b5415350c04304a28d29294441a07ae'
+         'd1980347fcbd1f13fa348dbb6e3afa9e')
 
 prepare() {
   cd $_pkgname-$pkgver
+  patch -Np1 -i ../0001-core-fix-failure-to-configure-routes-due-to-wrong-de.patch
   patch -Np1 -i ../disable_set_hostname.patch
 }
 
