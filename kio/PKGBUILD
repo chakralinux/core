@@ -3,22 +3,22 @@ source ../frameworks.conf
 
 pkgname=kio
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Resource and network access abstraction'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kio'
 license=('LGPL')
 depends=('solid' 'karchive' 'kjobwidgets' 'kbookmarks' 'libxslt' 'kwallet'
-        'desktop-file-utils' 'krb5' 'acl' 'python3')
+        'desktop-file-utils' 'krb5' 'acl')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools')
 checkdepends=('xorg-server-xvfb' 'openbox')
 groups=('kf5')
 install=kio.install
 options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
-        'kurlnavigator.diff')
+        'kurlnavigator.diff::https://quickgit.kde.org/?p=kio.git&a=commitdiff&h=d34b37b6831429f7a48edec7de77cb88524b3784&hp=da70a9c7fee17a304526aad60be749e5701dea95&o=plain')
 sha256sums=( $(getSum ${pkgname}) 
-            '0f8175caaa4d27e8ab0bb8c6c00c06969e0673c23e72cede1b8dabb654e6a2b5')
+            '471960f1ae08474f539f015dfe468e47016e8f25f169621dd45fd7e7e5c2e8ff')
 
 prepare() {
   mkdir -p build
