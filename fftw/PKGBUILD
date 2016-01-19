@@ -1,21 +1,18 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/fftw
 
 pkgname=fftw
-pkgver=3.3.2
+pkgver=3.3.4
 pkgrel=1
 pkgdesc="A library for computing the discrete Fourier transform (DFT)"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL2')
 url="http://www.fftw.org/"
-depends=('glibc' 'bash')
+depends=('gcc-libs' 'bash')
 makedepends=('gcc-fortran')
 options=('!libtool')
 source=(http://www.fftw.org/${pkgname}-${pkgver}.tar.gz)
 install=fftw.install
-md5sums=('6977ee770ed68c85698c7168ffa6e178')
+sha1sums=('fd508bac8ac13b3a46152c54b7ac885b69734262')
 
 # notes:
 # http://www.fftw.org/fftw2_doc/fftw_6.html#SEC69
@@ -23,27 +20,43 @@ md5sums=('6977ee770ed68c85698c7168ffa6e178')
 # http://www.fftw.org/fftw3_doc/Precision.html#Precision
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${srcdir}
   
+  cp -a ${pkgname}-${pkgver} ${pkgname}-${pkgver}-double
+  cp -a ${pkgname}-${pkgver} ${pkgname}-${pkgver}-long-double
+  mv ${pkgname}-${pkgver} ${pkgname}-${pkgver}-single
+  
+
+  # use upstream default CFLAGS while keeping our -march/-mtune
   CFLAGS+=" -O3 -fomit-frame-pointer -malign-double -fstrict-aliasing -ffast-math"
 
   CONFIGURE="./configure F77=gfortran --prefix=/usr \
-                 --enable-shared --enable-threads --enable-type-prefix"
+                 --enable-shared --enable-threads \
+		 --enable-openmp"
 
-  # build & install double precision
-  $CONFIGURE --enable-sse2
+  # build double precision
+  cd ${srcdir}/${pkgname}-${pkgver}-double
+  $CONFIGURE --enable-sse2 --enable-avx
   make
-  make DESTDIR=${pkgdir} install
-  make clean 
 
   # build & install long double precission
+  cd ${srcdir}/${pkgname}-${pkgver}-long-double
   $CONFIGURE --enable-long-double
   make
-  make DESTDIR=${pkgdir} install
-  make clean
 
   # build & install single precision
-  $CONFIGURE --enable-float --enable-sse
+  cd ${srcdir}/${pkgname}-${pkgver}-single
+  $CONFIGURE --enable-float --enable-sse --enable-avx
   make
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}-double
   make DESTDIR=${pkgdir} install
+
+  cd ${srcdir}/${pkgname}-${pkgver}-long-double
+  make DESTDIR=${pkgdir} install
+
+  cd ${srcdir}/${pkgname}-${pkgver}-single
+  make DESTDIR=${pkgdir} install  
 }
