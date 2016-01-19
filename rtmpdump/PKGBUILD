@@ -1,28 +1,35 @@
-#
-# Chakra Packages for Chakra, part of chakraos.org
-#
-# maintainer almack
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/rtmpdump
 
 pkgname=rtmpdump
-pkgver=2.4.20140706
+pkgver=2.4.r96.fa8646d
 pkgrel=1
+epoch=1
+commit=fa8646d
 pkgdesc="A tool to download rtmp streams"
 arch=('x86_64')
 url="http://rtmpdump.mplayerhq.hu/"
 license=('GPL2' 'LGPL2.1')
-depends=('openssl')
+depends=('openssl' 'glibc' 'zlib')
 categories=('network')
-#source=("http://rtmpdump.mplayerhq.hu/download/${pkgname}-${pkgver}.tar.gz")
-source=(git://git.ffmpeg.org/rtmpdump#commit=a1900c3)
+source=("git://git.ffmpeg.org/rtmpdump#commit=${commit}")
 md5sums=('SKIP')
 
 build() {
-  cd "${srcdir}/${pkgname}"  
-  make
+  cd rtmpdump
+
+  make \
+    OPT="$CFLAGS" \
+    XLDFLAGS="$LDFLAGS"
 }
 
 package() {
-  cd "${srcdir}/${pkgname}"
+  cd rtmpdump
+
   install -d -m755 "${pkgdir}/usr/lib"
-  make prefix=/usr mandir=/usr/share/man DESTDIR="${pkgdir}" install
+  make \
+    prefix='/usr' \
+    sbindir='/usr/bin' \
+    mandir='/usr/share/man' \
+    DESTDIR="${pkgdir}" \
+    install
 }
