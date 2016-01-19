@@ -1,26 +1,38 @@
-# $Id: PKGBUILD 27494 2009-02-22 04:26:47Z eric $
-# Maintainer: Eric Belanger <eric@archlinux.org>
-# Contributor: Sarah Hay <sarah@archlinux.org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/faad2
 
 pkgname=faad2
 pkgver=2.7
-pkgrel=1
+pkgrel=2
 pkgdesc="ISO AAC audio decoder"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.audiocoding.com/"
-license=('custom:GPL')
+license=('GPL')
 depends=('glibc')
-options=('!libtool' '!makeflags')
-source=(http://downloads.sourceforge.net/sourceforge/faac/${pkgname}-${pkgver}.tar.bz2 LICENSE)
-md5sums=('4c332fa23febc0e4648064685a3d4332' 'ec95f38142e14fb46c849503897a37a0')
-sha1sums=('b0e80481d27ae9faf9e46c8c8dfb617a0adb91b5' '00edd9b30d8d5098b5e91c03c595d96a3bbe56fd')
+options=('!makeflags')
+source=(http://downloads.sourceforge.net/sourceforge/faac/${pkgname}-${pkgver}.tar.bz2
+        libmp4ff-install-mp4ff_int_types_h.patch
+	libmp4ff-shared-lib.patch
+	man1_MANS.patch)
+sha1sums=('b0e80481d27ae9faf9e46c8c8dfb617a0adb91b5'
+          '970fe01640f5543f7926884b2b4003a9f6dbd61a'
+          'b3932d8adc08927cab7bdc6a8c6ed0c3beee211f'
+          'a8d9b3487803a484494a39ca166c61130dfd3df6')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  patch -p1 -i "${srcdir}/libmp4ff-shared-lib.patch"
+  patch -p0 -i "${srcdir}/libmp4ff-install-mp4ff_int_types_h.patch"
+  patch -p1 -i "${srcdir}/man1_MANS.patch"
+  autoreconf --force --install
+}
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  ./configure --prefix=/usr || return 1
-  make CFLAGS="${CFLAGS} -fPIC" || return 1
-  make DESTDIR=${pkgdir} manmdir=/usr/share/man/man1 install || return 1
-  install -m644 common/mp4ff/mp4ff_int_types.h ${pkgdir}/usr/include/mp4ff_int_types.h || return 1
-  install -D -m644 ${srcdir}/LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE || return 1
-  mv ${pkgdir}/usr/share/man/man1/faad.man ${pkgdir}/usr/share/man/man1/faad.1
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+  make CFLAGS="${CFLAGS} -fPIC"
+}
+
+package() {
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
 }
