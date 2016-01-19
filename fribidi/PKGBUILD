@@ -1,23 +1,24 @@
-# $Id: PKGBUILD 68036 2010-02-10 15:06:49Z giovanni $
-# Maintainer: Giovanni Scafora <giovanni@archlinux.org>
-# Contributor: Nezmer <Nezmer@gmail.com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/fribidi
 
 pkgname=fribidi
-pkgver=0.19.5
+pkgver=0.19.7
 pkgrel=1
 pkgdesc="A Free Implementation of the Unicode Bidirectional Algorithm"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('LGPL')
 url="http://fribidi.org"
 depends=('glibc')
 options=('!libtool')
 source=(http://fribidi.org/download/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('925bafb97afee8a2fc2d0470c072a155')
+md5sums=('6c7e7cfdd39c908f7ac619351c1c5c23')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-
   ./configure --prefix=/usr
-  make || return 1
-  make DESTDIR="${pkgdir}" install || return 1
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
 }
