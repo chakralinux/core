@@ -1,10 +1,8 @@
-#
-# Platform Packages for Chakra, part of chakraos.org
-#
-# maintainer almack
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/v4l-utils
 
 pkgname=v4l-utils
-pkgver=1.6.0
+# Caution: This package has a lib32 alternative, make sure to update that one as well
+pkgver=1.8.1
 pkgrel=1
 pkgdesc="Userspace tools and conversion library for Video 4 Linux"
 arch=('x86_64')
@@ -17,12 +15,12 @@ makedepends=('qt')
 optdepends=('qt')
 depends=('glibc' 'gcc-libs' 'sysfsutils' 'libjpeg-turbo')
 source=(http://linuxtv.org/downloads/v4l-utils/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('921dab41b8d950fb7d1412e39f48703e')
+md5sums=('f86d0938e46fde821dc10d4d2f6636e4')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr --sysconfdir=/etc
+  ./configure --prefix=/usr --sysconfdir=/etc --sbindir=/usr/bin
   make
 }
 
