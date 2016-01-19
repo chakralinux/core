@@ -1,11 +1,8 @@
-#
-# Chakra Packages for Chakra, part of chakraos.org
-#
-# Maintainer: Fabian Kosmale <0inkane@googlemail.com>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/openjpeg
 
 pkgname=openjpeg
 pkgver=1.5.2
-pkgrel=1
+pkgrel=2
 pkgdesc="An open source JPEG 2000 codec"
 arch=('x86_64')
 license=('BSD')
@@ -25,7 +22,7 @@ build() {
   # thus we pass --disable-silent-rules to configure
   rm -rf thirdparty
   ./configure --prefix=/usr \
-        --disable-static --disable-silent-rules
+        --enable-shared --disable-static --disable-silent-rules
   make
 }
 
