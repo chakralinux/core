@@ -1,8 +1,8 @@
-# Maintainer: abveritas@chakra-project.org
+# Contributions from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/normalize
 
 pkgname=normalize
 pkgver=0.7.7
-pkgrel=11
+pkgrel=12
 pkgdesc="A tool for adjusting the volume of WAV files to a standard level"
 arch=('x86_64')
 url="http://normalize.nongnu.org"
@@ -23,10 +23,10 @@ build() {
   patch -p0 -i "${srcdir}/normalize-0.7.7-m4.patch"
 
   touch AUTHORS NEWS ChangeLog
-  libtoolize --force --copy
-  aclocal -I m4
-  autoreconf
-  automake --add-missing
+  #libtoolize --force --copy
+  #aclocal -I m4
+  autoreconf -vi
+  #automake --add-missing
 
   ./configure --prefix=/usr \
               --mandir=/usr/share/man \
