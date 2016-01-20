@@ -3,14 +3,13 @@
 
 pkgname=frei0r-plugins
 pkgver=1.4
-pkgrel=4
+pkgrel=5
 pkgdesc="frei0r is a minimalistic plugin API for video sources and filters."
 arch=('x86_64')
-url="http://www.piksel.org/frei0r"
+url="http://frei0r.dyne.org/"
 license=('GPL')
-depends=('gcc-libs' 'gavl' 'opencv')
+depends=('gavl')
 makedepends=('doxygen')
-options=('!emptydirs')
 source=(https://distfiles.macports.org/frei0r-plugins/frei0r-plugins-1.4.tar.gz
         as-needed.patch)
 md5sums=('202375d1bcb545c1b6eb8f34e0260ec5'
@@ -19,17 +18,23 @@ md5sums=('202375d1bcb545c1b6eb8f34e0260ec5'
 prepare() {
   cd "$srcdir/$pkgname-$pkgver"
   patch -Np0 -i ../as-needed.patch
+  [[ -e build ]] && rm -rf build
+  mkdir build
 }
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/$pkgname-$pkgver"/build
   
-  ./configure --prefix=/usr 
+  #./configure --prefix=/usr 
+  export CXXFLAGS="${CXXFLAGS} -std=gnu++11"
+  cmake -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DWITHOUT_OPENCV=ON ..
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/$pkgname-$pkgver"/build
   
   make DESTDIR="$pkgdir" install 
 }
