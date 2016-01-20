@@ -1,36 +1,47 @@
-# Maintainer: abveritas@chakra-project.org
-
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sox
 
 pkgname=sox
-pkgver=14.4.1
-pkgrel=3
+pkgver=14.4.2
+pkgrel=1
 pkgdesc="The Swiss Army knife of sound processing tools"
 arch=('x86_64')
 url="http://sox.sourceforge.net/"
 license=('GPL' 'LGPL')
-depends=('libltdl' 'file' 'libsndfile' 'libpng' 'lame' 'opencore-amr' 'gsm' 'pulseaudio')
-makedepends=('ffmpeg' 'libao' 'libmad' 'libid3tag' 'wavpack')
+depends=('libltdl' 'file' 'libsndfile' 'libpng' 'lame' 'opencore-amr' 'gsm')
+makedepends=('libao' 'libmad' 'libid3tag' 'wavpack' 'libpulse' 'opusfile')
 optdepends=('libao: for ao plugin'
             'ffmpeg: for ffmpeg plugin'
             'libmad: for mp3 plugin'
             'libid3tag: for mp3 plugin'
-            'wavpack: for wavpack plugin')
-options=('!libtool')
-source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('ff9ca6aca972549de0e80e8e30ed379c')
+            'wavpack: for wavpack plugin'
+            'libpulse: for pulse plugin'
+	    'opusfile: for opus plugin')
+source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
+        'sox-dynamic.patch')
+sha1sums=('dc9668256b9d81ef25d672f14f12ec026b0b4087'
+          'fdd5face119b2590fd459172293a05c1cd187b7b')
+          
+prepare() {
+  cd ${pkgname}-${pkgver}
+  sed -i 's|man1/sox.1 soxeffect.7|man1/sox.1.gz soxeffect.7.gz|' Makefile.in
+  patch -p1 -i "${srcdir}/sox-dynamic.patch"
+  aclocal
+  automake
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr --sysconfdir=/etc \
+    --with-dyn-default --with-distro="Chakra"
+  make
+}
 
-  sed -i 's|man1/sox.1 soxeffect.7|man1/sox.1.gz soxeffect.7.gz|' Makefile.am
-  ./configure --prefix=/usr \
-    --sysconfdir=/etc \
-    --with-dyn-default \
-    --with-distro="Chakra-Linux" 
-  make 
+check() {
+  cd ${pkgname}-${pkgver}
+  make bindir=. installcheck
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
 }
