@@ -1,23 +1,21 @@
-# Maintainer: almack@chakraos.org
+# Contributions from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/portaudio
 
 pkgname=portaudio
 pkgver=19_20140130
-pkgrel=1
+pkgrel=2
 pkgdesc="PortAudio is a free, cross platform, open-source, audio I/O library."
 arch=('x86_64')
 url="http://www.portaudio.com"
 license="custom"
 depends=('gcc-libs' 'jack')
-conflicts=('portaudio-svn')
-provides=('portaudio-svn')
-replaces=('portaudio-svn')
+options=('!makeflags')
 source=("http://www.portaudio.com/archives/pa_stable_v$pkgver.tgz")
 md5sums=('7f220406902af9dca009668e198cbd23')
 
 build() {
   cd "$srcdir/$pkgname"
 
-  ./configure --prefix=/usr --with-alsa --with-jack
+  ./configure --prefix=/usr --with-alsa --with-jack --enable-cxx
   make
 }
 
