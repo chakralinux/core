@@ -1,24 +1,18 @@
-#
-# Platform Packages for Chakra, part of chakraos.org
-#
-# maintainer (x86_64): AlmAck
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/taglib
 
 pkgname=taglib
-pkgver=1.9.1
+pkgver=1.10
 pkgrel=1
 pkgdesc="A Library for reading and editing the meta-data of several popular audio formats"
 arch=('x86_64')
-url="http://developer.kde.org/~wheeler/taglib.html"
-license=('GPL2')
-depends=('sh' 'zlib' 'gcc-libs')
-makedepends=('cmake' 'pkg-config')
+url="http://taglib.github.io/"
+license=('LGPL' 'MPL')
+depends=('zlib')
+makedepends=('cmake')
 source=("http://${pkgname}.github.io/releases/${pkgname}-${pkgver}.tar.gz")
-md5sums=('0d35df96822bbd564c5504cb3c2e4d86')
+md5sums=('5b4441a15423b046dd92a096e09ea22c')
 
 build() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
-
-  cd "${srcdir}"
   mkdir build
   cd build
   cmake ../${pkgname}-${pkgver} \
