@@ -1,21 +1,21 @@
-# Maintainer: <abveritas[at]chakra-project[dot]org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/speech-dispatcher
 
 pkgname=speech-dispatcher
-pkgver=0.8
-pkgrel=4
+pkgver=0.8.3
+pkgrel=1
 arch=('x86_64')
 url="http://www.freebsoft.org/speechd"
 pkgdesc="High-level device independent layer for speech synthesis interface"
 license=('GPL2' 'FDL')
-depends=('glib2' 'libltdl' 'dotconf' 'texinfo' 'pulseaudio' 'python3-xdg')
+depends=('libltdl' 'dotconf' 'libpulse' 'python3-xdg' 'pulseaudio')
 makedepends=('intltool' 'espeak')
-optdepends=('espeak: Speech output using ESpeak.')
+optdepends=('espeak: Speech output using ESpeak')
 provides=("speechd=$pkgver")
 replaces=('opentts')
 source=("http://www.freebsoft.org/pub/projects/speechd/$pkgname-$pkgver.tar.gz"
         'speech-dispatcherd.service')
-install="speech-dispatcher.install"
-md5sums=('d88691a64c676122f996230c107c392f'
+install="${pkgname}.install"
+md5sums=('d17b041fa3c87cb1b73ac6e95b80d276'
          'db4690d8f8aaab7be415bdf27d838768')
 backup=(etc/speech-dispatcher/clients/emacs.conf
 	etc/speech-dispatcher/modules/ibmtts.conf
@@ -31,19 +31,33 @@ backup=(etc/speech-dispatcher/clients/emacs.conf
 	etc/speech-dispatcher/modules/flite.conf
 	etc/speech-dispatcher/speechd.conf)
 
+	
+prepare() {
+  cd ${pkgname}-${pkgver}
+
+  # Disabled due to bug: https://bugs.archlinux.org/task/35700
+  sed -i "s/cicero //g" configure.ac
+  sed -i "s/sd_cicero//g" src/modules/Makefile.am
+}
+
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${pkgname}-${pkgver}"
   
+  autoreconf -i
   ./configure --prefix=/usr \
+    --enable-shared \
     --sysconfdir=/etc \
     --without-flite
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${pkgname}-${pkgver}"
   make DESTDIR=${pkgdir} install
 
   install -Dm644 "${srcdir}/speech-dispatcherd.service" "${pkgdir}/usr/lib/systemd/system/speech-dispatcherd.service"
   install -d "${pkgdir}/var/log/speech-dispatcher"
+  
+  sed -i 's|includedir=.*|includedir=${prefix}/include/speech-dispatcher|g' "${pkgdir}/usr/lib/pkgconfig/speech-dispatcher.pc"
+
 }
