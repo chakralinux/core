@@ -1,8 +1,6 @@
-# Maintainer: almack
-
 pkgname=xine-lib
 pkgver=1.2.6
-pkgrel=2
+pkgrel=3
 pkgdesc="A multimedia playback engine"
 arch=('x86_64')
 url="http://www.xine-project.org"
@@ -10,7 +8,7 @@ license=('LGPL' 'GPL')
 depends=('libxvmc' 'ffmpeg' 'libxinerama' 'pulseaudio')
 makedepends=('wavpack' 'faad2' 'libmng' 'imagemagick' 'glu' 'libmodplug'
              'vcdimager' 'jack' 'aalib' 'libdca' 'a52dec' 'libmad'
-             'libmpcdec' 'libcaca' 'libbluray' 'libvdpau')
+             'libmpcdec' 'libcaca' 'libbluray' 'libvdpau' 'libdvdnav')
 optdepends=('imagemagick: for using the imagemagick plugin'
             'jack: for using the jack plugin'
             'vcdimager: for using the vcd plugin'
@@ -36,6 +34,7 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr \
               --with-wavpack \
+              --with-external-dvdnav \
               --enable-vdpau \
               --disable-optimizations \
               --disable-gnomevfs
