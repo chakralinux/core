@@ -2,17 +2,17 @@
 
 pkgname=twolame
 pkgver=0.3.13
-pkgrel=1
+pkgrel=2
 pkgdesc="An optimized MPEG Audio Layer 2 (MP2) encoder"
 arch=('x86_64')
 url="http://www.twolame.org/"
 license=('LGPL')
 depends=('libsndfile')
 source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-sha512sums=('241ae5faebf05cb919959bb0545cb89e9b71cfb07f92a7118d864499ea4f0065ddaa646ab1482ffbcbca427d52c2436764074bd67fd19a1eb9979987f23163f7')
+md5sums=('4113d8aa80194459b45b83d4dbde8ddb')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
 
   ./configure --prefix=/usr \
               --disable-static
@@ -20,7 +20,7 @@ build() {
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
 
   make DESTDIR=${pkgdir} install
 }
