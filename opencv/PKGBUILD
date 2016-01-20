@@ -1,82 +1,38 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer franzmari@chakra-project.it
-
 pkgbase=opencv
 pkgname=('opencv' 'opencv-samples')
-pkgver=2.4.10
-pkgrel=2
+pkgver=3.1.0
+pkgrel=1
 pkgdesc="Open Source Computer Vision Library"
 arch=('x86_64')
 license=('BSD')
-url="http://opencv.willowgarage.com/"
-depends=('gst-plugins-base' 'intel-tbb' 'libcl' 
-         'xine-lib' 'libdc1394' 'openexr' 'v4l-utils' 'ffmpeg' 'qt' 'glu')
-makedepends=('pkgconfig' 'cmake' 'python2-numpy' 'eigen2' 'mesa')
+url="http://opencv.org"
+depends=('gst-plugins-base' 'intel-tbb' 'libcl' 'libgphoto2'
+         'xine-lib' 'libdc1394' 'openexr' 'v4l-utils' 'ffmpeg' 'qt5-base' 'glu')
+makedepends=('pkgconfig' 'cmake' 'python2-numpy' 'mesa' 'python3-numpy' 'eigen3')
 optdepends=('python2-numpy: Python 2.x interface'
-            'eigen2')
-_patchver=053e3d73adc3de04632b6c23b2e0e1668a05ca7e
-source=("http://downloads.sourceforge.net/opencvlibrary/$pkgname-$pkgver.zip"
-        #"0550-bomb-commit-of-gstreamer-videocapture-and-videowrite.patch::http://pkgs.fedoraproject.org/cgit/opencv.git/plain/0550-bomb-commit-of-gstreamer-videocapture-and-videowrite.patch?id=${_patchver}"
-        #"0552-eliminated-warnings.patch::http://pkgs.fedoraproject.org/cgit/opencv.git/plain/0552-eliminated-warnings.patch?id=${_patchver}"
-        #"0587-Fix-build-with-gstreamer-0.10.28.patch::http://pkgs.fedoraproject.org/cgit/opencv.git/plain/0587-Fix-build-with-gstreamer-0.10.28.patch?id=${_patchver}"
-        #"0865-gstreamer-cleaning-up-resources.patch::http://pkgs.fedoraproject.org/cgit/opencv.git/plain/0865-gstreamer-cleaning-up-resources.patch?id=${_patchver}"
-        #"0871-allow-for-arbitraty-number-of-sources-and-sinks.patch::http://pkgs.fedoraproject.org/cgit/opencv.git/plain/0871-allow-for-arbitraty-number-of-sources-and-sinks.patch?id=${_patchver}"
-        'pkgconfig.patch'
-        'fsh.patch'
-        'x86_asmfix.patch')
-sha1sums=('0b185f5e332d5feef91722a6ed68c36a6d33909e'
-          #'ee6c16fbda3d4593ecfb7658ec950e9fc8a05b4e'
-          #'5a9a7ae32566dd343fb11d796c5d17421a40a8d1'
-          #'a3aa0c9cbb7ee2bb8d731d3b04f02f9acf645a08'
-          #'a3f387d99bb460496525e5ad46c7ee014e4be651'
-          #'2e851c53ba8881ae0db4c5d12a534212cab09f76'
-          'c5202144d24671cbee411207d65b4ea05747b0f4'
-          'e39a8f3f39298b2dcca604af95dee3e13689a55a'
-          'a80ea655bcfe6b1ff18110f60448dc7b1f933f9d')
-
+            'python3-numpy: Python 3.x interface'
+            'eigen3')
+source=("https://github.com/Itseez/opencv/archive/${pkgver}.zip")
+sha1sums=('8c932b68fe2e1575e88dde759ab1ed1d53d6f41b')
 _cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
             '-D CMAKE_INSTALL_PREFIX=/usr'
             '-D CMAKE_SKIP_RPATH=ON'
+            '-D BUILD_SHARED_LIBS=ON'
             '-D BUILD_TESTS=OFF'
             '-D BUILD_EXAMPLES=ON'
             '-D INSTALL_C_EXAMPLES=ON'
             '-D INSTALL_PYTHON_EXAMPLES=ON'
             '-D WITH_XINE=ON'
             '-D WITH_OPENGL=ON'
-            '-D WITH_QT=4'
+            '-D WITH_OPENCL=ON'
+            '-D WITH_QT=5'
             '-D WITH_GTK=OFF'
-            '-D WITH_GSTREAMER_1_X=ON'
-            '-D ENABLE_SSE3=OFF'
+            '-D WITH_GSTREAMER=ON'
+            '-D ENABLE_SSE3=ON'
+            '-D ENABLE_SSSE3=ON'
+            '-D ENABLE_SSE41=ON'
+            '-D ENABLE_SSE42=ON'
             '-D ENABLE_FAST_MATH=ON')
-
-prepare() {
-  cd "$srcdir/$pkgname-$pkgver"
-
-  sed -i 's|HAVE_OPENCV_HIGHGUI|HAVE_NO_OPENCV_HIGHGUI|g' modules/objdetect/src/precomp.hpp
-  sed -i 's|HAVE_OPENCV_HIGHGUI|HAVE_NO_OPENCV_HIGHGUI|g' modules/objdetect/src/latentsvm.cpp
-
-  msg2 "Applying backported fix for x86 ASM breakage"
-  # see https://github.com/Itseez/opencv/pull/3331
-  patch -Np1 -i "$srcdir/x86_asmfix.patch"
-  
-  msg2 "Fixing broken pkg-config (downstream)"
-  # fix pkg-config mess
-  # see https://bugs.archlinux.org/task/32430
-  # and http://code.opencv.org/issues/1925
-  patch -Np1 -i "$srcdir/pkgconfig.patch"
-
-  # fix another upstream mess that they won't fix
-  # see http://code.opencv.org/issues/2512
-  #patch -Np1 -i "$srcdir/fsh.patch"
-
-  #patch -Np1 -i ../0550-bomb-commit-of-gstreamer-videocapture-and-videowrite.patch
-  #patch -Np1 -i ../0552-eliminated-warnings.patch
-  #patch -Np1 -i ../0587-Fix-build-with-gstreamer-0.10.28.patch
-  #patch -Np1 -i ../0865-gstreamer-cleaning-up-resources.patch
-  #patch -Np1 -i ../0871-allow-for-arbitraty-number-of-sources-and-sinks.patch
-}
 
 build() {
   cd "$srcdir/$pkgbase-$pkgver"
@@ -87,11 +43,6 @@ build() {
 }
 
 package_opencv() {
-  replaces=('opencv-docs')
-  conflicts=('opencv-docs')
-  provides=('opencv-docs')
-  options=('staticlibs')
-
   cd "$srcdir/$pkgbase-$pkgver"
 
   make DESTDIR="$pkgdir" install
