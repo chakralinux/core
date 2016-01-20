@@ -1,22 +1,25 @@
-#
-# Platform Packages for Chakra, part of chakraos.org
-#
-# maintainer (x86_64): AlmAck
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/taglib-extras
 
 pkgname=taglib-extras
 pkgver=1.0.1
-pkgrel=3
+pkgrel=4
 pkgdesc="Additional taglib plugins for KDE"
 arch=('x86_64')
 url="http://developer.kde.org/~wheeler/taglib.html"
 license=('LGPL')
 depends=('taglib')
 makedepends=('pkgconfig' 'cmake' 'automoc4')
-source=("ftp://ftp.archlinux.org/other/packages/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('e973ca609b18e2c03c147ff9fd9e6eb8')
+source=("http://download.kde.org/stable/$pkgname/$pkgver/src/$pkgname-$pkgver.tar.gz"
+        'taglib-1.10.patch')
+md5sums=('e973ca609b18e2c03c147ff9fd9e6eb8'
+         'b24f1ac96f3eca2db0d75188ea3a659b')
 
 prepare() {
-  mkdir build
+  mkdir -p build
+
+# Fix taglib 1.10 detection
+  cd $pkgname-$pkgver
+  patch -p1 -i ../taglib-1.10.patch
 }
 
 build() {
