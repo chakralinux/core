@@ -2,40 +2,31 @@
 # Maintainer: abveritas[at]chakra-project[dot]org>
 
 pkgname=frei0r-plugins
-pkgver=1.4
-pkgrel=5
-pkgdesc="frei0r is a minimalistic plugin API for video sources and filters."
+pkgver=1.4.r41.g954fbe3
+pkgrel=1
+pkgdesc="A minimalistic plugin API for video sources and filters"
 arch=('x86_64')
-url="http://frei0r.dyne.org/"
+url="http://www.piksel.org/frei0r"
 license=('GPL')
-depends=('gavl')
+depends=('gcc-libs' 'gavl>=1.0.0' 'opencv>=2.4.3')
 makedepends=('doxygen')
-source=(https://distfiles.macports.org/frei0r-plugins/frei0r-plugins-1.4.tar.gz
-        as-needed.patch)
-md5sums=('202375d1bcb545c1b6eb8f34e0260ec5'
-         '49bab3a8700da8d8ffb6369423fa356d')
+options=('!emptydirs')
+source=('git://code.dyne.org/frei0r.git#commit=954fbe3e324e05f36aa1ae84f7fed4f87d6c9176')
+md5sums=('SKIP')
 
-prepare() {
-  cd "$srcdir/$pkgname-$pkgver"
-  patch -Np0 -i ../as-needed.patch
-  [[ -e build ]] && rm -rf build
-  mkdir build
+pkgver() {
+  cd "frei0r"
+  git describe --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g' | sed 's/v//g'
 }
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"/build
-  
-  #./configure --prefix=/usr 
-  export CXXFLAGS="${CXXFLAGS} -std=gnu++11"
-  cmake -DCMAKE_INSTALL_PREFIX=/usr \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DWITHOUT_OPENCV=ON ..
+  cd "$srcdir/frei0r"
+  NOCONFIGURE=1 ./autogen.sh
+  ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"/build
-  
-  make DESTDIR="$pkgdir" install 
+  cd "$srcdir/frei0r"
+  make DESTDIR="$pkgdir" install
 }
-
