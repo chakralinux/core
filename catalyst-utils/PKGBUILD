@@ -7,12 +7,15 @@ pkgname=('catalyst-utils' 'catalyst-libgl' 'opencl-catalyst')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 1x.x
 pkgver=15.9
 _amdver=15.201.1151
-pkgrel=2
+pkgrel=3
 pkgdesc="AMD/ATI Catalyst drivers utilities and libraries."
 arch=('x86_64')
 url="http://www.amd.com"
 license=('custom')
 options=('staticlibs' 'libtool' '!strip' '!upx')
+
+url_ref="http://support.amd.com/en-us/download/desktop?os=Linux+x86"
+DLAGENTS="http::/usr/bin/curl --referer ${url_ref} -o %o %u"
 
 source=(
     http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-installer-${_amdver}-x86.x86_64.zip
@@ -93,9 +96,7 @@ package_catalyst-libgl() {
 
 package_opencl-catalyst() {
       pkgdesc="AMD/ATI drivers. OpenCL implemention for AMD Catalyst"
-      provides=('libcl')
-      conflicts=('libcl')
-      depends=('gcc-libs')
+      depends=('gcc-libs' 'libcl')
       optdepends=('opencl-headers: headers necessary for OpenCL development')
       
       cd ${srcdir}/archive_files/arch/x86_64
@@ -105,11 +106,6 @@ package_opencl-catalyst() {
 
       install -m755 -d ${pkgdir}/usr/lib
       install -m755 usr/lib64/libamdocl*.so ${pkgdir}/usr/lib
-      install -m755 usr/lib64/libOpenCL.so.1 ${pkgdir}/usr/lib
-      ln -s libOpenCL.so.1 ${pkgdir}/usr/lib/libOpenCL.so
-
-      install -m755 -d ${pkgdir}/usr/bin
-      install -m755 usr/bin/clinfo ${pkgdir}/usr/bin
 
       # License
       install -m755 -d ${pkgdir}/usr/share/licenses
