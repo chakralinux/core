@@ -1,0 +1,57 @@
+From c2dd0bb2c7a0468abefb9556dead85456daa851f Mon Sep 17 00:00:00 2001
+From: Shawn Rutledge <shawn.rutledge@theqtcompany.com>
+Date: Fri, 4 Sep 2015 14:25:15 +0200
+Subject: [PATCH] xcb: don't crash in mapToNative/mapFromNative if the screen
+ is null
+
+The results will be wrong, but it only happens in rare cases anyway.
+
+Task-number: QTBUG-42985
+Task-number: QTBUG-47385
+Change-Id: I6438f219f175af2b118e6b3af16b5b626136defa
+---
+ src/plugins/platforms/xcb/qxcbwindow.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/plugins/platforms/xcb/qxcbwindow.cpp b/src/plugins/platforms/xcb/qxcbwindow.cpp
+index 4fdebe1..3b589d2 100644
+--- a/src/plugins/platforms/xcb/qxcbwindow.cpp
++++ b/src/plugins/platforms/xcb/qxcbwindow.cpp
+@@ -179,6 +179,8 @@ QXcbScreen *QXcbWindow::parentScreen()
+ 
+ QPoint QXcbWindow::mapToNative(const QPoint &pos, const QXcbScreen *screen) const
+ {
++    if (!screen)
++        return pos;
+     if (parent())
+         return pos * int(screen->devicePixelRatio());
+     else
+@@ -186,6 +188,8 @@ QPoint QXcbWindow::mapToNative(const QPoint &pos, const QXcbScreen *screen) cons
+ }
+ QPoint QXcbWindow::mapFromNative(const QPoint &pos, const QXcbScreen *screen) const
+ {
++    if (!screen)
++        return pos;
+     if (parent())
+         return pos / int(screen->devicePixelRatio());
+     else
+@@ -193,6 +197,8 @@ QPoint QXcbWindow::mapFromNative(const QPoint &pos, const QXcbScreen *screen) co
+ }
+ QRect QXcbWindow::mapToNative(const QRect &rect, const QXcbScreen *screen) const
+ {
++    if (!screen)
++        return rect;
+     if (parent())
+         return mapLocalGeometryToNative(rect, int(screen->devicePixelRatio()));
+     else
+@@ -200,6 +206,8 @@ QRect QXcbWindow::mapToNative(const QRect &rect, const QXcbScreen *screen) const
+ }
+ QRect QXcbWindow::mapFromNative(const QRect &rect, const QXcbScreen *screen) const
+ {
++    if (!screen)
++        return rect;
+     if (parent())
+         return mapLocalGeometryFromNative(rect, int(screen->devicePixelRatio()));
+     else
+-- 
+2.3.5

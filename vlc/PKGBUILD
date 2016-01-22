@@ -2,12 +2,12 @@
 
 pkgname=vlc
 pkgver=2.2.1
-pkgrel=10
+pkgrel=11
 pkgdesc="A multi-platform MPEG, VCD/DVD, and DivX player"
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
 license=('LGPL2.1' 'GPL2')
-depends=('a52dec' 'libdvbpsi' 'libxpm' 'libdca' 'qt4' 'libproxy'
+depends=('a52dec' 'libdvbpsi' 'libxpm' 'libdca' 'qt5-base' 'qt5-x11extras' 'libproxy'
          'sdl_image' 'libdvdnav' 'libtiger' 'lua' 'libmatroska'
          'zvbi' 'taglib' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp'
          'libshout' 'libmad' 'libmpeg2' 'xcb-util-keysyms' 'libtar'
@@ -16,7 +16,8 @@ makedepends=('live-media' 'libnotify' 'libbluray' 'flac'
              'libdc1394' 'libavc1394' 'lirc' 'libcaca'
              'librsvg' 'portaudio' 'libgme' 'xosd' 'projectm'
              'twolame' 'aalib' 'libmtp' 'libdvdcss'
-             'libgoom2' 'vcdimager' 'opus' 'libssh2' 'mesa')
+             'libgoom2' 'vcdimager' 'opus' 'libssh2' 'mesa'
+             'fluidsynth' 'chromaprint')
 optdepends=('avahi: for service discovery using bonjour protocol'
             'libnotify: for notification plugin'
             'ncurses: for ncurses interface support'
@@ -24,7 +25,6 @@ optdepends=('avahi: for service discovery using bonjour protocol'
             'lirc: for lirc plugin'
             'libavc1394: for devices using the 1394ta AV/C'
             'libdc1394: for IEEE 1394 plugin'
-            'kdelibs: KDE Solid hardware integration'
             'libva-vdpau-driver: vdpau back-end for nvidia'
             'libva-intel-driver: back-end for intel cards'
             'libbluray: for Blu-Ray support'
@@ -32,6 +32,8 @@ optdepends=('avahi: for service discovery using bonjour protocol'
             'portaudio: for portaudio support'
             'twolame: for TwoLAME mpeg2 encoder plugin'
             'projectm: for ProjectM visualisation plugin'
+            'fluidsynth: for fluidsynth plugin'
+            'chromaprint: for chromaprint plugin'
             'libcaca: for colored ASCII art video output'
             'libgme: for libgme plugin'
             'librsvg: for SVG plugin'
@@ -88,6 +90,9 @@ build() {
               --enable-upnp \
               --enable-opus \
               --enable-sftp \
+              --disable-opencv \
+              --disable-notify \
+              --with-kde-solid=/usr/share/solid/actions \
               --with-x
               LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`"
   make
