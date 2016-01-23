@@ -32,7 +32,7 @@ pkgname=('qt5-base'
          'qt5-x11extras'
          'qt5-xmlpatterns')
 pkgver=5.5.1
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -57,6 +57,8 @@ source=("http://download.qt-project.org/official_releases/qt/${pkgver%.*}/${pkgv
         'libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch'
         'xcb-dont-crash-in-mapToNativemapFromNative-if-the-screen-is-null.patch'
         'xcb-fix-yet-another-crash-when-screens-are-disconnected.patch'        
+        'xcb-glXGetCurrentDisplay-return-null-1.patch::https://github.com/qtproject/qtbase/commit/c8af3160d2514fb973a0d00d5bac324d4f7159f7.patch'
+        'xcb-glXGetCurrentDisplay-return-null-2.patch::https://github.com/qtproject/qtbase/commit/e8ad49d6cba6521f20b1b08bf65d92fc81c158e4.patch'
         # not yet upstream
         'libqt5-Fix-Gujarati-font.patch'
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
@@ -69,6 +71,7 @@ sha1sums=('5933651d46691ff6e919a49f5a380b9a217d30fb'
           'eb1fa717a650e95276bcd9f29b97fdb576c90337'
           '06e29fffec05e9eae0553a69cc0b8804c8fc537c'
           '27af3d679b8bd9fbb98d994b01f270dfa8c475ff'
+          '03222680790a8439ff58d82c8ddd465187f58cb0'
           'd5dc1de05f00fa9eabce400ef11e7932ed8af550'
           '0862a4a39b74d0e447181d7eca31580c9d580bc8'
           'b63cab2c86505b594e32b32ae43524090fcb7d29'
@@ -96,6 +99,8 @@ prepare() {
   patch -Np1 -i ../../libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch
   patch -Np1 -i ../../xcb-dont-crash-in-mapToNativemapFromNative-if-the-screen-is-null.patch
   patch -Np1 -i ../../xcb-fix-yet-another-crash-when-screens-are-disconnected.patch
+  patch -Np1 -i ../../xcb-glXGetCurrentDisplay-return-null-1.patch
+  patch -Np1 -i ../../xcb-glXGetCurrentDisplay-return-null-2.patch
   popd
 
   sed -i "s|-O2|${CXXFLAGS}|" qtbase/mkspecs/common/{g++,gcc}-base.conf
@@ -160,6 +165,8 @@ build() {
     -feature-textdate \
     -xkb-config-root $_xkbconfigroot \
     -system-xkbcommon \
+    -no-libproxy \
+    -gstreamer 1.0 \
     -feature-ftp \
     -xcursor
 
