@@ -7,7 +7,7 @@ pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs')
 _kernelname="-CHAKRA-LTS"
 _basekernel=3.14
 pkgver=3.14.57
-pkgrel=1
+pkgrel=2
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 arch=('x86_64')
 license=('GPL2')
@@ -19,12 +19,15 @@ source=("https://www.kernel.org/pub/linux/kernel/v3.x/linux-$_basekernel.tar.xz"
         'config.x86_64'
         # standard config files for mkinitcpio ramdisk
         'linux-lts.preset'
-        'change-default-console-loglevel.patch')
+        'change-default-console-loglevel.patch'
+        'CVE-2016-0728.patch')
 md5sums=('b621207b3f6ecbb67db18b13258f8ea8'
          '3d6b633d5c80988e9b107e0227b9383c'
          '9fd7a4e21d3f8f31fb5baa91c43937f7'
          '232b52576a62c7a333e9fe7a1e1ca359'
-         '98beb36f9b8cf16e58de2483ea9985e3')
+         '98beb36f9b8cf16e58de2483ea9985e3'
+         'c018da62d8f3a48e8a8985a1af43185d'
+)
 
 prepare() {
   cd ${srcdir}/linux-$_basekernel
@@ -32,6 +35,10 @@ prepare() {
   # add upstream patch
   patch -p1 -i "${srcdir}/patch-${pkgver}"
 
+  
+  # fixes #47820 CVE-2016-0728.patch
+  patch -Np1 -i "${srcdir}/CVE-2016-0728.patch"
+  
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
