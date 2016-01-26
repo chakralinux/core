@@ -1,7 +1,7 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/cups-filters
 
 pkgname=cups-filters
-pkgver=1.0.76
+pkgver=1.8.1
 pkgrel=1
 pkgdesc="OpenPrinting CUPS Filters"
 arch=('x86_64')
@@ -20,7 +20,7 @@ optdepends=('ghostscript: for non-PostScript printers to print with CUPS to conv
 backup=(etc/fonts/conf.d/99pdftoopvp.conf
         etc/cups/cups-browsed.conf)
 source=(http://www.openprinting.org/download/cups-filters/$pkgname-$pkgver.tar.xz)
-md5sums=('92e14b4f52a320c8d8b8176918bd4a8c')
+md5sums=('4c4a10b7cbc20f6f6ee5d05d7561399d')
 
 build() {
   cd $pkgname-$pkgver
@@ -47,7 +47,12 @@ package() {
   # add upstream systemd support file
   install -Dm644 utils/cups-browsed.service ${pkgdir}/usr/lib/systemd/system/cups-browsed.service
   sed -i "s|/usr/sbin/cups-browsed|/usr/bin/cups-browsed|" ${pkgdir}/usr/lib/systemd/system/cups-browsed.service
+  sed -i "s|cups.service|org.cups.cupsd.service|g" ${pkgdir}/usr/lib/systemd/system/cups-browsed.service
   
   # use lp group from cups pkg FS#36769
   chgrp -R lp ${pkgdir}/etc/cups
+
+  # license
+  mkdir -p "${pkgdir}"/usr/share/licenses/${pkgname}
+  install -m644 "${srcdir}"/${pkgname}-${pkgver}/COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/
 }
