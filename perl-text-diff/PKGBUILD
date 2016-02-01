@@ -1,25 +1,25 @@
 # Platform packages for Chakra
 
 pkgname=perl-text-diff
-_realname=Text-Diff
-pkgver=1.41
+_pkgname=Text-Diff
+pkgver=1.43
 pkgrel=1
 pkgdesc="Perform diffs on files and record sets "
-arch=('any')
-url="http://search.cpan.org/dist/${_realname}"
+arch=('x86_64')
+url="https://github.com/neilb/Text-Diff"
 license=('GPL' 'PerlArtistic')
-depends=('perl-algorithm-diff>=1.1900')
+depends=('perl-algorithm-diff')
 options=('!emptydirs')
-source=(http://www.cpan.org/authors/id/O/OV/OVID/${_realname}-${pkgver}.tar.gz) 
-md5sums=('30d56e6dd5551ca16b8e16cc7299dc21')
+source=(https://github.com/neilb/$_pkgname/archive/v$pkgver.tar.gz) 
+md5sums=('c2b5b6acf9adeeaef8e4b42e3e86f82f')
 
 build() {
-  cd $srcdir/${_realname}-${pkgver}
+  cd $_pkgname-$pkgver
   PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor  
   make 
 }
 package() {
-  cd $srcdir/${_realname}-${pkgver}
+  cd $_pkgname-$pkgver
   make install DESTDIR=$pkgdir 
   find $pkgdir -name '.packlist' -delete
   find $pkgdir -name '*.pod' -delete
