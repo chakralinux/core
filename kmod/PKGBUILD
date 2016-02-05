@@ -1,20 +1,25 @@
 # Maintainer: <inkane[at]chakra-project[dot]org>
 
 pkgname=kmod
-pkgver=19
+pkgver=22
 pkgrel=1
-pkgdesc="Linux kernel module handling"
+pkgdesc="Linux kernel module management tools and library"
 arch=('x86_64')
 url='http://git.kernel.org/?p=utils/kernel/kmod/kmod.git;a=summary'
 license=('GPL2')
 depends=('glibc' 'zlib' 'xz')
-provides=('module-init-tools=3.16')
+checkdepends=('linux-headers')
+options=('strip' 'debug')
+provides=('module-init-tools=3.16' 'libkmod.so')
 conflicts=('module-init-tools')
 replaces=('module-init-tools')
-source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/$pkgname/$pkgname-$pkgver.tar.xz"
+validpgpkeys=('EAB33C9690013C733916AC839BA2A5A630CBEA53')  # Lucas DeMarchi
+source=("ftp://ftp.kernel.org/pub/linux/utils/kernel/$pkgname/$pkgname-$pkgver.tar."{xz,sign}
         "depmod-search.conf")
-sha1sums=('f59f7dabe32cbf007bcc30731821d5f3ac9a5706'
-          '489b0ce0efd193aab70421a852526ed04dd026c4')
+md5sums=('4371b847f3fbfaa4e9aa890ad616748f'
+         'SKIP'
+         'dd62cbf62bd8f212f51ef8c43bec9a77')
+
 
 build() {
   cd "$pkgname-$pkgver"
@@ -28,7 +33,22 @@ build() {
 }
 
 check() {
-  make -C "$pkgname-$pkgver" check
+  # As of kmod v20, the test suite needs to build some kernel modules, and thus
+  # needs headers available in order to run. We depend on linux-headers, but
+  # this is really only to try and make sure that *some* useable tree of kernel
+  # headers exist. The first useable tree we find is good enough, as these
+  # modules will never be loaded by tests.
+
+  local kdirs=(/usr/lib/modules/*/build/Makefile)
+  if [[ ! -f ${kdirs[0]} ]]; then
+    printf '==> Unable to find kernel headers to build modules for tests\n' >&2
+    return 1
+  fi
+
+  local kver kdir=${kdirs[0]%/Makefile}
+  IFS=/ read _ _ _ kver _ <<<"$kdir"
+
+  make -C "$pkgname-$pkgver" check KDIR="$kdir" KVER="$kver"
 }
 
 package() {
