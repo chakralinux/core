@@ -1,27 +1,26 @@
+# Contributions of Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/xf86-video-intel
 # Part of X.org group
-# Maintainer AlmAck almack@chakraos.org
-# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
 pkgname=xf86-video-intel
-pkgver=2.99.917+478+gdf72bc5
+pkgver=2.99.917+544+g8b8c9a3
 pkgrel=1
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
 install=$pkgname.install
 pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
-depends=('mesa-dri' 'libxvmc' 'pixman' 'xcb-util>=0.3.9')
+depends=('mesa-dri' 'libxvmc' 'pixman' 'xcb-util')
 makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=19' 'libx11' 'libxrender'
              # additional deps for intel-virtual-output
-            'libxrandr' 'libxinerama' 'libxcursor' 'libxtst' 'git')
+            'libxrandr' 'libxinerama' 'libxcursor' 'libxtst' 'libxss' 'git')
 optdepends=('libxrandr: for intel-virtual-output'
             'libxinerama: for intel-virtual-output'
             'libxcursor: for intel-virtual-output'
             'libxtst: for intel-virtual-output')
-conflicts=('xorg-server<1.16' 'X-ABI-VIDEODRV_VERSION<19' 'X-ABI-VIDEODRV_VERSION>=20')
+conflicts=('X-ABI-VIDEODRV_VERSION<19' 'X-ABI-VIDEODRV_VERSION>=20')
 groups=('xorg-drivers' 'xorg')
 source=(${url}/archive/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-source=('git://anongit.freedesktop.org/xorg/driver/xf86-video-intel#commit=df72bc5')
+source=('git://anongit.freedesktop.org/xorg/driver/xf86-video-intel#commit=8b8c9a3')
 sha256sums=('SKIP')
 
 pkgver() {
