@@ -2,7 +2,7 @@
 
 pkgname=vlc
 pkgver=2.2.1
-pkgrel=10
+pkgrel=11
 pkgdesc="A multi-platform MPEG, VCD/DVD, and DivX player"
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
@@ -15,17 +15,16 @@ depends=('a52dec' 'libdvbpsi' 'libxpm' 'libdca' 'qt5-base' 'qt5-x11extras' 'libp
 makedepends=('live-media' 'libnotify' 'libbluray' 'flac'
              'libdc1394' 'libavc1394' 'lirc' 'libcaca'
              'librsvg' 'portaudio' 'libgme' 'xosd' 'projectm'
-             'twolame' 'aalib' 'libmtp' 'libdvdcss' 'qt4'
-             'libgoom2' 'vcdimager' 'opus' 'libssh2' 'mesa')
+             'twolame' 'aalib' 'libmtp' 'libdvdcss'
+             'libgoom2' 'vcdimager' 'opus' 'libssh2' 'mesa'
+             'fluidsynth' 'chromaprint')
 optdepends=('avahi: for service discovery using bonjour protocol'
             'libnotify: for notification plugin'
-            'gtk2: for notify plugin'
             'ncurses: for ncurses interface support'
             'libdvdcss: for decoding encrypted DVDs'
             'lirc: for lirc plugin'
             'libavc1394: for devices using the 1394ta AV/C'
             'libdc1394: for IEEE 1394 plugin'
-            'kdelibs: KDE Solid hardware integration'
             'libva-vdpau-driver: vdpau back-end for nvidia'
             'libva-intel-driver: back-end for intel cards'
             'libbluray: for Blu-Ray support'
@@ -33,10 +32,11 @@ optdepends=('avahi: for service discovery using bonjour protocol'
             'portaudio: for portaudio support'
             'twolame: for TwoLAME mpeg2 encoder plugin'
             'projectm: for ProjectM visualisation plugin'
+            'fluidsynth: for fluidsynth plugin'
+            'chromaprint: for chromaprint plugin'
             'libcaca: for colored ASCII art video output'
             'libgme: for libgme plugin'
             'librsvg: for SVG plugin'
-            'gnome-vfs: for GNOME Virtual File System support'
             'libgoom2: for libgoom plugin'
             'vcdimager: navigate VCD with libvcdinfo'
             'aalib: for ASCII art plugin'
@@ -90,6 +90,9 @@ build() {
               --enable-upnp \
               --enable-opus \
               --enable-sftp \
+              --disable-opencv \
+              --disable-notify \
+              --with-kde-solid=/usr/share/solid/actions \
               --with-x
               LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`"
   make
