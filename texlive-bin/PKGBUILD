@@ -1,35 +1,27 @@
-#
-# Platform Packages for Chakra, part of chakraos.org
-#
-# Maintainer:  Samir Benmendil <ram-z[at]chakra-project[dot]org>
-# Contributor: Rémy Oudompheng <remy@archlinux.org
-# Contributor: Drake Justice <djustice[at]chakra-linux[dot]org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-bin
 
-pkgname=texlive-bin
-pkgver=2014.34260
-pkgrel=4
-_biber_ver=1.9
+pkgname='texlive-bin' 
+pkgver=2015.37497
+pkgrel=1
+_biber_ver=2.2
 pkgdesc="TeX Live binaries"
 url='http://tug.org/texlive/'
 license=('GPL')
 arch=('x86_64')
-depends=('cairo' 'pixman' 'graphite' 't1lib' 'gd' 'poppler>=0.24.0'
+makedepends=('cairo' 'pixman' 'graphite' 't1lib' 'gd' 'poppler'
          'libsigsegv' 'zziplib' 'libpng' 'libjpeg' 'freetype2'
-         'icu' 'harfbuzz')
-makedepends=('perl' 'clisp' 'ffcall')
+         'icu' 'harfbuzz' 'harfbuzz-icu' 'gmp' 'mpfr' 'libpaper'
+         'perl' 'clisp' 'ffcall')
 optdepends=('ed: for texconfig')
 provides=('lcdf-typetools' 'kpathsea' 'xindy' 'pdfjam')
 conflicts=('pdfjam')
 options=('!strip')
 install="texlive.install"
-source=('fix-fontforge-encoding.patch'
-        "http://mirrors.kernel.org/archlinux/other/texlive/texlive-bin-source-${pkgver}.tar.xz"
-        "http://downloads.sourceforge.net/project/biblatex-biber/biblatex-biber/${_biber_ver}/binaries/Linux/biber-linux_x86_64.tar.gz"
-)
+source=("http://mirrors.kernel.org/archlinux/other/texlive/texlive-bin-source-${pkgver}.tar.xz"
+        "http://downloads.sourceforge.net/project/biblatex-biber/biblatex-biber/${_biber_ver}/binaries/Linux/biber-linux_x86_64.tar.gz")
 noextract=(biber-linux_x86_64.tar.gz)
-md5sums=('bfb9716aa00c86c08cd31e5b32edeb98'
-         'b6fe9a6e6b3df0d69e804b87370039ef'
-         '137839688478710ded88909088dee970')
+md5sums=('20be644511704910151560a4d99f6995'
+         '85e762642861eb6a75798cebe5d839f3')
 
 prepare() {
   cd source
@@ -59,7 +51,7 @@ build() {
     --datadir=/usr/share \
     --mandir=/usr/share/man \
     --disable-native-texlive-build \
-    --with-banner-add="/Chakra Linux" \
+    --with-banner-add="/Chakra" \
     --disable-multiplatform \
     --disable-dialog \
     --disable-psutils \
@@ -82,6 +74,8 @@ build() {
     --with-system-harfbuzz \
     --with-system-graphite \
     --with-system-icu \
+    --with-system-mpfr \
+    --with-system-libpaper \
     --with-freetype2-libdir=/usr/lib \
     --with-freetype2-include=/usr/include/freetype2 \
     --with-xdvi-x-toolkit=xaw \
@@ -215,7 +209,6 @@ luatools
 match_parens
 mf2pt1
 mkjobtexmf
-mkluatexfontdb
 mkt1font
 mktexfmt
 mptopdf
