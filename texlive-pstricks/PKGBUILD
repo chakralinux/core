@@ -3,7 +3,7 @@
 pkgname=texlive-pstricks
 pkgver=2015.38821
 _pkgver=${pkgver#*.}
-pkgrel=1
+pkgrel=2
 pkgdesc="TeX Live - Additional PSTricks packages."
 license=('GPL3')
 arch=(x86_64)
@@ -23,9 +23,9 @@ build() {
 }
 
 package() {
-   install -m755 -d $pkgdir/var/lib/texmf/arch/installedpkgs
+   install -m755 -d $pkgdir/var/lib/texmf/chakra/installedpkgs
    sed -i '/^#/d' CONTENTS
-   install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_$_pkgver.pkgs
+   install -m644 CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_$_pkgver.pkgs
    install -m755 -d $pkgdir/usr/share
    wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
    for dir in $wanteddirs; do
