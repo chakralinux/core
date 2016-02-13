@@ -20,10 +20,16 @@ build() {
   cd $srcdir/aspell6-pt_BR-20090702-0
   ./configure || return 1
   make || return 1
-  make DESTDIR=$pkgdir install || return 1
 
   cd $srcdir/aspell6-pt_PT-20070510-0
   ./configure || return 1
   make || return 1
+}
+
+package() {
+  cd $srcdir/aspell6-pt_BR-20090702-0
+  make DESTDIR=$pkgdir install || return 1
+
+  cd $srcdir/aspell6-pt_PT-20070510-0
   make DESTDIR=$pkgdir install || return 1
 }
