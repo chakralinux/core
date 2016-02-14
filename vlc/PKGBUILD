@@ -1,13 +1,13 @@
 # Contributions from ArchLinux: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/vlc
 
 pkgname=vlc
-pkgver=2.2.1
-pkgrel=11
+pkgver=2.2.2
+pkgrel=1
 pkgdesc="A multi-platform MPEG, VCD/DVD, and DivX player"
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
 license=('LGPL2.1' 'GPL2')
-depends=('a52dec' 'libdvbpsi' 'libxpm' 'libdca' 'qt5-base' 'qt5-x11extras' 'libproxy'
+depends=('a52dec' 'libdvbpsi' 'libxpm' 'libdca' 'qt4' 'libproxy'
          'sdl_image' 'libdvdnav' 'libtiger' 'lua' 'libmatroska'
          'zvbi' 'taglib' 'libmpcdec' 'ffmpeg' 'faad2' 'libupnp'
          'libshout' 'libmad' 'libmpeg2' 'xcb-util-keysyms' 'libtar'
@@ -16,8 +16,7 @@ makedepends=('live-media' 'libnotify' 'libbluray' 'flac'
              'libdc1394' 'libavc1394' 'lirc' 'libcaca'
              'librsvg' 'portaudio' 'libgme' 'xosd' 'projectm'
              'twolame' 'aalib' 'libmtp' 'libdvdcss'
-             'libgoom2' 'vcdimager' 'opus' 'libssh2' 'mesa'
-             'fluidsynth' 'chromaprint')
+             'libgoom2' 'vcdimager' 'opus' 'libssh2' 'mesa')
 optdepends=('avahi: for service discovery using bonjour protocol'
             'libnotify: for notification plugin'
             'ncurses: for ncurses interface support'
@@ -25,6 +24,7 @@ optdepends=('avahi: for service discovery using bonjour protocol'
             'lirc: for lirc plugin'
             'libavc1394: for devices using the 1394ta AV/C'
             'libdc1394: for IEEE 1394 plugin'
+            'kdelibs: KDE Solid hardware integration'
             'libva-vdpau-driver: vdpau back-end for nvidia'
             'libva-intel-driver: back-end for intel cards'
             'libbluray: for Blu-Ray support'
@@ -32,8 +32,6 @@ optdepends=('avahi: for service discovery using bonjour protocol'
             'portaudio: for portaudio support'
             'twolame: for TwoLAME mpeg2 encoder plugin'
             'projectm: for ProjectM visualisation plugin'
-            'fluidsynth: for fluidsynth plugin'
-            'chromaprint: for chromaprint plugin'
             'libcaca: for colored ASCII art video output'
             'libgme: for libgme plugin'
             'librsvg: for SVG plugin'
@@ -55,17 +53,13 @@ backup=('usr/share/vlc/lua/http/.hosts'
 categories=('multimedia')
 options=('!emptydirs')
 install="vlc.install"
-source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver/.a}/${pkgname}-${pkgver/.a/a}.tar.xz"
-        'vlc-2.2.1-CVE-2015-5949.patch')
-sha1sums=('ee8535c5966217bc2069a74c1d4e8c32609656e9'
-          '43c5ac8ae6a24228bc6219f027d0edb215f1c62b')
+source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver/.a}/${pkgname}-${pkgver/.a/a}.tar.xz")
+sha1sums=('7983168069fc2024707c21d38a639d23f3245c8a')
 screenshot='http://images1.videolan.org/vlc/screenshots/0.9.2/screenshot-kde4.jpg'
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver/.a}"
   
-  patch -p1 -i $srcdir/vlc-2.2.1-CVE-2015-5949.patch
-
   sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
   sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
 
@@ -90,9 +84,6 @@ build() {
               --enable-upnp \
               --enable-opus \
               --enable-sftp \
-              --disable-opencv \
-              --disable-notify \
-              --with-kde-solid=/usr/share/solid/actions \
               --with-x
               LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`"
   make

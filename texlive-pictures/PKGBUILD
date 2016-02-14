@@ -1,59 +1,57 @@
-# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-bibtexextra
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-pictures
 
-pkgname=texlive-bibtexextra
-pkgver=2015.38806
-_revnr=${pkgver#*.}
+pkgname=texlive-pictures
+pkgver=2015.38755
+_revnr=${pkgver#2015.}
 pkgrel=1
-pkgdesc="TeX Live - Additional BibTeX styles and bibliography databases"
+pkgdesc="TeX Live - Packages for drawings graphics"
 license=('GPL')
 arch=(x86_64)
 depends=('texlive-core')
 groups=('texlive-most')
 url='http://tug.org/texlive/'
-source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip")
+source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip" "$pkgname.maps")
+options=('!emptydirs')
 install=texlive.install
-md5sums=('bb8f65591c6821cfc39c2f8e25510bb8')
+md5sums=('c7ad951a24dca74a8df811aba81c5343'
+         'dd74bb4df23d2fc2dd6e1c72ce8cf35d')
 
 build() {
-   cd "${srcdir}"
-
+   cd "$srcdir"
    for p in *.tar.xz; do
 	   bsdtar -xf $p
    done
-
    rm -rf {tlpkg,doc,source} || true
 }
 
 package() {
+   cd "$srcdir"
    install -m755 -d $pkgdir/var/lib/texmf/chakra/installedpkgs
    sed -i '/^#/d' CONTENTS
    install -m644 CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_${_revnr}.pkgs
+   install -m644 $pkgname.maps $pkgdir/var/lib/texmf/chakra/installedpkgs/
    install -m755 -d $pkgdir/usr/share
-
    wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
    for dir in $wanteddirs; do
      find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
      find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;
    done
-
    if [[ -d texmf-dist ]]; then
      find texmf-dist -type d -exec install -d -m755 $pkgdir/usr/share/'{}' \;
      find texmf-dist -type f -exec install -m644 '{}' $pkgdir/usr/share/'{}' \;
    fi
-
    if [[ -d $pkgdir/usr/share/texmf-dist/scripts ]]; then
      find $pkgdir/usr/share/texmf-dist/scripts -type f -exec chmod a+x '{}' \;
    fi
 
-   # link programs from /usr/share/texmf-dist/scripts
-   _linked_scripts="
-bibexport/bibexport.sh
-crossrefware/bibdoiadd.pl
-crossrefware/bibzbladd.pl
-crossrefware/ltx2crossrefxml.pl
-listbib/listbib
-multibibliography/multibibliography.pl
-urlbst/urlbst
+    _linked_scripts="
+cachepic/cachepic.tlu
+epspdf/epspdftk.tcl
+epspdf/epspdf.tlu
+fig4latex/fig4latex
+getmap/getmapdl.lua
+mathspic/mathspic.pl
+mkpic/mkpic
 "
     install -m755 -d $pkgdir/usr/bin
     for _script in ${_linked_scripts}; do
@@ -62,4 +60,3 @@ urlbst/urlbst
         ln -s /usr/share/texmf-dist/scripts/${_script} ${pkgdir}/usr/bin/${_scriptbase}
     done
 }
-

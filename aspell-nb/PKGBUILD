@@ -5,7 +5,7 @@
 
 pkgname=aspell-nb
 pkgver=0.50.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Norwegian Bokmål dictionary for aspell"
 url="http://aspell.net/"
 license="GPL"
@@ -18,5 +18,9 @@ build() {
   cd ${srcdir}/${pkgname}-${pkgver}-0
   ./configure
   /usr/bin/make || return 1
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}-0
   /usr/bin/make DESTDIR=${pkgdir} install
 }

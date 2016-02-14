@@ -1,19 +1,13 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# Maintainer:  Samir Benmendil <ram-z[at]chakra-project[dot]org>
-# Contributor: Rémy Oudompheng <remy@archlinux.org>
-# Contributor: Phil Miller <philm[at]chakra-project[dot]org>
-# Contributor: Drake Justice <djustice[at]chakra-linux[dot]org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-core
 
 pkgname=texlive-core
-pkgver=2014.34872
+pkgver=2015.38835
 _revnr=${pkgver#*.}
-pkgrel=3
+pkgrel=2
 pkgdesc="TeX Live core distribution"
 url='http://tug.org/texlive/'
 license=('GPL')
-arch=(any)
+arch=(x86_64)
 depends=('texlive-bin' 'perl')
 optdepends=(
   'dialog:       for texconfig'
@@ -24,13 +18,12 @@ optdepends=(
   'python2:      for dviasm'
   'python3:      for pythontex'
   'ruby:        for old ConTeXT MkII and epspdf'
-  't1utils:     can be useful when installing Type1 fonts'
-)
+  't1utils:     can be useful when installing Type1 fonts')
 groups=('texlive-most')
 conflicts=('tetex' 'texlive-latex3')
 provides=('tetex' 'texlive-latex3')
 replaces=('tetex' 'texlive-latex3')
-source=("ftp://ftp.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
+source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
         "$pkgname.maps"
 	"texmf.cnf"
 	"texmfcnf.lua"
@@ -48,7 +41,7 @@ backup=(etc/texmf/web2c/texmf.cnf \
 	etc/texmf/web2c/mktex.cnf \
 	etc/texmf/xdvi/XDvi)
 
-md5sums=('65e63bdefdc909b9d6e6624924e53feb'
+md5sums=('59a48c870b4170926010352b2b402bd0'
          '75c813acb5df57d174e4bd07019adf34'
          'df537245012f3e5f05bdc55644b7a3df'
          '16ad4dc53deb00029baef1b01ba1d984'
@@ -69,10 +62,10 @@ package() {
    cd "$srcdir"
 
    # Install packages
-   install -m755 -d $pkgdir/var/lib/texmf/arch/installedpkgs
+   install -m755 -d $pkgdir/var/lib/texmf/chakra/installedpkgs
    sed -i '/^#/d' CONTENTS
-   install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_${_revnr}.pkgs
-   install -m644 $pkgname.maps $pkgdir/var/lib/texmf/arch/installedpkgs/
+   install -m644 CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_${_revnr}.pkgs
+   install -m644 $pkgname.maps $pkgdir/var/lib/texmf/chakra/installedpkgs/
    install -m755 -d $pkgdir/usr/share
    wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
    for dir in $wanteddirs; do
