@@ -4,7 +4,7 @@ source ../frameworks.conf
 
 pkgname=plasma-framework
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Plasma library and runtime components based upon KF5 and Qt5'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/plasma-framework'
@@ -13,11 +13,16 @@ depends=('qt5-quickcontrols' 'kactivities-frameworks' 'kpackage')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'kdoctools')
 options=("debug")
 groups=('kf5')
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
+        '0001-AppletQuickItem-Drop-timer-to-create-full-representa.patch')
+sha256sums=( $(getSum ${pkgname}) 
+            '8ceb9be7336583870a7a485e1b510517a6e8629dc2bcd9b17d6bf06c83f160d0')
 
 prepare() {
   mkdir -p build
+  
+  cd $pkgname-$pkgver
+  patch -p1 -R < $srcdir/0001-AppletQuickItem-Drop-timer-to-create-full-representa.patch
 }
 
 build() {

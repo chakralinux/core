@@ -1,0 +1,77 @@
+From 344dbeb93884af36f66e9a5133e7be7bd1b1e70d Mon Sep 17 00:00:00 2001
+From: David Rosca <nowrep@gmail.com>
+Date: Tue, 22 Dec 2015 15:46:00 +0100
+Subject: [PATCH] AppletQuickItem: Drop timer to create full representation
+
+The timer only added 250ms delay before creating the full representation,
+sometimes resulting in showing empty popup for a moment.
+
+REVIEW: 126468
+---
+ src/plasmaquick/appletquickitem.cpp         | 9 ++-------
+ src/plasmaquick/appletquickitem.h           | 1 -
+ src/plasmaquick/private/appletquickitem_p.h | 2 --
+ 3 files changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/src/plasmaquick/appletquickitem.cpp b/src/plasmaquick/appletquickitem.cpp
+index 5f6b857..ec2ed24 100644
+--- a/src/plasmaquick/appletquickitem.cpp
++++ b/src/plasmaquick/appletquickitem.cpp
+@@ -407,11 +407,6 @@ AppletQuickItem::AppletQuickItem(Plasma::Applet *applet, QQuickItem *parent)
+         d->containmentPackage = d->applet->containment()->package();
+     }
+ 
+-    d->compactRepresentationCheckTimer.setSingleShot(true);
+-    d->compactRepresentationCheckTimer.setInterval(250);
+-    connect(&d->compactRepresentationCheckTimer, SIGNAL(timeout()),
+-            this, SLOT(compactRepresentationCheck()));
+-
+     if (applet->pluginInfo().isValid()) {
+         const QString rootPath = applet->pluginInfo().property(QStringLiteral("X-Plasma-RootPath")).toString();
+         if (!rootPath.isEmpty()) {
+@@ -582,7 +577,7 @@ void AppletQuickItem::init()
+     //HACK: check the Layout properties we wrote
+     QQmlProperty p(this, "Layout.minimumWidth", QtQml::qmlContext(d->qmlObject->rootObject()));
+ 
+-    d->compactRepresentationCheckTimer.start();
++    d->compactRepresentationCheck();
+     qmlObject()->engine()->rootContext()->setBaseUrl(qmlObject()->source());
+     qmlObject()->engine()->setContextForObject(this, qmlObject()->engine()->rootContext());
+ }
+@@ -746,7 +741,7 @@ void AppletQuickItem::geometryChanged(const QRectF &newGeometry, const QRectF &o
+     Q_UNUSED(oldGeometry)
+ 
+     QQuickItem::geometryChanged(newGeometry, oldGeometry);
+-    d->compactRepresentationCheckTimer.start();
++    d->compactRepresentationCheck();
+ }
+ 
+ void AppletQuickItem::itemChange(ItemChange change, const ItemChangeData &value)
+diff --git a/src/plasmaquick/appletquickitem.h b/src/plasmaquick/appletquickitem.h
+index dffbcf3..1e0174a 100644
+--- a/src/plasmaquick/appletquickitem.h
++++ b/src/plasmaquick/appletquickitem.h
+@@ -152,7 +152,6 @@ protected:
+ private:
+     AppletQuickItemPrivate *const d;
+ 
+-    Q_PRIVATE_SLOT(d, void compactRepresentationCheck())
+     Q_PRIVATE_SLOT(d, void minimumWidthChanged())
+     Q_PRIVATE_SLOT(d, void minimumHeightChanged())
+     Q_PRIVATE_SLOT(d, void preferredWidthChanged())
+diff --git a/src/plasmaquick/private/appletquickitem_p.h b/src/plasmaquick/private/appletquickitem_p.h
+index 5a7f9db..94cfada 100644
+--- a/src/plasmaquick/private/appletquickitem_p.h
++++ b/src/plasmaquick/private/appletquickitem_p.h
+@@ -93,8 +93,6 @@ public:
+     QPointer<QObject> representationLayout;
+     QPointer<QObject> ownLayout;
+ 
+-    QTimer compactRepresentationCheckTimer;
+-
+     Plasma::Applet *applet;
+     KDeclarative::QmlObject *qmlObject;
+ 
+-- 
+2.4.1
+
