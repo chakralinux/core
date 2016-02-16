@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.22
-pkgrel=6
+pkgrel=7
 pkgdesc="GNU C Library"
 arch=('x86_64')
 url="http://www.gnu.org/software/libc"
@@ -18,11 +18,13 @@ options=('!strip' 'staticlibs')
 install=glibc.install
 source=(http://ftp.gnu.org/gnu/libc/${pkgname}-${pkgver}.tar.xz{,.sig}
         dtv_surplus.patch
+        glibc-2.22-CVE-2015-7547.patch
         locale.gen.txt
         locale-gen)
 md5sums=('e51e02bf552a0a1fbbdc948fb2f5e83c'
          'SKIP'
          '6469cba12e2252e16e32db0353ed3f21'
+         '482831190619876ea054929a9744e307'
          '07ac979b6ab5eeb778d55f041529d623'
          '476e9113489f93b348b21e144b6a8fcf')
 validpgpkeys=('F37CDAB708E65EA183FD1AF625EF0A436C2A4AFF')  # Carlos O'Donell
@@ -32,6 +34,9 @@ prepare() {
 
   # http://chakraos.org/bugtracker/index.php?do=details&task_id=1060&project=8
   patch -p1 -i $srcdir/dtv_surplus.patch
+  
+  # https://access.redhat.com/security/cve/CVE-2015-7547
+  patch -p1 -i $srcdir/glibc-2.22-CVE-2015-7547.patch
 
   mkdir ${srcdir}/glibc-build
 }
