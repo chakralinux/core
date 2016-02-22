@@ -5,22 +5,24 @@
 # contributor Mladen Pejaković <pejakm@gmail.com>
 
 pkgname=hunspell-sr
-pkgver=20130117
+pkgver=20140313
 pkgrel=1
+_git=e1ff02b45c8e133a617a1c98cae146299bc0d4de
 pkgdesc="Serbian Cyrillic and Latin hunspell dictionaries"
 arch=('x86_64')
-url="http://gitorious.org/dict-sr/hunspell-sr"
+url="https://github.com/grakic/hunspell-sr"
+source=("${pkgname}-${pkgver}.tar.gz"::"http://gitorious.org/dict-sr/hunspell-sr/archive-tarball/master")
 license=('GPL' 'LGPL' 'MPL' 'CC BY-SA 3.0 Unported')
 optdepends=('hunspell:	the spell checking libraries and apps')
-source=("${pkgname}-${pkgver}.tar.gz"::"http://gitorious.org/dict-sr/hunspell-sr/archive-tarball/master")
-sha1sums=('2a9920b1fb3e46618eaa01fd1f20e1790e38ab16')
+source=("${pkgname}-${pkgver}.tar.gz"::"https://github.com/grakic/hunspell-sr/archive/${_git}.tar.gz")
+sha1sums=('aa2f25f4f1dfcbc9d50d32fe63d07062eaa7054c')
 
 build() {
  /bin/true
 }
 
 package() {
-  cd "${srcdir}/dict-sr-hunspell-sr"
+  cd "${srcdir}/${pkgname}-${_git}"
   install -dm755 ${pkgdir}/usr/share/hunspell
   install -m644 sr.dic sr.aff $pkgdir/usr/share/hunspell
   install -m644 sr-Latn.aff $pkgdir/usr/share/hunspell/sh.aff
