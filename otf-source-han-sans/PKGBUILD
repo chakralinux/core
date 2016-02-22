@@ -1,7 +1,7 @@
 pkgbase=otf-source-han-sans
 pkgname=($pkgbase $pkgbase-kr $pkgbase-cn $pkgbase-tw ${pkgbase/otf/otc})
 pkgver=1.004
-pkgrel=3
+pkgrel=4
 pkgdesc='Adobe Source Han Sans - A set of Pan-CJK fonts designed to complement Source Sans Pro'
 arch=('any')
 license=('custom:OFL')
@@ -50,11 +50,11 @@ function _package {
     fi
 
     # Prepare destination directory
-    install -dm755 "$pkgdir/usr/share/fonts/$pkgbase"
+    install -dm755 "$pkgdir/usr/share/fonts/OTF"
 
     for w in "${_weights[@]}"; do
 	font="${_args[1]}-${w}.${_args[2]}"
-        install -m644 "$font" "$pkgdir/usr/share/fonts/$pkgbase"
+        install -m644 "$font" "$pkgdir/usr/share/fonts/OTF/"
     done
 
     # Install fontconfig fix
