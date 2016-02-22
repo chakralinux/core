@@ -1,18 +1,19 @@
 # Platform packages for Chakra
 
 pkgname=hunspell-sv
-pkgver=2.2
+pkgver=2.37
+_pkgver=2-37
 pkgrel=1
 pkgdesc="Swedish dictionaries for Hunspell"
 arch=('any')
 url="http://hunspell.sourceforge.net/"
 license=('LGPL3')
 depends=('hunspell')
-source=("https://dsso.googlecode.com/files/sv-$pkgver.zip")
-md5sums=('1cf8154f157d3783ede884b47063d27e')
+source=("http://extensions.libreoffice.org/extension-center/swedish-spelling-dictionary-den-stora-svenska-ordlistan/releases/${pkgver}/ooo_swedish_dict_${_pkgver}.oxt")
+md5sums=('560f90a0499513adeb0d4771b241b692')
 
 package() {
-    cd $srcdir
+    cd $srcdir/dictionaries
     install -D -m644 sv_SE.dic $pkgdir/usr/share/hunspell/sv_SE.dic
     install -D -m644 sv_SE.aff $pkgdir/usr/share/hunspell/sv_SE.aff
     install -D -m644 sv_FI.dic $pkgdir/usr/share/hunspell/sv_FI.dic
@@ -26,6 +27,3 @@ package() {
     done
     popd
 }
-
-
-
