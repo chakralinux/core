@@ -1,30 +1,44 @@
-# $Id: PKGBUILD 34574 2009-04-10 08:11:36Z eric $
-# Maintainer: Tobias Powalowski <tpowa@archlinux.org>
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libofa
+
 pkgname=libofa
 pkgver=0.9.3
-pkgrel=2
+pkgrel=3
 pkgdesc="Open Fingerprint Architecture"
-arch=(i686 x86_64)
+arch=(x86_64)
 url="http://code.google.com/p/musicip-libofa/"
 license=('GPL2' 'custom')
 depends=('expat' 'curl' 'fftw' 'gcc-libs')
-makedepends=('pkgconfig')
-options=('!libtool')
-source=(http://musicip-libofa.googlecode.com/files/$pkgname-$pkgver.tar.gz
-	gcc-4.patch libofa-0.9.3-gcc-4.3.patch)
-md5sums=('51507d2c4b432bd2755f48d58471696e' 'a6f78b90bd0f4354d022a71c3e58ef6c'\
-         'dd57db13770b8f8d196e8a3d3a50e713')
+source=("http://musicip-libofa.googlecode.com/files/$pkgname-$pkgver.tar.gz"
+        'gcc-4.patch'
+        'gcc-4.3.patch'
+        'gcc-4.5.patch'
+        'gcc-4.7.patch'
+        'curl-7.21.patch')
+md5sums=('51507d2c4b432bd2755f48d58471696e'
+         'a6f78b90bd0f4354d022a71c3e58ef6c'
+         'dd57db13770b8f8d196e8a3d3a50e713'
+         '8723e1c3722cc59cc76a744ffa9932b7'
+         'd6a865ee4e12e4d19fe1d9ca206a22b3'
+         'e1ceecef6b62268412fa91e67ae5b30a')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  patch -p0 -i "${srcdir}/gcc-4.patch"
+  patch -p1 -i "${srcdir}/gcc-4.3.patch"
+  patch -p1 -i "${srcdir}/gcc-4.5.patch"
+  patch -p1 -i "${srcdir}/gcc-4.7.patch"
+  patch -p1 -i "${srcdir}/curl-7.21.patch"
+}
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+  make
+}
 
-  # Fix build
-  sed -i -e 's/#include "protocol.h"/&\n#include <cstdio>/g' examples/example.cpp
+package() {
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
 
-  patch -Np0 -i ../gcc-4.patch || return 1
-  patch -Np1 -i ../libofa-0.9.3-gcc-4.3.patch || return 1
-  ./configure --prefix=/usr || return 1
-  make || return 1
-  make DESTDIR=${pkgdir} install || return 1
-  install -D -m644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  install -D -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
