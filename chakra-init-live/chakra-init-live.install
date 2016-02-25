@@ -1,0 +1,15 @@
+post_install() {
+  echo "Enabling systemd services"
+         systemctl enable upower.service
+         systemctl enable udisks.service
+         systemctl enable avahi-daemon.service
+         systemctl enable NetworkManager.service
+         systemctl enable sddm.service
+         systemctl enable ntpd.service
+         systemctl enable bluetooth.service
+         systemctl enable org.cups.cupsd
+}
+
+post_upgrade() {
+  post_install
+} 
