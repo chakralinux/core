@@ -1,25 +1,19 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
-#                       Drake Justice <djustice@chakra-project.org>
-#
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/zziplib
 
 pkgname=zziplib
 pkgver=0.13.62
-pkgrel=2
+pkgrel=3
 pkgdesc="A lightweight library that offers the ability to easily extract data from files archived in a single zip file"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://zziplib.sourceforge.net"
 license=('LGPL' 'MPL')
 depends=('zlib')
-makedepends=('python')
+makedepends=('python2')
 source=(http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.bz2)
 md5sums=('5fe874946390f939ee8f4abe9624b96c')
-options=('!libtool')
 
 build() {
-	cd ${srcdir}/${pkgname}-${pkgver}
+	cd ${pkgname}-${pkgver}
 
     export PYTHON=/usr/bin/python2
 	./configure --prefix=/usr
@@ -27,11 +21,11 @@ build() {
 }
 
 package() {
-	cd ${srcdir}/${pkgname}-${pkgver}
+	cd ${pkgname}-${pkgver}
 	make DESTDIR=${pkgdir} install
 
 	#fix permission
-	chmod -s ${pkgdir}/usr/share/man/man3
-	chmod 644 ${pkgdir}/usr/share/man/man3/*
-	chown -R root:root ${pkgdir}/usr/share/man/man3
+	chmod -s "${pkgdir}/usr/share/man/man3"
+	chmod 644 "${pkgdir}"/usr/share/man/man3/*    
+	chown -R root:root "${pkgdir}/usr/share/man/man3"
 }
