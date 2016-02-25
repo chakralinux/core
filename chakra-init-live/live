@@ -27,10 +27,12 @@ CONSOLEMAP="$(kernel_cmdline vconsole.font.map)"
 USENONFREE="$(kernel_cmdline nonfree no)"
 
 #edit /etc/environment
-echo "LANG=${LOCALE}" >> /etc/environment
+#this settings overwrites the locale.conf settings
+#do not enable it, is there as a placeolder
+#echo "LANG=${LOCALE}" >> /etc/environment
 
-source /etc/locale_setup.sh # imports get_bootparam_value, get_country and
-                       #set_locale
+# imports get_bootparam_value, get_country and set_locale
+source /etc/locale_setup.sh
 
 set_locale # sets locale settings and hwclock
 
