@@ -3,7 +3,7 @@ UPDMAP="etc/texmf/web2c/updmap.cfg"
 UPDMAPLOCAL="etc/texmf/web2c/updmap-local.cfg"
 SYNCWITHTREES=''
 
-MAPFILE="var/lib/texmf/arch/installedpkgs/$PKGNAME.maps"
+MAPFILE="var/lib/texmf/chakra/installedpkgs/$PKGNAME.maps"
 
 post_install() {
   TMPFILE=`mktemp`
@@ -12,7 +12,7 @@ post_install() {
   echo    ">>> texlive: regenerating updmap.cfg (custom additions should go"
   echo    "             into /etc/texmf/web2c/updmap-local.cfg"
   cp usr/share/texmf-dist/web2c/updmap-hdr.cfg $UPDMAP
-  cat var/lib/texmf/arch/installedpkgs/*.maps >> $UPDMAP
+  cat var/lib/texmf/chakra/installedpkgs/*.maps >> $UPDMAP
   [ -f "$UPDMAPLOCAL" ] && cat "$UPDMAPLOCAL" >> $UPDMAP
   echo    ">>> texlive: updating the filename database..."
   usr/bin/mktexlsr
@@ -34,7 +34,7 @@ post_upgrade() {
   echo    ">>> texlive: regenerating updmap.cfg (custom additions should go"
   echo    "             into /etc/texmf/web2c/updmap-local.cfg"
   cp usr/share/texmf-dist/web2c/updmap-hdr.cfg $UPDMAP
-  cat var/lib/texmf/arch/installedpkgs/*.maps >> $UPDMAP
+  cat var/lib/texmf/chakra/installedpkgs/*.maps >> $UPDMAP
   [ -f "$UPDMAPLOCAL" ] && cat "$UPDMAPLOCAL" >> $UPDMAP
   echo    ">>> texlive: updating the filename database..."
   usr/bin/mktexlsr
