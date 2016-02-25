@@ -1,0 +1,27 @@
+# Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/potrace
+
+pkgname=potrace
+pkgver=1.13
+pkgrel=1
+pkgdesc='Utility for tracing a bitmap (input: PBM,PGM,PPM,BMP; output: EPS,PS,PDF,SVG,DXF,PGM,Gimppath,XFig)'
+url='http://potrace.sourceforge.net/'
+arch=('x86_64')
+license=('GPL')
+source=("http://potrace.sourceforge.net/download/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+sha1sums=('fe8e42e0b5f7d3130b494818d6b1872e29097cd5')
+
+build() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+
+	./configure \
+		--prefix=/usr \
+		--mandir=/usr/share/man \
+		--with-libpotrace \
+
+	make
+}
+
+package() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	make DESTDIR="${pkgdir}" install
+}
