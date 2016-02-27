@@ -1,15 +1,13 @@
 pkgname=liblastfm-qt4
 _pkgname=liblastfm
 pkgver=1.0.9
-pkgrel=2
+pkgrel=3
 pkgdesc='A Qt C++ library for the Last.fm webservices'
 url="https://github.com/lastfm/liblastfm/"
 license=('GPL3')
 arch=('x86_64')
 depends=('qt')
 makedepends=('cmake')
-conflicts=('liblastfm')
-provides=('liblastfm')
 source=("https://github.com/lastfm/liblastfm/archive/${pkgver}.tar.gz")
 sha1sums=('4a6323538a26c5ea2080a8ebe58e4407dbc42397')
 
@@ -28,4 +26,5 @@ build() {
 package() {
   cd build
   make DESTDIR=${pkgdir} install
+  mv -v "${pkgdir}/usr/include/lastfm"{,4}
 }
