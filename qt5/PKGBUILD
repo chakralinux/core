@@ -1,7 +1,8 @@
 #
-# QT Packages for Chakra, part of chakra-project.org
+# QT Packages for Chakra, part of chakraos.org
 #
-# maintainer: Fabian Kosmale <inkane@chakra-project.org>
+# maintainer: Fabian Kosmale <inkane@chakraos.org>
+# contributor: Luca Giambonini <almack@chakraos.org>
 # heavily sto^H^H^H inspired by Andrea Scarpino' PKGBUILD from Arch
 
 pkgbase=qt5
@@ -16,10 +17,12 @@ pkgname=('qt5-base'
          'qt5-imageformats'
          'qt5-location'
          'qt5-multimedia'
-         'qt5-quick1'
+#         'qt5-quick1'
          'qt5-quickcontrols'
+         'qt5-quickcontrols2'
          'qt5-script'
          'qt5-sensors'
+         'qt5-serialbus'
          'qt5-serialport'
          'qt5-svg'
          'qt5-tools'
@@ -27,12 +30,15 @@ pkgname=('qt5-base'
          'qt5-wayland'
          'qt5-webchannel'
          'qt5-webengine'
-         'qt5-webkit'
+#         'qt5-webkit'
          'qt5-websockets'
+         'qt5-webview'
          'qt5-x11extras'
          'qt5-xmlpatterns')
-pkgver=5.5.1
-pkgrel=4
+pkgver=5.6.0RC
+subver=5.6.0-rc
+_pkgver=5.6
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -48,31 +54,23 @@ makedepends=('libxcb' 'xcb-proto' 'xcb-util' 'xcb-util-image' 'xcb-util-wm' 'xcb
             'gstreamer' 'gst-plugins-base' 'gst-plugins-good'
             'gst-plugins-bad' 'gst-plugins-ugly' 'harfbuzz' 'pkg-config'
             'libinput' 'yasm' 'git')
-_pkgfqn="qt-everywhere-opensource-src-${pkgver}"
-source=("http://download.qt-project.org/official_releases/qt/${pkgver%.*}/${pkgver}/single/${_pkgfqn}.tar.xz"
-        # qt 5.6
-        'vlc-qt5.patch::https://563458.bugs.gentoo.org/attachment.cgi?id=415738' # fixed in qt 5.6
+#_pkgfqn="qt-everywhere-opensource-src-${pkgver}"
+#source=("http://download.qt-project.org/official_releases/qt/${_pkgver}/${pkgver}/single/$_pkgfqn.tar.xz"
+_pkgfqn="qt-everywhere-opensource-src-${subver}"
+source=("http://download.qt-project.org/development_releases/qt/${_pkgver}/${subver}/single/$_pkgfqn.tar.xz"
         '0001-Fix-QWidget-setWindowRole.patch'
         '0005-Restore-documented-behavior-for-the-WA_X11NetWmWindo.patch'
         'libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch'
-        'xcb-dont-crash-in-mapToNativemapFromNative-if-the-screen-is-null.patch'
-        'xcb-fix-yet-another-crash-when-screens-are-disconnected.patch'        
-        'xcb-glXGetCurrentDisplay-return-null-1.patch::https://github.com/qtproject/qtbase/commit/c8af3160d2514fb973a0d00d5bac324d4f7159f7.patch'
-        'xcb-glXGetCurrentDisplay-return-null-2.patch::https://github.com/qtproject/qtbase/commit/e8ad49d6cba6521f20b1b08bf65d92fc81c158e4.patch'
         # not yet upstream
         'libqt5-Fix-Gujarati-font.patch'
+        # desktop files
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
         'qmlviewer.desktop'
         'qdbusviewer-qt5.desktop')
-sha1sums=('5933651d46691ff6e919a49f5a380b9a217d30fb'
-          'c7403ec1c2a1189a661e087b2117d25759b9cc58'
-          'f0f7287a1967cd9d0208517f4682c040e5ad25f5'
+sha1sums=('7401e1d3bd91766e3c6d9a283a14adc30bf6d1e4'
+          'f69e25beeba8682ef8ca9e8cf978061d75173914'
           '4dabcdf77de5325eba5890f356157c006b095cc9'
           'eb1fa717a650e95276bcd9f29b97fdb576c90337'
-          '06e29fffec05e9eae0553a69cc0b8804c8fc537c'
-          '27af3d679b8bd9fbb98d994b01f270dfa8c475ff'
-          'd67baddee28774ef4f2f1e2d14ef7a8c892139e4'
-          'd87664b0d898c86c404e0c6e31ba31a82adb2f16'
           'd5dc1de05f00fa9eabce400ef11e7932ed8af550'
           '0862a4a39b74d0e447181d7eca31580c9d580bc8'
           'b63cab2c86505b594e32b32ae43524090fcb7d29'
@@ -92,16 +90,11 @@ prepare() {
 
   pushd .
   cd qtbase 
-  patch -Np1 -i ../../vlc-qt5.patch # fixed in qt 5.6
-
+  
   patch -Np1 -i ../../0001-Fix-QWidget-setWindowRole.patch
   patch -Np1 -i ../../0005-Restore-documented-behavior-for-the-WA_X11NetWmWindo.patch
   patch -Np1 -i ../../libqt5-Fix-Gujarati-font.patch
   patch -Np1 -i ../../libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch
-  patch -Np1 -i ../../xcb-dont-crash-in-mapToNativemapFromNative-if-the-screen-is-null.patch
-  patch -Np1 -i ../../xcb-fix-yet-another-crash-when-screens-are-disconnected.patch
-  patch -Np1 -i ../../xcb-glXGetCurrentDisplay-return-null-1.patch
-  patch -Np1 -i ../../xcb-glXGetCurrentDisplay-return-null-2.patch
   popd
 
   sed -i "s|-O2|${CXXFLAGS}|" qtbase/mkspecs/common/{g++,gcc}-base.conf
@@ -123,8 +116,6 @@ prepare() {
 
 build() {
   cd $srcdir/$_pkgfqn
-  # reenable patch later
-  # patch -p1 -i "$srcdir/defaultbookmarks_new.diff"
 
   export QTDIR="${srcdir}"/${_pkgfqn}
   export LD_LIBRARY_PATH="${QTDIR}"/qtbase/lib:"${QTDIR}"/qttools/lib:"${LD_LIBRARY_PATH}"
@@ -180,10 +171,10 @@ build() {
     -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
   sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" \
     "${QTDIR}"/qtbase/qmake/Makefile.qmake-docs
-  find "${QTDIR}" -name Makefile \
-    -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
-  sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" \
-    qtwebkit/Source/Makefile.api
+#  find "${QTDIR}" -name Makefile \
+#    -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
+#  sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" \
+#    qtwebkit/Source/Makefile.api
   find "${QTDIR}" -name Makefile \
     -exec sed -i "s|/usr/lib/qt5/bin/qmlplugindump|${QTDIR}/qtdeclarative/bin/qmlplugindump|g" {} +
 
@@ -415,6 +406,16 @@ package_qt5-quick1() {
     "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
 }
 
+package_qt5-quickcontrols2() {
+  pkgdesc='Provides new light-weight set of embedded and mobile orientation controls (Technology Preview)'
+  depends=('qt5-declarative')
+  conflicts=('qt5')
+  options=("debug")
+
+  cd ${_pkgfqn}/qtquickcontrols2
+  make INSTALL_ROOT="${pkgdir}" install
+}
+
 package_qt5-quickcontrols() {
   pkgdesc='Reusable Qt Quick based UI controls to create classic desktop-style user interfaces'
   depends=('qt5-declarative')
@@ -453,6 +454,18 @@ package_qt5-sensors() {
 
   install -D -m644 LGPL_EXCEPTION.txt \
     "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
+}
+
+package_qt5-serialbus() {
+  pkgdesc='Provides classes and functions to access the various industrial serial buses and protocols, such as CAN, ModBus, and others. (Technology Preview)'
+  depends=('qt5-base')
+  conflicts=('qt5')
+  options=("debug")
+
+  cd ${_pkgfqn}/qtserialbus
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
 }
 
 package_qt5-serialport() {
@@ -596,6 +609,16 @@ package_qt5-websockets() {
   make INSTALL_ROOT="${pkgdir}" install
 
   _prlfix
+}
+
+package_qt5-webview() {
+  pkgdesc='Provides a way to display web content in a QML application'
+  depends=('qt5-webengine')
+  options=("debug")
+  license=('LGPL')
+
+  cd ${_pkgfqn}/qtwebview
+  make INSTALL_ROOT="${pkgdir}" install
 }
 
 package_qt5-x11extras() {
