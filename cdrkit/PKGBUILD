@@ -3,12 +3,9 @@
 # maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
-
 pkgname=cdrkit
 pkgver=1.1.11
-pkgrel=1
+pkgrel=2
 pkgdesc="Suite of programs for CD/DVD recording, ISO image creation, and audio CD extraction"
 arch=('i686' 'x86_64')
 url="http://cdrkit.org/"
@@ -17,7 +14,9 @@ depends=('file' 'bzip2' 'perl')
 makedepends=('cmake')
 provides=('cdrtools')
 conflicts=('cdrtools')
-source=(http://cdrkit.org/releases/$pkgname-$pkgver.tar.gz)
+# cdrkit.org, the old source, is now an empty domain. This is
+# the only one carrying the latest version.
+source=("http://pkgs.fedoraproject.org/repo/pkgs/${pkgname}/${pkgname}-${pkgver}.tar.gz/efe08e2f3ca478486037b053acd512e9/${pkgname}-${pkgver}.tar.gz")
 md5sums=('efe08e2f3ca478486037b053acd512e9')
 
 build() {
