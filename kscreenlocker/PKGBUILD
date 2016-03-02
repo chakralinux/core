@@ -2,7 +2,7 @@ source ../plasma.conf
 
 pkgname=kscreenlocker
 pkgver=${PVersion}
-pkgrel=2
+pkgrel=1
 pkgdesc='Library and components for secure lock screen architecture'
 arch=(x86_64)
 url='https://projects.kde.org/kscreenlocker'
@@ -11,17 +11,13 @@ groups=(plasma)
 depends=(kdelibs4support plasma-framework kidletime kwayland libxcursor)
 makedepends=(extra-cmake-modules python kdoctools)
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
-	"greeter.diff::https://quickgit.kde.org/?p=kscreenlocker.git&a=commitdiff&h=fae65f1cdd6446042b31ccd0eafd7a4c0b6623e3&hp=189f85fb340b75456d98ffede8c5dac058d5afc1&o=plain")
-sha256sums=( $(getSum ${pkgname}) 
-	    '5166fc44561716d0f32d4b335bbed96fdc421b678159a4c41c3c496d191ccafd')
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
 
-  cd $pkgname-${pkgver}
-  # https://bugs.kde.org/show_bug.cgi?id=358125  
-  patch -p1 -i $srcdir/greeter.diff
+  #cd $pkgname-${pkgver}
 }
 
 build() {
