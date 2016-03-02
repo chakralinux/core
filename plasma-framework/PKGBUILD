@@ -4,7 +4,7 @@ source ../frameworks.conf
 
 pkgname=plasma-framework
 pkgver=${KFVersion}
-pkgrel=2
+pkgrel=3
 pkgdesc='Plasma library and runtime components based upon KF5 and Qt5'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/plasma-framework'
@@ -14,15 +14,16 @@ makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'kdoctools')
 options=("debug")
 groups=('kf5')
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
-        '0001-AppletQuickItem-Drop-timer-to-create-full-representa.patch')
+        'AppletQuickItem-Fix-finding-own-attached-layout.patch')
 sha256sums=( $(getSum ${pkgname}) 
-            '8ceb9be7336583870a7a485e1b510517a6e8629dc2bcd9b17d6bf06c83f160d0')
+            '6094c6d9a7997554c74f930dc551517bf6e35e6e90700152aab12dec45455b86')
 
 prepare() {
   mkdir -p build
   
   cd $pkgname-$pkgver
-  patch -p1 -R < $srcdir/0001-AppletQuickItem-Drop-timer-to-create-full-representa.patch
+  # https://bugs.kde.org/show_bug.cgi?id=358849
+  patch -Np1 < $srcdir/AppletQuickItem-Fix-finding-own-attached-layout.patch
 }
 
 build() {
