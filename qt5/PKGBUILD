@@ -38,11 +38,11 @@ pkgname=('qt5-base'
 pkgver=5.6.0RC
 subver=5.6.0-rc
 _pkgver=5.6
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
-makedepends=('libxcb' 'xcb-proto' 'xcb-util' 'xcb-util-image' 'xcb-util-wm' 'xcb-util-keysyms'
+makedepends=('libxcb' 'xcb-proto' 'xcb-util' 'xcb-util-image' 'xcb-util-wm' 'xcb-util-keysyms' 'xcb-util-renderutil'
             'mesa' 'at-spi2-core' 'alsa-lib' 
             'libjpeg-turbo' 'cups' 'libpulse' 'hicolor-icon-theme' 'desktop-file-utils'
             'postgresql-libs' 'libmariadbclient' 'sqlite3' 'unixodbc' 'libmng'
@@ -144,6 +144,7 @@ build() {
     -testsdir /usr/share/qt5/tests \
     -translationdir /usr/share/qt5/translations \
     -plugin-sql-{psql,mysql,sqlite,odbc} \
+    -system-xcb \
     -system-sqlite \
     -openssl-linked \
     -nomake examples \
