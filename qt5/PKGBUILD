@@ -38,7 +38,7 @@ pkgname=('qt5-base'
 pkgver=5.6.0RC
 subver=5.6.0-rc
 _pkgver=5.6
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -61,6 +61,7 @@ source=("http://download.qt-project.org/development_releases/qt/${_pkgver}/${sub
         '0001-Fix-QWidget-setWindowRole.patch'
         '0005-Restore-documented-behavior-for-the-WA_X11NetWmWindo.patch'
         'libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch'
+        'highdpi-fix.patch::https://github.com/qtproject/qtbase/commit/cf846d6a8a0df0f0935f7f1306ab8439309cf6e5.patch'
         # not yet upstream
         'libqt5-Fix-Gujarati-font.patch'
         # desktop files
@@ -71,6 +72,7 @@ sha1sums=('7401e1d3bd91766e3c6d9a283a14adc30bf6d1e4'
           'f69e25beeba8682ef8ca9e8cf978061d75173914'
           '4dabcdf77de5325eba5890f356157c006b095cc9'
           'eb1fa717a650e95276bcd9f29b97fdb576c90337'
+          'f9a66a5df95bcc9c9269050c778d09e5bbec24cf'
           'd5dc1de05f00fa9eabce400ef11e7932ed8af550'
           '0862a4a39b74d0e447181d7eca31580c9d580bc8'
           'b63cab2c86505b594e32b32ae43524090fcb7d29'
@@ -95,6 +97,7 @@ prepare() {
   patch -Np1 -i ../../0005-Restore-documented-behavior-for-the-WA_X11NetWmWindo.patch
   patch -Np1 -i ../../libqt5-Fix-Gujarati-font.patch
   patch -Np1 -i ../../libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch
+  patch -Np1 -i ../../highdpi-fix.patch
   popd
 
   sed -i "s|-O2|${CXXFLAGS}|" qtbase/mkspecs/common/{g++,gcc}-base.conf
@@ -165,14 +168,16 @@ build() {
   make
 
   # Fix docs build when qt is not installed
-  sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" \
+  sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qttools/bin/qdoc|g" \
     "${QTDIR}"/qtbase/qmake/Makefile.qmake-docs
   find "${QTDIR}" -name Makefile \
-    -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qtbase/bin/qdoc|g" {} +
+    -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qttools/bin/qdoc|g" {} +
+  find "${QTDIR}" -name qdoc_wrapper.sh \
+    -exec sed -i "s|/usr/lib/qt5/bin/qdoc|${QTDIR}/qttools/bin/qdoc|g" {} +
   sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" \
     "${QTDIR}"/qtbase/qmake/Makefile.qmake-docs
-#  find "${QTDIR}" -name Makefile \
-#    -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
+  find "${QTDIR}" -name 'Makefile*' \
+    -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
 #  sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" \
 #    qtwebkit/Source/Makefile.api
   find "${QTDIR}" -name Makefile \
