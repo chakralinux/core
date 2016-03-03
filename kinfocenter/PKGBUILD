@@ -17,19 +17,18 @@ groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
         'kcm-about-distrorc'
-        'chakra-label.png'
-        'Module_Chakra.patch')
+        'chakra-label.png')
 sha256sums=( $(getSum ${pkgname})
             '7705eef707bbc5238c61bac4bbc749c4ba257d752b2b67e0720e56f9e287fa73'
-            'b06c781319509e0b082508a69f26f511acc40f169e79be5bc2cad8508ba25513'
-            'd493d642493b8eb2065becb8bbdc6d2d2953145e5522d8bfa25e63788b999361')
+            'b06c781319509e0b082508a69f26f511acc40f169e79be5bc2cad8508ba25513')
 
 prepare() {
   mkdir -p build
   
   cd "${pkgname}-${pkgver}/Modules/about-distro/src"
-  #  applay a custom patch to include only the chakra logo
-  patch -Np0 -i ${srcdir}/Module_Chakra.patch
+  # applay a custom patch to include only the chakra logo
+  # disable this for now
+  # patch -Np0 -i ${srcdir}/Module_Chakra.patch
 }
 
 build() {
