@@ -17,7 +17,6 @@ pkgname=('qt5-base'
          'qt5-imageformats'
          'qt5-location'
          'qt5-multimedia'
-#         'qt5-quick1'
          'qt5-quickcontrols'
          'qt5-quickcontrols2'
          'qt5-script'
@@ -30,7 +29,6 @@ pkgname=('qt5-base'
          'qt5-wayland'
          'qt5-webchannel'
          'qt5-webengine'
-#         'qt5-webkit'
          'qt5-websockets'
          'qt5-webview'
          'qt5-x11extras'
@@ -38,12 +36,12 @@ pkgname=('qt5-base'
 pkgver=5.6.0RC
 subver=5.6.0-rc
 _pkgver=5.6
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
 makedepends=('libxcb' 'xcb-proto' 'xcb-util' 'xcb-util-image' 'xcb-util-wm' 'xcb-util-keysyms' 'xcb-util-renderutil'
-            'mesa' 'at-spi2-core' 'alsa-lib' 
+            'mesa' 'at-spi2-core' 'alsa-lib' 'icu'
             'libjpeg-turbo' 'cups' 'libpulse' 'hicolor-icon-theme' 'desktop-file-utils'
             'postgresql-libs' 'libmariadbclient' 'sqlite3' 'unixodbc' 'libmng'
             'python2' 'ruby' 'gperf' 'libxslt' 'libxcomposite' 'fontconfig' 'bluez'
@@ -179,8 +177,6 @@ build() {
     "${QTDIR}"/qtbase/qmake/Makefile.qmake-docs
   find "${QTDIR}" -name 'Makefile*' \
     -exec sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" {} +
-#  sed -i "s|/usr/lib/qt5/bin/qhelpgenerator|${QTDIR}/qttools/bin/qhelpgenerator|g" \
-#    qtwebkit/Source/Makefile.api
   find "${QTDIR}" -name Makefile \
     -exec sed -i "s|/usr/lib/qt5/bin/qmlplugindump|${QTDIR}/qtdeclarative/bin/qmlplugindump|g" {} +
 
@@ -206,7 +202,7 @@ package_qt5-base() {
            'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'libxinerama' 'libxcursor'
            'pulseaudio' 'gstreamer' 'gst-plugins-base' 'gst-plugins-ugly' 'gst-plugins-good'
            'xcb-util-image' 'xcb-util-keysyms'
-           'xcb-util-renderutil' 'xcb-util-wm' 'libxkbcommon-x11' 'libinput')
+           'xcb-util-renderutil' 'xcb-util-wm' 'libxkbcommon-x11' 'libinput' 'icu')
   optdepends=('postgresql-libs: PostgreSQL driver'
               'libmariadbclient: MariaDB driver'
               'unixodbc: ODBC driver'
@@ -391,27 +387,6 @@ package_qt5-location() {
     "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
 }
 
-package_qt5-quick1() {
-  pkgdesc='Qt Declarative is provided for Qt 4 compatibility'
-  depends=('qt5-webkit' 'qt5-script')
-  conflicts=('qt5')
-  options=("debug")
-
-  cd ${_pkgfqn}/qtquick1
-  make INSTALL_ROOT="${pkgdir}" install
-
-  _prlfix 
-  
-  # create some symlinks in /usr/bin, postfixed with -qt5
-  install -d "${pkgdir}"/usr/bin
-  for i in $(ls ${pkgdir}/usr/lib/qt5/bin); do
-      ln -s /usr/lib/qt5/bin/${i} ${pkgdir}/usr/bin/${i}-qt5
-  done
-
-  install -D -m644 LGPL_EXCEPTION.txt \
-    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
-}
-
 package_qt5-quickcontrols2() {
   pkgdesc='Provides new light-weight set of embedded and mobile orientation controls (Technology Preview)'
   depends=('qt5-declarative')
@@ -506,7 +481,7 @@ package_qt5-svg() {
 
 package_qt5-tools() {
   pkgdesc='A cross-platform application and UI framework (Development Tools, QtHelp)'
-  depends=('qt5-webkit' 'desktop-file-utils' 'qt5-translations' 'hicolor-icon-theme'
+  depends=('qt5-base' 'desktop-file-utils' 'qt5-translations' 'hicolor-icon-theme'
            'xdg-utils')
   optdepends=('qt5-doc: documentation')
   conflicts=('qt5')
