@@ -1,0 +1,56 @@
+# maintainer almack
+
+pkgname=qt5-webkit
+pkgver=5.6.0RC
+_pkgver=5.6.0
+pkgrel=1
+arch=('x86_64')
+url='http://trac.webkit.org/wiki/QtWebKit'
+pkgdesc='An open source web browser engine (Qt port)'
+license=('LGPL2.1' 'GPL3')
+options=("debug")
+depends=(qt5-sensors  qt5-location  qt5-webchannel  gst-plugins-base  libxslt  libxcomposite  libwebp)
+makedepends=(qt5-declarative qt5-tools 'gperf' 'python2' 'mesa' 'ruby' 'git')
+optdepends=('gst-plugins-good: For media format support'
+            'gst-plugins-bad: For media format support'
+            'gst-plugins-ugly: For media format support'
+            'gst-libav: For media format support')
+# edit this source later, sf won't let us dl files that big
+source=("http://download.qt.io/development_releases/qt/5.6/5.6.0-rc/submodules/qtwebkit-opensource-src-${_pkgver}.tar.xz")
+sha1sums=('a68e8bfdf237cfb6b958674a3b609fcb2f8423f3')
+
+_prlfix() {
+  # Fix wrong path in prl files
+  find "${pkgdir}/usr/lib" -type f -name '*.prl' \
+    -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
+}
+
+prepare() {
+  cd qtwebkit-opensource-src-${_pkgver}
+
+  if [ ! -d include ]; then
+    syncqt.pl-qt5 -version 5.6.0 Source/sync.profile
+  fi
+}
+
+build() {
+  cd qtwebkit-opensource-src-${_pkgver}
+  mkdir -p build
+  cd build
+  qmake-qt5 ..
+
+  make
+
+  make docs
+}
+
+package() {
+  cd qtwebkit-opensource-src-${_pkgver}/build
+  make INSTALL_ROOT="${pkgdir}" install
+  make INSTALL_ROOT="${pkgdir}" install_docs
+
+  _prlfix
+  
+  # Fix wrong path in pc file
+  perl -pi -e "s, -L${srcdir}/?\S+,,g" "${pkgdir}"/usr/lib/pkgconfig/Qt5WebKit.pc
+}
