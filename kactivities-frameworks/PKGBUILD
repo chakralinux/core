@@ -3,7 +3,7 @@ source ../frameworks.conf
 pkgname=kactivities-frameworks
 _pkgname=kactivities
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 pkgdesc="Core components for the KDE's Activities"
 url='https://projects.kde.org/projects/frameworks/kactivities'
@@ -31,5 +31,11 @@ build() {
 
 package() {
   cd build
-  make DESTDIR="${pkgdir}" install
+
+  if [ "$(vercmp ${pkgver} 5.19.0)" == 1 ]; then
+      echo "Please make PKGBUILD use plain make install, this is only for 5.19 with plasma 5.6"
+  fi
+  make DESTDIR="${pkgdir}" -C src/lib install
+  make DESTDIR="${pkgdir}" -C src/imports install
+  make DESTDIR="${pkgdir}" -C src/service install
 }
