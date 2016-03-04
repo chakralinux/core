@@ -3,7 +3,7 @@ source ../frameworks.conf
 pkgname=kactivities-frameworks
 _pkgname=kactivities
 pkgver=${KFVersion}
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 pkgdesc="Core components for the KDE's Activities"
 url='https://projects.kde.org/projects/frameworks/kactivities'
@@ -39,4 +39,6 @@ package() {
   make DESTDIR="${pkgdir}" -C src/lib install
   make DESTDIR="${pkgdir}" -C src/imports install
   make DESTDIR="${pkgdir}" -C src/service install
+  make DESTDIR="${pkgdir}" install/local
+  rm -rf "${pkgdir}"/usr/share/locale 
 }
