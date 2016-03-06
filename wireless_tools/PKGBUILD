@@ -5,23 +5,24 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=wireless_tools
-pkgver=29
-pkgrel=5
+pkgver=30.pre9
+_pkgver=30
+pkgrel=1
 pkgdesc="Wireless Tools"
 arch=('i686' 'x86_64')
 url="http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html"
 license=('GPL')
 depends=('glibc')
-source=("http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/wireless_tools.${pkgver}.tar.gz")
-md5sums=('e06c222e186f7cc013fd272d023710cb')
+source=("http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/${pkgname}.${pkgver}.tar.gz")
+md5sums=('ca91ba7c7eff9bfff6926b1a34a4697d')
 
 build() {
-	cd ${srcdir}/wireless_tools.${pkgver}
+	cd ${srcdir}/wireless_tools.${_pkgver}
 	make
 }
 
 package() {
-	cd ${srcdir}/wireless_tools.${pkgver}
+	cd ${srcdir}/wireless_tools.${_pkgver}
 	make INSTALL_DIR="${pkgdir}/usr/sbin" \
 		INSTALL_LIB="${pkgdir}/usr/lib" \
 		INSTALL_INC="${pkgdir}/usr/include" \
