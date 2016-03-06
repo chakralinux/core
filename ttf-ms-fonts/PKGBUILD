@@ -2,7 +2,7 @@
 
 pkgname=ttf-ms-fonts
 pkgver=2.0
-pkgrel=5
+pkgrel=6
 pkgdesc="Core TTF Fonts from Microsoft"
 arch=('x86_64')
 url="http://corefonts.sourceforge.net/"
@@ -23,10 +23,8 @@ md5sums=('cbdc2fdd7d2ed0832795e86a8b9ee19a' '9637df0e91703179f0723ec095a36cb5'
          '230a1d13a365b22815f502eb24d9149b')
 
 package() { 
-  install -dm755 "$pkgdir/usr/share/fonts/TTF"
-
   for font in *.{ttf,TTF}; do
-    install -m644 $font "$pkgdir/usr/share/fonts/TTF/$(echo $font|tr A-Z a-z)"
+    install -Dm644 $font "$pkgdir/usr/share/fonts/MS-Font/$(echo $font|tr A-Z a-z)"
   done
 
   install -Dm644 Licen.TXT "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
