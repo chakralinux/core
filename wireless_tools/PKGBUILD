@@ -16,8 +16,15 @@ depends=('glibc')
 source=("http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/${pkgname}.${pkgver}.tar.gz")
 md5sums=('ca91ba7c7eff9bfff6926b1a34a4697d')
 
+prepare() {
+  	cd "${srcdir}/${pkgname}.${_pkgver}"
+# This triggers the full build, instead of the "static" one
+# which is smaller in size but lacks the shared library.
+	sed '/BUILD_STATIC =/d' -i Makefile
+}
+
 build() {
-	cd ${srcdir}/wireless_tools.${_pkgver}
+	cd ${srcdir}/${pkgname}.${_pkgver}
 	make
 }
 
