@@ -1,0 +1,33 @@
+#Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/bluedevil-frameworks
+source ../plasma.conf
+
+pkgname=breeze-plymouth
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="Breeze theme for Plymouth"
+arch=('x86_64')
+url='https://projects.kde.org/projects/kdereview/breeze-plymouth'
+license=('LGPL')
+depends=('plymouth')
+makedepends=('extra-cmake-modules')
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+
+  cd ${pkgname}-${pkgver}
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
