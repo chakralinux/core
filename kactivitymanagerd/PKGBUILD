@@ -1,0 +1,32 @@
+source ../plasma.conf
+
+pkgname=kactivitymanagerd
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="System service to manage user's activities and track the usage patterns"
+arch=('x86_64')
+url='https://projects.kde.org/kactivitymanagerd'
+license=('LGPL')
+depends=(kio)
+makedepends=(extra-cmake-modules boost)
+groups=('plasma')
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+
+  cd ${pkgname}-${pkgver}
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
