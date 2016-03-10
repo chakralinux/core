@@ -4,23 +4,22 @@
 
 pkgbase=python-pexpect
 pkgname=('python3-pexpect' 'python2-pexpect')
-pkgver=3.0rc3
+pkgver=4.0.1
 pkgrel=1
 pkgdesc='Python module for spawning and controlling other applications'
 arch=('any')
 url='http://pexpect.sourceforge.net/'
 license=('custom:ISC')
 makedepends=('python3' 'python2')
-source=("https://github.com/pexpect/pexpect/releases/download/$pkgver/pexpect-$pkgver.tar.gz")
-#source=("http://pypi.python.org/packages/source/p/pexpect/pexpect-$pkgver.tar.gz")
-sha512sums=('c7f9b7ecaae2ea584de228d3a6ccc2d2643ce5bbe9ca3b949dfeae3f96c38719ca80591ff6d9d851e4e672ad9aea64326edf5d78445aa103c7c4dc39d2ef0d91')
+source=("http://pypi.python.org/packages/source/p/pexpect/pexpect-${pkgver}.tar.gz")
+sha512sums=('c2476f977964379faa3ecef1bc4800f3a87bd6cdd9e2d52e4e4f33a4060a97bb54f0770dfb5804d5a863eaf6ddef6b11be1d24f1617cc4837015202868ca7e87')
 
 prepare() {
     cp -r ${srcdir}/pexpect-$pkgver ${srcdir}/python2-pexpect-$pkgver
 }
 
 package_python3-pexpect() {
-    depends=('python3')
+    depends=('python3' 'python3-ptyprocess')
 
     cd ${srcdir}/pexpect-$pkgver
 
@@ -34,7 +33,7 @@ package_python3-pexpect() {
 }
 
 package_python2-pexpect() {
-    depends=('python2')
+    depends=('python2' 'python2-ptyprocess')
     conflicts=('python-pexpect')
     replaces=('python-pexpect')
     provides=('python-pexpect')
@@ -49,3 +48,4 @@ package_python2-pexpect() {
            -e "s|#![ ]*/bin/env python$|#!/usr/bin/env python2|" \
                $(find ${pkgdir} -name '*.py')
 }
+
