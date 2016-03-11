@@ -1,0 +1,30 @@
+# Contributor from arch: https://projects.archlinux.org/svntogit/packages.git/tree/kde-unstable/PKGBUILD?h=packages/breeze-grub
+
+source ../plasma.conf
+
+pkgname=breeze-grub
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="Breeze theme for GRUB"
+arch=(any)
+url='https://projects.kde.org/breeze-grub'
+license=(LGPL)
+depends=(grub)
+makedepends=()
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
+	breeze-grub-remove-unsupported-options.patch::"https://quickgit.kde.org/?p=breeze-grub.git&a=commitdiff&h=a978617a&o=plain")
+sha256sums=( $(getSum ${pkgname})
+            'ccb833ccc1227af0cc1d4378f5dc021fe02a34854be73afbecaa285b0c5180b5')
+
+prepare() {
+  mkdir -p build
+
+# Remove unsupported options
+  cd $pkgname-$pkgver
+  patch -p1 -i ../breeze-grub-remove-unsupported-options.patch
+}
+
+package() {
+  install -d "$pkgdir"/boot/grub/themes
+  cp -r $pkgname-$pkgver/breeze "$pkgdir"/boot/grub/themes
+}
