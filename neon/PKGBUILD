@@ -1,19 +1,17 @@
 #
-# Core packages for Chakra, part of chakra-project.org
+# Core packages for Chakra, part of chakraos.org
 #
-# maintainer abveritas[at]chakra-project[dot]org>
 
-# KEEP LIBTOOL FILES!
 pkgname=neon
-pkgver=0.29.6
-pkgrel=6
+pkgver=0.30.1
+pkgrel=1
 pkgdesc="HTTP and WebDAV client library with a C interface"
 arch=('x86_64')
 license=('GPL' 'LGPL')
 depends=('krb5' 'expat' 'ca-certificates')
 url="http://www.webdav.org/neon/"
 source=("http://www.webdav.org/neon/${pkgname}-${pkgver}.tar.gz")
-md5sums=('591e0c82e6979e7e615211b386b8f6bc')
+md5sums=('231adebe5c2f78fded3e3df6e958878e')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
@@ -21,8 +19,6 @@ build() {
     --with-expat --enable-shared --disable-static \
     --with-ssl=openssl --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
   make 
-  # fix invalid .so links in man pages 
-  sed -i '/^\.so/s|\.so \([^.]\+\)\.\([[:digit:]]\)|.so man\2/\1.\2|' doc/man/*
 }
 
 package() {
