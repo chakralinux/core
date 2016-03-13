@@ -31,4 +31,8 @@ build() {
 package() {
   cd build
   make DESTDIR="${pkgdir}" install
+
+  msg 'change DuckDuckGo search'
+  cd ${pkgdir}/usr/share/kservices5/searchproviders/
+  sed 's/kde/chakra/g' -i duckduckgo*
 }
