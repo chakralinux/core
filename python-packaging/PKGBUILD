@@ -1,0 +1,50 @@
+# $Id$
+# Maintainer: Felix Yan <felixonmars@archlinux.org>
+
+pkgbase=python-packaging
+pkgname=(python3-packaging python2-packaging)
+_pkgname=packaging
+pkgver=16.5
+pkgrel=2
+pkgdesc="Core utilities for Python packages"
+arch=('any')
+url="https://github.com/pypa/packaging"
+license=('Apache')
+makedepends=('python3-setuptools' 'python2-setuptools' 'python3-pyparsing' 'python2-pyparsing' 'git')
+#checkdepends=('python3-pytest-runner' 'python2-pytest-runner' 'python3-pretend' 'python2-pretend' 'python3-coverage' 'python2-coverage')
+source=("git+https://github.com/pypa/packaging.git#tag=$pkgver")
+md5sums=('SKIP')
+
+prepare() {
+  cp -a $_pkgname{,-py2}
+}
+
+build() {
+  cd "${srcdir}/${_pkgname}"
+  python3 setup.py build
+
+  cd "${srcdir}/${_pkgname}-py2"
+  python2 setup.py build
+}
+
+#check() {
+#  cd "${srcdir}/${_pkgname}"
+#  python setup.py ptr
+#
+#  cd "${srcdir}/${_pkgname}-py2"
+#  python2 setup.py ptr
+#}
+
+package_python3-packaging() {
+  depends=('python3-pyparsing' 'python3-six')
+
+  cd "${srcdir}/${_pkgname}"
+  python3 setup.py install --root "$pkgdir"
+}
+
+package_python2-packaging() {
+  depends=('python2-pyparsing' 'python2-six')
+
+  cd "${srcdir}/${_pkgname}-py2"
+  python2 setup.py install --root "$pkgdir"
+}

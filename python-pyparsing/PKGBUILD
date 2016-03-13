@@ -1,0 +1,33 @@
+pkgbase=python-pyparsing
+pkgname=('python3-pyparsing' 'python2-pyparsing')
+pkgver=2.1.0
+pkgrel=2
+pkgdesc='General parsing module for Python'
+arch=('any')
+url='http://pyparsing.wikispaces.com'
+license=('MIT')
+makedepends=('python3-setuptools' 'python2-setuptools')
+source=("http://downloads.sourceforge.net/pyparsing/pyparsing-$pkgver.tar.gz")
+sha256sums=('f6cb2bc85a491347c3c699db47f7ecc02903959156b4f92669ebf82395982901')
+
+prepare() {
+  cp -vr $srcdir/pyparsing-$pkgver $srcdir/pyparsing-$pkgver-py2
+}
+
+package_python3-pyparsing() {
+  cd "$srcdir/pyparsing-$pkgver"
+
+  rm -rf build
+  python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
+
+package_python2-pyparsing() {
+  cd "pyparsing-$pkgver-py2"
+
+  rm -rf build
+  python2 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/python2-pyparsing/LICENSE"
+}
+
+# vim:set ts=2 sw=2 et:
