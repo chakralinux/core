@@ -1,75 +1,49 @@
-diff -Naur iproute2-3.4.0/Makefile iproute2-3.4.0.new/Makefile
---- iproute2-3.4.0/Makefile	2012-05-21 23:12:19.000000000 +0200
-+++ iproute2-3.4.0.new/Makefile	2012-06-18 10:23:53.896760158 +0200
-@@ -1,7 +1,8 @@
- ROOTDIR=$(DESTDIR)
- PREFIX=/usr
- LIBDIR=$(PREFIX)/lib
--SBINDIR=/sbin
-+SBINDIR=/usr/sbin
-+SHAREDIR=/usr/share
- CONFDIR=/etc/iproute2
- DATADIR=$(PREFIX)/share
- DOCDIR=$(DATADIR)/doc/iproute2
-diff -Naur iproute2-3.4.0/netem/Makefile iproute2-3.4.0.new/netem/Makefile
---- iproute2-3.4.0/netem/Makefile	2012-05-21 23:12:19.000000000 +0200
-+++ iproute2-3.4.0.new/netem/Makefile	2012-06-18 10:23:53.896760158 +0200
+diff -Naur iproute2-4.4.0/Makefile iproute2-4.4.0.new/Makefile
+--- iproute2-4.4.0/Makefile	2016-01-11 16:33:03.000000000 +0000
++++ iproute2-4.4.0.new/Makefile	2016-03-14 01:34:13.167172630 +0000
+@@ -1,6 +1,6 @@
+ PREFIX?=/usr
+ LIBDIR?=$(PREFIX)/lib
+-SBINDIR?=/sbin
++SBINDIR?=$(PREFIX)/sbin
+ CONFDIR?=/etc/iproute2
+ DATADIR?=$(PREFIX)/share
+ DOCDIR?=$(DATADIR)/doc/iproute2
+diff -Naur iproute2-4.4.0/netem/Makefile iproute2-4.4.0.new/netem/Makefile
+--- iproute2-4.4.0/netem/Makefile	2016-01-11 16:33:03.000000000 +0000
++++ iproute2-4.4.0.new/netem/Makefile	2016-03-14 01:35:52.179485855 +0000
 @@ -20,9 +20,9 @@
  	$(HOSTCC) $(CCOPTS) -I../include -o $@ $@.c -lm
  
  install: all
 -	mkdir -p $(DESTDIR)$(LIBDIR)/tc
-+	mkdir -p $(DESTDIR)$(SHAREDIR)/tc
++	mkdir -p $(DESTDIR)$(DATADIR)/tc
  	for i in $(DISTDATA); \
 -	do install -m 644 $$i $(DESTDIR)$(LIBDIR)/tc; \
-+	do install -m 644 $$i $(DESTDIR)$(SHAREDIR)/tc; \
++	do install -m 644 $$i $(DESTDIR)$(DATADIR)/tc; \
  	done
  
  clean:
-diff -Naur iproute2-3.4.0/tc/Makefile iproute2-3.4.0.new/tc/Makefile
---- iproute2-3.4.0/tc/Makefile	2012-05-21 23:12:19.000000000 +0200
-+++ iproute2-3.4.0.new/tc/Makefile	2012-06-18 10:23:53.893426840 +0200
-@@ -105,18 +105,11 @@
- 	$(AR) rcs $@ $(TCLIB)
- 
- install: all
--	mkdir -p $(MODDESTDIR)
-+	mkdir -p $(DESTDIR)$(LIBDIR)/tc
- 	install -m 0755 tc $(DESTDIR)$(SBINDIR)
- 	for i in $(TCSO); \
--	do install -m 755 $$i $(MODDESTDIR); \
-+	do install -m 755 $$i $(DESTDIR)$(LIBDIR)/tc; \
- 	done
--	if [ ! -f $(MODDESTDIR)/m_ipt.so ]; then \
--	if [ -f $(MODDESTDIR)/m_xt.so ]; \
--		then ln -s m_xt.so $(MODDESTDIR)/m_ipt.so ; \
--	elif [ -f $(MODDESTDIR)/m_xt_old.so ]; \
--		then ln -s m_xt_old.so $(MODDESTDIR)/m_ipt.so ; \
--	fi; \
--	fi
- 
- clean:
- 	rm -f $(TCOBJ) $(TCLIB) libtc.a tc *.so emp_ematch.yacc.h; \
-diff -Naur iproute2-3.4.0/tc/tc_util.c iproute2-3.4.0.new/tc/tc_util.c
---- iproute2-3.4.0/tc/tc_util.c	2012-05-21 23:12:19.000000000 +0200
-+++ iproute2-3.4.0.new/tc/tc_util.c	2012-06-18 10:23:53.893426840 +0200
-@@ -24,8 +24,8 @@
- #include "utils.h"
+diff -Naur iproute2-4.4.0/tc/tc_util.c iproute2-4.4.0.new/tc/tc_util.c
+--- iproute2-4.4.0/tc/tc_util.c	2016-01-11 16:33:03.000000000 +0000
++++ iproute2-4.4.0.new/tc/tc_util.c	2016-03-14 01:40:39.286562131 +0000
+@@ -28,8 +28,8 @@
  #include "tc_util.h"
+ #include "tc_common.h"
  
 -#ifndef LIBDIR
 -#define LIBDIR "/usr/lib"
-+#ifndef SHAREDIR
-+#define SHAREDIR "/usr/share"
++#ifndef DATADIR
++#define DATADIR "/usr/share"
  #endif
  
- const char *get_tc_lib(void)
-@@ -34,7 +34,7 @@
+ static struct db_names *cls_names = NULL;
+@@ -68,7 +68,7 @@
  
  	lib_dir = getenv("TC_LIB_DIR");
  	if (!lib_dir)
 -		lib_dir = LIBDIR "/tc/";
-+		lib_dir = SHAREDIR "/tc/";
++		lib_dir = DATADIR "/tc/";
  
  	return lib_dir;
  }
