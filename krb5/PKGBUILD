@@ -1,51 +1,46 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
 # maintainer inkane@chakra-project.org
 # contributor abveritas[at]chakra-project[dot]org>
 
 pkgname=krb5
-pkgver=1.11.3
-pkgrel=2
+pkgver=1.14.1
+pkgrel=1
 pkgdesc="The Kerberos network authentication system"
 arch=('i686' 'x86_64')
 url="http://web.mit.edu/kerberos/"
 license=('custom')
 depends=('e2fsprogs' 'libldap' 'keyutils')
 makedepends=('perl')
-provides=('heimdal')
-replaces=('heimdal')
-conflicts=('heimdal')
 backup=('etc/krb5.conf' 'var/lib/krb5kdc/kdc.conf')
-source=("http://web.mit.edu/kerberos/dist/${pkgname}/1.11/${pkgname}-${pkgver}-signed.tar"
+source=("http://web.mit.edu/kerberos/dist/${pkgname}/1.14/${pkgname}-${pkgver}.tar.gz"{,.asc}
         'krb5-kadmind.service'
         'krb5-config_LDFLAGS.patch'
         'krb5-kdc.service'
 	'krb5-kpropd.service'
 	'krb5-kpropd@.service'
 	'krb5-kpropd.socket')
-md5sums=('56f0ae274b285320b8a597cb89442449'
+md5sums=('400de0cabbfbe85c2c36f60347bf7dc6'
+         'SKIP'
          'd2c898d376ebe5c62b873da7cab0f7e7'
          '656e242de9b5ada1edf398983db51eef'
          'f0245d33083337f95654f4caf1d32f57'
          '3dddf2f79ef74c4e736711e41228ee91'
          'babefac221331f7131a29faac33cc5bc'
          '5b9cee689e4f8085d39ef4e05f1ddd9a')
-options=('!emptydirs')
+validpgpkeys=('2C732B1C0DBEF678AB3AF606A32F17FD0055C305')
 
-build() {
-   tar zxvf ${pkgname}-${pkgver}.tar.gz
-   cd "${srcdir}/${pkgname}-${pkgver}/src"
-   
+prepare() {
    # cf https://bugs.gentoo.org/show_bug.cgi?id=448778
    # fix issue with krb5-conf --libs returning wrong output
+   cd "${srcdir}/${pkgname}-${pkgver}/src/build-tools"
    patch -Np2 -i "${srcdir}"/krb5-config_LDFLAGS.patch
 
-   rm lib/krb5/krb/deltat.c
-
    # fix for the bug described at https://bugs.archlinux.org/task/25384
+   cd "${srcdir}/${pkgname}-${pkgver}/src"
    sed -i "/KRB5ROOT=/s/\/local//" util/ac_check_krb5.m4
+}
 
+build() {
+   cd ${pkgname}-${pkgver}/src
    export CFLAGS+=" -fPIC -fno-strict-aliasing -fstack-protector-all"
    export CPPFLAGS+=" -I/usr/include/et"
    ./configure --prefix=/usr \
@@ -75,6 +70,9 @@ package() {
    # Default configuration file
    install -dm 755 "${pkgdir}"/etc
    install -pm 644 config-files/krb5.conf "${pkgdir}"/etc/krb5.conf
+
+   install -dm 755 "${pkgdir}"/usr/share/aclocal
+   install -m 644 util/ac_check_krb5.m4 "${pkgdir}"/usr/share/aclocal
 
    install -Dm644 "${srcdir}"/${pkgname}-${pkgver}/NOTICE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
 
