@@ -3,13 +3,13 @@
 pkgbase=vigra
 pkgname=('vigra' 'vigra-doc')
 pkgver=1.10.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Computer vision library"
 arch=('x86_64')
 url="http://hci.iwr.uni-heidelberg.de/vigra/"
 license=('custom:MIT')
 makedepends=( # runtime deps
-             'libpng' 'libtiff' 'hdf5' 'fftw'
+             'libpng' 'libtiff' 'hdf5' 'fftw' 'openexr'
               # buildtime deps
              'cmake' 'python2-nose' 'doxygen' 'python2-sphinx' 'boost' 'python2-numpy' 'python3-sphinx')
 source=("https://github.com/ukoethe/vigra/releases/download/Version-${pkgver//./-}/${pkgname}-${pkgver}-src-with-docu.tar.gz")
@@ -21,6 +21,7 @@ build() {
   cmake -DCMAKE_INSTALL_PREFIX=/usr \
       -DPYTHON_EXECUTABLE=/usr/bin/python2 \
       -DWITH_VIGRANUMPY=1 \
+      -DWITH_OPENEXR=1 \
       -DDOCINSTALL=share/doc 
   make
 }
@@ -32,7 +33,7 @@ build() {
 # Currently failed due to limitation of buildsystem
 
 package_vigra() {
-  depends=('libpng' 'libtiff' 'hdf5' 'fftw')
+  depends=('libpng' 'libtiff' 'hdf5' 'fftw'i 'openexr')
   optdepends=('python2: for python bindings'
               'boost-libs: for python bindings')
 
