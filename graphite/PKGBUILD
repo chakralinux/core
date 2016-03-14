@@ -1,7 +1,7 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/graphite
 
 pkgname=graphite
-pkgver=1.3.5
+pkgver=1.3.6
 pkgrel=1
 arch=('x86_64')
 url="https://github.com/silnrsi/graphite"
@@ -13,8 +13,8 @@ makedepends=('cmake' 'freetype2' 'python2'
              'doxygen' 'dblatex' 'graphviz' 'asciidoc')
 checkdepends=('python2-fonttools')
 options=('!emptydirs')
-source=(https://github.com/silnrsi/graphite/releases/download/${pkgver}/graphite2-${pkgver}.tgz)
-md5sums=('5b8d22a8bbf031838e31432868c0109c')
+source=(https://github.com/silnrsi/${pkgname}/releases/download/${pkgver}/graphite-${pkgver}.tgz)
+md5sums=('12eb607e0f458febe348ae69b832b300')
 
 prepare() {
   cd "${srcdir}"
@@ -24,8 +24,7 @@ prepare() {
 }
 
 build() {
-  mkdir build
-  cd build
+  mkdir build && cd build
   cmake -G "Unix Makefiles" ../graphite2-${pkgver} \
 	-DCMAKE_C_FLAGS:STRING="${CFLAGS}" \
 	-DCMAKE_INSTALL_PREFIX=/usr \
