@@ -1,0 +1,19 @@
+X-Git-Url: https://codereview.qt-project.org/gitweb?p=qt%2Fqtbase.git;a=blobdiff_plain;f=src%2Fdbus%2Fqdbusintegrator.cpp;h=caf2e92fc29c25bfe8f71a66a52cf6344cad7acc;hp=cd448613d6512cc78c0d2311d986108a1dc218aa;hb=d011c92b47f95554fe639ad9c0542768d802666b;hpb=15fcd691dbd2bd029fde7a9c3becafa4b6708a52
+
+diff --git a/src/dbus/qdbusintegrator.cpp b/src/dbus/qdbusintegrator.cpp
+index cd44861..caf2e92 100644
+--- a/src/dbus/qdbusintegrator.cpp
++++ b/src/dbus/qdbusintegrator.cpp
+@@ -1484,8 +1484,10 @@ void QDBusConnectionPrivate::handleObjectCall(const QDBusMessage &msg)
+             return;
+         }
+ 
+-        if (!QDBusMessagePrivate::isLocal(msg)) {
+-            // external incoming message
++        if (!QDBusMessagePrivate::isLocal(msg) || QThread::currentThread() == QDBusConnectionManager::instance()) {
++            // two cases:
++            // 1. external incoming message
++            // 2. local message deferred by spy hook
+             // post it and forget
+             postEventToThread(HandleObjectCallPostEventAction, result.obj,
+                               new QDBusActivateObjectEvent(QDBusConnection(this), this, result,

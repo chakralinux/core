@@ -12,14 +12,12 @@ pkgname=('qt5-base'
          'qt5-connectivity'
          'qt5-declarative'
          'qt5-doc'
-         'qt5-enginio'
          'qt5-graphicaleffects'
          'qt5-imageformats'
          'qt5-location'
          'qt5-multimedia'
          'qt5-quickcontrols'
          'qt5-quickcontrols2'
-         'qt5-script'
          'qt5-sensors'
          'qt5-serialbus'
          'qt5-serialport'
@@ -33,10 +31,10 @@ pkgname=('qt5-base'
          'qt5-webview'
          'qt5-x11extras'
          'qt5-xmlpatterns')
-pkgver=5.6.0RC
-subver=5.6.0-rc
+pkgver=5.6.0
+subver=5.6.0
 _pkgver=5.6
-pkgrel=4
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -58,6 +56,7 @@ _pkgfqn="qt-everywhere-opensource-src-${subver}"
 source=("http://download.qt-project.org/development_releases/qt/${_pkgver}/${subver}/single/$_pkgfqn.tar.xz"
         '0001-Fix-QWidget-setWindowRole.patch'
         '0005-Restore-documented-behavior-for-the-WA_X11NetWmWindo.patch'
+        'do_not_synchronize_local_messages.patch'
         'libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch'
         'highdpi-fix.patch::https://github.com/qtproject/qtbase/commit/cf846d6a8a0df0f0935f7f1306ab8439309cf6e5.patch'
         # not yet upstream
@@ -66,9 +65,10 @@ source=("http://download.qt-project.org/development_releases/qt/${_pkgver}/${sub
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
         'qmlviewer.desktop'
         'qdbusviewer-qt5.desktop')
-sha1sums=('7401e1d3bd91766e3c6d9a283a14adc30bf6d1e4'
+sha1sums=('253f87623f2e8238623ba9d7f705355ed3da4eee'
           'f69e25beeba8682ef8ca9e8cf978061d75173914'
           '4dabcdf77de5325eba5890f356157c006b095cc9'
+          'dbc8a9b6d75553b19b4fa00f785876bea0177794'
           'eb1fa717a650e95276bcd9f29b97fdb576c90337'
           'f9a66a5df95bcc9c9269050c778d09e5bbec24cf'
           'd5dc1de05f00fa9eabce400ef11e7932ed8af550'
@@ -96,6 +96,7 @@ prepare() {
   patch -Np1 -i ../../libqt5-Fix-Gujarati-font.patch
   patch -Np1 -i ../../libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch
   patch -Np1 -i ../../highdpi-fix.patch
+  patch -Np1 -i ../../do_not_synchronize_local_messages.patch
   popd
 
   sed -i "s|-O2|${CXXFLAGS}|" qtbase/mkspecs/common/{g++,gcc}-base.conf
