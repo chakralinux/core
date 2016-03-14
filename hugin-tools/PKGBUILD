@@ -3,23 +3,20 @@
 
 pkgname=hugin-tools
 _pkgname=hugin
-pkgver=2014.0.0
-pkgrel=2
+pkgver=2015.0.0
+pkgrel=1
 pkgdesc="Hugin libs and tools to be used by Kipi-plugins"
 arch=('x86_64')
 url="http://hugin.sourceforge.net/"
 license=('LGPL')
-depends=('boost-libs' 'enblend-enfuse' 'exiv2>=0.24' 'perl-exiftool' 'openexr' 'libpano13>=2.9.19'
-         'lapack' 'desktop-file-utils' 'icu' 'libxt' 'lensfun' 'libpng' 'libxrandr' 'openexr')
+depends=('boost-libs' 'enblend-enfuse' 'exiv2>=0.24' 'fftw' 'perl-exiftool' 'openexr' 'libpano13>=2.9.19'
+         'sqlite3' 'lapack' 'desktop-file-utils' 'icu' 'libxt' 'libpng' 'libxrandr' 'openexr')
 makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap')
 source=("http://downloads.sourceforge.net/${_pkgname}/${_pkgname}-${pkgver}.tar.bz2")
-sha1sums=('7b4ae181f664b9e0a68f55f298cdaa210fa09aa9')
+sha1sums=('be7153a0791f2147153e93e8711912ef23b60b61')
 
 prepare() {
   cd "${srcdir}/${_pkgname}-${pkgver}"
-  
-  # Fix compiling against lensfun-0.3.0
-  sed '/LF_DIST_MODEL_FOV1/d' -i src/hugin_base/lensdb/LensDB.cpp
 }
 
 build() {
@@ -31,7 +28,6 @@ build() {
   # this makes possible to compile all the hugin tools without GUis
   sed -i -e "s~FIND_PACKAGE(wxWidgets REQUIRED)~~g" ${srcdir}/${_pkgname}-${pkgver}/CMakeLists.txt
   mkdir -p ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
-  cp ${srcdir}/${_pkgname}-${pkgver}/src/hugin1/PT/*.h ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
 
   cmake "${srcdir}/${_pkgname}-${pkgver}" \
     -DCMAKE_BUILD_TYPE=Release \
