@@ -1,6 +1,5 @@
-
 pkgname=xfsprogs
-pkgver=3.2.2
+pkgver=4.5.0
 pkgrel=1
 pkgdesc="XFS filesystem utilities"
 arch=('x86_64')
@@ -8,13 +7,14 @@ license=('LGPL')
 url="http://oss.sgi.com/projects/xfs/"
 groups=('base')
 depends=('util-linux')
+makedepends=('git')
 options=('!makeflags')
-# We mirror the sources as upstream tends to move them once a new release is out
-source=("https://sources.archlinux.org/other/xfsprogs/${pkgname}-${pkgver}.tar.gz")
-md5sums=('b6b0db5e3ee71ceba26d0a5accbd0666')
+source=("git://oss.sgi.com/xfs/cmds/xfsprogs#tag=v${pkgver}")
+md5sums=('SKIP')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}"
+  make configure
   export OPTIMIZER="-march=${CARCH/_/-} -O1"
   export DEBUG=-DNDEBUG
   ./configure --prefix=/usr
@@ -22,7 +22,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/${pkgname}"
   make DIST_ROOT="${pkgdir}" PKG_ROOT_SBIN_DIR="/usr/sbin" install install-dev
   chown -R root $pkgdir
   chgrp -R root $pkgdir
