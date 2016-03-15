@@ -1,33 +1,36 @@
 pkgbase=(harfbuzz)
 pkgname=(harfbuzz harfbuzz-icu)
-pkgver=1.1.2
-pkgrel=3
+pkgver=1.2.3
+pkgrel=1
 pkgdesc="OpenType text shaping engine"
 arch=(x86_64)
 url="http://www.freedesktop.org/wiki/Software/HarfBuzz"
 license=(MIT)
-makedepends=(glib2 freetype2 graphite cairo icu gobject-introspection)
+makedepends=(glib2 freetype2 graphite cairo icu gobject-introspection gtk-doc ragel)
 source=(http://www.freedesktop.org/software/harfbuzz/release/${pkgbase}-${pkgver}.tar.bz2)
-sha256sums=('4a2c5790bd3db7c3ca8c02e4858f2fd592df7932c1d2fa9f6b99acbce0f8461f')
+sha256sums=('8216d2404aaab7fde87be0365a90d64aa6c55928e104557cfcb37b54a096cb8c')
 
 prepare() {
   mkdir path
   ln -s /usr/bin/python2 path/python
 
   cd $pkgbase-$pkgver
+  NOCONFIGURE=1 ./autogen.sh
 }
 
 build() {
   cd $pkgbase-$pkgver
+  CFLAGS+=' -DNDEBUG'
+  CXXFLAGS+=' -DNDEBUG'
   ./configure --prefix=/usr \
     --with-glib --with-freetype --with-cairo --with-icu --with-graphite2 \
-    --with-gobject
+    --with-gobject --enable-doc
   make
 }
 
 check() {
   cd $pkgbase-$pkgver
-  PATH="$srcdir/path:$PATH" make -k check || :
+  PATH="$srcdir/path:$PATH" make check
 }
 
 package_harfbuzz() {
