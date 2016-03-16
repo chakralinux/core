@@ -5,88 +5,70 @@
 # contributor abveritas[at]chakra-project[dot]org>
 
 pkgbase=openldap
-pkgname=('libldap' 'openldap')
-pkgver=2.4.35
+pkgname=('openldap' 'libldap')
+pkgver=2.4.44
 pkgrel=1
 arch=('x86_64')
 url="http://www.openldap.org/"
 license=('custom')
-depends=('db')
-makedepends=('libltdl' 'libsasl' 'e2fsprogs' 'util-linux' 'groff')
-options=('!makeflags')
-source=("ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/${pkgbase}-${pkgver}.tgz"
-        "symbol_versions.patch"
-        "openldap-nssov.patch"
-        'slapd.default' 'slapd.service' 'slapd.tmpfiles' 'ntlm.patch')
-md5sums=('cd75d82ca89fb0280cba66ca6bd97448'
-         '4f2117eb1975ea52a5a4cfcfda804d95'
-         '2f0dfe1f114275d3b8b2e9d88edfa7b0'
-         '6be69f6b7e522cb64cce8703da81ed32'
-         'cbe2bd85be8d98851f640d20930ca9ea'
-         '13e622d1b6ce9ecc1c5c429b724c0cc2'
-         '4258ddbef923d1f29f2843bc050f8c56')
+makedepends=('libltdl' 'libsasl' 'e2fsprogs' 'util-linux' 'chrpath' 'unixodbc' 'groff')
+options=('!makeflags' 'emptydirs')
+source=(ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/${pkgbase}-${pkgver}.tgz
+        slapd.service openldap.tmpfiles openldap.sysusers openldap-ntlm.patch)
+sha1sums=('016a738d050a68d388602a74b5e991035cdba149'
+          '9c7f3441e6a6ee13cdcfe8d965081c7a574c3393'
+          '1f68bd85fb50595c4e916db164d8e90e0c6e21ee'
+          '2bf64351c32b0bf0a70663bd42de22910998b795'
+          'e4afd9f1c810ef4c4cd8fe1101dfe5887f2b7eef')
 
-build() {
-  cd "${srcdir}"/${pkgbase}-${pkgver}
-  # From LFS: 
-  # Without the following patch, the Evolution Exchange addressbook integration uses simple 
-  # binds with cleartext password
-  # This is not that critical, as we don't provide the evolution server in our servers,
-  # but it's in CCR, therefore this should be included
-  patch -p1 -i "${srcdir}"/ntlm.patch
-  # Patch from arch
-  patch -p0 -i "${srcdir}"/openldap-nssov.patch
-  # Patch from debian/LFS. Results in proper symbol versioning
-  # patch -Np1 -i "${srcdir}"/symbol_versions.patch
+# see http://www.openldap.org/faq/data/cache/756.html
+# there's no proper backend support for anything apart from
+# BerkeleyDB, if we don't want to drop local backend server support
+# we are forced to keep Berkeley DB here
 
-
+prepare() {
+  cd ${pkgbase}-${pkgver}
+  patch -p1 -i "${srcdir}"/openldap-ntlm.patch
   sed -i 's|-m 644 $(LIBRARY)|-m 755 $(LIBRARY)|' libraries/{liblber,libldap,libldap_r}/Makefile.in
   sed -i 's|#define LDAPI_SOCK LDAP_RUNDIR LDAP_DIRSEP "run" LDAP_DIRSEP "ldapi"|#define LDAPI_SOCK LDAP_DIRSEP "run" LDAP_DIRSEP "openldap" LDAP_DIRSEP "ldapi"|' include/ldap_defaults.h
-  sed -i 's|%LOCALSTATEDIR%/run|/run/openldap|' servers/slapd/slapd.conf
+  sed -i 's|%LOCALSTATEDIR%/run|/run/openldap|' servers/slapd/slapd.{conf,ldif}
   sed -i 's|-$(MKDIR) $(DESTDIR)$(localstatedir)/run|-$(MKDIR) $(DESTDIR)/run/openldap|' servers/slapd/Makefile.in
+}
 
-  LDFLAGS="$LDFLAGS -L\"${pkgdir}\"/libldap/usr/lib" 
-  ./configure --prefix=/usr \
-    --mandir=/usr/share/man \
-    --libexecdir=/usr/lib \
-    --sysconfdir=/etc \
-    --localstatedir=/var/lib/openldap \
-    --enable-ipv6 \
-    --enable-syslog \
-    --enable-local \
-    --enable-bdb \
-    --enable-hdb \
-    --enable-crypt \
-    --enable-dynamic \
-    --with-threads \
-    --disable-wrappers \
-    --without-fetch \
-    --enable-spasswd \
-    --with-cyrus-sasl \
-    --enable-overlays=mod \
-    --enable-modules=yes
+build() {
+  cd ${pkgbase}-${pkgver}
+  autoconf
+  ./configure --prefix=/usr --libexecdir=/usr/lib \
+    --sysconfdir=/etc --localstatedir=/var/lib/openldap \
+    --enable-dynamic --enable-syslog --enable-ipv6 --enable-local \
+    --enable-crypt --enable-spasswd --enable-modules \
+    --enable-backends --disable-ndb --enable-overlays=mod \
+    --with-cyrus-sasl --with-threads
   make
+
+  cd contrib/slapd-modules/nssov
+  make prefix=/usr libexecdir=/usr/lib sysconfdir=/etc/openldap
+  chrpath -d .libs/nssov.so
 }
 
 check() {
-  cd "${srcdir}"/${pkgbase}-${pkgver}
-  make test
+  cd ${pkgbase}-${pkgver}
+#  make test
 }
 
 package_libldap() {
   pkgdesc="Lightweight Directory Access Protocol (LDAP) client libraries"
   depends=('libsasl' 'e2fsprogs')
   backup=('etc/openldap/ldap.conf')
-  options=('!libtool')
 
-  cd "${srcdir}"/${pkgbase}-${pkgver}
+  cd ${pkgbase}-${pkgver}
   for dir in include libraries doc/man/man3 ; do
     pushd ${dir}
     make DESTDIR="${pkgdir}" install
     popd
   done
   install -Dm644 doc/man/man5/ldap.conf.5.tmp "${pkgdir}"/usr/share/man/man5/ldap.conf.5
-  
+
 # get rid of duplicate default conf files
   rm "${pkgdir}"/etc/openldap/*.default
 
@@ -98,17 +80,25 @@ package_libldap() {
 
 package_openldap() {
   pkgdesc="Lightweight Directory Access Protocol (LDAP) client and server"
-  depends=("libldap>=${pkgver}" 'libltdl' 'util-linux')
-  backup=('etc/openldap/slapd.conf' 'etc/conf.d/slapd')
-  options=('!libtool' 'emptydirs')
+  depends=("libldap>=${pkgver}" 'libltdl' 'unixodbc')
+  backup=('etc/openldap/slapd.conf' 'etc/openldap/slapd.ldif')
   install=openldap.install
 
-  cd "${srcdir}"/${pkgbase}-${pkgver}
-  for dir in clients servers doc/man/man{1,5,8} ; do
+  cd ${pkgbase}-${pkgver}
+  for dir in clients servers doc/man/man{1,5,8}; do
     pushd ${dir}
     make DESTDIR="${pkgdir}" install
     popd
   done
+
+  pushd contrib/slapd-modules/nssov
+  install -m755 .libs/nssov.so.0.0.0 "${pkgdir}"/usr/lib/openldap
+  ln -s nssov.so.0.0.0 "${pkgdir}"/usr/lib/openldap/nssov.so
+  ln -s nssov.so.0.0.0 "${pkgdir}"/usr/lib/openldap/nssov.so.0
+  install -m444 ldapns.schema "${pkgdir}"/etc/openldap/schema
+  install -m644 slapo-nssov.5 "${pkgdir}"/usr/share/man/man5/slapo-nssov.5
+  popd
+
   rm "${pkgdir}"/usr/share/man/man5/ldap.conf.5
   rm -r "${pkgdir}"/run
 
@@ -117,13 +107,15 @@ package_openldap() {
 
   ln -s ../lib/slapd "${pkgdir}"/usr/sbin/slapd
 
-  chown root:439 "${pkgdir}"/etc/openldap/{slapd.conf,DB_CONFIG.example}
-  chmod 640 "${pkgdir}"/etc/openldap/{slapd.conf,DB_CONFIG.example}
+  chown root:439 "${pkgdir}"/etc/openldap/{slapd.{conf,ldif},DB_CONFIG.example}
+  chmod 640 "${pkgdir}"/etc/openldap/{slapd.{conf,ldif},DB_CONFIG.example}
 
   install -dm700 -o 439 -g 439 "${pkgdir}"/var/lib/openldap
+  chown -R 439:439 "${pkgdir}"/var/lib/openldap
+
   install -dm700 -o 439 -g 439 "${pkgdir}"/etc/openldap/slapd.d
-  install -Dm644 "${srcdir}"/slapd.default "${pkgdir}"/etc/conf.d/slapd
   install -Dm644 "${srcdir}"/slapd.service "${pkgdir}"/usr/lib/systemd/system/slapd.service
-  install -Dm644 "${srcdir}"/slapd.tmpfiles "${pkgdir}"/usr/lib/tmpfiles.d/slapd.conf
+  install -Dm644 "${srcdir}"/openldap.tmpfiles "${pkgdir}"/usr/lib/tmpfiles.d/openldap.conf
+  install -Dm644 "${srcdir}"/openldap.sysusers "${pkgdir}"/usr/lib/sysusers.d/openldap.conf
   install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
 }
