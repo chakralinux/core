@@ -1,22 +1,20 @@
 
 pkgname=sudo
-_sudover=1.8.13
+_sudover=1.8.15
 pkgver=${_sudover/p/.p}
 pkgrel=1
-pkgdesc="Give certain users the ability to run some commands as root."
+pkgdesc="Give certain users the ability to run some commands as root"
 arch=('x86_64')
 url="http://www.sudo.ws/sudo/"
 license=('custom')
 depends=('glibc' 'pam' 'libldap')
 backup=('etc/sudoers' 'etc/pam.d/sudo')
+install=$pkgname.install
 source=(http://www.sudo.ws/sudo/dist/$pkgname-$_sudover.tar.gz{,.sig}
-        'sudo.tmpfiles.conf'
-        'sudo.pam')
-sha1sums=('6ee1ceaeeb7baee6340f5f5b44aa2b4253931a19'
-          'SKIP'
-          'b2a8594916f6920568cf6d7eada5684109cf5510'
-          '2388e362dc31cc3d7270fe1c86b6be9e6d28470d')
-
+        sudo.pam)
+sha256sums=('4316381708324da8b6cb151f655c1a11855207c7c02244d8ffdea5104d7cc308'
+            'SKIP'
+            'd1738818070684a5d2c9b26224906aad69a4fea77aabd960fc2675aee2df1fa2')
 validpgpkeys=('CCB24BE9E9481B15D34159535A89DFA27EE470C4')
 
 
@@ -30,7 +28,9 @@ build() {
     --with-rundir=/run/sudo \
     --with-vardir=/var/db/sudo \
     --with-logfac=auth \
+    --enable-tmpfiles.d \
     --with-pam \
+    --with-sssd \
     --with-ldap \
     --with-ldap-conf-file=/etc/openldap/ldap.conf \
     --with-env-editor \
@@ -45,18 +45,12 @@ check() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${_sudover}"
-
-  make DESTDIR="${pkgdir}" install
+  cd "$srcdir/$pkgname-$_sudover"
+  make DESTDIR="$pkgdir" install
 
   # Remove /run/sudo directory from the package; we create it using tmpfiles.d
-  # see 'Major changes between version 1.8.10 and 1.8.9p5:' on http://www.sudo.ws/sudo/stable.html why the run dir is needed 
   rmdir "$pkgdir/run/sudo"
   rmdir "$pkgdir/run"
-
-  # http://bugzilla.sudo.ws/show_bug.cgi?id=689
-  install -Dm644 "$srcdir/sudo.tmpfiles.conf" \
-    "$pkgdir/usr/lib/tmpfiles.d/sudo.conf"
 
   install -Dm644 "$srcdir/sudo.pam" "$pkgdir/etc/pam.d/sudo"
 
