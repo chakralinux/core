@@ -12,12 +12,14 @@ pkgname=('qt5-base'
          'qt5-connectivity'
          'qt5-declarative'
          'qt5-doc'
+         'qt5-enginio'
          'qt5-graphicaleffects'
          'qt5-imageformats'
          'qt5-location'
          'qt5-multimedia'
          'qt5-quickcontrols'
          'qt5-quickcontrols2'
+         'qt5-script'
          'qt5-sensors'
          'qt5-serialbus'
          'qt5-serialport'
@@ -34,7 +36,7 @@ pkgname=('qt5-base'
 pkgver=5.6.0
 subver=5.6.0
 _pkgver=5.6
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -50,27 +52,34 @@ makedepends=('libxcb' 'xcb-proto' 'xcb-util' 'xcb-util-image' 'xcb-util-wm' 'xcb
             'gstreamer' 'gst-plugins-base' 'gst-plugins-good'
             'gst-plugins-bad' 'gst-plugins-ugly' 'harfbuzz' 'pkg-config'
             'libinput' 'yasm' 'git')
-#_pkgfqn="qt-everywhere-opensource-src-${pkgver}"
-#source=("http://download.qt-project.org/official_releases/qt/${_pkgver}/${pkgver}/single/$_pkgfqn.tar.xz"
-_pkgfqn="qt-everywhere-opensource-src-${subver}"
-source=("http://download.qt-project.org/development_releases/qt/${_pkgver}/${subver}/single/$_pkgfqn.tar.xz"
+_pkgfqn="qt-everywhere-opensource-src-${pkgver}"
+source=("http://download.qt-project.org/official_releases/qt/${_pkgver}/${pkgver}/single/$_pkgfqn.tar.xz"
+#_pkgfqn="qt-everywhere-opensource-src-${subver}"
+#source=("http://download.qt-project.org/development_releases/qt/${_pkgver}/${subver}/single/$_pkgfqn.tar.xz"
         '0001-Fix-QWidget-setWindowRole.patch'
         '0005-Restore-documented-behavior-for-the-WA_X11NetWmWindo.patch'
         'do_not_synchronize_local_messages.patch'
         'libqt5-do-not-use-shm-if-display-name-doesnt-look-local.patch'
         'highdpi-fix.patch::https://github.com/qtproject/qtbase/commit/cf846d6a8a0df0f0935f7f1306ab8439309cf6e5.patch'
+        #dbus patches
+        'dbus-finish-call.patch::https://codereview.qt-project.org/gitweb?p=qt/qtbase.git;a=patch;h=acde2e69df5dedc624674107596f276125e22864'
+        'dbus-deadlock.patch::https://codereview.qt-project.org/gitweb?p=qt/qtbase.git;a=patch;h=11c5e716b08b6b3c5a7c9fce96b0cde8624ec869'
+        'dbus-closesession.patch::https://codereview.qt-project.org/gitweb?p=qt/qtbase.git;a=patch;h=b024fbe83863fc57364a52c717d5b43d654bdb5d'
         # not yet upstream
         'libqt5-Fix-Gujarati-font.patch'
         # desktop files
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
         'qmlviewer.desktop'
         'qdbusviewer-qt5.desktop')
-sha1sums=('253f87623f2e8238623ba9d7f705355ed3da4eee'
+sha1sums=('08ff0db4df01d39732753dfc05bbb7ade4d8dcbb'
           'f69e25beeba8682ef8ca9e8cf978061d75173914'
           '4dabcdf77de5325eba5890f356157c006b095cc9'
           'dbc8a9b6d75553b19b4fa00f785876bea0177794'
           'eb1fa717a650e95276bcd9f29b97fdb576c90337'
           'f9a66a5df95bcc9c9269050c778d09e5bbec24cf'
+          '4795bf263052deb7bca49e425abecde1b6e01013'
+          'c57aeb39f521527e20d9dd31f33ff6d083ca6975'
+          '0315dde15a567f841788990ac2d9d87df4806bb6'
           'd5dc1de05f00fa9eabce400ef11e7932ed8af550'
           '0862a4a39b74d0e447181d7eca31580c9d580bc8'
           'b63cab2c86505b594e32b32ae43524090fcb7d29'
@@ -78,6 +87,7 @@ sha1sums=('253f87623f2e8238623ba9d7f705355ed3da4eee'
           '2e0b6245c40c91fbb0a965724450b6d6883f2927'
           'b0e6c61b8364eb3f7af4dae41fa7738c3181dd96'
           '1295012599b5335f24b6945bc7ee312093339ec4')
+
 
 _prlfix() {
   # Fix wrong path in prl files
@@ -90,6 +100,14 @@ prepare() {
 
   pushd .
   cd qtbase 
+  
+  # dbus patches
+  # https://codereview.qt-project.org/#/c/151340/
+  patch -Np1 -i ../../dbus-finish-call.patch
+  # https://codereview.qt-project.org/#/c/151459/
+  patch -Np1 -i ../../dbus-deadlock.patch
+  # https://codereview.qt-project.org/#/c/151496/
+  patch -Np1 -i ../../dbus-closesession.patch
   
   patch -Np1 -i ../../0001-Fix-QWidget-setWindowRole.patch
   patch -Np1 -i ../../0005-Restore-documented-behavior-for-the-WA_X11NetWmWindo.patch
