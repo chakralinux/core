@@ -1,20 +1,16 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-
 pkgname=grep
-pkgver=2.21
+pkgver=2.24
 pkgrel=1
 pkgdesc="A string search utility"
 arch=('x86_64')
 license=('GPL3')
 url="http://www.gnu.org/software/grep/grep.html"
 groups=('base')
-depends=('glibc' 'pcre' 'sh')
+depends=('glibc' 'pcre')
 makedepends=('texinfo')
 install="${pkgname}.install"
 source=(ftp://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz{,.sig})
-md5sums=('43c48064d6409862b8a850db83c8038a'
+md5sums=('f1c980134c04692a90078e87283074b6'
          'SKIP')
 
 # If pcre get a major upgrade in order to compile grep you must:
@@ -39,4 +35,3 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 }
-
