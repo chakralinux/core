@@ -3,28 +3,25 @@
 _pkgbase='pidgin'
 pkgname='libpurple'
 pkgver=2.10.11
-pkgrel=2
+pkgrel=1
 pkgdesc="IM library extracted from Pidgin"
 arch=('x86_64')
 url="http://pidgin.im/"
 license=('GPL')
 makedepends=('startup-notification' 'libxss' 'nss' 'libsasl' 'python2' 'silc-toolkit'
              'avahi' 'tk' 'ca-certificates' 'intltool' 'networkmanager' 'farstream' 'gstreamer')
-depends=('libsasl' 'dbus-glib' 'silc-toolkit' 'nss>=3.17.1' 'nspr>=4.10.7' 'cyrus-sasl-plugins')
+depends=('libsasl' 'dbus-glib' 'silc-toolkit' 'nss>=3.17.1' 'nspr>=4.10.7')
 optdepends=('dbus-python: for purple-remote and purple-url-handler')
 source=("http://downloads.sourceforge.net/${_pkgbase}/${_pkgbase}-${pkgver}.tar.bz2"
-        'libpurple-gst1.patch')
+        "pidgin-2.10.11-gstreamer1-1.patch" # from Linux from Scratch
+       )
 md5sums=('7c8bb6f997e05e7929104439872c2844'
-         '99164fd9fbca352cae70ae43bae47546')
+         'a06b910661f04143ae1c179896117ddd')
 
 prepare() {
    cd "${srcdir}/${_pkgbase}-${pkgver}"
-   patch -Np1 -i $srcdir/libpurple-gst1.patch
-   autoreconf -vi
-   
-   # Use Python 2
-   sed -i "s#env python#env python2#" */plugins/*.py
-   sed -i "s#env python#env python2#" libpurple/purple-{remote,notifications-example,url-handler}
+   patch -Np1 -i ${srcdir}/pidgin-2.10.11-gstreamer1-1.patch
+   autoreconf -i
 }
 
 build() {
