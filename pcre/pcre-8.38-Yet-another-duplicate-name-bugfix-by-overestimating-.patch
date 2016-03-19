@@ -1,0 +1,56 @@
+From b7537308b7c758f33c347cb0bec62754c43c271f Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@2f5784b3-3f2a-0410-8824-cb99058d5e15>
+Date: Sat, 27 Feb 2016 17:38:11 +0000
+Subject: [PATCH] Yet another duplicate name bugfix by overestimating the
+ memory needed (i.e. another hack - PCRE2 has this "properly" fixed).
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+git-svn-id: svn://vcs.exim.org/pcre/code/trunk@1636 2f5784b3-3f2a-0410-8824-cb99058d5e15
+
+Petr Písař: Ported to 8.38.
+
+diff --git a/pcre_compile.c b/pcre_compile.c
+index 5019854..4ffea0c 100644
+--- a/pcre_compile.c
++++ b/pcre_compile.c
+@@ -7311,7 +7311,12 @@ for (;; ptr++)
+           so far in order to get the number. If the name is not found, leave
+           the value of recno as 0 for a forward reference. */
+ 
+-          else
++          /* This patch (removing "else") fixes a problem when a reference is
++          to multiple identically named nested groups from within the nest.
++          Once again, it is not the "proper" fix, and it results in an
++          over-allocation of memory. */
++
++          /* else */
+             {
+             ng = cd->named_groups;
+             for (i = 0; i < cd->names_found; i++, ng++)
+diff --git a/testdata/testinput2 b/testdata/testinput2
+index 086e0f4..c805f5f 100644
+--- a/testdata/testinput2
++++ b/testdata/testinput2
+@@ -4239,4 +4239,6 @@ backtracking verbs. --/
+     9010
+     abcd
+      
++/((?J)(?'R'(?'R'(?'R'(?'R'(?'R'(?|(\k'R'))))))))/
++
+ /-- End of testinput2 --/
+diff --git a/testdata/testoutput2 b/testdata/testoutput2
+index d414a72..800a72f 100644
+--- a/testdata/testoutput2
++++ b/testdata/testoutput2
+@@ -14665,4 +14665,6 @@ Start of matched string is beyond its end - displaying from end to start.
+   0     ^    0
+ No match
+      
++/((?J)(?'R'(?'R'(?'R'(?'R'(?'R'(?|(\k'R'))))))))/
++
+ /-- End of testinput2 --/
+-- 
+2.5.0
+

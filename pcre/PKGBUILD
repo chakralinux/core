@@ -5,16 +5,27 @@
 
 pkgname=pcre
 pkgver=8.38
-pkgrel=1
+pkgrel=2
 pkgdesc="A library that implements Perl 5-style regular expressions"
 arch=('x86_64')
 url="http://www.pcre.org/"
 license=('BSD')
 depends=('gcc-libs' 'readline' 'zlib' 'bzip2')
 validpgpkeys=('45F68D54BBE23FB3039B46E59766E084FB0F43D8') # Philip Hazel
-source=("ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$pkgname-$pkgver.tar.bz2"{,.sig})
+source=("ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$pkgname-$pkgver.tar.bz2"{,.sig}
+        "pcre-8.38-Fix-negated-POSIX-class-within-negated-overall-class.patch"
+        "pcre-8.38-Fix-workspace-overflow-for-ACCEPT-with-deeply-nested.patch"
+)
 md5sums=('00aabbfe56d5a48b270f999b508c5ad2'
-         'SKIP')
+         'SKIP'
+         '7da5ec0bcce0de711d802c26741a7b05'
+         '64b1c23179fcea4534417f8654b6138a')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  patch -Np1 -i ${srcdir}/pcre-8.38-Fix-negated-POSIX-class-within-negated-overall-class.patch
+  patch -Np1 -i ${srcdir}/pcre-8.38-Fix-workspace-overflow-for-ACCEPT-with-deeply-nested.patch
+}
 
 build() {
   cd ${pkgname}-${pkgver}

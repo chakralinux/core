@@ -1,0 +1,94 @@
+From ef6b10fcde41a2687f38d4a9ff2886b037948a1b Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@2f5784b3-3f2a-0410-8824-cb99058d5e15>
+Date: Fri, 27 Nov 2015 17:13:13 +0000
+Subject: [PATCH 1/5] Fix negated POSIX class within negated overall class UCP
+ bug.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+git-svn-id: svn://vcs.exim.org/pcre/code/trunk@1612 2f5784b3-3f2a-0410-8824-cb99058d5e15
+
+Petr Písař: Ported to 8.38.
+diff --git a/pcre_compile.c b/pcre_compile.c
+index 3360a8b..3670f1e 100644
+--- a/pcre_compile.c
++++ b/pcre_compile.c
+@@ -5063,20 +5063,22 @@ for (;; ptr++)
+             ptr = tempptr + 1;
+             continue;
+ 
+-            /* For the other POSIX classes (ascii, xdigit) we are going to fall
+-            through to the non-UCP case and build a bit map for characters with
+-            code points less than 256. If we are in a negated POSIX class
+-            within a non-negated overall class, characters with code points
+-            greater than 255 must all match. In the special case where we have
+-            not yet generated any xclass data, and this is the final item in
+-            the overall class, we need do nothing: later on, the opcode
++            /* For the other POSIX classes (ascii, cntrl, xdigit) we are going
++            to fall through to the non-UCP case and build a bit map for
++            characters with code points less than 256. If we are in a negated
++            POSIX class, characters with code points greater than 255 must
++            either all match or all not match. In the special case where we
++            have not yet generated any xclass data, and this is the final item
++            in the overall class, we need do nothing: later on, the opcode
+             OP_NCLASS will be used to indicate that characters greater than 255
+             are acceptable. If we have already seen an xclass item or one may
+             follow (we have to assume that it might if this is not the end of
+-            the class), explicitly match all wide codepoints. */
++            the class), explicitly list all wide codepoints, which will then
++            either not match or match, depending on whether the class is or is
++            not negated. */
+ 
+             default:
+-            if (!negate_class && local_negate &&
++            if (local_negate &&
+                 (xclass || tempptr[2] != CHAR_RIGHT_SQUARE_BRACKET))
+               {
+               *class_uchardata++ = XCL_RANGE;
+diff --git a/testdata/testinput6 b/testdata/testinput6
+index aeb62a0..a178d3d 100644
+--- a/testdata/testinput6
++++ b/testdata/testinput6
+@@ -1553,4 +1553,13 @@
+     \x{200}
+     \x{37e}
+ 
++/[^[:^ascii:]\d]/8W
++    a
++    ~
++    0
++    \a
++    \x{7f}
++    \x{389}
++    \x{20ac}
++
+ /-- End of testinput6 --/
+diff --git a/testdata/testoutput6 b/testdata/testoutput6
+index beb85aa..b64dc0d 100644
+--- a/testdata/testoutput6
++++ b/testdata/testoutput6
+@@ -2557,4 +2557,20 @@ No match
+     \x{37e}
+  0: \x{37e}
+ 
++/[^[:^ascii:]\d]/8W
++    a
++ 0: a
++    ~
++ 0: ~
++    0
++No match
++    \a
++ 0: \x{07}
++    \x{7f}
++ 0: \x{7f}
++    \x{389}
++No match
++    \x{20ac}
++No match
++
+ /-- End of testinput6 --/
+-- 
+2.4.3
+
