@@ -4,8 +4,8 @@
 pkgname=qt5-webengine
 _qtver=5.6.0
 pkgver=${_qtver/-/}
-pkgrel=6
-arch=('i686' 'x86_64')
+pkgrel=7
+arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
 pkgdesc='Provides support for web applications using the Chromium browser project'
@@ -16,6 +16,7 @@ _pkgfqn="${pkgname/5-/}-opensource-src-${_qtver}"
 source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/${_qtver}/submodules/${_pkgfqn}.tar.xz" qt5-webengine-nss.patch)
 md5sums=('a8be84d642a78724d84b27c20adee14c'
          '26f5e1e96be524ccad564dc2fdb9766c')
+
 
 prepare() {
   mkdir -p build
@@ -28,8 +29,8 @@ prepare() {
 build() {
   cd build
 
-  export PATH="$srcdir/bin:$PATH"
-  qmake-qt5 WEBENGINE_CONFIG+=use_proprietary_codecs WEBENGINE_CONFIG+=use_system_icu WEBENGINE_CONFIG+=use_system_ffmpeg ../${_pkgfqn}
+  #export PATH="$srcdir/bin:$PATH"
+  qmake-qt5 WEBENGINE_CONFIG+=use_proprietary_codecs WEBENGINE_CONFIG+=use_system_ffmpeg ../${_pkgfqn}
 
   make
 }
