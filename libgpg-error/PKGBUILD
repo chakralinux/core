@@ -1,20 +1,17 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
-
 pkgname=libgpg-error
-pkgver=1.17
+pkgver=1.21
 pkgrel=1
 pkgdesc="Support library for libgcrypt"
-arch=(i686 x86_64)
+arch=(x86_64)
 url="http://www.gnupg.org"
 license=('LGPL')
 depends=('glibc' 'sh')
 options=(!libtool)
-source=("ftp://ftp.gnupg.org/gcrypt/libgpg-error/${pkgname}-${pkgver}.tar.bz2")
-install=libgpg-error.install
-sha1sums=('ba5858b2947e7272dd197c87bac9f32caf29b256')
+source=("ftp://ftp.gnupg.org/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2"{,.sig})
+install=${pkgname}.install
+sha1sums=('ef1dfb2f8761f019091180596e9e638d8cc37513'
+          'SKIP')
+validpgpkeys=('D8692123C4065DEA5E0F3AB5249B39D24F25E3B6') # Werner Koch (dist sig) 2048R/4F25E3B6 
 
 build() {
   cd "${srcdir}"/${pkgname}-${pkgver}
