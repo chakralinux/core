@@ -2,18 +2,31 @@
 
 pkgbase=telepathy-qt
 pkgname=('telepathy-qt4' 'telepathy-qt5')
-pkgver=0.9.5
+pkgver=0.9.6
 pkgrel=1
 arch=('x86_64')
 url="http://telepathy.freedesktop.org/wiki/"
 license=('LGPL')
 makedepends=('qt4' 'telepathy-farstream' 'libxslt' 'python2' 'cmake' 'doxygen' 'qt5-base')
 options=('staticlibs')
-source=("http://telepathy.freedesktop.org/releases/${pkgbase}/${pkgbase}-${pkgver}.tar.gz")
-md5sums=('22c0daa7e4f7e48e779f703c9b27b816')
+source=("http://telepathy.freedesktop.org/releases/${pkgbase}/${pkgbase}-${pkgver}.tar.gz"
+  '0001-CMake-Fixed-deprecated-_BSD_SOURCE.patch'
+  '0002-CMakeLists-Minimum-version-bumped-to-2.8.12.patch'
+  '0021-Farstream-gst-gstconfig.h-can-be-in-LIBDIR-search-fo.patch')
+md5sums=('1f18935f30dcf90282a2d6d65fcde752'
+         '114e5f9747fe218f7e08864d67515b74'
+         '2ce35b9e77326324a747e38a3f54a14a'
+         '18ed8c6671e21c34e8cb354b40eb7944')
 
 prepare() {
+  [ -d build ] && rm -r build
+  [ -d build-qt4 ] && rm -r build-qt4
   mkdir build{,-qt4}
+  
+  cd "$pkgbase-$pkgver"
+  patch -Np1 -i ../0001-CMake-Fixed-deprecated-_BSD_SOURCE.patch
+  patch -Np1 -i ../0002-CMakeLists-Minimum-version-bumped-to-2.8.12.patch
+  patch -Np1 -i ../0021-Farstream-gst-gstconfig.h-can-be-in-LIBDIR-search-fo.patch
 }
 
 build() {
