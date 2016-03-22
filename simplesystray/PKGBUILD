@@ -1,14 +1,14 @@
 source ../plasma.conf
 
-pkgname=kactivitymanagerd
+pkgname=simplesystray
 pkgver=${PVersion}
-pkgrel=3
-pkgdesc="System service to manage user's activities and track the usage patterns"
+pkgrel=1
+pkgdesc="Experimental systemtray replacement"
 arch=('x86_64')
-url='https://projects.kde.org/kactivitymanagerd'
+url="https://projects.kde.org/projects/kde/workspace/simplesystray"
 license=('LGPL')
-depends=(kio)
-makedepends=(extra-cmake-modules boost)
+depends=(krunner knotifyconfig kdelibs4support knewstuff plasma-workspace)
+makedepends=(extra-cmake-modules kdoctools)
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
@@ -29,7 +29,4 @@ build() {
 package() {
   cd build
   make DESTDIR="${pkgdir}" install
-
-  # conflict with plasma for now
-  rm -r "$pkgdir/usr/share/locale"
 }
