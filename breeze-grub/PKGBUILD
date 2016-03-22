@@ -11,17 +11,13 @@ url='https://projects.kde.org/breeze-grub'
 license=(LGPL)
 depends=(grub)
 makedepends=()
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
-	breeze-grub-remove-unsupported-options.patch::"https://quickgit.kde.org/?p=breeze-grub.git&a=commitdiff&h=a978617a&o=plain")
-sha256sums=( $(getSum ${pkgname})
-            'ccb833ccc1227af0cc1d4378f5dc021fe02a34854be73afbecaa285b0c5180b5')
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}))
 
 prepare() {
   mkdir -p build
 
-# Remove unsupported options
   cd $pkgname-$pkgver
-  patch -p1 -i ../breeze-grub-remove-unsupported-options.patch
 }
 
 package() {

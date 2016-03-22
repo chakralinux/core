@@ -2,7 +2,7 @@ source ../plasma.conf
 
 pkgname=breeze-plymouth
 pkgver=${PVersion}
-pkgrel=2
+pkgrel=1
 pkgdesc="Breeze theme for Plymouth"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kdereview/breeze-plymouth'
@@ -11,20 +11,13 @@ depends=('plymouth')
 makedepends=('extra-cmake-modules')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
-        "fix-path.patch"
-        "fix-link.patch")
-sha256sums=( $(getSum ${pkgname})
-            'e6a41cac24a86f7e2a09970bfaac291b4c2ffa94927abecb4f076da29f4ce5fb'
-            '218bada0082e1b5eec4fdad3d0ddbd843d9f452a8b0cc5fd021b1e47e624c8fc')
+source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+sha256sums=( $(getSum ${pkgname}))
 
 prepare() {
   mkdir -p build
 
   cd ${pkgname}-${pkgver}
-
-  patch -p1 -i ../fix-path.patch
-  patch -p1 -i ../fix-link.patch
 }
 
 build() {
