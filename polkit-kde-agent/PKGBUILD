@@ -18,17 +18,18 @@ source=("${PServer}/${pkgver}/${_pkgname}-${PVersion}.tar.xz")
 sha256sums=( $(getSum ${_pkgname}) )
 
 prepare() {
+  cd ${srcdir}/${_pkgname}-${pkgver}
   mkdir -p build
 }
 
 build() {
-  cd build
-  cmake_kf5 ../${_pkgname}-${pkgver} \
+  cd ${srcdir}/${_pkgname}-${pkgver}/build
+  cmake_kf5 .. \
     -DLIBEXEC_INSTALL_DIR=lib/polkit-kde 
   make
 }
 
 package() {
-  cd build
+  cd ${srcdir}/${_pkgname}-${pkgver}/build
   make DESTDIR="$pkgdir" install
 }
