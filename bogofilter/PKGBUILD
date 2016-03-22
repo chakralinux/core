@@ -1,10 +1,5 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas[at]chakra-project[dot]org>
-
 pkgname=bogofilter
-pkgver=1.2.3
+pkgver=1.2.4
 pkgrel=1
 pkgdesc="A fast Bayesian spam filtering tool"
 arch=('x86_64')
@@ -13,14 +8,16 @@ url="http://bogofilter.sourceforge.net"
 depends=('db' 'perl' 'gsl')
 backup=(etc/bogofilter/bogofilter.cf)
 source=("http://sourceforge.net/projects/${pkgname}/files/${pkgname}-current/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('c3ed7f483b83abcbf6d8c797084bd06e')
+md5sums=('d0a5eebb3274b23ceabe766a6443a1c5')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
   ./configure --prefix=/usr \
               --sysconfdir=/etc/bogofilter  \
               --localstatedir=/var \
-              --enable-transactions
+              --enable-transactions \
+              --with-database=db
+
   make
 }
 
