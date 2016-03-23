@@ -9,21 +9,17 @@ pkgdesc='Plasma library and runtime components based upon KF5 and Qt5'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/plasma-framework'
 license=('LGPL')
-depends=('qt5-quickcontrols' 'kactivities-frameworks' 'kpackage')
+depends=('qt5-quickcontrols' 'kactivities' 'kpackage')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'kdoctools')
 options=("debug")
 groups=('kf5')
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
-        'AppletQuickItem-Fix-finding-own-attached-layout.patch')
-sha256sums=( $(getSum ${pkgname}) 
-            '6094c6d9a7997554c74f930dc551517bf6e35e6e90700152aab12dec45455b86')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
   
   cd $pkgname-$pkgver
-  # https://bugs.kde.org/show_bug.cgi?id=358849
-  patch -Np1 < $srcdir/AppletQuickItem-Fix-finding-own-attached-layout.patch
 }
 
 build() {
