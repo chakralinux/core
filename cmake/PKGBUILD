@@ -1,8 +1,8 @@
 # maintainer: Neophytos Kolokotronis <tetris4ATgmailDOTcom>
 
 pkgname=cmake
-pkgver=3.4.0
-_pkgver=3.4
+pkgver=3.5.1
+_pkgver=3.5
 pkgrel=1
 pkgdesc="A cross-platform open-source make system"
 arch=('x86_64')
@@ -11,12 +11,14 @@ url="http://www.cmake.org"
 depends=('curl' 'libarchive>=2.3.1' 'shared-mime-info' 'jsoncpp')
 makedepends=('qt5-base' 'python3-sphinx')
 install=${pkgname}.install
-source=("http://www.cmake.org/files/v${_pkgver}/${pkgname}-${pkgver}.tar.gz")
-sha256sums=('a5b82bf6ace6c481cdb911fd5d372a302740cbefd387e05297cb37f7468d1cea')
+source=("http://www.cmake.org/files/v${_pkgver}/${pkgname}-${pkgver}.tar.gz" "add_openblas.diff")
+sha256sums=('93d651a754bcf6f0124669646391dd5774c0fc4d407c384e3ae76ef9a60477e8'
+            '9cd72e7c269d06dc2df9ed42f7e0658ffcb8fce64af94098364ac72dbf26e5dc')
 
 prepare() {
   cd "${srcdir}"/${pkgname}-${pkgver}
   # patch -Np1 < ${srcdir}/findfreetype.patch
+  patch -Np1 < ${srcdir}/add_openblas.diff
 }
 
 build() {
