@@ -5,14 +5,14 @@
 
 pkgname=suitesparse
 pkgver=4.4.1
-pkgrel=1
+pkgrel=2
 pkgdesc="A collection of sparse matrix libraries"
 url="http://www.cise.ufl.edu/research/sparse/SuiteSparse/"
 arch=('x86_64')
 conflicts=('umfpack')
 provides=('umfpack')
 replaces=('umfpack')
-depends=('blas' 'lapack')
+depends=('openblas' 'lapack')
 makedepends=('gcc-fortran')
 license=('GPL')
 source=(http://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-$pkgver.tar.gz)
@@ -56,11 +56,11 @@ build() {
       --whole-archive LDL/Lib/libldl.a && \
       ln -sf libldl.so.2.2.1 shared/libldl.so
    ld -shared -soname libcholmod.so.3 -o shared/libcholmod.so.3.0.3 \
-      --whole-archive CHOLMOD/Lib/libcholmod.a -lblas -llapack \
+      --whole-archive CHOLMOD/Lib/libcholmod.a -lopenblas -llapack \
       -L./shared -lamd -lcamd -lcolamd -lccolamd -lsuitesparseconfig -lm && \
       ln -sf libcholmod.so.3.0.3 shared/libcholmod.so
    ld -shared -soname libspqr.so.2 -o shared/libspqr.so.2.0.0 \
-      --whole-archive SPQR/Lib/libspqr.a -lblas -llapack \
+      --whole-archive SPQR/Lib/libspqr.a -lopenblas -llapack \
       -L./shared -lcholmod -lsuitesparseconfig -lm && \
       ln -sf libspqr.so.2.0.0 shared/libspqr.so
    ld -shared -soname libcxsparse.so.3 -o shared/libcxsparse.so.3.1.4 \
@@ -70,7 +70,7 @@ build() {
       --whole-archive KLU/Lib/libklu.a -L./shared -lamd -lbtf \
       -lsuitesparseconfig -lm && ln -sf libklu.so.1.3.2 shared/libklu.so
    ld -shared -soname libumfpack.so.5 -o shared/libumfpack.so.5.7.1 \
-      --whole-archive UMFPACK/Lib/libumfpack.a -lblas -llapack -L./shared \
+      --whole-archive UMFPACK/Lib/libumfpack.a -lopenblas -llapack -L./shared \
       -lamd -lcholmod -lsuitesparseconfig -lm && \
       ln -sf libumfpack.so.5.7.1 shared/libumfpack.so
 }
