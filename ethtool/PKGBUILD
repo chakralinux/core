@@ -4,23 +4,29 @@
 # maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=ethtool
-pkgver=3.8
+pkgver=4.2
 pkgrel=1
 pkgdesc="Utility for controlling network drivers and hardware"
-arch=(i686 x86_64)
+arch=(x86_64)
 url="http://www.kernel.org/pub/software/network/ethtool/"
 license=('GPL')
 depends=(glibc)
-source=(http://www.kernel.org/pub/software/network/$pkgname/$pkgname-$pkgver.tar.xz)
-md5sums=('7ae96870bc4f9b43f666650ae30f2685')
+source=(http://www.kernel.org/pub/software/network/$pkgname/$pkgname-$pkgver.tar.{xz,sign})
+md5sums=('8433e71a256678d859ecc264132063c5'
+         'SKIP')
+validpgpkeys=(AC2B29BD34A6AFDDB3F68F35E7BFC8EC95861109) # Ben Hutchings <bwh@kernel.org>
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --mandir=/usr/share/man || return 1
-  make || return 1
+  cd ${pkgname}-${pkgver}
+  ./configure \
+    --prefix=/usr \
+    --mandir=/usr/share/man \
+    --sbindir=/usr/bin
+
+  make
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
-  make DESTDIR="${pkgdir}" install || return 1
+  cd $pkgname-$pkgver
+  make DESTDIR="${pkgdir}" install
 }
