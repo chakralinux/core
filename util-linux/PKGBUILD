@@ -1,20 +1,18 @@
-#
-
 pkgname=util-linux
 pkgver=2.27
-pkgrel=1
+pkgrel=2
 pkgdesc="Miscellaneous system utilities for Linux"
 url="https://www.kernel.org/pub/linux/utils/util-linux/"
 arch=('x86_64')
 groups=('base')
-depends=('pam' 'shadow' 'coreutils' 'glibc')
-makedepends=('systemd' 'python3')
+depends=('pam' 'shadow' 'coreutils' 'glibc' 'python3')
+makedepends=('systemd')
 conflicts=('util-linux-ng' 'eject')
 provides=("util-linux-ng=${pkgver}" 'eject')
 license=('GPL2')
 options=('strip' 'debug')
 validpgpkeys=('B0C64D14301CC6EFAEDF60E4E4B71D5EEC39C284')  # Karel Zak
-source=("https://www.kernel.org/pub/linux/utils/util-linux/v2.27/$pkgname-$pkgver.tar."{xz,sign}
+source=("https://www.kernel.org/pub/linux/utils/util-linux/v2.27/$pkgname-$pkgver.tar.xz"
         "0001-libmount-monitor-don-t-check-for-regular-mtab.patch"
         pam-{login,common,su})
 backup=(etc/pam.d/chfn
@@ -23,7 +21,6 @@ backup=(etc/pam.d/chfn
         etc/pam.d/su
         etc/pam.d/su-l)
 md5sums=('5b06bbda9309624ee7add15bc8d8ca22'
-         'SKIP'
          'f9e06605db9107b9c4bb1c48059fe18e'
          '4368b3f98abd8a32662e094c54e7f9b1'
          'a31374fef2cba0ca34dfc7078e2969e4'
