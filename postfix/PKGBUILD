@@ -1,78 +1,79 @@
-pkgname=(postfix postfix-tools)
-pkgbase=postfix
-pkgver=3.0.3
+pkgname=postfix
+pkgver=3.1.0
 pkgrel=1
-pkgdesc='Secure, fast, easy to administer alternative to Sendmail'
+pkgdesc='Fast, easy to administer, secure mail server'
 url='http://www.postfix.org/'
 arch=('x86_64')
 license=('custom')
-makedepends=('pcre' 'libsasl' 'libldap' 'db'
-                 'libmariadbclient' 'postgresql-libs' 'sqlite3' 'openssl')
+makedepends=('openssl' 'pcre' 'icu' 'libsasl' 'libldap' 'db'
+             'libmariadbclient' 'postgresql-libs' 'sqlite3' 'tinycdb')
 source=("ftp://ftp.porcupine.org/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz"
         'aliases.patch'
         'postfix.service')
-md5sums=('61caffae689c11d09b4c972a394ae3b1'
-         'd37bc46fe542e1805d8546573b781bb6'
-         'f4d2c2019f8bc70619fef2a62732cbeb')
-         
-build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+sha1sums=('a79409958c0327dc605473d2522483219464cbd2'
+          '5fc3de6c7df1e5851a0a379e825148868808318b'
+          'dd12885d367bebaf0fc9d2e9823a7f82086b6ee9')
+backup=('etc/postfix/'{access,aliases,canonical,generic,header_checks,main.cf,master.cf,relocated,transport,virtual})
 
-  make makefiles DEBUG='' CCARGS=' \
-          -DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl \
-          -DHAS_LDAP \
-          -DUSE_TLS \
-          -DHAS_MYSQL -I/usr/include/mysql \
-          -DHAS_PGSQL -I/usr/include/postgresql \
-          -DHAS_SQLITE \
-          -DDEF_COMMAND_DIR=\"/usr/bin\" \
-          -DDEF_DAEMON_DIR=\"/usr/lib/postfix\" \
-          -DDEF_SENDMAIL_PATH=\"/usr/bin/sendmail\" \
-          -DDEF_README_DIR=\"/usr/share/doc/postfix\" \
-          -DDEF_SAMPLE_DIR=\"/etc/postfix/sample\" \
-          -DDEF_MANPAGE_DIR=\"/usr/share/man\" \
-  ' AUXLIBS=' \
-          -lsasl2 \
-          -lldap -llber \
-          -lssl -lcrypto \
-          -lmysqlclient -lz -lm \
-          -lpq \
-          -lsqlite3 -lpthread \
-  ' OPT="${CFLAGS} ${LDFLAGS}"
+conflicts=('smtp-server' 'smtp-forwarder' 'postfix-tools')
+provides=('smtp-server' 'smtp-forwarder' 'postfix-tools')
+replaces=('postfix-tools')
+
+install=postfix.install
+
+build() {
+  cd $pkgname-$pkgver
+
+  CCARGS='
+    -DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl
+    -DHAS_LDAP
+    -DUSE_TLS
+    -DHAS_MYSQL -I/usr/include/mysql
+    -DHAS_PGSQL -I/usr/include/postgresql
+    -DHAS_SQLITE
+    -DDEF_COMMAND_DIR=\"/usr/bin\"
+    -DDEF_DAEMON_DIR=\"/usr/lib/postfix\"
+    -DDEF_SENDMAIL_PATH=\"/usr/bin/sendmail\"
+    -DDEF_README_DIR=\"/usr/share/doc/postfix\"
+    -DDEF_MANPAGE_DIR=\"/usr/share/man\"
+  '
+  AUXLIBS='
+    -lsasl2
+    -lldap -llber
+    -lssl -lcrypto
+    -lmysqlclient -lz -lm
+    -lpq
+    -lsqlite3 -lpthread
+    -lcdb
+  '
+
+  make makefiles \
+    DEBUG='' \
+    pie=yes \
+    shared=yes \
+    CCARGS="${CCARGS//$'\n'/}" \
+    AUXLIBS="${AUXLIBS//$'\n'/}" \
+    OPT="${CFLAGS} ${LDFLAGS}"
 
   make
 }
 
-package_postfix() {
-  pkgdesc='Fast, easy to administer, secure mail server'
-  depends=('pcre' 'libsasl' 'libldap' 'db'
-            'libmariadbclient' 'postgresql-libs' 'sqlite3')
-  backup=('etc/postfix/'{access,aliases,canonical,generic,header_checks,main.cf,master.cf,relocated,transport,virtual})
-  provides=('smtp-server' 'smtp-forwarder')
-  replaces=('postfix-mysql' 'postfix-pgsql')
-  conflicts=('postfix-mysql' 'postfix-pgsql' 'smtp-server' 'smtp-forwarder')
-  install=$pkgname.install
-  cd "${srcdir}/postfix-${pkgver}"
+package() {
+  cd $pkgname-$pkgver
 
-  sh postfix-install -non-interactive install_root="${pkgdir}"
+  sed 's:bin/postconf -dhx:bin/postconf -c conf -dhx:g' -i postfix-install
+  LD_LIBRARY_PATH=lib:$LD_LIBRARY_PATH \
+  sh postfix-install -non-interactive install_root="$pkgdir"
 
-  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-  install -Dm644 ../postfix.service "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
-
-  cd "${pkgdir}"
-  patch -p0 -i "${srcdir}"/aliases.patch
-  sed 's/^\(\$manpage[^:]*\):/\1.gz:/' -i "etc/postfix/postfix-files"
-}
-
-package_postfix-tools() {
-  pkgdesc='SMTP/QMQP tools from the postfix distribution'
-  depends=('openssl')
-  cd "${srcdir}/postfix-${pkgver}"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 $srcdir/postfix.service "$pkgdir/usr/lib/systemd/system/$pkgname.service"
 
   for name in posttls-finger {smtp,qmqp}-{sink,source}; do
-          install -Dm644 "man/man1/${name}.1" "$pkgdir/usr/share/man/man1/${name}.1"
-          install -Dm755 "bin/${name}" "$pkgdir/usr/bin/${name}"
+    install -Dm644 "man/man1/${name}.1" "$pkgdir/usr/share/man/man1/${name}.1"
+    install -Dm755 "bin/${name}" "$pkgdir/usr/bin/${name}"
   done
 
-  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  cd "$pkgdir"
+  patch -p0 -i "$srcdir"/aliases.patch
+  sed 's/^\(\$manpage[^:]*\):/\1.gz:/' -i "etc/postfix/postfix-files"
 }
