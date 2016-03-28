@@ -1,8 +1,6 @@
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
 pkgname=iproute2
 pkgver=4.4.0
-pkgrel=1
+pkgrel=2
 pkgdesc="IP Routing Utilities"
 arch=('x86_64')
 license=('GPL2')
@@ -17,23 +15,16 @@ replaces=('iproute')
 options=('!makeflags')
 backup=('etc/iproute2/ematch_map' 'etc/iproute2/rt_dsfield' 'etc/iproute2/rt_protos' \
 	'etc/iproute2/rt_realms' 'etc/iproute2/rt_scopes' 'etc/iproute2/rt_tables')
-source=(http://www.kernel.org/pub/linux/utils/net/$pkgname/$pkgname-$pkgver.tar{.xz,.sign}
-        iproute2-fhs.patch
-	unwanted-link-help.patch)
+source=("http://www.kernel.org/pub/linux/utils/net/$pkgname/$pkgname-$pkgver.tar.xz"
+        iproute2-fhs.patch)
 sha256sums=('bc91c367288a19f78ef800cd6840363be1f22da8436fbae88e1a7250490d6514'
-            'SKIP'
-            '7ab86ebccbdbd2e0218400588a3e6a8404e2ee0004794dacba2a01256540150e'
-            '3f72492554a5417c13b2b6f6222c158319ce91c0b6c25fd651f49add493323a7')
-validpgpkeys=('9F6FC345B05BE7E766B83C8F80A77F6095CDE47E')
+            '7ab86ebccbdbd2e0218400588a3e6a8404e2ee0004794dacba2a01256540150e')
 
 prepare() {
   cd "$srcdir/$pkgname-$pkgver"
 
   # set correct fhs structure
   patch -Np1 -i "$srcdir/iproute2-fhs.patch"
-
-  # allow operations on links called "h", "he", "hel", "help"
-  # patch -Np1 -i "$srcdir/unwanted-link-help.patch"
 
   # do not treat warnings as errors
   sed -i 's/-Werror//' Makefile
@@ -54,4 +45,8 @@ package() {
   # libnetlink isn't installed, install it FS#19385
   install -Dm644 include/libnetlink.h "$pkgdir/usr/include/libnetlink.h"
   install -Dm644 lib/libnetlink.a "$pkgdir/usr/lib/libnetlink.a"
+
+  # move binaries
+  cd "${pkgdir}"
+  mv usr/sbin usr/bin
 }
