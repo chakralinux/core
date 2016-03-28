@@ -1,16 +1,11 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
-# include global config
-source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+# Maintainer:  Ram-Z <ram-z[at]chakraos[dot]org>
+# Contributor: Phil Miller <philm[at]chakra-project[dog]org>
+# Contributor: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgbase=pyxdg
 pkgname=('python2-xdg' 'python3-xdg')
 pkgver=0.25
-pkgrel=1
+pkgrel=2
 pkgdesc="Python library to access freedesktop.org standards."
 arch=('any')
 url="http://freedesktop.org/Software/pyxdg"
@@ -19,6 +14,7 @@ makedepends=('python2' 'python3')
 source=(http://www.freedesktop.org/~takluyver/${pkgbase}-${pkgver}.tar.gz{,.asc})
 sha1sums=('1272ee62b8c3909ac4844a34a95f8b1fb3398af2'
           'b5ec82567cc4d7bcf3a151eaf70c42dd3ed5b194')
+validpgpkeys=('6391296E3F25C0A721C1F1AFAF88B3AC5DECB224') # Thomas Kluyver
 
 package_python2-xdg() {
   depends=('python2')
@@ -26,13 +22,13 @@ package_python2-xdg() {
   provides=('pyxdg')
   replaces=('pyxdg')
 
-  cd "${srcdir}/${pkgbase}-${pkgver}"
+  cd ${pkgbase}-${pkgver}
   python2 setup.py install --prefix=/usr --root="${pkgdir}"
 }
 
 package_python3-xdg() {
   depends=('python3')
 
-  cd "${srcdir}/${pkgbase}-${pkgver}"
+  cd ${pkgbase}-${pkgver}
   python3 setup.py install --prefix=/usr --root="${pkgdir}" --skip-build --optimize=1
 }
