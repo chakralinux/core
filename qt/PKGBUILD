@@ -1,21 +1,16 @@
-#
-# QT Packages for Chakra, part of chakra-project.org
-#
-# maintainer: inkane@chakra-project.org
-# contributor: abveritas@chakra-project.org
 ## rebuild on icu update
 
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers' 'qt-docs')
 pkgver=4.8.7
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 url='http://www.qt.io'
 license=('GPL3' 'LGPL')
 makedepends=('libtiff' 'libpng' 'libmng' 'sqlite3' 'ca-certificates' 'glib2' 'dbus'
     'fontconfig' 'libgl' 'libsm' 'libxrandr' 'libxv' 'libxi' 'alsa-lib'
     'xdg-utils' 'hicolor-icon-theme' 'desktop-file-utils' 'mesa' 'postgresql-libs'
-    'mysql' 'unixodbc' 'cups' 'libxinerama' 'libxcursor')
+    'mysql' 'unixodbc' 'cups' 'libxinerama' 'libxcursor' 'freetds')
 options=('staticlibs' 'debug')
 _pkgfqn="qt-everywhere-opensource-src-${pkgver}"
 source=("http://download.qt.io/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar.gz"
@@ -122,7 +117,8 @@ package_qt() {
 	  'unixodbc: ODBC driver'
 	  'libxinerama: Xinerama support'
 	  'libxfixes: Xfixes support'
-	  'icu: Unicode support')
+	  'icu: Unicode support'
+	  'freetds: Sybase & MS SQL driver')
     provides=('qt4')
     install='qt.install'
 	
@@ -173,7 +169,7 @@ package_qt-private-headers() {
 
 package_qt-docs() {
     pkgdesc='The Qt gui toolkit documentation'
-    arch=('any')
+    arch=('x86_64')
     options=('docs')
     depends=('qt')
     replaces=('qt-doc')
