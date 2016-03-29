@@ -4,7 +4,7 @@ pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse)
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=8.0
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(LGPL)
@@ -46,8 +46,18 @@ build() {
 
 package_pulseaudio() {
   depends=("libpulse=$pkgver-$pkgrel" rtkit libltdl speexdsp tdb orc
-           webrtc-audio-processing sbc libsoxr xenstore)
-  optdepends=('pulseaudio-alsa: ALSA configuration (recommended)')
+           webrtc-audio-processing sbc libsoxr)
+  optdepends=('pulseaudio-alsa: ALSA configuration (recommended)'
+              'avahi: Zeroconf support for PulseAudio'
+              'openssl: Zeroconf support for PulseAudio'
+              'lirc: IR (lirc) support for PulseAudio'
+              'xenstore: Xen support for PulseAudio'
+              'jack2: Jack support for PulseAudio'
+              'bluez: Bluetooth support for PulseAudio'
+              'bluez-libs: Bluetooth support for PulseAudio' 
+              'python3-pyqt4: Equalizer for PulseAudio'
+              'fftw: Equalizer for PulseAudio'
+              'gconf: GConf support for PulseAudio')
   backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
   install=pulseaudio.install
 
