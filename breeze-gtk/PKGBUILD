@@ -2,7 +2,7 @@ source ../plasma.conf
 
 pkgname=breeze-gtk
 pkgver=${PVersion}
-pkgrel=2
+pkgrel=1
 pkgdesc="Breeze port for GTK. (GIT version)"
 arch=('x86_64')
 url='https://quickgit.kde.org/?p=breeze-gtk.git'
@@ -15,15 +15,12 @@ conflicts=('gnome-breeze')
 replaces=('gnome-breeze')
 group=('gtk-integration') # groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
-        'fix-breeze-dark.patch')
-sha256sums=("$(getSum ${pkgname})"
-            '6cb9ca054d618962ca9c0f982777e1f66d8d3cd219546927be615dce6060e0e7')
+source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=("$(getSum ${pkgname})")
 
 prepare() {
   mkdir -p build
   cd ${pkgname}-${pkgver}
-  patch -p1 -i $srcdir/fix-breeze-dark.patch
 }
 
 build() {
