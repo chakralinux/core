@@ -1,11 +1,10 @@
-# Maintainer: AlmAck
 # Note: remember to build lib32 counterpart when bumping pkgver
 
 pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse)
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=8.0
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(LGPL)
@@ -47,7 +46,7 @@ build() {
 
 package_pulseaudio() {
   depends=("libpulse=$pkgver-$pkgrel" rtkit libltdl speexdsp tdb orc
-           webrtc-audio-processing sbc libsoxr)
+           webrtc-audio-processing sbc libsoxr xenstore)
   optdepends=('pulseaudio-alsa: ALSA configuration (recommended)')
   backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
   install=pulseaudio.install
