@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=kio
 pkgver=${KFVersion}
-pkgrel=2
+pkgrel=3
 pkgdesc='Resource and network access abstraction'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kio'
@@ -15,11 +15,17 @@ checkdepends=('xorg-server-xvfb' 'openbox')
 groups=('kf5')
 install=kio.install
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
+        '0001-Fix-crash-in-rename-dialog.patch')
+sha256sums=( $(getSum ${pkgname}) 
+            '1d2f48f859521f3ded1c0fa1211fccea22a52df41ac253e40c295569d534047c')
 
 prepare() {
   mkdir -p build
+  
+  cd ${srcdir}/${pkgname}-${pkgver}
+  # Bug 360488 - dolphin with >=kde-frameworks-5.20 crashes when copy+paste file in same directory
+  patch -p1 -i ${srcdir}/0001-Fix-crash-in-rename-dialog.patch
 }
 
 build() {
@@ -31,9 +37,4 @@ build() {
 package() {
   cd build
   make DESTDIR="${pkgdir}" install
-
-  # the following is comment out, waiting for discision being made.
-  # msg 'change DuckDuckGo search'
-  # cd ${pkgdir}/usr/share/kservices5/searchproviders/
-  # sed 's/kde/chakra/g' -i duckduckgo*
 }
