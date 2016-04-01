@@ -1,14 +1,18 @@
+# Maintainer:   H W Tovetjärn (totte) <totte@tott.es>
+# Contributors: AlmAck
+
 pkgbase=mlt
 pkgname=(mlt mlt-python-bindings)
-pkgver=0.9.8
-pkgrel=3
+pkgver=6.0.0
+pkgrel=2
 pkgdesc="An open source multimedia framework"
 arch=('x86_64')
 url="http://www.mltframework.org"
 license=(GPL)
-makedepends=(ladspa frei0r-plugins libdv sdl_image libsamplerate sox ffmpeg vid.stab qt5-svg jack libexif python2 swig)
+makedepends=(ladspa frei0r-plugins libdv sdl_image libsamplerate sox ffmpeg vid.stab qt5-svg jack libexif python2 swig movit eigen3)
 source=("https://github.com/mltframework/mlt/archive/v${pkgver}.tar.gz")
-md5sums=('57397f2f0fa0545c248c5e9b59c140d5')
+md5sums=('df4909bbf3dacb1186b5c1bd2aeef568')
+options=('debug')
 
 build() {
   # mlt
@@ -37,10 +41,11 @@ package_mlt() {
             'sox: for SOX (Audio Swiss Army Knife) plugin'
             'ffmpeg: for ffmpeg plugin'
             'vid.stab: for video stabilize plugin'
-	    'gtk2: Gtk plugin'
             'qt5-svg: for Qt5 plugins'
             'jack2: for JACK sound output plugin'
-            'libexif: for auto rotate plugin')
+            'libexif: for auto rotate plugin'
+            'frei0r-plugins: for additional effects'
+            'movit: opengl plugin')
   conflicts=('mlt++<=0.3.8')
 
   cd "$srcdir/mlt-$pkgver"
@@ -48,7 +53,7 @@ package_mlt() {
 }
 
 package_mlt-python-bindings() {
-  depends=('python2' 'mlt>=0.8')
+  depends=('python2' 'mlt')
 
   cd "$srcdir/mlt-$pkgver/src/swig/python"
   mkdir -p "$pkgdir/usr/lib/python2.7/"

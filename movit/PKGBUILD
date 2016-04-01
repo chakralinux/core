@@ -1,0 +1,23 @@
+
+pkgname=movit
+pkgver=1.3.2
+pkgrel=1
+pkgdesc="The modern video toolkit"
+arch=(x86_64)
+url="http://movit.sesse.net/"
+license=(GPL)
+depends=(fftw libepoxy)
+makedepends=(eigen3 gtest sdl2)
+source=("https://movit.sesse.net/$pkgname-$pkgver.tar.gz")
+md5sums=('dadc7e1695ac784a0233df6b2a1a2b8b')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+} 
