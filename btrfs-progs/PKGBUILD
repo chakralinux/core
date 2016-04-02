@@ -1,5 +1,5 @@
 pkgname=btrfs-progs
-pkgver=4.4.1
+pkgver=4.5
 pkgrel=1
 pkgdesc='Btrfs filesystem utilities'
 arch=('x86_64')
@@ -39,18 +39,18 @@ package() {
    cd $pkgname
 
    make prefix="$pkgdir"/usr install
-   
+
    # install bash completion (FS#44618)
    install -Dm644 btrfs-completion "$pkgdir/usr/share/bash-completion/completions/btrfs"
 
    # install mkinitcpio hooks
    cd "$srcdir"
    install -Dm644 initcpio-install-btrfs "$pkgdir/usr/lib/initcpio/install/btrfs"
-   install -Dm644 initcpio-hook-btrfs "$pkgdir/usr/lib/initcpio/hooks/btrfs"
+   install -Dm644 initcpio-hook-btrfs    "$pkgdir/usr/lib/initcpio/hooks/btrfs"
 
    # install scrub service/timer
    install -Dm644 btrfs-scrub@.service "$pkgdir/usr/lib/systemd/system/btrfs-scrub@.service"
-   install -Dm644 btrfs-scrub@.timer "$pkgdir/usr/lib/systemd/system/btrfs-scrub@.timer"
+   install -Dm644 btrfs-scrub@.timer   "$pkgdir/usr/lib/systemd/system/btrfs-scrub@.timer"
 }
 
 # vim:set ts=2 sw=2 ft=sh et:

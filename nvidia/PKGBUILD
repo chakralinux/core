@@ -1,23 +1,23 @@
 #
 # Chakra Packages for Chakra, part of chakraos.org
 
-_extramodules=extramodules-4.2-CHAKRA
-_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.2.6
+_extramodules=extramodules-4.5-CHAKRA
+_kernelver=4.5
 
 pkgname=('nvidia' 'chd-nvidia')
-pkgver=358.16
-pkgrel=2
+pkgver=361.42
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
-makedepends=("linux-headers=${_kernelver}")
+makedepends=("linux-headers=${_kernelver}" "nvidia-utils=${pkgver}")
 license=('custom')
+options=('!strip')
 source=("http://git.chakraos.org/chakra-hardware-detection.git/blob_plain/HEAD:/hwdb/nvidia_supported_new")
 
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
 md5sums=('874fc31d9a647e51ce20372d090083f5'
-         'efb1e649c0e0d62e92774bbf2c124488')
+         'e70ece47407c53ebb527fa684ca759e7')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
@@ -26,6 +26,7 @@ prepare() {
 }
 
 build() {
+    _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
     cd "${_pkg}/kernel"
     make SYSSRC=/usr/lib/modules/"${_kver}/build" module
 }
@@ -37,7 +38,7 @@ package_nvidia() {
     replaces=('nvidia-bumblebee')
     provides=('nvidia-bumblebee')
     install=nvidia.install
-    
+
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-uvm.ko" \
@@ -45,7 +46,7 @@ package_nvidia() {
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-modeset.ko" \
          "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-modeset.ko"
     gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
-    
+
     install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
     echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nouveau_blacklist.conf"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
