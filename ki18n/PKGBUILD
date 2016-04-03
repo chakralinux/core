@@ -4,7 +4,7 @@ source ../frameworks.conf
 
 pkgname=ki18n
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='A get-text based translation framework'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/ki18n'
@@ -35,4 +35,10 @@ build() {
 package() {
   cd build
   make DESTDIR="${pkgdir}" install
+
+  # conflicts with kde-l10n since kf5 5.20.0
+  rm ${pkgdir}/usr/share/locale/nb/LC_SCRIPTS/ki18n5/ki18n5.js
+  rm ${pkgdir}/usr/share/locale/nn/LC_SCRIPTS/ki18n5/ki18n5.js
+  rm ${pkgdir}/usr/share/locale/nn/LC_SCRIPTS/ki18n5/skjermelement.pmap
+  rm ${pkgdir}/usr/share/locale/nn/LC_SCRIPTS/ki18n5/skjermelement.pmapc
 }
