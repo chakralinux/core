@@ -1,13 +1,13 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
-_extramodules=extramodules-4.2-CHAKRA
+_extramodules=extramodules-4.5-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.2.6
-_rootOfSourceTree=/usr/src/linux-${_kver}
+_kernelver=4.5
+_rootOfSourceTree=/usr/lib/modules/${_kver}/build
 
 pkgname=ndiswrapper
 pkgver=1.59
-pkgrel=20
+pkgrel=21
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
@@ -25,10 +25,8 @@ source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$p
 
 sha1sums=('75fbbda677fe91ee07a6f6a8e19b1f3e2479540f'
           'f120e96fa9abab45e1c724aaac29da7b892820f0'
-          '0f2d6fe0203e11dcbb8a9e267bd0de238aabc07c'
           'aa8c9279d53a3b2762a4e504bcde68c38aa3ce58'
           '2af212edfdf647c03823845504b17931a9f19921')
-
 
 prepare() {
   [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false

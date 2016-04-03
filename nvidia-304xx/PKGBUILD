@@ -1,11 +1,11 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 
-_extramodules=extramodules-4.2-CHAKRA
+_extramodules=extramodules-4.5-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.2.6
+_kernelver=4.5
 
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
-pkgver=304.128
+pkgver=304.131
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
@@ -13,13 +13,10 @@ makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 source=("http://git.chakraos.org/chakra-hardware-detection.git/blob_plain/HEAD:/hwdb/nvidia_supported")
 _pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
-source+=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run")
+source+=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run"
+         'nv-drm.patch')
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '291d41ccdbcc08f752a38f9e0a7eeea0')
-
-source+=(nv-drm.patch)
-md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '6478e40ed87d9177cbfc3d0b6e39a051'
+         '24c9c6a8679edae3b2a608b191fdc727'
          '79671a27131da619a33eb02ed0c2c031')
 
 prepare() {

@@ -1,13 +1,14 @@
 # maintainer tetris4@gmail.com
 # contributions from: https://www.archlinux.org/packages/community/x86_64/bbswitch/
 
-_extramodules=extramodules-4.2-CHAKRA
+_extramodules=extramodules-4.5-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.2.6
+_kernelver=4.5
+_rootOfSourceTree=/usr/lib/modules/${_kver}/build
 
 pkgname=bbswitch
 pkgver=0.8
-pkgrel=20
+pkgrel=21
 pkgdesc="kernel module allowing to switch dedicated graphics card on Optimus laptops"
 arch=('x86_64')
 url=("http://github.com/Bumblebee-Project/bbswitch")
@@ -25,7 +26,7 @@ prepare() {
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  make KDIR=/usr/src/linux-${_kver}
+  make KDIR=${_rootOfSourceTree}
 }
 
 package() {
