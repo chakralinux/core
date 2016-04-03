@@ -3,8 +3,8 @@
 pkgname=qtwebkit
 pkgver=2.3.4
 _pkgver=23
-pkgrel=1
-_qtver=4.8.6
+pkgrel=2
+_qtver=4.8.7
 arch=('x86_64')
 url='http://trac.webkit.org/wiki/QtWebKit'
 pkgdesc='An open source web browser engine (Qt port)'
@@ -25,13 +25,15 @@ source=(
         'qwebview.patch'
         'use-python2.patch'
         'qtwebkit-2.3-debuginfo.patch'
-        'qtwebkit-2.3-save_memory.patch')
+        'qtwebkit-2.3-save_memory.patch'
+        'gcc-5.patch')
 sha1sums=('31bc60de1cf26bb0766d539b4d564651ddbb0650'
-          'ddf9c20ca8309a116e0466c42984238009525da6'
+          '76aef40335c0701e5be7bb3a9101df5d22fe3666'
           'c3df6107233f466a032e36681cee07f16536657c'
           '315b6ff603f35e5492a036f7082f6aa075dfb607'
           '1329b1564fd70ced8be411eac275972a49502e23'
-          '6563e0e1b36a8ab28cb65edfa724aca1dbb03dfe')
+          '6563e0e1b36a8ab28cb65edfa724aca1dbb03dfe'
+          '5d506578ea30daeeeb1e91ab83876fe6d5669715')
 
 prepare() {
   cd ${pkgname}-${pkgver}
@@ -41,6 +43,9 @@ prepare() {
   # reduce debug info, to avoid the error "ar: libWebCore.a: File truncated" of 4GB file max exceed
   patch -p1 -i "${srcdir}"/qtwebkit-2.3-debuginfo.patch
   patch -p1 -i "${srcdir}"/qtwebkit-2.3-save_memory.patch
+  
+  # Fix build with GCC 5 (Fedora)
+  patch -p1 -i "$srcdir"/gcc-5.patch
   
   # QWebView plugin
   cd ../$_pkgfqn
