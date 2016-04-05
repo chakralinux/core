@@ -1,20 +1,21 @@
 pkgname=postfix
 pkgver=3.1.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Fast, easy to administer, secure mail server'
 url='http://www.postfix.org/'
 arch=('x86_64')
 license=('custom')
-makedepends=('openssl' 'pcre' 'icu' 'libsasl' 'libldap' 'db'
-             'libmariadbclient' 'postgresql-libs' 'sqlite3' 'tinycdb')
-source=("ftp://ftp.porcupine.org/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz"
+depends=('openssl' 'pcre' 'icu' 'libsasl' 'libldap' 'db'
+         'libmariadbclient' 'postgresql-libs' 'sqlite3' 'tinycdb')
+source=("ftp://ftp.porcupine.org/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz"{,.gpg2}
         'aliases.patch'
         'postfix.service')
 sha1sums=('a79409958c0327dc605473d2522483219464cbd2'
+          'SKIP'
           '5fc3de6c7df1e5851a0a379e825148868808318b'
           'dd12885d367bebaf0fc9d2e9823a7f82086b6ee9')
 backup=('etc/postfix/'{access,aliases,canonical,generic,header_checks,main.cf,master.cf,relocated,transport,virtual})
-
+validpgpkeys=('622C7C012254C186677469C50C0B590E80CA15A7') # Wietse Venema
 conflicts=('smtp-server' 'smtp-forwarder' 'postfix-tools')
 provides=('smtp-server' 'smtp-forwarder' 'postfix-tools')
 replaces=('postfix-tools')
