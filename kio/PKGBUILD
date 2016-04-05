@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=kio
 pkgver=${KFVersion}
-pkgrel=3
+pkgrel=1
 pkgdesc='Resource and network access abstraction'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kio'
@@ -15,17 +15,13 @@ checkdepends=('xorg-server-xvfb' 'openbox')
 groups=('kf5')
 install=kio.install
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
-        '0001-Fix-crash-in-rename-dialog.patch')
-sha256sums=( $(getSum ${pkgname}) 
-            '1d2f48f859521f3ded1c0fa1211fccea22a52df41ac253e40c295569d534047c')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
 
 prepare() {
   mkdir -p build
   
   cd ${srcdir}/${pkgname}-${pkgver}
-  # Bug 360488 - dolphin with >=kde-frameworks-5.20 crashes when copy+paste file in same directory
-  patch -p1 -i ${srcdir}/0001-Fix-crash-in-rename-dialog.patch
 }
 
 build() {

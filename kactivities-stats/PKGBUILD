@@ -1,21 +1,18 @@
 source ../frameworks.conf
 
-pkgname=kactivities
+pkgname=kactivities-stats
 pkgver=${KFVersion}
 pkgrel=1
 arch=('x86_64')
-pkgdesc="Core components for the KDE's Activities"
-url='https://projects.kde.org/projects/frameworks/kactivities'
+pkgdesc="A library for accessing the usage data collected by the activities system"
+url='https://projects.kde.org/projects/frameworks/kactivities-stats'
 license=('LGPL')
-depends=('kcmutils' 'kdeclarative' 'kactivitymanagerd>=5.5.95')
+depends=('kactivities')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'boost' 'python3')
-provides=("kactivities-frameworks=${pkgver}")
-replaces=("kactivities-frameworks" 'kactivities4')
-conflicts=('kactivities4' 'kactivities-frameworks')
 options=("debug")
 groups=('kf5')
 source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n 1) )
+sha256sums=( $(getSum ${pkgname} | head -n 2) )
 
 prepare() {
   mkdir -p build
@@ -33,3 +30,4 @@ package() {
   
   make  DESTDIR="${pkgdir}"  install
 }
+
