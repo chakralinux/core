@@ -1,18 +1,19 @@
-# Maintainer: Drake Justice <djustice@chakraos.org>
 
-pkgname=xf86-video-ati
-pkgver=7.7.0
+pkgname=xf86-video-amdgpu
+pkgver=1.1.0
 pkgrel=1
-pkgdesc="X.org ati video driver"
+pkgdesc="X.org amdgpu video driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
 license=('custom')
-depends=('libdrm>=2.4.58' 'systemd' 'mesa-dri')
+depends=('libdrm' 'systemd' 'mesa-dri')
 makedepends=('xorg-server-devel' 'X-ABI-VIDEODRV_VERSION=19')
-conflicts=('xorg-server<1.16.0' 'X-ABI-VIDEODRV_VERSION<19' 'X-ABI-VIDEODRV_VERSION>=20')
+conflicts=('xorg-server<1.16.0' 'X-ABI-VIDEODRV_VERSION<19' 'X-ABI-VIDEODRV_VERSION>=19')
 groups=('xorg-drivers' 'xorg')
-source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('844d1c577b145c90dc8ef027678f0c27f554363f782cd696a3aea26415b2c1c3')
+source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2{,.sig})
+md5sums=('89e62ee60b12f94e27ab76268bbbe778'
+         'SKIP')
+validpgpkeys=('B09FAF35BE914521980951145A81AF8E6ADBB200') # Michel Daenzer <michel@daenzer.net>
 
 build() {
   cd ${pkgname}-${pkgver}
@@ -29,4 +30,3 @@ package() {
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
-
