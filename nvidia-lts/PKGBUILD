@@ -1,10 +1,10 @@
 
 _extramodules=extramodules-3.14-CHAKRA-LTS
 _kver="$(cat /lib/modules/${_extramodules}/version)"
-_kernelver=3.14.57
+_kernelver=3.14.66
 
-pkgname=nvidia-lts
-pkgver=358.16
+pkgnamen=nvidia-lts
+pkgver=361.42
 pkgrel=1
 pkgdesc="NVIDIA drivers for linux."
 arch=('x86_64')
@@ -18,7 +18,7 @@ license=('custom')
 install=nvidia.install
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
-md5sums=('efb1e649c0e0d62e92774bbf2c124488')
+md5sums=('e70ece47407c53ebb527fa684ca759e7')
 
 prepare() {
     sh ${_pkg}.run --extract-only
@@ -32,6 +32,10 @@ build() {
 package() {  
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
+    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-modeset.ko" \
+      "${pkgdir}/usr/lib/modules/${_extramodules}/kernel/drivers/video/nvidia-modeset.ko"
+    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-drm.ko" \
+      "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-drm.ko"
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-uvm.ko" \
         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-uvm.ko"
     gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
