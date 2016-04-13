@@ -4,7 +4,7 @@ source ../frameworks.conf
 
 pkgname=kservice
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Advanced plugin and service introspection'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kservice'
@@ -14,11 +14,15 @@ makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools' 'python3')
 checkdepends=('xorg-server-xvfb' 'kded')
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
+        '03_chakra_menu.patch')
+sha256sums=( $(getSum ${pkgname}) 
+            '505e9e5e969be5094b3f713b865d5927cc3de1f4693915174732b20793228c4f')
 
 prepare() {
   mkdir -p build
+  cd ${pkgname}-${pkgver}/src
+  patch -Np2 -i ${srcdir}/03_chakra_menu.patch
 }
 
 build() {
