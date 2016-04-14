@@ -6,7 +6,7 @@ pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia' 'libcl')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 # Update nvidia-settings too
 pkgver=364.16
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
@@ -125,6 +125,7 @@ package_nvidia-utils() {
     install -D -m755 "libnvidia-glcore.so.${pkgver}"  "${pkgdir}/usr/lib/libnvidia-glcore.so.${pkgver}"
     install -D -m755 "libnvidia-eglcore.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-eglcore.so.${pkgver}"
     install -D -m755 "libnvidia-glsi.so.${pkgver}"    "${pkgdir}/usr/lib/libnvidia-glsi.so.${pkgver}"
+    install -D -m755 "libnvidia-egl-wayland.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-egl-wayland.so.${pkgver}"
 
     # misc
     install -D -m755 "libnvidia-ifr.so.${pkgver}"    "${pkgdir}/usr/lib/libnvidia-ifr.so.${pkgver}"
@@ -132,6 +133,9 @@ package_nvidia-utils() {
     install -D -m755 "libnvidia-encode.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-encode.so.${pkgver}"
     install -D -m755 "libnvidia-cfg.so.${pkgver}"    "${pkgdir}/usr/lib/libnvidia-cfg.so.${pkgver}"
     install -D -m755 "libnvidia-ml.so.${pkgver}"     "${pkgdir}/usr/lib/libnvidia-ml.so.${pkgver}"
+
+    # Vulkan ICD
+    install -D -m644 "nvidia_icd.json" "${pkgdir}/etc/vulkan/icd.d/nvidia_icd.json"
 
     # VDPAU
     install -D -m755 "libvdpau_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/vdpau/libvdpau_nvidia.so.${pkgver}"
