@@ -5,8 +5,8 @@ _extramodules=extramodules-4.5-CHAKRA
 _kernelver=4.5.1
 
 pkgname=('nvidia' 'chd-nvidia')
-pkgver=361.42
-pkgrel=2
+pkgver=364.16
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}" "nvidia-utils=${pkgver}")
@@ -14,10 +14,13 @@ license=('custom')
 options=('!strip')
 source=("http://git.chakraos.org/chakra-hardware-detection.git/blob_plain/HEAD:/hwdb/nvidia_supported_new")
 
-_pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-source+=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
+#_pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
+_pkg="NVIDIA-Linux-x86_64-${pkgver}"
+
+#source+=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
+source+=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
 md5sums=('874fc31d9a647e51ce20372d090083f5'
-         'e70ece47407c53ebb527fa684ca759e7')
+         '5d954bfb0be8532779a4ca1741851493')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
