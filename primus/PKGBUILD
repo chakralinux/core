@@ -2,7 +2,7 @@
 # Contributions from Arch:  https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/primus
 # If you update this package,please remember to update lib32-primus!
 pkgname=primus
-pkgver=20141228
+pkgver=20151110
 pkgrel=1
 pkgdesc="Faster OpenGL offloading for Bumblebee (git sources)"
 arch=('x86_64')
@@ -11,8 +11,16 @@ license=('custom:ISC')
 depends=('bumblebee')
 makedepends=('git')
 provides=('primus')
-source=("git://github.com/amonakov/primus.git#commit=7e21554eb2")
-sha1sums=('SKIP')
+source=("git://github.com/amonakov/primus.git#commit=d1afbf6"
+        "register_cleanup.patch")
+sha1sums=('SKIP'
+          'fd48f89c55c1ad854d7a985781faed2c52c0135f')
+
+prepare() {
+  cd primus
+
+  patch -Np1 < "$srcdir/register_cleanup.patch"
+}
 
 build() {
   cd "${srcdir}/${pkgname}"
