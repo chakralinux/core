@@ -1,9 +1,9 @@
 pkgbase="sqlite3"
 pkgname=('sqlite3' 'sqlite3-tcl' 'sqlite3-doc')
-_amalgamationver=3110100
+_amalgamationver=3120100
 _docver=${_amalgamationver}
-pkgver=3.11.1
-pkgrel=2
+pkgver=3.12.1
+pkgrel=1
 pkgdesc="A C library that implements an SQL database engine"
 arch=('x86_64')
 license=('custom:Public Domain')
@@ -13,18 +13,29 @@ source=( # tarball containing the amalgamation for SQLite >= 3.7.5 together with
         https://www.sqlite.org/2016/sqlite-autoconf-$_amalgamationver.tar.gz
         https://www.sqlite.org/2016/sqlite-doc-${_docver}.zip
         license.txt)
-sha1sums=('c4b4dcd735a4daf5a2e2bb90f374484c8d4dad29'
-          '79a24f86bbfc77371fb528ac396d3ad1c266ffa4'
+sha1sums=('fa1f3dbf6e2e8c6d14125b2eceda5b2e16a19f1f'
+          '5adad476e52a031bfb1cbc9c1426a5fb77e453a3'
           'f34f6daa4ab3073d74e774aad21d66878cf26853')
 
 build() {
-  export CFLAGS="$CFLAGS -DSQLITE_ENABLE_FTS3=1 -DSQLITE_ENABLE_COLUMN_METADATA=1 -DSQLITE_ENABLE_UNLOCK_NOTIFY -DSQLITE_SECURE_DELETE -DSQLITE_ENABLE_DBSTAT_VTAB"
+  export CFLAGS="$CFLAGS -DSQLITE_ENABLE_COLUMN_METADATA=1 \
+                         -DSQLITE_ENABLE_UNLOCK_NOTIFY \
+                         -DSQLITE_SECURE_DELETE \
+                         -DSQLITE_ENABLE_DBSTAT_VTAB \
+                         -DSQLITE_ENABLE_FTS3_TOKENIZER=1 \
+                         -DSQLITE_ENABLE_API_ARMOR"
 
   # build sqlite
   cd "$srcdir"/sqlite-autoconf-$_amalgamationver
 
   ./configure --prefix=/usr \
-    --disable-static
+              --disable-static \
+              --disable-amalgamation \
+              --enable-fts3 \
+              --enable-fts4 \
+              --enable-fts5 \
+              --enable-rtree \
+              --enable-json1
   make
 
   # build the tcl extension
@@ -37,6 +48,7 @@ build() {
 package_sqlite3() {
   pkgdesc="A C library that implements an SQL database engine"
   depends=('readline')
+  provides=('sqlite')
   conflicts=('sqlite')
   replaces=('sqlite')
 
@@ -44,7 +56,7 @@ package_sqlite3() {
   make DESTDIR=${pkgdir} install
 
   # license - no linking required because pkgbase=pkgname
-  install -D -m644 ${srcdir}/license.txt ${pkgdir}/usr/share/licenses/${pkgbase}/license.txt
+  install -Dm644 ${srcdir}/license.txt ${pkgdir}/usr/share/licenses/${pkgbase}/license.txt
 }
 
 package_sqlite3-tcl() {
