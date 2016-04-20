@@ -1,7 +1,7 @@
 pkgname=networkmanager
 _pkgname=NetworkManager
 pkgver=1.0.12
-pkgrel=1
+pkgrel=2
 _pppver=2.4.7
 pkgdesc="Network Management daemon"
 arch=('x86_64')
@@ -21,14 +21,17 @@ backup=('etc/NetworkManager/NetworkManager.conf')
 install=networkmanager.install
 source=("http://ftp.gnome.org/pub/gnome/sources/$_pkgname/${pkgver:0:3}/$_pkgname-$pkgver.tar.xz"
         'NetworkManager.conf' 
-        'disable_set_hostname.patch')
+        'disable_set_hostname.patch'
+        '0001-wifi-hack-for-wext-devices.patch')
 md5sums=('ebb273456a81ccf9dfaf2461061b0e96'
          '1653159d6634fb62d3a5c548b7a56151'
-         '6b5415350c04304a28d29294441a07ae')
+         '6b5415350c04304a28d29294441a07ae'
+         'd82b9db3ac6050b075ab529cc1e648ee')
 
 prepare() {
   cd $_pkgname-$pkgver
   patch -Np1 -i ../disable_set_hostname.patch
+  patch -Np1 -i ../0001-wifi-hack-for-wext-devices.patch
 }
 
 build() {
