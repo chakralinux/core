@@ -4,9 +4,9 @@
 _extramodules=extramodules-4.5-CHAKRA
 _kernelver=4.5.1
 
-pkgname=('nvidia' 'chd-nvidia')
+pkgname=('nvidia' 'chd-nvidia') # 'nvidia-dkms') Maybe we don't need dkms module
 pkgver=364.16
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}" "nvidia-utils=${pkgver}")
@@ -26,6 +26,20 @@ prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
     # patches here
+
+#    cp -a kernel kernel-dkms
+#    cd kernel-dkms
+#    sed -i "s/__VERSION_STRING/${pkgver}/" dkms.conf
+#    sed -i 's/__JOBS/`nproc`/' dkms.conf
+#    sed -i 's/__DKMS_MODULES//' dkms.conf
+#    sed -i '$iBUILT_MODULE_NAME[0]="nvidia"\
+#DEST_MODULE_LOCATION[0]="/kernel/drivers/video"\
+#BUILT_MODULE_NAME[1]="nvidia-uvm"\
+#DEST_MODULE_LOCATION[1]="/kernel/drivers/video"\
+#BUILT_MODULE_NAME[2]="nvidia-modeset"\
+#DEST_MODULE_LOCATION[2]="/kernel/drivers/video"\
+#BUILT_MODULE_NAME[3]="nvidia-drm"\
+#DEST_MODULE_LOCATION[3]="/kernel/drivers/video"' dkms.conf
 }
 
 build() {
@@ -37,17 +51,13 @@ build() {
 package_nvidia() {
     pkgdesc="NVIDIA drivers for linux."
     depends=("linux=${_kernelver}" "nvidia-libgl" "nvidia-utils=${pkgver}")
-    conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx' 'nvidia-bumblebee')
-    replaces=('nvidia-bumblebee')
-    provides=('nvidia-bumblebee')
+    conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx')
     install=nvidia.install
 
-    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
-        "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
-    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-uvm.ko" \
-        "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-uvm.ko"
-    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia-modeset.ko" \
-         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-modeset.ko"
+    for ko in nvidia nvidia-uvm nvidia-modeset nvidia-drm; do
+    install -Dm644 "${srcdir}/${_pkg}/kernel/${ko}.ko" \
+        "${pkgdir}/usr/lib/modules/${_extramodules}/${ko}.ko"
+    done
     gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
 
     install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
@@ -65,3 +75,16 @@ package_chd-nvidia() {
     sh -e "${srcdir}/nvidia_supported_new" README.txt kernel/nv-kernel.o \
         > "${pkgdir}/opt/chakra/hwdb/hw_nvidia_hwdb"
 }
+
+#package_nvidia-dkms() {
+#    pkgdesc="NVIDIA driver sources for linux"
+#    depends=('dkms' "nvidia-utils=$pkgver" 'nvidia-libgl')
+#    optdepends=('linux-headers: Build the module for kernel'
+#                'linux-lts-headers: Build the module for LTS kernel')
+#    conflicts+=('nvidia')
+#
+#    cd ${_pkg}
+#    install -dm 755 "${pkgdir}"/usr/{lib/modprobe.d,src}
+#    cp -dr --no-preserve='ownership' kernel-dkms "${pkgdir}/usr/src/nvidia-${pkgver}"
+#    echo 'blacklist nouveau' > "${pkgdir}/usr/lib/modprobe.d/nvidia.conf"
+#}
