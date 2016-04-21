@@ -3,7 +3,7 @@ source ../plasma.conf
 
 pkgname=kde-cli-tools
 pkgver=${PVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc="Tools based on KDE Frameworks 5 to better interact with the system"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/kde-cli-tools'
@@ -33,4 +33,8 @@ package() {
 
   # conflicts with kdebase-runtime
   rm -r "$pkgdir"/usr/share/man
+
+  # link some useful binaries
+  ln -sf /usr/lib/kf5/kdesu ${pkgdir}/usr/bin/kdesu
+  ln -sf /usr/lib/kf5/kdeeject ${pkgdir}/usr/bin/kdeeject
 }
