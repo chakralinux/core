@@ -3,7 +3,7 @@ _kernelver=3.14.66
 
 pkgname=('nvidia-lts')
 pkgdesc=('NVIDIA drivers for linux-lts')
-pkgver=364.16
+pkgver=364.19
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
@@ -11,9 +11,13 @@ depends=("linux-lts=${_kernelver}" "nvidia-libgl" "nvidia-utils=${pkgver}")
 makedepends=("linux-lts-headers=${_kernelver}")
 install=nvidia.install
 license=('custom')
-_pkg="NVIDIA-Linux-x86_64-${pkgver}"
-source=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
-md5sums=('5d954bfb0be8532779a4ca1741851493')
+
+_pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
+#_pkg="NVIDIA-Linux-x86_64-${pkgver}"
+
+source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
+#source=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
+md5sums=('ad7a0b1855b3913390fb75b4cc3a26dc')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
