@@ -1,14 +1,10 @@
-#
-# Platform Packages for Chakra, part of chakraos.org
-#
-
-_extramodules=extramodules-3.19-CHAKRA
+_extramodules=extramodules-4.5-CHAKRA
 _kernver="$(cat /usr/lib/modules/$_extramodules/version || true)"
-_kernelver=3.19.4
+_kernelver=4.5.1
 
 pkgname=r8168
-pkgver=8.038.00
-pkgrel=11
+pkgver=8.041.00
+pkgrel=1
 pkgdesc="A kernel module for Realtek 8168 network cards"
 url="http://www.realtek.com.tw"
 license=("GPL")
@@ -16,17 +12,14 @@ arch=('x86_64')
 depends=('glibc' "linux=${_kernelver}")
 makedepends=("linux-headers=${_kernelver}")
 install=$pkgname.install
-source=("https://dl.dropboxusercontent.com/u/362439/archlinux/r8168-$pkgver.tar.bz2"
-        delayed_work_ethtool_ops_fix2.patch)
-sha256sums=('1384bdf4d33b219f937bf1a600c72b22962baf7796e562b08e4da3c000f49072'
-            '2a03fa65e476cb7dd3ed5976037e0218260ff2660b6a4c495a824865eb10c303')
+source=("https://github.com/mtorromeo/r8168/archive/$pkgver/$pkgname-$pkgver.tar.gz"
+        'linux-4.5.patch')
+sha256sums=('d56f60e4157ccbf8f8717270b1acb391b0a959d9a96c2f0b4a91c683aa8b83a5'
+            'e05a4bccf28beecc97db246064a5fe80d1303476b76086bd262c9c8db82b2e6e')
 
 prepare(){
 	cd "$pkgname-$pkgver"
-
-	# Fix build with Linux 3.15 and 3.16
-	# https://code.google.com/p/r8168/issues/detail?id=19
-	patch -Np1 -i "$srcdir/delayed_work_ethtool_ops_fix2.patch"
+	patch -Np1 -i "$srcdir/linux-4.5.patch"
 }
 
 build() {
