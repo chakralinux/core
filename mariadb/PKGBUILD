@@ -2,17 +2,18 @@
 
 pkgbase=mariadb
 pkgname=('libmariadbclient' 'mariadb-clients' 'mytop' 'mariadb')
-pkgver=10.1.10
-pkgrel=2
+pkgver=10.1.13
+pkgrel=1
 arch=('x86_64')
 license=('GPL')
 url='http://mariadb.org/'
 makedepends=('cmake' 'openssl' 'zlib' 'libaio' 'libxml2' 'openssl' 'pcre' 'snappy'
              'jemalloc' 'lz4' 'lzo2' 'boost')
-source=(http://ftp.heanet.ie/mirrors/mariadb/mariadb-$pkgver/source/mariadb-$pkgver.tar.gz mariadb.service
+source=(http://ftp.heanet.ie/mirrors/mariadb/mariadb-$pkgver/source/mariadb-$pkgver.tar.gz
+        mariadb.service
         mariadb-post.sh
         mariadb-tmpfiles.conf)
-sha256sums=('d2c26fc76ff7397bdf25924161174c30a2b7fbd59893048f50145fc0a8278f76'
+sha256sums=('21e1c7da1421146c69f5e8077333aaac06778a87046a1943ee4f449fbcefc00d'
             'a6cf5446159fff16598d0d787dd3a3c30a53a656a5f876ddb608bc60e234d334'
             '368f9fd2454d80eb32abb8f29f703d1cf9553353fb9e1ae4529c4b851cb8c5dd'
             '8ef799553c04aad69f8585496b5fa149f7809ff38147ae0bb294a45530e4686c')
@@ -51,6 +52,7 @@ build() {
     -DWITH_SSL=system \
     -DWITH_PCRE=system \
     -DWITH_LIBWRAP=OFF \
+    -DWITH_INNODB_SNAPPY=ON \
     -DWITH_JEMALLOC=ON \
     -DCMAKE_EXE_LINKER_FLAGS='-ljemalloc' \
     -DWITH_EXTRA_CHARSETS=complex \
