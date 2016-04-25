@@ -3,19 +3,20 @@
 
 pkgname=ffmpeg
 pkgver=2.8.6
-pkgrel=1
+pkgrel=2
 pkgdesc='Complete solution to record, convert and stream audio and video'
 arch=('i686' 'x86_64')
 url='http://ffmpeg.org/'
-license=('GPL3')
+license=('GPL3' 'custom')
 depends=('alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'gnutls' 'gsm' 'lame'
          'libass' 'libbluray' 'libmodplug' 'libpulse' 'libsoxr' 'libssh'
          'libtheora' 'libva' 'libvdpau' 'libwebp' 'opencore-amr' 'openjpeg'
          'opus' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore' 'zlib'
-         'libdcadec.so' 'libvidstab.so' 'libvorbis.so' 'libvorbisenc.so'
-         'libvpx.so' 'libx264.so' 'libx265.so')
+         'dcadec' 'vid.stab' 'libvorbis' 'lame' 'openh264'
+         'libvpx' 'libx264.so' 'x265' 'libfdk-aac')
 makedepends=('hardening-wrapper' 'ladspa' 'libvdpau' 'yasm')
 optdepends=('ladspa: LADSPA filters')
+#checkdepends=('valgrind')
 provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
           'libavresample.so' 'libavutil.so' 'libpostproc.so' 'libswresample.so'
           'libswscale.so')
@@ -81,12 +82,21 @@ build() {
     --enable-libxvid \
     --enable-shared \
     --enable-version3 \
-    --enable-x11grab
+    --enable-x11grab \
+    --enable-nonfree \
+    --enable-libfdk-aac \
+    --enable-libopenh264 \
+    --enable-libmp3lame
 
   make
   make tools/qt-faststart
   make doc/ff{mpeg,play,server}.1
 }
+
+#check() {
+#  cd ${pkgname}-${pkgver}
+#  make check
+#}
 
 package() {
   cd ${pkgname}-${pkgver}
