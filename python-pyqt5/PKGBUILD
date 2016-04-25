@@ -1,6 +1,6 @@
 pkgbase=pyqt5
 pkgname=('python-pyqt5-common' 'python3-pyqt5' 'python2-pyqt5')
-pkgver=5.5.1
+pkgver=5.6
 pkgrel=1
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
@@ -21,14 +21,14 @@ makedepends=('python2-dbus'
              'qt5-webkit'
              'qt5-websockets'
              'qt5-x11extras')
-source=("http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-${pkgver}/PyQt-gpl-${pkgver}.tar.gz")
-md5sums=('586ed481b734c665b52fbb4f32161ff7')
+source=("http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${pkgver}/PyQt5_gpl-${pkgver}.tar.gz")
+md5sums=('dbfc885c0548e024ba5260c4f44e0481')
 
 build() {
-    cp -r ${srcdir}/PyQt-gpl-${pkgver} ${srcdir}/python2-Qt-gpl-${pkgver}
+    cp -r ${srcdir}/PyQt5_gpl-${pkgver} ${srcdir}/python2-Qt-gpl-${pkgver}
 
     # Python 3 version
-    cd ${srcdir}/PyQt-gpl-${pkgver}
+    cd ${srcdir}/PyQt5_gpl-${pkgver}
     msg "Configuring the Python 3 version"
     python3 configure.py \
         --confirm-license \
@@ -57,7 +57,7 @@ package_python-pyqt5-common(){
     depends=('qt5-base')
     conflicts=('pyqt5-common')
 
-    cd ${srcdir}/PyQt-gpl-${pkgver}
+    cd ${srcdir}/PyQt_gpl-${pkgver}
     msg "Packaging python-pyqt5-common"
     make -C pyrcc DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
     make -C pylupdate DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
@@ -76,20 +76,21 @@ package_python3-pyqt5(){
                 'qt5-serialport: QtSerialPort'
                 'qt5-svg: QtSvg'
                 'qt5-tools: QtHelp, QtDesigner'
+		'qt5-webengine: QtWebEngine, Qt WebEngineWidgets'
                 'qt5-webkit: QtWebKit, QtWebKitWidgets'
                 'qt5-xmlpatterns: QtXmlPatterns')
 
-    cd ${srcdir}/PyQt-gpl-${pkgver}
+    cd ${srcdir}/PyQt5_gpl-${pkgver}
     msg "Packaging python3-pyqt5"
 
     # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
 
     # Fix naming conflict with python2-pyqt5
-    mv "${pkgdir}"/usr/bin/pyuic5{,-3.3}
+    mv "${pkgdir}"/usr/bin/pyuic5{,-3.5}
 
     # Default /usr/bin/pyuic5
-    ln -s /usr/bin/pyuic5-3.3 "${pkgdir}"/usr/bin/pyuic5
+    ln -s /usr/bin/pyuic5-3.5 "${pkgdir}"/usr/bin/pyuic5
 
     # Provided by python-pyqt5-common
     rm "${pkgdir}"/usr/bin/{pylupdate5,pyrcc5}
@@ -108,6 +109,7 @@ package_python2-pyqt5(){
                 'qt5-serialport: QtSerialPort'
                 'qt5-svg: QtSvg'
                 'qt5-tools: QtHelp, QtDesigner'
+		'qt5-webengine: QtWebEngine, Qt WebEngineWidgets'
                 'qt5-webkit: QtWebKit, QtWebKitWidgets'
                 'qt5-xmlpatterns: QtXmlPatterns')
 
