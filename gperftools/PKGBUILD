@@ -1,17 +1,10 @@
-#
-# Contributor: Dave Reisner <dreisner@archlinux.org>
-# Contributor: Alexander Rødseth <rodseth@gmail.com>
-# Contributor: Thomas Jost <schnouki@schnouki.net>
-# Contributor: JaDa <jada@archlinux.us>
-# Contributor: Joaquim Pedro <osmano807@gmail.com>
-# Contributor: Jan Rüegg <rggjan@gmail.com>
 
 pkgname=gperftools
-pkgver=2.2.1
+pkgver=2.5
 pkgrel=1
 pkgdesc="Fast, multi-threaded malloc() and nifty performance analysis tools"
 arch=('x86_64')
-url="http://code.google.com/p/gperftools/"
+url="https://github.com/gperftools/gperftools"
 license=('BSD')
 depends=('perl')
 provides=('libtcmalloc.so'
@@ -20,24 +13,28 @@ provides=('libtcmalloc.so'
           'libtcmalloc_and_profiler.so'
           'libtcmalloc_minimal.so'
           'libtcmalloc_minimal_debug.so')
-makedepends=('git')
+#makedepends=('git')
 optdepends=('graphviz: pprof graph generation'
             'gv: pprof postscript generation')
-source=("https://googledrive.com/host/0B6NtGsLhIcf7MWxMMF9JdTN3UVk/$pkgname-$pkgver.tar.gz")
-md5sums=('47cbede9442764f9e8fbc403af6cacfd')
+source=("https://github.com/gperftools/gperftools/archive/$pkgname-$pkgver.tar.gz")
+md5sums=('b2e7137ae1c5839cc83f1e4d3af8d952')
+
+prepare() {
+  cd $pkgname-$pkgname-$pkgver
+
+  ./autogen.sh
+}
 
 build() {
-  cd "$pkgname-$pkgver"
+  cd $pkgname-$pkgname-$pkgver
 
   ./configure --prefix=/usr --enable-frame-pointers
   make
 }
 
 package() {
-  cd "$pkgname-$pkgver"
+  cd $pkgname-$pkgname-$pkgver
 
-  make DESTDIR="$pkgdir" install
+  make DESTDIR=$pkgdir install
   install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
 }
-
-# vim:set ts=2 sw=2 et:
