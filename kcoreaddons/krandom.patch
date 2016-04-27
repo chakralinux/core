@@ -1,0 +1,27 @@
+From 78212436643af95779facd9593c82fb149c2213d Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <aacid@kde.org>
+Date: Tue, 26 Apr 2016 23:41:27 +0200
+Subject: [PATCH] Missing rand() -> qrand
+
+Fixes regression introduced in 9ae6d765b37135bbfe3a8b936e5a88b8a435e424
+
+Reviewed by Aleix
+
+BUGS: 362161
+---
+ src/lib/randomness/krandom.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/randomness/krandom.cpp b/src/lib/randomness/krandom.cpp
+index eef6bf6..eaff71f 100644
+--- a/src/lib/randomness/krandom.cpp
++++ b/src/lib/randomness/krandom.cpp
+@@ -51,7 +51,7 @@ int KRandom::random()
+         }
+         qsrand(seed);
+     }
+-    return rand();
++    return qrand();
+ }
+ 
+ QString KRandom::randomString(int length)

@@ -4,7 +4,7 @@ source ../frameworks.conf
 
 pkgname=kcoreaddons
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Addons to QtCore'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kcoreaddons'
@@ -13,11 +13,15 @@ depends=("qt5-base" 'shared-mime-info' 'gamin')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
 groups=('kf5')
 install=${pkgname}.install
-source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("$KFServer/${pkgname}-${pkgver}.tar.xz"
+        "krandom.patch")
+sha256sums=( $(getSum ${pkgname}) 
+	    "91927ffc396a165d2e0d687fbe2d82a102c1b43ae6fcf32be3f892fe682e1fb8")
 
 prepare() {
   mkdir -p build
+  cd ${srcdir}/${pkgname}-${pkgver}
+  patch -Np1 -i ../krandom.patch
 }
 
 build() {
@@ -26,11 +30,6 @@ build() {
     -D_KDE4_DEFAULT_HOME_POSTFIX=4
   make
 }
-
-# check() {
-#   cd build
-#   make test
-# }
 
 package() {
   cd build
