@@ -1,8 +1,8 @@
 pkgname=ntp
 _pkgname=ntp #-dev
-_pkgver=4.2.8p3
+_pkgver=4.2.8p7
 pkgver=${_pkgver/p/.p}
-pkgrel=2
+pkgrel=1
 pkgdesc='Network Time Protocol reference implementation'
 url="http://www.ntp.org/"
 license=('custom')
@@ -10,12 +10,11 @@ arch=('x86_64')
 depends=('openssl' 'libcap' 'libedit')
 makedepends=('perl-html-parser')
 backup=('etc/ntp.conf')
-#source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/${_pkgname}/${_pkgname}-${_pkgver}.tar.gz"
-source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/${_pkgname}-${_pkgver}.tar.gz"
+source=("http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/${_pkgname}-${pkgver}/${_pkgname}-${_pkgver}.tar.gz"
         'ntp.conf'
         'ntpd.service'
         'ntpdate.service')
-sha1sums=('fc624396f8d9f9bc282da30c8e8e527ade7d420f'
+sha1sums=('a1f6300132cf1fc6884990353aca7340daf0be0d'
           '76045019df8182c8b759828549dbd957e26c4d6e'
           '0cccca872385e0142888ab48d273fec0669b30a8'
           '059b382d1af0c55202e2d17f2ae065a2cbfec9ee')
@@ -46,3 +45,4 @@ package() {
   install -Dm644 ../ntpdate.service "${pkgdir}"/usr/lib/systemd/system/ntpdate.service
   install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
+
