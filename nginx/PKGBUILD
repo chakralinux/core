@@ -1,5 +1,5 @@
 pkgname=nginx
-pkgver=1.8.1
+pkgver=1.10.0
 pkgrel=1
 pkgdesc='Lightweight HTTP server and IMAP/POP3 proxy server'
 arch=('x86_64')
@@ -19,7 +19,7 @@ backup=('etc/nginx/fastcgi.conf'
 source=("http://nginx.org/download/nginx-$pkgver.tar.gz"
 	nginx.service
 	nginx.logrotate)
-md5sums=('2e91695074dbdfbf1bcec0ada9fda462'
+md5sums=('c184c873d2798c5ba92be95ed1209c02'
          'e67b777bd10f5c180e247092ddfd6eb7'
          '19a26a61c8afe78defb8b4544f79a9a0')
 
@@ -50,7 +50,7 @@ build() {
     --with-http_gunzip_module \
     --with-http_gzip_static_module \
     --with-http_realip_module \
-    --with-http_spdy_module \
+    --with-http_v2_module \
     --with-http_ssl_module \
     --with-http_stub_status_module \
     --with-http_addition_module \
@@ -58,7 +58,12 @@ build() {
     --with-http_flv_module \
     --with-http_mp4_module \
     --with-http_secure_link_module \
-    --with-http_sub_module
+    --with-http_sub_module \
+    --with-mail \
+    --with-mail_ssl_module \
+    --with-stream \
+    --with-stream_ssl_module \
+    --with-threads
 
   make
 }
