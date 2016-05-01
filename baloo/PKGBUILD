@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=baloo
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc="A framework for searching and managing metadata"
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/baloo'
@@ -16,11 +16,15 @@ replaces=('baloo5' 'kf5-baloo' 'baloo-kf5')
 provides=('baloo5' 'kf5-baloo' 'baloo_file' 'baloo-kf5')
 conflicts=('baloo5' 'kf5-baloo' 'baloo<=4.14.3-1' 'baloo4' 'baloo-kf5')
 install=${pkgname}.install
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
+        'baloo-5.16.0-fix-cjk-search.patch')
+sha256sums=( $(getSum ${pkgname}) 
+            '65fca7ee01a6de3e749aabed3fd8d945bd41db41bb20005255094984b70e3a9d')
 
 prepare() {
   mkdir -p build
+  cd ${pkgname}-${pkgver}
+  patch -Np1 -i ../baloo-5.16.0-fix-cjk-search.patch
 }
 
 build() {

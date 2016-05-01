@@ -1,0 +1,45 @@
+diff -Nur baloo-5.16.0/src/engine/queryparser.cpp baloo-5.16.0n/src/engine/queryparser.cpp
+--- baloo-5.16.0/src/engine/queryparser.cpp	2015-11-08 20:08:54.000000000 +0800
++++ baloo-5.16.0n/src/engine/queryparser.cpp	2015-11-20 13:22:44.928016124 +0800
+@@ -161,7 +161,18 @@
+         queries << phraseQueries;
+         phraseQueries.clear();
+     }
+-
++    //detect text contains chinese or not.
++    //if contain chinese, every chinese character should be a term.
++    int nCount = text.count();
++    for(int i = 0 ; i < nCount ; i++)
++    {
++        QChar cha = text.at(i);
++        ushort uni = cha.unicode();
++        if(uni >= 0x4E00 && uni <= 0x9FA5)
++        {  
++           queries << EngineQuery(QString(cha).toUtf8(), EngineQuery::StartsWith);
++        }   
++    }   
+     if (queries.size() == 1) {
+         return queries.first();
+     }
+diff -Nur baloo-5.16.0/src/engine/termgenerator.cpp baloo-5.16.0n/src/engine/termgenerator.cpp
+--- baloo-5.16.0/src/engine/termgenerator.cpp	2015-11-08 20:08:54.000000000 +0800
++++ baloo-5.16.0n/src/engine/termgenerator.cpp	2015-11-20 13:22:45.432016115 +0800
+@@ -99,6 +99,19 @@
+ void TermGenerator::indexFileNameText(const QString& text, const QByteArray& prefix, int wdfInc)
+ {
+     QStringList terms = termList(text);
++    //detect text contains chinese or not.
++    //if contain chinese, every chinese character should be a term.
++    int nCount = text.count();  
++    for(int i = 0 ; i < nCount ; i++)  
++    {  
++        QChar cha = text.at(i);  
++        ushort uni = cha.unicode();  
++        if(uni >= 0x4E00 && uni <= 0x9FA5)  
++        {
++           terms<<QString(cha);  
++        }  
++    }
++
+     for (const QString& term : terms) {
+         QByteArray arr = term.toUtf8();
