@@ -1,7 +1,7 @@
 pkgbase=mplayer
 pkgname=('mplayer' 'mencoder')
-pkgver=37379
-pkgrel=4
+pkgver=37857
+pkgrel=1
 arch=('x86_64')
 makedepends=(
   'subversion' 'libxxf86vm' 'libmad' 'libxinerama' 'sdl' 'lame' 'libtheora'
@@ -18,34 +18,19 @@ categories=('multimedia')
 screenshot=("http://www.mplayerhq.hu/images/screenshots/gui-preview-01.jpg")
 options=('!buildflags' '!emptydirs')
 source=($pkgbase-$pkgver::svn://svn.mplayerhq.hu/mplayer/trunk#revision=$pkgver
-        http://ffmpeg.org/releases/ffmpeg-2.6.2.tar.bz2
         mplayer.desktop
-        cdio-includes.patch
         include-samba-4.0.patch
-        ffmpeg-libvpxenc-remove-some-unused-ctrl-id-mappings.patch
         revert-icl-fixes.patch)
 md5sums=('SKIP'
-         'e75d598921285d6775f20164a91936ac'
          '62f44a58f072b2b1a3c3d3e4976d64b3'
-         '7b5be7191aafbea64218dc4916343bbc'
          '868a92bdef148df7f38bfa992b26ce9d'
-         '71be9bcd297cb9ce833bbc5d425c0470'
          '3579402002b7302fdf2d146639333efd')
-
-pkgver() {
-  cd $pkgbase-$pkgver
-  svnversion
-}
 
 prepare() {
   cd $pkgbase-$pkgver
-  rm -rf ./ffmpeg
-  mv ../ffmpeg-*/ ./ffmpeg
 
-  patch -Np0 -i ../cdio-includes.patch
   patch -Np1 -i ../include-samba-4.0.patch
   patch -Np0 -i ../revert-icl-fixes.patch
-  patch -d ffmpeg -Np1 <../ffmpeg-libvpxenc-remove-some-unused-ctrl-id-mappings.patch
 
   ./version.sh
 }
