@@ -1,5 +1,5 @@
 pkgname=hplip
-pkgver=3.16.3
+pkgver=3.16.5
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('x86_64')
@@ -7,7 +7,7 @@ url="http://hplipopensource.com"
 license=('GPL')
 depends=('python3' 'ghostscript' 'net-snmp' 'wget' 'foomatic-db-engine'
          #dependencies added by default to run the GUI and other services
-         'python3-pyqt4' 'python3-gobject' 'cups' 'libusb' 'python3-dbus')
+         'python3-pyqt5' 'python3-gobject' 'cups' 'libusb' 'python3-dbus')
 makedepends=('sane' 'rpcbind' )
 optdepends=('sane: for scanner support'
             'python3-pillow: for commandline scanning support'
@@ -16,7 +16,7 @@ optdepends=('sane: for scanner support'
 install=hplip.install
 source=(http://downloads.sourceforge.net/${pkgname}/$pkgname-$pkgver.tar.gz
         disable_upgrade.patch)
-md5sums=('43379bb4790fa7252254094c294f8930'
+md5sums=('3f50c45c52b2adaee8d9ff32db8c4e6e'
          '4ebb9377a989b4fb776e37f5968bb7b0')
 
 prepare() {
@@ -54,7 +54,8 @@ prepare() {
 build() {
  cd ${pkgname}-${pkgver}
  ./configure --prefix=/usr \
-             --enable-qt4 \
+	     --enable-qt5 \
+             --disable-qt4 \
              --disable-foomatic-rip-hplip-install \
              --enable-foomatic-ppd-install \
              --enable-hpcups-install \
@@ -81,3 +82,4 @@ package() {
   # remove rc script
   rm -rf "$pkgdir"/etc/init.d
 }
+
