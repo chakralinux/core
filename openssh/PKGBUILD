@@ -1,6 +1,6 @@
 pkgname=openssh
 pkgver=7.2p2
-pkgrel=2
+pkgrel=3
 pkgdesc='Free version of the SSH connectivity tools'
 url='http://www.openssh.org/portable.html'
 license=('custom:BSD')
@@ -8,7 +8,7 @@ arch=('x86_64')
 makedepends=('linux-headers')
 depends=('krb5' 'openssl' 'libedit' 'ldns')
 optdepends=('xorg-xauth: X11 forwarding')
-source=("ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${pkgname}-${pkgver}.tar.gz"{,.asc}
+source=("http://ftp.spline.de/pub/OpenBSD/OpenSSH/portable/${pkgname}-${pkgver}.tar.gz"{,.asc}
         'sshdgenkeys.service'
         'sshd@.service'
         'sshd.service'
@@ -23,7 +23,9 @@ sha1sums=('70e35d7d6386fe08abbd823b3a12a3ca44ac6d38'
           'd93dca5ebda4610ff7647187f8928a3de28703f3')
 validpgpkeys=('59C2118ED206D927E667EBE3D3E5F56B6D920D30')
 
-backup=('etc/ssh/ssh_config' 'etc/ssh/sshd_config' 'etc/pam.d/sshd')
+backup=('etc/ssh/ssh_config' 'etc/ssh/sshd_config' 'etc/pam.d/sshd'
+        'usr/lib/systemd/system/sshd.socket'
+        'usr/lib/systemd/system/sshd.service') # listening port may differ, we need to assure user config doesn't break
 
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
