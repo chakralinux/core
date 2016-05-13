@@ -1,18 +1,18 @@
 pkgname=openvpn
-pkgver=2.3.10
-pkgrel=2
+pkgver=2.3.11
+pkgrel=1
 pkgdesc="An easy-to-use, robust, and highly configurable VPN (Virtual Private Network)"
 arch=('x86_64')
 url="http://openvpn.net/index.php/open-source.html"
 depends=('openssl' 'lzo2' 'iproute2' 'systemd')
 license=('custom')
 backup=(usr/share/openvpn/easy-rsa/vars)
-source=("http://swupdate.openvpn.net/community/releases/openvpn-${pkgver}.tar.gz"
+source=("http://swupdate.openvpn.net/community/releases/openvpn-${pkgver}.tar.xz"
         "http://build.openvpn.net/downloads/releases/easy-rsa-2.2.0_master.tar.gz"
 	'openvpn@.service')
-sha256sums=('f8b0b5b92e35bbca1db1a7e6b49e04639e45634e9accd460459b40b2c99ec8f6'
+sha256sums=('0f5f1ca1dc5743fa166d93dd4ec952f014b5f33bafd88f0ea34b455cae1434a7'
             'd23ddc3a764b40d03ada76f387c92ae4dcf4f5266da54c2bae130325b05eebe2'
-            '4696aefe672b4a2e3e201d3c2c0211b08e87a3a1a039788013846629a79ec6fd')
+            '47a4ee993f8aaa7370e9a84384fcfc993fd76aa4db11c46629b156d0c5fad49a')
 
 build() {
   cd "${srcdir}"/$pkgname-$pkgver
@@ -21,7 +21,8 @@ build() {
     --enable-password-save \
     --mandir=/usr/share/man \
     --enable-iproute2 \
-    --enable-systemd
+    --enable-systemd \
+    --enable-x509-alt-username
   make
 
   # Build easy-rsa
