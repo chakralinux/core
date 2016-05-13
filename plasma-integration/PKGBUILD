@@ -1,0 +1,35 @@
+source ../plasma.conf
+
+pkgname=plasma-integration
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="Qt Platform Theme integration plugins for the Plasma workspaces"
+arch=(x86_64)
+url='https://www.kde.org/workspaces/plasmadesktop/'
+license=(LGPL)
+depends=(kio kwayland libxcursor ttf-noto ttf-oxygen)
+makedepends=("extra-cmake-modules>=${KFECMVersion}" python3)
+options=("debug")
+groups=('plasma')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../$pkgname-$pkgver \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DKDE_INSTALL_LIBDIR=lib \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBUILD_TESTING=OFF
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="$pkgdir" install
+}
