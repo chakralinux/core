@@ -1,6 +1,6 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=229
+pkgver=230
 pkgrel=1
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
@@ -52,8 +52,7 @@ source=("git+https://github.com/systemd/systemd.git#tag=v$pkgver"
         'chakra.conf'
         'chakra_fallback.conf'
         'loader.conf'
-        'splash-chakra.bmp'
-        0999-Add-a-workaround-for-linux-net-if.h-conflict.patch)
+        'splash-chakra.bmp')
 md5sums=('SKIP'
          '90ea67a7bb237502094914622a39e281'
          '976c5511b6493715e381f43f16cdb151'
@@ -62,26 +61,10 @@ md5sums=('SKIP'
          '0fdb041cc891292162f6c2f7d1af830c'
          'bfccc8b2a9da47823e4dcef2206d4b1b'
          '88949acaf49231fd01e9f0733c5dd812'
-         '3f1e033e9334e33d6e15f3bf7ce076e3'
-         'ce29c81d2d3450c81d7225e89e91b667')
+         '3f1e033e9334e33d6e15f3bf7ce076e3')
 
 prepare() {
   cd "$pkgname"
-
-  # networkd: FIONREAD is not reliable on some sockets
-  git cherry-pick -n 4edc2c9b6b5b921873eb82e58719ed4d9e0d69bf
-
-  # fix assertion failure in src/core/timer.c on bootup (FS#48197)
-  git cherry-pick -n 3f51aec8647fe13f4b1e46b2f75ff635403adf91
-
-  # fix udevd error checking from cg_unified() (FS#48188)
-  git cherry-pick -n 6d2353394fc33e923d1ab464c8f88df2a5105ffb
-
-  # revert "core: resolve specifier in config_parse_exec()"
-  git cherry-pick -n bd1b973fb326e9b7587494fd6108e5ded46e9163
-  
-  # fedora patch, https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/F35B3R7LZMWIQNSEFX2AYC4TZYAG4CBP/
-  patch -Np1 -i ${srcdir}/0999-Add-a-workaround-for-linux-net-if.h-conflict.patch
 
   ./autogen.sh
 }
