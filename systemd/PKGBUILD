@@ -1,7 +1,7 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
 pkgver=230
-pkgrel=2
+pkgrel=3
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -45,6 +45,7 @@ conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'gummiboot')
 replaces=('udev' 'gummiboot')
 install="systemd.install"
 source=("git+https://github.com/systemd/systemd.git#tag=v$pkgver"
+        "revert_FBDEV.patch::https://github.com/systemd/systemd/commit/e77813ca9f4e0735fd0e3e2caae4d7d1ee436011.patch"
         'initcpio-hook-udev'
         'initcpio-install-systemd'
         'initcpio-install-udev'
@@ -54,6 +55,7 @@ source=("git+https://github.com/systemd/systemd.git#tag=v$pkgver"
         'loader.conf'
         'splash-chakra.bmp')
 md5sums=('SKIP'
+         'b339a544be961cc8d8180aaa3711c232'
          '90ea67a7bb237502094914622a39e281'
          '19185c46811f7e056a760864870bfb4c'
          '1b3aa3a0551b08af9305d33f85b5c2fc'
@@ -66,6 +68,9 @@ md5sums=('SKIP'
 prepare() {
   cd "$pkgname"
 
+  # revert FBDEV changes: https://github.com/systemd/systemd/pull/3333
+  patch -Np1 -i ${srcdir}/revert_FBDEV.patch
+  
   ./autogen.sh
 }
 
@@ -86,7 +91,9 @@ build() {
       --disable-ima \
       --with-sysvinit-path= \
       --with-sysvrcnd-path= \
-      --with-ntp-servers="${timeservers[*]}"
+      --with-ntp-servers="${timeservers[*]}" \
+      --with-default-dnssec=no
+      #--without-kill-user-processes
    make
 }
 
