@@ -1,32 +1,29 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-# This package has a corresponding lib32 package (lib32-cracklib).
-
 pkgname=cracklib
 pkgver=2.9.6
-pkgrel=1
+pkgrel=2
 pkgdesc="Password Checking Library"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 license=('GPL')
 url="http://sourceforge.net/projects/cracklib"
 depends=('glibc' 'zlib')
-options=('!libtool')
 source=(https://github.com/cracklib/cracklib/releases/download/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.gz)
 md5sums=('c52f463585d85924b28cdc1e373ae06d')
 
 build() {
   cd ${srcdir}/$pkgname-$pkgver
-  ./configure --prefix=/usr --without-python
-  make || return 1
+  ./configure --prefix=/usr
+  make
 }
 
 package() {
   cd ${srcdir}/$pkgname-$pkgver
   make DESTDIR=$pkgdir install
   install -Dm644 dicts/cracklib-small $pkgdir/usr/share/dict/cracklib-small
+
+  # equivilent for make dict
   sh ./util/cracklib-format dicts/cracklib-small \
     | sh ./util/cracklib-packer $pkgdir/usr/share/cracklib/pw_dict
+
+  # needed for libsrtp test
+  ln -s /usr/share/cracklib/pw_dict.pwd ${pkgdir}/usr/share/dict/words
 }
