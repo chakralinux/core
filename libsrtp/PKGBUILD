@@ -1,39 +1,29 @@
-# Contributor: Sergej Pupykin <pupykin.s+arch@gmail.com>
-# Contributor: Yejun Yang <yejunx AT gmail DOT com>
-# Contributor: Michal Krenek <mikos@sg1.cz>
-
 pkgname=libsrtp
-pkgver=15.1c9bd90
-pkgrel=3
+pkgver=2.0.0
+epoch=1
+pkgrel=1
 pkgdesc="Open-source implementation of the Secure Real-time Transport Protocol (SRTP)"
-url="http://srtp.sourceforge.net/srtp.html"
+url="https://github.com/cisco/libsrtp"
 arch=('x86_64')
 license=('BSD')
 depends=('glibc')
-makedepends=('git')
-source=("git://git.linphone.org/srtp.git#commit=1c9bd90" 7713d5706524f9f1ee94fd6b55125357e63656d5.patch)
-md5sums=('SKIP'
-         '33b3ba860560a4d9dee244caf73eceef')
-
-pkgver() {
-  cd srtp
-  echo $(git rev-list --count HEAD).$(git rev-parse --short HEAD)
-}
-
-prepare() {
-  cd srtp
-  patch -p1 -i ../7713d5706524f9f1ee94fd6b55125357e63656d5.patch
-}
+checkdepends=('cracklib')
+source=("${url}/archive/v${pkgver}.tar.gz")
+md5sums=('54b7fbc8ed45aa3c1c02511ee8976dd9')
 
 build() {
-  cd srtp
-  autoconf
+  cd ${pkgname}-${pkgver}
   ./configure --prefix=/usr
   make
 }
 
+check() {
+  cd ${pkgname}-${pkgver}
+  make runtest
+}
+
 package() {
-  cd srtp
+  cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
 
   install -Dm0644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
