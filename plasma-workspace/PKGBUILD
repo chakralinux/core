@@ -5,7 +5,7 @@ pkgbase=plasma-workspace
 pkgname=('plasma-workspace' 'drkonqi' 'plasma-wayland-session')
 _pkgver="${PVersion}"
 pkgver=${PVersion}
-pkgrel=2
+pkgrel=3
 pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
@@ -21,9 +21,11 @@ makedepends=('extra-cmake-modules' 'kdoctools' 'gpsd' 'baloo'
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${_pkgver}.tar.xz"
-        "kde.pam")
+        "kde.pam"
+        "fix-auto-hide.patch::https://quickgit.kde.org/?p=plasma-workspace.git&a=commitdiff&h=e1ae057fef297b46d17256d497e8e2f4e24c1264&o=plain")
 sha256sums=( $(getSum ${pkgname} | head -n1) 
-            "44a7c7acee30547dd41d0a593486b29df4eaa5c3707287b87e23b1104de3964a")
+            "44a7c7acee30547dd41d0a593486b29df4eaa5c3707287b87e23b1104de3964a"
+            '2fbd507df4b52d4e87198b37f520c888b160c857fe42b9560cee969aa7a7aa09')
 
 prepare() {
   mkdir -p build
@@ -32,6 +34,8 @@ prepare() {
   # be sure to use the Qt5 version of qtpaths
   sed -e 's:qtpaths:qtpaths-qt5:' -i startkde/start*.cmake
 
+  # https://bugs.kde.org/show_bug.cgi?id=362105
+  patch -uNp1 -i $srcdir/fix-auto-hide.patch
 }
 
 build() {
