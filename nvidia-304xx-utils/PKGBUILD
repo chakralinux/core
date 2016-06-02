@@ -5,7 +5,7 @@ pkgbase=nvidia-304xx-utils
 pkgname=('nvidia-304xx-utils' 'nvidia-304xx-libgl' 'opencl-nvidia-304xx')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 pkgver=304.131
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
@@ -86,7 +86,7 @@ package_nvidia-304xx-utils() {
   optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig'
               'opencl-nvidia-304xx: OpenCL support'
               'nvidia-settings: Gtk GUI')
-  conflicts=('nvidia-utils')
+  conflicts=('nvidia-utils' 'libglvnd')
   provides=('nvidia-utils')
 
   cd ${_pkg}
@@ -125,13 +125,6 @@ package_nvidia-304xx-utils() {
   # nvidia-xconfig
   install -D -m755 nvidia-xconfig "${pkgdir}/usr/bin/nvidia-xconfig"
   install -D -m644 nvidia-xconfig.1.gz "${pkgdir}/usr/share/man/man1/nvidia-xconfig.1.gz"
-
-  # nvidia-settings
-  install -D -m755 nvidia-settings "${pkgdir}/usr/bin/nvidia-settings"
-  install -D -m644 nvidia-settings.1.gz "${pkgdir}/usr/share/man/man1/nvidia-settings.1.gz"
-  install -D -m644 nvidia-settings.desktop "${pkgdir}/usr/share/applications/nvidia-settings.desktop"
-  install -D -m644 nvidia-settings.png "${pkgdir}/usr/share/pixmaps/nvidia-settings.png"
-  sed -e 's:__UTILS_PATH__:/usr/bin:' -e 's:__PIXMAP_PATH__:/usr/share/pixmaps:' -i "${pkgdir}/usr/share/applications/nvidia-settings.desktop"
 
   # nvidia-bug-report
   install -D -m755 nvidia-bug-report.sh "${pkgdir}/usr/bin/nvidia-bug-report.sh"
