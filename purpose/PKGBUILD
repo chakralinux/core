@@ -2,25 +2,26 @@
 # Maintainer:Antonio Rojas <arojas@archlinux.org>
 
 pkgname=purpose
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
 pkgdesc="Framework for providing abstractions to get the developer's purposes fulfilled"
 arch=('x86_64')
 url='https://projects.kde.org/purpose'
 license=('LGPL')
-depends=('kaccounts-integration' 'hicolor-icon-theme')
-makedepends=('extra-cmake-modules' 'intltool')
+depends=('kaccounts-integration' 'accounts-qml-module' 'hicolor-icon-theme')
+makedepends=('extra-cmake-modules' 'intltool' 'python3')
+optdepends=('kdeconnect: sharing to smartphone via KDE Connect')
 source=("http://download.kde.org/stable/$pkgname/$pkgname-$pkgver.tar.xz")
 install=$pkgname.install
-md5sums=('8f27161d5bc0193ad67db48cb6782d84')
+md5sums=('9d97612738bb3d7b43ac6dcbcb864a4f')
 
 build() {
   mkdir -p build && cd build
   cmake ../$pkgname-$pkgver \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DLIB_INSTALL_DIR=lib \
-    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DKDE_INSTALL_LIBDIR=lib \
+    -DKDE_INSTALL_LIBEXECDIR=lib \
     -DBUILD_TESTING=OFF
   make
 }
@@ -28,7 +29,4 @@ build() {
 package() {
   cd build
   make DESTDIR="$pkgdir" install
-
-# remove icons provided by kdevplatform
-  rm "$pkgdir"/usr/share/icons/hicolor/*/apps/reviewboard.png
 }
