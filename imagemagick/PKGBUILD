@@ -1,7 +1,5 @@
-# Maintainer: Chaoting Liu <brli@sourceforge.net>
-
 pkgname=imagemagick
-pkgver=6.9.0.10
+pkgver=6.9.4.7
 pkgrel=1
 pkgdesc="An image viewing/manipulation program"
 arch=('x86_64')
@@ -21,9 +19,9 @@ optdepends=('ghostscript: for Ghostscript support'
 options=('libtool' '!emptydirs')
 source=(http://www.imagemagick.org/download/releases/ImageMagick-${pkgver%.*}-${pkgver##*.}.tar.xz{,.asc}
         'perlmagick.rpath.patch')
-sha1sums=('fa557737223ac5c055d702cbeb0d69fea7b9b756'
+sha1sums=('d386de76334a7c1c13f40d337a0f38b18c4ca86c'
           'SKIP'
-          '23405f80904b1de94ebd7bd6fe2a332471b8c283')
+          'e143cf9d530fabf3b58023899b5cc544ba93daec')
 backup=("etc/ImageMagick-${pkgver%%.*}/coder.xml"
         "etc/ImageMagick-${pkgver%%.*}/colors.xml"
         "etc/ImageMagick-${pkgver%%.*}/delegates.xml"
@@ -60,8 +58,7 @@ build() {
     --with-fftw \
     --with-gs-font-dir=/usr/share/fonts/Type1 \
     --with-gslib \
-    --with-jp2 \
-    --with-lcms2 \
+    --with-openjp2 \
     --with-modules \
     --with-openexr \
     --with-perl \
@@ -69,14 +66,12 @@ build() {
     --with-rsvg \
     --with-webp \
     --with-wmf \
-    --with-x \
     --with-xml \
     --without-autotrace \
     --without-dps \
     --without-fpx \
     --without-gvc \
     --without-jbig
-    # --enable-openmp \
 
   make
 }
