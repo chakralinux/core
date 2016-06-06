@@ -1,21 +1,16 @@
-#
-# Platform Packages for Chakra, part of chakraos.org
-#
-# Maintainer: Weng Xuetian <wengxt@gmail.com>
-
 pkgname=dnsmasq
-pkgver=2.72
-pkgrel=2
+pkgver=2.76
+pkgrel=1
 pkgdesc="Lightweight, easy to configure DNS forwarder and DHCP server"
 url="http://www.thekelleys.org.uk/dnsmasq/doc.html"
 arch=('x86_64')
 license=('GPL')
-depends=('glibc' 'libdbus' 'gmp' 'nettle')
+depends=('glibc' 'libdbus' 'libidn' 'gmp' 'nettle')
 install=$pkgname.install
 backup=('etc/dnsmasq.conf')
 source=("http://www.thekelleys.org.uk/$pkgname/$pkgname-$pkgver.tar.xz"
         'dnsmasq.service')
-md5sums=('0256e0a71e27c8d8a5c89a0d18f3cfe2'
+md5sums=('00f5ee66b4e4b7f14538bf62ae3c9461'
          '7ac45726cabef4145db40d758cc7fedf')
 
 build() {
@@ -24,7 +19,8 @@ build() {
   make \
     CFLAGS="$CPPFLAGS $CFLAGS" \
     LDFLAGS="$LDFLAGS" \
-    COPTS="-DHAVE_DNSSEC -DHAVE_DBUS"
+    COPTS="-DHAVE_DNSSEC -DHAVE_DBUS -DHAVE_IDN" \
+    all-i18n
 }
 
 package() {
@@ -40,5 +36,3 @@ package() {
   sed -i 's,%%PREFIX%%,/usr,' "$pkgdir"/etc/dnsmasq.conf
   install -Dm644 "trust-anchors.conf" "$pkgdir"/usr/share/dnsmasq/trust-anchors.conf
 }
-
-# vim: ts=2 sw=2 et ft=sh
