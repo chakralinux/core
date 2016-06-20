@@ -1,0 +1,38 @@
+source ../qt5.conf
+
+pkgname=qt5-datavis3d
+pkgver=${QSubVersion}
+pkgrel=2
+arch=('x86_64')
+url='http://qt-project.org/'
+license=('GPL3' 'LGPL' 'FDL' 'custom')
+pkgdesc='Qt Data Visualization module'
+depends=('qt5-base')
+makedepends=('qt5-declarative')
+optdepends=('qt5-declarative: QML bindings')
+groups=('qt5')
+options=('debug')
+source=( $(getSrc ${pkgname}) )
+md5sums=( $(getSum ${pkgname}) )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+
+  qmake-qt5 ../$(getPkgName ${pkgname})
+  make
+}
+
+package() {
+  cd build
+  make INSTALL_ROOT="$pkgdir" install
+
+  # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+  qtprlfix
+
+  install -d "$pkgdir"/usr/share/licenses
+  ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/${pkgname}
+}

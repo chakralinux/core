@@ -1,0 +1,118 @@
+source ../qt5.conf
+
+pkgname=qt5-base
+pkgver=${QSubVersion}
+pkgrel=2
+arch=('x86_64')
+url='http://qt-project.org/'
+license=('GPL3' 'LGPL' 'FDL' 'custom')
+pkgdesc='A cross-platform application and UI framework'
+depends=('libjpeg-turbo' 'xcb-util-keysyms' 'libgl' 'fontconfig'
+         'xcb-util-wm' 'libxrender' 'libxi' 'sqlite3' 'xcb-util-image' 'icu'
+         'libinput' 'libsm' 'libxkbcommon-x11' 'libproxy' 'dbus')
+makedepends=('mtdev' 'libmariadbclient' 'sqlite3' 'unixodbc' 'postgresql-libs' 'alsa-lib' 'gst-plugins-base-libs'
+             'libpulse' 'cups' 'freetds')
+optdepends=('qt5-svg: to use SVG icon themes'
+            'postgresql-libs: PostgreSQL driver'
+            'libmariadbclient: MariaDB driver'
+            'unixodbc: ODBC driver'
+            'freetds: MS SQL driver'
+            'mtdev: evdev plugin')
+groups=('qt5')
+options=('debug')
+source=( $(getSrc ${pkgname}) 
+        qtbug-53071.patch::"https://github.com/qtproject/qtbase/commit/e9041c7fc.patch"
+        qtbug-53071b.patch::"https://github.com/qtproject/qtbase/commit/cd25866f.patch")
+md5sums=( $(getSum ${pkgname}) 
+         '462f079cd46f869def6858903a718bf5'
+         'da4fd787ea877516397a027412e975e1')
+
+
+prepare() {
+  cd $(getPkgName ${pkgname})
+
+  # Build qmake using Chakra {C,LD}FLAGS
+  # This also sets default {C,CXX,LD}FLAGS for projects built using qmake
+  sed -i -e "s|^\(QMAKE_CFLAGS_RELEASE.*\)|\1 ${CFLAGS}|" \
+    mkspecs/common/gcc-base.conf
+  sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 ${LDFLAGS}|" \
+    mkspecs/common/g++-unix.conf
+
+  # Use python2 for Python 2.x
+  find . -name '*.py' -exec sed -i \
+    's|#![ ]*/usr/bin/python$|&2|;s|#![ ]*/usr/bin/env python$|&2|' {} +
+
+  # Fix libsystemd-journal detection
+  sed -e 's|libsystemd-journal|libsystemd|' -i config.tests/unix/journald/journald.pro -i src/corelib/global/global.pri
+
+  # Fix parsing of tzfile(5) POSIX rule zone names with bracket quotes
+  patch -p1 -i ../qtbug-53071.patch
+  patch -p1 -i ../qtbug-53071b.patch
+}
+
+build() {
+  cd $(getPkgName ${pkgname})
+
+#  export QTDIR="${srcdir}"/$(getPkgName ${pkgname})
+#  export LD_LIBRARY_PATH="${QTDIR}"/lib:"${LD_LIBRARY_PATH}"
+#  export QT_PLUGIN_PATH="${QTDIR}"/qtbase/plugins
+
+  export _xkbconfigroot=$(pkg-config --variable=xkb_base xkeyboard-config)
+
+  PYTHON=/usr/bin/python2 ./configure -confirm-license -opensource -v \
+    -prefix /usr \
+    -bindir /usr/lib/qt5/bin \
+    -docdir /usr/share/doc/qt5 \
+    -force-debug-info \
+    -headerdir /usr/include/qt5 \
+    -archdatadir /usr/lib/qt5 \
+    -datadir /usr/share/qt5 \
+    -sysconfdir /etc/xdg \
+    -examplesdir /usr/share/doc/qt5/examples \
+    -plugindir /usr/lib/qt5/plugins \
+    -importdir /usr/lib/qt5/imports \
+    -qmldir /usr/lib/qt5/qml \
+    -testsdir /usr/share/qt5/tests \
+    -translationdir /usr/share/qt5/translations \
+    -plugin-sql-{psql,mysql,sqlite,odbc} \
+    -system-sqlite \
+    -openssl-linked \
+    -nomake tests \
+    -nomake examples \
+    -no-rpath \
+    -optimized-qmake \
+    -dbus-linked \
+    -system-harfbuzz \
+    -journald \
+    -libinput \
+    -reduce-relocations \
+    -opengl desktop \
+    -feature-menu \
+    -feature-textdate \
+    -feature-ftp \
+    -xkb-config-root $_xkbconfigroot \
+    -system-xkbcommon
+
+  make
+}
+
+package() {
+  cd $(getPkgName ${pkgname})
+  make INSTALL_ROOT="${pkgdir}" install
+
+  install -D -m644 LGPL_EXCEPTION.txt \
+    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
+
+  # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+  qtprlfix
+
+  # Fix wrong qmake path in pri file
+  sed -i "s|${srcdir}/$(getPkgName ${pkgname})|/usr|" \
+    "${pkgdir}"/usr/lib/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri
+
+  # Useful symlinks
+  install -d "${pkgdir}"/usr/bin
+  for b in "${pkgdir}"/usr/lib/qt5/bin/*; do
+    ln -s /usr/lib/qt5/bin/$(basename $b) "${pkgdir}"/usr/bin/$(basename $b)-qt5
+  done
+}

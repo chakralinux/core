@@ -9,10 +9,12 @@ pkgbase=qt5
 pkgname=('qt5-base'
          'qt5-3d'
          'qt5-canvas3d'
+         'qt5-charts'
          'qt5-connectivity'
+         'qt5-datavis3d'
          'qt5-declarative'
+         'qt5-declarative-render2d'
          'qt5-doc'
-         'qt5-enginio'
          'qt5-graphicaleffects'
          'qt5-imageformats'
          'qt5-location'
@@ -32,9 +34,9 @@ pkgname=('qt5-base'
          'qt5-webview'
          'qt5-x11extras'
          'qt5-xmlpatterns')
-pkgver=5.6.1
-subver=5.6.1
-_pkgver=5.6
+pkgver=5.7.0
+subver=5.7.0
+_pkgver=5.7
 pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
@@ -66,7 +68,7 @@ source=("http://download.qt-project.org/official_releases/qt/${_pkgver}/${pkgver
         'assistant-qt5.desktop' 'designer-qt5.desktop' 'linguist-qt5.desktop' 'qtconfig-qt5.desktop'
         'qmlviewer.desktop'
         'qdbusviewer-qt5.desktop')
-sha1sums=('c7db3269350a081ca4c07deba3cccbc380a62894'
+sha1sums=('bfc3d07ffba27d96cf070f74148f34a668646a19'
           'f69e25beeba8682ef8ca9e8cf978061d75173914'
           '4dabcdf77de5325eba5890f356157c006b095cc9'
           'dbc8a9b6d75553b19b4fa00f785876bea0177794'
@@ -161,7 +163,6 @@ build() {
     -journald \
     -libinput \
     -reduce-relocations \
-    -no-gtkstyle \
     -opengl desktop \
     -feature-menu \
     -feature-textdate \
@@ -217,7 +218,7 @@ package_qt5-base() {
               'mtdev: evdev plugin'
 	      'libxfixes: Xfixes support')
   conflicts=('qt5' 'qt5-private-headers')
-  replaces=('qt5-private-headers')
+  replaces=('qt5-private-headers' 'qt5-enginio')
   options=("staticlibs" "debug")
 
   cd ${_pkgfqn}/qtbase
@@ -250,6 +251,18 @@ package_qt5-canvas3d() {
   _prlfix
 }
 
+package_qt5-charts() {
+  pkgdesc='Provides a set of easy to use chart components'
+  depends=('qt5-base')
+  optdepends=('qt5-declarative: QML bindings')
+  options=("debug")
+
+  cd ${_pkgfqn}/qtcharts
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
+}
+
 package_qt5-connectivity() {
   pkgdesc='Provides access to Bluetooth hardware'
   depends=('qt5-declarative' 'bluez')
@@ -262,6 +275,18 @@ package_qt5-connectivity() {
 
   install -D -m644 LGPL_EXCEPTION.txt \
     "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
+}
+
+package_qt5-datavis3d() {
+  pkgdesc='Qt Data Visualization module'
+  depends=('qt5-base')
+  options=("debug")
+  conflicts=('qt5')
+
+  cd ${_pkgfqn}/qtdatavis3d
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
 }
 
 package_qt5-declarative() {
@@ -282,6 +307,19 @@ package_qt5-declarative() {
   done
 }
 
+package_qt5-declarative-render2d() {
+  pkgdesc='Raster backend for QtQuick scene graph'
+  depends=('qt5-declarative')
+  options=("debug")
+  conflicts=('qt5')
+
+  cd ${_pkgfqn}/qtdeclarative-render2d
+  make INSTALL_ROOT="${pkgdir}" install
+
+  _prlfix
+}
+
+
 package_qt5-doc() {
   pkgdesc='A cross-platform application and UI framework (Documentation)'
   depends=('qt5-base')
@@ -290,20 +328,6 @@ package_qt5-doc() {
 
   cd ${_pkgfqn}
   make INSTALL_ROOT="${pkgdir}" install_docs
-
-  install -D -m644 LGPL_EXCEPTION.txt \
-    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
-}
-
-package_qt5-enginio() {
-  pkgdesc='A Backend-as-a-Service solution to ease the backend development for connected and data-driven application'
-  depends=('qt5-declarative')
-  options=("debug")
-
-  cd ${_pkgfqn}/qtenginio
-  make INSTALL_ROOT="${pkgdir}" install
-
-  _prlfix
 
   install -D -m644 LGPL_EXCEPTION.txt \
     "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
