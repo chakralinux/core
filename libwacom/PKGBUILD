@@ -1,0 +1,34 @@
+
+pkgname=libwacom
+pkgver=0.18
+pkgrel=1
+pkgdesc="Library to identify Wacom tablets and their features"
+arch=('x86_64')
+url="http://sourceforge.net/apps/mediawiki/linuxwacom/index.php?title=Libwacom"
+license=('MIT')
+depends=('glib2' 'systemd' 'libgudev')
+source=(http://sourceforge.net/projects/linuxwacom/files/libwacom/$pkgname-$pkgver.tar.bz2{,.sig})
+sha256sums=('71bfa2a8d10ec2f2ada852aed816724a9af4713cbe0cf8559877b7fa56a7b722'
+            'SKIP')
+validpgpkeys=('9A12ECCC5383CA2AF5B42CDCA6DC66911B2127D5') #Jason Gerecke <killertofu@gmail.com>
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+  install -D -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -m755 -d ${pkgdir}/usr/lib/udev/rules.d
+  cd tools
+  ./generate-udev-rules > ${pkgdir}/usr/lib/udev/rules.d/65-libwacom.rules
+  
+}
