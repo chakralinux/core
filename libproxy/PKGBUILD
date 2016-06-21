@@ -1,36 +1,29 @@
 # maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=libproxy
-pkgver=0.4.11
-pkgrel=2
+pkgver=0.4.12
+pkgrel=1
 pkgdesc="A library that provides automatic proxy configuration management"
 arch=('x86_64')
 license=('LGPL')
-depends=('gcc-libs')
+depends=('gcc-libs' 'js17')
 optdepends=('networkmanager: NetworkManager configuration module'
             'perl: Perl bindings'
-            'python2: Python bindings'
-            'js17: PAC proxy support - Mozilla based pacrunner')
-makedepends=('cmake' 'networkmanager' 'python2' 'perl' 'js17')
-url="http://libproxy.googlecode.com"
-source=(http://libproxy.googlecode.com/files/${pkgname}-${pkgver}.tar.gz
+            'python2: Python bindings')
+makedepends=('cmake' 'networkmanager' 'python2' 'perl')
+url="http://libproxy.github.io/libproxy/"
+source=(https://github.com/libproxy/libproxy/archive/${pkgver}.tar.gz
         0001-pacrunner_mozjs-Also-support-mozjs-17.0.patch
-        libproxy-0.4.11-crash.patch
-        libproxy-0.4.11-fdleak.patch
-        dont_segfault_on_exit.patch)
-md5sums=('3cd1ae2a4abecf44b3f24d6639d2cd84'
+        libproxy-0.4.11-crash.patch)
+md5sums=('258d89cc052e0a3c09aa1f42d7f93045'
          '16cb8ad1292f04279108a80f36434c7b'
-         'a45f2195c164a48639e963e8341f5d93'
-         '6302b995c570e42691007f3b09953a59'
-         '0a4980304ee93764162dbdbd0eb5e519')
+         'a45f2195c164a48639e963e8341f5d93')
 
 prepare() {
   mkdir build
   cd $pkgname-$pkgver
   patch -Np1 -i ../0001-pacrunner_mozjs-Also-support-mozjs-17.0.patch
   patch -Np1 -i ../libproxy-0.4.11-crash.patch
-  patch -Np1 -i ../libproxy-0.4.11-fdleak.patch
-  patch -Np1 -i ../dont_segfault_on_exit.patch
 }
 
 build() {
