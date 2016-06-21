@@ -1,33 +1,13 @@
-commit 1bf46d7f134b24a8f594a0e108056aed67759590
-Author: Anatol Pomozov <anatol.pomozov@gmail.com>
-Date:   Tue Dec 30 04:50:55 2014 -0800
-
-    Fix test for ruby 2.2
-    
-    The main source of problems with ruby 2.2 is that it uses new test-unit framework
-    that changes some API.
-    
-    In partcular all assert_* functions are void, but our tests expect bool. Change tests and do
-    not check output of assert_* functions.
-    
-    Do not override TestCase::inherit function as it is used by the framework itself.
-    
-    In ruby 2.2 bool is frozen object so we cannot modify it.
-
-diff --git a/subversion/bindings/swig/ruby/test/my-assertions.rb b/subversion/bindings/swig/ruby/test/my-assertions.rb
-index 77c42e7..91f7ad8 100644
---- a/subversion/bindings/swig/ruby/test/my-assertions.rb
-+++ b/subversion/bindings/swig/ruby/test/my-assertions.rb
-@@ -24,41 +24,13 @@ module Test
+--- subversion/bindings/swig/ruby/test/my-assertions.rb	2016-05-15 22:17:33.293873010 +0100
++++ subversion/bindings/swig/ruby/test/my-assertions.rb	2016-05-15 22:18:28.058156321 +0100
+@@ -24,39 +24,13 @@
    module Unit
      module Assertions
  
 -      # make an intermediary assertion block handler
 -      def _my_assert_block(&block)
 -       if RUBY_VERSION > '1.9'
--         assert_block do
--           yield
--         end
+-         yield
 -       else
 -         _wrap_assertion do
 -           yield
@@ -60,7 +40,7 @@ index 77c42e7..91f7ad8 100644
            actual = actual.collect do |entry|
              changed_paths = entry.changed_paths
              changed_paths.each_key do |path|
-@@ -73,7 +45,6 @@ module Test
+@@ -71,7 +45,6 @@
               entry.has_children?]
            end
            assert_equal(expected, actual, message)
@@ -68,10 +48,8 @@ index 77c42e7..91f7ad8 100644
        end
      end
    end
-diff --git a/subversion/bindings/swig/ruby/test/test-unit-ext.rb b/subversion/bindings/swig/ruby/test/test-unit-ext.rb
-index ce88d75..62a1508 100644
---- a/subversion/bindings/swig/ruby/test/test-unit-ext.rb
-+++ b/subversion/bindings/swig/ruby/test/test-unit-ext.rb
+--- subversion/bindings/swig/ruby/test/test-unit-ext.rb	2016-05-15 22:17:33.293873010 +0100
++++ subversion/bindings/swig/ruby/test/test-unit-ext.rb	2016-05-15 22:18:42.015065065 +0100
 @@ -18,6 +18,6 @@
  # ====================================================================
  
@@ -80,11 +58,9 @@ index ce88d75..62a1508 100644
 +#require "test-unit-ext/priority"
  require "test-unit-ext/backtrace-filter" if RUBY_VERSION < '1.9.3'
  require "test-unit-ext/long-display-for-emacs" if RUBY_VERSION < '1.9.3'
-diff --git a/subversion/bindings/swig/ruby/test/test_delta.rb b/subversion/bindings/swig/ruby/test/test_delta.rb
-index 541a4fe..90c1e3b 100644
---- a/subversion/bindings/swig/ruby/test/test_delta.rb
-+++ b/subversion/bindings/swig/ruby/test/test_delta.rb
-@@ -48,7 +48,6 @@ class SvnDeltaTest < Test::Unit::TestCase
+--- subversion/bindings/swig/ruby/test/test_delta.rb	2016-05-15 22:17:33.293873010 +0100
++++ subversion/bindings/swig/ruby/test/test_delta.rb	2016-05-15 22:19:19.519048836 +0100
+@@ -48,7 +48,6 @@
      target = StringIO.new(t)
      stream = Svn::Delta::TextDeltaStream.new(source, target)
      assert_nil(stream.md5_digest)
@@ -92,7 +68,7 @@ index 541a4fe..90c1e3b 100644
        ret = stream.each do |window|
          window.ops.each do |op|
            op_size = op.offset + op.length
-@@ -64,8 +63,6 @@ class SvnDeltaTest < Test::Unit::TestCase
+@@ -64,8 +63,6 @@
            end
          end
        end
@@ -101,7 +77,7 @@ index 541a4fe..90c1e3b 100644
      assert_equal(Digest::MD5.hexdigest(t), stream.md5_digest)
    end
  
-@@ -84,7 +81,6 @@ class SvnDeltaTest < Test::Unit::TestCase
+@@ -84,7 +81,6 @@
        end
      end
  
@@ -109,7 +85,7 @@ index 541a4fe..90c1e3b 100644
        composed_window.ops.each do |op|
          op_size = op.offset + op.length
          case op.action_code
-@@ -98,7 +94,6 @@ class SvnDeltaTest < Test::Unit::TestCase
+@@ -98,7 +94,6 @@
            flunk
          end
        end
@@ -117,25 +93,21 @@ index 541a4fe..90c1e3b 100644
    end
  
    def test_txdelta_apply_instructions
-diff --git a/subversion/bindings/swig/ruby/test/test_repos.rb b/subversion/bindings/swig/ruby/test/test_repos.rb
-index 89ca8c1..6745200 100644
---- a/subversion/bindings/swig/ruby/test/test_repos.rb
-+++ b/subversion/bindings/swig/ruby/test/test_repos.rb
-@@ -678,7 +678,8 @@ class SvnReposTest < Test::Unit::TestCase
+--- subversion/bindings/swig/ruby/test/test_repos.rb	2016-05-15 22:17:33.293873010 +0100
++++ subversion/bindings/swig/ruby/test/test_repos.rb	2016-05-15 22:19:48.019543071 +0100
+@@ -678,7 +678,8 @@
  
        dest_path = File.join(@tmp_path, "dest")
        Svn::Repos.create(dest_path) do |repos|
 -        assert_raises(NoMethodError) do
 +        assert_raises(RuntimeError) do
-+          # Can't modify frozen object
++	  # Can't modify frozen object
            repos.load_fs(nil)
          end
        end
-diff --git a/subversion/bindings/swig/ruby/test/test_wc.rb b/subversion/bindings/swig/ruby/test/test_wc.rb
-index 3a2aa65..2313e60 100644
---- a/subversion/bindings/swig/ruby/test/test_wc.rb
-+++ b/subversion/bindings/swig/ruby/test/test_wc.rb
-@@ -411,7 +411,7 @@ EOE
+--- subversion/bindings/swig/ruby/test/test_wc.rb	2016-05-15 22:17:33.293873010 +0100
++++ subversion/bindings/swig/ruby/test/test_wc.rb	2016-05-15 22:20:41.400468645 +0100
+@@ -411,7 +411,7 @@
      end
    end
  
@@ -144,7 +116,7 @@ index 3a2aa65..2313e60 100644
      source = "source"
      file1 = "file1"
      file2 = "file2"
-@@ -534,7 +534,6 @@ EOE
+@@ -534,7 +534,6 @@
        ctx.ci(lf_path)
  
        Svn::Wc::AdmAccess.open(nil, @wc_path, true, 5) do |access|
@@ -152,22 +124,10 @@ index 3a2aa65..2313e60 100644
            File.open(src_path, "wb") {|f| f.print(source)}
            args = [method_name, src_path, crlf_path, Svn::Wc::TRANSLATE_FROM_NF]
            result = yield(access.send(*args), source)
-@@ -553,7 +552,6 @@ EOE
+@@ -553,7 +552,6 @@
            result ||= File.open(src_path, "rb") {|f| f.read}
            assert_equal(lf_source, result)
          end
--      end
-     end
-   end
- 
-@@ -1072,11 +1070,6 @@ EOE
-         assert_not_nil context
-         assert_kind_of Svn::Wc::Context, context
-       end
--      if RUBY_VERSION > '1.9'
--        assert_equal(result,true)
--      else
--        assert_nil result
 -      end
      end
    end

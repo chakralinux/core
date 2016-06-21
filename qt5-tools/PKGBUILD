@@ -1,0 +1,71 @@
+source ../qt5.conf
+
+pkgname=qt5-tools
+pkgver=${QSubVersion}
+pkgrel=3
+arch=('x86_64')
+url='http://qt-project.org/'
+license=('GPL3' 'LGPL' 'FDL' 'custom')
+pkgdesc='A cross-platform application and UI framework (Development Tools, QtHelp)'
+depends=('qt5-base')
+makedepends=('qt5-declarative' 'qt5-webkit')
+optdepends=('qt5-doc: documentation' 'qt5-webkit: for Qt Assistant')
+groups=('qt5')
+options=('debug')
+source=( $(getSrc ${pkgname}) 
+        {assistant,designer,linguist,qdbusviewer}-qt5.desktop)
+md5sums=( $(getSum ${pkgname}) 
+         '892d3632bdcd9a22f191aa8f28a3c0e1'
+         '208921efc9e4c11fae762e9580ca23aa'
+         '59cbeef3e6090dcb7d2a7d32cd62ea08'
+         '7b93fdff30e7e0389b648ad68dd61355')
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+
+  qmake-qt5 ../$(getPkgName ${pkgname}) 
+  make
+}
+
+package() {
+  cd build
+  make INSTALL_ROOT="${pkgdir}" install
+
+  cd ../$(getPkgName ${pkgname}) 
+  # install missing icons and desktop files
+  for icon in src/linguist/linguist/images/icons/linguist-*-32.png ; do
+    size=$(echo $(basename ${icon}) | cut -d- -f2)
+    install -p -D -m644 ${icon} \
+      "${pkgdir}/usr/share/icons/hicolor/${size}x${size}/apps/linguist-qt5.png"
+  done
+
+  install -D -m644 src/assistant/assistant/images/assistant.png \
+    "${pkgdir}/usr/share/icons/hicolor/32x32/apps/assistant-qt5.png"
+  install -D -m644 src/assistant/assistant/images/assistant-128.png \
+    "${pkgdir}/usr/share/icons/hicolor/128x128/apps/assistant-qt5.png"
+  install -D -m644 src/designer/src/designer/images/designer.png \
+    "${pkgdir}/usr/share/icons/hicolor/128x128/apps/QtProject-designer-qt5.png"
+  install -D -m644 src/qdbus/qdbusviewer/images/qdbusviewer.png \
+    "${pkgdir}/usr/share/icons/hicolor/32x32/apps/qdbusviewer-qt5.png"
+  install -D -m644 src/qdbus/qdbusviewer/images/qdbusviewer-128.png \
+    "${pkgdir}/usr/share/icons/hicolor/128x128/apps/qdbusviewer-qt5.png"
+  install -d "${pkgdir}/usr/share/applications"
+  install -m644 "${srcdir}"/{linguist-qt5,designer-qt5,assistant-qt5,qdbusviewer-qt5}.desktop \
+    "${pkgdir}/usr/share/applications/"
+
+  # Useful symlinks
+  install -d "${pkgdir}"/usr/bin
+  for b in "${pkgdir}"/usr/lib/qt5/bin/*; do
+    ln -s /usr/lib/qt5/bin/$(basename $b) "${pkgdir}"/usr/bin/$(basename $b)-qt5
+  done
+
+  # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+  qtprlfix
+
+  install -d "$pkgdir"/usr/share/licenses
+  ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/${pkgname}
+}

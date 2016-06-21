@@ -2,21 +2,19 @@
 
 pkgname=libffado
 pkgver=2.2.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Driver for FireWire audio devices"
 arch=('x86_64')
 url="http://www.ffado.org/"
 license=('GPL')
 depends=('libiec61883' 'libavc1394' 'libsigc++' 'libxml++' 'alsa-lib'
          'dbus' 'libconfig' 'dbus-c++')
-makedepends=('scons' 'python2-pyqt4')
+makedepends=('scons' 'python2-pyqt4' 'jack2' 'python2-dbus')
 optdepends=('python2-pyqt4: mixer applet'
             'python2: ffado-diag')
 source=("http://www.ffado.org/files/libffado-$pkgver.tgz"
-	'python2-qt.patch'
 	'fix-test-errno-usage.patch')
 md5sums=('e113d828835051f835fb4a329cb0cbd4'
-         'acb6e0dca1239850c7862bf2e1443fd7'
          'd9cf3bed720e82ea97e29003f20b3c6b')
 
 
@@ -25,16 +23,12 @@ prepare() {
   
   # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=805211
   patch -Np1 -i "$srcdir/fix-test-errno-usage.patch"
-  
-  msg2 "Applying Python 2 compatibility patch (downstream)"
-  patch -Np1 -i "$srcdir/python2-qt.patch"
 }
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
 
   scons DEBUG=False \
-        ENABLE_OPTIMIZATIONS=true \
         PREFIX=/usr \
         MANDIR=/usr/share/man \
         UDEVDIR=/usr/lib/udev/rules.d \
@@ -53,4 +47,3 @@ package() {
   install -Dm644 support/xdg/hi64-apps-ffado.png \
     "$pkgdir/usr/share/pixmaps/ffado.png"
 }
-

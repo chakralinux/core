@@ -1,11 +1,11 @@
 pkgname=mkinitcpio
 pkgver=19
-pkgrel=2
+pkgrel=3
 pkgdesc="Modular initramfs image creation utility"
 arch=('x86_64')
 url="http://www.archlinux.org/"
 license=('GPL')
-depends=('awk' 'mkinitcpio-busybox' 'kmod' 'util-linux' 'libarchive=3.1.2'
+depends=('awk' 'mkinitcpio-busybox' 'kmod' 'util-linux' 'libarchive'
          'coreutils' 'bash' 'findutils' 'grep' 'filesystem' 'gzip' 'systemd')
 makedepends=('asciidoc')
 optdepends=('xz: Use lzma or xz compression for the initramfs image'
@@ -23,7 +23,7 @@ sha256sums=('7170e7a3d1b9ed21b0961941a327886febe80e62e2dfee6b88359ed72d0da620'
 prepare() {
   cd ${pkgname}-${pkgver}
   patch -Np1 -i ../microcode.patch
-  sed -i 's/HOOKS="base udev autodetect modconf block filesystems keyboard fsck"/HOOKS="base udev autodetect resume keymap  modconf block filesystems keyboard fsck microcode"/g' mkinitcpio.conf
+  sed -i 's/HOOKS="base udev autodetect modconf block filesystems keyboard fsck"/HOOKS="base udev autodetect resume keymap modconf block filesystems keyboard fsck microcode"/g' mkinitcpio.conf
 }
 
 package() {

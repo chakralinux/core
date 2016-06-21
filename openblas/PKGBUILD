@@ -4,7 +4,7 @@
 pkgname=openblas
 _pkgname=OpenBLAS
 pkgver=0.2.17
-pkgrel=8
+pkgrel=9
 pkgdesc="An optimized BLAS library based on GotoBLAS2 1.13 BSD "
 arch=('i686' 'x86_64')
 url="http://www.openblas.net/"
@@ -36,6 +36,10 @@ package() {
 
   # Remove reference to ${pkgdir}
   sed -i -e "s|${pkgdir}||" "${pkgdir}/usr/lib/cmake/openblas/OpenBLASConfig.cmake"
+
+  # create symlink as some packages just don't support arbitrary blas packages
+  ln -s libopenblas.so $pkgdir/usr/lib/libblas.so.3
+  ln -sf libblas.so.3 $pkgdir/usr/lib/libblas.so
 }
 
 # vim:set ts=2 sw=2 et:

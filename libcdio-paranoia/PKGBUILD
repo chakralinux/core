@@ -1,0 +1,26 @@
+# Maintainer : UtG <utg.chakra.linux[at]gmail[dot]com>
+# Contributor: damir <damir@archlinux.org>
+
+pkgname=libcdio-paranoia
+pkgver=10.2+0.90+1
+pkgrel=1
+pkgdesc="CD paranoia libraries from libcdio"
+arch=('x86_64')
+license=('GPL' 'LGPL')
+url="http://www.gnu.org/software/libcdio/"
+depends=('libcdio')
+source=(http://ftp.gnu.org/gnu/libcdio/${pkgname}-${pkgver}.tar.bz2{,.sig})
+md5sums=('e79e196864dd3b1ca87a01345abbda07'
+         'SKIP')
+
+build() {
+  cd "${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --enable-cpp-progs --disable-static --disable-example-progs
+  make
+}
+
+package() {
+  cd "${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
+ 

@@ -1,12 +1,12 @@
 pkgname=subversion
-pkgver=1.9.3
-pkgrel=2
+pkgver=1.9.4
+pkgrel=1
 pkgdesc="A Modern Concurrent Version Control System"
 arch=('x86_64')
 license=('apache')
 depends=('sqlite3' 'file' 'serf' 'systemd')
 makedepends=('krb5' 'apache' 'python2' 'perl' 'swig' 'ruby' 'java-runtime' 
-             'autoconf' 'kdelibs')
+             'autoconf' 'kdelibs' 'openjdk')
 optdepends=('kdeutils-kwallet: for KWallet for auth credentials'
             'bash-completion: for svn bash completion'
             'python2: for some hook scripts'
@@ -23,20 +23,20 @@ source=(http://www.apache.org/dist/subversion/subversion-${pkgver}.tar.bz2{,.asc
 	svnserve.service
         subversion.rpath.fix.patch
         fix_ruby22_tests.patch)
-sha1sums=('27e8df191c92095f48314a415194ec37c682cbcf'
+sha1sums=('bc7d51fdda43bea01e1272dfe9d23d0a9d6cd11c'
           'SKIP'
           '73b36c046c09cec2093354911c89e3ba8056af6c'
           'ad117bf3b2a838a9a678a93fd8db1a066ad46c41'
           '00cc36e69077a8c45674ead6dd62a7647b3a3b6d'
           'd299e1612d5e48afb877bd3ae18338d198f89dfa'
           'afdf311e7422131fab1c068d7153b5c4b3bb318e'
-          '7b2df2d911c69d37abb61ddec8fafb1aef3c6077')
+          '96f9043c67affc384e08c6dbac06ec05611055a3')
 validpgpkeys=('E7B2A7F4EC28BE9FF8B38BA4B64FFF1209F9FA74')
 
 prepare() {
    cd ${pkgname}-${pkgver}
    patch -Np0 -i ../subversion.rpath.fix.patch
-   patch -p1 -i ../fix_ruby22_tests.patch
+   patch -Np0 -i ../fix_ruby22_tests.patch
    sed -i 's|/usr/bin/env python|/usr/bin/env python2|' tools/hook-scripts/{,mailer/{,tests/}}*.py
 }
 
@@ -48,7 +48,7 @@ build() {
    # configure
    ./configure --prefix=/usr --with-apr=/usr --with-apr-util=/usr \
                --with-zlib=/usr --with-serf=/usr --with-apxs \
-               --with-sqlite=/usr \
+               --with-sqlite=/usr --with-jdk=/usr/lib/jvm/java-8-openjdk \
                --enable-javahl --without-gnome-keyring --with-kwallet \
                --with-apache-libexecdir=/usr/lib/httpd/modules \
                --disable-static
@@ -92,3 +92,4 @@ package() {
       ln -sf subversion "${pkgdir}"/usr/share/bash-completion/completions/${i}
    done
 }
+

@@ -2,22 +2,24 @@
 
 _extramodules=extramodules-4.5-CHAKRA
 _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.5.1
+_kernelver=${_kver%-1-CHAKRA}
 
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
 pkgver=304.131
-pkgrel=2
+pkgrel=4
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
-source=("http://git.chakraos.org/chakra-hardware-detection.git/blob_plain/HEAD:/hwdb/nvidia_supported")
 _pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
-source+=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run"
-         'nv-drm.patch')
+source=("http://git.chakraos.org/chakra-hardware-detection.git/blob_plain/HEAD:/hwdb/nvidia_supported"
+        "ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run"
+         'nv-drm.patch' 'disable-mtrr.patch' 'linux-4.6.patch')
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
          '24c9c6a8679edae3b2a608b191fdc727'
-         '79671a27131da619a33eb02ed0c2c031')
+         '79671a27131da619a33eb02ed0c2c031'
+         'c4becf1145a139cc0121be9ad340bcd8'
+         '63041b8272d0177cd776114f418ffece')
 
 prepare() {
     cd "${srcdir}"
@@ -26,6 +28,9 @@ prepare() {
     cd "${_pkg}"
     # patches here
     patch -p0 -i "$srcdir/nv-drm.patch"
+    patch -p1 --no-backup-if-mismatch -i ../linux-4.6.patch
+    cd kernel
+    patch -p1 --no-backup-if-mismatch -i "$srcdir"/disable-mtrr.patch
 }
 
 build() {
