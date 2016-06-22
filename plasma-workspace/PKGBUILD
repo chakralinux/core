@@ -4,7 +4,7 @@ source ../plasma.conf
 pkgbase=plasma-workspace
 pkgname=('plasma-workspace' 'drkonqi' 'plasma-wayland-session')
 pkgver=${PVersion}
-pkgrel=1
+pkgrel=3
 pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
@@ -13,7 +13,7 @@ license=('LGPL')
 # not detected by namcap because libgl depends on it
 # but nvidia providing libgl does not depend on libxdamage
 depends=('kjsembed' 'knotifyconfig' 'libxdamage' 'libksysguard' 'libkscreen' 'ktexteditor' 'libqalculate'
-         'qt5-tools' 'kded' 'kde-cli-tools' 'xorg-xrdb' 'xorg-xsetroot'
+         'qt5-tools' 'kded' 'kde-cli-tools' 'xorg-xrdb' 'xorg-xsetroot' 'kholidays'
          'xorg-apps' 'xorg-utils' 'milou' 'breeze' 'prison-kf5' 'kwin' 'chakra-common' 'plasma-integration')
 makedepends=('extra-cmake-modules' 'kdoctools' 'gpsd' 'baloo'
              'krunner' 'kxmlrpcclient' 'networkmanager-qt' 'kdewebkit')
@@ -41,9 +41,9 @@ build() {
 package_plasma-workspace() {
   optdepends=('plasma-workspace-wallpapers: additional wallpapers'
               'gpsd: GPS based geolocation' 'networkmanager-qt: IP based geolocation')
-  replaces=('xembed-sni-proxy' 'xembed-sni-proxy-git')
-  provides=('xembed-sni-proxy' 'xembed-sni-proxy-git')
-  conflicts=('xembed-sni-proxy' 'xembed-sni-proxy-git')
+  replaces=('xembed-sni-proxy' 'xembed-sni-proxy-git' 'simplesystray')
+  provides=('xembed-sni-proxy' 'xembed-sni-proxy-git' 'simplesystray')
+  conflicts=('xembed-sni-proxy' 'xembed-sni-proxy-git' 'simplesystray')
 
   cd build
   make DESTDIR="${pkgdir}" install
