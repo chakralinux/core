@@ -13,10 +13,7 @@ depends=('bluez-qt' 'bluez' 'kcoreaddons' 'kwidgetsaddons' 'kdbusaddons' 'ki18n'
 makedepends=('extra-cmake-modules' 'kdoctools')
 groups=('plasma')
 options=("debug")
-replaces=('bluedevil<5.4' 'bluedevil-kf5')
-provides=('bluedevil-kf5')
-conflicts=('bluedevil<5.4' 'bluedevil-kf5')
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz")
 sha256sums=( $(getSum ${pkgname}) )
 install=bluedevil.install
 
@@ -29,7 +26,7 @@ prepare() {
 build() {
   cd build
   cmake_kf5 ../${pkgname}-${pkgver}
-    make
+  make
 }
 
 package() {
