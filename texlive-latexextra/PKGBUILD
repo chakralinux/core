@@ -1,14 +1,14 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-latexextra
 
 pkgname=texlive-latexextra
-pkgver=2015.38831
+pkgver=2016.41473
 _revnr=${pkgver#*.}
-pkgrel=2
+pkgrel=1
 pkgdesc="TeX Live - Large collection of add-on packages for LaTeX"
 license=('GPL')
 arch=(x86_64)
 depends=('texlive-core'
-	 'perl-file-which')
+  'perl-file-which')
 optdepends=(
   'texlive-genericextras: to use the calctab package'
   'texlive-pictures: to use the package overpic'
@@ -19,51 +19,61 @@ source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
         "$pkgname.maps")
 options=('!emptydirs')
 install=texlive.install
-md5sums=('5b41e1277c3e32bae7adb216f641be6b'
-         '9e4825f47dac663dd62c4bfa67899e84')
+md5sums=('04e9310f60d2936ce08747dba24ceadc'
+         '017fc9ed83747aa8884ca9ae0767531f')
 
 build() {
-   for p in *.tar.xz; do
-      bsdtar -xf $p
-   done
-   rm -rf {tlpkg,doc,source}
+  for p in *.tar.xz; do
+     bsdtar -xf $p
+  done
+  rm -rf {tlpkg,doc,source}
 }
 
 package() {
-   install -m755 -d $pkgdir/var/lib/texmf/chakra/installedpkgs
-   sed -i '/^#/d' CONTENTS
-   install -m644 CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_${_revnr}.pkgs
-   install -m644 $pkgname.maps $pkgdir/var/lib/texmf/chakra/installedpkgs/
-   install -m755 -d $pkgdir/usr/share
+  install -m755 -d $pkgdir/var/lib/texmf/chakra/installedpkgs
+  sed -i '/^#/d' CONTENTS
+  install -m644 CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_${_revnr}.pkgs
+  install -m644 $pkgname.maps $pkgdir/var/lib/texmf/chakra/installedpkgs/
+  install -m755 -d $pkgdir/usr/share
 
-   wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
-   for dir in $wanteddirs; do
-     find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
-     find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;
-   done
+  wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
+  for dir in $wanteddirs; do
+    find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
+    find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;
+  done
 
-   if [[ -d texmf-dist ]]; then
-     find texmf-dist -type d -exec install -d -m755 $pkgdir/usr/share/'{}' \;
-     find texmf-dist -type f -exec install -m644 '{}' $pkgdir/usr/share/'{}' \;
-   fi
+  if [[ -d texmf-dist ]]; then
+    find texmf-dist -type d -exec install -d -m755 $pkgdir/usr/share/'{}' \;
+    find texmf-dist -type f -exec install -m644 '{}' $pkgdir/usr/share/'{}' \;
+  fi
 
-   if [[ -d $pkgdir/usr/share/texmf-dist/scripts ]]; then
-     find $pkgdir/usr/share/texmf-dist/scripts -type f -exec chmod a+x '{}' \;
-   fi
+  if [[ -d $pkgdir/usr/share/texmf-dist/scripts ]]; then
+    find $pkgdir/usr/share/texmf-dist/scripts -type f -exec chmod a+x '{}' \;
+  fi
 
-   #add symlinks that were in texlive-bin:
-   install -m755 -d $pkgdir/usr/bin
-   ln -s /usr/share/texmf-dist/scripts/authorindex/authorindex $pkgdir/usr/bin/authorindex
-   ln -s /usr/share/texmf-dist/scripts/exceltex/exceltex "$pkgdir"/usr/bin/exceltex
-   ln -s /usr/share/texmf-dist/scripts/glossaries/makeglossaries $pkgdir/usr/bin/makeglossaries
-   ln -s /usr/share/texmf-dist/scripts/pax/pdfannotextractor.pl $pkgdir/usr/bin/pdfannotextractor
-   ln -s /usr/share/texmf-dist/scripts/perltex/perltex.pl $pkgdir/usr/bin/perltex
-   ln -s /usr/share/texmf-dist/scripts/pst-pdf/ps4pdf $pkgdir/usr/bin/ps4pdf
-   ln -s /usr/share/texmf-dist/scripts/splitindex/splitindex.pl $pkgdir/usr/bin/splitindex
-   ln -s /usr/share/texmf-dist/scripts/svn-multi/svn-multi.pl $pkgdir/usr/bin/svn-multi
-   ln -s /usr/share/texmf-dist/scripts/vpe/vpe.pl $pkgdir/usr/bin/vpe
+  #add symlinks that were in texlive-bin:
+  _linked_scripts="
+authorindex/authorindex
+exceltex/exceltex
+glossaries/makeglossaries
+glossaries/makeglossaries-lite.lua
+makedtx/makedtx.pl
+pax/pdfannotextractor.pl
+perltex/perltex.pl
+pst-pdf/ps4pdf
+splitindex/splitindex.pl
+svn-multi/svn-multi.pl
+vpe/vpe.pl
+yplan/yplan
+"
+  install -m755 -d "$pkgdir"/usr/bin
+  for _script in ${_linked_scripts}; do
+    _scriptbase=$(basename $_script)
+    _scriptbase=${_scriptbase%.*}
+    ln -s /usr/share/texmf-dist/scripts/${_script} ${pkgdir}/usr/bin/${_scriptbase}
+  done
 
-   rm $pkgdir/usr/share/texmf-dist/scripts/glossaries/makeglossaries.bat
-   rm $pkgdir/usr/share/texmf-dist/scripts/pst-pdf/ps4pdf.bat*
-   rm $pkgdir/usr/share/texmf-dist/scripts/shipunov/biokey2html.bat
+  rm $pkgdir/usr/share/texmf-dist/scripts/glossaries/makeglossaries.bat
+  rm $pkgdir/usr/share/texmf-dist/scripts/pst-pdf/ps4pdf.bat*
+  rm $pkgdir/usr/share/texmf-dist/scripts/shipunov/biokey2html.bat
 }

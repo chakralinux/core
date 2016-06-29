@@ -1,9 +1,9 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/texlive-pstricks
 
 pkgname=texlive-pstricks
-pkgver=2015.38821
+pkgver=2016.41321
 _pkgver=${pkgver#*.}
-pkgrel=2
+pkgrel=1
 pkgdesc="TeX Live - Additional PSTricks packages."
 license=('GPL3')
 arch=(x86_64)
@@ -13,33 +13,33 @@ url='http://tug.org/texlive/'
 install=texlive.install
 options=('!emptydirs')
 source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip")
-md5sums=('47e86a2abbb258a1d7a0cb687cf14525')
+md5sums=('d61f741137c3f6d8e3839dbe22fb6abe')
 
 build() {
-   for p in *.tar.xz; do
-     bsdtar -xf $p
-   done
-   rm -rf {tlpkg,doc,source} || true
+  for p in *.tar.xz; do
+    bsdtar -xf $p
+  done
+  rm -rf {tlpkg,doc,source} || true
 }
 
 package() {
-   install -m755 -d $pkgdir/var/lib/texmf/chakra/installedpkgs
-   sed -i '/^#/d' CONTENTS
-   install -m644 CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_$_pkgver.pkgs
-   install -m755 -d $pkgdir/usr/share
-   wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
-   for dir in $wanteddirs; do
-     find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
-     find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;
-   done
-   if [[ -d texmf-dist ]]; then
-     find texmf-dist -type d -exec install -d -m755 $pkgdir/usr/share/'{}' \;
-     find texmf-dist -type f -exec install -m644 '{}' $pkgdir/usr/share/'{}' \;
-   fi
-   if [[ -d $pkgdir/usr/share/texmf-dist/scripts ]]; then
-     find $pkgdir/usr/share/texmf-dist/scripts -type f -exec chmod a+x '{}' \;
-   fi
-   install -m755 -d $pkgdir/usr/bin
-   ln -s /usr/share/texmf-dist/scripts/pst2pdf/pst2pdf $pkgdir/usr/bin/pst2pdf
-   ln -s /usr/share/texmf-dist/scripts/pedigree-perl/pedigree.pl $pkgdir/usr/bin/pedigree
+  install -m755 -d $pkgdir/var/lib/texmf/chakra/installedpkgs
+  sed -i '/^#/d' CONTENTS
+  install -m644 CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_$_pkgver.pkgs
+  install -m755 -d $pkgdir/usr/share
+  wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
+  for dir in $wanteddirs; do
+    find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
+    find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;
+  done
+  if [[ -d texmf-dist ]]; then
+    find texmf-dist -type d -exec install -d -m755 $pkgdir/usr/share/'{}' \;
+    find texmf-dist -type f -exec install -m644 '{}' $pkgdir/usr/share/'{}' \;
+  fi
+  if [[ -d $pkgdir/usr/share/texmf-dist/scripts ]]; then
+    find $pkgdir/usr/share/texmf-dist/scripts -type f -exec chmod a+x '{}' \;
+  fi
+  install -m755 -d $pkgdir/usr/bin
+  ln -s /usr/share/texmf-dist/scripts/pedigree-perl/pedigree.pl $pkgdir/usr/bin/pedigree
+  ln -s /usr/share/texmf-dist/scripts/pst2pdf/pst2pdf $pkgdir/usr/bin/pst2pdf
 }

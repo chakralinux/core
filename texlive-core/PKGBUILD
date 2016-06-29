@@ -1,13 +1,12 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-core
 
 pkgname=texlive-core
-pkgver=2015.38835
-_revnr=${pkgver#*.}
-pkgrel=5
+pkgver=2016.41471
+_revnr=${pkgver#2016.}
+pkgrel=1
 pkgdesc="TeX Live core distribution"
-url='http://tug.org/texlive/'
 license=('GPL')
-arch=(x86_64)
+arch=(any)
 depends=('texlive-bin' 'perl')
 optdepends=(
   'dialog:       for texconfig'
@@ -18,38 +17,37 @@ optdepends=(
   'python2:      for dviasm'
   'python3:      for pythontex'
   'ruby:        for old ConTeXT MkII and epspdf'
-  't1utils:     can be useful when installing Type1 fonts')
+  't1utils:     can be useful when installing Type1 fonts'
+)
 groups=('texlive-most')
 conflicts=('tetex' 'texlive-latex3')
 provides=('tetex' 'texlive-latex3')
 replaces=('tetex' 'texlive-latex3')
+url='http://tug.org/texlive/'
 source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
         "$pkgname.maps"
-	"texmf.cnf"
-	"texmfcnf.lua"
-	"09-texlive-fonts.conf")
+        "texmf.cnf"
+        "texmfcnf.lua"
+        "09-texlive-fonts.conf")
 install=texlive.install
 backup=(etc/texmf/web2c/texmf.cnf \
         etc/texmf/chktex/chktexrc \
-	etc/texmf/dvipdfmx/dvipdfmx.cfg \
-	etc/texmf/dvips/config/config.ps \
-	etc/texmf/tex/generic/config/language.dat \
-	etc/texmf/tex/generic/config/language.def \
-	etc/texmf/tex/generic/config/pdftexconfig.tex \
-	etc/texmf/ttf2pk/ttf2pk.cfg \
-	etc/texmf/web2c/fmtutil.cnf \
-	etc/texmf/web2c/mktex.cnf \
-	etc/texmf/xdvi/XDvi)
-
-md5sums=('59a48c870b4170926010352b2b402bd0'
-         '75c813acb5df57d174e4bd07019adf34'
+        etc/texmf/dvipdfmx/dvipdfmx.cfg \
+        etc/texmf/dvips/config/config.ps \
+        etc/texmf/tex/generic/config/language.dat \
+        etc/texmf/tex/generic/config/language.def \
+        etc/texmf/tex/generic/tex-ini-files/pdftexconfig.tex \
+        etc/texmf/ttf2pk/ttf2pk.cfg \
+        etc/texmf/web2c/fmtutil.cnf \
+        etc/texmf/web2c/mktex.cnf \
+        etc/texmf/xdvi/XDvi)
+md5sums=('7e73ca95a2c2da5cb59af6fbb2aa40fe'
+         '54a34f8ddbeccec2427e4d5763349f9b'
          'df537245012f3e5f05bdc55644b7a3df'
          '16ad4dc53deb00029baef1b01ba1d984'
          '393a4bf67adc7ca5df2b386759d1a637')
 
 build() {
-   cd "${srcdir}"
-
    echo -n "   --> extracting all packages... "
    for p in *.tar.xz; do 
      bsdtar -xf $p
@@ -59,12 +57,9 @@ build() {
 }
 
 package() {
-   cd "$srcdir"
-
-   # Install packages
-   install -m755 -d $pkgdir/var/lib/texmf/chakra/installedpkgs
+   # Install packages.
    sed -i '/^#/d' CONTENTS
-   install -m644 CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_${_revnr}.pkgs
+   install -m644 -D CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_${_revnr}.pkgs
    install -m644 $pkgname.maps $pkgdir/var/lib/texmf/chakra/installedpkgs/
    install -m755 -d $pkgdir/usr/share
    wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
@@ -72,7 +67,6 @@ package() {
      find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
      find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;
    done
-
    find texmf-dist -type d -exec install -d -m755 $pkgdir/usr/share/'{}' \;
    find texmf-dist -type f -exec install -m644 '{}' $pkgdir/usr/share/'{}' \;
    find texmf-dist -type f -executable -exec chmod 755 $pkgdir/usr/share/'{}' \;
@@ -85,6 +79,7 @@ package() {
    install -d -m755 "$pkgdir"/etc/texmf/dvips/config
    install -d -m755 "$pkgdir"/etc/texmf/dvipdfmx
    install -d -m755 "$pkgdir"/etc/texmf/tex/generic/config
+   install -d -m755 "$pkgdir"/etc/texmf/tex/generic/tex-ini-files
    install -d -m755 "$pkgdir"/etc/texmf/ttf2pk
    install -d -m755 "$pkgdir"/etc/texmf/xdvi
    install -d -m755 "$pkgdir"/etc/fonts/conf.avail
@@ -95,27 +90,27 @@ package() {
 
    # copy config files to $TEXMFCONFIG tree
    cp -a "$pkgdir"/usr/share/texmf-dist/chktex/chktexrc \
-     	"$pkgdir"/etc/texmf/chktex/
+        "$pkgdir"/etc/texmf/chktex/
    cp -a "$pkgdir"/usr/share/texmf-dist/web2c/mktex.cnf \
-   	  "$pkgdir"/etc/texmf/web2c/
+          "$pkgdir"/etc/texmf/web2c/
    cp -a "$pkgdir"/usr/share/texmf-dist/web2c/updmap.cfg \
-   	  "$pkgdir"/etc/texmf/web2c/
+          "$pkgdir"/etc/texmf/web2c/
    cp -a "$pkgdir"/usr/share/texmf-dist/web2c/fmtutil.cnf \
-   	  "$pkgdir"/etc/texmf/web2c/
+          "$pkgdir"/etc/texmf/web2c/
    cp -a "$pkgdir"/usr/share/texmf-dist/dvips/config/config.ps \
-   	  "$pkgdir"/etc/texmf/dvips/config/
+          "$pkgdir"/etc/texmf/dvips/config/
    cp -a "$pkgdir"/usr/share/texmf-dist/dvipdfmx/dvipdfmx.cfg \
-   	  "$pkgdir"/etc/texmf/dvipdfmx/
-   cp -a "$pkgdir"/usr/share/texmf-dist/tex/generic/config/pdftexconfig.tex \
-   	  "$pkgdir"/etc/texmf/tex/generic/config/
+          "$pkgdir"/etc/texmf/dvipdfmx/
+   cp -a "$pkgdir"/usr/share/texmf-dist/tex/generic/tex-ini-files/pdftexconfig.tex \
+         "$pkgdir"/etc/texmf/tex/generic/tex-ini-files/
    cp -a "$pkgdir"/usr/share/texmf-dist/tex/generic/config/language.dat \
-   	  "$pkgdir"/etc/texmf/tex/generic/config/
+          "$pkgdir"/etc/texmf/tex/generic/config/
    cp -a "$pkgdir"/usr/share/texmf-dist/tex/generic/config/language.def \
-   	  "$pkgdir"/etc/texmf/tex/generic/config/
+          "$pkgdir"/etc/texmf/tex/generic/config/
    cp -a "$pkgdir"/usr/share/texmf-dist/ttf2pk/ttf2pk.cfg \
-   	  "$pkgdir"/etc/texmf/ttf2pk/
+          "$pkgdir"/etc/texmf/ttf2pk/
    cp -a "$pkgdir"/usr/share/texmf-dist/xdvi/XDvi \
-   	  "$pkgdir"/etc/texmf/xdvi/
+          "$pkgdir"/etc/texmf/xdvi/
    # remove TL specific warnings in the language.{dat,def} files:
    sed -i -e '/DO NOT EDIT/,+3 d' "$pkgdir"/etc/texmf/tex/generic/config/language.*
    # clean updmap.cfg
@@ -150,7 +145,7 @@ package() {
    # copy config file to texmf-config
    #mkdir -p $pkgdir/etc/texmf/tex/context/config
    #cp -a $pkgdir/usr/share/texmf-dist/tex/context/config/cont-usr.tex \
-   #	  $pkgdir/etc/texmf/tex/context/config/cont-usr.tex
+   #      $pkgdir/etc/texmf/tex/context/config/cont-usr.tex
    
    # remove obsolete stuff (we don't provide the omega and aleph binaries anyway)
    rm -f $pkgdir/usr/share/texmf-dist/tex/plain/config/{omega,aleph}.ini
@@ -164,7 +159,6 @@ package() {
    rm -rf $pkgdir/usr/share/texmf-dist/scripts/context/stubs/mswin/
 
    # link programs from /usr/share/texmf-dist/scripts
-    # link programs from /usr/share/texmf-dist/scripts
     _linked_scripts="
 a2ping/a2ping.pl
 accfonts/mkt1font
@@ -175,6 +169,7 @@ arara/arara.sh
 bundledoc/arlatex
 bundledoc/bundledoc
 checkcites/checkcites.lua
+checklistings/checklistings.sh
 chktex/chkweb.sh
 chktex/deweb.pl
 cjk-gs-integrate/cjk-gs-integrate.pl
@@ -212,11 +207,13 @@ ltxfileinfo/ltxfileinfo
 ltximg/ltximg.pl
 lua2dox/lua2dox_filter
 luaotfload/luaotfload-tool.lua
+make4ht/make4ht
 match_parens/match_parens
 mf2pt1/mf2pt1.pl
 mkjobtexmf/mkjobtexmf.pl
 oberdiek/pdfatfi.pl
-pdfcrop/pdfcrop.pl
+pdfbook2/pdfbook2
+pdfcrop/pdfcr
 pdfjam/pdf180
 pdfjam/pdf270
 pdfjam/pdf90
@@ -229,6 +226,7 @@ pdfjam/pdfjam-slides6up
 pdfjam/pdfjoin
 pdfjam/pdfnup
 pdfjam/pdfpun
+pdfxup/pdfxup
 pfarrei/a5toa4.tlu
 pfarrei/pfarrei.tlu
 pkfix-helper/pkfix-helper
@@ -238,8 +236,10 @@ purifyeps/purifyeps
 pythontex/pythontex.py
 pythontex/depythontex.py
 simpdftex/simpdftex
+srcredact/srcredact.pl
 sty2dtx/sty2dtx.pl
 texcount/texcount.pl
+tex4ebook/tex4ebook
 texdef/texdef.pl
 texdiff/texdiff
 texdirflatten/texdirflatten
@@ -272,15 +272,12 @@ typeoutfileinfo/typeoutfileinfo.sh
 xindy/texindy.pl
 xindy/xindy.pl
 "
-
     install -m755 -d $pkgdir/usr/bin
     for _script in ${_linked_scripts}; do
       _scriptbase=$(basename $_script)
       _scriptbase=${_scriptbase%.*}
-      [[ -f ${pkgdir}/usr/share/texmf-dist/scripts/${_script} ]] &&
-          ln -s /usr/share/texmf-dist/scripts/${_script} ${pkgdir}/usr/bin/${_scriptbase}
+      ln -s /usr/share/texmf-dist/scripts/${_script} ${pkgdir}/usr/bin/${_scriptbase}
     done
-
     ln -s /usr/share/texmf-dist/scripts/listings-ext/listings-ext.sh ${pkgdir}/usr/bin/listings-ext.sh
 
     # additional symlinks
