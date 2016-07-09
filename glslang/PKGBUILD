@@ -1,0 +1,28 @@
+# Arch contributor: https://git.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/vulkan-loader-layers
+
+pkgname=glslang
+pkgver=3.0.git4678ca9d
+pkgrel=1
+arch=(i686 x86_64)
+url="https://www.khronos.org/vulkan/"
+license=('custom')
+pkgdesc="Khronos reference front-end for GLSL and ESSL, and sample SPIR-V generator"
+makedepends=(git cmake)
+depends=(glibc)
+source=('git://github.com/KhronosGroup/glslang.git#commit=4678ca9dacfec7a084dbc69bbe568bdad6889f1b')
+sha256sums=('SKIP')
+
+build() {
+  cd "${pkgname}"
+  rm -rf build ; mkdir build ; cd build
+  cmake -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    ../
+  make
+}
+
+package() {
+  cd "${pkgname}/build"
+  make DESTDIR="${pkgdir}" install
+}
+
