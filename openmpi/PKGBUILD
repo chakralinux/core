@@ -1,6 +1,6 @@
 
 pkgname=openmpi
-pkgver=1.8.5
+pkgver=2.0.0
 pkgmin="${pkgver%.*}"
 pkgrel=1
 pkgdesc='High performance message passing library (MPI)'
@@ -12,12 +12,11 @@ makedepends=('inetutils' 'valgrind' 'gcc-fortran')
 optdepends=('gcc-fortran: fortran support')
 options=(staticlibs)
 source=(http://www.open-mpi.org/software/ompi/v${pkgmin}/downloads/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('2e0408dbb033b0df21d1f95fffb872f2a8237de6')
+sha1sums=('a34f07a0e94af4ccd8080d74827befd61824c6c3')
 
 build() {
    cd $pkgname-$pkgver
 
-   ./autogen.pl
    ./configure --prefix=/usr \
                --sysconfdir=/etc/${pkgname} \
                --enable-mpi-fortran=all \
@@ -53,10 +52,10 @@ package() {
    done
 
    # Openmpi's otfinfo conflicts with the one from texlive
-   mv "$pkgdir"/usr/bin/otfinfo{,mpi}
+   #mv "$pkgdir"/usr/bin/otfinfo{,mpi}
 
    # Remove dangling symlink and useless file
-   rm "$pkgdir"/usr/share/vampirtrace/config.log
+   #rm "$pkgdir"/usr/share/vampirtrace/config.log
 
    install -d -m 755 "${pkgdir}"/etc/ld.so.conf.d
    echo "/usr/lib/${pkgname}" > "${pkgdir}"/etc/ld.so.conf.d/${pkgname}.conf
