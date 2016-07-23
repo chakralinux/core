@@ -1,54 +1,53 @@
 pkgname=mono
-pkgver=3.12.0
+pkgver=4.4.1.0
+_pkgver=4.4.1
 pkgrel=1
 pkgdesc="Free implementation of the .NET platform including runtime and compiler"
-arch=(x86_64)
+arch=('x86_64')
 license=('GPL' 'LGPL2.1' 'MPL' 'custom:MITX11')
 url="http://www.mono-project.com/"
-depends=('zlib' 'libgdiplus>=3.8' 'sh' 'python')
+depends=('zlib' 'libgdiplus>=4.2' 'sh' 'python' 'ca-certificates')
 options=('!makeflags')
 provides=('monodoc')
 conflicts=('monodoc')
-source=(http://download.mono-project.com/sources/mono/${pkgname}-${pkgver}.tar.bz2
+source=(http://download.mono-project.com/sources/mono/$pkgname-$pkgver.tar.bz2
         mono.binfmt.d)
-sha1sums=('cec83efd13ffc1e212c632395a5aac75772a09e7'
+sha1sums=('627c36ded06cb8e53afb2a50afbd421f7492cccc'
           '3c81ade946e6e3afab9f2e4eddc83023e01bfb85')
 
 build() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
+  cd $pkgname-$_pkgver
 
   # build mono
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --bindir=/usr/bin \
     --sbindir=/usr/bin \
-    --disable-quiet-build \
-    --disable-system-aot \
-    --disable-static \
     --with-mcs-docs=no
   make
 
   # build jay
-  cd "${srcdir}"/${pkgname}-${pkgver}/mcs/jay
+  cd mcs/jay
   make
 }
 
 package() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
-  make DESTDIR="${pkgdir}" install
+  cd $pkgname-$_pkgver
+  make DESTDIR=$pkgdir install
 
   # install jay
-  pushd "${srcdir}"/${pkgname}-${pkgver}/mcs/jay
-  make DESTDIR="${pkgdir}" prefix=/usr INSTALL=../../install-sh install
+  pushd mcs/jay
+  make DESTDIR=$pkgdir prefix=/usr INSTALL=../../install-sh install
   popd
 
   # install binfmt conf file and pathes
-  install -D -m644 "${srcdir}"/mono.binfmt.d "${pkgdir}"/usr/lib/binfmt.d/mono.conf
+  install -D -m644 ../mono.binfmt.d $pkgdir/usr/lib/binfmt.d/mono.conf
 
   #install license
-  mkdir -p "${pkgdir}"/usr/share/licenses/${pkgname}
-  install -m644 mcs/MIT.X11 "${pkgdir}"/usr/share/licenses/${pkgname}/
+  mkdir -p $pkgdir/usr/share/licenses/$pkgname
+  install -m644 mcs/MIT.X11 $pkgdir/usr/share/licenses/$pkgname/
 
   #fix .pc file to be able to request mono on what it depends, fixes #go-oo build
-  sed -i -e "s:#Requires:Requires:" "${pkgdir}"/usr/lib/pkgconfig/mono.pc
+  sed -i -e "s:#Requires:Requires:" $pkgdir/usr/lib/pkgconfig/mono.pc
+  sed -i -e "s:/2.0/:/4.5/:g" "${pkgdir}"/usr/lib/pkgconfig/mono-nunit.pc
 }
