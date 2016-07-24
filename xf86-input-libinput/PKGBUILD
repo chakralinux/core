@@ -1,7 +1,7 @@
 # Maintainer: AlmAck <almack@chakraos.org>
 
 pkgname=xf86-input-libinput
-pkgver=0.16.0
+pkgver=0.19.0
 pkgrel=1
 pkgdesc="Generic input driver for the X.Org server based on libinput"
 arch=('x86_64')
@@ -12,8 +12,10 @@ makedepends=('xorg-server-devel' 'libxi' 'libx11' 'resourceproto' 'scrnsaverprot
 provides=('xf86-input-driver')
 conflicts=('xorg-server<1.16' 'X-ABI-XINPUT_VERSION<21' 'X-ABI-XINPUT_VERSION>=22')
 groups=('xorg-drivers' 'xorg')
-source=(http://xorg.freedesktop.org/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('fdade531e91e79acf6dce8ac55fa4f65abe3f1358c5d3d777ae48dbc74b76f49')
+source=(http://xorg.freedesktop.org/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2{,.sig})
+sha256sums=('6c5d30dc7c8b8ae34261340e1dc9cbb8ef435078e084b8ef507527a8a21af477'
+            'SKIP')
+validpgpkeys=('3C2C43D9447D5938EF4551EBE23B7E70B467F0BF') # Peter Hutterer (Who-T) <office@who-t.net>
 
 build() {
   cd ${pkgname}-${pkgver}
