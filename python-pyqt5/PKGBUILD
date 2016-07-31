@@ -1,7 +1,7 @@
 pkgbase=pyqt5
 pkgname=('python-pyqt5-common' 'python3-pyqt5' 'python2-pyqt5')
 pkgver=5.7
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
 license=('GPL')
@@ -64,6 +64,10 @@ package_python-pyqt5-common(){
     make -C pyrcc DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
     make -C pylupdate DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
     install -Dm644 PyQt5.api "${pkgdir}"/usr/share/qt5/qsci/api/python/PyQt5.api
+    
+    # Provided by python3-pyqt5
+    rm -r ${pkgdir}/usr/lib
+    rm -r ${pkgdir}/usr/share/sip
 }
 
 package_python3-pyqt5(){
