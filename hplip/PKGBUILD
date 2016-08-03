@@ -1,5 +1,5 @@
 pkgname=hplip
-pkgver=3.16.5
+pkgver=3.16.7
 pkgrel=1
 pkgdesc="Drivers for HP DeskJet, OfficeJet, Photosmart, Business Inkjet and some LaserJet."
 arch=('x86_64')
@@ -16,11 +16,11 @@ optdepends=('sane: for scanner support'
 install=hplip.install
 source=(http://downloads.sourceforge.net/${pkgname}/$pkgname-$pkgver.tar.gz
         disable_upgrade.patch)
-md5sums=('3f50c45c52b2adaee8d9ff32db8c4e6e'
+md5sums=('d4982fd71549f45856b5ad76e1ae8809'
          '4ebb9377a989b4fb776e37f5968bb7b0')
 
 prepare() {
- cd ${pkgname}-${pkgver}
+ cd $pkgname-$pkgver
  
  export PYTHON=python3
  
@@ -35,7 +35,7 @@ prepare() {
  sed -i 's|/usr/bin/python|/usr/bin/python3|' data/rules/hplip-printer@.service
  
  # disable insecure update
- patch -Np0 -i ${srcdir}/disable_upgrade.patch
+ patch -Np0 -i ../disable_upgrade.patch
  
  # Use system foomatic-rip for hpijs driver instead of foomatic-rip-hplip
  # The hpcups driver does not use foomatic-rip
@@ -52,7 +52,7 @@ prepare() {
 }
 
 build() {
- cd ${pkgname}-${pkgver}
+ cd $pkgname-$pkgver
  ./configure --prefix=/usr \
 	     --enable-qt5 \
              --disable-qt4 \
@@ -70,16 +70,16 @@ build() {
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
-  make -j1 rulesdir=/usr/lib/udev/rules.d DESTDIR="$pkgdir/" install
+  cd $pkgname-$pkgver
+  make -j1 rulesdir=/usr/lib/udev/rules.d DESTDIR=$pkgdir install
   
   # remove config provided by sane and autostart of hp-daemon
-  rm -rf "$pkgdir"/etc/{sane.d,xdg}
+  rm -rf $pkgdir/etc/{sane.d,xdg}
   
   # remove HAL .fdi file because HAL is no longer used
-  rm -rf "$pkgdir"/usr/share/hal
+  rm -rf $pkgdir/usr/share/hal
  
   # remove rc script
-  rm -rf "$pkgdir"/etc/init.d
+  rm -rf $pkgdir/etc/init.d
 }
 
