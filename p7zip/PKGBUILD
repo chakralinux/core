@@ -1,7 +1,7 @@
 # Contributions from Arch: https://www.archlinux.org/packages/extra/x86_64/p7zip/
 
 pkgname=p7zip
-pkgver=15.14.1
+pkgver=16.02
 pkgrel=1
 pkgdesc="A command-line port of the 7zip compression utility"
 arch=('x86_64')
@@ -10,21 +10,13 @@ url="http://p7zip.sourceforge.net"
 depends=('gcc-libs' 'bash')
 makedepends=('yasm')
 options=('!makeflags')
-source=("http://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgver}/${pkgname}_${pkgver}_src_all.tar.bz2"
-        'CVE-2016-2334.patch'
-        'CVE-2016-2335.patch')
-md5sums=('92cca093312b5a71a7be7dc7d1d32509'
-         '509d8fa040de07c79424f52faf403df3'
-         '11dfad35c8e160d98ef804bda80df1b5')
+source=("https://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgver}/${pkgname}_${pkgver}_src_all.tar.bz2")
+md5sums=('a0128d661cfe7cc8c121e73519c54fbf')
 
 
 prepare() {
   cd "$srcdir/${pkgname}_$pkgver"
   cp makefile.linux_amd64_asm makefile.machine
-
-  # https://sourceforge.net/p/p7zip/discussion/383043/thread/9d0fb86b/
-  patch -Np1 -i ../CVE-2016-2334.patch
-  patch -Np1 -i ../CVE-2016-2335.patch
 }
 
 build() {
