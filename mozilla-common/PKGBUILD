@@ -3,18 +3,18 @@
 
 pkgname=mozilla-common
 pkgver=1.4
-pkgrel=2
+pkgrel=3
 pkgdesc="Common Initialization Profile for Mozilla.org products"
-arch=(i686 x86_64)
+arch=(x86_64)
 license=('GPL')
 url="http://www.mozilla.org/"
 install=mozilla-common.install
 source=(mozilla-common.sh
         mozilla-common.csh)
-md5sums=('71f2d354cbea1b3b8227b83751f12a85'
-         '0a1f9fe0add8ee76fe5413cb073aa538')
+md5sums=('39451f6fe87d3cb224e140322c55eb27'
+         '944589f6097070dfa7ab038172574207')
 
-build() {
-  install -m755 -d "${pkgdir}/etc/profile.d"
-  install -m755 mozilla-common.{,c}sh "${pkgdir}/etc/profile.d/" || return 1
+package() {
+  install -dm755 "${pkgdir}/etc/profile.d"
+  install -m755 mozilla-common.{,c}sh "${pkgdir}/etc/profile.d/"
 }
