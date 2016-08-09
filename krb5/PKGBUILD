@@ -1,6 +1,6 @@
 pkgname=krb5
-pkgver=1.14.1
-pkgrel=2
+pkgver=1.14.3
+pkgrel=1
 pkgdesc="The Kerberos network authentication system"
 arch=('i686' 'x86_64')
 url="http://web.mit.edu/kerberos/"
@@ -11,16 +11,14 @@ backup=('etc/krb5.conf' 'var/lib/krb5kdc/kdc.conf')
 source=("http://web.mit.edu/kerberos/dist/${pkgname}/1.14/${pkgname}-${pkgver}.tar.gz"{,.asc}
         'krb5-kadmind.service'
         'krb5-config_LDFLAGS.patch'
-        'CVE-2016-3119.patch'
         'krb5-kdc.service'
 	'krb5-kpropd.service'
 	'krb5-kpropd@.service'
 	'krb5-kpropd.socket')
-md5sums=('400de0cabbfbe85c2c36f60347bf7dc6'
+md5sums=('f76e4f8a3c95bb59980dd5ef4b48aea9'
          'SKIP'
          'd2c898d376ebe5c62b873da7cab0f7e7'
          '656e242de9b5ada1edf398983db51eef'
-         'd90b8b1a3d0c145ce086c06d0a258069'
          'f0245d33083337f95654f4caf1d32f57'
          '3dddf2f79ef74c4e736711e41228ee91'
          'babefac221331f7131a29faac33cc5bc'
@@ -38,8 +36,8 @@ prepare() {
    sed -i "/KRB5ROOT=/s/\/local//" util/ac_check_krb5.m4
 
    # Fix LDAP null deref on empty arg [CVE-2016-3119]
-   cd "${srcdir}/${pkgname}-${pkgver}"
-   patch -Np1 -i ${srcdir}/CVE-2016-3119.patch
+   #cd "${srcdir}/${pkgname}-${pkgver}"
+   #patch -Np1 -i ${srcdir}/CVE-2016-3119.patch
 }
 
 build() {
