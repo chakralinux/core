@@ -1,26 +1,32 @@
 pkgname=libimobiledevice
 pkgver=1.2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Is a software library that talks the protocols to support iPhone and iPod Touch devices on Linux"
 url="http://libimobiledevice.org/"
 arch=('x86_64')
 license=('GPL2' 'LGPL2.1')
 depends=('gnutls'  'libusbmuxd' 'libgcrypt')
-makedepends=('python2')
+makedepends=('python2-cython')
+optdepends=('python2-cython: Python binding support')
 source=("http://libimobiledevice.org/downloads/${pkgname}-${pkgver}.tar.bz2"
-	"disable-sslv3.patch")
+	"disable-sslv3.patch"
+        'CVE-2016-5104.patch')
 md5sums=('8757900ba7bbe2ef5f54342415d0223e'
-         'bac123da4cc67b2f5cc798727e6231a9')
+         'bac123da4cc67b2f5cc798727e6231a9'
+         'e3535be4b4082486804b033d3f165193')
 
 prepare() {
   cd "$pkgname-$pkgver"
   patch -Np1 -i ../disable-sslv3.patch
+
+  # CVE-2016-5104, should be upstreamed in pkgver>1.2.0
+  patch -Np1 -i ../CVE-2016-5104.patch
 }
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  PYTHON=/usr/bin/python2 ./configure --prefix=/usr
+  PYTHON=/usr/bin/python2 cython_python_bindings=yes ./configure --prefix=/usr
   make
 }
 
