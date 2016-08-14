@@ -1,30 +1,27 @@
-#
-# Core Packages for Chakra, part of chakraos.org
-#
+# Source global configuration
+source ../linux-lts.conf
 
 pkgbase="linux-lts"
 pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs')
-_kernelname="-CHAKRA-LTS"
-_basekernel=3.14
-pkgver=3.14.66
+pkgver=${_kernelver}
 pkgrel=1
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 arch=('x86_64')
 license=('GPL2')
 url="http://www.kernel.org"
 options=(!strip)
-source=("https://www.kernel.org/pub/linux/kernel/v3.x/linux-$_basekernel.tar.xz"
-        "https://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
+source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-$_basekernel.tar.xz"
+        "https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config.x86_64'
         # standard config files for mkinitcpio ramdisk
         'linux-lts.preset'
         'change-default-console-loglevel.patch')
-md5sums=('b621207b3f6ecbb67db18b13258f8ea8'
-         '0ee585c72b3ebfdfcd68a3e7ed291f19'
-         '9fd7a4e21d3f8f31fb5baa91c43937f7'
+md5sums=('9a78fa2eb6c68ca5a40ed5af08142599'
+         '12acd9b991b2d369774f262d3bf319dc'
+         '3c2a6142e569256e1c1774098c745444'
          '232b52576a62c7a333e9fe7a1e1ca359'
-         '98beb36f9b8cf16e58de2483ea9985e3')
+         'df7fceae6ee5d7e7be7b60ecd7f6bb35')
 
 
 prepare() {
@@ -36,6 +33,7 @@ prepare() {
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
+  msg 'patch for console loglevel'
   # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
   # remove this when a Kconfig knob is made available by upstream
   # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
@@ -234,9 +232,9 @@ package_linux-lts-headers() {
     "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/tuners/"
 
   # add xfs and shmem for aufs building
-  mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/fs/xfs"
+  #mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/fs/xfs"
   mkdir -p "${pkgdir}/usr/src/linux-${_kernver}/mm"
-  cp fs/xfs/xfs_sb.h "${pkgdir}/usr/src/linux-${_kernver}/fs/xfs/xfs_sb.h"
+  #cp fs/xfs/xfs_sb.h "${pkgdir}/usr/src/linux-${_kernver}/fs/xfs/xfs_sb.h"
 
   # copy in Kconfig files
   for i in `find . -name "Kconfig*"`; do
