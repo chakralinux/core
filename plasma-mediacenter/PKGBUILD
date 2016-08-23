@@ -1,7 +1,7 @@
 source ../plasma.conf
 
 pkgname=plasma-mediacenter
-pkgver=${PVersion}
+pkgver=5.7.3
 pkgrel=1
 pkgdesc="A mediacenter user interface based on KDE Plasma components"
 arch=(x86_64)
@@ -11,8 +11,9 @@ depends=(plasma-workspace baloo taglib)
 makedepends=(extra-cmake-modules python3)
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("http://download.kde.org/stable/plasma/$pkgver/$pkgname-$pkgver.tar.xz")
+sha256sums=('59aa14f24f213e720e5bcc6f861e3f553c28f6c21290a95fda2e0b4fc28db75c'
+            'SKIP')
 
 prepare() {
   mkdir -p build
