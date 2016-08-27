@@ -1,81 +1,48 @@
 
 pkgname=kbd
-pkgver=2.0.3
+pkgver=2.0.2
 pkgrel=1
 pkgdesc="Keytable files and keyboard utilities"
 arch=('x86_64')
 url="http://www.kbd-project.org"
 license=('GPL')
 depends=('glibc' 'pam')
-makedepends=('check' 'perl' 'keyboardctl')
+makedepends=('check')
 source=(ftp://ftp.altlinux.org/pub/people/legion/kbd/${pkgname}-${pkgver}.tar.gz
-        'fix-euro2.patch'
-        'xml2lst.pl')
+        'fix-dvorak-es.patch'
+        'fix-euro2.patch')
 provides=('vlock')
 conflicts=('vlock')
 replaces=('vlock')
-md5sums=('d636ee56f35233b5cd6f855c08372489'
-         'd869200acbc0aab6a9cafa43cb140d4e'
-         'c2fb8f824d5af81df99d9bd962dd721c')
+md5sums=('f1f75f0dd5f7dde89ce47585274366f8'
+         '998957c4f815347dcc874c4d7555dc66'
+         'd869200acbc0aab6a9cafa43cb140d4e')
 
 prepare() {
-    cd ${srcdir}/${pkgname}-${pkgver}
-    # rename keymap files with the same names
-    # this is needed because when only name of keymap is specified
-    # loadkeys loads the first keymap it can find, which is bad (see FS#13837)
-    # this should be removed when upstream adopts the change
-    mv data/keymaps/i386/qwertz/cz{,-qwertz}.map
-    mv data/keymaps/i386/olpc/es{,-olpc}.map
-    mv data/keymaps/i386/olpc/pt{,-olpc}.map
-    mv data/keymaps/i386/dvorak/no{,-dvorak}.map
-    mv data/keymaps/i386/fgGIod/trf{,-fgGIod}.map
-    mv data/keymaps/i386/colemak/{en-latin9,colemak}.map
-    # fix euro2 #28213
-    patch -Np1 -i ../fix-euro2.patch
+  cd ${srcdir}/${pkgname}-${pkgver}
+  # rename keymap files with the same names
+  # this is needed because when only name of keymap is specified
+  # loadkeys loads the first keymap it can find, which is bad (see FS#13837)
+  # this should be removed when upstream adopts the change
+  mv data/keymaps/i386/qwertz/cz{,-qwertz}.map
+  mv data/keymaps/i386/olpc/es{,-olpc}.map
+  mv data/keymaps/i386/olpc/pt{,-olpc}.map
+  mv data/keymaps/i386/dvorak/no{,-dvorak}.map
+  mv data/keymaps/i386/fgGIod/trf{,-fgGIod}.map
+  mv data/keymaps/i386/colemak/{en-latin9,colemak}.map
+  # fix es-dvorak #33662
+  patch -Np1 -i ../fix-dvorak-es.patch
+  # fix euro2 #28213
+  patch -Np1 -i ../fix-euro2.patch
 }
 
 build() {
-    cd ${srcdir}/${pkgname}-${pkgver}
-    ./configure --prefix=/usr --datadir=/usr/share/kbd --mandir=/usr/share/man
-    make KEYCODES_PROGS=yes RESIZECONS_PROGS=yes
+  cd ${srcdir}/${pkgname}-${pkgver}
+  ./configure --prefix=/usr --datadir=/usr/share/kbd --mandir=/usr/share/man
+  make KEYCODES_PROGS=yes RESIZECONS_PROGS=yes
 }
 
 package() {
-    cd ${srcdir}/${pkgname}-${pkgver}
-    make KEYCODES_PROGS=yes RESIZECONS_PROGS=yes DESTDIR=${pkgdir} install
-
-    # Create additional name for Serbian latin keyboard
-    ln -s sr-cy.map.gz ${pkgdir}/usr/share/kbd/keymaps/i386/qwerty/sr-latin.map.gz
-
-    # The rhpl keyboard layout table is indexed by kbd layout names, so we need a
-    # Korean keyboard
-    ln -s us.map.gz ${pkgdir}/usr/share/kbd/keymaps/i386/qwerty/ko.map.gz
-
-    # Move original keymaps to legacy directory
-    mkdir -p ${pkgdir}/usr/share/kbd/keymaps/legacy
-    mv ${pkgdir}//usr/share/kbd/keymaps/{amiga,atari,i386,include,mac,ppc,sun} ${pkgdir}/usr/share/kbd/keymaps//legacy
-
-    # Convert X keyboard layouts to console keymaps
-    mkdir -p ${pkgdir}/usr/share/kbd/keymaps//xkb
-    perl ${srcdir}/xml2lst.pl < /usr/share/X11/xkb/rules/base.xml > layouts-variants.lst
-    while read line; do
-    XKBLAYOUT=`echo "$line" | cut -d " " -f 1`
-    echo "$XKBLAYOUT" >> layouts-list.lst
-    XKBVARIANT=`echo "$line" | cut -d " " -f 2`
-    ckbcomp "$XKBLAYOUT" "$XKBVARIANT" | gzip > ${pkgdir}/usr/share/kbd/keymaps/xkb/"$XKBLAYOUT"-"$XKBVARIANT".map.gz
-    done < layouts-variants.lst
-
-    # Convert X keyboard layouts (plain, no variant)
-    cat layouts-list.lst | sort -u >> layouts-list-uniq.lst
-    while read line; do
-    ckbcomp "$line" | gzip > ${pkgdir}/usr/share/kbd/keymaps/xkb/"$line".map.gz
-    done < layouts-list-uniq.lst
-
-    # wipe converted layouts which cannot input ASCII (#1031848)
-    zgrep -L "U+0041" ${pkgdir}/usr/share/kbd/keymaps/xkb/* | xargs rm -f
-
-    # Rename the converted default fi (kotoistus) layout (#1117891)
-    gunzip ${pkgdir}/usr/share/kbd/keymaps/xkb/fi.map.gz
-    mv ${pkgdir}/usr/share/kbd/keymaps/xkb/fi.map ${pkgdir}/usr/share/kbd/keymaps/xkb/fi-kotoistus.map
-    gzip ${pkgdir}/usr/share/kbd/keymaps/xkb/fi-kotoistus.map
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make KEYCODES_PROGS=yes RESIZECONS_PROGS=yes DESTDIR=${pkgdir} install
 }
