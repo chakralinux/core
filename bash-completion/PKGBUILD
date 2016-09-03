@@ -1,5 +1,5 @@
 pkgname=bash-completion
-pkgver=2.3
+pkgver=2.4
 pkgrel=1
 pkgdesc="Programmable completion for the bash shell"
 arch=('any')
@@ -8,15 +8,8 @@ license=('GPL2')
 depends=('bash')
 options=('!emptydirs' '!makeflags')
 #http://bash-completion.alioth.debian.org/files/${pkgname}-${pkgver}.tar.bz2
-source=("https://github.com/scop/bash-completion/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz"
-        'bash-4.3.patch')
-sha256sums=('b2e081af317f3da4fff3a332bfdbebeb5514ebc6c2d2a9cf781180acab15e8e9'
-            '9092e6ac975bf43e9ec672477e4e21ca5b0bf52ca5d4e22ec71962ff2a195a5b')
-
-prepare() {
-  cd ${pkgname}-${pkgver}
-  patch -p1 -i ../bash-4.3.patch
-}
+source=("https://github.com/scop/bash-completion/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('c0f76b5202fec9ef8ffba82f5605025ca003f27cfd7a85115f838ba5136890f6')
 
 build() {
   cd ${pkgname}-${pkgver}
