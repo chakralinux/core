@@ -2,7 +2,7 @@ source ../qt5.conf
 
 pkgname=qt5-declarative
 pkgver=${QSubVersion}
-pkgrel=3
+pkgrel=4
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -36,7 +36,7 @@ package() {
   # Useful symlinks
   install -d "$pkgdir"/usr/bin
   for b in "$pkgdir"/usr/lib/qt5/bin/*; do
-    ln -s /usr/lib/qt/bin/$(basename $b) "$pkgdir"/usr/bin/$(basename $b)-qt5
+    ln -s /usr/lib/qt5/bin/$(basename $b) "$pkgdir"/usr/bin/$(basename $b)-qt5
   done
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
