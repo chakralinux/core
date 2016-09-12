@@ -1,10 +1,6 @@
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# contributor (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
-
 pkgname=epsoneplijs
 pkgver=0.4.1
-pkgrel=3
+pkgrel=4
 pkgdesc="Printer driver which gives ghostscript the ability to print to Epson EPL-5700L, EPL-5800L, EPL-5900L, EPL-6100L and EPL-6200L laser printers."
 arch=(i686 x86_64)
 license=('custom')
@@ -18,7 +14,10 @@ build() {
     cd $srcdir/$pkgname-$pkgver
     ./configure --prefix=/usr --with-libusb
     make 
+}
 
+package() {
+    cd $srcdir/$pkgname-$pkgver
     mkdir -p $pkgdir/usr/bin
     make prefix=$pkgdir/usr install
 
@@ -35,6 +34,5 @@ build() {
     cp -av $srcdir/$pkgname-$pkgver/foomatic_PPDs/Epson-EPL-*-cups.ppd.gz $pkgdir/usr/share/cups/model/
 
     # install license
-    cd $startdir
-    install -D -m 644 LICENSE $pkgdir/usr/share/licenses/$pkgname/LICENSE
+    install -Dm644 ${srcdir}/LICENSE $pkgdir/usr/share/licenses/$pkgname/LICENSE
 }
