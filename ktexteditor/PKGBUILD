@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=ktexteditor
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Advanced embeddable text editor'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/ktexteditor'
@@ -12,11 +12,16 @@ depends=('kparts' 'libgit2')
 makedepends=("extra-cmake-modules>=${KFECMVersion}")
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}))
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
+        'pkgbuild-syntax-highlight.patch')
+sha256sums=( $(getSum ${pkgname})
+        'e4973d3c64a28de67f6736ecba76b473817974f610513783de5cd4b9cf5f06f1')
 
 prepare() {
   mkdir -p build
+  
+  cd ${pkgname}-${pkgver}
+  patch -p0 -i "${srcdir}"/pkgbuild-syntax-highlight.patch
 }
 
 build() {
