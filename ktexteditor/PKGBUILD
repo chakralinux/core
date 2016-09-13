@@ -12,16 +12,11 @@ depends=('kparts' 'libgit2')
 makedepends=("extra-cmake-modules>=${KFECMVersion}")
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
-	'pkgbuild-syntax-highlight.patch')
-sha256sums=( $(getSum ${pkgname})
-            '7d898e9aeb8faa7d6ea2e9c4b288d895261645aa6856ca56b7c03ee3caa93cdc')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${pkgname}))
 
 prepare() {
   mkdir -p build
-
-  cd ${pkgname}-${pkgver}
-  patch -p0 -i "${srcdir}"/pkgbuild-syntax-highlight.patch
 }
 
 build() {
