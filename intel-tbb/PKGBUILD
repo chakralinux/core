@@ -1,0 +1,28 @@
+pkgname=intel-tbb
+pkgver=4.4.5
+pkgrel=1
+_pkgname=tbb44
+_ver=20150728
+pkgdesc='An award-winning C++ runtime library that abstracts the low-level threading details necessary for optimal multi-core performance.'
+arch=('x86_64')
+url='https://www.threadingbuildingblocks.org/'
+license=('GPL')
+depends=('gcc-libs')
+source=("${url}/sites/default/files/software_releases/source/${_pkgname}_${_ver}oss_src.tgz")
+md5sums=('2ef1d8cb790324c09aa17360d75dd619')
+
+build() {
+  cd ${_pkgname}_${_ver}oss
+
+  make
+}
+
+package() {
+  cd ${_pkgname}_${_ver}oss
+
+  install -d ${pkgdir}/usr/lib
+  install -m755 build/linux_*/*.so* ${pkgdir}/usr/lib
+
+  install -d ${pkgdir}/usr/include
+  cp -pr include/tbb ${pkgdir}/usr/include
+}
