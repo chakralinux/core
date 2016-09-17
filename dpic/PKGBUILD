@@ -1,0 +1,28 @@
+pkgname=dpic
+pkgver=2016.07.12
+pkgrel=1
+pkgdesc="A pic language interpreter"
+arch=('x86_64')
+url="http://www.ece.uwaterloo.ca/~aplevich/dpic/"
+license=('BSD')
+makedepends=('gcc')
+source=("https://ece.uwaterloo.ca/~aplevich/dpic/dpic.tar.gz"
+        "dpic-$pkgver-destdir.patch")
+sha256sums=('637f642d859a5ff0bd32143f987aeda861f669e080f21647839da23254d1cf72'
+            'b1eae3c4a1cc8e4653231447ff46c905132586ca70039c09e0266ee5beff9fbf')
+
+prepare() {
+  cd $srcdir/$pkgname-$pkgver
+  patch -uNp1 -i $srcdir/dpic-$pkgver-destdir.patch
+}
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd $srcdir/$pkgname-$pkgver
+  make DESTDIR=$pkgdir/usr install
+}

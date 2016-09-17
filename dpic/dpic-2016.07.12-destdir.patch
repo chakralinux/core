@@ -1,0 +1,24 @@
+diff -Naur old/Makefile.in new/Makefile.in
+--- old/Makefile.in	2016-08-01 18:03:57.000000000 +0200
++++ new/Makefile.in	2016-08-19 19:13:07.482021830 +0200
+@@ -3,8 +3,8 @@
+ PREFIX = .
+ DEST = ${DESTDIR}/${PREFIX}/bin
+ 
+-MANDIR = /usr/share/man/man1
+-DOCDIR = /usr/share/doc/dpic
++MANDIR = ${DESTDIR}/${PREFIX}/share/man/man1
++DOCDIR = ${DESTDIR}/${PREFIX}/share/doc/dpic
+ 
+ #-----------------------------------------------------------------------
+ 
+@@ -33,7 +33,7 @@
+ 
+ install: installdpic installdocs
+ 
+-installdpic: dpic doc/dpicdoc.pdf
++installdpic: dpic
+ 	mkdir -p $(DEST)
+ 	if test -x dpic.exe ; then \
+       strip dpic.exe; install dpic.exe $(DEST) ; \
+ 
