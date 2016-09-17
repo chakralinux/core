@@ -1,0 +1,84 @@
+# Include global configuration
+source ../kdeapps.conf
+
+pkgname="kdelibs"
+arch=('x86_64')
+pkgver=${_libsver}
+pkgrel=1
+pkgdesc="KDE Core Libraries"
+url="http://www.kde.org"
+license=('GPL' 'LGPL' 'FDL')
+options=('!docs' 'debug')
+depends=("${_qtpkg}>=${_qtver}" 
+         'shared-mime-info' 'upower' 'udisks2' 'xz' 'enchant' 'jasper' 'openexr' 'giflib' 'strigi' 'libxtst'
+         'ca-certificates' 'xdg-utils' 'qca' 'polkit-qt4' 'libxss' 'phonon' 'shared-desktop-ontologies'
+         'attica>=0.4.2' 'krb5' 'libxcursor' 'libutempter' 'hicolor-icon-theme' 'libdbusmenu-qt' 'grantlee' 
+         'media-player-info' 'qtwebkit' 'systemd' 'pcre')
+makedepends=('pkg-config' 'cmake' 'automoc4' 'intltool' 'avahi' 'libgl' 'aspell' 'hspell' 'shared-mime-info' 
+             'docbook-xsl' 'docbook-xml' 'bzip2>=1.0.6' 'libzip' 'libpulse')
+optdepends=('phonon-gstreamer: GStreamer Phonon backend (default)'
+            'phonon-xine:      Xine Phonon backend'
+            'phonon-mplayer:   MPlayer Phonon backend'
+            'phonon-vlc:       VLC Phonon backend'
+            'avahi:            Service discovery on your local network'
+            'aspell:           Spell checking'
+            'hspell:           Hebrew spell checking')
+provides=("${pkgname}=${_libsver}"
+          "kdelibs-doc")
+replaces=('kdelibs-experimental' 'arts' 'kdelibs-doc')
+groups=("kde" "kde-minimal" "kde-uninstall")
+conflicts=("kdelibs-doc")
+install=${pkgname}.install
+source=($_mirror/${pkgname}-$_libsver.tar.xz
+        01_chakra_tag.patch
+        02_kde_applications_menu.patch
+        03_chakra_menu.patch
+        MergeDir.patch)
+sha256sums=('45e663e8739f131115eda69e5af95e895cce8161228d075d74a9a8cd390346ef'
+            '029e2d07c5fc8676d143b903aa181fc470e5b469d49ccf107e19031f562bf4e3'
+            'b2d25c76081ea6bb31d90c4c6b619ce64ac36de3a6eefb2f9990d3dbf8cd9c91'
+            '505e9e5e969be5094b3f713b865d5927cc3de1f4693915174732b20793228c4f'
+            'd7d2fac1ceb1551081a5f3fa860c14d4aeb0c774d56067e931c20b8d79c4450f')
+
+prepare() {
+    # main patches
+    msg "Applying patches..."
+    cd ${srcdir}/${pkgname}-${pkgver}
+    patch -Np1 -i ${srcdir}/01_chakra_tag.patch
+    patch -Np1 -i ${srcdir}/02_kde_applications_menu.patch
+    patch -Np1 -i ${srcdir}/03_chakra_menu.patch
+
+    # right positioning of applications' entries in kmenu
+    patch -p1 -i ${srcdir}/MergeDir.patch
+    cd ${srcdir}
+    rm -rf build
+    mkdir -p build
+}
+
+build() {
+    cd build
+    cmake ../${pkgname}-${pkgver} \
+        -DCMAKE_BUILD_TYPE=${_build_type} \
+        -DCMAKE_INSTALL_PREFIX=${_installprefix} \
+        -DSYSCONF_INSTALL_DIR=/etc \
+        -DHTML_INSTALL_DIR=/usr/share/doc/kde/html \
+        -DLOCALE_INSTALL_DIR=/usr/share/locale/kde4 \
+        -DKDE_DISTRIBUTION_TEXT='Chakra' \
+        -DKDE_DEFAULT_HOME='.kde4' \
+        -DWITH_FAM=OFF \
+        -DWITH_HUpnp=OFF \
+        -DCMAKE_SKIP_RPATH=ON \
+        -DWITH_SOLID_UDISKS2=ON \
+        -DCMAKE_{SHARED,MODULE,EXE}_LINKER_FLAGS='-Wl,--no-undefined -Wl,--as-needed'
+    make
+}
+
+package() {
+    cd ${srcdir}/build
+    make DESTDIR=${pkgdir} install
+    # link cert bundle to the one from ca-certificates
+    rm -f ${pkgdir}/usr/share/apps/kssl/ca-bundle.crt
+    ln -sf /etc/ssl/certs/ca-certificates.crt ${pkgdir}/usr/share/apps/kssl/ca-bundle.crt
+    # remove wastes of KDE SC, which does nothing on Plamsa
+    rm -rf ${pkgdir}/etc/xdg/menus
+}
