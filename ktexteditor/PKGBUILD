@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=ktexteditor
 pkgver=${KFVersion}
-pkgrel=2
+pkgrel=3
 pkgdesc='Advanced embeddable text editor'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/ktexteditor'
@@ -13,15 +13,18 @@ makedepends=("extra-cmake-modules>=${KFECMVersion}")
 groups=('kf5')
 options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
+        "git://anongit.kde.org/ktexteditor#branch=master" # We only need the syntax upadates here
         'pkgbuild-syntax-highlight.patch')
 sha256sums=( $(getSum ${pkgname})
-        'e4973d3c64a28de67f6736ecba76b473817974f610513783de5cd4b9cf5f06f1')
+        'SKIP'
+        '3ac25ae5f7a4956ae7bed6e79607a4ab5021875fd198fe348a1712db71a25b96')
 
 prepare() {
   mkdir -p build
-  
   cd ${pkgname}-${pkgver}
-  patch -p0 -i "${srcdir}"/pkgbuild-syntax-highlight.patch
+  rm -rfv src/syntax/data
+  cp -rv ${srcdir}/${pkgname}/src/syntax/data src/syntax
+  patch -Np1 -i "${srcdir}"/pkgbuild-syntax-highlight.patch
 }
 
 build() {
