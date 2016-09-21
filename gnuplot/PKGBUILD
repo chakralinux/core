@@ -1,49 +1,51 @@
-pkgname=gnuplot 
-pkgver=5.0.1
+# Forked from https://git.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/gnuplot&id=be5f1a375aaa550032e221adf954adfe5fea269c
+
+pkgname=gnuplot
+pkgver=5.0.4
 pkgrel=1
 pkgdesc="Plotting package which outputs to X11, PostScript, PNG, GIF, and others" 
 arch=('x86_64') 
 url="http://www.gnuplot.info" 
 license=('custom') 
-depends=('readline' 'gd' 'cairo' 'libjpeg' 'lua' 'qt5-svg' 'qt5-tools' 'gnutls') 
-makedepends=('texinfo' 'texlive-core' 'emacs-nox' 'texlive-latexextra') 
+depends=('readline' 'gd' 'cairo' 'libjpeg' 'lua' 'qt5-svg' 'qt5-tools' 'gnutls')
+makedepends=('texinfo' 'texlive-core' 'emacs-nox' 'texlive-latexextra')
 options=('!makeflags')
-install=gnuplot.install 
-source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz")
-sha1sums=('a66f5211d3eb8d382b8dd9bdf320b65cf1315a13')
+source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz"
+        "lua53_compat.patch")
+sha1sums=('3a616a1beca8e86662afcc9d368aad6847ed4e0f'
+          '9005fa9e4da91ceedb8ccd1d761866e7b064f8b1')
 
-build() {
-  cd $srcdir/$pkgname-$pkgver
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
-  # fix default source location; use the GDFONTPATH variable to modify at runtime 
+  # fix default source location; use the GDFONTPATH variable to modify at runtime
   sed -i 's|/usr/X11R6/lib/X11/fonts/truetype|/usr/share/fonts/TTF|' src/variable.c
 
   sed -i -e 's|/usr/X11R6/lib/X11/fonts/Type1|/usr/share/fonts/Type1|' \
   -e 's|$(X11ROOT)/X11R6/lib/X11/fonts/Type1|$(X11ROOT)/usr/share/fonts/Type1|' \
   src/variable.c
-  
-  # Fix our Qt complile option issue
-  sed -i 's+-fPIE+-fPIC+' configure
-  
+
+  patch -p1 < "$srcdir"/lua53_compat.patch
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CXXFLAGS="-std=c++11"
   ./configure --prefix=/usr \
               --libexecdir=/usr/bin \
               --with-gihdir=/usr/share/gnuplot \
               --with-readline=gnu \
-              --disable-wxwidgets
+              --disable-wxwidgets \
+              --with-bitmap-terminals
   make pkglibexecdir=/usr/bin
 }
 
-
 package() {
-  cd $srcdir/$pkgname-$pkgver
-  
-  msg "Installing core files"
-  make pkglibexecdir=/usr/bin DESTDIR="$pkgdir" install
-  
-  msg "Installing info files"
-  make pkglibexecdir=/usr/bin DESTDIR="$pkgdir" install-info
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make pkglibexecdir=/usr/bin DESTDIR="${pkgdir}" install install-info
 
-  install -Dm644 Copyright $pkgdir/usr/share/licenses/$pkgname/Copyright
+  install -Dm644 Copyright "${pkgdir}/usr/share/licenses/$pkgname/Copyright"
 
-  rm -f $pkgdir/usr/share/texmf-dist/ls-R
+  rm -f "${pkgdir}/usr/share/texmf-dist/ls-R"
 }

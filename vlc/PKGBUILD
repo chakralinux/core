@@ -2,7 +2,7 @@
 
 pkgname=vlc
 pkgver=2.2.4
-pkgrel=1
+pkgrel=2
 pkgdesc="A multi-platform MPEG, VCD/DVD, and DivX player"
 arch=('x86_64')
 url="http://www.videolan.org/vlc/"
@@ -53,24 +53,25 @@ backup=('usr/share/vlc/lua/http/.hosts'
 categories=('multimedia')
 options=('!emptydirs')
 install="vlc.install"
-source=("http://download.videolan.org/pub/videolan/${pkgname}/${pkgver/.a}/${pkgname}-${pkgver/.a/a}.tar.xz")
-sha1sums=('ec171b0ad731d9d114540cd7b7fcb41fc3293696')
+source=("http://download.videolan.org/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
+        "lua53_compat.patch")
+sha1sums=('ec171b0ad731d9d114540cd7b7fcb41fc3293696'
+          '5d7dba23756ff577a90b8631b187fbeac1f94e17')
 screenshot='http://images1.videolan.org/vlc/screenshots/0.9.2/screenshot-kde4.jpg'
 
 prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver/.a}"
-  
+  cd "${pkgname}-${pkgver}"
+
   sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
   sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
 
-  autoreconf -fi
+  patch -p1 < "${srcdir}/lua53_compat.patch"
 }
 
-
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver/.a}"
-  
+  cd "${pkgname}-${pkgver}"
   CFLAGS+=" -I/usr/include/samba-4.0" CPPFLAGS+=" -I/usr/include/samba-4.0" \
+  LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`" \
   ./configure --prefix=/usr \
               --sysconfdir=/etc \
               --disable-rpath \
@@ -85,17 +86,14 @@ build() {
               --enable-opus \
               --enable-sftp \
               --with-x
-              LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`"
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver/.a}"
-
+  cd "${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
-
   for res in 16 32 48 128; do
-    install -D -m644 "${srcdir}/vlc-${pkgver/.a}/share/icons/${res}x${res}/vlc.png" \
-        "${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png"
+    install -D -m644 "${srcdir}/vlc-${pkgver}/share/icons/${res}x${res}/vlc.png" \
+                     "${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png"
   done
 }
