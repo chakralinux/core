@@ -9,17 +9,15 @@ pkgbase=boost
 pkgname=('boost-libs' 'boost')
 pkgver=1.60.0
 _boostver=${pkgver//./_}
-pkgrel=1
+pkgrel=2
 pkgdesc="Free peer-reviewed portable C++ source libraries"
 arch=('x86_64')
 url="http://www.boost.org/"
 license=('custom')
-makedepends=('icu' 'python2' 'python3' 'bzip2' 'zlib' 'openmpi') 
+makedepends=('icu' 'python2' 'python3' 'bzip2' 'zlib') 
 source=("http://downloads.sourceforge.net/${pkgbase}/${pkgbase}_${_boostver}.tar.gz")
 sha1sums=('ac74db1324e6507a309c5b139aea41af624c8110')
 license=('custom')
-
-_stagedir="${srcdir}/stagedir"
 
 prepare() {
    cd "${srcdir}/${pkgbase}_${_boostver}"
@@ -27,6 +25,8 @@ prepare() {
 
 build() {
    cd "${srcdir}/${pkgbase}_${_boostver}"
+   _stagedir="${srcdir}/stagedir"
+
    local JOBS="$(sed -e 's/.*\(-j *[0-9]\+\).*/\1/' <<< ${MAKEFLAGS})"
 
    ./bootstrap.sh --with-toolset=gcc --with-icu --with-python=/usr/bin/python2
@@ -40,10 +40,6 @@ build() {
    # need to be the default.
    echo "using python : 3.5 : /usr/bin/python3 : /usr/include/python3.5m : /usr/lib ;" \
       >> project-config.jam
-
-
-   # Support for OpenMPI
-   echo "using mpi ;" >> project-config.jam
 
    # boostbook is needed by quickbook
    install -dm755 "${_stagedir}"/share/boostbook
@@ -78,7 +74,7 @@ package_boost() {
                'boost-build: to use boost jam for building your project.')
    options=('staticlibs')
 
-
+   _stagedir="${srcdir}/stagedir"
    install -dm755 "${pkgdir}"/usr
    cp -a "${_stagedir}"/{bin,include,share} "${pkgdir}"/usr
 
@@ -94,8 +90,8 @@ package_boost() {
 package_boost-libs() {
    pkgdesc="Free peer-reviewed portable C++ source libraries - Runtime"
    depends=('bzip2' 'zlib' 'icu')
-   optdepends=('openmpi: for mpi support')
 
+   _stagedir="${srcdir}/stagedir"
    install -d -m 755 "${pkgdir}"/usr
    cp -a "${_stagedir}"/lib "${pkgdir}"/usr
    rm -f "${pkgdir}"/usr/lib/*.a
