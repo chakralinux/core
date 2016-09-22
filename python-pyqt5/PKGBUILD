@@ -1,7 +1,7 @@
 pkgbase=pyqt5
 pkgname=('python-pyqt5-common' 'python3-pyqt5' 'python2-pyqt5')
 pkgver=5.7
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
 license=('GPL')
@@ -68,6 +68,10 @@ package_python-pyqt5-common(){
     # Provided by python3-pyqt5
     rm -r ${pkgdir}/usr/lib
     rm -r ${pkgdir}/usr/share/sip
+
+    mkdir "${pkgdir}/usr/bin"
+    cp pylupdate5 "${pkgdir}"/usr/bin/pylupdate5
+    cp pyrcc5 "${pkgdir}"/usr/bin/pyrcc5
 }
 
 package_python3-pyqt5(){
@@ -101,8 +105,8 @@ package_python3-pyqt5(){
     ln -s /usr/bin/pyuic5-3.5 "${pkgdir}"/usr/bin/pyuic5
 
     # Provided by python-pyqt5-common
-    rm "${pkgdir}"/usr/bin/{pylupdate5,pyrcc5}
     rm -r "${pkgdir}"/usr/share/qt5
+    rm "${pkgdir}"/usr/bin/{pylupdate5,pyrcc5}
 }
 
 package_python2-pyqt5(){
