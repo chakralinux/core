@@ -1,18 +1,18 @@
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=enblend-enfuse
-pkgver=4.1.4
+pkgver=4.2
 pkgrel=1
 pkgdesc="intelligent blend tool for overlapping picture"
 arch=("x86_64")
 license=('GPL')
 url="http://enblend.sourceforge.net"
-depends=('glew' 'libxmi' 'freeglut' 'libgl' 'lcms2' 
-         'texinfo' 'libpng' 'boost-libs' 'vigra' 'openexr' 'gsl')
-makedepends=('boost' 'mesa' 'help2man')
-install=${pkgname}.install
+depends=('vigra' 'lcms2' 'gsl')
+makedepends=('libtiff'  'openexr' 'libgl' 'glu' 'boost' 
+             # to build the docs
+             'texlive-latexextra' 'texlive-htmlxml' 'help2man')
 source=("http://downloads.sourceforge.net/sourceforge/enblend/${pkgname}-${pkgver}.tar.gz")
-md5sums=('51abb1add90786ed64ec261778b31647')
+md5sums=('e26751f393862cecfd1a113003787001')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -24,6 +24,4 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  install -D -m644 doc/enblend.info "${pkgdir}/usr/share/info/enblend.info"
-  install -D -m644 doc/enfuse.info "${pkgdir}/usr/share/info/enfuse.info"
 }
