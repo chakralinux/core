@@ -1,5 +1,8 @@
 pkgname=vc
-pkgver=1.2.0
+# WARNING: Do not upgrade until pigments (a Calligra library) supports a newer version. See:
+# https://bugs.kde.org/show_bug.cgi?id=356204
+epoch=2
+pkgver=0.7.5
 pkgrel=1
 pkgdesc="A library to ease explicit vectorization of C++ code"
 url='http://code.compeng.uni-frankfurt.de/projects/vc/'
@@ -7,7 +10,7 @@ arch=('x86_64')
 license=('BSD')
 makedepends=('cmake')
 source=("https://github.com/VcDevel/Vc/releases/download/${pkgver}/Vc-${pkgver}.tar.gz")
-md5sums=('f2a213ae4bad0dcf4ec6469e4dad41c1')
+md5sums=('59854e2381b78d602b4a00e459e3d333')
  
 build() {
   mkdir -p build && cd build
@@ -15,6 +18,11 @@ build() {
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_BUILD_TYPE=Release
   make
+}
+
+check() {
+  cd build
+  make test
 }
 
 package() {
