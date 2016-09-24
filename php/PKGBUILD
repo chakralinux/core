@@ -22,11 +22,11 @@ pkgname=('php'
          'php-tidy'
          'php-xsl')
 pkgver=7.0.11
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 license=('PHP')
 url='http://www.php.net'
-makedepends=('apache' 'aspell' 'imap' 'db' 'enchant' 'gd' 'gmp' 'icu' 'libmcrypt' 'libxslt' 'libzip' 'net-snmp'
+makedepends=('apache' 'aspell' 'imap' 'db' 'enchant' 'gd' 'gmp' 'icu' 'libmcrypt' 'libxpm' 'libxslt' 'libzip' 'net-snmp'
              'postgresql-libs' 'sqlite3' 'systemd' 'tidyhtml' 'unixodbc' 'curl' 'libtool' 'postfix' 'freetds')
 checkdepends=('procps-ng')
 source=("http://www.php.net/distributions/${pkgbase}-${pkgver}.tar.xz"{,.asc}
@@ -229,7 +229,7 @@ package_php-fpm() {
 
 package_php-embed() {
 	pkgdesc='Embedded PHP SAPI library'
-	depends=('php' 'libsystemd')
+	depends=('php' 'systemd')
 	options=('!emptydirs')
 
 	cd ${srcdir}/build
@@ -261,7 +261,7 @@ package_php-enchant() {
 
 package_php-gd() {
 	pkgdesc='gd module for PHP'
-	depends=('php' 'gd')
+	depends=('php' 'gd' 'libxpm')
 
 	install -D -m755 ${srcdir}/build/modules/gd.so ${pkgdir}/usr/lib/php/modules/gd.so
 }
