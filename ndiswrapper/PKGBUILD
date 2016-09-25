@@ -1,13 +1,10 @@
-# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
-
-_extramodules=extramodules-4.5-CHAKRA
-_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.5.7
-_rootOfSourceTree=/usr/lib/modules/${_kver}/build
+# Source global configuration
+source ../linux.conf
 
 pkgname=ndiswrapper
-pkgver=1.59
-pkgrel=23
+_commit=d3ffd3008d4e0d696b0efad2d079b2339dfd9178
+pkgver=1.60
+pkgrel=1
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
@@ -19,38 +16,29 @@ provides=("ndiswrapper-utils=$pkgver")
 replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
-source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
-        "ndiswrapper-1.59.patch"
-        "kernel-4.0.patch" "kernel-4.2.patch")
-
-sha1sums=('75fbbda677fe91ee07a6f6a8e19b1f3e2479540f'
-          'f120e96fa9abab45e1c724aaac29da7b892820f0'
-          'aa8c9279d53a3b2762a4e504bcde68c38aa3ce58'
-          '2af212edfdf647c03823845504b17931a9f19921')
+source=("git+https://github.com/pgiri/ndiswrapper.git#commit=$_commit")
+sha1sums=('SKIP')
 
 prepare() {
   [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
   msg "Found kernel version: $_kver"
 
-  cd "$srcdir/$pkgname-$pkgver" 
-  patch -p1 -i ../ndiswrapper-1.59.patch
-  patch -p1 -i ../kernel-4.0.patch
-  patch -p1 -i ../kernel-4.2.patch
+  cd "$srcdir/$pkgname/$pkgname"
 
   sed -i -e 's|strnicmp|strncasecmp|' driver/ndis.c
   sed -i "/modinfo/s/s/usr\//" driver/Makefile
 }
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"        
+  cd "$srcdir/$pkgname/$pkgname"
   make -C driver KVERS_UNAME=${_kver}
   make -C utils
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/$pkgname/$pkgname"
 
-  make sbindir=/usr/sbin usrsbindir=/usr/sbin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
+  make sbindir=usr/sbin usrsbindir=usr/bin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
         KVERS=$_kver DESTDIR="$pkgdir/" install
 
   sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
