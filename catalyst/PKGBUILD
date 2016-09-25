@@ -1,10 +1,4 @@
-#
-# Chakra Packages for Chakra, part of chakraos.org
-#
-
-_extramodules=extramodules-4.5-CHAKRA
-_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.5.7
+source ../linux.conf
 
 pkgname=(catalyst chd-catalyst)
 pkgver=15.9
@@ -30,6 +24,8 @@ source=(http://www2.ati.com/drivers/linux/amd-catalyst-${pkgver}-linux-installer
         4.3-gentoo-mtrr.patch
         4.3-kolasa-seq_printf.patch
         4.4-manjaro-xstate.patch
+        4.6-arch-get_user_pages-page_cache_release.patch
+        4.7-arch-cpu_has_pge-v2.patch
         grsec_arch.patch
         fglrx_supported)
 md5sums=('d2de2df6946b452c266a3c892e6e46ff'
@@ -42,6 +38,8 @@ md5sums=('d2de2df6946b452c266a3c892e6e46ff'
          '98828e3eeaec2b3795e584883cc1b746'
          '0e0666e95d1d590a7a83192805679485'
          'd9bea135ae3e1b3ca87c5bbe6dcf8e72'
+         '11b7c2e0dc4794801005d66b0e7608a3'
+         '37eef5103a11d8136979463e7bc31091'
          '8941e91fc58cb44ce21ab9bda135754e'
          '96f6cc8332e5745b25bbf80b0daa6baf')
 
@@ -71,6 +69,8 @@ build() {
       patch -Np1 -i ../fglrx_gpl_symbol.patch
       patch -Np1 -i ../4.4-manjaro-xstate.patch
       patch -Np1 -i ../grsec_arch.patch
+      patch -Np1 -i ../4.6-arch-get_user_pages-page_cache_release.patch
+      patch -Np1 -i ../4.7-arch-cpu_has_pge-v2.patch
     
     cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
     cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a" . 
