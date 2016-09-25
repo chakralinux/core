@@ -1,11 +1,8 @@
-#
-# Chakra Packages for Chakra, part of chakraos.org
+# Source global configuration
+source ../linux.conf
 
-_extramodules=extramodules-4.5-CHAKRA
-_kernelver=4.5.7
-
-pkgname=('nvidia' 'chd-nvidia') # 'nvidia-dkms') Maybe we don't need dkms module
-pkgver=367.27
+pkgname=('nvidia' 'chd-nvidia') # 'nvidia-dkms') # Maybe we don't need dkms module
+pkgver=367.44
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
@@ -20,7 +17,7 @@ _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
 #source+=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
 sha1sums=('bdb063bbd03eed9fa718664ef2023fd759efe4a3'
-          '5b0ce9507f09d68af5c557a062868368cd096d00')
+          '888eb578499befc48e451001886db3c10a0a39b1')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
@@ -43,7 +40,6 @@ prepare() {
 }
 
 build() {
-    _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
     cd "${_pkg}/kernel"
     make SYSSRC=/usr/lib/modules/"${_kver}/build" module
 }
@@ -75,16 +71,3 @@ package_chd-nvidia() {
     sh -e "${srcdir}/nvidia_supported_new" README.txt kernel/nv-kernel.o \
         > "${pkgdir}/opt/chakra/hwdb/hw_nvidia_hwdb"
 }
-
-#package_nvidia-dkms() {
-#    pkgdesc="NVIDIA driver sources for linux"
-#    depends=('dkms' "nvidia-utils=$pkgver" 'nvidia-libgl')
-#    optdepends=('linux-headers: Build the module for kernel'
-#                'linux-lts-headers: Build the module for LTS kernel')
-#    conflicts+=('nvidia')
-#
-#    cd ${_pkg}
-#    install -dm 755 "${pkgdir}"/usr/{lib/modprobe.d,src}
-#    cp -dr --no-preserve='ownership' kernel-dkms "${pkgdir}/usr/src/nvidia-${pkgver}"
-#    echo 'blacklist nouveau' > "${pkgdir}/usr/lib/modprobe.d/nvidia.conf"
-#}
