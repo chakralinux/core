@@ -1,8 +1,5 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
-
-_extramodules=extramodules-4.5-CHAKRA
-_kver="$(cat /usr/lib/modules/${_extramodules}/version)"
-_kernelver=4.5.7
+source ../linux.conf
 
 pkgname=('nvidia-340xx' 'chd-nvidia-340xx')
 pkgver=340.96
@@ -12,13 +9,15 @@ url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 source=("http://git.chakraos.org/chakra-hardware-detection.git/blob_plain/HEAD:/hwdb/nvidia_supported"
-        'nv-drm.patch')
+        'nv-drm.patch'
+        'linux-4.6.patch')
 
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
          '79671a27131da619a33eb02ed0c2c031'
+         '1f2baa65fd351ae7a2fc3dfd71ffcbfe'
          '7bdbcee13bade63227933d9217571882')
 
 prepare() {
@@ -26,6 +25,7 @@ prepare() {
     cd "${_pkg}"
     # patches here
     patch -p0 -i ../nv-drm.patch
+    patch -p1 --no-backup-if-mismatch -i ../linux-4.6.patch
 }
 
 build() {
