@@ -7,12 +7,14 @@ pkgdesc='Plasma applet for audio volume management using PulseAudio'
 arch=(x86_64)
 url='https://projects.kde.org/plasma-pa'
 license=(LGPL)
-depends=(plasma-workspace pulseaudio)
+depends=(plasma-workspace pulseaudio libcanberra gconf)
 makedepends=(extra-cmake-modules python3 kdoctools)
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname}) 
+             'SKIP' )
+validpgpkeys=(${Pvalidpgpkeys})
 
 prepare() {
   mkdir -p build

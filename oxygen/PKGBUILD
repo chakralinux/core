@@ -11,8 +11,10 @@ url='https://projects.kde.org/projects/kde/workspace/oxygen'
 license=('LGPL')
 makedepends=('frameworkintegration' 'extra-cmake-modules' 'kdoctools' 'kdelibs' 'automoc4' 'kdecoration' 'kwin')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n 1) )
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname} | head -n 1) 
+             'SKIP' )
+validpgpkeys=(${Pvalidpgpkeys})
 
 prepare() {
   mkdir -p build{,-kde4}

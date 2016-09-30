@@ -14,8 +14,10 @@ replaces=('polkit-kde-agent-frameworks')
 conflicts=('polkit-kde-agent-frameworks')
 provides=('polkit-kde-agent-frameworks')
 makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
-source=("${PServer}/${pkgver}/${_pkgname}-${PVersion}.tar.xz")
-sha256sums=( $(getSum ${_pkgname}) )
+source=("${PServer}/${pkgver}/${_pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${_pkgname}) 
+             'SKIP' )
+validpgpkeys=(${Pvalidpgpkeys})
 
 prepare() {
   cd ${srcdir}/${_pkgname}-${pkgver}

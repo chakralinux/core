@@ -11,8 +11,10 @@ url='https://projects.kde.org/projects/kde/workspace/breeze'
 license=('LGPL')
 makedepends=('extra-cmake-modules' 'frameworkintegration' 'kdecoration' 'kdelibs' 'automoc4' 'kcmutils' 'plasma-framework')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgbase}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgbase} | head -n 1))
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgbase} | head -n 1) 
+             'SKIP' )
+validpgpkeys=(${Pvalidpgpkeys})
 
 prepare() {
   mkdir -p build{,-kde4}

@@ -19,8 +19,10 @@ replaces=('kdeplasma-addons-kf5')
 provides=('kdeplasma-addons-kf5')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname}) 
+             'SKIP' )
+validpgpkeys=(${Pvalidpgpkeys})
 install=${pkgname}.install
 
 prepare() {

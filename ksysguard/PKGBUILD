@@ -12,8 +12,11 @@ depends=('knewstuff' 'libksysguard' 'lm_sensors' 'xdg-utils' 'hicolor-icon-theme
 makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n 1) )
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname} | head -n 1)
+             'SKIP' )
+validpgpkeys=(${Pvalidpgpkeys})
+
 install=${pkgname}.install
 
 prepare() {

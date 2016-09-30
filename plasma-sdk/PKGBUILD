@@ -23,8 +23,10 @@ depends=('qt5-base' 'qt5-svg' 'qt5-webkit' 'qt5-xmlpatterns'
 makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname}) 
+             'SKIP' )
+validpgpkeys=(${Pvalidpgpkeys})
 
 prepare() {
   mkdir -p build

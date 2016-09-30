@@ -13,10 +13,12 @@ depends=('kwallet')
 makedepends=('extra-cmake-modules' 'python3')
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PSubVersion}.tar.xz"
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig}
         "$pkgname.sh")
 sha256sums=( $(getSum ${pkgname}) 
-            'cba50feec8b0d058d0967407e79573b225c53dc1fe5461b3b2ddfbfbb2aff809')
+             'SKIP'
+             'cba50feec8b0d058d0967407e79573b225c53dc1fe5461b3b2ddfbfbb2aff809' )
+validpgpkeys=(${Pvalidpgpkeys})
 
 prepare() {
   mkdir -p build

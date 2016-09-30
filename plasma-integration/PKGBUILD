@@ -11,8 +11,10 @@ depends=(kio kwayland libxcursor ttf-noto ttf-oxygen breeze)
 makedepends=("extra-cmake-modules>=${KFECMVersion}" python3)
 options=("debug")
 groups=('plasma')
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname}) 
+             'SKIP' )
+validpgpkeys=(${Pvalidpgpkeys})
 
 prepare() {
   mkdir -p build
