@@ -1,0 +1,73 @@
+Make system tray icon sizes configurable by the user.
+See also Bug #364431 https://bugs.kde.org/show_bug.cgi?id=364431
+See also Bug #365570 https://bugs.kde.org/show_bug.cgi?id=365570
+
+diff --git a/applets/systemtray/package/contents/ui/ConfigGeneral.qml b/applets/systemtray/package/contents/ui/ConfigGeneral.qml
+index 4fcfcf6..ec6885b 100644
+--- a/applets/systemtray/package/contents/ui/ConfigGeneral.qml
++++ b/applets/systemtray/package/contents/ui/ConfigGeneral.qml
+@@ -42,5 +42,6 @@ Item {
+     property alias cfg_hardwareControlShown: hardwareControl.checked
+     property alias cfg_miscellaneousShown: miscellaneous.checked
++    property alias cfg_iconSize: iconSize.value
+     property var cfg_extraItems: []
+
+     SystemPalette {
+@@ -52,6 +54,39 @@ Item {
+
+         PlasmaExtras.Heading {
+             level: 2
++            text: i18n("Icon Size")
++            color: palette.text
++        }
++        Item {
++            width: height
++            height: units.gridUnit / 2
++        }
++        QtLayouts.RowLayout {
++            visible: !isPopup || viewMode.currentIndex === 1
++            QtControls.Label {
++                text: i18n("Size:")
++            }
++            QtControls.Label {
++                text: i18n("Small")
++            }
++            QtControls.Slider {
++                id: iconSize
++                minimumValue: 0
++                maximumValue: 5
++                stepSize: 1
++                tickmarksEnabled: true
++            }
++            QtControls.Label {
++                text: i18n("Large")
++            }
++        }
++
++        Item {
++            width: height
++            height: units.gridUnit
++        }
++        PlasmaExtras.Heading {
++            level: 2
+             text: i18n("Categories")
+             color: palette.text
+         }
+diff --git a/applets/systemtray/package/contents/ui/main.qml b/applets/systemtray/package/contents/ui/main.qml
+index a66ea69..d0a1e04 100644
+--- a/applets/systemtray/package/contents/ui/main.qml
++++ b/applets/systemtray/package/contents/ui/main.qml
+@@ -22,5 +22,6 @@ import QtQuick 2.5
+ import org.kde.plasma.core 2.0 as PlasmaCore
+ import org.kde.plasma.plasmoid 2.0
++import "IconSizeTools.js" as IconSizeTools
+ import "items"
+
+ MouseArea {
+@@ -34,4 +35,4 @@ MouseArea {
+     property bool vertical: plasmoid.formFactor == PlasmaCore.Types.Vertical
+-    property int itemSize: units.roundToIconSize(Math.min(Math.min(width, height), units.iconSizes[iconSizes[plasmoid.configuration.iconSize]]))
+-    property int hiddenItemSize: units.iconSizes.smallMedium
++    property int itemSize: units.roundToIconSize(Math.min(Math.min(width, height), IconSizeTools.iconSizeFromTheme(plasmoid.configuration.iconSize)))
++    property int hiddenItemSize: Math.min(units.iconSizes.large, IconSizeTools.iconSizeFromTheme(plasmoid.configuration.iconSize))
+     property alias expanded: dialog.visible
