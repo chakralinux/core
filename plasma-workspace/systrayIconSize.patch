@@ -2,6 +2,31 @@ Make system tray icon sizes configurable by the user.
 See also Bug #364431 https://bugs.kde.org/show_bug.cgi?id=364431
 See also Bug #365570 https://bugs.kde.org/show_bug.cgi?id=365570
 
+diff --git a/applets/systemtray/package/contents/code/IconSizeTools.js b/applets/systemtray/package/contents/code/IconSizeTools.js
+new file mode 100644
+index 0000000..7d06349
+--- /dev/null
++++ b/applets/systemtray/package/contents/code/IconSizeTools.js
+@@ -0,0 +1,5 @@
++var iconSizes = new Array("small", "smallMedium", "medium", "large", "huge", "enormous");
++
++function iconSizeFromTheme(size) {
++    return units.iconSizes[iconSizes[size]];
++}
+diff --git a/applets/systemtray/package/contents/config/main.xml b/applets/systemtray/package/contents/config/main.xml
+index 65a7029..f0defc3 100644
+--- a/applets/systemtray/package/contents/config/main.xml
++++ b/applets/systemtray/package/contents/config/main.xml
+@@ -45,6 +45,9 @@
+     <entry name="knownItems" type="StringList">
+       <default></default>
+     </entry>
++    <entry name="iconSize" type="Int">
++      <default>2</default>
++    </entry>
+   </group>
+
+ </kcfg>
 diff --git a/applets/systemtray/package/contents/ui/ConfigGeneral.qml b/applets/systemtray/package/contents/ui/ConfigGeneral.qml
 index 4fcfcf6..ec6885b 100644
 --- a/applets/systemtray/package/contents/ui/ConfigGeneral.qml
