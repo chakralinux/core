@@ -9,7 +9,7 @@
 pkgname=('llvm' 'llvm-libs' 'llvm-ocaml' 'lldb' 'clang' 'clang-analyzer'
          'clang-tools-extra')
 pkgver=3.9.0
-pkgrel=1
+pkgrel=3
 _ocaml_ver=4.03.0
 arch=('x86_64')
 url="http://llvm.org/"
@@ -98,6 +98,7 @@ package_llvm() {
   # The runtime libraries go into llvm-libs
   mv -f "$pkgdir"/usr/lib/lib{LLVM,LTO}.so* "$srcdir"
   mv -f "$pkgdir"/usr/lib/LLVMgold.so "$srcdir"
+  mv -f "$pkgdir"/usr/lib/libLLVM-3.9*.so "$srcdir"
 
   # OCaml bindings go to a separate package
   rm -rf "$srcdir"/ocaml.{lib,doc}
@@ -124,6 +125,7 @@ package_llvm-libs() {
   cp -P \
     "$srcdir"/lib{LLVM,LTO}.so* \
     "$srcdir"/LLVMgold.so \
+    "$srcdir"/libLLVM-3.9*.so \
     "$pkgdir/usr/lib/"
 
   # Symlink LLVMgold.so from /usr/lib/bfd-plugins
