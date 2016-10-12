@@ -1,6 +1,5 @@
-pkgbase=ttf-noto
-pkgname=('ttf-noto' 'otf-noto')
-pkgver=20150929
+pkgname=ttf-noto
+pkgver=20161012
 pkgrel=1
 pkgdesc="Google Noto TTF fonts"
 arch=('any')
@@ -8,17 +7,18 @@ url="http://www.google.com/get/noto"
 license=('apache')
 depends=(fontconfig)
 makedepends=()
+provides=('ttf-font' "${pkgname}-emoji")
+conflicts=("${pkgname}-emoji<${pkgver}")
+replaces=("${pkgname}-emoji<${pkgver}")
 source=("http://storage.googleapis.com/noto-website/pkgs/Noto-hinted.zip")
-md5sums=('70cb627abadc32f66de34cfb6f2a65db')
-install=${pkgbase}.install
+md5sums=('e8fd003b86f583b2b5bf9d679c1d424d')
+install=${pkgname}.install
+
+pkgver() {
+  date +%Y%m%d
+}
 
 package_ttf-noto() {
-    provides=('ttf-font')
-
-    mkdir -p "$pkgdir"/usr/share/fonts/TTF
+    install -dm755 "$pkgdir"/usr/share/fonts/TTF
     install -m644 *.ttf "$pkgdir"/usr/share/fonts/TTF
-}
-package_otf-noto() {
-    mkdir -p "$pkgdir"/usr/share/fonts/OTF
-    install -m644 *.otf "$pkgdir"/usr/share/fonts/OTF
 }
