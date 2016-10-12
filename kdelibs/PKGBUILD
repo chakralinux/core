@@ -1,16 +1,12 @@
-# Include global configuration
-source ../kdeapps.conf
-
 pkgname="kdelibs"
 arch=('x86_64')
-pkgver=${_libsver}
+pkgver=4.14.25
 pkgrel=1
 pkgdesc="KDE Core Libraries"
 url="http://www.kde.org"
 license=('GPL' 'LGPL' 'FDL')
 options=('!docs' 'debug')
-depends=("${_qtpkg}>=${_qtver}" 
-         'shared-mime-info' 'upower' 'udisks2' 'xz' 'enchant' 'jasper' 'openexr' 'giflib' 'strigi' 'libxtst'
+depends=('qt=4.8.7' 'shared-mime-info' 'upower' 'udisks2' 'xz' 'enchant' 'jasper' 'openexr' 'giflib' 'strigi' 'libxtst'
          'ca-certificates' 'xdg-utils' 'qca' 'polkit-qt4' 'libxss' 'phonon' 'shared-desktop-ontologies'
          'attica>=0.4.2' 'krb5' 'libxcursor' 'libutempter' 'hicolor-icon-theme' 'libdbusmenu-qt' 'grantlee' 
          'media-player-info' 'qtwebkit' 'systemd' 'pcre')
@@ -23,18 +19,14 @@ optdepends=('phonon-gstreamer: GStreamer Phonon backend (default)'
             'avahi:            Service discovery on your local network'
             'aspell:           Spell checking'
             'hspell:           Hebrew spell checking')
-provides=("${pkgname}=${_libsver}"
-          "kdelibs-doc")
-replaces=('kdelibs-experimental' 'arts' 'kdelibs-doc')
 groups=("kde" "kde-minimal" "kde-uninstall")
-conflicts=("kdelibs-doc")
 install=${pkgname}.install
-source=($_mirror/${pkgname}-$_libsver.tar.xz
+source=(http://download.kde.org/stable/applications/16.08.2/${pkgname}-${pkgver}.tar.xz
         01_chakra_tag.patch
         02_kde_applications_menu.patch
         03_chakra_menu.patch
         MergeDir.patch)
-sha256sums=('45e663e8739f131115eda69e5af95e895cce8161228d075d74a9a8cd390346ef'
+sha256sums=('ba5d3e893f492368e9ded2fe51cf419c5329524291a523b1974f9c86e3c02d02'
             '029e2d07c5fc8676d143b903aa181fc470e5b469d49ccf107e19031f562bf4e3'
             'b2d25c76081ea6bb31d90c4c6b619ce64ac36de3a6eefb2f9990d3dbf8cd9c91'
             '505e9e5e969be5094b3f713b865d5927cc3de1f4693915174732b20793228c4f'
@@ -81,4 +73,6 @@ package() {
     ln -sf /etc/ssl/certs/ca-certificates.crt ${pkgdir}/usr/share/apps/kssl/ca-bundle.crt
     # remove wastes of KDE SC, which does nothing on Plamsa
     rm -rf ${pkgdir}/etc/xdg/menus
+    rm -rfv ${pkgdir}/usr/share/kde4/services/qimageioplugins/
+    rm -rfv ${pkgdir}/usr/share/kde4/servicetypes/
 }
