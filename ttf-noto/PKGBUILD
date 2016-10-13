@@ -1,15 +1,12 @@
-pkgname=ttf-noto
-pkgver=20161012
+pkgbase=ttf-noto
+pkgname=('ttf-noto' 'otf-noto' 'ttf-noto-emoji')
+pkgver=20161013
 pkgrel=1
-pkgdesc="Google Noto TTF fonts"
 arch=('any')
 url="http://www.google.com/get/noto"
 license=('apache')
 depends=(fontconfig)
 makedepends=()
-provides=('ttf-font' "${pkgname}-emoji")
-conflicts=("${pkgname}-emoji<${pkgver}")
-replaces=("${pkgname}-emoji<${pkgver}")
 source=("http://storage.googleapis.com/noto-website/pkgs/Noto-hinted.zip")
 md5sums=('e8fd003b86f583b2b5bf9d679c1d424d')
 install=${pkgname}.install
@@ -18,7 +15,27 @@ pkgver() {
   date +%Y%m%d
 }
 
+prepare() {
+    mkdir ${srcdir}/emoji
+    mv *Emoji* emoji
+}
+
 package_ttf-noto() {
+    pkgdesc="Google Noto TTF fonts"
+    provides=('ttf-font')
+
     install -dm755 "$pkgdir"/usr/share/fonts/TTF
     install -m644 *.ttf "$pkgdir"/usr/share/fonts/TTF
+}
+
+package_otf-noto() {
+    pkgdesc="Google Noto CJK OTF fonts"
+    install -dm755 "$pkgdir"/usr/share/fonts/OTF
+    install -m644 *.otf "$pkgdir"/usr/share/fonts/OTF
+}
+
+package_ttf-noto-emoji() {
+    pkgdesc="Google Noto Emoji TTF fonts"
+    install -dm755 "$pkgdir"/usr/share/fonts/TTF
+    install -m644 ${srcdir}/emoji/*.ttf "$pkgdir"/usr/share/fonts/TTF
 }
