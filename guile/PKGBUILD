@@ -1,9 +1,6 @@
-# Maintainer: Francesco Marinucci <franzmari[at]chakra-project[dot]it>
-# contributor: almack <almack@chakraos.org>
-
 pkgname=guile
-pkgver=2.0.11
-pkgrel=5
+pkgver=2.0.13
+pkgrel=1
 pkgdesc="Guile is a portable, embeddable Scheme implementation written in C"
 url="http://www.gnu.org/software/guile/"
 arch=('x86_64')
@@ -11,19 +8,20 @@ license=('GPL')
 depends=('gmp' 'libltdl' 'ncurses' 'texinfo' 'libunistring' 'gc' 'libffi')
 install=guile.install
 source=(ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz)
-md5sums=('e532c68c6f17822561e3001136635ddd')
+md5sums=('dac267e76330176d48583258aeaa7016')
 
 build() {
   cd $pkgname-$pkgver
   ./configure --prefix=/usr \
     --disable-static \
     --disable-silent-rules \
+    --disable-error-on-warning \
     --with-threads
-  make -j1
+  make
 }
 
 package() {
   make -C $pkgname-$pkgver DESTDIR="$pkgdir" install
   install -D -dm755 "$pkgdir"/usr/share/gdb/auto-load/usr/lib
-  mv "$pkgdir"/usr/lib/libguile-2.0.so.22.7.2-gdb.scm "$pkgdir"/usr/share/gdb/auto-load/usr/lib
+  mv "$pkgdir"/usr/lib/libguile-2.0.so.*-gdb.scm "$pkgdir"/usr/share/gdb/auto-load/usr/lib
 }
