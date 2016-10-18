@@ -1,6 +1,7 @@
+# Contributor: ahjolinna <@yahoo.com>
 
 pkgname=plymouth
-pkgver=0.9.2
+pkgver=0.9.2.90.e4b7e495
 pkgrel=1
 pkgdesc="A graphical boot splash screen with kernel mode-setting support"
 url="http://www.freedesktop.org/wiki/Software/Plymouth/"
@@ -9,7 +10,7 @@ arch=('x86_64')
 license=('GPL')
 
 depends=('libdrm' 'pango' 'systemd')
-makedepends=('docbook-xsl')
+makedepends=('git' 'docbook-xsl')
 optdepends=('ttf-dejavu')
 
 options=('!libtool' '!emptydirs')
@@ -18,41 +19,46 @@ provides=('plymouth')
 conflicts=('plymouth-git')
 backup=('etc/plymouth/plymouthd.conf')
 
-source=("http://www.freedesktop.org/software/${pkgname}/releases/${pkgname}-${pkgver}.tar.bz2"
+_gitsha='e4b7e495'
+source=("git://anongit.freedesktop.org/plymouth#commit=${_gitsha}"
         'chakra-logo.png'
-	'plymouth.encrypt_hook'
-	'plymouth.encrypt_install'
-	'plymouth-start.service'
-	'plymouth-start.path'
-	'plymouth.initcpio_hook'
-	'plymouth.initcpio_install'
-	'plymouth-quit.service.in.patch'
-	'plymouth-set-default-theme.in.patch'
-	'plymouth-update-initrd.patch')
+        'plymouth.encrypt_hook'
+        'plymouth.encrypt_install'
+        'sddm-plymouth.service'
+        'plymouth.initcpio_hook'
+        'plymouth.initcpio_install'
+        'sd-plymouth.initcpio_install'
+        'plymouth-set-default-theme.in.patch'
+        'plymouth-quit.service.in.patch'
+        'plymouth-update-initrd.patch'
+        'plymouthd.conf')
 
-md5sums=('ff420994deb7ea203df678df92e7ab7d'
-         'ea55756c8ee1f38c3017043d7036c409'
-         'fbdd5d04e3089a214b9056357434df86'
-         '65eb269910f1b81e3f0970af456394ca'
-         '78340207f7391c682601b1b36baed14d'
-         '672ad913e2383483bcb4599a0a6bee48'
-         '32f04fdbd1eb94ade30d1e63fdcdd9b5'
-         '763785c26c6429a755d7b08798de2178'
-         '165a39dbedcc6e123c8ca05d5b4b2e25'
-         'f79edbbb30c71b0dbcd102c7dd31660b'
-         '0357775c16b5f90f1af485e6a4c80a9e')
+sha256sums=('SKIP'
+            '17ba688027bad20e888f703fef33f2460be4cd4426dd2d5291f9126c71cfceb2'
+            'cbfb5bcb6897703e088eefdee9d578f75d987116becafecbb2018b283ba3865e'
+            '544399d4f3454644f24ad11e504eaa7d622c73942728f52fb55bea054c756fa1'
+            '62be126971068eb6138674f797dc9cfce4dc59371d31ff5388cd8de2b1cb397e'
+            'd349b30832ff84ea7e4b86265efd5d08f8ff00e9153f05f41c8e8b49addf321c'
+            'b0467b7c490539470f726358e5d0c72951efd58d268a2d16411dafacba68041a'
+            'f434dd9cc96c3cec470aedb7734663cd3e04ffa34eff2bea92708f966132a2da'
+            'b7ce99519c4ecbd582ac4b2ee873c56424c6eee4d32ba8b0074798f4c23a12df'
+            'fc900a0c330b9bcbf84afaa6575d9df392c4e8c2ea699b72dc9a137f4972de49'
+            'bb597e2ced7c3beca8c9e9f212bc001750746d9b41e00071697a0352ec2a2e27'
+            '4e28ed8a22dd722f939f788283edde6a6310985c2060c1fd9562ed5b72f6b5ae')
 
 prepare() {
-	cd "$srcdir"/${pkgname}-${pkgver}
-	patch -p1 -i $srcdir/plymouth-set-default-theme.in.patch
-	patch -p1 -i $srcdir/plymouth-update-initrd.patch
-	patch -p1 -i $srcdir/plymouth-quit.service.in.patch
+        cd plymouth
+
+        patch -p1 -i $srcdir/plymouth-set-default-theme.in.patch
+        patch -p1 -i "$srcdir"/plymouth-update-initrd.patch
+        patch -p1 -i "$srcdir"/plymouth-quit.service.in.patch
 }
 
 build() {
-	cd "$srcdir"/${pkgname}-${pkgver}
-	
-	LDFLAGS="$LDFLAGS -ludev" ./configure --prefix=/usr \
+	cd ${pkgname%-*}
+
+	LDFLAGS="$LDFLAGS -ludev" ./autogen.sh \
+		--prefix=/usr \
 		--exec-prefix=/usr \
 		--sysconfdir=/etc \
 		--localstatedir=/var \
@@ -76,19 +82,22 @@ build() {
 }
 
 package() {
-  cd "$srcdir"/${pkgname}-${pkgver}
+	cd plymouth
 
-  make DESTDIR="$pkgdir" install
+	make DESTDIR="$pkgdir" install
 
-  install -Dm644 "$srcdir/chakra-logo.png"             "$pkgdir/usr/share/plymouth/chakra-logo.png"
+	install -Dm644 "$srcdir"/chakra-logo.png "$pkgdir"/usr/share/plymouth/arch-logo.png
 
-  install -Dm644 "$srcdir/plymouth.encrypt_hook"     "$pkgdir/usr/lib/initcpio/hooks/plymouth-encrypt"
-  install -Dm644 "$srcdir/plymouth.encrypt_install"  "$pkgdir/usr/lib/initcpio/install/plymouth-encrypt"
-  install -Dm644 "$srcdir/plymouth.initcpio_hook"    "$pkgdir/usr/lib/initcpio/hooks/plymouth"
-  install -Dm644 "$srcdir/plymouth.initcpio_install" "$pkgdir/usr/lib/initcpio/install/plymouth"
- 
-  install -Dm644 "$srcdir/plymouth-start.service" "$pkgdir/usr/lib/systemd/system/plymouth-start.service"
-  install -Dm644 "$srcdir/plymouth-start.path" "$pkgdir/usr/lib/systemd/system/plymouth-start.path"
-  install -Dm644 "$pkgdir/usr/share/plymouth/plymouthd.defaults" "$pkgdir/etc/plymouth/plymouthd.conf"
+	install -Dm644 "$srcdir"/plymouth.encrypt_hook "$pkgdir"/usr/lib/initcpio/hooks/plymouth-encrypt
+	install -Dm644 "$srcdir"/plymouth.initcpio_hook "$pkgdir"/usr/lib/initcpio/hooks/plymouth
+	install -Dm644 "$srcdir"/plymouth.encrypt_install "$pkgdir"/usr/lib/initcpio/install/plymouth-encrypt
+	install -Dm644 "$srcdir"/plymouth.initcpio_install "$pkgdir"/usr/lib/initcpio/install/plymouth
+	install -Dm644 "$srcdir"/sd-plymouth.initcpio_install "$pkgdir"/usr/lib/initcpio/install/sd-plymouth
+
+	install -dm755 "$pkgdir"/usr/lib/systemd/system
+	install -m644 "$srcdir"/sddm-plymouth.service "$pkgdir"/usr/lib/systemd/system
+
+	ln -s '../systemd-ask-password-plymouth.path' "$pkgdir"/usr/lib/systemd/system/sysinit.target.wants/systemd-ask-password-plymouth.path
+
+	install -Dm644 "$srcdir"/plymouthd.conf "$pkgdir"/etc/plymouth/plymouthd.conf
 }
-
