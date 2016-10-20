@@ -2,7 +2,7 @@
 
 pkgname=sddm
 pkgver=0.14.0
-pkgrel=1
+pkgrel=2
 pkgdesc='QML based X11 and Wayland display manager'
 arch=('x86_64')
 url='http://github.com/sddm/sddm'
@@ -17,12 +17,23 @@ backup=('usr/share/sddm/scripts/Xsetup'
         'etc/sddm.conf'
         'etc/pam.d/sddm')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/${pkgname}/${pkgname}/archive/v${pkgver}.tar.gz"
+        sddm-fix-avatars.patch::"https://github.com/sddm/sddm/commit/ecb903e4.patch"
         'sddm.conf')
 md5sums=('393fbed2f2e9d030e1717949867e96c8'
-         '7651ef1f651b0bef23b08edb58039d97')
-         
+         'f929c400807144f3bc53d8ed6ed74f21'
+         'cff07724e92a3e44fcf1c680d0be425b')
+
+prepare() {
+  [[ -e build ]] && rm -rf build
+  mkdir -p build
+
+  # Fix displaying avatars
+  cd $pkgname-$pkgver
+  patch -p1 -i ../sddm-fix-avatars.patch
+}
+
 build() {
-  mkdir -p build && cd build
+  cd build
   cmake ../${pkgname}-${pkgver} \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DCMAKE_BUILD_TYPE=Release \
