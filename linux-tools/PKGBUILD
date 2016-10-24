@@ -37,17 +37,13 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/linux-${pkgver}.tar.xz"
         'cpupower.systemd'
         'cpupower.service'
         'usbipd.service'
-        '01-cpupower-governor-fix.patch'
-        '02-archlinux-paths.patch'
-        '04-fix-usip-h-path.patch')
-md5sums=('8275cc42f3ba2e82aeca975766f262fb'
+        '01-cpupower-governor-fix.patch')
+md5sums=('6a382a6b4fd6fd1695ac9a51a353ef41'
          '56883c159381ba89e50ab8ea65efec77'
          '7e0710c2f31c1eb1e1417a7972e676b1'
          '2450e8ff41b30eb58d43b5fffbfde1f4'
          'bb35634f480325a78b943f7e10165e86'
-         '33c871519adfd4e5575643c4579d019b'
-         '1bc4f8c7a21a30e1a873d07e69fb698b'
-         'a73ea3ea6d9c9ecb1cc910871eead3ff')
+         '33c871519adfd4e5575643c4579d019b')
 
 prepare() {
   cd linux-${pkgver}
@@ -69,10 +65,11 @@ build() {
 
   msg2 'perf'
   pushd linux-${pkgver}/tools/perf
-  make \
-    WERROR=0 \
-    DESTDIR="$pkgdir/usr" \
-    perfexecdir='lib/perf' \
+  make -f Makefile.perf \
+    prefix=/usr \
+    lib=lib/perf \
+    perfexecdir=lib/perf \
+    NO_SDT=1 \
     PYTHON=python2 \
     PYTHON_CONFIG=python2-config \
     PERF_VERSION=$pkgver-$pkgrel \
@@ -148,18 +145,22 @@ package_perf() {
   optdepends=('gtk2: support GTK2 browser for perf report')
 
   cd linux-${pkgver}/tools/perf
-  make \
-    WERROR=0 \
-    DESTDIR="$pkgdir/usr" \
-    perfexecdir='lib/perf' \
+  make -f Makefile.perf \
+    prefix=/usr \
+    lib=lib/perf \
+    perfexecdir=lib/perf \
+    NO_SDT=1 \
     PYTHON=python2 \
     PYTHON_CONFIG=python2-config \
     PERF_VERSION=$pkgver-$pkgrel \
+    DESTDIR="$pkgdir" \
     install install-man
-  # move completion in new directory
   cd "$pkgdir"
-  install -Dm644 usr/etc/bash_completion.d/perf usr/share/bash-completion/completions/perf
-  rm -r usr/etc
+  # move completion in new directory
+  install -Dm644 etc/bash_completion.d/perf usr/share/bash-completion/completions/perf
+  rm -r etc
+  # no exec on usr/share
+  find usr/share -type f -exec chmod a-x {} \;
 }
 
 package_cpupower() {
