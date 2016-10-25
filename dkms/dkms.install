@@ -8,6 +8,11 @@ post_upgrade() {
 ===> dkms startup config file moved to /etc/default/dkms
 EOF
     fi
+  post_install
 }
 
+post_install() {
+  systemctl enable dkms.service
+  systemctl start dkms.service
+}
 # vim:set ts=2 sw=2 ft=sh et:
