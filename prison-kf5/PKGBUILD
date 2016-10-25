@@ -5,7 +5,8 @@
 source ../frameworks.conf
 
 pkgname=prison-kf5
-pkgver=1.1.1.r24.g84724fa
+pkgver=5.25.0.git20160814
+_commit=f109d48
 pkgrel=1
 arch=('x86_64')
 pkgdesc="A barcode api to produce QRCode barcodes and DataMatrix barcode"
@@ -14,13 +15,8 @@ license=('GPL' 'LGPL' 'FDL')
 makedepends=('cmake' 'extra-cmake-modules')
 depends=('qt5-base' 'libdmtx' 'qrencode')
 options=('debug')
-source=("git://anongit.kde.org/prison.git#branch=frameworks")
-md5sums=('SKIP')
-
-pkgver() {
-  cd prison
-  git describe --long | sed 's/^v\([^-]*-\)\([^-]*-g.*\)/\1r\2/;s/-/./g'
-}
+source=($pkgname-$pkgver::"http://quickgit.kde.org/?p=prison.git&a=snapshot&h=${_commit}&fmt=tgz")
+md5sums=('d7f703b53801d88dc913eefb38a39326')
 
 build() {
 	msg "starting build ..."
