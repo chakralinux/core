@@ -1,15 +1,9 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer Fabian Kosmale <inkane@chakra-project.org>
-# contributor Daniele Cocca <jmc@chakra-project.org>
 # resynced with Arch's version from https://projects.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/llvm
-# adjusted for Chakra
 
 pkgname=('llvm' 'llvm-libs' 'llvm-ocaml' 'lldb' 'clang' 'clang-analyzer'
          'clang-tools-extra')
 pkgver=3.9.0
-pkgrel=3
+pkgrel=1
 _ocaml_ver=4.03.0
 arch=('x86_64')
 url="http://llvm.org/"
@@ -123,9 +117,8 @@ package_llvm-libs() {
 
   install -d "$pkgdir/usr/lib"
   cp -P \
-    "$srcdir"/lib{LLVM,LTO}.so* \
+    "$srcdir"/lib{LLVM,LTO}*.so* \
     "$srcdir"/LLVMgold.so \
-    "$srcdir"/libLLVM-3.9*.so \
     "$pkgdir/usr/lib/"
 
   # Symlink LLVMgold.so from /usr/lib/bfd-plugins
