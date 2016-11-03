@@ -1,13 +1,25 @@
-diff -ur mesa-orig/configure.ac mesa-origb/configure.ac
---- mesa-orig/configure.ac	2016-05-25 15:37:44.191643017 +0200
-+++ mesa-origb/configure.ac	2016-05-25 15:42:20.861654709 +0200
-@@ -813,10 +813,6 @@
+diff -Naur mesa-orig/configure.ac mesa-new/configure.ac
+--- mesa-orig/configure.ac	2016-11-01 21:39:59.000000000 +0800
++++ mesa-new/configure.ac	2016-11-03 11:28:48.790434753 +0800
+@@ -826,22 +826,6 @@
  dnl pkgconfig files.
  test -z "$PTHREAD_LIBS" && PTHREAD_LIBS="-lpthread"
  
--PKG_CHECK_MODULES(PTHREADSTUBS, pthread-stubs)
--AC_SUBST(PTHREADSTUBS_CFLAGS)
--AC_SUBST(PTHREADSTUBS_LIBS)
+-dnl pthread-stubs is mandatory on targets where it exists
+-case "$host_os" in
+-cygwin* )
+-    pthread_stubs_possible="no"
+-    ;;
+-* )
+-    pthread_stubs_possible="yes"
+-    ;;
+-esac
+-
+-if test "x$pthread_stubs_possible" = xyes; then
+-    PKG_CHECK_MODULES(PTHREADSTUBS, pthread-stubs)
+-    AC_SUBST(PTHREADSTUBS_CFLAGS)
+-    AC_SUBST(PTHREADSTUBS_LIBS)
+-fi
 -
  dnl SELinux awareness.
  AC_ARG_ENABLE([selinux],
