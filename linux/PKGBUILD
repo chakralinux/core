@@ -1,12 +1,12 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs')
 _srcname=linux-4.8
-pkgver=4.8.4
-pkgrel=2
+pkgver=4.8.6
+pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
-makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
+makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'libelf')
 options=('!strip')
 source=(http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.{xz,sign}
         http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.{xz,sign}
@@ -17,9 +17,9 @@ source=(http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.{xz,sign}
         change-default-console-loglevel.patch)
 sha256sums=('3e9150065f193d3d94bcf46a1fe9f033c7ef7122ab71d75a7fb5a2f0c9a7e11a'
             'SKIP'
-            '86e246b19253ee3aa971403a5990376a5e33667122f7c8742cc0ee807f204403'
+            '3ac0ea443ac8a7aa40f8d5ce8ec33b84abbad4dbfc567c7699df728c2c21df37'
             'SKIP'
-            '132dc2e98f7d4fdfeee47799321dfac1c7ac5e2f84cf766ed4107f692219af47'
+            '84edac339a8904fccfea2de11dee64febc828841d7543bd0d30385078227c5c2'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             '1256b241cd477b265a3c2d64bdc19ffe3c9bbcee82ea3994c590c2c76e767d99')
 validpgpkeys=(
@@ -51,10 +51,8 @@ prepare() {
     sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
   fi
 
-  # set extraversion to pkgrel FIXME: let's try to break less stuff by NOT incrementing it this time
-  # sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
-  _todo='1'
-  sed -ri "s|^(EXTRAVERSION =).*|\1 -${_todo}|" Makefile
+  # set extraversion to pkgrel
+  sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
 
   # don't run depmod on 'make install'. We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
@@ -254,6 +252,12 @@ package_linux-headers() {
     mkdir -p "${pkgdir}"/usr/lib/modules/${_kernver}/build/`echo ${i} | sed 's|/Kconfig.*||'`
     cp ${i} "${pkgdir}/usr/lib/modules/${_kernver}/build/${i}"
   done
+  
+  # add objtool for external module building and enabled VALIDATION_STACK option
+  if [ -f tools/objtool/objtool ];  then
+      mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/tools/objtool"
+      cp -a tools/objtool/objtool ${pkgdir}/usr/lib/modules/${_kernver}/build/tools/objtool/ 
+  fi
 
   chown -R root.root "${pkgdir}/usr/lib/modules/${_kernver}/build"
   find "${pkgdir}/usr/lib/modules/${_kernver}/build" -type d -exec chmod 755 {} \;
