@@ -1,7 +1,10 @@
+# Source global configuration
+source ../linux.conf
+
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs')
-_srcname=linux-4.8
-pkgver=4.8.6
+_srcname=linux-${_basekernel}
+pkgver=${_kernelver}
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -114,13 +117,13 @@ package_linux() {
     -i "${startdir}/${install}"
 
   # install fallback mkinitcpio.conf file and preset file for kernel
-  install -D -m644 "${srcdir}/linux.preset" "${pkgdir}/etc/mkinitcpio.d/linux.preset"
+  install -D -m644 "${srcdir}/linux.preset" "${pkgdir}/etc/mkinitcpio.d/linux${_kernelname}.preset"
   sed \
     -e "1s|'linux.*'|'${pkgname}'|" \
     -e "s|ALL_kver=.*|ALL_kver=\"/boot/vmlinuz-${pkgname}\"|" \
     -e "s|default_image=.*|default_image=\"/boot/initramfs-${pkgname}.img\"|" \
     -e "s|fallback_image=.*|fallback_image=\"/boot/initramfs-${pkgname}-fallback.img\"|" \
-    -i "${pkgdir}/etc/mkinitcpio.d/linux.preset"
+    -i "${pkgdir}/etc/mkinitcpio.d/linux${_kernelname}.preset"
 
   # remove build and source links
   rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}

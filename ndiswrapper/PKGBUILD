@@ -2,9 +2,8 @@
 source ../linux.conf
 
 pkgname=ndiswrapper
-_commit=d3ffd3008d4e0d696b0efad2d079b2339dfd9178
-pkgver=1.60
-pkgrel=6
+pkgver=1.61
+pkgrel=1
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
@@ -16,27 +15,27 @@ provides=("ndiswrapper-utils=$pkgver")
 replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
-source=("git+https://github.com/pgiri/ndiswrapper.git#commit=$_commit")
-sha1sums=('SKIP')
+source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
+sha1sums=('213854ca8a83f9b5972db8fa873d346124e4bcb5')
 
 prepare() {
   [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
   msg "Found kernel version: $_kver"
 
-  cd "$srcdir/$pkgname/$pkgname"
+  cd "$srcdir/$pkgname-$pkgver"
 
   sed -i -e 's|strnicmp|strncasecmp|' driver/ndis.c
   sed -i "/modinfo/s/s/usr\//" driver/Makefile
 }
 
 build() {
-  cd "$srcdir/$pkgname/$pkgname"
+  cd "$srcdir/$pkgname-$pkgver"
   make -C driver KVERS_UNAME=${_kver}
   make -C utils
 }
 
 package() {
-  cd "$srcdir/$pkgname/$pkgname"
+  cd "$srcdir/$pkgname-$pkgver"
 
   make sbindir=usr/sbin usrsbindir=usr/bin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
         KVERS=$_kver DESTDIR="$pkgdir/" install
