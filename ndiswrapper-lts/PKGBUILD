@@ -5,7 +5,7 @@ source ../linux-lts.conf
 
 pkgname=ndiswrapper-lts
 _pkgname=ndiswrapper
-pkgver=1.60
+pkgver=1.61
 pkgrel=1
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-lts."
 license=('GPL')
@@ -15,7 +15,7 @@ install="ndiswrapper.install"
 depends=("linux-lts=${_kernelver}")
 makedepends=("linux-lts-headers=${_kernelver}")
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
-sha1sums=('20998237cf6d37b86391dc8736c10031110db578')
+sha1sums=('213854ca8a83f9b5972db8fa873d346124e4bcb5')
 
 prepare() {
   [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
@@ -33,9 +33,9 @@ build() {
 }
 
 package() {
-  cd "$srcdir/$_pkgname-$pkgver"
+  cd "$srcdir/$_pkgname-$pkgver"   
 
-  make sbindir=/usr/sbin usrsbindir=/usr/sbin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
+  make sbindir=usr/sbin usrsbindir=usr/bin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
         KVERS=$_kver DESTDIR="$pkgdir/" install
 
   sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
