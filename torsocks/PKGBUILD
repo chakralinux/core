@@ -1,10 +1,10 @@
 # Arch contributor: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/torsocks
 pkgname=torsocks
-pkgver=2.1.0
+pkgver=2.2.0
 pkgrel=1
 pkgdesc='Wrapper to safely torify applications'
-arch=('i686' 'x86_64')
-url='http://code.google.com/p/torsocks'
+arch=('x86_64')
+url='https://gitweb.torproject.org/torsocks.git/'
 license=('GPL2')
 makedepends=('git')
 backup=("etc/tor/${pkgname}.conf")
@@ -16,6 +16,11 @@ build() {
   ./autogen.sh
   ./configure --prefix=/usr --sysconfdir=/etc
   make
+}
+
+check() {
+  cd $pkgname
+  make check
 }
 
 package() {
