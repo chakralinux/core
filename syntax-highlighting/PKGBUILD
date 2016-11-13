@@ -2,7 +2,7 @@ source ../frameworks.conf
 
 pkgname=syntax-highlighting
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Syntax highlighting Engine for Structured Text and Code.'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/syntax-highlighting'
@@ -11,11 +11,15 @@ depends=('qt5-xmlpatterns' 'perl')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python3')
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"
+        'pkgbuild-syntax-highlight.patch')
+sha256sums=( $(getSum ${pkgname})
+            '3ac25ae5f7a4956ae7bed6e79607a4ab5021875fd198fe348a1712db71a25b96')
 
 prepare() {
   mkdir -p build
+  cd ${pkgname}-${pkgver}/data/syntax
+  patch -Np4 -i ${srcdir}/pkgbuild-syntax-highlight.patch
 }
 
 build() {
