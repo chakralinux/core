@@ -1,31 +1,25 @@
 # maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 
 pkgname=facile
-pkgver=1.1
-pkgrel=15
+pkgver=1.1.2
+pkgrel=1
 pkgdesc="A Functional Constraint Library"
-arch=('x86_64')
+arch=(x86_64)
 url="http://www.recherche.enac.fr/opti/facile/"
-license="LGPL"
+license=("LGPL")
 makedepends=('ocaml')
 depends=()
-source=("http://www.recherche.enac.fr/opti/facile/distrib/$pkgname-$pkgver.tar.gz"
-        'ocaml4-fix.patch')
-md5sums=('ab673e1fc0859a42bcb639a02c2d7e9e'
-         '85fe830895f2059bbbf88895c98877f8')
+source=(http://opti.recherche.enac.fr/facile/distrib/$pkgname-$pkgver.tar.gz)
+md5sums=('1409fb5a725e491a6e8e60ad7484eeb1')
 
 build() {
-  cd ${srcdir}/$pkgname-$pkgver
-  #fix ocaml4 issues when compiling kdeedu-kalzium: https://groups.google.com/forum/#!topic/chakra-devel/hf582tdtVuA
-  patch -Np1 -i ../ocaml4-fix.patch
-  
+  cd "$srcdir/$pkgname-$pkgver"
   ./configure
   make
 }
 
 package() {
-  cd ${srcdir}/$pkgname-$pkgver
-  mkdir -p ${pkgdir}/usr/lib/ocaml/facile
-  cd src
-  install -D -m 644 facile.cmxa facile.cmi facile.cma facile.a ${pkgdir}/usr/lib/ocaml/facile
+  cd "$srcdir/$pkgname-$pkgver/src"
+  install -d "$pkgdir/usr/lib/ocaml/facile"
+  install -D -m 644 facile.cmxa facile.cmi facile.cma facile.a "$pkgdir/usr/lib/ocaml/facile"
 }
