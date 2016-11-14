@@ -1,5 +1,5 @@
 pkgname=pypy
-pkgver=5.1.1
+pkgver=5.6.0
 pkgrel=1
 pkgdesc="A Python implementation written in Python, JIT enabled"
 arch=('x86_64')
@@ -9,18 +9,18 @@ depends=('expat' 'bzip2' 'gdbm' 'openssl' 'libffi' 'zlib')
 makedepends=('python2' 'tk' 'sqlite3')
 optdepends=('sqlite3: sqlite module'
             'tk: tk module')
-source=("https://bitbucket.org/${pkgname}/${pkgname}/downloads/$pkgname-$pkgver-src.tar.bz2")
+source=("https://bitbucket.org/${pkgname}/${pkgname}/downloads/pypy2-v$pkgver-src.tar.bz2")
 options=(!buildflags)
-md5sums=('8c2630896178e650e593686ddae625ac')
+md5sums=('c3fc7187061fec762269496f1f5daa86')
 
 build() {
-  cd "${srcdir}"/${pkgname}-${pkgver}-src/pypy/goal
+  cd "${srcdir}"/pypy2-v${pkgver}-src/pypy/goal
 
   python2 ../../rpython/bin/rpython -Ojit --shared targetpypystandalone
 }
 
 package() {
-  cd "${srcdir}"/${pkgname}-${pkgver}-src/pypy/tool/release
+  cd "${srcdir}"/pypy2-v${pkgver}-src/pypy/tool/release
 
   python2 package.py --archive-name pypy --targetdir .
   mkdir -p unpacked
@@ -35,7 +35,7 @@ package() {
   mkdir -p "${pkgdir}"/usr/bin
   ln -s /opt/pypy/bin/pypy "${pkgdir}"/usr/bin/pypy
 
-  install -Dm644 ${srcdir}/${pkgname}-${pkgver}-src/LICENSE "${pkgdir}"/opt/pypy/LICENSE
-  install -Dm644 ${srcdir}/${pkgname}-${pkgver}-src/README.rst "${pkgdir}"/opt/pypy/README.rst
-  install -Dm644 ${srcdir}/${pkgname}-${pkgver}-src/LICENSE "${pkgdir}"/usr/share/licenses/pypy/LICENSE
+  install -Dm644 ${srcdir}/pypy2-v${pkgver}-src/LICENSE "${pkgdir}"/opt/pypy/LICENSE
+  install -Dm644 ${srcdir}/pypy2-v${pkgver}-src/README.rst "${pkgdir}"/opt/pypy/README.rst
+  install -Dm644 ${srcdir}/pypy2-v${pkgver}-src/LICENSE "${pkgdir}"/usr/share/licenses/pypy/LICENSE
 }
