@@ -2,7 +2,7 @@ source ../plasma.conf
 
 pkgname=plasma-sdk
 pkgver=${PVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Plasma development tools'
 url="https://projects.kde.org/"
 arch=('x86_64')
@@ -20,7 +20,10 @@ depends=('qt5-base' 'qt5-svg' 'qt5-webkit' 'qt5-xmlpatterns'
          'ktexteditor' 'kwidgetsaddons' 'kxmlgui' 'kwindowsystem'
          'kitemmodels')
 
-makedepends=('extra-cmake-modules' 'kdoctools' 'python3')
+makedepends=('extra-cmake-modules' 'kdoctools' 'python3' 'kdesignerplugin' 
+             'kdelibs4support' 'kdevplatform' 'kirigami')
+optdepends=('kdevplatform: for plasmate'
+            'kirigami: for look and feel explorer')
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
