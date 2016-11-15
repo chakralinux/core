@@ -1,9 +1,8 @@
 # resynced with Arch's version from https://projects.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/llvm
 
-pkgname=('llvm' 'llvm-libs' 'llvm-ocaml' 'lldb' 'clang' 'clang-analyzer'
-         'clang-tools-extra')
+pkgname=('llvm' 'llvm-libs' 'llvm-ocaml' 'lldb' 'clang' 'clang-tools-extra')
 pkgver=3.9.0
-pkgrel=1
+pkgrel=2
 _ocaml_ver=4.03.0
 arch=('x86_64')
 url="http://llvm.org/"
@@ -164,6 +163,9 @@ package_clang() {
   url="http://clang.llvm.org/"
   depends=("llvm-libs=$pkgver-$pkgrel" 'gcc')
   optdepends=('python2: for git-clang-format')
+  provides=("clang-analyzer=$pkgver")
+  conflicts=("clang-analyzer<$pkgver")
+  replaces=('clang-analyzer')
 
   cd "$srcdir/llvm-$pkgver.src"
 
@@ -173,11 +175,16 @@ package_clang() {
   # Remove documentation sources
   rm -r "$pkgdir"/usr/share/doc/$pkgname/html/{_sources,.buildinfo}
 
+  # Move analyzer scripts out of /usr/libexec
+  mv "$pkgdir"/usr/libexec/{ccc,c++}-analyzer "$pkgdir/usr/lib/clang/"
+  rmdir "$pkgdir/usr/libexec"
+  sed -i 's|libexec|lib/clang|' "$pkgdir/usr/bin/scan-build"
+
   # Install Python bindings
   install -d "$pkgdir/usr/lib/python2.7/site-packages"
   cp -a tools/clang/bindings/python/clang "$pkgdir/usr/lib/python2.7/site-packages/"
-  python2 -m compileall "$pkgdir/usr/lib/python2.7/site-packages/clang"
-  python2 -O -m compileall "$pkgdir/usr/lib/python2.7/site-packages/clang"
+  python2 -m compileall "$pkgdir"
+  python2 -O -m compileall "$pkgdir"
 
   # Use Python 2
   sed -i 's|/usr/bin/env python|&2|' \
@@ -186,41 +193,6 @@ package_clang() {
 
   install -Dm644 tools/clang/LICENSE.TXT \
     "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-}
-
-package_clang-analyzer() {
-  pkgdesc="A source code analysis framework"
-  url="http://clang-analyzer.llvm.org/"
-  depends=("clang=$pkgver-$pkgrel" 'python2')
-
-  cd "$srcdir/llvm-$pkgver.src/tools/clang"
-
-  install -d "$pkgdir"/usr/{bin,lib/clang-analyzer}
-  for _tool in scan-{build,view}; do
-    cp -a tools/$_tool "$pkgdir/usr/lib/clang-analyzer/"
-    ln -s /usr/lib/clang-analyzer/$_tool/$_tool "$pkgdir/usr/bin/"
-  done
-
-  # scan-build looks for clang within the same directory
-  ln -s /usr/bin/clang "$pkgdir/usr/lib/clang-analyzer/scan-build/"
-
-  # Relocate man page
-  install -d "$pkgdir/usr/share/man/man1"
-  mv "$pkgdir/usr/lib/clang-analyzer/scan-build/man/scan-build.1" \
-    "$pkgdir/usr/share/man/man1/"
-
-  # Use Python 2
-  sed -i \
-    -e 's|env python$|&2|' \
-    -e 's|/usr/bin/python$|&2|' \
-    "$pkgdir/usr/lib/clang-analyzer/scan-view/bin/scan-view" \
-    "$pkgdir/usr/lib/clang-analyzer/scan-build/bin/set-xcode-analyzer"
-
-  # Compile Python scripts
-  python2 -m compileall "$pkgdir/usr/lib/clang-analyzer"
-  python2 -O -m compileall "$pkgdir/usr/lib/clang-analyzer"
-
-  install -Dm644 LICENSE.TXT "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
 
 package_clang-tools-extra() {
