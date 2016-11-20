@@ -1,26 +1,37 @@
 pkgname=encfs
-pkgver=1.8.1
+pkgver=1.9.1
 pkgrel=1
 pkgdesc='Encrypted filesystem in user-space'
 arch=('x86_64')
 url='http://www.arg0.net/encfs'
 license=('GPL')
-depends=('rlog' 'openssl' 'fuse' 'boost-libs')
-makedepends=('boost' 'automake')
+depends=('openssl' 'fuse' 'boost-libs')
+makedepends=('boost' 'cmake')
 options=('!libtool')
 source=("https://github.com/vgough/encfs/releases/download/v${pkgver}/encfs-${pkgver}.tar.gz")
-md5sums=('f8365378ab7c0d493e04f4e98ae7eb4e')
+md5sums=('7cbf9cc3c5af49b46703ce6ba70d22a4')
 
 build(){
-  cd ${pkgname}-${pkgver}
+  cd ${srcdir}
 
-  autoreconf -if
-  ./configure --prefix=/usr
+  mkdir build && cd build
+  cmake ../${pkgname}-${pkgver} \
+	  -DUSE_INTERNAL_TINYXML=ON \
+	  -DCMAKE_INSTALL_PREFIX=/usr \
+	  -DINSTALL_LIBENCFS=ON \
+	  -DBUILD_SHARED_LIBS=ON
   make
 }
 
+check() {
+  cd ${srcdir}/build
+  make test
+}
+
 package() {
-  cd ${pkgname}-${pkgver}
+  cd ${srcdir}/build
 
   make DESTDIR=${pkgdir} install
+  cp internal/tinyxml2-3.0.0/libtinyxml2.so.3 "${pkgdir}"/usr/lib/libtinyxml2.so.3
+  chmod +x "${pkgdir}"/usr/bin/encfssh
 }
