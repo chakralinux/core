@@ -1,24 +1,27 @@
 pkgname=qoauth
-pkgver=1.0.1
-pkgrel=4
+pkgver=2.0.0
+pkgrel=1
 pkgdesc="Support with OAuth-powered network services"
 url="http://github.com/ayoy/qoauth"
 license=('GPL')
 arch=('x86_64')
-depends=('qca')
-makedepends=('cmake' 'automoc4')
-source=($pkgname-$pkgver::"https://github.com/ayoy/qoauth/archive/v$pkgver.tar.gz")
-md5sums=('255121fc0070a1fbed83703e39111ce4')
+depends=('qca-qt5')
+provides=('qoauth-qt5')
+source=($pkgname-$pkgver::"https://github.com/ayoy/qoauth/archive/v$pkgver.tar.gz"
+        "qtstring-fix.patch")
+md5sums=('a30ab54144bcdb5b5adaf4d45b59a7d4'
+         '986bd219364bb44a17f7fe7c618ea37d')
 
 prepare() {
   cd $pkgname-$pkgver
   # Move libraries from /usr/lib64 to /usr/lib
   sed -i 's|lib64|lib|' src/src.pro
+  patch -p1 -i ../qtstring-fix.patch
 }
 
 build() {
   cd $pkgname-$pkgver  
-  qmake
+  qmake-qt5
   make
 }
 
