@@ -3,7 +3,7 @@ source ../plasma.conf
 
 pkgname=plasma-desktop
 pkgver=${PVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='KDE Plasma Desktop'
 arch=('x86_64')
 url='https://www.kde.org/workspaces/plasmadesktop/'
@@ -23,11 +23,17 @@ options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
 sha256sums=( $(getSum ${pkgname}) 
              'SKIP' )
+source+=( chakra_defaultPanel.patch::https://bugsfiles.kde.org/attachment.cgi?id=102600 )
+sha256sums+=( 'af2856ae7904726e6e8cfb3616a51f82fbfee10dc7edc85b579be684601a554c' )
 validpgpkeys=(${Pvalidpgpkeys})
 install=${pkgname}.install
 
 prepare() {
   mkdir -p build
+ 
+  cd ${pkgname}-${pkgver} 
+  # apply custom patch to change from taskmanager to icontasks
+  patch -Np1 -i "$srcdir/chakra_defaultPanel.patch"
 }
 
 build() {
