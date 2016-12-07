@@ -28,4 +28,6 @@ build() {
 package() {
   cd build
   make DESTDIR="${pkgdir}" install
+  # conflicts with kio
+  rm -r ${pkgdir}/usr/share/doc/HTML/*/kcontrol5
 }
