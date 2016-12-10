@@ -1,32 +1,38 @@
 pkgname=modemmanager
 _realname=ModemManager
-pkgver=1.4.10
+pkgver=1.6.4
 pkgrel=1
 pkgdesc="Mobile broadband modem management service"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/ModemManager/"
-license=('GPL2' 'LGPL2.1')
-depends=('systemd' 'libgudev' 'polkit' 'ppp' 'python2' 'libqmi' 'libmbim' 'hicolor-icon-theme')
-makedepends=('intltool' 'gobject-introspection' 'vala')
-source=("http://www.freedesktop.org/software/${_realname}/${_realname}-${pkgver}.tar.xz"
-        "bus-signals.patch")
-optdepends=('usb-modeswitch: install if your modem shows up as a storage drive')
-md5sums=('1e46a148e2af0e9f503660fcd2d8957d'
-         '02aac68b3ef2ec1971f05300760ba4e5')
+license=(GPL2 LGPL2.1)
+depends=(systemd libgudev polkit ppp libqmi libmbim)
+makedepends=(intltool gtk-doc gobject-introspection vala autoconf-archive git)
+_commit=ed41d18ab6b0db386b30ed8ef712ab51a865c7cf  # tags/1.6.4
+source=("git://anongit.freedesktop.org/ModemManager/ModemManager#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd ModemManager
+  git describe --tags | sed 's/-/+/g'
+}
 
 prepare() {
-  cd ModemManager-$pkgver
-  patch -Np1 -i ../bus-signals.patch
+  cd ModemManager
+  NOCONFIGURE=1 ./autogen.sh
 }
 
 build() {
-  cd "$srcdir/${_realname}-${pkgver}"
+  cd ModemManager
   ./configure --prefix=/usr \
-   	--sysconfdir=/etc \
-	--localstatedir=/var \
-	--with-udev-base-dir=/usr/lib/udev \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --sbindir=/usr/bin \
+        --with-dbus-sys-dir=/usr/share/dbus-1/system.d \
+        --with-udev-base-dir=/usr/lib/udev \
         --with-polkit=permissive \
-        --disable-gtk-doc \
+        --with-suspend-resume=systemd \
+        --enable-gtk-doc \
         --disable-static
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=655517
@@ -36,6 +42,6 @@ build() {
 }
 
 package() {
-  cd "$srcdir/${_realname}-${pkgver}"
+  cd ModemManager
   make DESTDIR="$pkgdir" install
 }
