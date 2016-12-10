@@ -1,51 +1,58 @@
 pkgname=networkmanager
 _pkgname=NetworkManager
-pkgver=1.0.12
-pkgrel=3
+pkgver=1.4.2
+pkgrel=1
 _pppver=2.4.7
 pkgdesc="Network Management daemon"
 arch=('x86_64')
 license=('GPL')
 url="http://www.gnome.org/projects/NetworkManager/"
-depends=('dbus-glib' 'iproute2' 'libndp' 'libnl' 'nss' 'polkit' 'systemd' 'libgudev' 'wpa_supplicant' 
-         "ppp=${_pppver}" 'dhclient' 'libsoup' 'modemmanager' 'libnewt' 'libteam')
-makedepends=('intltool' 'iptables' 'gobject-introspection' 'rp-pppoe' 'vala')
-optdepends=('dhcpcd: Alternative dhcp support'
-            'dnsmasq: connection sharing'
+depends=(iproute2 polkit wpa_supplicant libsoup modemmanager
+         libnewt libndp libteam "ppp=${_pppver}"
+         libgudev nss dbus-glib util-linux jansson systemd)
+makedepends=(intltool dhclient iptables gobject-introspection gtk-doc
+             "ppp=$_pppver" modemmanager dbus-glib iproute2 nss polkit
+             wpa_supplicant libsoup systemd libgudev rp-pppoe
+             libnewt libndp libteam vala perl-yaml python3-gobject git)
+checkdepends=(libx11 python3-dbus)
+optdepends=('dnsmasq: connection sharing'
             'bluez: Bluetooth support'
             'openresolv: resolvconf support'
             'ppp: dialup connection support'
             'rp-pppoe: ADSL support'
+            'dhclient: External DHCP client'
             'modemmanager: cellular network support')
 backup=('etc/NetworkManager/NetworkManager.conf')
 install=networkmanager.install
-source=("http://ftp.gnome.org/pub/gnome/sources/$_pkgname/${pkgver:0:3}/$_pkgname-$pkgver.tar.xz"
-        'NetworkManager.conf' 
-        'disable_set_hostname.patch'
-        '0001-wifi-hack-for-wext-devices.patch')
-md5sums=('ebb273456a81ccf9dfaf2461061b0e96'
-         '1653159d6634fb62d3a5c548b7a56151'
-         '6b5415350c04304a28d29294441a07ae'
-         'd82b9db3ac6050b075ab529cc1e648ee')
+_commit=fa4913a5210586c47806c0833ffdaf3beb486541  # tags/1.4.2^0
+source=("git+https://anongit.freedesktop.org/git/NetworkManager/NetworkManager#commit=$_commit"
+        NetworkManager.conf)
+sha256sums=('SKIP'
+            '67f112c1ac8ee3726eb229f5cd783de19f09cc252af49e157343d82b324b923f')
 
 prepare() {
-  cd $_pkgname-$pkgver
-  patch -Np1 -i ../disable_set_hostname.patch
-  patch -Np1 -i ../0001-wifi-hack-for-wext-devices.patch
+  cd NetworkManager
+
+  2to3 -w libnm src tools
+
+  NOCONFIGURE=1 ./autogen.sh
+}
+
+pkgver() {
+  cd NetworkManager
+  git describe | sed 's/-dev/dev/;s/-/+/g'
 }
 
 build() {
-  cd $_pkgname-$pkgver
-
-  ./configure \
-    --prefix=/usr \
+  cd NetworkManager
+  ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
     --sbindir=/usr/bin \
     --libexecdir=/usr/lib/networkmanager \
     --with-crypto=nss \
     --with-dhclient=/usr/bin/dhclient \
-    --with-dhcpcd=/usr/bin/dhcpcd \
+    --without-dhcpcd \
     --with-dnsmasq=/usr/bin/dnsmasq \
     --with-iptables=/usr/bin/iptables \
     --with-systemdsystemunitdir=/usr/lib/systemd/system \
@@ -61,13 +68,16 @@ build() {
     --enable-more-warnings=no \
     --disable-wimax \
     --enable-modify-system \
-    --enable-doc
+    --enable-doc \
+    --disable-gtk-doc
+
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0 /g' -e 's/    if test "$export_dynamic" = yes && test -n "$export_dynamic_flag_spec"; then/      func_append compile_command " -Wl,-O1,--as-needed"\n      func_append finalize_command " -Wl,-O1,--as-needed"\n\0/' libtool
 
   make
 }
 
 package() {
-  cd $_pkgname-$pkgver
+  cd $_pkgname
   make DESTDIR="$pkgdir" install
 
   install -m644 ../NetworkManager.conf "$pkgdir/etc/NetworkManager/"

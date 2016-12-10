@@ -1,28 +1,39 @@
 pkgname=networkmanager-openvpn
-pkgver=1.0.8
+pkgver=1.2.6
 pkgrel=1
 pkgdesc="NetworkManager VPN plugin for OpenVPN"
+url="https://wiki.gnome.org/Projects/NetworkManager"
 arch=('x86_64')
 license=('GPL')
-url="http://www.gnome.org/projects/NetworkManager/"
 depends=('networkmanager' 'openvpn')
 makedepends=('intltool')
 install=networkmanager-openvpn.install
-source=("http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-openvpn/1.0/NetworkManager-openvpn-${pkgver}.tar.xz")
-sha256sums=('1b979519d72ba4d78e729d4856c5b53fad914ca7ee3ca91209ce489ba78912ac')
+_commit=41d2ad56b6436e6e6fa5c41609fd64fb60e33b48  # tags/1.2.7-dev~1
+source=("git://git.gnome.org/network-manager-openvpn#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd network-manager-openvpn
+  git describe --tags | sed 's/-/+/g'
+}
+
+prepare() {
+  cd network-manager-openvpn
+  # NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd "${srcdir}/NetworkManager-openvpn-${pkgver}"
-  ./configure --prefix=/usr \
-  	--sysconfdir=/etc \
-	--localstatedir=/var \
-	--libexecdir=/usr/lib/networkmanager \
-        --without-gnome \
-	--disable-static 
-  make 
+  cd network-manager-openvpn
+  ./autogen.sh --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+    --libexecdir=/usr/lib/networkmanager \
+    --enable-more-warnings=yes \
+    -without-gnome \
+    --disable-static
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  make
 }
 
 package() {
-  cd "${srcdir}/NetworkManager-openvpn-${pkgver}"
-  make DESTDIR="${pkgdir}" install 
+  cd network-manager-openvpn
+  make DESTDIR="$pkgdir" install
 }

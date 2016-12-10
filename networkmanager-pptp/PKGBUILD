@@ -1,29 +1,40 @@
 pkgname=networkmanager-pptp
-pkgver=1.0.8
-_pppver=2.4.7
+pkgver=1.2.4
 pkgrel=1
-pkgdesc="NetworkManager VPN plugin for pptp "
+pkgdesc="NetworkManager VPN plugin for PPTP"
+url="https://wiki.gnome.org/Projects/NetworkManager"
 arch=('x86_64')
 license=('GPL')
-url="http://www.gnome.org/projects/NetworkManager/"
+_pppver=2.4.7
 depends=('networkmanager' 'pptpclient' "ppp=$_pppver")
 makedepends=('intltool')
-source=("http://ftp.gnome.org/pub/GNOME/sources/NetworkManager-pptp/1.0/NetworkManager-pptp-${pkgver}.tar.xz")
-sha256sums=('6ff031baf170d890f779cfd15533ff0429999f1513aa3903a60c9d21ae09244c')
+_commit=7861022af7edcf4a26b01d30ad6b2f0bbc51e55e  # tags/1.2.4^0
+source=("git://git.gnome.org/network-manager-pptp#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd network-manager-pptp
+  git describe --tags | sed 's/-/+/g'
+}
+
+prepare() {
+  cd network-manager-pptp
+  # NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd "${srcdir}/NetworkManager-pptp-${pkgver}"
-  ./configure --prefix=/usr \
-  	--sysconfdir=/etc \
-	--localstatedir=/var \
-	--libexecdir=/usr/lib/networkmanager \
-        --without-gnome \
-        --with-pppd-plugin-dir=/usr/lib/pppd/$_pppver \
-	--disable-static 
-  make 
+  cd network-manager-pptp
+  ./autogen.sh --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+    --libexecdir=/usr/lib/networkmanager \
+    --with-pppd-plugin-dir=/usr/lib/pppd/$_pppver \
+    --enable-more-warnings=yes \
+    --without-gnome \
+    --disable-static
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  make
 }
 
 package() {
-  cd "${srcdir}/NetworkManager-pptp-${pkgver}"
-  make DESTDIR="${pkgdir}" install 
+  cd network-manager-pptp
+  make DESTDIR="$pkgdir" install
 }
