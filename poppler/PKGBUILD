@@ -2,17 +2,17 @@
 
 pkgbase=poppler
 pkgname=('poppler' 'poppler-glib' 'poppler-qt4' 'poppler-qt5')
-pkgver=0.47.0
+pkgver=0.49.0
 pkgrel=1
 arch=('x86_64')
 license=('GPL')
-makedepends=('libjpeg-turbo' 'libpng' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'qt' 'pkgconfig' 'lcms2' 'qt5-base')
+makedepends=('libjpeg-turbo' 'libpng' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'qt' 'pkgconfig' 'lcms2' 'qt5-base' 'gobject-introspection' 'icu')
 options=('!emptydirs')
 url="http://poppler.freedesktop.org/"
 _testtag=0d2bfd4af4c76a3bac27ccaff793d9129df7b57a
 source=("http://poppler.freedesktop.org/${pkgname}-${pkgver}.tar.xz"
 	"http://cgit.freedesktop.org/poppler/test/snapshot/test-${_testtag}.tar.bz2")
-md5sums=('669b195ff24173d35cacf1d20b6fe4fa'
+md5sums=('9e057ed8eee1f9979fa75d8f044783b8'
          '5ce0e8161b08dc138c0eef3ed958ad00')
 
 prepare() {
@@ -21,7 +21,6 @@ prepare() {
 
 build() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
-  autoreconf
   ./configure --prefix=/usr --sysconfdir=/etc \
       --localstatedir=/var --disable-static \
       --enable-cairo-output \
@@ -31,6 +30,7 @@ build() {
       --enable-poppler-qt5 \
       --enable-poppler-glib \
       --disable-gtk
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0 /g' libtool
   make
 }
 
