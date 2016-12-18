@@ -1,14 +1,14 @@
 pkgbase="cups"
 pkgname=('libcups' 'cups')
-pkgver=2.1.4
-pkgrel=3
+pkgver=2.2.1
+pkgrel=1
 arch=('x86_64')
 license=('GPL')
 url="http://www.cups.org/"
 makedepends=('libtiff>=4.0.0' 'libpng>=1.5.7' 'acl' 'pam' 'xdg-utils' 'krb5' 'gnutls'
              'cups-filters' 'bc' 'colord' 'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus' 
              'avahi'  'hicolor-icon-theme' 'systemd' 'inetutils' 'libpaper' 'valgrind')
-source=("https://github.com/apple/cups/releases/download/release-${pkgver}/${pkgbase}-${pkgver}-source.tar.gz"{,.sig}
+source=("https://github.com/apple/cups/releases/download/v${pkgver}/${pkgbase}-${pkgver}-source.tar.gz"{,.sig}
         cups.logrotate cups.pam
         # improve build and linking
         cups-no-export-ssllibs.patch
@@ -18,7 +18,7 @@ source=("https://github.com/apple/cups/releases/download/release-${pkgver}/${pkg
         cups-1.6.0-fix-install-perms.patch
         # bugfixes
 )
-md5sums=('9f9bf6e3b9c20a3519b4dc409666d6e7'
+md5sums=('a94da2a1e9dbdccb4f3836a38a431931'
          'SKIP'
          'fc8286f185e2cc5f7e1f6843bf193e2b'
          '96f82c38f3f540b53f3e5144900acf17'
@@ -93,7 +93,7 @@ backup=(etc/cups/client.conf)
   
   # install client.conf man page and config file
   install -dm755 ${pkgdir}/usr/share/man/man5
-  install -Dm644  ${srcdir}/${pkgbase}-${pkgver}/man/client.conf.5 ${pkgdir}/usr/share/man/man5/
+  install -Dm644  ${srcdir}/${pkgbase}-${pkgver}/man/client.conf.man ${pkgdir}/usr/share/man/man5/
   install -dm755 -g lp ${pkgdir}/etc/cups
   touch ${pkgdir}/etc/cups/client.conf
   echo "# see 'man client.conf'" >> ${pkgdir}/etc/cups/client.conf
@@ -159,3 +159,4 @@ optdepends=('xdg-utils: xdg .desktop file support')
   # comment out unnecessary PageLogFormat entry
   sed -i -e 's:PageLogFormat:#PageLogFormat:' $pkgdir/etc/cups/cupsd.conf*
 }
+
