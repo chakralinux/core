@@ -1,13 +1,19 @@
 pkgname=libgcrypt
-pkgver=1.6.6
+pkgver=1.7.5
 pkgrel=1
 pkgdesc="a general purpose crypto library based on the code used"
 arch=('x86_64')
 url="http://www.gnupg.org"
 license=('LGPL')
 depends=('libgpg-error')
-source=("ftp://ftp.gnupg.org/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-sha1sums=('ad79fd0b6963e1049612aa5d98e1a0b8eb775701')
+options=('!emptydirs')
+# https://www.gnupg.org/download/integrity_check.html
+source=(ftp://ftp.gnupg.org/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2{,.sig})
+# https://gnupg.org/download/integrity_check.html
+sha1sums=('fa485d854748fc06ea041b3057b2de2f12fbc17f'
+          'SKIP')
+validpgpkeys=('031EC2536E580D8EA286A9F22071B08A33BD3F06' # "NIIBE Yutaka (GnuPG Release Key) <gniibe@fsij.org>"
+              'D8692123C4065DEA5E0F3AB5249B39D24F25E3B6') # Werner Koch
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
