@@ -1,5 +1,5 @@
 pkgname=gnupg
-pkgver=2.1.16
+pkgver=2.1.17
 pkgrel=1
 pkgdesc='Complete and free implementation of the OpenPGP standard'
 url='http://www.gnupg.org/'
@@ -9,9 +9,9 @@ optdepends=('libldap: gpg2keys_ldap'
             'libusb-compat: scdaemon')
 makedepends=('libldap' 'libusb-compat')
 depends=('npth' 'libgpg-error' 'libgcrypt' 'libksba' 'libassuan'
-         'pinentry' 'bzip2' 'readline' 'gnutls')
+         'pinentry' 'bzip2' 'readline' 'gnutls' 'sqlite3')
 source=("ftp://ftp.gnupg.org/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-sha1sums=('67540161c9fe289153c4a5ea60f7cdce0ef48897')
+sha1sums=('d83ab893faab35f37ace772ca29b939e6a5aa6a7')
 
 install=${pkgname}.install
 
@@ -49,4 +49,9 @@ package() {
 	ln -s gpg2 "${pkgdir}"/usr/bin/gpg
 	ln -s gpgv2 "${pkgdir}"/usr/bin/gpgv
 	ln -s gpg2.1.gz "${pkgdir}"/usr/share/man/man1/gpg.1.gz
+        
+        cd doc/examples/systemd-user
+	for i in *.*; do
+		install -Dm644 "$i" "${pkgdir}/usr/lib/systemd/user/$i"
+	done
 }
