@@ -2,7 +2,7 @@ source ../qt5.conf
 
 pkgname=qt5-base
 pkgver=${QSubVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
@@ -20,8 +20,10 @@ optdepends=('qt5-svg: to use SVG icon themes'
             'mtdev: evdev plugin')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname}) )
-md5sums=( $(getSum ${pkgname}) )
+source=( $(getSrc ${pkgname}) 
+        qtbug-49061.patch::"https://github.com/qt/qtbase/commit/494376f980e96339b6f1eff7c41336ca4d853065.patch")
+md5sums=( $(getSum ${pkgname})
+         'c86af27562bbbe05c3defd63d00130fd')
 
 prepare() {
   cd $(getPkgName ${pkgname})
@@ -40,6 +42,7 @@ prepare() {
   # Fix libsystemd-journal detection
   sed -e 's|libsystemd-journal|libsystemd|' -i config.tests/unix/journald/journald.pro -i src/corelib/global/global.pri
 
+  patch -p1 -i ../qtbug-49061.patch
 }
 
 build() {
