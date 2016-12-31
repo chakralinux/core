@@ -4,7 +4,7 @@ arch=('x86_64')
 _snapdate=20161210
 _relver=4.0
 pkgver=${_relver}_${_snapdate}
-pkgrel=1
+pkgrel=2
 makedepends=('cups' 'perl' 'libxml2' 'enscript' 'perl' 'net-snmp' 'bash')
 source=("http://www.openprinting.org/download/foomatic/${pkgbase}-db-engine-${_relver}-${_snapdate}.tar.gz"
         "http://www.openprinting.org/download/foomatic/${pkgbase}-db-${_relver}-${_snapdate}.tar.xz"
@@ -36,7 +36,7 @@ package_foomatic-db-engine() {
   depends=('perl' 'libxml2' 'cups-filters' 'bash')
 
   cd "${srcdir}/foomatic-db-engine-${_relver}-${_snapdate}"
-  ./configure --prefix=/usr
+  ./configure --prefix=/usr --libdir=/usr/lib
   make 
   eval `perl -V:archname`
   make DESTDIR=${pkgdir} \
