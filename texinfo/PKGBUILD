@@ -1,8 +1,8 @@
 # Maintainer: almack[at]chakraos[dot]org>
 
 pkgname=texinfo
-pkgver=5.2
-pkgrel=3
+pkgver=6.3
+pkgrel=1
 pkgdesc="Utilities to work with and produce manuals, ASCII text, and on-line documentation from a single source file"
 arch=('x86_64')
 url="http://www.gnu.org/software/texinfo/"
@@ -10,16 +10,20 @@ license=('GPL3')
 groups=('base')
 depends=('ncurses' 'findutils' 'gzip' 'sh' 'perl')
 install=texinfo.install
-source=(ftp://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz{,.sig}
-	texinfo-5.2-C-n-fix.patch)
-md5sums=('cb489df8a7ee9d10a236197aefdb32c5'
+source=(https://ftp.gnu.org/pub/gnu/$pkgname/$pkgname-$pkgver.tar.xz{,.sig}
+        texinfo-6.0-disable-failing-info-test.patch
+        texinfo-install.hook
+        texinfo-remove.hook)
+md5sums=('32baefe5c7080dfb512a4eac5ce67b2a'
          'SKIP'
-         '89724bac1ecbd1a57b1ea81e87f96f44')
-validpgpkeys=('17D3311B14BC0F248267BF020716748A30D155AD') # Karl Berry
+         '8bfaa21315a8a6184811de8478005d22'
+         '9a98fb162650ff3065f9a4ebec22db36'
+         '5590fb3ef9ec309c98f5a4d85eca49da')
+validpgpkeys=('EAF669B31E31E1DECBD11513DDBC579DAB37FBA9') # Gavin Smith
 
 prepare() {
   cd ${srcdir}/${pkgname}-${pkgver}
-  patch -p0 -i ${srcdir}/texinfo-5.2-C-n-fix.patch
+  patch -p1 -i ../texinfo-6.0-disable-failing-info-test.patch
 }
 
 build() {
@@ -38,4 +42,7 @@ package() {
    cd ${srcdir}/${pkgname}-${pkgver}
    
    make DESTDIR=${pkgdir} install
+ 
+   install -dm755 "$pkgdir"/usr/share/libalpm/hooks/
+   install -m644 ${srcdir}/texinfo-{install,remove}.hook "$pkgdir"/usr/share/libalpm/hooks/
 }

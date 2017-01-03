@@ -1,30 +1,29 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer (x86_64): AlmAck <almack[at]chakraos[dot]org>
+# maintainer (x86_64): AlmAck <almack[at]chakralinux[dot]org>
 
 pkgname=pcre
-pkgver=8.38
-pkgrel=2
+pkgver=8.39
+pkgrel=1
 pkgdesc="A library that implements Perl 5-style regular expressions"
 arch=('x86_64')
 url="http://www.pcre.org/"
 license=('BSD')
 depends=('gcc-libs' 'readline' 'zlib' 'bzip2')
 validpgpkeys=('45F68D54BBE23FB3039B46E59766E084FB0F43D8') # Philip Hazel
-source=("ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$pkgname-$pkgver.tar.bz2"{,.sig}
-        "pcre-8.38-Fix-negated-POSIX-class-within-negated-overall-class.patch"
-        "pcre-8.38-Fix-workspace-overflow-for-ACCEPT-with-deeply-nested.patch"
-)
-md5sums=('00aabbfe56d5a48b270f999b508c5ad2'
-         'SKIP'
-         '7da5ec0bcce0de711d802c26741a7b05'
-         '64b1c23179fcea4534417f8654b6138a')
+source=("https://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$pkgname-$pkgver.tar.bz2"{,.sig})
+md5sums=('e3fca7650a0556a2647821679d81f585'
+         'SKIP')
 
 prepare() {
-  cd ${pkgname}-${pkgver}
-  patch -Np1 -i ${srcdir}/pcre-8.38-Fix-negated-POSIX-class-within-negated-overall-class.patch
-  patch -Np1 -i ${srcdir}/pcre-8.38-Fix-workspace-overflow-for-ACCEPT-with-deeply-nested.patch
+  cd $pkgname-$pkgver
+  # apply patch from the source array (should be a pacman feature)
+  local filename
+  for filename in "${source[@]}"; do
+    if [[ "$filename" =~ \.patch$ ]]; then
+      msg2 "Applying patch ${filename##*/}"
+      patch -p1 -N -i "$srcdir/${filename##*/}"
+    fi
+  done
+  :
 }
 
 build() {
