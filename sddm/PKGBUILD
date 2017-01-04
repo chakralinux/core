@@ -1,38 +1,32 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sddm
 
 pkgname=sddm
-pkgver=0.14.0
-pkgrel=3
+pkgver=0.14.0.r26.17ccb31
+pkgrel=2
 pkgdesc='QML based X11 and Wayland display manager'
 arch=('x86_64')
 url='http://github.com/sddm/sddm'
 license=('GPL')
 depends=('qt5-declarative')
-makedepends=('cmake' 'extra-cmake-modules' 'python3-docutils' 'qt5-tools')
+makedepends=('cmake' 'extra-cmake-modules' 'python3-docutils' 'qt5-tools' 'git')
 install="${pkgname}.install"
 options=('emptydirs')
 backup=('usr/share/sddm/scripts/Xsetup'
         'etc/sddm.conf'
         'etc/pam.d/sddm')
-source=("${pkgname}-${pkgver}.tar.gz::https://github.com/${pkgname}/${pkgname}/archive/v${pkgver}.tar.gz"
-        sddm-fix-avatars.patch::"https://github.com/sddm/sddm/commit/ecb903e4.patch"
+source=("${pkgname}::git+https://github.com/sddm/sddm.git#commit=17ccb31"
         'sddm.conf')
-md5sums=('393fbed2f2e9d030e1717949867e96c8'
-         'f929c400807144f3bc53d8ed6ed74f21'
+md5sums=('SKIP'
          'cff07724e92a3e44fcf1c680d0be425b')
 
 prepare() {
   [[ -e build ]] && rm -rf build
   mkdir -p build
-
-  # Fix displaying avatars
-  cd $pkgname-$pkgver
-  patch -p1 -i ../sddm-fix-avatars.patch
 }
 
 build() {
   cd build
-  cmake ../${pkgname}-${pkgver} \
+  cmake ../${pkgname} \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBEXECDIR=/usr/lib/sddm \
@@ -51,18 +45,5 @@ package() {
 
   # set permissions in attempt to fix autologin
   install -d -g 996 -o 996 ${pkgdir}/var/lib/sddm
-
-  # auto unlock the kwallet when the user password
-  # and the kwallet password match (FS#1253)
-
-  echo "
-# Chakra custom settings
-# auto unlock the kwallet when the user password
-# and the kwallet password match (FS#1253)
-
-auth		optional	pam_kwallet.so  kdehome=.kde4
-session		optional	pam_kwallet.so  kdehome=.kde4
-auth		optional	pam_kwallet5.so
-session		optional	pam_kwallet5.so" >> ${pkgdir}/etc/pam.d/sddm
 
 }
