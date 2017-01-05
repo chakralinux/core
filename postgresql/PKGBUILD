@@ -4,10 +4,10 @@ pkgbase=postgresql
 pkgname=('postgresql-libs'
          'postgresql-docs'
          'postgresql')
-pkgver=9.4.6
+pkgver=9.6.1
 _majorver=${pkgver%.*}
 # When upgrading to a major version, remember to update the postgresql-check-db-dir file accordingly!!
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 url='http://www.postgresql.org/'
 license=('custom:PostgreSQL')
@@ -20,14 +20,14 @@ source=("ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar
         'postgresql.pam'
         'postgresql.service'
         'postgresql.tmpfiles.conf')
-sha512sums=('03e2c68ec7fb40b4886885136692e96ed5d7e50ead8ebd094ede402eeb8ed94a791357e8eff2776a2e4a537ced3d900e032779a33c1fbd920588d89f8b6705ee'
-            'a26d06c672070a388c5d19a2327df3f12cee666e0203fc6650d12b74868149d35bb9fa504dcbc371236ff1799021cf2f2834e67723749772cafad07e9ee3609d'
-            '031efe12d18ce386989062327cdbbe611c5ef1f94e4e1bead502304cb3e2d410af533d3c7f1109d24f9da9708214fe32f9a10ba373a3ca8d507bdb521fbb75f7'
-            'a60faeca09e6a4e8b2ada06b16768a8f4db39710af4c47aab82842a085b80d6be4252c8d030de90e3d8f2b2a0c8317bcb1b891316358079d807501544745a4cf'
-            '9ab4da01337ffbab8faec0e220aaa2a642dbfeccf7232ef2645bdc2177a953f17ee3cc14a4d8f8ebd064e1dae8b3dba6029adbffb8afaabea383963213941ba8'
-            '1e6183ab0eb812b3ef687ac2c26ce78f7cb30540f606d20023669ac00ba04075487fb72e4dc89cc05dab0269ff6aca98fc1167cc75669c225b88b592482fbf67'
-            'c59846579b91e3b04776a83e7f59acb482db2abecf31b33a451dd07df2afa426e69c5188ab19d09b7ad87df81fec1778f6f4b35a8073dbe8055b4e0a1af5020a'
-            '583f4add381b6d076237f9b1f3a8d095340621d6ba75222dbabb8af71a96efa5b1a69b75cc3c60f27c258c5be6e3de94fe258dc9d523e306f1e8cb60885e7242')
+sha256sums=('e5101e0a49141fc12a7018c6dad594694d3a3325f5ab71e93e0e51bd94e51fcd'
+            'f15418433b7d9a153eea22af58cc64fda462144d7039d1083ae1e2e489cc303a'
+            '8538619cb8bea51078b605ad64fe22abd6050373c7ae3ad6595178da52f6a7d9'
+            '419550699aae3d19715e87e51f32d1ad50cbb5d3175794f5476697572383b4e3'
+            '6abb842764bbed74ea4a269d24f1e73d1c0b1d8ecd6e2e6fb5fb10590298605e'
+            '57dfd072fd7ef0018c6b0a798367aac1abb5979060ff3f9df22d1048bb71c0d5'
+            'c69b614731fdd3f4e127540814f5999f423363523c5209e252e19b1d4362ad68'
+            '7e086d70e0dcaa6ce45693b4e826ce92d770192b3aff5642319b1ef279d88dc4')
 
 build() {
     cd "${srcdir}/postgresql-${pkgver}"
@@ -36,7 +36,9 @@ build() {
         --prefix=/usr \
         --mandir=/usr/share/man \
         --datadir=/usr/share/postgresql \
-        --with-libxml \
+        --sysconfdir=/etc \
+	--with-gssapi \
+	--with-libxml \
         --with-openssl \
         --with-perl \
         --with-python PYTHON=/usr/bin/python3 \

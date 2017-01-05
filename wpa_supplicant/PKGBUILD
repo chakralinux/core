@@ -1,11 +1,6 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer  <inkane@chakra-project.org>
-# contributor <abveritas[at]chakra-project[dot]org>
 
 pkgname=wpa_supplicant
-pkgver=2.3
+pkgver=2.6
 pkgrel=1
 pkgdesc="A utility providing key negotiation for WPA wireless networks"
 arch=('x86_64')
@@ -14,10 +9,12 @@ license=('GPL')
 groups=('base')
 backup=('etc/wpa_supplicant/wpa_supplicant.conf')
 url="http://hostap.epitest.fi/wpa_supplicant"
-source=("http://hostap.epitest.fi/releases/wpa_supplicant-$pkgver.tar.gz"
-        'config')
-md5sums=('f2ed8fef72cf63d8d446a2d0a6da630a'
-         'd621945fe43f04f8fdea612ae6d1251e')
+source=(https://w1.fi/releases/${pkgname}-${pkgver}.tar.gz{,.asc}
+        config)
+validpgpkeys=('EC4AA0A991A5F2464582D52D2B6EF432EFC895FA') # Jouni Malinen
+sha256sums=('b4936d34c4e6cdd44954beba74296d964bc2c9668ecaa5255e499636fe2b1450'
+            'SKIP'
+            '15be07f0d8003a2239dfba008f09602f1203bbf143004d8979ff4d863153c817')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}/${pkgname}/"

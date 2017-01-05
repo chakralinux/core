@@ -2,15 +2,15 @@
 
 pkgbase=samba
 pkgname=('libwbclient' 'smbclient' 'samba')
-pkgver=4.3.12
+pkgver=4.5.3
 pkgrel=1
 arch=('x86_64')
 url="https://www.samba.org"
 license=('GPL3')
 makedepends=('python2' 'docbook-xsl' 'pkg-config' 'libbsd' 'db' 'popt' 'libcups' 
-             'readline' 'tevent' 'acl' 'libldap' 'libcap' 'ldb>=1.1.15' 'krb5' 'pam' 'systemd' 
-             'gamin' 'gnutls' 'talloc' 'tdb' 'dbus')
-source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${pkgver}.tar.gz
+             'readline' 'tevent' 'acl' 'libldap' 'libcap' 'ldb>=1.1.29' 'krb5' 'pam' 'systemd' 
+             'gamin' 'gnutls' 'talloc' 'tdb' 'dbus' 'libaio')
+source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${pkgver}.tar{.gz,.asc}
         samba.logrotate
         samba.pam
         samba.service
@@ -21,7 +21,10 @@ source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${pkgver}.tar.gz
         smbd@.service
         winbindd.service
         samba.conf)
-md5sums=('00712fdce34934bf5dc5af96c156e8d0'
+validpgpkeys=('52FBC0B86D954B0843324CDC6F33915B6568B7EA') #Samba Distribution Verification Key <samba-bugs@samba.org>
+
+md5sums=('6f30eed6dfbd036dfde023e03ed8b311'
+         'SKIP'
          '5697da77590ec092cc8a883bae06093c'
          '96f82c38f3f540b53f3e5144900acf17'
          'ee4763a656cf00d92bfda31b6bb2c5cb'
@@ -146,7 +149,6 @@ depends=('popt' 'cifs-utils' 'tdb' "libwbclient>=$pkgver" 'ldb'
 
     install -d -m755 ${pkgdir}/usr/lib/pkgconfig
     mv ${_pkgsrc}/usr/lib/pkgconfig/smbclient.pc ${pkgdir}/usr/lib/pkgconfig/
-    mv ${_pkgsrc}/usr/lib/pkgconfig/smbclient-raw.pc ${pkgdir}/usr/lib/pkgconfig/
     mv ${_pkgsrc}/usr/lib/pkgconfig/netapi.pc ${pkgdir}/usr/lib/pkgconfig/
 
     install -d -m755 ${pkgdir}/usr/share/man/man1
