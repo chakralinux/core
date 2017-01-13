@@ -1,11 +1,10 @@
-
 pkgname=licenses
-pkgver=20150428
+pkgver=20170114
 pkgrel=1
 pkgdesc="The standard licenses distribution package"
 arch=('any')
 license=('custom:none')
-url="http://chakraos.org"
+url="https://chakralinux.org"
 groups=('base')
 source=(apache-2.0.txt::http://www.apache.org/licenses/LICENSE-2.0.txt
         cc-by-3.0.txt
@@ -15,6 +14,13 @@ source=(apache-2.0.txt::http://www.apache.org/licenses/LICENSE-2.0.txt
         cc-by-nd-3.0.txt
         cc-by-sa-3.0.txt
         cc-readme.txt
+        cc-by-4.0.txt
+        cc-by-nc-4.0.txt
+        cc-by-nc-nd-4.0.txt
+        cc-by-nc-sa-4.0.txt
+        cc-by-nd-4.0.txt
+        cc-by-sa-4.0.txt
+        cc-4.0-readme.txt
         cddl-1.0.txt
         eclipse-1.0.txt
         http://www.gnu.org/licenses/gpl-2.0.txt
@@ -24,7 +30,8 @@ source=(apache-2.0.txt::http://www.apache.org/licenses/LICENSE-2.0.txt
         http://www.gnu.org/licenses/fdl-1.2.txt
         http://www.gnu.org/licenses/fdl-1.3.txt
         http://www.latex-project.org/lppl.txt
-        http://www.mozilla.org/MPL/MPL-1.1.txt
+        MPL-1.1.txt::http://www.mozilla.org/media/MPL/1.1/index.0c5913925d40.txt
+	MPL-2.0.txt::https://www.mozilla.org/media/MPL/2.0/index.815ca599c9df.txt
         perlartistic.txt
         php-3.0.txt::http://www.php.net/license/3_0.txt
         ruby-license.txt::http://www.ruby-lang.org/en/LICENSE.txt
@@ -32,7 +39,7 @@ source=(apache-2.0.txt::http://www.apache.org/licenses/LICENSE-2.0.txt
         python-2.txt
         LICENSE.ralink-firmware.txt
         ZopePublicLicense.txt
-        w3c.txt)
+	w3c.txt)
 md5sums=('3b83ef96387f14655fc854ddc3c6bd57'
          'ffb24d1bbf8b83d373f0b8edc3feb0c6'
          '682a5e3b03510ba46c4f566478c871bc'
@@ -41,6 +48,13 @@ md5sums=('3b83ef96387f14655fc854ddc3c6bd57'
          '2502517d13d8136fffaf248489ad0870'
          '5367190077e12a7f55403d531ef3998e'
          '019bc72509b18a804f0ea8fd2bab1932'
+         'eacc0b19e3fb8dd12d2e110b24be0452'
+         '4bae66d5a37f332d35f39164d42114de'
+         '8009795292660aa9c8da059e5b1581c1'
+         'ec37b7e2f93dfba230d77628b438b99d'
+         '0cda3c45168123a11e2f4560004fa5c7'
+         'e277f2eefa979e093628e4fb368f5044'
+         '0e66f47e5034d2cec9c05b25a8533d50'
          '6cb35f3976cd093011967fa1abbce386'
          'f300afd598546add034364cd0a533261'
          'b234ee4d69f5fce4486a80fdaf4a4263'
@@ -50,10 +64,11 @@ md5sums=('3b83ef96387f14655fc854ddc3c6bd57'
          '24ea4c7092233849b4394699333b5c56'
          '10b9de612d532fdeeb7fe8fcd1435cc6'
          '9f4337828d782bdea41f03dd2ad1b808'
-         'b7426de1c630b269dc95ba20ea82a290'
+         '0c5913925d40b124fb52ce84c5deb3f3'
+         '815ca599c9df247a0c7f619bab123dad'
          'd09c120ca7db95ef2aeecec0cb08293b'
          'a45bb1bbeed9e26b26c5763df1d3913d'
-         '837b32593517ae48b9c3b5c87a5d288c'
+         '8a960b08d972f43f91ae84a6f00dcbfb'
          'f083e41c43db25e18f36c91e57750b64'
          'a055911c32fb4ed6e96c453ceaeba857'
          '682eac07428a4e8f138bc082f090ecac'
@@ -61,21 +76,29 @@ md5sums=('3b83ef96387f14655fc854ddc3c6bd57'
          '6f2095b5d61770740852873b195a4d21')
 
 package() {
-  cd ${pkgdir}
-  mkdir -p usr/share/licenses/common
+  install -dm755 usr/share/licenses/common
   cd usr/share/licenses/common
 
   mkdir APACHE
   cp ${srcdir}/apache-2.0.txt APACHE/license.txt
 
-  mkdir CCPL
-  cp ${srcdir}/cc-by-3.0.txt CCPL/
-  cp ${srcdir}/cc-by-nc-3.0.txt CCPL/
-  cp ${srcdir}/cc-by-nc-nd-3.0.txt CCPL/
-  cp ${srcdir}/cc-by-nc-sa-3.0.txt CCPL/
-  cp ${srcdir}/cc-by-nd-3.0.txt CCPL/
-  cp ${srcdir}/cc-by-sa-3.0.txt CCPL/
-  cp ${srcdir}/cc-readme.txt CCPL/
+  mkdir CCPL3.0
+  cp ${srcdir}/cc-by-3.0.txt CCPL3.0/
+  cp ${srcdir}/cc-by-nc-3.0.txt CCPL3.0/
+  cp ${srcdir}/cc-by-nc-nd-3.0.txt CCPL3.0/
+  cp ${srcdir}/cc-by-nc-sa-3.0.txt CCPL3.0/
+  cp ${srcdir}/cc-by-nd-3.0.txt CCPL3.0/
+  cp ${srcdir}/cc-by-sa-3.0.txt CCPL3.0/
+  cp ${srcdir}/cc-readme.txt CCPL3.0/
+
+  mkdir CCPL4.0
+  cp ${srcdir}/cc-by-4.0.txt CCPL4.0/
+  cp ${srcdir}/cc-by-nc-4.0.txt CCPL4.0/
+  cp ${srcdir}/cc-by-nc-nd-4.0.txt CCPL4.0/
+  cp ${srcdir}/cc-by-nc-sa-4.0.txt CCPL4.0/
+  cp ${srcdir}/cc-by-nd-4.0.txt CCPL4.0/
+  cp ${srcdir}/cc-by-sa-4.0.txt CCPL4.0/
+  cp ${srcdir}/cc-4.0-readme.txt CCPL4.0/
 
   mkdir CDDL
   cp ${srcdir}/cddl-1.0.txt CDDL/license.txt
@@ -104,8 +127,9 @@ package() {
   mkdir LPPL
   cp ${srcdir}/lppl.txt LPPL/license.txt
 
-  mkdir MPL
-  cp ${srcdir}/MPL-1.1.txt MPL/license.txt
+  mkdir MPL{1.1,2.0}
+  cp ${srcdir}/MPL-1.1.txt MPL1.1/license.txt
+  cp ${srcdir}/MPL-2.0.txt MPL2.0/license.txt
 
   mkdir PerlArtistic
   cp ${srcdir}/perlartistic.txt PerlArtistic/license.txt
