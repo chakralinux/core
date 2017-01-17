@@ -1,42 +1,45 @@
 # maintainer: Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
-
 pkgname=glibc
-pkgver=2.22
-pkgrel=7
+pkgver=2.24
+pkgrel=1
 pkgdesc="GNU C Library"
 arch=('x86_64')
 url="http://www.gnu.org/software/libc"
 license=('GPL' 'LGPL')
 groups=('base')
-depends=('linux-api-headers>=3.4' 'tzdata' 'filesystem>=2014.07')
-makedepends=('gcc>=5.2')
+depends=('linux-api-headers>=4.7' 'tzdata' 'filesystem>=2014.07')
+makedepends=('gcc>=5.2' 'git')
 backup=(etc/gai.conf
         etc/locale.gen
         etc/nscd.conf)
 options=('!strip' 'staticlibs')
 install=glibc.install
-source=(http://ftp.gnu.org/gnu/libc/${pkgname}-${pkgver}.tar.xz{,.sig}
+source=(git://sourceware.org/git/glibc.git#commit=fdfc9260
+        glibc-2.24-CVE-2016-6323.patch
+        0001-Revert-Avoid-an-extra-branch-to-PLT-for-z-now.patch
         dtv_surplus.patch
-        glibc-2.22-CVE-2015-7547.patch
         locale.gen.txt
         locale-gen)
-md5sums=('e51e02bf552a0a1fbbdc948fb2f5e83c'
-         'SKIP'
+md5sums=('SKIP'
+         '489c4569da0ec0cce9fb73734a31323c'
+         'aa0c0742ea5de00c25dfae8868c1bc9b'
          '6469cba12e2252e16e32db0353ed3f21'
-         '482831190619876ea054929a9744e307'
          '07ac979b6ab5eeb778d55f041529d623'
          '476e9113489f93b348b21e144b6a8fcf')
-validpgpkeys=('F37CDAB708E65EA183FD1AF625EF0A436C2A4AFF')  # Carlos O'Donell
 
 prepare() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${srcdir}/${pkgname}
+
+  # build fails with PIE enabled toolchain
+  # https://sourceware.org/bugzilla/show_bug.cgi?id=20621
+  patch -p1 -i $srcdir/0001-Revert-Avoid-an-extra-branch-to-PLT-for-z-now.patch
 
   # http://chakraos.org/bugtracker/index.php?do=details&task_id=1060&project=8
   patch -p1 -i $srcdir/dtv_surplus.patch
   
-  # https://access.redhat.com/security/cve/CVE-2015-7547
-  patch -p1 -i $srcdir/glibc-2.22-CVE-2015-7547.patch
+  # https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-6323
+  patch -p1 -i $srcdir/glibc-2.24-CVE-2016-6323.patch
 
   mkdir ${srcdir}/glibc-build
 }
@@ -52,19 +55,21 @@ build() {
   # remove hardening options for building libraries
   CFLAGS=${CFLAGS/-fstack-protector-strong/}
   CPPFLAGS=${CPPFLAGS/-D_FORTIFY_SOURCE=2/}
+  # this is handled properly by --enable-bind-now
+  LDFLAGS=${LDFLAGS/,-z,now/}
 
-  ${srcdir}/${pkgname}-${pkgver}/configure --prefix=/usr \
+  ${srcdir}/${pkgname}/configure --prefix=/usr \
       --libdir=/usr/lib --libexecdir=/usr/lib \
       --with-headers=/usr/include \
-      --with-bugurl=https://chakraos.org/bugtracker \
+      --with-bugurl=https://chakralinux.org/bugtracker \
       --enable-add-ons \
       --enable-obsolete-rpc \
       --enable-kernel=2.6.32 \
       --enable-bind-now --disable-profile \
       --enable-stackguard-randomization \
       --enable-multi-arch \
-      --disable-werror
-#     --enable-lock-elision \
+      --disable-werror \
+      --enable-lock-elision 
 
   # build libraries with hardening disabled
   echo "build-programs=no" >> configparms
@@ -76,12 +81,13 @@ build() {
   echo "CXX += -fstack-protector-strong -D_FORTIFY_SOURCE=2" >> configparms
   make
 
-  # remove harding in preparation to run test-suite
-  sed -i '5,7d' configparms
 }
 
 check() {
   cd ${srcdir}/glibc-build
+
+  # remove harding in preparation to run test-suite
+  sed -i '/FORTIFY/d' configparms
 
   make check  &> ${srcdir}/checked || true
 }
@@ -98,11 +104,11 @@ package() {
 
   install -dm755 ${pkgdir}/usr/lib/{locale,systemd/system,tmpfiles.d}
 
-  install -m644 ${srcdir}/${pkgname}-${pkgver}/nscd/nscd.conf ${pkgdir}/etc/nscd.conf
-  install -m644 ${srcdir}/${pkgname}-${pkgver}/nscd/nscd.service ${pkgdir}/usr/lib/systemd/system
-  install -m644 ${srcdir}/${pkgname}-${pkgver}/nscd/nscd.tmpfiles ${pkgdir}/usr/lib/tmpfiles.d/nscd.conf
+  install -m644 ${srcdir}/${pkgname}/nscd/nscd.conf ${pkgdir}/etc/nscd.conf
+  install -m644 ${srcdir}/${pkgname}/nscd/nscd.service ${pkgdir}/usr/lib/systemd/system
+  install -m644 ${srcdir}/${pkgname}/nscd/nscd.tmpfiles ${pkgdir}/usr/lib/tmpfiles.d/nscd.conf
 
-  install -m644 ${srcdir}/${pkgname}-${pkgver}/posix/gai.conf ${pkgdir}/etc/gai.conf
+  install -m644 ${srcdir}/${pkgname}/posix/gai.conf ${pkgdir}/etc/gai.conf
 
   install -m755 ${srcdir}/locale-gen ${pkgdir}/usr/bin
 
@@ -112,7 +118,7 @@ package() {
   # create /etc/locale.gen
   install -m644 ${srcdir}/locale.gen.txt ${pkgdir}/etc/locale.gen
   sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
-    ${srcdir}/glibc-${pkgver}/localedata/SUPPORTED >> ${pkgdir}/etc/locale.gen
+    ${srcdir}/glibc/localedata/SUPPORTED >> ${pkgdir}/etc/locale.gen
 
   # remove the static libraries that have a shared counterpart
   # libc, libdl, libm and libpthread are required for toolchain testsuites
