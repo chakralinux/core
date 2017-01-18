@@ -2,26 +2,64 @@
 # contributor: abveritas@chakra-project.org
 
 pkgname=doxygen
-pkgver=1.8.5
+pkgver=1.8.13
 pkgrel=1
 pkgdesc="A documentation system for C++, C, Java, IDL and PHP"
 license=('GPL')
 arch=('x86_64')
 url="http://www.doxygen.org/"
-depends=('gcc-libs')
-makedepends=('flex' 'qt' 'graphviz')
-optdepends=('graphviz: for caller/callee graph generation'
-            'qt: for doxywizard')
+makedepends=('flex' 'qt5-tools' 'graphviz' 'cmake' 'texlive-core' 'ghostscript' 'texlive-latexextra' 'gcc-libs' 'python')
 source=("ftp://ftp.stack.nl/pub/users/dimitri/${pkgname}-${pkgver}.src.tar.gz")
-md5sums=('db51274568755e2c75c2657e30a78a55')
+md5sums=('0fa414975f8cd6d30e126c28327c1f7c')
+
+prepare() {
+  mkdir build
+
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  # Install the man pages in the right place
+  sed -i 's:DESTINATION man/man1:DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1":g' \
+    doc/CMakeLists.txt
+}
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  QTDIR=/usr ./configure --prefix /usr --with-doxywizard
-  make 
+  cd build
+
+  cmake "../${pkgbase}-${pkgver}" \
+    -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+    -DDOC_INSTALL_DIR:PATH=share/doc/doxygen \
+    -DPYTHON_EXECUTABLE:FILE=/usr/bin/python2 \
+    -Dbuild_doc:BOOL=ON \
+    -Dbuild_wizard:BOOL=ON
+
+  make
+  make docs
 }
 
-package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make INSTALL=${pkgdir}/usr MAN1DIR=share/man/man1 install
+check(){
+  cd build
+  make tests
 }
+
+package_doxygen() {
+  pkgdesc="A documentation system for C++, C, Java, IDL and PHP"
+  depends=('gcc-libs')
+  optdepends=('graphviz: for caller/callee graph generation'
+              'qt5-base: for doxywizard')
+
+  cd build
+  make DESTDIR="$pkgdir" install
+
+  # Docs are in 'doxygen-docs'
+  rm -rf "${pkgdir}/usr/share/doc"
+}
+
+package_doxygen-docs() {
+  pkgdesc="Developer documentation for doxygen"
+
+  cd build
+  make DESTDIR="${pkgdir}" install
+
+  rm -rf "${pkgdir}/usr/bin"
+  rm -rf "${pkgdir}/usr/share/man"
+}
+
