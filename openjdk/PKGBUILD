@@ -30,7 +30,9 @@ source=(jdk8u-${_repo_ver}.tar.gz::${_url_src}/archive/${_repo_ver}.tar.gz
         langtools-${_repo_ver}.tar.gz::${_url_src}/langtools/archive/${_repo_ver}.tar.gz
         nashorn-${_repo_ver}.tar.gz::${_url_src}/nashorn/archive/${_repo_ver}.tar.gz
         openjdk.profile.sh
-        openjdk.profile.csh)
+        openjdk.profile.csh
+	add-fontconfig.patch
+	build_with_gcc6.patch)
 md5sums=('7cea409da1305214175b245e54bbfb5d'
          '981f37e07ef5b2ef5c51e7c6e88061c0'
          'c18909af1adb7b598a6a3886d866adba'
@@ -40,7 +42,9 @@ md5sums=('7cea409da1305214175b245e54bbfb5d'
          '33ecf4b2aad5c0e46fb6865ca55fb741'
          'd503d3e5b6505e51f8f70928d8622641'
          '65fecbcbadfa455f35cb6fef7d1fc553'
-         'b839efffcbdb4f630b52d92ee1565c90')
+         'b839efffcbdb4f630b52d92ee1565c90'
+         '4615ccfc1731f49d27d17bda79f9a82f'
+         '86c80fc46517f73a6b325d702534d5ae')
 
 _jdkname=openjdk8
 _jvmdir=/usr/lib/jvm/java-8-openjdk
@@ -53,11 +57,15 @@ _nonheadless=(bin/policytool
 
 prepare() {
   cd "${srcdir}/jdk8u-${_repo_ver}"
-  
+  patch -p1 -i ${srcdir}/build_with_gcc6.patch
+
   for subrepo in corba hotspot jdk jaxws jaxp langtools nashorn
   do
     ln -sf ../${subrepo}-${_repo_ver} ${subrepo}
   done
+
+  cd "${srcdir}/jdk-${_repo_ver}"
+  patch -p1 -i ${srcdir}/add-fontconfig.patch
 }
 
 
