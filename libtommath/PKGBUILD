@@ -1,23 +1,18 @@
 #Contributions from Arch: https://www.archlinux.org/packages/community/x86_64/libtommath/
 
 pkgname=libtommath
-pkgver=0.42.0
-pkgrel=2
+pkgver=1.0
+pkgrel=1
 pkgdesc="Highly optimized and portable routines for integer based number theoretic applications"
 url="http://www.libtom.org/"
 license=('custom')
 arch=('x86_64')
-source=("https://github.com/libtom/libtommath/archive/v${pkgver}.tar.gz"
-        'libtommath-0.42.0-makefile.patch')
-md5sums=('6e2a82a6073388e4d14d30e8eb0d4fe3'
-         'd50c26fdc5aa87e6acfd4adc20557ff4')
+source=("https://github.com/libtom/libtommath/archive/v${pkgver}.tar.gz")
+md5sums=('c62fbc717289f492246f8dd4dd72a602')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-
-  patch -Np1 -i ${srcdir}/libtommath-0.42.0-makefile.patch
-
-  make -f makefile.shared IGNORE_SPEED=1
+  CFLAGS="$CFLAGS -fPIC" make -f makefile.shared IGNORE_SPEED=1
 }
 
 package() {
