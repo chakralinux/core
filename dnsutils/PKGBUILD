@@ -1,29 +1,21 @@
-#
-# Core Packages for Chakra, part of chakra-project.org
-#
-# maintainer: inkane@chakra-project.org
-# contributor: abveritas@chakra-project.org
 
 pkgname=dnsutils
 # _pkver when P version used.
-pkgver=9.9.3.1
-_pkgver=9.9.3-P1
+pkgver=9.11.1
+_pkgver=9.11.1b1
 pkgrel=1
 pkgdesc="Various DNS utilities - dig host nslookup nsupdate"
 arch=('x86_64')
 url="https://www.isc.org/software/bind"
 license=('custom:ISC')
-depends=('openssl')
+depends=('openssl' 'readline')
 options=('makeflags')
-source=("http://ftp.isc.org/isc/bind9/${_pkgver}/bind-${_pkgver}.tar.gz"
-	'tools-only.patch')
-md5sums=('cf9cd9238d7bc15f1b4a5a5fff90f0d4'
-         '49510087bdb52945242a1a1ba9408112')
+source=("http://ftp.isc.org/isc/bind9/${_pkgver}/bind-${_pkgver}.tar.gz")
+md5sums=('08638a21adb963a60dd2bfe7e642fa96')
 
 build() {
 	cd "${srcdir}/bind-${_pkgver}"
 
-	patch -p1 -i "${srcdir}/tools-only.patch"
 	export STD_CDEFINES='-DDIG_SIGCHASE'
 
 	./configure \
