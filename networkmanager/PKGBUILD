@@ -1,7 +1,7 @@
 pkgname=networkmanager
 _pkgname=NetworkManager
 pkgver=1.4.4
-pkgrel=1
+pkgrel=2
 pkgdesc="Network Management daemon"
 arch=('x86_64')
 license=('GPL')
@@ -26,9 +26,11 @@ backup=('etc/NetworkManager/NetworkManager.conf')
 install=networkmanager.install
 _commit=3c70a03cf5be420afaaf44f3a0bab5d00cc4e993  # tags/1.4.4^0
 source=("git+https://anongit.freedesktop.org/git/NetworkManager/NetworkManager#commit=$_commit"
-        NetworkManager.conf)
+        NetworkManager.conf
+        20-connectivity.conf)
 sha256sums=('SKIP'
-            '67f112c1ac8ee3726eb229f5cd783de19f09cc252af49e157343d82b324b923f')
+            '67f112c1ac8ee3726eb229f5cd783de19f09cc252af49e157343d82b324b923f'
+            '569c312647723c39c356a9ba746ce674f9c69595b4764990b1e8254dd141e0b1')
 
 prepare() {
   cd NetworkManager
@@ -80,8 +82,11 @@ package() {
   cd $_pkgname
   make DESTDIR="$pkgdir" install
 
+  install -dm700 "$pkgdir/etc/NetworkManager/system-connections"
+  install -d "$pkgdir"/etc/NetworkManager/{conf,dnsmasq}.d
   install -m644 ../NetworkManager.conf "$pkgdir/etc/NetworkManager/"
-  install -m755 -d "$pkgdir/etc/NetworkManager/dnsmasq.d"
+  install -Dm644 ../20-connectivity.conf \
+    "$pkgdir/usr/lib/NetworkManager/conf.d/20-connectivity.conf"
  
   rm -r "$pkgdir/var/run"  
 }
