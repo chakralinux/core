@@ -1,29 +1,36 @@
 #Contributions from AUR: https://aur.archlinux.org/packages/epson-inkjet-printer-escpr/
 
 pkgname=epson-inkjet-printer-escpr
-pkgver=1.4.5
+pkgver=1.6.11
 pkgrel=1
-pkgdesc="Common Linux printer driver for Epson Multifonction Inkjet Printers."
+pkgdesc="Epson Inkjet Printer Driver (ESC/P-R) for Linux"
 arch=('x86_64')
-url="https://www.epson.com"
-license=('GPL')
-depends=('cups' 'gutenprint')
-source=('https://download3.ebz.epson.net/dsc/f/03/00/03/52/19/d912de1ce0155980d9ad3f156f14af99d69d627a/epson-inkjet-printer-escpr-1.4.5-1lsb3.2.src.rpm')
-sha256sums=('118c578e8d9b966349e63afc8d581f35701539ee2898a18b079b547cf94d76ef')
- 
+url="http://download.ebz.epson.net/dsc/search/01/search/?OSC=LX"
+license=('GPL2')
+depends=('cups' 'ghostscript')
+source=('https://download3.ebz.epson.net/dsc/f/03/00/05/36/34/7b858fe7440558b9864dde0a6d353821ddb6f310/epson-inkjet-printer-escpr-1.6.11-1lsb3.2.tar.gz'
+        'bug_x86_64.patch')
+sha256sums=('367f2503b533ffacae9b9f529f629daaf9f4f8068615ae3d77cb5a4e13bbe39d'
+            '277bc9afe581d2c434217db646e20ecfd1b6045bdcce861f2f08992ccf854084')
+
 prepare() {
-  tar zxf "$pkgname-$pkgver-1lsb3.2.tar.gz"
+  cd "$pkgname-$pkgver"
+
+  patch -p1 -i "${srcdir}/bug_x86_64.patch"
+
 }
- 
+
 build() {
   cd "$pkgname-$pkgver"
+
   ./configure --prefix=/usr \
               --with-cupsfilterdir=/usr/lib/cups/filter \
               --with-cupsppddir=/usr/share/ppd
-              make
+  make
 }
- 
+
 package() {
   cd "$pkgname-$pkgver"
   make DESTDIR="$pkgdir" install
 }
+
