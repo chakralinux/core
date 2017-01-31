@@ -1,8 +1,8 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/cups-filters
 
 pkgname=cups-filters
-pkgver=1.13.1
-pkgrel=2
+pkgver=1.13.3
+pkgrel=1
 pkgdesc="OpenPrinting CUPS Filters"
 arch=('x86_64')
 url="http://www.linuxfoundation.org/collaborate/workgroups/openprinting"
@@ -10,9 +10,6 @@ license=('GPL')
 depends=('lcms2' 'poppler' 'qpdf')
 makedepends=('ghostscript' 'python2')
 checkdepends=('ttf-dejavu')
-replaces=('foomatic-filters')
-provides=('foomatic-filters')
-conflicts=('foomatic-filters')
 optdepends=('ghostscript: for non-PostScript printers to print with CUPS to convert PostScript to raster images'
 	    'foomatic-db: drivers use Ghostscript to convert PostScript to a printable form directly'
 	    'foomatic-db-engine: drivers use Ghostscript to convert PostScript to a printable form directly'
@@ -20,7 +17,7 @@ optdepends=('ghostscript: for non-PostScript printers to print with CUPS to conv
 backup=(etc/fonts/conf.d/99pdftoopvp.conf
         etc/cups/cups-browsed.conf)
 source=(http://www.openprinting.org/download/cups-filters/$pkgname-$pkgver.tar.xz)
-md5sums=('a1f785753ff8778b8312b9f53a992ba0')
+md5sums=('3fac49dfeb7d0db37873dd33cff67a96')
 
 build() {
   cd $pkgname-$pkgver
@@ -30,8 +27,10 @@ build() {
     --localstatedir=/var \
     --with-rcdir=no \
     --enable-avahi \
+    --disable-mutool \
     --with-browseremoteprotocols=DNSSD,CUPS \
     --with-test-font-path=/usr/share/fonts/TTF/DejaVuSans.ttf
+# mutool is muted as for now (the 1.13.3-1 build), it requires more dependency and some core package updates
   make
 }
 
