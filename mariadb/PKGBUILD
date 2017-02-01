@@ -1,4 +1,3 @@
-
 pkgbase=mariadb
 pkgname=('libmariadbclient' 'mariadb-clients' 'mytop' 'mariadb')
 pkgver=10.1.21
@@ -22,8 +21,10 @@ prepare() {
   # Changes to the upstream unit files:
   #  * remove the alias from unit files, we install symlinks in package function
   #  * enable PrivateTmp for a little bit more security
+  #  * change binary directory from sbin to bin
   sed -i -e '/^Alias/d' \
     -e '/^PrivateTmp/c PrivateTmp=true' \
+    -e 's,/sbin/,/bin/,g' \
     $pkgbase-$_pkgver/support-files/mariadb{,@}.service.in
   [[ -d build ]] && rm -rf build
   mkdir -p build
@@ -42,8 +43,8 @@ build() {
     -DDEFAULT_CHARSET=utf8 \
     -DDEFAULT_COLLATION=utf8_general_ci \
     -DENABLED_LOCAL_INFILE=ON \
-    -DINSTALL_DOCDIR=share/doc/mysql \
-    -DINSTALL_DOCREADMEDIR=share/doc/mysql \
+    -DINSTALL_DOCDIR=share/doc/${pkgbase} \
+    -DINSTALL_DOCREADMEDIR=share/doc/${pkgbase} \
     -DINSTALL_MANDIR=share/man \
     -DINSTALL_PLUGINDIR=lib/mysql/plugin \
     -DINSTALL_SCRIPTDIR=bin \
@@ -165,7 +166,7 @@ package_mariadb() {
 
   # move to proper licenses directories
   install -d usr/share/licenses/mariadb
-  mv usr/share/doc/mysql/COPYING* usr/share/licenses/mariadb/
+  mv usr/share/doc/mariadb/COPYING* usr/share/licenses/mariadb/
 
   # already installed to real systemd unit directory
   rm -r usr/share/mysql/systemd/
