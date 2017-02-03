@@ -2,8 +2,8 @@
 # contributor Jan de Groot <jgc@archlinux.org>
 
 pkgname=gst-plugins-good
-pkgver=1.6.3
-pkgrel=2
+pkgver=1.10.3
+pkgrel=1
 pkgdesc="GStreamer Multimedia Framework Good Plugins"
 arch=('x86_64')
 license=('LGPL')
@@ -11,8 +11,10 @@ url="http://gstreamer.freedesktop.org/"
 depends=('libpulse' 'jack' 'libsoup' 'gst-plugins-base-libs' 'wavpack' 'aalib' 'taglib' 'libdv' 'libshout' 'libvpx' 'gdk-pixbuf2' 'libcaca' 'libavc1394' 'libiec61883' 'libxdamage' 'v4l-utils' 'cairo' 'libgudev')
 makedepends=('gstreamer' 'speex' 'flac' 'libraw1394' 'python3')
 options=(!emptydirs)
-source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
-sha256sums=('24b19db70b2a83461ebddfe20033db432dadfdb5d4b54ffb1dfa0d830134a177')
+source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz{,.asc})
+sha256sums=('4e07e93e34d4b93208f1579c21e7d91a236577b36f128a5332ffee85b4465955'
+            'SKIP')
+validpgpkeys=('7F4BC7CC3CA06F97336BBFEB0668CC1486C2D7B5')
 
 build() {
   cd $pkgname-$pkgver
@@ -23,7 +25,7 @@ build() {
     --disable-static \
     --enable-experimental \
     --with-package-name="GStreamer Good Plugins (Chakra GNU/Linux)" \
-    --with-package-origin="http://www.chakraos.org/"
+    --with-package-origin="https://chakralinux.org/"
   
   # https://bugzilla.gnome.org/show_bug.cgi?id=655517
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
@@ -31,11 +33,11 @@ build() {
   make
 }
 
-# Disabled for now: souphttpsrc times out, and takes a damn long time to do so
-#check() {
-#  cd $pkgname-$pkgver
-#  make check
-#}
+# Failed at gdkpixbufoverlay, full log committed
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
 
 package() {
   cd $pkgname-$pkgver

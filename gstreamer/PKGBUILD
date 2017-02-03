@@ -2,7 +2,7 @@
 # contributor Jan de Groot <jgc@archlinux.org>
 
 pkgname=gstreamer
-pkgver=1.10.2
+pkgver=1.10.3
 pkgrel=1
 pkgdesc="GStreamer Multimedia Framework"
 arch=('x86_64')
@@ -11,8 +11,10 @@ url="http://gstreamer.freedesktop.org/"
 depends=('libxml2' 'glib2')
 optdepends=('sh: feedback script')
 makedepends=('intltool' 'pkgconfig' 'gobject-introspection')
-source=(${url}/src/gstreamer/gstreamer-${pkgver}.tar.xz)
-sha256sums=('150e8e81febac94c161d8141cde78a38038a8f56e8ec549f353da54994278d65')
+source=(${url}/src/gstreamer/gstreamer-${pkgver}.tar.xz{,.asc})
+sha256sums=('85b9dc1b2991f224fa90d534ec57014896c479e061dc9fa1bc16ae17cbebb63d'
+            'SKIP')
+validpgpkeys=('7F4BC7CC3CA06F97336BBFEB0668CC1486C2D7B5')
 
 build() {
   cd "${srcdir}/gstreamer-${pkgver}"
@@ -21,7 +23,7 @@ build() {
       --localstatedir=/var \
       --libexecdir=/usr/lib \
       --with-package-name="GStreamer (Chakra GNU/Linux)" \
-      --with-package-origin="https://www.chakralinux.org/" \
+      --with-package-origin="https://chakralinux.org/" \
       --disable-static
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=655517

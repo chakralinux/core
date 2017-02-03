@@ -1,6 +1,6 @@
 pkgbase=gst-plugins-base
 pkgname=('gst-plugins-base-libs' 'gst-plugins-base')
-pkgver=1.6.3
+pkgver=1.10.3
 pkgrel=1
 pkgdesc="GStreamer Multimedia Framework Base Plugins"
 arch=('x86_64')
@@ -8,16 +8,18 @@ license=('LGPL')
 makedepends=('pkgconfig' 'gstreamer' 'orc' 'libxv' 'alsa-lib' 'cdparanoia' 'libvisual' 'libvorbis' 'libtheora' 'pango' 'gobject-introspection' 'python2')
 options=(!emptydirs)
 url="http://gstreamer.freedesktop.org/"
-source=(${url}/src/$pkgbase/$pkgbase-${pkgver}.tar.xz)
-sha256sums=('b6154f8fdba4877e95efd94610ef0ada4f0171cd12eb829a3c3c97345d9c7a75')
+source=(${url}/src/$pkgbase/$pkgbase-${pkgver}.tar.xz{,.asc})
+sha256sums=('e6299617d705a0cbfb535107c1d3a8fc0f0967f14193a8c5c7583f46a88b1710'
+            'SKIP')
+validpgpkeys=('7F4BC7CC3CA06F97336BBFEB0668CC1486C2D7B5')
 
 build() {
   cd $pkgbase-$pkgver
 
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --disable-static --enable-experimental \
-    --with-package-name="GStreamer Base Plugins (Arch Linux)" \
-    --with-package-origin="http://www.archlinux.org/"
+    --with-package-name="GStreamer Base Plugins (Chakra GNU/Linux)" \
+    --with-package-origin="https://chakralinux.org/"
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=655517
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool

@@ -1,21 +1,20 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
 # Maintainer: Francesco Marinucci < franzmari[at]chakra-project[dot]it>
 # contributor Jan de Groot <jgc@archlinux.org>
 
 pkgname=gst-plugins-ugly
-pkgver=1.6.3
+pkgver=1.10.3
 pkgrel=1
 pkgdesc="GStreamer Multimedia Framework Ugly Plugins"
 arch=('x86_64')
 license=('LGPL')
 url="http://gstreamer.freedesktop.org/"
 depends=('gst-plugins-base-libs' 'libdvdread' 'lame' 'libmpeg2' 'a52dec' 'libmad' 'libsidplay' 'libcdio' 'libx264' 'opencore-amr')
-makedepends=('python' 'x264')
+makedepends=('python' 'x264' 'valgrind')
 options=(!emptydirs)
-source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
-sha256sums=('2fecf7b7c7882f8f62f1900048f4013f98c214fb3d3303d8d812245bb41fd064')
+source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz{,.asc})
+sha256sums=('c91597d03abff9df435ad4892eae44df1ee14159c7cc7317ac9d2766ff446bd2'
+            'SKIP')
+validpgpkeys=('7F4BC7CC3CA06F97336BBFEB0668CC1486C2D7B5')
 
 build() {
   cd $pkgname-$pkgver
@@ -26,7 +25,7 @@ build() {
     --disable-static \
     --enable-experimental \
     --with-package-name="GStreamer Ugly Plugins (Chakra GNU/Linux)" \
-    --with-package-origin="http://www.chakraos.org/"
+    --with-package-origin="https://chakralinux.org/"
   
   # https://bugzilla.gnome.org/show_bug.cgi?id=655517
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool

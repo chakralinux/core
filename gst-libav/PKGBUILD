@@ -1,5 +1,5 @@
 pkgname=gst-libav
-pkgver=1.6.3
+pkgver=1.10.3
 pkgrel=1
 pkgdesc="Gstreamer libav Plugin"
 arch=('x86_64')
@@ -9,8 +9,10 @@ depends=('gst-plugins-base-libs' 'bzip2' 'ffmpeg')
 makedepends=('python' 'yasm')
 options=(!emptydirs)
 provides=("gst-ffmpeg=$pkgver-$pkgrel")
-source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz)
-sha256sums=('857b9c060a0337de38c6d26238c47352433c02eabf26c2f860c854dbc35bd4ab')
+source=(${url}/src/$pkgname/$pkgname-$pkgver.tar.xz{,.asc})
+sha256sums=('9a6bc165b1862b18b98d9f1755c43806e4839a80f69ec7ea9a2dab61b65752a9'
+            'SKIP')
+validpgpkeys=('7F4BC7CC3CA06F97336BBFEB0668CC1486C2D7B5')
 
 prepare() {
   cd $pkgname-$pkgver
@@ -22,7 +24,7 @@ build() {
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --disable-static --with-libav-extra-configure="--enable-runtime-cpudetect" \
     --with-package-name="GStreamer libav Plugin (Chakra Linux)" \
-    --with-package-origin="http://www.chakraos.org/" \
+    --with-package-origin="https://chakralinux.org/" \
     --with-system-libav
 
   # https://bugzilla.gnome.org/show_bug.cgi?id=655517
@@ -31,6 +33,7 @@ build() {
   make
 }
 
+# check failed in 2 tests, log provided
 check() {
   cd $pkgname-$pkgver
   make check
