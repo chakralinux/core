@@ -1,39 +1,40 @@
-# Maintainer: abveritas@chakra-project.org
-# Contributor: Mladen Pejakovic <pejakm@gmail.com>
 
 pkgbase=libxkbcommon
 pkgname=(libxkbcommon libxkbcommon-x11)
-pkgver=0.5.0
-pkgrel=2
+pkgver=0.7.1
+pkgrel=1
 pkgdesc="Keyboard handling library using XKB data"
 arch=('x86_64')
 url="http://xkbcommon.org/"
 license=('custom')
 depends=(xkeyboard-config glibc)
 checkdepends=(xorg-server-xvfb libgl)
-makedepends=(libxcb doxygen xorg-util-macros)
-source=("http://xkbcommon.org/download/$pkgname-$pkgver.tar.xz")
-md5sums=('2e1faeafcc609c30af3a561a91e84158')
+makedepends=(libxcb doxygen xorg-util-macros autoconf-archive git graphviz
+             wayland wayland-protocols)
+source=("https://github.com/xkbcommon/libxkbcommon/archive/xkbcommon-$pkgver.tar.gz")
+md5sums=('93e7d136da177810af3a384c1337d52a')
 
 prepare() {
   mkdir -p x11/usr/{include/xkbcommon,lib/pkgconfig}
+  cd "$pkgbase-xkbcommon-$pkgver"
+  NOCONFIGURE=1 ./autogen.sh
 }
 
 build() {
-  cd $pkgbase-$pkgver
+  cd "$pkgbase-xkbcommon-$pkgver"
   ./configure --prefix=/usr --disable-static
   make
 }
 
 check() {
-  cd $pkgbase-$pkgver
+  cd "$pkgbase-xkbcommon-$pkgver"
   xvfb-run -a make -k check
 }
 
 package_libxkbcommon() {
-  cd $pkgbase-$pkgver
+  cd "$pkgbase-xkbcommon-$pkgver"
   make DESTDIR="$pkgdir" install
-  install -Dm644 COPYING "$pkgdir/usr/share/licenses/libxkbcommon/LICENSE"
+  install -Dm644  LICENSE "$pkgdir/usr/share/licenses/libxkbcommon/LICENSE"
 
 ### Split libxkbcommon-x11
 
@@ -45,10 +46,7 @@ package_libxkbcommon() {
 package_libxkbcommon-x11() {
   pkgdesc="Keyboard handling library using XKB data for X11 XCB clients"
   depends=(libxkbcommon libxcb)
-  conflicts=('libxkbcommon<=0.5.0-1')
-  replaces=('libxkbcommon<=0.5.0-1')
-
   mv x11/* "$pkgdir"
 
-  install -Dm644 $pkgbase-$pkgver/COPYING "$pkgdir/usr/share/licenses/libxkbcommon-x11/LICENSE"
+  install -Dm644 $pkgbase-$pkgver/LICENSE "$pkgdir/usr/share/licenses/libxkbcommon-x11/LICENSE"
 }
