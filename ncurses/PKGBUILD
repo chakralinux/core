@@ -1,5 +1,5 @@
 pkgname=ncurses
-_pkgver=6.0-20170114
+_pkgver=6.0-20170204
 pkgver=${_pkgver/-/+}
 pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library"
@@ -7,8 +7,9 @@ arch=('x86_64')
 url="http://www.gnu.org/software/ncurses/"
 license=('MIT')
 depends=('glibc')
+provides=('libncurses++w.so' 'libformw.so' 'libmenuw.so' 'libpanelw.so' 'libncursesw.so')
 source=(http://invisible-mirror.net/archives/ncurses/current/ncurses-${_pkgver}.tgz{,.asc})
-md5sums=('247b694bfca665046a83400375b80b39'
+md5sums=('1d772a92023f83fc9acfa9baca4babe7'
          'SKIP')
 validpgpkeys=('C52048C0C0748FEE227D47A2702353E0F7E48EDB')  # Thomas Dickey
 
@@ -36,7 +37,7 @@ package() {
   # Fool packages looking to link to non-wide-character ncurses libraries
   for lib in ncurses ncurses++ form panel menu ; do
     echo "INPUT(-l${lib}w)" >"${pkgdir}/usr/lib/lib${lib}.so"
-    ln -s "lib${lib}w.pc" "${pkgdir}/usr/lib/pkgconfig/${lib}.pc"
+    ln -s "${lib}w.pc" "${pkgdir}/usr/lib/pkgconfig/${lib}.pc"
   done
 
   # Some packages look for -lcurses during build
