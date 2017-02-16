@@ -1,0 +1,28 @@
+# Contributions from Arch: https://git.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/mdds
+pkgname=mdds
+pkgver=1.2.2
+pkgrel=1
+pkgdesc="A collection of multi-dimensional data structures and indexing algorithms"
+arch=('any')
+url="https://gitlab.com/mdds/mdds"
+license=('MIT')
+checkdepends=('boost')
+# see http://code.google.com/p/multidimalgorithm/wiki/Downloads
+source=(http://kohei.us/files/mdds/src/${pkgname}-${pkgver}.tar.bz2)
+sha256sums=('141e730b39110434b02cd844c5ad3442103f7c35f7e9a4d6a9f8af813594cc9d')
+
+build() {
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+}
+
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
+}
+
+package() {
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+}
