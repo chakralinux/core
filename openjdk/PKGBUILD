@@ -1,15 +1,14 @@
-#Contributions from KaOS: https://github.com/KaOSx/main/blob/master/openjdk/PKGBUILD
 
 pkgname=('openjdk' 'openjdk-src' 'openjdk-doc')
 pkgbase='openjdk'
 _java_ver=8
-_jdk_update=112
-_jdk_build=16
+_jdk_update=121
+_jdk_build=13
 # latest release notes:
 # http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 pkgver=${_java_ver}.u${_jdk_update}	
 _repo_ver=jdk${_java_ver}u${_jdk_update}-b${_jdk_build}
-pkgrel=2
+pkgrel=1
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 arch=('x86_64')
 url="http://icedtea.classpath.org/"
@@ -33,14 +32,14 @@ source=(jdk8u-${_repo_ver}.tar.gz::${_url_src}/archive/${_repo_ver}.tar.gz
         openjdk.profile.csh
 	add-fontconfig.patch
 	build_with_gcc6.patch)
-md5sums=('7cea409da1305214175b245e54bbfb5d'
-         '981f37e07ef5b2ef5c51e7c6e88061c0'
-         'c18909af1adb7b598a6a3886d866adba'
-         '79d756fafce06804c26495259e830210'
-         '1d24c994060280266c9a813d3441c028'
-         'dff71240a55f98083caf9c6a40c877dd'
-         '33ecf4b2aad5c0e46fb6865ca55fb741'
-         'd503d3e5b6505e51f8f70928d8622641'
+md5sums=('c1e6f96a7715893ed9710559c9569efa'
+         '9362ebce2a04fa5f2ea23c927c70b710'
+         '5b4bbfe393a60baa24b340edee23838a'
+         '9bb6f636507321b5324b4decc004cd85'
+         '38fc050e0fedeef9e585123419605bb2'
+         '12be4364080f13c3d0bb0473adca797f'
+         'c5e5bbbcbd4c61f31145193aca01f0b6'
+         'e7b73ccc96b276a5051f78ccb7f2042b'
          '65fecbcbadfa455f35cb6fef7d1fc553'
          'b839efffcbdb4f630b52d92ee1565c90'
          '4615ccfc1731f49d27d17bda79f9a82f'
@@ -76,6 +75,7 @@ build() {
   unset JAVA_HOME
   # http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1346
   export MAKEFLAGS=${MAKEFLAGS/-j*}
+  export CFLAGS="${CFLAGS} -Wno-error=deprecated-declarations"
 
   install -d -m 755 "${srcdir}/${_prefix}/"
   sh configure \
