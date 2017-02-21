@@ -1,0 +1,24 @@
+pkgname=nilfs-utils
+pkgver=2.2.6
+pkgrel=1
+pkgdesc="A log-structured file system supporting continuous snapshotting (userspace tools)"
+arch=('x86_64')
+url="http://nilfs.sourceforge.net/"
+license=('GPL2' 'LGPL2.1')
+depends=('util-linux')
+source=(https://github.com/nilfs-dev/${pkgname}/archive/v${pkgver}.tar.gz)
+md5sums=('614bd602caa83546acf0383160b94add')
+
+build() {
+  cd $pkgname-$pkgver
+  ./autogen.sh
+
+  sed -i -e 's#root_sbindir=/sbin#root_sbindir=/usr/bin#' configure
+  ./configure --sbindir=/usr/bin --with-libmount
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" sbindir=/usr/bin install LDCONFIG=/bin/true
+}
