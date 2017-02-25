@@ -1,6 +1,6 @@
 pkgname=nilfs-utils
 pkgver=2.2.6
-pkgrel=2
+pkgrel=3
 pkgdesc="A log-structured file system supporting continuous snapshotting (userspace tools)"
 arch=('x86_64')
 url="http://nilfs.sourceforge.net/"
@@ -13,7 +13,9 @@ build() {
   cd $pkgname-$pkgver
   ./autogen.sh
 
-  sed -i -e 's#root_sbindir=/sbin#root_sbindir=/usr/bin#' configure
+  # TODO: there is a change to configure to apply here.
+  # root_sbindir needs to change from /sbin to /usr/bin
+  # or there are file conflicts later.
   ./configure --sbindir=/usr/bin --with-libmount
   make
 }
