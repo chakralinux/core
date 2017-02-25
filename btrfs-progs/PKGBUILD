@@ -2,8 +2,8 @@
 # kernel.
 
 pkgname=btrfs-progs
-pkgver=4.8.1
-pkgrel=3
+pkgver=4.8.5
+pkgrel=1
 pkgdesc='Btrfs filesystem utilities'
 arch=('x86_64')
 depends=('glibc' 'util-linux' 'e2fsprogs' 'lzo2' 'zlib')
@@ -13,18 +13,19 @@ replaces=('btrfs-progs-unstable')
 conflicts=('btrfs-progs-unstable')
 provides=('btrfs-progs-unstable')
 license=('GPL2')
-source=("git://git.kernel.org/pub/scm/linux/kernel/git/kdave/$pkgname.git#tag=v$pkgver"
+source=("https://github.com/kdave/${pkgname}/archive/v${pkgver}.tar.gz"
         'initcpio-install-btrfs'
         'initcpio-hook-btrfs'
         'btrfs-scrub@.service'
         'btrfs-scrub@.timer')
-install=btrfs-progs.install
-options=(!staticlibs)
-md5sums=('SKIP'
+md5sums=('2ef6510400d2f25a13547afc10c1c9d7'
          '7241ba3a4286d08da0d50b7176941112'
          'b09688a915a0ec8f40e2f5aacbabc9ad'
          '794b867e09451284c545bae112aa0cfd'
          'a290e0ab88b7b4675cd20f5a2befc8cb')
+
+install=btrfs-progs.install
+options=(!staticlibs)
 
 build() {
    cd $pkgname
@@ -57,4 +58,5 @@ package() {
 }
 
 # vim:set ts=2 sw=2 ft=sh et:
+
 
