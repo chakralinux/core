@@ -11,8 +11,10 @@ url='https://projects.kde.org/projects/kdesupport/extra-cmake-modules'
 license=('LGPL')
 depends=('cmake')
 makedepends=('qt5-tools' 'python3-sphinx')
-source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum $pkgname) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

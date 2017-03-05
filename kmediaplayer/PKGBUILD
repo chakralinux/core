@@ -14,8 +14,10 @@ makedepends=("extra-cmake-modules>=${KFECMVersion}")
 checkdepends=("cmake" "xorg-server-xvfb")
 groups=('kf5-aids')
 options=("debug")
-source=("${KFServer}/portingAids/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/portingAids/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

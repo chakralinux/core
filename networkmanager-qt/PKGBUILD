@@ -17,8 +17,10 @@ replaces=('libnm-qt5')
 conflicts=('libnm-qt5')
 provides=("libnm-qt5=${pkgver}")
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

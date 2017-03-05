@@ -14,8 +14,11 @@ replaces=("kactivities-frameworks" 'kactivities4')
 conflicts=('kactivities4' 'kactivities-frameworks')
 options=("debug")
 groups=('kf5')
-source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n 1) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname} | head -n 1)
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
+
 
 prepare() {
   mkdir -p build

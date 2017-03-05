@@ -13,8 +13,10 @@ depends=('karchive' 'docbook-xsl')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" "ki18n" "python3" "perl-uri")
 groups=('kf5')
 options=('staticlibs' 'debug')
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

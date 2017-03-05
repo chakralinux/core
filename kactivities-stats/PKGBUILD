@@ -11,8 +11,10 @@ depends=('kactivities')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'boost' 'python3')
 options=("debug")
 groups=('kf5')
-source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n 2) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname} | head -n 2)
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

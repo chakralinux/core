@@ -13,8 +13,10 @@ depends=('python3-jinja' 'python3-yaml')
 makedepends=("extra-cmake-modules>=$KFECMVersion" 'qt5-base')
 groups=('kf5')
 options=("debug")
-source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
-sha256sums=($(getSum ${pkgname}))
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname}) 
+             'SKIP' )
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build
