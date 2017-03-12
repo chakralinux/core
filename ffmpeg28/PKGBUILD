@@ -1,5 +1,5 @@
-pkgname=ffmpeg
-pkgver=3.2.4
+pkgname=ffmpeg2.8
+pkgver=2.8.11
 pkgrel=1
 pkgdesc='Complete solution to record, convert and stream audio and video'
 arch=('x86_64')
@@ -17,32 +17,49 @@ optdepends=('ladspa: LADSPA filters')
 provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
           'libavresample.so' 'libavutil.so' 'libpostproc.so' 'libswresample.so'
           'libswscale.so')
-source=(http://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.bz2{,.asc})
+source=(http://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.bz2{,.asc}
+        https://github.com/FFmpeg/FFmpeg/commit/7145e80b4f78cff5ed5fee04d4c4d53daaa0e077.patch
+        https://github.com/FFmpeg/FFmpeg/commit/6ba42b6482c725a59eb468391544dc0c75b8c6f0.patch
+        https://github.com/FFmpeg/FFmpeg/commit/cfda1bea4c18ec1edbc11ecc465f788b02851488.patch)
 validpgpkeys=('FCF986EA15E6E293A5644F10B4322F04D67658D8')
-sha256sums=('c0fa3593a2e9e96ace3c1757900094437ad96d1d6ca19f057c378b5f394496a4'
-            'SKIP')
+sha256sums=('9987e0f6b1f66311390f807a0c18ad9c90652b5097cff17b3dcbeabdd89f8d32'
+            'SKIP'
+            '402477e1cdea436bc322016d97f0a48433c7063ab8cb1100490d059b1663e92e'
+            'c5e5d2cba239f663004e65f86f87ab608348b5eedb11c0ac6d3403a0b8b49f42'
+            'cd285af37d91e04c26a112d6bcbab994e9acf7f49e9f9db06d7c9e8540bb25bd')
+
+prepare() {
+  cd ffmpeg-${pkgver}
+
+  # FS#47738
+  patch -Np1 -i ../7145e80b4f78cff5ed5fee04d4c4d53daaa0e077.patch
+  patch -Np1 -i ../6ba42b6482c725a59eb468391544dc0c75b8c6f0.patch
+  patch -Np1 -i ../cfda1bea4c18ec1edbc11ecc465f788b02851488.patch
+}
 
 build() {
-  cd ${pkgname}-${pkgver}
+  cd ffmpeg-${pkgver}
 
   ./configure \
     --prefix='/usr' \
+    --incdir='/usr/include/ffmpeg2.8' \
+    --libdir='/usr/lib/ffmpeg2.8' \
+    --shlibdir='/usr/lib/ffmpeg2.8' \
     --disable-debug \
     --disable-static \
     --disable-stripping \
     --enable-avisynth \
     --enable-avresample \
     --enable-fontconfig \
-    --enable-gmp \
     --enable-gnutls \
     --enable-gpl \
     --enable-ladspa \
     --enable-libass \
     --enable-libbluray \
+    --enable-libdcadec \
     --enable-libfreetype \
     --enable-libfribidi \
     --enable-libgsm \
-    --enable-libiec61883 \
     --enable-libmodplug \
     --enable-libmp3lame \
     --enable-libopencore_amrnb \
@@ -82,10 +99,13 @@ build() {
 #}
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd ffmpeg-${pkgver}
 
-  make DESTDIR="${pkgdir}" install install-man
-  install -Dm 755 tools/qt-faststart "${pkgdir}"/usr/bin/
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/usr/{bin,share}
+
+  install -dm 755 "${pkgdir}"/etc/ld.so.conf.d
+  echo -e '/usr/lib/\n/usr/lib/ffmpeg2.8/' > "${pkgdir}"/etc/ld.so.conf.d/ffmpeg2.8.conf
 }
 
 # vim: ts=2 sw=2 et:
