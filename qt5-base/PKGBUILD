@@ -2,12 +2,12 @@ source ../qt5.conf
 
 pkgname=qt5-base
 pkgver=${QSubVersion}
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
 pkgdesc='A cross-platform application and UI framework'
-depends=('libjpeg-turbo' 'xcb-util-keysyms' 'libgl' 'fontconfig'
+depends=('libjpeg-turbo' 'xcb-util-keysyms' 'xcb-util-renderutil' 'libgl' 'fontconfig'
          'xcb-util-wm' 'libxrender' 'libxi' 'sqlite3' 'xcb-util-image' 'icu'
          'libinput' 'libsm' 'libxkbcommon-x11' 'libproxy' 'dbus')
 makedepends=('mtdev' 'libmariadbclient' 'sqlite3' 'unixodbc' 'postgresql-libs' 'alsa-lib' 'gst-plugins-base-libs'
@@ -21,9 +21,16 @@ optdepends=('qt5-svg: to use SVG icon themes'
 groups=('qt5')
 options=('debug')
 source=( $(getSrc ${pkgname}) 
-        qtbug-49061.patch::"https://github.com/qt/qtbase/commit/494376f980e96339b6f1eff7c41336ca4d853065.patch")
+        qt5-base-journald.patch::"https://github.com/qt/qtbase/commit/0c8f3229.patch"
+        plasma-crash-1.patch::https://github.com/qt/qtbase/commit/3bd0fd8f.patch
+        plasma-crash-2.patch::https://github.com/qt/qtbase/commit/0874861b.patch
+        plasma-crash-3.patch::https://github.com/qt/qtbase/commit/baad82d2.patch)
 md5sums=( $(getSum ${pkgname})
-         'c86af27562bbbe05c3defd63d00130fd')
+         '160fde81fe882c4241f04634f53691ad'
+         '078d8a051c06abf28451fd2cdb7f19ce'
+         '92daaa3ebd7cf10ee725b963e44c95a7'
+         '76ab122615f1ba2d68c83477f82e389e')
+
 
 prepare() {
   cd $(getPkgName ${pkgname})
@@ -39,20 +46,22 @@ prepare() {
   find . -name '*.py' -exec sed -i \
     's|#![ ]*/usr/bin/python$|&2|;s|#![ ]*/usr/bin/env python$|&2|' {} +
 
-  # Fix libsystemd-journal detection
-  sed -e 's|libsystemd-journal|libsystemd|' -i config.tests/unix/journald/journald.pro -i src/corelib/global/global.pri
+  # Fix logging to systemd journal
+  patch -p1 -i ../qt5-base-journald.patch
 
-  patch -p1 -i ../qtbug-49061.patch
+  # Fix some Plasma taskbar crashes https://bugs.kde.org/show_bug.cgi?id=342763
+  patch -p1 -i ../plasma-crash-1.patch
+  patch -p1 -i ../plasma-crash-2.patch
+  patch -p1 -i ../plasma-crash-3.patch
 }
 
 build() {
   cd $(getPkgName ${pkgname})
 
-#  export QTDIR="${srcdir}"/$(getPkgName ${pkgname})
-#  export LD_LIBRARY_PATH="${QTDIR}"/lib:"${LD_LIBRARY_PATH}"
-#  export QT_PLUGIN_PATH="${QTDIR}"/qtbase/plugins
-
   export _xkbconfigroot=$(pkg-config --variable=xkb_base xkeyboard-config)
+  
+  echo "INCLUDEPATH += /usr/include/openssl-1.0" >> src/network/network.pro
+  export OPENSSL_LIBS='-L/usr/lib/openssl-1.0 -lssl -lcrypto'
 
   PYTHON=/usr/bin/python2 ./configure -confirm-license -opensource -v \
     -prefix /usr \
@@ -81,10 +90,6 @@ build() {
     -journald \
     -libinput \
     -reduce-relocations \
-    -opengl desktop \
-    -feature-menu \
-    -feature-textdate \
-    -feature-ftp \
     -xkb-config-root $_xkbconfigroot \
     -system-xkbcommon
 
