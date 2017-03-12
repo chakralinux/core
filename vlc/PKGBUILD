@@ -70,6 +70,7 @@ prepare() {
 
 build() {
   cd "${pkgname}-${pkgver}"
+  PKG_CONFIG_PATH="/usr/lib/ffmpeg2.8/pkgconfig" \
   CFLAGS+=" -I/usr/include/samba-4.0" CPPFLAGS+=" -I/usr/include/samba-4.0" \
   LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`" \
   ./configure --prefix=/usr \
@@ -85,7 +86,8 @@ build() {
               --enable-upnp \
               --enable-opus \
               --enable-sftp \
-              --with-x
+              --with-x \
+              RCC=/usr/bin/rcc
   make
 }
 
