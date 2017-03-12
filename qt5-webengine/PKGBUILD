@@ -12,11 +12,9 @@ depends=('qt5-webchannel' 'qt5-location' 'libxcomposite' 'libxrandr' 'libxtst' '
 makedepends=('python2' 'git' 'gperf')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname}) 
-        qtwebengine-5.7.0-icu58.patch
+source=( $(getSrc ${pkgname})
         qtbug-58488.patch::"https://github.com/qt/qtwebengine/commit/7e7dd262.patch")
-md5sums=( $(getSum ${pkgname}) 
-         '9d225d1bf83ea45dbf6556d30d35fcb8'
+md5sums=( $(getSum ${pkgname})
          '3762cbdbc6a752e4d876e048e5e16de6')
 
 prepare() {
@@ -27,9 +25,6 @@ prepare() {
   ln -s /usr/bin/python2 bin/python
 
   cd $(getPkgName ${pkgname})
-
-  # Fix build with ICU 58 (gentoo)
-  #patch -p1 -i "$srcdir"/qtwebengine-5.7.0-icu58.patch
 
   # Prevent drop-down popups form stealing focus https://bugreports.qt.io/browse/QTBUG-58488
   patch -p1 -i ../qtbug-58488.patch
