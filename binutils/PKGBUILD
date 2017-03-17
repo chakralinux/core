@@ -1,25 +1,23 @@
 pkgname=binutils
-pkgver=2.27
-pkgrel=3
+pkgver=2.28
+pkgrel=1
+_commit=7fa393306ed8b93019d225548474c0540b8928f7
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('x86_64')
 url="http://www.gnu.org/software/binutils/"
 license=('GPL')
 groups=('base-devel')
-depends=('glibc>=2.24' 'zlib')
+depends=('glibc>=2.25' 'zlib')
+makedepends=('git')
 checkdepends=('dejagnu' 'bc')
 conflicts=('binutils-multilib')
 replaces=('binutils-multilib')
-options=('!distcc' '!ccache' 'staticlibs')
-install=binutils.install
-#source=(ftp://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.bz2{,.sig}
-#        binutils-e9c1bdad.patch)
-source=(git://sourceware.org/git/binutils-gdb.git#commit=2870b1ba)
+options=('staticlibs' '!distcc' '!ccache')
+source=(git+https://sourceware.org/git/binutils-gdb.git#commit=${_commit})
 md5sums=('SKIP')
-validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93') # Tristan Gingold
 
 prepare() {
-  cd ${srcdir}/binutils-gdb
+  cd binutils-gdb
 
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
   sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
@@ -28,22 +26,29 @@ prepare() {
 }
 
 build() {
-  cd ${srcdir}/binutils-build
+  cd binutils-build
 
-  ${srcdir}/binutils-gdb/configure --prefix=/usr \
+  ../binutils-gdb/configure \
+    --prefix=/usr \
     --with-lib-path=/usr/lib:/usr/local/lib \
     --with-bugurl=http://chakralinux.org/bugtracker \
-    --enable-threads --enable-shared --with-pic \
-    --enable-ld=default --enable-gold --enable-plugins \
-    --disable-werror --disable-gdb # we have an extra gdb package, so we do not build gdb from binutils
+    --enable-threads \
+    --enable-shared \
+    --enable-ld=default \
+    --enable-gold \
+    --enable-plugins \
+    --enable-deterministic-archives \
+    --disable-werror \
+    --disable-gdb # we have an extra gdb package, so we do not build gdb from binutils
 
   # check the host environment and makes sure all the necessary tools are available
   make configure-host
+
   make tooldir=/usr
 }
 
 check() {
-  cd ${srcdir}/binutils-build
+  cd binutils-build
   
   # unset LDFLAGS as testsuite makes assumptions about which ones are active
   # ignore failures in gold testsuite...
@@ -51,7 +56,7 @@ check() {
 }
 
 package() {
-  cd ${srcdir}/binutils-build
+  cd binutils-build
   make prefix=${pkgdir}/usr tooldir=${pkgdir}/usr install
 
   # Remove unwanted files
@@ -59,4 +64,6 @@ package() {
 
   # No shared linking to these files outside binutils
   rm ${pkgdir}/usr/lib/lib{bfd,opcodes}.so
+  echo "INPUT ( /usr/lib/libbfd.a -liberty -lz -ldl )" > "$pkgdir"/usr/lib/libbfd.so
+  echo "INPUT ( /usr/lib/libopcodes.a -lbfd )" > "$pkgdir"/usr/lib/libopcodes.so
 }
