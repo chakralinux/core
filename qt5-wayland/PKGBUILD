@@ -2,7 +2,7 @@ source ../qt5.conf
 
 pkgname=qt5-wayland
 pkgver=${QSubVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -10,11 +10,17 @@ pkgdesc='Provides APIs for Wayland'
 depends=('qt5-declarative' 'libxcomposite')
 makedepends=()
 groups=('qt5')
-source=( $(getSrc ${pkgname}) )
-md5sums=( $(getSum ${pkgname}) )
+source=( $(getSrc ${pkgname}) 
+            QTBUG-58423_wl_surface.patch)
+md5sums=( $(getSum ${pkgname}) 
+                    '564b07db876805f5b3e9cccfe0813efd')
 
 prepare() {
   mkdir -p build
+  
+  cd $(getPkgName ${pkgname})
+  # https://codereview.qt-project.org/#/c/184278/
+  patch -p1 -i ../QTBUG-58423_wl_surface.patch  
 }
 
 build() {

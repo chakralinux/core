@@ -1,20 +1,21 @@
 pkgname=vc
 epoch=2
-pkgver=1.2.0
+pkgver=1.3.1
 pkgrel=1
 pkgdesc="A library to ease explicit vectorization of C++ code"
-url='http://code.compeng.uni-frankfurt.de/projects/vc/'
+url='https://github.com/VcDevel/Vc'
 arch=('x86_64')
-license=('BSD')
+license=(LGPL3)
 makedepends=('cmake')
 source=("https://github.com/VcDevel/Vc/releases/download/${pkgver}/Vc-${pkgver}.tar.gz")
-md5sums=('f2a213ae4bad0dcf4ec6469e4dad41c1')
+md5sums=('97f754e878ddae5a481486dcb270bb8e')
  
 build() {
   mkdir -p build && cd build
   cmake ../Vc-${pkgver} \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_BUILD_TYPE=Release \
+    -DTARGET_ARCHITECTURE=generic
   make
 }
 

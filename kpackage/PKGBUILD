@@ -4,7 +4,7 @@ source ../frameworks.conf
 
 pkgname=kpackage
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Framework that lets applications manage user installable packages of non-binary assets'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kpackage'
@@ -14,8 +14,10 @@ makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'python3' 'kdoct
 checkdepends=("cmake")
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

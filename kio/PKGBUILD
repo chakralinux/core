@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=kio
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Resource and network access abstraction'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kio'
@@ -15,8 +15,10 @@ checkdepends=('xorg-server-xvfb' 'openbox')
 groups=('kf5')
 install=kio.install
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

@@ -1,10 +1,6 @@
-#
-# Core Packages for Chakra, part of chakraos.org
-#
-
 pkgname=bash
 _basever=4.4
-_patchlevel=005 #prepare for some patches
+_patchlevel=012 #prepare for some patches
 pkgver=$_basever.$_patchlevel
 pkgrel=1
 pkgdesc="The GNU Bourne Again shell"
@@ -13,7 +9,7 @@ license=('GPL')
 url="http://www.gnu.org/software/bash/bash.html"
 groups=('base')
 backup=(etc/bash.bash{rc,_logout} etc/skel/.bash{rc,_profile,_logout})
-depends=('readline>=6.3' 'glibc')
+depends=('readline>=7.0' 'glibc')
 optdepends=('bash-completion: for tab completion')
 provides=('sh')
 install=bash.install
@@ -23,6 +19,25 @@ source=(https://ftp.gnu.org/gnu/bash/bash-$_basever.tar.gz{,.sig}
         dot.bash_logout
         system.bashrc
         system.bash_logout)
+sha1sums=('8de012df1e4f3e91f571c3eb8ec45b43d7c747eb'
+          'SKIP'
+          '3211397399c367a501d103d36abfe5c7cadfeab2'
+          '672c3c0c28c3642a5cff0e4093ff98359c747ff0'
+          '9fd0cfda5b85651169f8761a834941b1f6f53952'
+          '895ffd3f5c729271859a659c4ca17aefc3fda927'
+          '0bc4dc72ef407eefe27b6ba5b384ccddb3e0852b'
+          'b0a20634e049a7b747703235b96ac0da10215d99'
+          'c9b7329897295301879a9600d96b2182ea2023b1'
+          '21cf7e0c6151de7fe8aca0bab8deb601bac2849e'
+          '32789657933c288d81210dd96a6b08e67207b593'
+          '8eee9cf9997215bd14f53dfc25c97186cee9437c'
+          '59d9e79adb1fc35e086caa0fa2af49381fe8b2f5'
+          '8924cde74fbb4fafeaf0ff6b5e4e94fcd2c2b98a'
+          'b38e9df20869643ef9388cbab585610a20ccc847'
+          '4bd44109ff79f0d6da19c27948dc40db9598da85'
+          '31180db58d25591f0744fc6923df1f8a97f0d19b'
+          '240c287dc60cb69185a2a05b1341bfceafd1071a'
+          '6dcceca364953498d3eb0c18c49fb0f3374fa3c2')
 validpgpkeys=('7C0135FB088AAF6C66C650B9BB5869F064EA74AB') # Chet Ramey
 
 if [[ $((10#${_patchlevel})) -gt 0 ]]; then
@@ -47,7 +62,8 @@ build() {
   _bashconfig=(-DDEFAULT_PATH_VALUE=\'\"/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin\"\'
 	       -DSTANDARD_UTILS_PATH=\'\"/usr/bin:/usr/sbin\"\'
 	       -DSYS_BASHRC=\'\"/etc/bash.bashrc\"\'
-	       -DSYS_BASH_LOGOUT=\'\"/etc/bash.bash_logout\"\')
+	       -DSYS_BASH_LOGOUT=\'\"/etc/bash.bash_logout\"\'
+               -DNON_INTERACTIVE_LOGIN_SHELLS)
   export CFLAGS="${CFLAGS} ${_bashconfig[@]}"
 
   ./configure --prefix=/usr --with-curses --enable-readline \
@@ -76,18 +92,3 @@ package() {
   install -m644 ${srcdir}/dot.bash_profile ${pkgdir}/etc/skel/.bash_profile
   install -m644 ${srcdir}/dot.bash_logout ${pkgdir}/etc/skel/.bash_logout
 }
-
-
-md5sums=('148888a7c95ac23705559b6f477dfe25'
-         'SKIP'
-         '7b50480e812f4b2bbbec8ba45608da54'
-         '2902e0fee7a9168f3a4fd2ccd60ff047'
-         '42f4400ed2314bd7519c020d0187edc5'
-         '3546099a1b2f667adc9794f52e78e35b'
-         '472f536d7c9e8250dc4568ec4cfaf294'
-         '817d01a6c0af6f79308a8b7b649e53d8'
-         '765e14cff12c7284009772e8e24f2fe0'
-         '49e7da93bf07f510a2eb6bb43ac3e5a2'
-         '4557d674ab5831a5fa98052ab19edaf4'
-         'cce96dd77cdd1d293beec10848f6cbb5')
-

@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=kxmlgui
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='User configurable main windows'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kxmlgui'
@@ -13,8 +13,10 @@ makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python3')
 checkdepends=('xorg-server-xvfb')
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

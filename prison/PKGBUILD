@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=prison
 pkgver=$KFVersion
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 pkgdesc="A barcode api to produce QRCode barcodes and DataMatrix barcode"
 url="https://projects.kde.org/projects/kdesupport/prison"
@@ -15,8 +15,10 @@ options=("debug")
 replaces=('prison-kf5')
 provides=('prison-kf5')
 conflicts=('prison-kf5')
-source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
-sha256sums=($(getSum ${pkgname}))
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

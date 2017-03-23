@@ -1,28 +1,43 @@
 # Maintainer: Neophytos Kolokotronis <tetris4@gmail.com>
 # Contributor from Arch: Eric Belanger <eric@archlinux.org>
 
-pkgname=mutagen
-pkgver=1.20
+pkgbase=mutagen
+pkgname=('mutagen' 'python3-mutagen')
+pkgver=1.37
 pkgrel=1
-pkgdesc="An audio metadata tag reader and writer implemented in pure python"
 arch=('any')
-url="http://code.google.com/p/mutagen/"
+url="https://github.com/quodlibet/mutagen"
 license=('GPL2')
-depends=('python2')
-source=(http://mutagen.googlecode.com/files/${pkgname}-${pkgver}.tar.gz{,.sig})
-sha1sums=('7a8c1918160e6b5d24acd146f57c08ed942a2fa8'
-          '046c2d763cd59f86ee920a6dc28a32f86b555473')
+makedepends=('python2-setuptools' 'python3-setuptools')
+checkdepends=('python2-pytest' 'python3-pytest')
+source=($pkgname-$pkgver::https://github.com/quodlibet/mutagen/archive/release-${pkgver}.tar.gz)
+sha1sums=('4c9725f0b613d54e8ae522dac3d716c36ef10095')
 
-check() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  python2 setup.py test
+prepare() {
+  cp -aT $pkgbase-release-$pkgver python3-$pkgbase-$pkgver
 }
 
-package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+check() {
+  cd $pkgbase-release-$pkgver
+  LANG=en_US.UTF8 python2 setup.py test
+  cd ../python3-$pkgbase-$pkgver
+#  LANG=en_US.UTF8 python3 setup.py test
+}
+
+package_mutagen() {
+  pkgdesc="An audio metadata tag reader and writer"
+  depends=('python2')
+
+  cd $pkgbase-release-$pkgver
   python2 setup.py install --root="${pkgdir}"
-  install -d "${pkgdir}/usr/bin"
-  install -m755 tools/* "${pkgdir}/usr/bin"
-  sed -i 's|^#!.*/usr/bin/env.*python|#!/usr/bin/env python2|' "${pkgdir}"/usr/bin/* \
-    "${pkgdir}/usr/lib/python2.7/site-packages/mutagen/__init__.py"
+}
+
+package_python3-mutagen() {
+  pkgdesc="An audio metadata tag reader and writer library for Python 3"
+  depends=('python3')
+
+  cd python3-$pkgbase-$pkgver
+  python3 setup.py install --root="${pkgdir}"
+
+  rm -r "${pkgdir}"/usr/{bin,share}
 }

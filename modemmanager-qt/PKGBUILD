@@ -3,7 +3,7 @@ source ../frameworks.conf
 pkgname=modemmanager-qt
 _pkgname=modemmanager-qt
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc="Plasma Workspace"
 arch=('x86_64')
 url='http://projects.kde.org'
@@ -16,8 +16,10 @@ replaces=("libmm-qt5<=5.2.2")
 conflicts=("libmm-qt5<=5.2.2")
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) ) 
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} ) 
 
 prepare() {
   mkdir -p build

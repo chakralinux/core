@@ -1,73 +1,76 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakralinux.org
 #
-# maintainer abveritas@chakra-project.org
 
 pkgname=ghostscript
-pkgver=9.07
-pkgrel=3
+pkgver=9.20
+pkgrel=1
 pkgdesc="An interpreter for the PostScript language"
 arch=('x86_64')
-license=('GPL3' 'custom')
-depends=('libxt' 'libcups' 'fontconfig' 'jasper' 'zlib' 'libpng' 'libjpeg' 'libtiff' 'lcms')
-makedepends=('gnutls')
+license=('AGPL' 'custom')
+depends=('libxt' 'libcups' 'fontconfig' 'zlib' 'libpng' 'libjpeg'
+          'libtiff' 'libxext' 'lcms2' 'dbus' 'libpaper')
+makedepends=('gnutls' 'hardening-wrapper')
 optdepends=('texlive-core:      needed for dvipdf')
 url="http://www.ghostscript.com/"
-source=("http://downloads.ghostscript.com/public/ghostscript-${pkgver}.tar.bz2")
-md5sums=('eea27befc1e85bef6d4768202f6b03a5')
-options=('!libtool' '!makeflags')
+source=(https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${pkgver/./}/ghostscript-${pkgver}.tar.xz
+        ghostscript-sys-zlib.patch)
+options=('!makeflags')
+# https://github.com/ArtifexSoftware/ghostpdl-downloads/releases
+sha1sums=('ed63f43482f5af60dff52e81b2d9478da3ad1e3e'
+          'e054caf753df4d67221b29a2eac66130653f7556')
+
+prepare() {
+  cd ghostscript-${pkgver}
+  # fix build with system zlib
+  patch -Np1 -i ${srcdir}/ghostscript-sys-zlib.patch
+}
 
 build() {
-  cd ${srcdir}/ghostscript-${pkgver}
-
+  cd ghostscript-${pkgver}
+  
   # force it to use system-libs
-  rm -rf jpeg libpng zlib jasper expat tiff freetype lcms
+  # keep heavily patched included openjpeg, leads to segfault with system openjpeg
+  # https://bugs.archlinux.org/task/38226
+  rm -rfv cups/libs freetype jpeg lcms2 libpng tiff zlib
+
+  autoconf --force
 
   ./configure --prefix=/usr \
 	--enable-dynamic \
-	--with-ijs \
-	--with-jbig2dec \
 	--without-omni \
 	--with-x \
 	--with-drivers=ALL\
 	--with-fontpath=/usr/share/fonts/Type1:/usr/share/fonts \
-        --with-install-cups \
 	--enable-fontconfig \
 	--enable-freetype \
+	--enable-openjpeg \
 	--without-luratech \
-	--disable-compile-inits \
 	--with-system-libtiff \
-	--disable-gtk
-
-  make
-  
-  # Build IJS
-  cd ${srcdir}/ghostscript-${pkgver}/ijs
-  sed -i "s:AM_PROG_CC_STDC:AC_PROG_CC:g" configure.ac
-  ./autogen.sh
-  ./configure --prefix=/usr --enable-shared --disable-static
+	--with-libpaper \
+	--disable-gtk \
+	--disable-compile-inits #--help # needed for linking with system-zlib
+  make so
   make
 }
 
 package() {
-  cd ${srcdir}/ghostscript-${pkgver}
-  make DESTDIR=${pkgdir} \
-	cups_serverroot=${pkgdir}/etc/cups \
-	cups_serverbin=${pkgdir}/usr/lib/cups install soinstall
+  cd ghostscript-${pkgver}
+  make DESTDIR="${pkgdir}" \
+	cups_serverroot="${pkgdir}"/etc/cups \
+	cups_serverbin="${pkgdir}"/usr/lib/cups install install-so
+
+  # drop full libs linked gs, prefer gsc dynamically linked against libgs; FS#50422
+  ln -sf /usr/bin/gsc "${pkgdir}"/usr/bin/gs
 
   # install missing doc files # http://bugs.archlinux.org/task/18023
-  install -m 644 ${srcdir}/ghostscript-${pkgver}/doc/{Ps2ps2.htm,gs-vms.hlp,gsdoc.el,pscet_status.txt} ${pkgdir}/usr/share/ghostscript/$pkgver/doc/
+  install -m 644 "${srcdir}"/ghostscript-${pkgver}/doc/{VectorDevices.htm,gs-vms.hlp,gsdoc.el,pscet_status.txt} "${pkgdir}"/usr/share/ghostscript/$pkgver/doc/
   
-  mkdir -p ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/
+  install -D -m644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
 
   # remove unwanted localized man-pages
-  rm -rf $pkgdir/usr/share/man/[^man1]*
+  rm -rf "$pkgdir"/usr/share/man/[^man1]*
 
-  # remove filters that are now maintained in cups-filter
+  # remove filters that are now maintained in cups-filters as upstream home
   rm -rf "$pkgdir"/usr/lib/cups/filter/{gstopxl,gstoraster}
-
-  # install IJS
-  cd ${srcdir}/ghostscript-${pkgver}/ijs
-  make DESTDIR=${pkgdir} install
 }

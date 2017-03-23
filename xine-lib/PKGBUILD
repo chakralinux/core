@@ -1,6 +1,6 @@
 pkgname=xine-lib
-pkgver=1.2.6
-pkgrel=4
+pkgver=1.2.8
+pkgrel=1
 pkgdesc="A multimedia playback engine"
 arch=('x86_64')
 url="http://www.xine-project.org"
@@ -27,15 +27,12 @@ optdepends=('imagemagick: for using the imagemagick plugin'
             'libbluray: for using the bluray plugin'
             'libvdpau: for using the VDPAU plugin'
             'smbclient: for using the samba plugin' )
-source=("http://downloads.sourceforge.net/sourceforge/xine/${pkgname}-${pkgver}.tar.xz"
-	xine-lib-xcb-1.12.patch)
-sha1sums=('ac929eef2b7bf5c27699bbed612b953a01fccba5'
-          '890c8f044c0080bfb7d4b163061dd42621fc4df1')
+source=("http://downloads.sourceforge.net/sourceforge/xine/${pkgname}-${pkgver}.tar.xz")
+sha1sums=('f20115ddfced42d51feb159393607b17e6f2bdc1')
 
 prepare() {
   cd $pkgname-$pkgver
-# Fix build with xcb 1.12 (Gentoo)
-  patch -p1 -i ../xine-lib-xcb-1.12.patch
+
   autoreconf -vi
 }
 

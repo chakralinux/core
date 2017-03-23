@@ -1,0 +1,27 @@
+pkgname=reiser4progs
+pkgver=1.1.0
+pkgrel=1
+pkgdesc="Reiser4 utilities"
+arch=('x86_64')
+url='https://sourceforge.net/projects/reiser4'
+license=('GPL2')
+depends=('libaal' 'e2fsprogs')
+options=('!libtool')
+source=("http://sourceforge.net/projects/reiser4/files/reiser4-utils/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+        "reiser4-for-4.10.0.patch")
+md5sums=('4abfda040a0ef152bc2f42152e247a5e'
+         'SKIP')
+
+# TODO: include patch.
+
+build() {
+	cd "${pkgname}-${pkgver}"
+	./configure --prefix=/usr --sbindir=/usr/bin
+	make
+}
+
+package() {
+	cd "${pkgname}-${pkgver}"
+	make DESTDIR="${pkgdir}" install
+}
+

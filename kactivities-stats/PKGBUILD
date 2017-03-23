@@ -2,7 +2,7 @@ source ../frameworks.conf
 
 pkgname=kactivities-stats
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 pkgdesc="A library for accessing the usage data collected by the activities system"
 url='https://projects.kde.org/projects/frameworks/kactivities-stats'
@@ -11,8 +11,10 @@ depends=('kactivities')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'boost' 'python3')
 options=("debug")
 groups=('kf5')
-source=("$KFServer/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n 2) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname} | head -n 2)
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=kconfigwidgets
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Widgets for KConfig'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kconfigwidgets'
@@ -12,8 +12,10 @@ depends=('kauth' 'kcodecs' 'kconfig' 'kguiaddons' 'ki18n' 'kwidgetsaddons')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" "kdoctools" "python3")
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

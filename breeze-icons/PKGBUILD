@@ -3,7 +3,7 @@ source ../frameworks.conf
 
 pkgname=breeze-icons
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Breeze icon themes'
 arch=('any')
 url='https://projects.kde.org/projects/kde/workspace/breeze'
@@ -11,8 +11,10 @@ license=('LGPL')
 groups=('kf5')
 optdepends=('oxygen-icons: fallback icon theme')
 makedepends=('extra-cmake-modules' 'qt5-base')
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build

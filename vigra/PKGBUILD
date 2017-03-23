@@ -2,46 +2,44 @@
 
 pkgbase=vigra
 pkgname=('vigra' 'vigra-doc')
-pkgver=1.10.0
-pkgrel=3
-pkgdesc="Computer vision library"
+pkgver=1.11.0
+pkgrel=1
 arch=('x86_64')
 url="http://hci.iwr.uni-heidelberg.de/vigra/"
 license=('custom:MIT')
-makedepends=( # runtime deps
-             'libpng' 'libtiff' 'hdf5' 'fftw' 'openexr'
+makedepends=(# runtime deps
+             'libpng' 'libtiff' 'openexr' 'gcc-libs' 'sh' 'hdf5' 'fftw'
               # buildtime deps
              'cmake' 'python2-nose' 'doxygen' 'python2-sphinx' 'boost' 'python2-numpy' 'python3-sphinx')
-source=("https://github.com/ukoethe/vigra/releases/download/Version-${pkgver//./-}/${pkgname}-${pkgver}-src-with-docu.tar.gz")
-md5sums=('85e2968e4ee5f9541b5dd8b3fb9cc433')
+source=("https://github.com/ukoethe/vigra/releases/download/Version-${pkgver//./-}/${pkgname}-${pkgver}-src.tar.gz")
+md5sums=('7f80d289e03a2f2e8c8e85f3ff29d988')
 
 build() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
-  
+  cd "${srcdir}"/${pkgbase}-${pkgver}
   cmake -DCMAKE_INSTALL_PREFIX=/usr \
       -DPYTHON_EXECUTABLE=/usr/bin/python2 \
+      -DWITH_OPENEXR=true \
       -DWITH_VIGRANUMPY=1 \
-      -DWITH_OPENEXR=1 \
-      -DDOCINSTALL=share/doc 
+      -DDOCINSTALL=share/doc
   make
 }
 
 #check() {
 #  cd "${srcdir}"/${pkgname}-${pkgver}
-#  make -k check
+#  make -j1 -k check #|| /bin/true # i686 fails
 #}
-# Currently failed due to limitation of buildsystem
 
 package_vigra() {
-  depends=('libpng' 'libtiff' 'hdf5' 'fftw' 'openexr')
+  pkgdesc="Computer vision library"
+  depends=('libpng' 'libtiff' 'openexr' 'gcc-libs' 'sh' 'hdf5' 'fftw')
   optdepends=('python2: for python bindings'
               'boost-libs: for python bindings')
 
-  cd "${srcdir}"/${pkgname}-${pkgver}
+  cd "${srcdir}"/${pkgbase}-${pkgver}
   make DESTDIR="${pkgdir}" install
   # license
   install -D -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
-
+  
   # remove doc
   rm -rf "${pkgdir}"/usr/share/doc
 
@@ -50,7 +48,9 @@ package_vigra() {
 }
 
 package_vigra-doc() {
-  pkgdesc+=" - documentation and examples"
+  pkgdesc="Computer vision library - documentation and examples"
+  #depends=('vigra')
+  #arch=('any')
 
   cd "${srcdir}"/${pkgbase}-${pkgver}
   make DESTDIR="${pkgdir}" install

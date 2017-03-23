@@ -4,7 +4,7 @@ source ../frameworks.conf
 
 pkgname=karchive
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='Qt 5 addon providing access to numerous types of archives'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/karchive'
@@ -13,8 +13,10 @@ depends=("qt5-base")
 makedepends=("extra-cmake-modules>=${KFECMVersion}")
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum $pkgname) )
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys} )
 
 prepare() {
   mkdir -p build
