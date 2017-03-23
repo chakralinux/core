@@ -2,13 +2,13 @@
 
 pkgname=libffado
 pkgver=2.2.1
-pkgrel=3
+pkgrel=4
 pkgdesc="Driver for FireWire audio devices"
 arch=('x86_64')
 url="http://www.ffado.org/"
 license=('GPL')
 depends=('libiec61883' 'libavc1394' 'libsigc++' 'libxml++' 'alsa-lib'
-         'dbus' 'libconfig' 'dbus-c++')
+         'dbus' 'libconfig' 'dbus-c++' 'python2-pyqt4')
 makedepends=('scons' 'python2-pyqt4' 'jack2' 'python2-dbus')
 optdepends=('python2-pyqt4: mixer applet'
             'python2: ffado-diag')
@@ -19,14 +19,14 @@ md5sums=('e113d828835051f835fb4a329cb0cbd4'
 
 
 prepare() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
   
   # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=805211
-  patch -Np1 -i "$srcdir/fix-test-errno-usage.patch"
+  patch -Np1 -i ../fix-test-errno-usage.patch
 }
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
 
   scons DEBUG=False \
         PREFIX=/usr \
@@ -36,7 +36,7 @@ build() {
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd $pkgname-$pkgver
 
   scons DESTDIR="$pkgdir" WILL_DEAL_WITH_XDG_MYSELF="True" install
 
