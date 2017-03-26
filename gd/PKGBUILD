@@ -1,17 +1,22 @@
 pkgname=gd
-pkgver=2.2.3
+pkgver=2.2.4
 pkgrel=1
 pkgdesc='Library for the dynamic creation of images by programmers'
 arch=('x86_64')
 url='http://www.libgd.org/'
 license=('custom')
-depends=('libpng'
-         'fontconfig'
-         'libjpeg-turbo'
-	 'libxpm')
+depends=('libpng' 'fontconfig' 'libjpeg-turbo' 'libxpm')
 optdepends=('perl: bdftogd script')
-source=("https://github.com/libgd/libgd/releases/download/gd-${pkgver}/libgd-${pkgver}.tar.xz")
-sha256sums=('746b6cbd6769a22ff3ba6f5756f3512a769bd4cdf4695dff17f4867f25fa7d3c')
+checkdepends=('ttf-liberation')
+source=("https://github.com/libgd/libgd/releases/download/gd-${pkgver}/libgd-${pkgver}.tar.xz"
+        'gd-2.2.4-upstream.patch')
+sha256sums=('137f13a7eb93ce72e32ccd7cebdab6874f8cf7ddf31d3a455a68e016ecd9e4e6'
+            '0aa73d278fa7bc70c830660ff8539fb32d703f80523ecdb0994b7e14846435d7')
+
+prepare() {
+  cd libgd-${pkgver}
+  patch -p1 -i ${srcdir}/gd-2.2.4-upstream.patch
+}
 
 build() {
     cd ${srcdir}/libgd-${pkgver}
