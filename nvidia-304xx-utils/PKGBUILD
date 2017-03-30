@@ -2,17 +2,19 @@
 # contributor: abveritas@chakra-project.org
 
 pkgbase=nvidia-304xx-utils
-pkgname=('nvidia-304xx-utils' 'nvidia-304xx-libgl' 'opencl-nvidia-304xx')
+pkgname=('nvidia-304xx-utils' 'opencl-nvidia-304xx')
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 pkgver=304.135
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
 _pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
-source=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run")
-md5sums=('8ee9bd0b020508bca9953181811422fa')
+source=("ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run"
+        'nvidia-drm-outputclass.conf')
+md5sums=('8ee9bd0b020508bca9953181811422fa'
+         'a433deeb5f9cc661e537f42bde2f1df7')
 
 create_links() {
   # create soname links
@@ -29,9 +31,9 @@ build() {
 
 package_opencl-nvidia-304xx() {
   pkgdesc="OpenCL implemention for NVIDIA, 304xx legacy branch"
-  depends=('libcl' 'zlib')
+  depends=('zlib')
   optdepends=('opencl-headers: headers necessary for OpenCL development')
-  provides=('opencl-nvidia')
+  provides=('opencl-nvidia' 'opencl-driver')
   conflicts=('opencl-nvidia')
 
   cd ${_pkg}
@@ -46,78 +48,46 @@ package_opencl-nvidia-304xx() {
   install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/opencl-nvidia-304xx/LICENSE"
 }
 
-package_nvidia-304xx-libgl() {
-  pkgdesc="NVIDIA drivers libraries symlinks, 304xx legacy branch"
-  depends=('nvidia-304xx-utils' 'mesa')
-  conflicts=('libgl' 'mesa-libgl' 'nvidia-libgl')
-  provides=('libgl' 'mesa-libgl' 'nvidia-libgl')
-
-  cd ${_pkg}
-
-  mkdir -p "${pkgdir}/usr/lib/xorg/modules/extensions"
-  ln -s "../../../nvidia/xorg/modules/extensions/libglx.so.${pkgver}" "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so.${pkgver}"
-  ln -s "libglx.so.${pkgver}" "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so.1"
-  ln -s "libglx.so.${pkgver}" "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so"
-
-  ln -s nvidia/libGL.so.${pkgver} "${pkgdir}/usr/lib/libGL.so.${pkgver}"
-  ln -s libGL.so.${pkgver} "${pkgdir}/usr/lib/libGL.so.1"
-  ln -s libGL.so.${pkgver} "${pkgdir}/usr/lib/libGL.so"
-
-  # We have to provide symlinks to mesa, as nvidia 304xx doesn't ship them
-  ln -s mesa/libEGL.so.1.0.0 "${pkgdir}/usr/lib/libEGL.so.1.0.0"
-  ln -s libEGL.so.1.0.0      "${pkgdir}/usr/lib/libEGL.so.1"
-  ln -s libEGL.so.1.0.0      "${pkgdir}/usr/lib/libEGL.so"
-
-  ln -s mesa/libGLESv1_CM.so.1.1.0 "${pkgdir}/usr/lib/libGLESv1_CM.so.1.1.0"
-  ln -s libGLESv1_CM.so.1.1.0      "${pkgdir}/usr/lib/libGLESv1_CM.so.1"
-  ln -s libGLESv1_CM.so.1.1.0      "${pkgdir}/usr/lib/libGLESv1_CM.so"
-
-  ln -s mesa/libGLESv2.so.2.0.0 "${pkgdir}/usr/lib/libGLESv2.so.2.0.0"
-  ln -s libGLESv2.so.2.0.0      "${pkgdir}/usr/lib/libGLESv2.so.2"
-  ln -s libGLESv2.so.2.0.0      "${pkgdir}/usr/lib/libGLESv2.so"
-
-  mkdir -p "${pkgdir}/usr/share/licenses"
-  ln -s nvidia-304xx "${pkgdir}/usr/share/licenses/nvidia-304xx-libgl"
-}
-
 package_nvidia-304xx-utils() {
   pkgdesc="NVIDIA drivers utilities and libraries, 304xx legacy branch"
-  depends=('xorg-server' 'libxvmc')
-  optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig'
-              'opencl-nvidia-304xx: OpenCL support'
-              'nvidia-settings: Gtk GUI')
-  conflicts=('nvidia-utils' 'libglvnd')
-  provides=('nvidia-utils')
-
+  depends=('xorg-server' 'libxvmc' 'mesa')
+  optdepends=('gtk2: nvidia-settings'
+              'pkg-config: nvidia-xconfig'
+              'opencl-nvidia-304xx: OpenCL support')
+  conflicts=('nvidia-304xx-libgl' 'nvidia-340xx-utils' 'nvidia-utils')
+  provides=('libgl' 'libgles' 'libegl' 'nvidia-304xx-libgl' 'nvidia-utils')
+  replaces=('nvidia-304xx-libgl')
+  
   cd ${_pkg}
 
   # X driver
   install -D -m755 nvidia_drv.so "${pkgdir}/usr/lib/xorg/modules/drivers/nvidia_drv.so"
 
   # GLX extension module for X
-  install -D -m755 "libglx.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/xorg/modules/extensions/libglx.so.${pkgver}"
-  ln -s "libglx.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/xorg/modules/extensions/libglx.so"    # X doesn't find glx otherwise
+  install -D -m755 "libglx.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/xorg/libglx.so.${pkgver}"
+  ln -s "libglx.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/xorg/libglx.so.1"    # X doesn't find glx otherwise
+  ln -s "libglx.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/xorg/libglx.so"    # X doesn't find glx otherwise
   
   # OpenGL libraries
   install -D -m755 "libGL.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/libGL.so.${pkgver}"
 
   # OpenGL core library
-  install -D -m755 "libnvidia-glcore.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-glcore.so.${pkgver}"
+  install -D -m755 "libnvidia-glcore.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/libnvidia-glcore.so.${pkgver}"
 
   # XvMC
-  install -D -m755 "libXvMCNVIDIA.so.${pkgver}" "${pkgdir}/usr/lib/libXvMCNVIDIA.so.${pkgver}"
+  install -D -m755 "libXvMCNVIDIA.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/libXvMCNVIDIA.so.${pkgver}"
 
   # VDPAU
   install -D -m755 "libvdpau_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/vdpau/libvdpau_nvidia.so.${pkgver}"
 
   # nvidia-tls library
-  install -D -m755 "tls/libnvidia-tls.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-tls.so.${pkgver}"
-  install -D -m755 "libnvidia-cfg.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-cfg.so.${pkgver}"
-  install -D -m755 "libnvidia-ml.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-ml.so.${pkgver}"
+  install -D -m755 "tls/libnvidia-tls.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/libnvidia-tls.so.${pkgver}"
+  install -D -m755 "libnvidia-cfg.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/libnvidia-cfg.so.${pkgver}"
+  install -D -m755 "libnvidia-ml.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/libnvidia-ml.so.${pkgver}"
   
   # CUDA
-  install -D -m755 "libcuda.so.${pkgver}" "${pkgdir}/usr/lib/libcuda.so.${pkgver}"
-  install -D -m755 "libnvcuvid.so.${pkgver}" "${pkgdir}/usr/lib/libnvcuvid.so.${pkgver}"
+  install -D -m755 "libcuda.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/libcuda.so.${pkgver}"
+  install -D -m755 "libnvcuvid.so.${pkgver}" "${pkgdir}/usr/lib/nvidia/libnvcuvid.so.${pkgver}"
 
   # DEBUG
   install -D -m755 nvidia-debugdump "${pkgdir}/usr/bin/nvidia-debugdump"
@@ -139,6 +109,26 @@ package_nvidia-304xx-utils() {
   install -D -m644 README.txt "${pkgdir}/usr/share/doc/nvidia-304xx/README"
   install -D -m644 NVIDIA_Changelog "${pkgdir}/usr/share/doc/nvidia-304xx/NVIDIA_Changelog"
   ln -s nvidia-304xx "${pkgdir}/usr/share/doc/nvidia-304xx-utils"
+
+  # We have to provide symlinks to mesa, as nvidia 304xx doesn't ship them
+  ln -s /usr/lib/libEGL.so.1.0.0 "${pkgdir}/usr/lib/nvidia/libEGL.so.1.0.0"
+  ln -s libEGL.so.1.0.0      "${pkgdir}/usr/lib/nvidia/libEGL.so.1"
+  ln -s libEGL.so.1.0.0      "${pkgdir}/usr/lib/nvidia/libEGL.so"
+
+  ln -s /usr/lib/libGLESv1_CM.so.1.1.0 "${pkgdir}/usr/lib/nvidia/libGLESv1_CM.so.1.1.0"
+  ln -s libGLESv1_CM.so.1.1.0      "${pkgdir}/usr/lib/nvidia/libGLESv1_CM.so.1"
+  ln -s libGLESv1_CM.so.1.1.0      "${pkgdir}/usr/lib/nvidia/libGLESv1_CM.so"
+
+  ln -s /usr/lib/libGLESv2.so.2.0.0 "${pkgdir}/usr/lib/nvidia/libGLESv2.so.2.0.0"
+  ln -s libGLESv2.so.2.0.0      "${pkgdir}/usr/lib/nvidia/libGLESv2.so.2"
+  ln -s libGLESv2.so.2.0.0      "${pkgdir}/usr/lib/nvidia/libGLESv2.so"
+
+  # distro specific files must be installed in /usr/share/X11/xorg.conf.d
+  install -m755 -d "${pkgdir}/usr/share/X11/xorg.conf.d"
+  install -m644 "${srcdir}/nvidia-drm-outputclass.conf" "${pkgdir}/usr/share/X11/xorg.conf.d/10-nvidia-drm-outputclass.conf"
+
+  install -dm 755 "${pkgdir}"/etc/ld.so.conf.d
+  echo -e '/usr/lib/nvidia/' > "${pkgdir}"/etc/ld.so.conf.d/00-nvidia.conf
 
   create_links
 }
