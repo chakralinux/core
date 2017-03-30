@@ -2,7 +2,7 @@
 # kernel.
 
 pkgname=btrfs-progs
-pkgver=4.8.5
+pkgver=4.10.1
 pkgrel=1
 pkgdesc='Btrfs filesystem utilities'
 arch=('x86_64')
@@ -18,7 +18,7 @@ source=("https://github.com/kdave/${pkgname}/archive/v${pkgver}.tar.gz"
         'initcpio-hook-btrfs'
         'btrfs-scrub@.service'
         'btrfs-scrub@.timer')
-md5sums=('2ef6510400d2f25a13547afc10c1c9d7'
+md5sums=('0ee1e799b78f8b141328947684442278'
          '7241ba3a4286d08da0d50b7176941112'
          'b09688a915a0ec8f40e2f5aacbabc9ad'
          '794b867e09451284c545bae112aa0cfd'
@@ -28,19 +28,19 @@ install=btrfs-progs.install
 options=(!staticlibs)
 
 build() {
-   cd $pkgname
+   cd $pkgname-$pkgver
    ./autogen.sh
    ./configure --prefix=/usr
    make
 }
 
 check() {
-   cd $pkgname
+   cd $pkgname-$pkgver
    ./btrfs filesystem show
 }
 
 package() {
-   cd $pkgname
+   cd $pkgname-$pkgver
 
    make DESTDIR=${pkgdir} prefix=/usr install
 

@@ -4,9 +4,10 @@
 
 pkgname=linux-firmware
 # Commit date + git rev-parse --short origin/master
-_rev=9c71af9
-pkgver=20161005.${_rev}
-_b43=5.100.138
+_rev=695f2d6d82173f4e322d8f834c9849775778022a
+pkgver=20170309.695f2d6
+_b43=6.30.163.46
+_classic=5.100.138
 _legacy=3.130.20.0
 pkgrel=1
 pkgdesc="Firmware files for Linux"
@@ -14,7 +15,7 @@ makedepends=('b43-fwcutter' 'git')
 arch=('any')
 url="http://git.kernel.org/?p=linux/kernel/git/firmware/linux-firmware.git;a=summary"
 license=('GPL2' 'GPL3' 'custom')
-provides=('kernel26-firmware=3.1.99' 'linux-firmware=3.1.99' 'amd-ucode')
+provides=("b43-firmware"{,-{legacy,classic}}'amd-ucode')
 conflicts=('linux-firmware-git'
            'kernel26-firmware'
            'ar9170-fw'
@@ -48,11 +49,19 @@ replaces=('kernel26-firmware'
           'amd-ucode')
 options=(!strip)
 source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git#commit=${_rev}"
-        "http://mirror2.openwrt.org/sources/broadcom-wl-${_b43}.tar.bz2"
+        "http://www.lwfinger.com/b43-firmware/"broadcom-wl-{$_b43,$_classic}.tar.bz2
         "http://downloads.openwrt.org/sources/wl_apsta-${_legacy}.o")
 sha256sums=('SKIP'
+            'a07c3b6b277833c7dbe61daa511f908cd66c5e2763eb7a0859abc36cd9335c2d'
             'f1e7067aac5b62b67b8b6e4c517990277804339ac16065eb13c731ff909ae46f'
             '7dba610b1d96dd14e901bcbce14cd6ecd1b1ac6f5c0035b0d6b6dc46a7c3ef90')
+
+pkgver() {
+  cd "${srcdir}/${pkgname}"
+
+  # Commit date + short rev
+  echo $(TZ=UTC git show -s --pretty=%cd --date=format-local:%Y%m%d HEAD).$(git rev-parse --short HEAD)
+}
 
 package() {
   cd "${srcdir}/${pkgname}"
@@ -64,7 +73,10 @@ package() {
   install -Dm644 LICEN* WHENCE "${pkgdir}/usr/share/licenses/linux-firmware/"
 
   # install b43-firmware
-  b43-fwcutter -w "${pkgdir}/usr/lib/firmware/" ${srcdir}/broadcom-wl-${_b43}/linux/wl_apsta.o
+  b43-fwcutter -w "${pkgdir}/usr/lib/firmware/" ${srcdir}/broadcom-wl-${_b43}.wl_apsta.o
+
+  # install b43-classic-firmware
+  b43-fwcutter -w "${pkgdir}/usr/lib/firmware/" ${srcdir}/broadcom-wl-${_classic}/linux/wl_apsta.o
 
   # install b43-legacy-firmware
   b43-fwcutter -w "${pkgdir}/usr/lib/firmware/" ${srcdir}/wl_apsta-${_legacy}.o
