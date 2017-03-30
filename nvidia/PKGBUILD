@@ -2,14 +2,15 @@
 source ../linux.conf
 
 pkgname=('nvidia' 'chd-nvidia') # 'nvidia-dkms') # Maybe we don't need dkms module
-pkgver=370.28
-pkgrel=5
+pkgver=378.13
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}" "nvidia-utils=${pkgver}")
 license=('custom')
 options=('!strip')
-source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported_new")
+source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported_new"
+        'kernel_4.10.patch')
 
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 #_pkg="NVIDIA-Linux-x86_64-${pkgver}"
@@ -17,12 +18,15 @@ _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
 #source+=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
 sha1sums=('bdb063bbd03eed9fa718664ef2023fd759efe4a3'
-          '29b710d7aee6aa7624f87789a71fe17498184337')
+          'ef2748a39d071ef8000640c1db8d13f57610da42'
+          'fd93f18a38e7213295078bfdfd51cf9e87db0289')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
     # patches here
+
+    patch -Np1 -i ../kernel_4.10.patch
 
 #    cp -a kernel kernel-dkms
 #    cd kernel-dkms
