@@ -2,27 +2,29 @@
 source ../linux.conf
 
 pkgname=('nvidia-340xx' 'chd-nvidia-340xx')
-pkgver=340.98
-pkgrel=5
+pkgver=340.102
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported"
-        'nv-drm.patch')
-
+        'fs52243.patch' '4.10.0_kernel.patch')
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("ftp://download.nvidia.com/XFree86/Linux-${_ARCH}/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '79671a27131da619a33eb02ed0c2c031'
-         'e8d1292d8d002a15e10ea349151fa8f2')
+         '4b9b61bbcaaea4a99a6abe4a13309016'
+         'fe306bc9c3798a6a922931d6dea7d0e9'
+         '81e720487caa2823586b32659da9acc1')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
     # patches here
-    patch -p0 -i ../nv-drm.patch
+
+    patch -Np0 < "${srcdir}"/fs52243.patch
+    patch -Np1 < "${srcdir}"/4.10.0_kernel.patch
 }
 
 build() {

@@ -2,8 +2,8 @@
 source ../linux.conf
 
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
-pkgver=304.132
-pkgrel=5
+pkgver=304.135
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
@@ -11,11 +11,12 @@ license=('custom')
 _pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
 source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported"
         "ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run"
-         'nv-drm.patch' 'disable-mtrr.patch')
+        'drm-driver-legacy.patch'
+        'kernel_4.10.patch')
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '671551de37d7164d3b117c854374dcec'
-         '79671a27131da619a33eb02ed0c2c031'
-         'c4becf1145a139cc0121be9ad340bcd8')
+         '8ee9bd0b020508bca9953181811422fa'
+         'a5328715e210e36e5d9bbed0f9e55223'
+         'a8d331a75fbc541f1730e95b95e9ef14')
 
 prepare() {
     cd "${srcdir}"
@@ -23,9 +24,12 @@ prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
     # patches here
-    patch -p0 -i "$srcdir/nv-drm.patch"
+    patch -Np1 --no-backup-if-mismatch -i ../kernel_4.10.patch
+
+    # FS#47092
     cd kernel
-    patch -p1 --no-backup-if-mismatch -i "$srcdir"/disable-mtrr.patch
+    patch -p1 --no-backup-if-mismatch -i "$srcdir"/drm-driver-legacy.patch
+
 }
 
 build() {
