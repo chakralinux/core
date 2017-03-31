@@ -4,7 +4,7 @@
 
 pkgname=bumblebee
 pkgver=3.2.1
-pkgrel=14
+pkgrel=15
 pkgdesc="Bumblebee brings Optimus Support for Linux Through VirtualGL."
 arch=('x86_64')
 depends=('virtualgl' 'glib2' 'mesa')
@@ -68,9 +68,8 @@ package() {
     make install DESTDIR="$pkgdir"
 
     # Stop nvidia from loading on boot
-    mkdir -p "${pkgdir}/usr/lib/modprobe.d/"
-    echo "blacklist nvidia" > "${pkgdir}/usr/lib/modprobe.d/bumblebee.conf"
-  
+    install -Dm644 "${srcdir}/bumblebee.conf" "${pkgdir}/usr/lib/modprobe.d/bumblebee.conf"  
+
     # Install systemd unit
     install -D -m644 "scripts/systemd/bumblebeed.service" "${pkgdir}/usr/lib/systemd/system/bumblebeed.service"
 
