@@ -1,6 +1,6 @@
 pkgbase=vim
 pkgname=(vim vim-runtime)
-pkgver=8.0.0142
+pkgver=8.0.0529
 _versiondir=80
 pkgrel=1
 arch=('x86_64')
@@ -12,7 +12,7 @@ source=(vim-$pkgver.tar.gz::http://github.com/vim/vim/archive/v$pkgver.tar.gz
         'default.vim'
         'vimrc'
         'https://raw.github.com/tomasr/molokai/master/colors/molokai.vim')
-sha512sums=('14eb7a562f2eb8e814f8757b0e73b245468de9c077a026c9b35e3b7962f590f0fa0c681b302207771851ee0af1b4f5f74b6987af8bcffa556cdd50b9dd01ca49'
+sha512sums=('fba968c5a852ea4eb2df36e8db02ac8af640fdad0fcf606c1784a2ef74cd0010cc8266d65508ef27c375531e83784d965a557620a41c6c8a4fb6d61af63bb53c'
             '493b95e83bd6fb6ce2ebec17994af0bf8e6b209383979d9a1cda58c9af947acda04f8917d39e4e4a4a5db414043c7b44a5347f9bbbb0fb1fb7ca2674387b638a'
             'd698b5a800929bb7b37cf82955c162429684754f377239c0364ff3c31cd46e0c506276d36d253a07ec15ae728ba5fc3226f66f593614e656ee8176b6929bcb5d'
             'd8a088ac2f486e47d4f5f91e21ec79486503b2bbd4ce10b923d6aead0c73d260c88b6159704ed47c54885c67c9484f12f032f15dbb4060c88b2e851306138a17'
@@ -39,7 +39,7 @@ build() {
     --with-compiledby='Chakra' \
     --enable-gpm \
     --enable-acl \
-    --with-x=no \
+    --with-x=yes \
     --disable-gui \
     --enable-multibyte \
     --enable-cscope \
@@ -53,10 +53,11 @@ build() {
   make
 }
 
-check() {
-  cd vim-$pkgver
-  TERM=xterm make -j1 test
-}
+# Tests fail when built `with-x` and run outside a X session
+# check() {
+#   cd vim-$pkgver
+#   TERM=xterm make -j1 test
+# }
 
 package_vim-runtime() {
   pkgdesc='Runtime for vim and gvim'
@@ -105,7 +106,7 @@ package_vim-runtime() {
 
 package_vim() {
   pkgdesc='Vi Improved, a highly configurable, improved version of the vi text editor'
-  depends=("vim-runtime=${pkgver}-${pkgrel}" 'gpm' 'acl')
+  depends=("vim-runtime=${pkgver}-${pkgrel}" 'gpm' 'acl' 'libxt')
   optdepends=('python2: Python 2 language support'
               'python3: Python 3 language support'
               'ruby: Ruby language support'
