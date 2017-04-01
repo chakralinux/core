@@ -1,0 +1,27 @@
+# Based on the file created for Arch Linux by:
+# Pierre Schmitz <pierre@archlinux.de>
+
+# Maintainer: Luca Giambonini <almack@chakralinux.org>
+
+pkgname=chakra-keyring
+pkgver=20170401
+pkgrel=1
+pkgdesc='Chakra PGP keyring'
+arch=('any')
+groups=('base')
+url='https://chakralinux.org'
+license=('GPL')
+install="${pkgname}.install"
+source=('Makefile'
+        'chakra.gpg'
+        'chakra-revoked'
+        'chakra-trusted')
+sha256sums=('0331469dc8044758801d3b56bb1bfc1a69396a39fe42ee1d0f3d94b080c69d0e'
+            '066702708f6cb52947d4afee9c6cc5b00c120d764c9333477776faab0b865f43'
+            'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+            '0bf484981bfacddd177f839372c891a717ddcdd203cb3fde81e6e74006a7bbef')
+
+package() {
+    cd ${srcdir}
+    make PREFIX=/usr DESTDIR=${pkgdir} install
+}
