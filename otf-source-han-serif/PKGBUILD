@@ -1,0 +1,103 @@
+pkgbase=otf-source-han-serif
+pkgname=($pkgbase $pkgbase-kr $pkgbase-cn $pkgbase-tw ${pkgbase/otf/otc})
+pkgver=1.000
+pkgrel=1
+pkgdesc='Adobe Source Han Serif - A set of Pan-CJK fonts designed to complement Source Serif Pro'
+arch=('any')
+license=('custom:OFL')
+url='http://sourceforge.net/adobe/source-han-serif'
+depends=('fontconfig')
+install="${pkgbase}.install"
+source=()
+
+_commit=f6cf97d92b22e7bd77e355a61fe549ae44b6de76
+_weights=("Bold" "SemiBold" "ExtraLight" "Heavy" "Light" "Medium" "Regular")
+_font=("OTC SourceHanSerif ttc ${pkgbase/otf/otc} 44-source-han-serif-otc.conf"
+       "OTF/Japanese SourceHanSerif otf $pkgbase 44-source-han-serif.conf"
+       "OTF/Korean SourceHanSerifK otf $pkgbase-kr 44-source-han-serif-kr.conf"
+       "OTF/SimplifiedChinese SourceHanSerifSC otf $pkgbase-cn 44-source-han-serif-cn.conf"
+       "OTF/TraditionalChinese SourceHanSerifTC otf $pkgbase-tw 44-source-han-serif-tw.conf")
+
+_pkgdesc=("Adobe Source Han Serif - Pan-CJK OpenType/CFF Collection fonts"
+          "Adobe Source Han Serif - Japanese OpenType/CFF fonts"
+          "Adobe Source Han Serif - Korean OpenType/CFF fonts"
+          "Adobe Source Han Serif - Simplified Chinese OpenType/CFF fonts"
+          "Adobe Source Han Serif - Traditional Chinese OpenType/CFF fonts")
+
+for((idx=0;idx<${#_font[@]};idx++)); do
+    _info=${_font[$idx]}
+    _args=($_info)
+    source+=("${_args[4]}")
+    for w in "${_weights[@]}"; do
+        source+=("https://github.com/adobe-fonts/source-han-serif/raw/$_commit/${_args[0]}/${_args[1]}-${w}.${_args[2]}")
+    done
+    eval "function package_${_args[3]}() { _package $idx; }"
+done
+
+function _package {
+    cd "$srcdir"
+    idx=$1
+
+    _info=${_font[$idx]}
+    _args=($_info)
+    _fontconfig_filename=${_args[4]}
+    pkgdesc=${_pkgdesc[$idx]}
+    if [[ "${_replace[$idx]}" != "" ]]; then
+         replaces=("${_replace[$idx]}")
+         conflicts=("${_replace[$idx]}")
+    fi
+
+    # Prepare destination directory
+    install -dm755 "$pkgdir/usr/share/fonts/OTF"
+
+    for w in "${_weights[@]}"; do
+	font="${_args[1]}-${w}.${_args[2]}"
+        install -m644 "$font" "$pkgdir/usr/share/fonts/OTF/"
+    done
+
+    # Install fontconfig fix
+    install -d "$pkgdir/etc/fonts/conf.d"
+    install -Dm644 "$srcdir/$_fontconfig_filename" "$pkgdir/etc/fonts/conf.avail/$_fontconfig_filename"
+    ln -s ../conf.avail/$_fontconfig_filename "$pkgdir/etc/fonts/conf.d/$_fontconfig_filename"
+}
+
+sha256sums=('63ac05fe65000c0157fa3b63903c4584fb77c08a3b3d6baef1495644dc9d0e67'
+            '47e45a6be9797601ec1fbbb0a840864f06550ef359ccb6ab5d2b41a8a7be8d1b'
+            'b79735db610d085a44de4282472f964409fe4b0671ccc987a6e9486fb30ebf21'
+            'aafb51ec1bec8b3b1035a041e2d04a1c7aeee46003eaf09d990d0f4d55dbcb04'
+            'f00b8cf85f2f6cd03aa98acd97a2d43dcd9920c68601068bb718fdf1c1664e82'
+            '8f90f7fbb4e4720854d449c23b78380d98086ee480a1e121fb4e7bfe6ab2d4ba'
+            '218f2f38692c447faaf8a1fd02be25f536961817c9d2879ec24e0481f9aa356f'
+            '0b923cb5cfc015b9ce91789448d066230ca95a9984da0f826af65c3560e2e1c1'
+            '18f4b2f0cea524554098ca44897fe72923d7f0055693ea0e5a1092df8ac5b057'
+            '3d9d64f4c1efb45dcb5731afd57745dc8f7825fa2bc554b6a64db7befff8c562'
+            '4895c56e375667fae3eeebd00571185b3854d135c8f3b588320fe420652a05e1'
+            'd7ba802b532597794b22dddc6a86a512f185e7ffab8807808e3fdb1f9f4e9654'
+            'c68db52fa1aea78b6bedc0b97987951f351734dd7d1e3708bc72936de94b22bc'
+            'f76d1c70146f8771b6935e626f016a71be1f6883d7660d11cc0b76293812b774'
+            '6a3b4e5058c79880637f79cef9924b32930091456fd5baeb53656de64d846751'
+            'e89ee695bdea8ad69ae0db5d8060c521d09b54a2217a4ff8b1ec96c26841ac4a'
+            'fa6b0c5a395d83ec9297dd8999da8280f0cb8f1252b116fe71968a5c1129b59a'
+            '5ce4cb73b2a85348f38c191172fc62616e968d3c563b2f86de8a681ba96545f2'
+            'ed8615c5d2beb07b15a7783c8e23268dd42c590a78852bd8064e79eda54cb78e'
+            'f5989bf1f8b041a54a52e1906f7cc0b890e78c2862a1a475c08670c0e6ed5138'
+            'e97611c35b9f3128ddccee0867948b8eafb8a174694f6b62f42040d1ef7f046e'
+            'a35c331798d17ccbfa03ea130ce1804d3ef11e7d439461baf86e37cbbc2f11b5'
+            'ecb0d89c8e1037af38c7d9d535bd168b725272e346b201bcdf50eed367d437c4'
+            '7cf3d48e53a14d3dc6dac30cb6f00ebb223e4b1ca13a91d57ae4e84c4c4bba06'
+            '8b74db581d1024b4fe9a5c922fa3953d3df937fe1c8ed6ab552cc60e8b2cc88d'
+            '26e2c9bd766fee0df6d1ff1f1a0896607d0178649ee382faa725f445d5dbeaae'
+            'd975b0960c521878e978971afd2ba613ff259e9f26ee4d75623647d657c9f8c9'
+            '07bf1d0b3cb632e391852ed2ba5e8584539afe019feb042acc7e03df3b0c8fcc'
+            '5b76df8431f8b17cdd843aa2c614d61d4dc41adb34c4a7f9422ad41e3e826c12'
+            'ee841d9d43bf4f0b308fb06da85a683223287be52c59de74c121f5e83accb280'
+            '8e224937647ae71ba1b1f310bcb3fbc32f21ec7c2c490ba04670455c901f3378'
+            '99c3237ec02b87b1ae32eaa74732db0e16eaa1a9734b78a9913764db0735b74a'
+            '2e0de54fbe91cd7b5bcfe71b311c5abdd659b7bc03e09c7df3eab704b70004f8'
+            'b2a265d16a9125836ac11b95b02b5f2b9a48a34197878f55e2ca837621efd485'
+            '7785f0a956b2558d605092496a0aab5980dfb3c66a87f8c026e20ca131f71355'
+            'c0fca3b9ee5fdfa47b71324b7937563b68de1ec5408e5120b3912a3443e4893f'
+            '82dd492ae0a82e0b37faf7377910367ebc4e33f54c6e85bf3390c2ebfaeb6ef2'
+            '8dd5271d58aeca2b6444acd1d7980df4896fa5118ec12d748d94dfbc526a8860'
+            'd3c1f3603a68399e97afcbb8bce8caa7021c543f58b5bdc74c86d9729de479bb'
+            '33e3d779c878c84caeda77065c21c60e14e2fd6966cbd49c78a7a802d1e584dc')
