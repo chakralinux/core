@@ -4,12 +4,19 @@ pkgver=20170406
 pkgrel=1
 arch=('any')
 url="http://www.google.com/get/noto"
-license=('apache')
+license=('custom:SIL')
 depends=(fontconfig)
 makedepends=()
 source=("http://storage.googleapis.com/noto-website/pkgs/Noto-hinted.zip")
-md5sums=('59ba4db1e832db3c241db1cb224a0087')
-install=${pkgname}.install
+md5sums=('59ba4db1e832db3c241db1cb224a0087'
+         '87f0082b0bbf6855f00d797777624df8'
+         '0de03ab843bb92e80ee52a84335e5b63'
+         'f476f0d940df895986e95be382f02349'
+         'd29e79bf5a4e8f5bbc67f8c8ceb41b32')
+install=${pkgbase}.install
+for lang in jp kr sc tc; do
+  source+=(https://noto-website.storage.googleapis.com/pkgs/NotoSerifCJK"${lang}"-hinted.zip)
+done
 
 pkgver() {
   date +%Y%m%d
@@ -26,6 +33,7 @@ package_ttf-noto() {
 
     install -dm755 "$pkgdir"/usr/share/fonts/TTF
     install -m644 *.ttf "$pkgdir"/usr/share/fonts/TTF
+    install -Dm644 LICENSE_OFL.txt "$pkgdir"/usr/share/licenses/"$pkgname"/LICENSE
 }
 
 package_otf-noto-cjk() {
@@ -34,10 +42,12 @@ package_otf-noto-cjk() {
     replaces=('otf-noto')
     install -dm755 "$pkgdir"/usr/share/fonts/OTF
     install -m644 *.otf "$pkgdir"/usr/share/fonts/OTF
+    install -Dm644 LICENSE_OFL.txt "$pkgdir"/usr/share/licenses/"$pkgname"/LICENSE
 }
 
 package_ttf-noto-emoji() {
     pkgdesc="Google Noto Emoji TTF fonts"
     install -dm755 "$pkgdir"/usr/share/fonts/TTF
     install -m644 ${srcdir}/emoji/*.ttf "$pkgdir"/usr/share/fonts/TTF
+    install -Dm644 LICENSE_OFL.txt "$pkgdir"/usr/share/licenses/"$pkgname"/LICENSE
 }
