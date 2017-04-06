@@ -1,6 +1,6 @@
 pkgbase=ttf-noto
-pkgname=('ttf-noto' 'otf-noto' 'ttf-noto-emoji')
-pkgver=20161013
+pkgname=('ttf-noto' 'otf-noto-cjk' 'ttf-noto-emoji')
+pkgver=20170406
 pkgrel=1
 arch=('any')
 url="http://www.google.com/get/noto"
@@ -8,7 +8,7 @@ license=('apache')
 depends=(fontconfig)
 makedepends=()
 source=("http://storage.googleapis.com/noto-website/pkgs/Noto-hinted.zip")
-md5sums=('e8fd003b86f583b2b5bf9d679c1d424d')
+md5sums=('59ba4db1e832db3c241db1cb224a0087')
 install=${pkgname}.install
 
 pkgver() {
@@ -28,8 +28,10 @@ package_ttf-noto() {
     install -m644 *.ttf "$pkgdir"/usr/share/fonts/TTF
 }
 
-package_otf-noto() {
+package_otf-noto-cjk() {
     pkgdesc="Google Noto CJK OTF fonts"
+    provides=('otf-noto')
+    replaces=('otf-noto')
     install -dm755 "$pkgdir"/usr/share/fonts/OTF
     install -m644 *.otf "$pkgdir"/usr/share/fonts/OTF
 }
