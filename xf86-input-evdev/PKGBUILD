@@ -1,8 +1,10 @@
 # Maintainer: Drake Justice <djustice@chakraos.org>
 
+source ../xorg.conf
+
 pkgname=xf86-input-evdev
-pkgver=2.10.0
-pkgrel=2
+pkgver=2.10.5
+pkgrel=1
 pkgdesc="X.org evdev input driver"
 arch=('x86_64')
 url="http://xorg.freedesktop.org/"
@@ -10,11 +12,11 @@ license=('custom')
 depends=('glibc' 'systemd' 'mtdev' 'libevdev')
 makedepends=('xorg-server-devel' 'resourceproto' 'scrnsaverproto')
 provides=('xf86-input-driver')
-conflicts=('xorg-server<1.16.0' 'X-ABI-XINPUT_VERSION<21' 'X-ABI-XINPUT_VERSION>=22')
+conflicts=('xorg-server<1.16.0' "X-ABI-XINPUT_VERSION<${X_ABI_XINPUT_MAJOR}" "X-ABI-XINPUT_VERSION>=$((X_ABI_XINPUT_MAJOR+1))")
 options=('!makeflags')
 groups=('xorg-drivers' 'xorg')
 source=(${url}/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2)
-sha256sums=('d097298eb07b7a9edf4493b5c3c058041458ca52c8c62dbd4f40b84c5086d117')
+sha256sums=('9edaa6205baf6d2922cc4db3d8e54a7e7773b5f733b0ae90f6be7725f983b70d')
 
 build() {
   cd ${pkgname}-${pkgver}
