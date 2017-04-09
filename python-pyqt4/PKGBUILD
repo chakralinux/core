@@ -1,7 +1,7 @@
 pkgbase=pyqt4
 pkgname=('python-pyqt4-common' 'python3-pyqt4' 'python2-pyqt4')
 pkgver=4.12
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://riverbankcomputing.co.uk/software/pyqt/intro'
 license=('GPL')
@@ -51,8 +51,8 @@ package_python-pyqt4-common() {
 
     cd PyQt4_gpl_x11-${pkgver}
     msg "Packaging python-pyqt4-common"
-    make -C pyrcc DESTDIR="${pkgdir}" install
-    make -C pylupdate DESTDIR="${pkgdir}" install
+    make -C pyrcc INSTALL_ROOT="${pkgdir}" install
+    make -C pylupdate INSTALL_ROOT="${pkgdir}" install
 
     install -Dm644 PyQt4.api "${pkgdir}"/usr/share/qt/qsci/api/python/PyQt4.api
 
