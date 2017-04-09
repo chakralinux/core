@@ -3,7 +3,7 @@
 # If you update this package,please remember to update lib32-primus!
 pkgname=primus
 pkgver=20151110
-pkgrel=1
+pkgrel=2
 pkgdesc="Faster OpenGL offloading for Bumblebee (git sources)"
 arch=('x86_64')
 url="https://github.com/amonakov/primus"
@@ -14,7 +14,7 @@ provides=('primus')
 source=("git://github.com/amonakov/primus.git#commit=d1afbf6"
         "register_cleanup.patch")
 sha1sums=('SKIP'
-          'fd48f89c55c1ad854d7a985781faed2c52c0135f')
+          'cec9946b5f90d7b4fb7be03df9d651d903bd1062')
 
 prepare() {
   cd primus
@@ -30,14 +30,14 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}"
 
-  install -D "lib/libGL.so.1" "$pkgdir/usr/lib/primus/libGL.so.1"
-  sed -e "s#^PRIMUS_libGL=.*#PRIMUS_libGL='/usr/\$LIB/primus'#" primusrun > primusrun.dist
-  install -D "primusrun.dist" "$pkgdir/usr/bin/primusrun"
-  
+  sed -e '/^PRIMUS_libGL=/cPRIMUS_libGL=/usr/\\$LIB/primus' \
+      -e '/^exec/iexport __GLVND_DISALLOW_PATCHING=1' \
+    primusrun | install -D /dev/stdin "$pkgdir/usr/bin/primusrun"
+
+  install -D "lib/libGL.so.1" "$pkgdir/usr/lib/primus/libGL.so.1" 
   install -D "primus.bash-completion" "$pkgdir/etc/bash_completion.d/primusrun"
   
   gzip -9 "primusrun.1"
   install -D "primusrun.1.gz" "$pkgdir/usr/share/man/man1/primusrun.1.gz"
-
-  install -D -m644 LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
