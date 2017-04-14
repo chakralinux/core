@@ -3,7 +3,7 @@ source ../xorg.conf
 pkgbase=xorg-server
 pkgname=('xorg-server' 'xorg-server-xephyr' 'xorg-server-xdmx' 'xorg-server-xvfb' 'xorg-server-xnest' 'xorg-server-xwayland' 'xorg-server-common' 'xorg-server-devel')
 pkgver=1.19.3
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 license=('custom')
 groups=('xorg')
@@ -196,7 +196,7 @@ package_xorg-server-xdmx() {
 
 package_xorg-server-xwayland() {
   pkgdesc="run X clients under wayland"
-  depends=(libxfont2 libepoxy libunwind libsystemd libgl pixman xorg-server-common)
+  depends=(libxfont2 libepoxy libunwind libgl systemd pixman xorg-server-common)
 
   cd "${pkgbase}-${pkgver}/hw/xwayland"
   make DESTDIR="${pkgdir}" install
