@@ -3,7 +3,7 @@ source ../xorg.conf
 pkgbase=xorg-server
 pkgname=('xorg-server' 'xorg-server-xephyr' 'xorg-server-xdmx' 'xorg-server-xvfb' 'xorg-server-xnest' 'xorg-server-xwayland' 'xorg-server-common' 'xorg-server-devel')
 pkgver=1.19.3
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 license=('custom')
 groups=('xorg')
@@ -148,7 +148,7 @@ package_xorg-server() {
 
 package_xorg-server-xephyr() {
   pkgdesc="A nested X server that runs as an X application"
-  depends=(libxfont2 libgl libepoxy libunwind libsystemd libxv pixman xorg-server-common xcb-util-image
+  depends=(libxfont2 libgl libepoxy libunwind libxv systemd pixman xorg-server-common xcb-util-image
            xcb-util-renderutil xcb-util-wm xcb-util-keysyms)
 
   cd "${pkgbase}-${pkgver}/hw/kdrive"
@@ -160,7 +160,7 @@ package_xorg-server-xephyr() {
 
 package_xorg-server-xvfb() {
   pkgdesc="Virtual framebuffer X server"
-  depends=(libxfont2 libunwind libsystemd pixman xorg-server-common xorg-xauth libgl)
+  depends=(libxfont2 libunwind systemd pixman xorg-server-common xorg-xauth libgl)
 
   cd "${pkgbase}-${pkgver}/hw/vfb"
   make DESTDIR="${pkgdir}" install
@@ -174,7 +174,7 @@ package_xorg-server-xvfb() {
 
 package_xorg-server-xnest() {
   pkgdesc="A nested X server that runs as an X application"
-  depends=(libxfont2 libxext libunwind pixman xorg-server-common libsystemd)
+  depends=(libxfont2 libxext libunwind pixman xorg-server-common systemd)
 
   cd "${pkgbase}-${pkgver}/hw/xnest"
   make DESTDIR="${pkgdir}" install
