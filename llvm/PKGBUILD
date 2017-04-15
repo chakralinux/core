@@ -161,11 +161,14 @@ package_llvm-ocaml() {
 package_lldb() {
   pkgdesc="Next generation, high-performance debugger"
   url="http://lldb.llvm.org/"
-  depends=('libxml2' 'python2')
+  depends=('libxml2' 'python2' 'python2-six')
 
   cd "$srcdir/llvm-$pkgver.src"
 
   make -C build/tools/lldb DESTDIR="$pkgdir" install
+
+  # Remove bundled six library
+  rm "$pkgdir/usr/lib/python2.7/site-packages/six.py"
 
   # Compile Python scripts
   python2 -m compileall "$pkgdir/usr/lib/python2.7/site-packages/lldb"
