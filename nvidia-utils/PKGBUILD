@@ -1,22 +1,18 @@
 pkgbase=nvidia-utils
-pkgname=('nvidia-utils' 'opencl-nvidia')
+pkgname=(nvidia-utils opencl-nvidia)
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 # Update nvidia-settings too
 pkgver=378.13
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
-
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-#_pkg="NVIDIA-Linux-x86_64-${pkgver}"
-
-source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run"
+source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
         'nvidia-drm-outputclass.conf')
-#source=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
-sha1sums=('fd93f18a38e7213295078bfdfd51cf9e87db0289'
-          '04c92e577ff6501c817f5bb2d16398d7b9f47395')
+md5sums=('fe4d25b19a780a690cafc8e3b7c0113f'
+         'a433deeb5f9cc661e537f42bde2f1df7')
 
 create_links() {
     # create soname links

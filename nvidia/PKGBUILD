@@ -1,9 +1,9 @@
 # Source global configuration
 source ../linux.conf
 
-pkgname=('nvidia' 'chd-nvidia') # 'nvidia-dkms') # Maybe we don't need dkms module
+pkgname=(nvidia nvidia-dkms chd-nvidia)
 pkgver=378.13
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}" "nvidia-utils=${pkgver}")
@@ -11,12 +11,8 @@ license=('custom')
 options=('!strip')
 source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported_new"
         'kernel_4.10.patch')
-
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-#_pkg="NVIDIA-Linux-x86_64-${pkgver}"
-
-source+=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-#source+=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
+source+=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
 sha1sums=('bdb063bbd03eed9fa718664ef2023fd759efe4a3'
           'ef2748a39d071ef8000640c1db8d13f57610da42'
           'fd93f18a38e7213295078bfdfd51cf9e87db0289')
@@ -24,23 +20,22 @@ sha1sums=('bdb063bbd03eed9fa718664ef2023fd759efe4a3'
 prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
-    # patches here
 
     patch -Np1 -i ../kernel_4.10.patch
 
-#    cp -a kernel kernel-dkms
-#    cd kernel-dkms
-#    sed -i "s/__VERSION_STRING/${pkgver}/" dkms.conf
-#    sed -i 's/__JOBS/`nproc`/' dkms.conf
-#    sed -i 's/__DKMS_MODULES//' dkms.conf
-#    sed -i '$iBUILT_MODULE_NAME[0]="nvidia"\
-#DEST_MODULE_LOCATION[0]="/kernel/drivers/video"\
-#BUILT_MODULE_NAME[1]="nvidia-uvm"\
-#DEST_MODULE_LOCATION[1]="/kernel/drivers/video"\
-#BUILT_MODULE_NAME[2]="nvidia-modeset"\
-#DEST_MODULE_LOCATION[2]="/kernel/drivers/video"\
-#BUILT_MODULE_NAME[3]="nvidia-drm"\
-#DEST_MODULE_LOCATION[3]="/kernel/drivers/video"' dkms.conf
+    cp -a kernel kernel-dkms
+    cd kernel-dkms
+    sed -i "s/__VERSION_STRING/${pkgver}/" dkms.conf
+    sed -i 's/__JOBS/`nproc`/' dkms.conf
+    sed -i 's/__DKMS_MODULES//' dkms.conf
+    sed -i '$iBUILT_MODULE_NAME[0]="nvidia"\
+DEST_MODULE_LOCATION[0]="/kernel/drivers/video"\
+BUILT_MODULE_NAME[1]="nvidia-uvm"\
+DEST_MODULE_LOCATION[1]="/kernel/drivers/video"\
+BUILT_MODULE_NAME[2]="nvidia-modeset"\
+DEST_MODULE_LOCATION[2]="/kernel/drivers/video"\
+BUILT_MODULE_NAME[3]="nvidia-drm"\
+DEST_MODULE_LOCATION[3]="/kernel/drivers/video"' dkms.conf
 }
 
 build() {
@@ -49,20 +44,33 @@ build() {
 }
 
 package_nvidia() {
-    pkgdesc="NVIDIA drivers for linux."
-    depends=("linux=${_kernelver}" "nvidia-libgl" "nvidia-utils=${pkgver}")
+    pkgdesc="NVIDIA drivers for linux"
+    depends=("linux=${_kernelver}" "nvidia-utils=${pkgver}")
     conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx')
     install=nvidia.install
 
     for ko in nvidia nvidia-uvm nvidia-modeset nvidia-drm; do
-    install -Dm644 "${srcdir}/${_pkg}/kernel/${ko}.ko" \
-        "${pkgdir}/usr/lib/modules/${_extramodules}/${ko}.ko"
+        install -Dm644 "${srcdir}/${_pkg}/kernel/${ko}.ko" \
+            "${pkgdir}/usr/lib/modules/${_extramodules}/${ko}.ko"
     done
     gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
-
     install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
-    echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nouveau_blacklist.conf"
+
+    echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nvidia.conf"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
+}
+
+package_nvidia-dkms() {
+    pkgdesc="NVIDIA driver sources for linux"
+    depends=('dkms' "nvidia-utils=$pkgver" 'libgl')
+    optdepends=('linux-headers: Build the module for Arch kernel'
+                'linux-lts-headers: Build the module for LTS Arch kernel')
+    conflicts+=('nvidia')
+
+    cd ${_pkg}
+    install -dm 755 "${pkgdir}"/usr/{lib/modprobe.d,src}
+    cp -dr --no-preserve='ownership' kernel-dkms "${pkgdir}/usr/src/nvidia-${pkgver}"
+    echo 'blacklist nouveau' > "${pkgdir}/usr/lib/modprobe.d/nvidia.conf"
 }
 
 package_chd-nvidia() {
