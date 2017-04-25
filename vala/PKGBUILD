@@ -1,5 +1,5 @@
 pkgname=vala
-pkgver=0.34.6
+pkgver=0.36.2
 pkgrel=1
 pkgdesc="Compiler for the GObject type system."
 arch=('x86_64')
@@ -8,12 +8,12 @@ license=('LGPL')
 depends=('glib2')
 makedepends=('libxslt')
 checkdepends=('dbus' 'libx11' 'gobject-introspection')
-source=(http://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver:0:4}/$pkgname-$pkgver.tar.xz)
-sha256sums=('d1e32d6c55c2d66964d30b7410b78f5f313f1231fc3502da9980c3c80a797bb1')
+source=(https://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver:0:4}/$pkgname-$pkgver.tar.xz)
+sha256sums=('863dbfb399d59289dfc34379c0cd34d94e505a49787497550588810310cdf689')
 
 build() {
     cd $pkgname-$pkgver
-    ./configure --prefix=/usr
+    ./configure --prefix=/usr --enable-vapigen
     make
 }
 
