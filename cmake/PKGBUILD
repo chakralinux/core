@@ -1,18 +1,20 @@
 pkgname=cmake
-pkgver=3.7.1
-pkgrel=2
-pkgdesc="A cross-platform open-source make system"
+pkgver=3.8.0
+pkgrel=1
+pkgdesc='A cross-platform open-source make system'
 arch=('x86_64')
+url="http://www.cmake.org/"
 license=('custom')
-url="http://www.cmake.org"
 depends=('curl' 'libarchive' 'shared-mime-info' 'jsoncpp' 'libuv')
-makedepends=('qt5-base' 'python3-sphinx' 'libxkbcommon-x11')
+makedepends=('qt5-base' 'python3-sphinx' 'libxkbcommon-x11' 'rhash')
+optdepends=('qt5-base: cmake-gui'
+            'libxkbcommon-x11: cmake-gui')
+source=("https://www.cmake.org/files/v${pkgver%.*}/${pkgname}-${pkgver}.tar.gz")
+sha256sums=('cab99162e648257343a20f61bcd0b287f5e88e36fcb2f1d77959da60b7f35969')
 install=${pkgname}.install
-source=("http://www.cmake.org/files/v${pkgver%.*}/${pkgname}-${pkgver}.tar.gz")
-sha256sums=('449a5bce64dbd4d5b9517ebd1a1248ed197add6ad27934478976fd5f1f9330e1')
 
 build() {
-  cd "${srcdir}"/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
 
   ./bootstrap --prefix=/usr \
     --mandir=/share/man \
@@ -31,12 +33,14 @@ package() {
 
   vimpath="${pkgdir}/usr/share/vim/vimfiles"
   install -d "${vimpath}"/{help,indent,syntax}
-  ln -s /usr/share/${pkgname}-${_pkgver}/editors/vim/cmake-help.vim "${vimpath}"/help/
-  ln -s /usr/share/${pkgname}-${_pkgver}/editors/vim/cmake-indent.vim "${vimpath}"/indent/
-  ln -s /usr/share/${pkgname}-${_pkgver}/editors/vim/cmake-syntax.vim "${vimpath}"/syntax/
+  ln -s /usr/share/cmake-${pkgver%.*}/editors/vim/indent/cmake.vim \
+    "${vimpath}"/indent/
+  ln -s /usr/share/cmake-${pkgver%.*}/editors/vim/syntax/cmake.vim \
+    "${vimpath}"/syntax/
 
   install -d "${pkgdir}"/usr/share/emacs/site-lisp/
-  ln -s /usr/share/${pkgname}-${_pkgver}/editors/emacs/cmake-mode.el "${pkgdir}"/usr/share/emacs/site-lisp/
+  ln -s /usr/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.el \
+    "${pkgdir}"/usr/share/emacs/site-lisp/
 
   install -Dm644 Copyright.txt \
     "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
