@@ -5,7 +5,7 @@
 
 pkgbase=python-twisted
 pkgname=(python3-twisted python2-twisted)
-pkgver=16.0.0
+pkgver=17.1.0
 pkgrel=1
 pkgdesc="Asynchronous networking framework written in Python"
 arch=('x86_64')
@@ -19,11 +19,9 @@ sha1sums=('SKIP')
 prepare() {
   cp -a "twisted"{,-py2}
 
-  cd "twisted-py2"
   sed -i 's:^#!.*bin.*python:#!/usr/bin/python2:' \
-    twisted/python/test/pullpipe.py \
-    twisted/mail/test/pop3testserver.py \
-    twisted/trial/test/scripttest.py
+    twisted-py2/src/twisted/mail/test/pop3testserver.py \
+    twisted-py2/src/twisted/trial/test/scripttest.py
 }
 
 build() {
@@ -52,13 +50,9 @@ package_python3-twisted() {
   cd "$srcdir/twisted"
   python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
 
-  # Wrong path, wrong!
-  cp -a "$pkgdir"/usr/twisted/* "$pkgdir"/usr/lib/python3.5/site-packages/twisted/
-  rm -r "$pkgdir"/usr/twisted
-
   # twisted in python 3 supports only few command line tools for now.
   # Let's rename the tools the other way round after the python 3 version supports all.
-  for name in trial twistd; do
+  for name in trial twistd twist ckeygen cftp conch pyhtmlizer tkconch; do
     mv "$pkgdir/usr/bin/$name"{,3}
   done
 
