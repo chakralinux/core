@@ -1,20 +1,20 @@
 pkgname=networkmanager
 _pkgname=NetworkManager
-pkgver=1.4.4
-pkgrel=4
+pkgver=1.8rc3+10+gddd6f94
+pkgrel=1
 pkgdesc="Network Management daemon"
 arch=('x86_64')
-license=('GPL')
+license=(GPL2 LGPL2.1)
+url="https://wiki.gnome.org/Projects/NetworkManager"
 _pppver=2.4.7
-url="http://www.gnome.org/projects/NetworkManager/"
+makedepends=(intltool dhclient iptables gobject-introspection gtk-doc "ppp=$_pppver" modemmanager
+             dbus-glib iproute2 nss polkit wpa_supplicant libsoup systemd libgudev rp-pppoe
+             libnewt libndp libteam vala perl-yaml python3-gobject git vala jansson bluez-libs)
 depends=(iproute2 polkit wpa_supplicant libsoup modemmanager
-         libnewt libndp libteam "ppp=${_pppver}"
+         libnewt libndp libteam "ppp=$_pppver"
          libgudev nss dbus-glib util-linux jansson systemd)
-makedepends=(intltool dhclient iptables gobject-introspection gtk-doc
-             "ppp=${_pppver}" modemmanager dbus-glib iproute2 nss polkit
-             wpa_supplicant libsoup systemd libgudev rp-pppoe
-             libnewt libndp libteam vala perl-yaml python3-gobject git)
 checkdepends=(libx11 python3-dbus)
+_commit=ddd6f94ab70eae875641ab593e17326acf65644c  # nm-1-8
 optdepends=('dnsmasq: connection sharing'
             'bluez: Bluetooth support'
             'openresolv: resolvconf support'
@@ -24,13 +24,11 @@ optdepends=('dnsmasq: connection sharing'
             'modemmanager: cellular network support')
 backup=('etc/NetworkManager/NetworkManager.conf')
 install=networkmanager.install
-_commit=3c70a03cf5be420afaaf44f3a0bab5d00cc4e993  # tags/1.4.4^0
 source=("git+https://anongit.freedesktop.org/git/NetworkManager/NetworkManager#commit=$_commit"
-        NetworkManager.conf
-        20-connectivity.conf)
+        NetworkManager.conf 20-connectivity.conf)
 sha256sums=('SKIP'
             '67f112c1ac8ee3726eb229f5cd783de19f09cc252af49e157343d82b324b923f'
-            '569c312647723c39c356a9ba746ce674f9c69595b4764990b1e8254dd141e0b1')
+            'e6ba2bed35c7613379101e8e079a9c94d0e43c3ca14ff02b4398ea64d50c9e91')
 
 prepare() {
   cd NetworkManager
@@ -42,38 +40,73 @@ prepare() {
 
 pkgver() {
   cd NetworkManager
-  git describe | sed 's/-dev/dev/;s/-/+/g'
+  git describe | sed 's/-dev/dev/;s/-rc/rc/;s/-/+/g'
 }
 
 build() {
   cd NetworkManager
-  ./configure --prefix=/usr \
+  PYTHON=python3 ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
+    runstatedir=/run \
     --sbindir=/usr/bin \
-    --libexecdir=/usr/lib/networkmanager \
+    --libexecdir=/usr/lib/NetworkManager \
+    --disable-ifcfg-rh \
+    --disable-ifcfg-suse \
+    --disable-ifnet \
+    --disable-ifupdown \
+    --disable-lto \
+    --disable-more-warnings \
+    --disable-static \
+    --enable-bluez5-dun \
+    --enable-concheck \
+    --enable-config-plugin-ibft \
+    --disable-gtk-doc \
+    --enable-introspection \
+    --enable-json-validation \
+    --enable-ld-gc \
+    --enable-modify-system \
+    --enable-polkit \
+    --enable-polkit-agent \
+    --enable-teamdctl \
+    --enable-wifi \
+    --with-config-dhcp-default=dhclient \
+    --with-config-dns-rc-manager-default=resolvconf \
+    --with-config-logging-backend-default=journal \
+    --with-config-plugins-default=keyfile,ibft \
     --with-crypto=nss \
+    --with-dbus-sys-dir=/usr/share/dbus-1/system.d \
     --with-dhclient=/usr/bin/dhclient \
-    --without-dhcpcd \
+    --with-dist-version="$pkgver-$pkgrel, Chakra Linux" \
     --with-dnsmasq=/usr/bin/dnsmasq \
+    --with-dnssec-trigger=/usr/lib/dnssec-trigger \
+    --with-hostname-persist=default \
     --with-iptables=/usr/bin/iptables \
+    --with-kernel-firmware-dir=/usr/lib/firmware \
+    --with-libnm-glib \
+    --with-libsoup \
+    --with-modem-manager-1 \
+    --with-nmcli \
+    --with-nmtui \
+    --with-pppd-plugin-dir=/usr/lib/pppd/$_pppver \
+    --with-pppd=/usr/bin/pppd \
+    --with-resolvconf=/usr/bin/resolvconf \
+    --with-session-tracking=systemd \
+    --with-suspend-resume=systemd \
+    --with-system-ca-path=/etc/ssl/certs \
+    --with-systemd-journal \
+    --with-systemd-logind \
     --with-systemdsystemunitdir=/usr/lib/systemd/system \
     --with-udev-dir=/usr/lib/udev \
-    --with-resolvconf=/usr/bin/resolvconf \
-    --with-pppd=/usr/bin/pppd \
-    --with-pppd-plugin-dir=/usr/lib/pppd/$_pppver \
-    --with-pppoe=/usr/bin/pppoe \
-    --with-kernel-firmware-dir=/usr/lib/firmware \
-    --with-session-tracking=systemd \
-    --with-modem-manager-1 \
-    --disable-static \
-    --enable-more-warnings=no \
-    --disable-wimax \
-    --enable-modify-system \
-    --enable-doc \
-    --disable-gtk-doc
+    --with-wext \
+    --without-consolekit \
+    --without-dhcpcd \
+    --without-libaudit \
+    --without-netconfig \
+    --without-ofono \
+    --without-selinux
 
-  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0 /g' -e 's/    if test "$export_dynamic" = yes && test -n "$export_dynamic_flag_spec"; then/      func_append compile_command " -Wl,-O1,--as-needed"\n      func_append finalize_command " -Wl,-O1,--as-needed"\n\0/' libtool
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
 
   make
 }
@@ -87,6 +120,4 @@ package() {
   install -m644 ../NetworkManager.conf "$pkgdir/etc/NetworkManager/"
   install -Dm644 ../20-connectivity.conf \
     "$pkgdir/usr/lib/NetworkManager/conf.d/20-connectivity.conf"
- 
-  rm -r "$pkgdir/var/run"  
 }
