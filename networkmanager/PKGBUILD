@@ -1,7 +1,7 @@
 pkgname=networkmanager
 _pkgname=NetworkManager
 pkgver=1.8rc3+10+gddd6f94
-pkgrel=1
+pkgrel=2
 pkgdesc="Network Management daemon"
 arch=('x86_64')
 license=(GPL2 LGPL2.1)
@@ -11,8 +11,8 @@ makedepends=(intltool dhclient iptables gobject-introspection gtk-doc "ppp=$_ppp
              dbus-glib iproute2 nss polkit wpa_supplicant libsoup systemd libgudev rp-pppoe
              libnewt libndp libteam vala perl-yaml python3-gobject git vala jansson bluez-libs)
 depends=(iproute2 polkit wpa_supplicant libsoup modemmanager
-         libnewt libndp libteam "ppp=$_pppver"
-         libgudev nss dbus-glib util-linux jansson systemd)
+         libnewt libndp libteam curl "ppp=$_pppver"
+         libgudev nss dbus-glib util-linux jansson systemd bluez-libs)
 checkdepends=(libx11 python3-dbus)
 _commit=ddd6f94ab70eae875641ab593e17326acf65644c  # nm-1-8
 optdepends=('dnsmasq: connection sharing'
@@ -27,8 +27,8 @@ install=networkmanager.install
 source=("git+https://anongit.freedesktop.org/git/NetworkManager/NetworkManager#commit=$_commit"
         NetworkManager.conf 20-connectivity.conf)
 sha256sums=('SKIP'
-            '67f112c1ac8ee3726eb229f5cd783de19f09cc252af49e157343d82b324b923f'
-            'e6ba2bed35c7613379101e8e079a9c94d0e43c3ca14ff02b4398ea64d50c9e91')
+            'dd2d3a9c8a08ce961e263e1847453890f1b24c72a806d8c83a5b69b227a5ccec'
+            'f091ee515890996fc1933694617e5aa36769d159b3dc16676cd41719b3b75549')
 
 prepare() {
   cd NetworkManager
