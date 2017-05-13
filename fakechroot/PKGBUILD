@@ -3,30 +3,24 @@
 # Contributor: Aaron Griffin <aaron@archlinux.org>
 
 pkgname=fakechroot
-pkgver=2.18
+pkgver=2.19
 pkgrel=1
 pkgdesc="Gives a fake chroot environment"
-arch=('i686' 'x86_64')
-url="http://fakechroot.alioth.debian.org"
+arch=('x86_64')
+url="https://github.com/dex4er/fakechroot/wiki"
 license=('LGPL')
-options=('!libtool')
 install=fakechroot.install
-source=(http://ftp.debian.org/debian/pool/main/f/${pkgname}/${pkgname}_${pkgver}.orig.tar.gz)
-md5sums=('bdcee07d3c9e3a8ff8443e2bed27a4f8')
+source=($pkgname-$pkgver.tar.gz::https://github.com/dex4er/fakechroot/archive/${pkgver}.tar.gz)
+md5sums=('db6378420c769232e69508bb78612c34')
 
-build()
-{
+build(){
   cd ${srcdir}/${pkgname}-${pkgver}
   
-  sed -i "s#1.10#1.11#" autogen.sh
-  ./autogen.sh
-  
-  ./configure --prefix=/usr --libdir=/usr/lib/libfakeroot
-  make || return 1
+  ./configure --prefix=/usr --libdir=/usr/lib/libfakeroot --sysconfdir=/etc
+  make
 }
   
-package()
-{
+package(){
   cd ${srcdir}/${pkgname}-${pkgver}
   make DESTDIR=${pkgdir} install
   
