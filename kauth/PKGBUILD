@@ -1,10 +1,8 @@
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-
 source ../frameworks.conf
 
 pkgname=kauth
 pkgver=${KFVersion}
-pkgrel=2
+pkgrel=1
 pkgdesc='Abstraction to system policy and authentication features'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kauth'
@@ -19,14 +17,8 @@ sha256sums=( $(getSum ${pkgname})
                         SKIP)
 validpgpkeys=( ${KFvalidpgpkeys} )
 
-# https://www.kde.org/info/security/advisory-20170510-1.txt kauth < 5.34, kdelibs < 4.14.32
-source+=(CVE-2017-8422.patch::'https://cgit.kde.org/kauth.git/patch/?id=df875f725293af53399f5146362eb158b4f9216a')
-sha256sums+=('dd628d4ff775a3444bcb382f6dfc6fa0df4583690f2200ddb256275e5a94d4b4')
-
 prepare() {
   mkdir -p build
-  cd ${srcdir}/${pkgname}-${pkgver}
-  patch -Np1 -i $srcdir/CVE-2017-8422.patch
 }
 echo ${KFBuildType}
 
