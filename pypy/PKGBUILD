@@ -1,40 +1,48 @@
 pkgname=pypy
-pkgver=5.6.0
+pkgver=5.7.1
 pkgrel=1
 pkgdesc="A Python implementation written in Python, JIT enabled"
 arch=('x86_64')
 url="http://www.pypy.org/"
 license=('custom:MIT')
 depends=('expat' 'bzip2' 'gdbm' 'openssl' 'libffi' 'zlib')
-makedepends=('python2' 'tk' 'sqlite3')
+makedepends=('python2' 'tk' 'sqlite3' 'python2-pycparser')
 optdepends=('sqlite3: sqlite module'
             'tk: tk module')
 source=("https://bitbucket.org/${pkgname}/${pkgname}/downloads/pypy2-v$pkgver-src.tar.bz2")
 options=(!buildflags)
-md5sums=('c3fc7187061fec762269496f1f5daa86')
+md5sums=('73720fd65aa634d60d4633a4c4e38cbb')
 
 build() {
   cd "${srcdir}"/pypy2-v${pkgver}-src/pypy/goal
 
   python2 ../../rpython/bin/rpython -Ojit --shared targetpypystandalone
+
+  # Compile binary modules
+  PYTHONPATH=../.. ./pypy-c ../tool/build_cffi_imports.py
+
 }
 
 package() {
   cd "${srcdir}"/pypy2-v${pkgver}-src/pypy/tool/release
 
+  # Prepare installation
   python2 package.py --archive-name pypy --targetdir .
   mkdir -p unpacked
   tar xf pypy.tar.bz2 -C unpacked
 
+  # Install pypy
   cd unpacked
   install -Dm755 pypy/bin/pypy "${pkgdir}"/opt/pypy/bin/pypy
   install -Dm755 pypy/bin/libpypy-c.so "${pkgdir}"/usr/lib/libpypy-c.so
   cp -r pypy/include pypy/lib_pypy pypy/lib-python pypy/site-packages "${pkgdir}"/opt/pypy/
   cd ..
 
+  # Install symlink
   mkdir -p "${pkgdir}"/usr/bin
   ln -s /opt/pypy/bin/pypy "${pkgdir}"/usr/bin/pypy
 
+  # Install misc stuff
   install -Dm644 ${srcdir}/pypy2-v${pkgver}-src/LICENSE "${pkgdir}"/opt/pypy/LICENSE
   install -Dm644 ${srcdir}/pypy2-v${pkgver}-src/README.rst "${pkgdir}"/opt/pypy/README.rst
   install -Dm644 ${srcdir}/pypy2-v${pkgver}-src/LICENSE "${pkgdir}"/usr/share/licenses/pypy/LICENSE
