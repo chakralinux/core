@@ -2,17 +2,17 @@
 
 pkgbase=poppler
 pkgname=('poppler' 'poppler-glib' 'poppler-qt4' 'poppler-qt5')
-pkgver=0.49.0
+pkgver=0.54.0
 pkgrel=1
 arch=('x86_64')
 license=('GPL')
-makedepends=('libjpeg-turbo' 'libpng' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg' 'qt' 'pkgconfig' 'lcms2' 'qt5-base' 'gobject-introspection' 'icu')
+makedepends=('libjpeg-turbo' 'libpng' 'gcc-libs' 'cairo' 'libxml2' 'fontconfig' 'openjpeg2' 'qt4' 'pkgconfig' 'lcms2' 'qt5-base' 'gobject-introspection' 'icu')
 options=('!emptydirs')
 url="http://poppler.freedesktop.org/"
 _testtag=0d2bfd4af4c76a3bac27ccaff793d9129df7b57a
 source=("http://poppler.freedesktop.org/${pkgname}-${pkgver}.tar.xz"
 	"http://cgit.freedesktop.org/poppler/test/snapshot/test-${_testtag}.tar.bz2")
-md5sums=('9e057ed8eee1f9979fa75d8f044783b8'
+md5sums=('ed0b36e3f577e669dcc58bd408cacde6'
          '5ce0e8161b08dc138c0eef3ed958ad00')
 
 prepare() {
@@ -29,6 +29,7 @@ build() {
       --enable-poppler-qt4 \
       --enable-poppler-qt5 \
       --enable-poppler-glib \
+      --enable-libopenjpeg=openjpeg2 \
       --disable-gtk
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0 /g' libtool
   make
@@ -36,13 +37,12 @@ build() {
 
 check() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
-  LANG=en_US.UTF8 make check |true
-  # 1 FAIL because of a file that is not UTF8 encoded "Gday garon - owner.pdf': No such file or directory." 
+  LANG=en_US.UTF8 make check
 }
 
 package_poppler() {
   pkgdesc="PDF rendering library based on xpdf 3.0"
-  depends=('libjpeg' 'gcc-libs' 'cairo' 'fontconfig' 'openjpeg' 'lcms2')
+  depends=('libjpeg' 'gcc-libs' 'cairo' 'fontconfig' 'openjpeg2' 'lcms2')
   optdepends=('poppler-data: encoding data to display PDF documents containing CJK characters')
   conflicts=("poppler-qt3<${pkgver}")
 
