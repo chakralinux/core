@@ -4,12 +4,12 @@ pkgbase=postgresql
 pkgname=('postgresql-libs'
          'postgresql-docs'
          'postgresql')
-pkgver=9.6.1
+pkgver=9.6.3
 _majorver=${pkgver%.*}
 # When upgrading to a major version, remember to update the postgresql-check-db-dir file accordingly!!
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
-url='http://www.postgresql.org/'
+url='https://www.postgresql.org/'
 license=('custom:PostgreSQL')
 makedepends=('krb5' 'libxml2' 'openssl' 'perl' 'python3' 'tcl')
 source=("ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar.bz2"
@@ -20,7 +20,7 @@ source=("ftp://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar
         'postgresql.pam'
         'postgresql.service'
         'postgresql.tmpfiles.conf')
-sha256sums=('e5101e0a49141fc12a7018c6dad594694d3a3325f5ab71e93e0e51bd94e51fcd'
+sha256sums=('1645b3736901f6d854e695a937389e68ff2066ce0cde9d73919d6ab7c995b9c6'
             'e0b86be2aba21517061563b235c485d723e7af6273ced3fd23b41c4b5431677f'
             '8538619cb8bea51078b605ad64fe22abd6050373c7ae3ad6595178da52f6a7d9'
             '419550699aae3d19715e87e51f32d1ad50cbb5d3175794f5476697572383b4e3'
@@ -32,6 +32,7 @@ sha256sums=('e5101e0a49141fc12a7018c6dad594694d3a3325f5ab71e93e0e51bd94e51fcd'
 build() {
     cd "${srcdir}/postgresql-${pkgver}"
     patch -Np1 < ../postgresql-run-socket.patch
+
     ./configure \
         --prefix=/usr \
         --mandir=/usr/share/man \
@@ -63,9 +64,14 @@ package_postgresql-libs() {
     # Install license
     install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/postgresql-libs/LICENSE"
 
-    # Install libraries
-    for dir in src/interfaces src/bin/pg_config src/bin/psql src/bin/pg_dump; do
-        make -C ${dir} DESTDIR="${pkgdir}" install
+    # install libs and non-server binaries
+    for dir in src/interfaces src/bin/pg_config src/bin/pg_dump src/bin/psql src/bin/scripts; do
+    make -C ${dir} DESTDIR="${pkgdir}" install
+    done
+
+    for util in pg_config pg_dump pg_dumpall pg_restore psql \
+        clusterdb createdb createlang createuser dropdb droplang dropuser pg_isready reindexdb vacuumdb; do
+    install -Dm 644 doc/src/sgml/man1/${util}.1 "${pkgdir}"/usr/share/man/man1/${util}.1
     done
 
     install -Dm644 doc/src/sgml/man1/pg_config.1 "${pkgdir}/usr/share/man/man1/pg_config.1"
@@ -111,7 +117,7 @@ package_postgresql-docs() {
 }
 
 package_postgresql() {
-    pkgdesc="A sophisticated object-relational DBMS"
+    pkgdesc="Sophisticated object-relational DBMS"
     backup=('etc/pam.d/postgresql'
             'etc/logrotate.d/postgresql')
     depends=("postgresql-libs>=${pkgver}" 'krb5' 'libxml2' 'openssl' 'readline')
@@ -130,15 +136,14 @@ package_postgresql() {
     make -C contrib DESTDIR="${pkgdir}" install
     make -C doc/src/sgml DESTDIR="${pkgdir}" install-man
 
-    # Remove files provided by postgresql-libs
-    for dir in src/interfaces src/bin/pg_config src/bin/psql src/bin/pg_dump; do
-        make -C ${dir} DESTDIR="${pkgdir}" uninstall
+    # we don't want these, they are in the -libs package
+    for dir in src/interfaces src/bin/pg_config src/bin/pg_dump src/bin/psql src/bin/scripts; do
+    make -C ${dir} DESTDIR="${pkgdir}" uninstall
     done
-    rm "${pkgdir}/usr/share/man/man1/pg_config.1"
-    rm "${pkgdir}/usr/share/man/man1/pg_dump.1"
-    rm "${pkgdir}/usr/share/man/man1/pg_dumpall.1"
-    rm "${pkgdir}/usr/share/man/man1/pg_restore.1"
-    rm "${pkgdir}/usr/share/man/man1/psql.1"
+    for util in pg_config pg_dump pg_dumpall pg_restore psql \
+        clusterdb createdb createlang createuser dropdb droplang dropuser pg_isready reindexdb vacuumdb; do
+    rm "${pkgdir}"/usr/share/man/man1/${util}.1
+    done
 
     # Install license
     install -Dm644 COPYRIGHT "${pkgdir}/usr/share/licenses/${pkgbase}/LICENSE"
