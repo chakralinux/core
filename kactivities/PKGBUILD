@@ -2,16 +2,16 @@ source ../frameworks.conf
 
 pkgname=kactivities
 pkgver=${KFVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 pkgdesc="Core components for the KDE's Activities"
 url='https://projects.kde.org/projects/frameworks/kactivities'
 license=('LGPL')
 depends=('kcmutils' 'kdeclarative' 'kactivitymanagerd>=5.5.95')
 makedepends=("extra-cmake-modules>=${KFECMVersion}" 'boost' 'python3')
-provides=("kactivities-frameworks=${pkgver}")
-replaces=("kactivities-frameworks" 'kactivities4')
-conflicts=('kactivities4' 'kactivities-frameworks')
+provides=("kactivities-frameworks=${pkgver}" 'libkactivities4')
+replaces=("kactivities-frameworks" 'kactivities4' 'libkactivities4')
+conflicts=('kactivities4' 'kactivities-frameworks' 'libkactivities4')
 options=("debug")
 groups=('kf5')
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
