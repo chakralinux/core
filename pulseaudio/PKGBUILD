@@ -3,27 +3,34 @@
 pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse)
 pkgdesc="A featureful, general-purpose sound server"
-pkgver=9.0
+pkgver=10.0
 pkgrel=1
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(LGPL)
 makedepends=(libasyncns libcap attr libxtst libsm libsndfile libtool rtkit libsoxr
-             speexdsp tdb systemd dbus avahi bluez bluez-libs intltool jack2-dbus sbc
-             lirc openssl xenstore fftw orc json-c webrtc-audio-processing
-             check)
+             speexdsp tdb systemd dbus avahi bluez bluez-libs gconf intltool jack2-dbus sbc
+             lirc openssl fftw orc webrtc-audio-processing
+             check autoconf-archive git)
 options=(!emptydirs)
-source=(http://freedesktop.org/software/$pkgbase/releases/$pkgbase-$pkgver.tar.xz
+_commit=84952e6a092b6a0c5b153bd7a4f6e490810681c8  # tags/v10.0^0
+source=("git+https://anongit.freedesktop.org/git/pulseaudio/pulseaudio#commit=$_commit"
         padsp-lib32.patch)
-sha256sums=('c3d3d66b827f18fbe903fe3df647013f09fc1e2191c035be1ee2d82a9e404686'
+sha256sums=('SKIP'
             '7832fc59df76538ff10aedd297c03cb7ff117235da8bfad26082994bb5b84332')
 
+pkgver() {
+  cd pulseaudio
+  git describe --tags | sed 's/^v//;s/-/+/g'
+}
+
 prepare() {
-  cd $pkgbase-$pkgver
+  cd pulseaudio
+  NOCONFIGURE=1 ./bootstrap.sh
 }
 
 build() {
-  cd $pkgbase-$pkgver
+  cd pulseaudio
 
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
@@ -45,29 +52,42 @@ build() {
 }
 
 package_pulseaudio() {
-  depends=("libpulse=$pkgver-$pkgrel" rtkit libltdl speexdsp tdb orc
-           webrtc-audio-processing sbc libsoxr)
+  depends=("libpulse=$pkgver-$pkgrel" rtkit libltdl speexdsp tdb orc libsoxr
+           webrtc-audio-processing sbc)
   optdepends=('pulseaudio-alsa: ALSA configuration (recommended)'
-              'avahi: Zeroconf support for PulseAudio'
-              'openssl: Zeroconf support for PulseAudio'
-              'lirc: IR (lirc) support for PulseAudio'
-              'xenstore: Xen support for PulseAudio'
-              'jack2: Jack support for PulseAudio'
-              'bluez: Bluetooth support for PulseAudio'
-              'bluez-libs: Bluetooth support for PulseAudio' 
-              'python3-pyqt4: Equalizer for PulseAudio'
-              'fftw: Equalizer for PulseAudio'
-              'gconf: GConf support for PulseAudio')
+             'avahi: Zeroconf support for PulseAudio'
+             'openssl: Zeroconf support for PulseAudio'
+             'lirc: IR (lirc) support for PulseAudio'
+             'jack2: Jack support for PulseAudio'
+             'bluez: Bluetooth support for PulseAudio'
+             'bluez-libs: Bluetooth support for PulseAudio' 
+             'python3-pyqt4: Equalizer for PulseAudio'
+             'fftw: Equalizer for PulseAudio'
+             'gconf: GConf support for PulseAudio')
+
   backup=(etc/pulse/{daemon.conf,default.pa,system.pa})
   install=pulseaudio.install
+  replaces=('pulseaudio-xen<=9.0')
 
-  cd $pkgbase-$pkgver
+  cd pulseaudio
+
+  _pulsever=$(./git-version-gen .tarball-version)
+  while [[ $_pulsever = *.*.* ]]; do
+    _pulsever=${_pulsever%.*}
+  done
+  _pulsever=${_pulsever%%-*}
+
   make -j1 DESTDIR="$pkgdir" install \
     bashcompletiondir=/usr/share/bash-completion/completions
 
   cd "$pkgdir"
   patch -Np1 -i "$srcdir/padsp-lib32.patch"
 
+  # Assumes that any volume adjustment is intended by the user, who can control
+  # each app's volume. Misbehaving clients can trigger earsplitting volume
+  # jumps. App volumes can diverge wildly and cause apps without their own
+  # volume control to fall below sink volume; a sink-only volume control will
+  # suddenly be unable to make such an app loud enough.
   sed -e '/flat-volumes/iflat-volumes = no' \
       -i etc/pulse/daemon.conf
 
@@ -132,7 +152,8 @@ package_pulseaudio() {
 
 package_libpulse() {
   pkgdesc="$pkgdesc (client library)"
-  depends=(dbus libasyncns libcap libxtst libsm libsndfile json-c systemd)
+  depends=(dbus libasyncns libcap libxtst libsm libsndfile systemd)
+  license=(LGPL)
   backup=(etc/pulse/client.conf)
 
   mv "$srcdir"/libpulse/* "$pkgdir"
