@@ -1,10 +1,10 @@
 #
-# Core Packages for Chakra, part of chakraos.org
+# Core Packages for Chakra, part of chakralinux.org
 #
 
 pkgname=pam
-pkgver=1.2.1
-pkgrel=3
+pkgver=1.3.0
+pkgrel=1
 pkgdesc="PAM (Pluggable Authentication Modules) library"
 arch=('x86_64')
 license=('GPL2')
@@ -15,9 +15,9 @@ backup=(etc/security/{access.conf,group.conf,limits.conf,namespace.conf,namespac
 source=(http://linux-pam.org/library/Linux-PAM-$pkgver.tar.bz2
         https://sources.archlinux.org/other/pam_unix2/pam_unix2-2.9.1.tar.bz2
         pam_unix2-glibc216.patch)
-md5sums=('9dc53067556d2dd567808fd509519dd6'
-         'da6a46e5f8cd3eaa7cbc4fc3a7e2b555'
-         'dac109f68e04a4df37575fda6001ea17')
+md5sums=('da4b2289b7cfb19583d54e9eaaef1c3a'
+                   'da6a46e5f8cd3eaa7cbc4fc3a7e2b555'
+                   'dac109f68e04a4df37575fda6001ea17')
 
 options=('!emptydirs')
 
@@ -53,16 +53,6 @@ package() {
   cd $srcdir/pam_unix2-2.9.1
   make DESTDIR=$pkgdir install
 
-  # add the realtime permissions for audio users
-  sed -i 's|# End of file||' $pkgdir/etc/security/limits.conf
-  cat >>$pkgdir/etc/security/limits.conf <<_EOT
-*               -       rtprio          0
-*               -       nice            0
-@audio          -       rtprio          65
-@audio          -       nice           -10
-@audio          -       memlock         40000
-_EOT
-
   # fix some missing symlinks from old pam for compatibility
   cd $pkgdir/usr/lib/security
   ln -s pam_unix.so pam_unix_acct.so
@@ -72,4 +62,8 @@ _EOT
 
   # set unix_chkpwd uid
   chmod +s $pkgdir/usr/sbin/unix_chkpwd
+
+  # remove doc which is not used anymore
+  # FS #40749
+  rm $pkgdir/usr/share/doc/Linux-PAM/sag-pam_userdb.html
 }
