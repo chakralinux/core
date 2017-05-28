@@ -1,15 +1,22 @@
 # Please remember lib32 counterpart
 pkgname=libsndfile
 pkgver=1.0.28
-pkgrel=1
+pkgrel=2
 pkgdesc="A C library for reading and writing files containing sampled sound"
 arch=('x86_64')
 url="http://www.mega-nerd.com/libsndfile"
 license=('LGPL')
 depends=('alsa-lib' 'flac' 'libvorbis')
 options=('!libtool')
-source=("http://www.mega-nerd.com/libsndfile/files/${pkgname}-${pkgver}.tar.gz")
-md5sums=('646b5f98ce89ac60cdb060fcd398247c')
+source=("http://www.mega-nerd.com/libsndfile/files/${pkgname}-${pkgver}.tar.gz"
+            CVE-2017-8363.patch::https://github.com/erikd/libsndfile/commit/fd0484aba8e51d16af1e3a880f9b8b857b385eb3.patch)
+md5sums=('646b5f98ce89ac60cdb060fcd398247c'
+         'cdd75dee754a3f97a2b9852193858e8b')
+
+prepare(){
+ cd "${srcdir}/${pkgname}-${pkgver}"
+ patch -Np1 -i  ${srcdir}/CVE-2017-8363.patch
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
