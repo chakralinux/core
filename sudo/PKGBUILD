@@ -1,6 +1,6 @@
 
 pkgname=sudo
-_sudover=1.8.15
+_sudover=1.8.20p1
 pkgver=${_sudover/p/.p}
 pkgrel=1
 pkgdesc="Give certain users the ability to run some commands as root"
@@ -9,10 +9,11 @@ url="http://www.sudo.ws/sudo/"
 license=('custom')
 depends=('glibc' 'pam' 'libldap')
 backup=('etc/sudoers' 'etc/pam.d/sudo')
+groups=('base-devel')
 install=$pkgname.install
 source=(http://www.sudo.ws/sudo/dist/$pkgname-$_sudover.tar.gz{,.sig}
         sudo.pam)
-sha256sums=('4316381708324da8b6cb151f655c1a11855207c7c02244d8ffdea5104d7cc308'
+sha256sums=('9e980eb23a60dd11f0f452e672e705d7a386882bc230c6e8483050e03182db1d'
             'SKIP'
             'd1738818070684a5d2c9b26224906aad69a4fea77aabd960fc2675aee2df1fa2')
 validpgpkeys=('CCB24BE9E9481B15D34159535A89DFA27EE470C4')
@@ -28,6 +29,7 @@ build() {
     --with-rundir=/run/sudo \
     --with-vardir=/var/db/sudo \
     --with-logfac=auth \
+    --enable-gcrypt \
     --enable-tmpfiles.d \
     --with-pam \
     --with-sssd \
