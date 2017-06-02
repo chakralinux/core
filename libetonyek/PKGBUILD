@@ -1,18 +1,26 @@
 pkgname=libetonyek
 pkgver=0.1.6
-pkgrel=2
+pkgrel=3
 pkgdesc='Library and a set of tools for reading and converting Apple Keynote presentations'
 arch=('x86_64')
-url='http://www.freedesktop.org/wiki/Software/libetonyek/'
+url='https://wiki.documentfoundation.org/DLP/Libraries/libetonyek'
 license=('MPL')
 depends=('libxml2' 'zlib' 'libwpd' 'boost-libs' 'librevenge' 'liblangtag')
 makedepends=('boost' 'cppunit' 'gperf' 'doxygen' 'glm' 'mdds')
-source=(http://dev-www.libreoffice.org/src/${pkgname}/${pkgname}-${pkgver}.tar.xz)
-md5sums=('dfe25b0c7739283a5c61a930ea1f9bf8')
+source=(http://dev-www.libreoffice.org/src/${pkgname}/${pkgname}-${pkgver}.tar.xz
+        0001-Allow-building-with-mdds-1.2.patch)
+md5sums=('dfe25b0c7739283a5c61a930ea1f9bf8'
+         '0635b9c27717596828ac32d9e0521eb3')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  patch -Np1 -i ../0001-Allow-building-with-mdds-1.2.patch
+  ./autogen.sh
+}
 
 build() {
   cd ${pkgname}-${pkgver}
-  ./configure --prefix=/usr
+  ./configure --prefix=/usr --with-mdds=1.2
   make
 }
 
