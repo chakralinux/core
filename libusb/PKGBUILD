@@ -1,10 +1,9 @@
-# maintainer: Neophytos Kolokotronis <tetris4ATgmailDOTcom>
-# Contributors: abveritas
+# Contributions from ArchLinux: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libusb
 
 pkgname=libusb
-pkgver=1.0.19
+pkgver=1.0.21
 pkgrel=1
-depends=('glibc')
+depends=('glibc' 'systemd')
 pkgdesc="Library that provides generic access to USB device"
 arch=('x86_64')
 url='http://libusb.info/'
@@ -12,21 +11,19 @@ license=('LGPL')
 replaces=('libusb1' 'libusbx')
 provides=("libusbx=$pkgver")
 conflicts=('libusbx')
-source=(http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.bz2)
-md5sums=('f9e2bb5879968467e5ca756cb4e1fa7e')
+source=(https://github.com/libusb/libusb/releases/download/v$pkgver/libusb-$pkgver.tar.bz2)
+md5sums=('1da9ea3c27b3858fa85c5f4466003e44')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr --disable-static
-  make
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make -j1
 }
 
 check() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make check
+  make -C $pkgname-$pkgver check
 }
 
 package () {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  make -C $pkgname-$pkgver DESTDIR="$pkgdir" install
 }
