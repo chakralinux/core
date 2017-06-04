@@ -2,7 +2,7 @@
 
 pkgbase=telepathy-qt
 pkgname=('telepathy-qt4' 'telepathy-qt5')
-pkgver=0.9.6.1
+pkgver=0.9.7
 pkgrel=1
 arch=('x86_64')
 url="http://telepathy.freedesktop.org/wiki/"
@@ -13,7 +13,7 @@ source=("http://telepathy.freedesktop.org/releases/${pkgbase}/${pkgbase}-${pkgve
   '0001-CMake-Fixed-deprecated-_BSD_SOURCE.patch'
   '0002-CMakeLists-Minimum-version-bumped-to-2.8.12.patch'
   '0021-Farstream-gst-gstconfig.h-can-be-in-LIBDIR-search-fo.patch')
-md5sums=('bebebfbe29d194a9ba00b4f422a44f74'
+md5sums=('86470dd3d7f6de8b8f4f36165486d42f'
          'SKIP'
          '114e5f9747fe218f7e08864d67515b74'
          '2ce35b9e77326324a747e38a3f54a14a'
@@ -26,9 +26,6 @@ prepare() {
   mkdir build{,-qt4}
   
   cd "$pkgbase-$pkgver"
-  patch -Np1 -i ../0001-CMake-Fixed-deprecated-_BSD_SOURCE.patch
-  patch -Np1 -i ../0002-CMakeLists-Minimum-version-bumped-to-2.8.12.patch
-  patch -Np1 -i ../0021-Farstream-gst-gstconfig.h-can-be-in-LIBDIR-search-fo.patch
 }
 
 build() {
@@ -73,3 +70,4 @@ package_telepathy-qt5() {
   cd $srcdir/build
   make DESTDIR="$pkgdir" install
 }
+
