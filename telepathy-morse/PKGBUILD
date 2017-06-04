@@ -1,0 +1,32 @@
+pkgname=telepathy-morse
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Telepathy connection manager for Telegram."
+arch=('x86_64')
+url="http://telepathy.freedesktop.org"
+license=('GPL')
+depends=('telepathy-qt5' 'telegram-qt')
+makedepends=('cmake')
+groups=('telepathy')
+source=("https://github.com/TelepathyIM/${pkgname}/archive/${pkgname}-${pkgver}.tar.gz")
+sha1sums=('f77c42a7c0a02bc8f5d5bf6ba72c907412b1e8f9')
+
+prepare() {
+	mkdir -p build
+}
+
+build() {
+	cd build
+	cmake ../${pkgname}-${pkgname}-${pkgver} \
+		-DCMAKE_PREFIX_PATH="/usr/lib/cmake/TelepathyQt5;/usr/lib/cmake/TelegramQt5" \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_INSTALL_LIBEXECDIR=lib/telepathy \
+		-DCMAKE_BUILD_TYPE=Release
+	make
+}
+
+package() {
+	cd build
+	make DESTDIR="${pkgdir}" install
+}
