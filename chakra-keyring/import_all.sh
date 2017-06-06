@@ -60,3 +60,8 @@ import_trusted "0xC51B9BC2" >> chakra-trusted
 gpg --recv-keys --keyserver keys.gnupg.net 0x46B51A79
 gpg --armor --export gnastyle >> chakra.gpg
 import_trusted "0x46B51A79" >> chakra-trusted
+# totte's key
+gpg --recv-keys --keyserver keys.gnupg.net 0x99421F98
+gpg --armor --export totte@chakralinux.org >> chakra.gpg
+import_trusted "0x99421F98" >> chakra-trusted
+
