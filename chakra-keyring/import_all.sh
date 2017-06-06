@@ -3,7 +3,7 @@
 # This is a simple script which import all Chakra keys
 # this script is licensed under the GPL
 #
-# Copyrignt (c) 2017 - Luca Giambonini <almack@chakralinux.org>
+# Copyright (c) 2017 - Luca Giambonini <almack@chakralinux.org>
 
 
 import_trusted() {
