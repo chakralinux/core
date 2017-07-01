@@ -2,7 +2,7 @@ source ../qt5.conf
 
 pkgname=qt5-base
 pkgver=${QSubVersion}
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
@@ -20,16 +20,12 @@ optdepends=('qt5-svg: to use SVG icon themes'
             'mtdev: evdev plugin')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname})
-        "QTBUG-61140.patch::https://codereview.qt-project.org/gitweb?p=qt/qtbase.git;a=patch;h=32390f49291308eb85dcbcaa898bbf825a2eb229" )
-md5sums=( $(getSum ${pkgname})
-         "369f7cd38462bdf885c0dfb2343c9ecf")
+source=( $(getSrc ${pkgname}) )
+md5sums=( $(getSum ${pkgname}) )
 
 
 prepare() {
   cd $(getPkgName ${pkgname})
-
-  patch -Np1 -i ../QTBUG-61140.patch
 
   # Build qmake using Chakra {C,LD}FLAGS
   # This also sets default {C,CXX,LD}FLAGS for projects built using qmake
