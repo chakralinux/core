@@ -1,5 +1,5 @@
 pkgname=nginx
-pkgver=1.10.2
+pkgver=1.12.1
 pkgrel=1
 pkgdesc='Lightweight HTTP server and IMAP/POP3 proxy server'
 arch=('x86_64')
@@ -18,10 +18,10 @@ backup=('etc/nginx/fastcgi.conf'
         'etc/logrotate.d/nginx')
 source=("http://nginx.org/download/nginx-$pkgver.tar.gz"
 	nginx.service
-	nginx.logrotate)
-md5sums=('e8f5f4beed041e63eb97f9f4f55f3085'
-         'e67b777bd10f5c180e247092ddfd6eb7'
-         '19a26a61c8afe78defb8b4544f79a9a0')
+        nginx.logrotate)
+md5sums=('a307e74aca95403e5ee00f153807ce58'
+         '4b2c29330395a94a9cf0282409b7706d'
+         '6a01fb17af86f03707c8ae60f98a2dc2')
 
 build() {
   cd $pkgname-$pkgver
@@ -41,10 +41,13 @@ build() {
     --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
     --http-scgi-temp-path=/var/lib/nginx/scgi \
     --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+    --with-cc-opt="$CFLAGS $CPPFLAGS" \
+    --with-ld-opt="$LDFLAGS" \
     --with-mail \
     --with-mail_ssl_module \
     --with-ipv6 \
     --with-pcre-jit \
+    --with-compat \
     --with-file-aio \
     --with-http_dav_module \
     --with-http_gunzip_module \
@@ -62,7 +65,10 @@ build() {
     --with-mail \
     --with-mail_ssl_module \
     --with-stream \
+    --with-stream_geoip_module \
+    --with-stream_realip_module \
     --with-stream_ssl_module \
+    --with-stream_ssl_preread_module \
     --with-threads
 
   make
