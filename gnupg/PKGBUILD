@@ -1,6 +1,6 @@
 pkgname=gnupg
 pkgver=2.1.21
-pkgrel=1
+pkgrel=2
 pkgdesc='Complete and free implementation of the OpenPGP standard'
 url='http://www.gnupg.org/'
 license=('GPL')
@@ -10,8 +10,11 @@ optdepends=('libldap: gpg2keys_ldap'
 makedepends=('libldap' 'libusb-compat')
 depends=('npth' 'libgpg-error' 'libgcrypt' 'libksba' 'libassuan'
          'pinentry' 'bzip2' 'readline' 'gnutls' 'sqlite3')
-source=("ftp://ftp.gnupg.org/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-sha1sums=('1852c066bc21893bc52026ead78edf50fdf15e13')
+checkdepends=('openssh')
+source=("https://gnupg.org/ftp/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
+        'scdaemon.patch')
+sha1sums=('1852c066bc21893bc52026ead78edf50fdf15e13'
+          '25b059bca5e95ff9740a0bfc34a355996796af97')
 
 install=${pkgname}.install
 
@@ -22,6 +25,7 @@ replaces=('dirmngr' 'gnupg2')
 prepare() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
 	sed '/noinst_SCRIPTS = gpg-zip/c sbin_SCRIPTS += gpg-zip' -i tools/Makefile.in
+	patch -p1 -i ../scdaemon.patch
 }
 
 build() {
