@@ -3,7 +3,7 @@ source ../linux.conf
 
 pkgname=broadcom-wl
 pkgver=6.30.223.271
-pkgrel=12
+pkgrel=13
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 arch=('x86_64')
@@ -13,26 +13,35 @@ makedepends=("linux-headers=${_kernelver}")
 source=("http://www.broadcom.com/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz"
          #"http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" "http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
         'modprobe.d'
-        'license.patch'
-        'wl_linux.c.patch'
-        'linux47.patch'
-        'linux48.patch')
+        '001-null-pointer-fix.patch'
+        '002-rdtscl.patch'
+        '003-linux47.patch'
+        '004-linux48.patch'
+        '005-debian-fix-kernel-warnings.patch'
+        '006-linux411.patch'
+        '007-linux412.patch')
 sha1sums=('1f568bb989d175813c5631c6629d9479eae6f3be'
           'a37c5dd9ab279372f0c68595bb2a8f1fe694cd13'
-          '81c05d48b234d56ad2e18eaee5ce89b79550ef20'
-          '94e12ef9e64fde04a5bfb04858dd5be86a70e902'
+          '75300b4ad9fa0f7b8ad98dfa6fbd0159a3a4c222'
+          '80dc4aba85043dc56041040e423cfb3548c867bf'
           '6429084dc8476d1256f3735272815d94a2b9dc09'
-          '9caf6527a5329342d6f6d12231e0af07e7f1b3e9')
+          '7ce912f606476b61d200e1051a27c9db66fcff61'
+          'faca186c7c1f894240c46ffa53bece501fe58773'
+          '4263937f6ec075b7c5461806771dd17261d56d54'
+          '1d3fb939df5ba3b04e2949df6c5ed24f4a3d1f48')
 
 install=install
 
 prepare() {
     cd "${srcdir}"
 
-    patch -p1 -i license.patch
-    patch -p1 -i wl_linux.c.patch
-    patch -p1 -i linux47.patch
-    patch -p1 -i linux48.patch
+    patch -p1 -i 001-null-pointer-fix.patch
+    patch -p1 -i 002-rdtscl.patch
+    patch -p1 -i 003-linux47.patch
+    patch -p1 -i 004-linux48.patch
+    patch -p1 -i 005-debian-fix-kernel-warnings.patch
+    patch -p1 -i 006-linux411.patch
+    patch -p1 -i 007-linux412.patch
 
     sed -e "/BRCM_WLAN_IFNAME/s:eth:wlan:" \
         -i src/wl/sys/wl_linux.c

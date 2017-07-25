@@ -2,26 +2,22 @@
 source ../linux.conf
 
 pkgname=(nvidia nvidia-dkms chd-nvidia)
-pkgver=378.13
+pkgver=384.59
 pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}" "nvidia-utils=${pkgver}")
 license=('custom')
 options=('!strip')
-source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported_new"
-        'kernel_4.10.patch')
+source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported_new")
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-source+=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
+source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
 sha1sums=('bdb063bbd03eed9fa718664ef2023fd759efe4a3'
-          'ef2748a39d071ef8000640c1db8d13f57610da42'
-          'fd93f18a38e7213295078bfdfd51cf9e87db0289')
+          '78a15e6e531aa7995bfa0bcb80e3e651c968ef4c')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
-
-    patch -Np1 -i ../kernel_4.10.patch
 
     cp -a kernel kernel-dkms
     cd kernel-dkms

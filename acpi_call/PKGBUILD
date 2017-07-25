@@ -4,7 +4,7 @@ source ../linux.conf
 pkgname=acpi_call
 _pkgname=acpi_call
 pkgver=1.1.0
-pkgrel=36
+pkgrel=37
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('x86_64')
 url=("http://github.com/mkottman/acpi_call")
@@ -18,8 +18,11 @@ md5sums=('f69d40e130b0e5ed17ce8adb19e6dda1')
 prepare() {
   cd ${pkgname}-${pkgver}
 
-  # Fix build with Linux 3.17
+  # Fix build with Linux >= 3.17
   sed -i 's|acpi/acpi.h|linux/acpi.h|' acpi_call.c
+
+  # Fix build with Linux >= 4.12
+  sed -i 's|asm/uaccess.h|linux/uaccess.h|' acpi_call.c
 }
 
 build() {

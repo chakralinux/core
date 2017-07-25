@@ -3,20 +3,24 @@ source ../linux.conf
 
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
 pkgver=304.135
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 _pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
 source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported"
-        "ftp://download.nvidia.com/XFree86/Linux-${arch}/${pkgver}/${_pkg}.run"
+        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
         'drm-driver-legacy.patch'
-        'kernel_4.10.patch')
+        'kernel_4.10.patch'
+        'kernel_4.11.patch'
+        'kernel_4.12.patch')
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
          '8ee9bd0b020508bca9953181811422fa'
          'a5328715e210e36e5d9bbed0f9e55223'
-         'a8d331a75fbc541f1730e95b95e9ef14')
+         'a8d331a75fbc541f1730e95b95e9ef14'
+         '93365975020db32ab3a670fcafca3925'
+         '9bf784d939ab1bf3191575df89c9e218')
 
 prepare() {
     cd "${srcdir}"
@@ -25,6 +29,8 @@ prepare() {
     cd "${_pkg}"
     # patches here
     patch -Np1 --no-backup-if-mismatch -i ../kernel_4.10.patch
+    patch -Np1 --no-backup-if-mismatch -i ../kernel_4.11.patch
+    patch -Np1 --no-backup-if-mismatch -i ../kernel_4.12.patch
 
     # FS#47092
     cd kernel

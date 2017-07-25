@@ -2,18 +2,18 @@
 source ../linux.conf
 
 pkgname=vhba-module
-pkgver=20161009
-pkgrel=2
+pkgver=20170610
+pkgrel=1
 pkgdesc="Kernel module that emulates SCSI devices"
 arch=('x86_64')
 url="http://cdemu.sourceforge.net/"
-license=('GPL2')
+license=('GPL')
 depends=("linux=${_kernelver}")
 makedepends=("linux-headers=${_kernelver}")
 install=vhba-module.install
-source=("http://sourceforge.net/projects/cdemu/files/vhba-module/vhba-module-$pkgver.tar.bz2"
-        '60-vhba.rules')
-md5sums=('9a9dc156e4cb73d0ca5892eeba801026'
+source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2"
+        60-vhba.rules)
+md5sums=('f9478a5f5528fc672c204b6b4bd02213'
          '4dc37dc348b5a2c83585829bde790dcc')
 
 prepare() {
@@ -21,16 +21,18 @@ prepare() {
 }
 
 build() {
-  cd "$pkgname-$pkgver"
-
-  make KDIR=/usr/lib/modules/$_kver/build
+  cd $pkgname-$pkgver
+  make KERNELRELEASE="$(cat /usr/lib/modules/$_extramodules/version)"
 }
 
 package() {
-  cd $pkgname-$pkgver
-  install -Dm644 vhba.ko "$pkgdir/usr/lib/modules/${_extramodules}/vhba.ko"
-  install -Dm644 ../60-vhba.rules "$pkgdir/usr/lib/udev/rules.d/60-vhba.rules"
+  depends=("linux=${_kernelver}")
+  install=vhba-module.install
 
-sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
+  cd $pkgname-$pkgver
+  install -Dt "$pkgdir/usr/lib/modules/$_extramodules" -m644 vhba.ko
+  install -Dt "$pkgdir/usr/lib/udev/rules.d" -m644 ../60-vhba.rules
+  
+  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
           "${startdir}/vhba-module.install"
 }
