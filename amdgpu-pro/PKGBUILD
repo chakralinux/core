@@ -1,0 +1,187 @@
+# Arch Maintainer: David McFarland <corngood@gmail.com>
+
+source ../xorg.conf
+
+pkgbase=amdgpu-pro
+pkgname=(amdgpu-pro  amdgpu-pro-libdrm amdgpu-pro-libgl amdgpu-pro-opencl amdgpu-pro-vdpau amdgpu-pro-vulkan xf86-video-amdgpu-pro)
+pkgver=17.10.401251
+_pkgver=17.10-401251
+pkgrel=1
+arch=('x86_64')
+url='http://www.amd.com'
+license=('custom:AMD')
+makedepends=('wget')
+
+DLAGENTS='https::/usr/bin/wget --referer https://support.amd.com/en-us/kb-articles/Pages/AMDGPU-PRO-Install.aspx -N %u'
+
+source=(https://www2.ati.com/drivers/linux/ubuntu/amdgpu-pro-${_pkgver}.tar.xz)
+sha256sums=(0a10cf39841bf77eacb393ca112ce5f82ca0c4ea728d2fce975732855c039600)
+
+
+# extracts a debian package
+# $1: deb file to extract
+# $2: deb arch i386/amd64/all, if empty default amd64
+extract_deb() {
+    local tmpdir="$1"
+    local debarch="$2"
+    if [ -z "$2" ]; then  debarch="amd64"; fi
+
+    rm -Rf "$tmpdir"
+    mkdir "$tmpdir"
+    cd "$tmpdir"
+    local fullPath=$(readlink -f ${srcdir}/amdgpu-pro-${_pkgver}/./${1}_*_${debarch}.deb)
+    echo $fullPath
+    ar x "${fullPath}"
+    tar -C "${pkgdir}" -xf data.tar.xz
+}
+# move ubuntu specific /usr/lib/x86_64-linux-gnu to /usr/lib
+# $1: library dir
+# $2: destination (optional)
+move_libdir() {
+    local libdir="usr/lib"
+    if [ -n "$2" ]; then
+            libdir="$2"
+    fi
+    if [ -d "$1" ]; then
+            if [ -d "${pkgdir}/${libdir}" ]; then
+                    cp -ar -t "${pkgdir}/${libdir}/" "$1"/*
+                    rm -rf "$1"
+            else
+                    mkdir -p "${pkgdir}/${libdir}"
+                    mv -t "${pkgdir}/${libdir}/" "$1"/*
+                    rmdir "$1"
+            fi
+    fi
+}
+
+
+package_amdgpu-pro () {
+    pkgdesc="The AMDGPU Pro driver package"
+    install=amdgpu-pro-core.install
+    arch=('x86_64')
+    depends=('glib2' 'gst-plugins-base' 'gstreamer' 'libomxil-bellagio' 'libx11' 'libxcb' 'libxdamage>=1.1' 'libxext' 'libxfixes' 'libxshmfence' 'libxxf86vm' 'ncurses5-compat-libs>=6' 'openssl' 'zlib')
+
+    extract_deb amdgpu-pro
+    extract_deb amdgpu-pro-lib32
+    extract_deb gst-omx-amdgpu-pro
+    extract_deb libegl1-amdgpu-pro
+    extract_deb libgbm1-amdgpu-pro
+    extract_deb libgbm1-amdgpu-pro-base all
+    extract_deb libgbm1-amdgpu-pro-dev
+    extract_deb libgl1-amdgpu-pro-appprofiles all
+    extract_deb libgl1-amdgpu-pro-dri
+    extract_deb libgl1-amdgpu-pro-ext
+    extract_deb libgl1-amdgpu-pro-glx
+    extract_deb libglamor-amdgpu-pro-dev
+    extract_deb libgles2-amdgpu-pro
+    extract_deb mesa-amdgpu-pro-omx-drivers
+    #move_libdir "${pkgdir}/opt/amdgpu-pro" "usr"
+    #move_libdir "${pkgdir}/opt/amdgpu-pro/lib/x86_64-linux-gnu"
+    move_libdir "${pkgdir}/lib"
+
+    # extra_commands:
+    mv "${pkgdir}"/usr/lib/x86_64-linux-gnu/dri ${pkgdir}/usr/lib/
+    # This is needed because libglx.so has a hardcoded DRI_DRIVER_PATH
+    ln -s /usr/lib/dri ${pkgdir}/usr/lib/x86_64-linux-gnu/dri
+    mkdir -p "${pkgdir}/etc/ld.so.conf.d/"
+    echo "/opt/amdgpu-pro/lib/x86_64-linux-gnu/" > "${pkgdir}"/etc/ld.so.conf.d/amdgpu-pro.conf
+}
+
+
+package_amdgpu-pro-libdrm () {
+    pkgdesc="The AMDGPU Pro userspace interface to kernel DRM services"
+    arch=('x86_64')
+    provides=('libdrm')
+    conflicts=('libdrm')
+    depends=('bcunit')
+
+    extract_deb libdrm-amdgpu-pro-amdgpu1
+    extract_deb libdrm-amdgpu-pro-dev
+    extract_deb libdrm-amdgpu-pro-radeon1
+    extract_deb libdrm-amdgpu-pro-utils
+    extract_deb libdrm2-amdgpu-pro
+    #move_libdir "${pkgdir}/opt/amdgpu-pro" "usr"
+    #move_libdir "${pkgdir}/opt/amdgpu-pro/lib/x86_64-linux-gnu"
+    move_libdir "${pkgdir}/lib"
+}
+
+
+package_amdgpu-pro-libgl () {
+    pkgdesc="The AMDGPU Pro libgl library symlinks"
+    arch=('x86_64')
+    provides=('libgl')
+    conflicts=('libgl')
+    depends=(amdgpu-pro)
+
+    #move_libdir "${pkgdir}/opt/amdgpu-pro" "usr"
+    #move_libdir "${pkgdir}/opt/amdgpu-pro/lib/x86_64-linux-gnu"
+    move_libdir "${pkgdir}/lib"
+}
+
+
+package_amdgpu-pro-opencl () {
+    pkgdesc="The AMDGPU Pro OpenCL implementation"
+    arch=('x86_64')
+    provides=('opencl-driver')
+    depends=()
+
+    extract_deb clinfo-amdgpu-pro
+    extract_deb libopencl1-amdgpu-pro
+    extract_deb opencl-amdgpu-pro-icd
+    #move_libdir "${pkgdir}/opt/amdgpu-pro" "usr"
+    #move_libdir "${pkgdir}/opt/amdgpu-pro/lib/x86_64-linux-gnu"
+    move_libdir "${pkgdir}/lib"
+}
+
+
+package_amdgpu-pro-vdpau () {
+    pkgdesc="The AMDGPU Pro VDPAU driver"
+    arch=('x86_64')
+    depends=('amdgpu-pro-libdrm=${pkgver}' 'libvdpau>=1.1' 'libxcb' 'ncurses5-compat-libs>=6' 'openssl' 'zlib')
+
+    extract_deb libvdpau-amdgpu-pro
+    #move_libdir "${pkgdir}/opt/amdgpu-pro" "usr"
+    #move_libdir "${pkgdir}/opt/amdgpu-pro/lib/x86_64-linux-gnu"
+    move_libdir "${pkgdir}/lib"
+
+    # extra_commands:
+    mkdir -p "${pkgdir}"/usr/lib/
+    ln -s /opt/amdgpu-pro/lib/x86_64-linux-gnu/vdpau/libvdpau_amdgpu.so.1.0.0 "${pkgdir}"/usr/lib/libvdpau_amdgpu.so.1.0.0
+    ln -s /opt/amdgpu-pro/lib/x86_64-linux-gnu/vdpau/libvdpau_amdgpu.so.1.0.0 "${pkgdir}"/usr/lib/libvdpau_amdgpu.so.1
+    ln -s /opt/amdgpu-pro/lib/x86_64-linux-gnu/vdpau/libvdpau_amdgpu.so.1.0.0 "${pkgdir}"/usr/lib/libvdpau_amdgpu.so
+}
+
+
+package_amdgpu-pro-vulkan () {
+    pkgdesc="The AMDGPU Pro Vulkan driver"
+    arch=('x86_64')
+    provides=('vulkan-driver')
+    depends=('amdgpu-pro-libdrm=${pkgver}')
+
+    extract_deb vulkan-amdgpu-pro
+    #move_libdir "${pkgdir}/opt/amdgpu-pro" "usr"
+    #move_libdir "${pkgdir}/opt/amdgpu-pro/lib/x86_64-linux-gnu"
+    move_libdir "${pkgdir}/lib"
+
+    # extra_commands:
+    mkdir -p "${pkgdir}"/usr/share/vulkan/icd.d/
+    mv "${pkgdir}"/etc/vulkan/icd.d/amd_icd64.json "${pkgdir}"/usr/share/vulkan/icd.d/
+    rm -rf "${pkgdir}"/etc/vulkan/
+}
+
+
+package_xf86-video-amdgpu-pro () {
+    pkgdesc="The AMDGPU Pro X.org video driver"
+    arch=('x86_64')
+    provides=('xf86-video-amdgpu')
+    conflicts=('xf86-video-amdgpu' 'xorg-server<1.16' "X-ABI-VIDEODRV_VERSION<${X_ABI_VIDEODRV_MAJOR}" "X-ABI-VIDEODRV_VERSION>=$((X_ABI_VIDEODRV_MAJOR+1))")
+    groups=('xorg-driversxorg')
+    depends=('amdgpu-pro-libdrm=${pkgver}' 'amdgpu-pro=${pkgver}' 'libepoxy>=1.0' 'libsystemd')
+
+    extract_deb xserver-xorg-video-amdgpu-pro
+    extract_deb xserver-xorg-video-glamoregl-amdgpu-pro
+    extract_deb xserver-xorg-video-modesetting-amdgpu-pro
+    #move_libdir "${pkgdir}/opt/amdgpu-pro" "usr"
+    #move_libdir "${pkgdir}/opt/amdgpu-pro/lib/x86_64-linux-gnu"
+    move_libdir "${pkgdir}/lib"
+}
