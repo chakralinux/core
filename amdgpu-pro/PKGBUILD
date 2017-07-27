@@ -4,8 +4,8 @@ source ../xorg.conf
 
 pkgbase=amdgpu-pro
 pkgname=(amdgpu-pro  amdgpu-pro-libdrm amdgpu-pro-libgl amdgpu-pro-opencl amdgpu-pro-vdpau amdgpu-pro-vulkan xf86-video-amdgpu-pro)
-pkgver=17.10.401251
-_pkgver=17.10-401251
+pkgver=17.30.458935
+_pkgver=17.30-458935
 pkgrel=1
 arch=('x86_64')
 url='http://www.amd.com'
@@ -14,9 +14,18 @@ makedepends=('wget')
 
 DLAGENTS='https::/usr/bin/wget --referer https://support.amd.com/en-us/kb-articles/Pages/AMDGPU-PRO-Install.aspx -N %u'
 
-source=(https://www2.ati.com/drivers/linux/ubuntu/amdgpu-pro-${_pkgver}.tar.xz)
-sha256sums=(0a10cf39841bf77eacb393ca112ce5f82ca0c4ea728d2fce975732855c039600)
-
+source=(https://www2.ati.com/drivers/linux/ubuntu/amdgpu-pro-${_pkgver}.tar.xz
+        0001-disable-firmware-copy.patch
+        0002-linux-4.9-fixes.patch
+        0003-Change-seq_printf-format-for-64-bit-context.patch
+        0004-fix-warnings-for-Werror.patch
+        0005-add-archlinux-as-build-option.patch)
+sha256sums=('3652a5c9476a650a3e3cd89bcd7ac119ed7d16a570501eeeea6a902cbc6f9488'
+            '6aaf7566a70d1654bfc1ddfc73f25b246518e39c504c350cd131f4c40ce5a583'
+            '858828f9292e552dc2a20d838c602ab76e56c32384352d3de26e519c18a16db5'
+            '1e22be9d3e3aed6848cc0030f37d3fe710b37322d6db2219521827edf02cf38c'
+            '375a0caad148e018774fae57cc1c05926b01b71497c363b38d83163b0e6961ca'
+            '4e29fd4c1fd319b22c42d4d9e26e5cc75b9eab61e15f65e8acbe6db8a31ca3fb')
 
 # extracts a debian package
 # $1: deb file to extract
@@ -87,6 +96,32 @@ package_amdgpu-pro () {
     echo "/opt/amdgpu-pro/lib/x86_64-linux-gnu/" > "${pkgdir}"/etc/ld.so.conf.d/amdgpu-pro.conf
 }
 
+package_amdgpu-pro-dkms () {
+    pkgdesc="amdgpu-pro driver in DKMS format."
+    arch=('any')
+    depends=('dkms>=1.95')
+
+    extract_deb "${srcdir}"/amdgpu-pro-17.10-401251/./amdgpu-pro-dkms_17.10-401251_all.deb
+    #move_libdir "${pkgdir}/opt/amdgpu-pro" "usr"
+    #move_libdir "${pkgdir}/opt/amdgpu-pro/lib/x86_64-linux-gnu"
+    move_libdir "${pkgdir}/lib"
+
+    # extra_commands:
+    msg 'Applying patches...'
+    (cd ${pkgdir}/usr/src/amdgpu-pro-17.10-401251;
+            sed -i 's/\/extra/\/extramodules/' dkms.conf
+                    msg2 '0001-disable-firmware-copy.patch'
+            patch -p1 -i "${srcdir}/0001-disable-firmware-copy.patch";
+            msg2 '0002-linux-4.9-fixes.patch'
+            patch -p1 -i "${srcdir}/0002-linux-4.9-fixes.patch";
+            msg2 '0003-Change-seq_printf-format-for-64-bit-context.patch'
+            patch -p1 -i "${srcdir}/0003-Change-seq_printf-format-for-64-bit-context.patch";
+            msg2 '0004-fix-warnings-for-Werror.patch'
+            patch -p1 -i "${srcdir}/0004-fix-warnings-for-Werror.patch";
+            msg2 '0005-add-archlinux-as-build-option.patch'
+            patch -p1 -i "${srcdir}/0005-add-archlinux-as-build-option.patch"
+    )
+}
 
 package_amdgpu-pro-libdrm () {
     pkgdesc="The AMDGPU Pro userspace interface to kernel DRM services"
