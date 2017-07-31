@@ -1,10 +1,12 @@
 pkgbase=python-lxml
 pkgname=('python3-lxml' 'python2-lxml' 'python-lxml-docs')
 pkgver=3.8.0
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
-license=('BSD' 'GPL' 'custom')
-makedepends=('python3' 'python3-setuptools' 'python2' 'python2-setuptools' 'libxslt')
+license=('BSD' 'custom')
+url="http://lxml.de/"
+makedepends=('python3' 'python3-setuptools' 'python2' 'python2-setuptools' 'libxslt'
+             'python3-cssselect' 'python2-cssselect' 'python3-beautifulsoup4' 'python2-beautifulsoup4')
 source=(https://pypi.io/packages/source/l/lxml/lxml-${pkgver}.tar.gz)
 md5sums=('e54e2fae44d684d6b9c636fe189e93ff')
 
@@ -13,6 +15,14 @@ prepare() {
 
   # Setting LC_CTYPE to workaround encoding issue
   export LC_CTYPE=en_US.UTF-8
+}
+
+build() {
+  cd "$srcdir"/lxml-$pkgver
+  python3 setup.py build
+
+  cd "$srcdir"/lxml-$pkgver-py2
+  python2 setup.py build
 }
 
 package_python3-lxml() {
