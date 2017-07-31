@@ -21,31 +21,34 @@ pkgname=('php'
          'php-sqlite'
          'php-tidy'
          'php-xsl')
-pkgver=7.0.15
+pkgver=7.1.7
 pkgrel=1
 arch=('x86_64')
 license=('PHP')
 url='http://www.php.net'
 makedepends=('apache' 'aspell' 'imap' 'db' 'enchant' 'gd' 'gmp' 'icu' 'libmcrypt' 'libxpm' 'libxslt' 'libzip' 'net-snmp'
-             'postgresql-libs' 'sqlite3' 'systemd' 'tidyhtml' 'unixodbc' 'curl' 'libtool' 'postfix' 'freetds')
+             'postgresql-libs' 'sqlite3' 'systemd' 'tidyhtml' 'unixodbc' 'curl' 'libtool' 'postfix' 'freetds' 'pcre')
 checkdepends=('procps-ng')
-source=("http://www.php.net/distributions/${pkgbase}-${pkgver}.tar.xz"{,.asc}
+source=("https://php.net/distributions/${pkgbase}-${pkgver}.tar.xz"{,.asc}
         'apache.conf'
+        'apache.patch'
         'php-fpm.patch'
         'php-fpm.tmpfiles'
         'php.ini.patch')
-sha256sums=('300364d57fc4a6176ff7d52d390ee870ab6e30df121026649f8e7e0b9657fe93'
+sha256sums=('0d42089729be7b2bb0308cbe189c2782f9cb4b07078c8a235495be5874fff729'
             'SKIP'
             '8b5b15f1c348d8897d837ea9894157d9630dc542bbb0dbc7ad93c5dc0235d1d5'
-            '136e197384255420c73678aef812e70aa86320f6dbefcc5a952df1a65fdd53fa'
+            '258b33b6531b1128d9804c8b608b6013423a421edcf764747042d07e79ec6df3'
+            '7d982a3cefb3eaec0b3458340e4991c2959c10d1518ecb7c1d041884b14efc73'
             '640dba0d960bfeaae9ad38d2826d3f6b5d6c175a4d3e16664eefff29141faad5'
-            'f6888d92cf9aab2aa690f4f5343e07173fd1c3793bfe0a5603d30155de57ba36')
-validpgpkeys=('1A4E8B7277C42E53DBA9C7B9BCAA30EA9C0D5763'
-              '6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3')
+            '78f60b1d9f3a0ef8af77208feed76e303b3a13e93b80613c1e5a729004a5343c')
+validpgpkeys=('A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0'
+              '528995BFEDFBA7191D46839EF9BA0ADA31CBD89E')
 
 prepare() {
 	cd ${srcdir}/${pkgbase}-${pkgver}
 
+	patch -p0 -i ${srcdir}/apache.patch
 	patch -p0 -i ${srcdir}/php-fpm.patch
 	patch -p0 -i ${srcdir}/php.ini.patch
 
@@ -178,7 +181,7 @@ check() {
 
 package_php() {
 	pkgdesc='A general-purpose scripting language that is especially suited to web development'
-	depends=('pcre' 'libxml2' 'curl' 'libzip')
+	depends=('pcre' 'libxml2' 'curl' 'libzip' 'pcre')
 	replaces=('php-ldap' 'php-mssql' 'php-pear')
 	conflicts=('php-ldap' 'php-mssql' 'php-pear')
 	provides=("php-ldap=${pkgver}")
