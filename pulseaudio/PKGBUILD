@@ -1,10 +1,10 @@
 # Note: remember to build lib32 counterpart when bumping pkgver
 
 pkgbase=pulseaudio
-pkgname=(pulseaudio libpulse)
+pkgname=(pulseaudio libpulse pulseaudio-gconf)
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=10.0
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(LGPL)
@@ -148,6 +148,16 @@ package_pulseaudio() {
 
   mv usr/share/vala \
      "$srcdir/libpulse/usr/share"
+
+### Split modules
+
+  mkdir -p "$srcdir"/gconf/usr/lib/pulse-$_pulsever/modules \
+           "$srcdir"/gconf
+
+  mv usr/lib/pulse-$_pulsever/modules/module-gconf.so \
+     "$srcdir/gconf/usr/lib/pulse-$_pulsever/modules"
+  mv usr/lib/pulse/gconf-helper \
+     "$srcdir/gconf/usr/lib/pulse"
 }
 
 package_libpulse() {
@@ -157,4 +167,11 @@ package_libpulse() {
   backup=(etc/pulse/client.conf)
 
   mv "$srcdir"/libpulse/* "$pkgdir"
+}
+
+package_pulseaudio-gconf(){
+  pkgdesc="GConf support for PulseAudio"
+  depends=("pulseaudio=$pkgver-$pkgrel" gconf)
+
+  mv "$srcdir"/gconf/* "$pkgdir"
 }
