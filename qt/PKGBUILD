@@ -3,7 +3,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers' 'qt-docs')
 pkgver=4.8.7
-pkgrel=5
+pkgrel=6
 arch=('x86_64')
 url='http://www.qt.io'
 license=('GPL3' 'LGPL')
@@ -26,24 +26,26 @@ source=("http://download.qt.io/official_releases/qt/4.8/${pkgver}/${_pkgfqn}.tar
         'disable-sslv3.patch'
         'l-qclipboard_fix_recursive.patch'
         'l-qclipboard_delay.patch'
-        'qt4-gcc6.patch' 'qt4-glibc-2.25.patch')
-md5sums=('d990ee66bf7ab0c785589776f35ba6ad'
-         'fc211414130ab2764132e7370f8e5caa'
-         '85179f5e0437514f8639957e1d8baf62'
-         'f11852b97583610f3dbb669ebc3e21bc'
-         '6b771c8a81dd90b45e8a79afa0e5bbfd'
-         '742bfebaebc44c26f6cabe654f702cc8'
-         '41587e01bb0ca6d0c52fcf39eb737459'
-         'b9fb6b953cec428d59c026b1ef370e86'
-         'da387bde22ae1c446f12525d2a31f070'
-         'a523644faa8f98a73f55c4aa23c114a6'
-         '66dfea63916c8dbf47b23cb012ffdccc'
-         '85679531c8a7310317adfb7002d9f99a'
-         '1803ab6313df762d807678e58fc85f53'
-         '009de09b4e589a7770fba74405656c99'
-         'addc5e88d538ee55e17bd49ba337ca67'
-         '98e00c5c7e5fee12e11ecbedd03f01ff'
-         '296a06554222ff5839cccc41c5d3987e')
+        'qt4-gcc6.patch' 'qt4-glibc-2.25.patch' 'qt4-icu59.patch' 'qt4-openssl-1.1.patch')
+sha256sums=('e2882295097e47fe089f8ac741a95fef47e0a73a3f3cdf21b56990638f626ea0'
+            '2cc5c2ed8c281a52e164e5552ebaa0002daa3b7fa043ab6349246666773bbafb'
+            '41014db487da59208cc3f2ccf7ec4b3130220599715c8559633aef3dd634a10b'
+            'e77b365f842b0a881630cb65dc7892c9962d14e8081357dc6160bf7d7e3bdef6'
+            'ecab346b7e15e5de1d839456d16d26814e4507a23234d05654a55cb1ce75b23c'
+            '8b2adbd707c896d7ad1b02ea2c0bdd978dbbd56d8f0b82c260e007005bd28312'
+            '63cbca72141bcd4f6fb0ed6a86d8562cdd82eaab3b71297c3ab0f71c07603f53'
+            '6a4e02d7719e20dacddeda175e612ba3dfc6f5e4f27660b76fc66f706f0277cb'
+            '876c681ef8fbcc25f28cd4ad6c697abf8a4165d540bae37433bc40256dbf9d62'
+            '9fad22674c5eec835613a7f16c11b865aa793b448e90974c0f804105284a548b'
+            'ce97da195445f145d9f82df8f8e5d8716128e869ec6632db66c7125be663d813'
+            'e7f8d1c906640b836454e8202a48602352609d8e44a33a3de05dc1d20f5b1a8a'
+            '829b02ba10f208c2beba8e8a0110b6d10c63932612dabc08d536f099b9f66101'
+            '5db36cbb0686b8a503941779c821febc4a0330dc260e51d603f7aa1e4d8860ad'
+            'af3648ddb2372333b0e428788fd2ffbcfe571653fb46f898a55ae5a202f7e242'
+            '51da49e41edac66559d3ec8dd0a152995a51a53e5d1f63f09fa089a8af7e3112'
+            'e6555f4a681227447e94e9f14e11626d50b7e5108aad06088311e87063bc0347'
+            '61d6bf45649c728dec5f8d22be5b496ed9d40f52c2c70102696d07133cd1750d'
+            'ff3ddb5428cd2ff243558dc0c75b35f470077e9204bbc989ddcba04c866c1b68')
 
 prepare() {
 	cd ${_pkgfqn}
@@ -83,6 +85,12 @@ prepare() {
 
 	# Fix build of Qt4 applications with glibc 2.25 (Fedora)
 	patch -p1 -i "$srcdir"/qt4-glibc-2.25.patch
+
+	# Fix build with ICU 59 (pld-linux)
+	patch -p1 -i "$srcdir"/qt4-icu59.patch
+
+	# Fix build with OpenSSL 1.1 (Debian + OpenMandriva)
+	# patch -p1 -i "$srcdir"/qt4-openssl-1.1.patch
 }
 
 build() {
