@@ -4,7 +4,7 @@ pkgbase=pulseaudio
 pkgname=(pulseaudio libpulse pulseaudio-gconf)
 pkgdesc="A featureful, general-purpose sound server"
 pkgver=10.0
-pkgrel=2
+pkgrel=3
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(LGPL)
@@ -151,9 +151,8 @@ package_pulseaudio() {
 
 ### Split modules
 
-  mkdir -p "$srcdir"/gconf/usr/lib/pulse-$_pulsever/modules \
-           "$srcdir"/gconf
-
+  mkdir -p "$srcdir"/gconf/usr/lib/{pulse-${_pulsever}/modules,pulse}
+  
   mv usr/lib/pulse-$_pulsever/modules/module-gconf.so \
      "$srcdir/gconf/usr/lib/pulse-$_pulsever/modules"
   mv usr/lib/pulse/gconf-helper \
@@ -173,5 +172,9 @@ package_pulseaudio-gconf(){
   pkgdesc="GConf support for PulseAudio"
   depends=("pulseaudio=$pkgver-$pkgrel" gconf)
 
-  mv "$srcdir"/gconf/* "$pkgdir"
+  mkdir -p $pkgdir/usr/lib/pulse-$_pulsever/modules/
+  mkdir -p $pkgdir/usr/lib/pulse/
+  
+  mv gconf/usr/lib/pulse-$_pulsever/modules/module-gconf.so $pkgdir/usr/lib/pulse-$_pulsever/modules/
+  mv gconf/usr/lib/pulse/gconf-helper $pkgdir/usr/lib/pulse/
 }
