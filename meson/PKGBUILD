@@ -1,5 +1,5 @@
 pkgname=meson
-pkgver=0.39.1
+pkgver=0.41.2
 pkgrel=1
 pkgdesc='High productivity build system'
 url='http://mesonbuild.com/'
@@ -9,16 +9,24 @@ depends=('python3' 'ninja')
 makedepends=('python3-setuptools')
 checkdepends=('gcc-objc' 'vala' 'rust' 'gcc-fortran' 'mono' 'boost' 'qt5-base' 'git'
               'python3-cython' 'gtest' 'gmock' 'protobuf' 'python3-gobject' 'gobject-introspection'
-              'itstool' 'valgrind')
+              'itstool' 'valgrind' 'sdl2' 'doxygen' 'llvm' 'clang' 'gnustep-base' 'gtk-doc' 'gtk3')
 source=(https://github.com/mesonbuild/meson/releases/download/${pkgver}/meson-${pkgver}.tar.gz{,.asc})
-sha512sums=('1d5a6bd8b635c61b4f30c79b3bce6425e8ae60ca894130d3ce384481c626839b8408e49fc98f5337801c0a7513587ce5dcd76e7a1fe00b715facfa1034c73fb9'
+sha512sums=('0b22f08bc1fc500a416d536aec558cb1f775c90b618c1079cfcdbd1b6a6d9b8b02a57288295e1cbea4e44bab3f23ecdab89e8b7bac5d7025e699e2f71908f97e'
             'SKIP')
 validpgpkeys=('95181F4EED14FDF4E41B518D3BF4693BFEEB9428') # Jussi Pakkanen <jpakkane@gmail.com>
 
-#check() {
-#  cd ${pkgname}-${pkgver}
-#  MESON_PRINT_TEST_OUTPUT=1 LC_CTYPE=en_US.UTF-8 ./run_tests.py
-#}
+build() {
+  cd ${pkgname}-${pkgver}
+  python3 setup.py build
+}
+
+check() {
+  cd ${pkgname}-${pkgver}
+  unset CLASSPATH  # GNUstep breaks java tests
+  # export MESON_PRINT_TEST_OUTPUT=1 # set this for debug output
+  # Installing graphviz breaks doxygen tests
+  LC_CTYPE=en_US.UTF-8 DC=ldc ./run_tests.py
+}
 
 package() {
   cd ${pkgname}-${pkgver}
