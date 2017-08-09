@@ -6,7 +6,7 @@
 #               Simone Sclavi 'Ito' <darkhado@gmail.com>
 
 pkgname=libjpeg-turbo
-pkgver=1.3.0
+pkgver=1.5.2
 pkgrel=1
 pkgdesc='JPEG image codec with accelerated baseline compression and decompression'
 arch=('x86_64')
@@ -14,21 +14,19 @@ url='http://libjpeg-turbo.virtualgl.org/'
 license=('GPL'
          'custom')
 makedepends=('nasm')
-provides=('libjpeg=8.0.2'
+provides=('libjpeg=8.1.2'
           'libjpeg6')
 replaces=('libjpeg'
           'libjpeg6')
 conflicts=('libjpeg'
            'libjpeg6')
 options=('!libtool')
-source=("http://sourceforge.net/projects/$pkgname/files/$pkgver/$pkgname-$pkgver.tar.gz"
-        'cve-2013-6629.patch')
-sha512sums=('4d34c3c5f2cdd70b2a3d1b55eeb4ce59cb3d4b8d22bb6d43c2ec844b7eb5685b55a9b1b46ad2bc5f2756b5f5535ccad032791c3b932af9c1efc502aa5e701053'
-            'c5f063f87305ab48cb40c243df9e7a307efedc02eef8eee65e9ca5006676d5257a6d1dc7a32ff77a2486c8be8792b4f5431d18e46759ad63c182b8332a736099')
+source=("http://sourceforge.net/projects/$pkgname/files/$pkgver/$pkgname-$pkgver.tar.gz")
+sha512sums=('c7fe5cc77e38fad33af3f10e6db961c8edf033a86c09541121f49bfa20547179760924e6d3e397f0add7030459ff3babadd3457ab2da4a40a2147dc1574aa444')
 
 prepare() {
     cd "${srcdir}/${pkgname}-${pkgver}"
-    patch -i ../cve-2013-6629.patch # FS#38094
+    sed 's/Szathmáry/Szathmary/g' -i java/org/libjpegturbo/turbojpeg/*.java
 }
 
 build() {
@@ -38,6 +36,7 @@ build() {
     ./configure \
         --prefix=/usr \
         --with-jpeg6 \
+	--without-simd \
         --mandir=/usr/share/man
     make
     mkdir -p ${srcdir}/libjpeg6
@@ -70,6 +69,5 @@ package() {
     # Provide jpegint.h as it is required by various software
     install -m644 jpegint.h $pkgdir/usr/include/
 
-    install -Dm644 README-turbo.txt $pkgdir/usr/share/licenses/libjpeg-turbo/README-turbo.txt
-    install -Dm644 README $pkgdir/usr/share/licenses/libjpeg-turbo/README
+    install -Dm644 README.md $pkgdir/usr/share/licenses/libjpeg-turbo/README
 }
