@@ -1,44 +1,40 @@
 #
-# Platform Packages for Chakra, part of chakra-project.org
+# Platform Packages for Chakra, part of chakralinux.org
 #
 # Maintainer: Adrian Chaves Fernandez (Gallaecio) <adriyetichaves@gmail.com>
 
 pkgbase=python-twisted
 pkgname=(python3-twisted python2-twisted)
-pkgver=17.1.0
-pkgrel=1
+pkgver=17.5.0
+pkgrel=2
 pkgdesc="Asynchronous networking framework written in Python"
 arch=('x86_64')
 url="http://twistedmatrix.com/"
 license=('MIT')
 makedepends=('python3-crypto' 'python2-crypto' 'python3-zope-interface' 'python2-zope-interface'
              'python3-setuptools' 'python2-setuptools' 'python3-service-identity' 'python2-service-identity')
-source=("git+https://github.com/twisted/twisted.git#tag=twisted-$pkgver")
-sha1sums=('SKIP')
+source=("$pkgbase-$pkgver.tar.gz::https://github.com/twisted/twisted/archive/twisted-$pkgver.tar.gz")
+sha1sums=('2c7331971b37095faa4d232c402cd7571ce45b37')
 
 prepare() {
-  cp -a "twisted"{,-py2}
+  cp -a twisted-twisted-$pkgver{,-py2}
 
   sed -i 's:^#!.*bin.*python:#!/usr/bin/python2:' \
-    twisted-py2/src/twisted/mail/test/pop3testserver.py \
-    twisted-py2/src/twisted/trial/test/scripttest.py
+  twisted-twisted-$pkgver-py2/src/twisted/mail/test/pop3testserver.py \
+  twisted-twisted-$pkgver-py2/src/twisted/trial/test/scripttest.py
 }
 
 build() {
-  cd "$srcdir/twisted"
+  cd "$srcdir"/twisted-twisted-$pkgver
   python3 setup.py build
 
-  cd "$srcdir/twisted-py2"
+  cd "$srcdir"/twisted-twisted-$pkgver-py2
   python2 setup.py build
 }
 
-check() {
-  cd "$srcdir/twisted"
-  LC_CTYPE=en_US.utf8 xvfb-run python3 admin/run-python3-tests || warning "Tests failed"
+# to many checkdepends missing on chakra
+#check()
 
-  cd "$srcdir/twisted-py2"
-  LC_CTYPE=en_US.utf8 xvfb-run python2 bin/trial twisted || warning "Tests failed"
-}
 
 package_python3-twisted() {
   depends=('python3-crypto' 'python3-zope-interface')
@@ -47,7 +43,7 @@ package_python3-twisted() {
               'python3-pyasn1: for using conch'
               'tk: for using tkconch')
 
-  cd "$srcdir/twisted"
+  cd "$srcdir"/twisted-twisted-$pkgver
   python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
 
   # twisted in python 3 supports only few command line tools for now.
@@ -71,7 +67,7 @@ package_python2-twisted() {
   conflicts=('twisted<14.0.0')
   replaces=('twisted<14.0.0')
 
-  cd "$srcdir/twisted-py2"
+  cd "$srcdir"/twisted-twisted-$pkgver-py2
   python2 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
   install -D -m644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
