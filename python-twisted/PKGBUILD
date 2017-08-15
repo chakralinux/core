@@ -6,13 +6,15 @@
 pkgbase=python-twisted
 pkgname=(python3-twisted python2-twisted)
 pkgver=17.5.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Asynchronous networking framework written in Python"
 arch=('x86_64')
 url="http://twistedmatrix.com/"
 license=('MIT')
-makedepends=('python3-crypto' 'python2-crypto' 'python3-zope-interface' 'python2-zope-interface'
-             'python3-setuptools' 'python2-setuptools' 'python3-service-identity' 'python2-service-identity')
+makedepends=('python3-zope-interface' 'python2-zope-interface' 'python3-setuptools'
+             'python2-setuptools' 'python3-service-identity' 'python2-service-identity'
+             'python3-incremental' 'python2-incremental' 'python3-constantly' 'python2-constantly'
+             'python3-automat' 'python2-automat' 'python3-hyperlink' 'python2-hyperlink')
 source=("$pkgbase-$pkgver.tar.gz::https://github.com/twisted/twisted/archive/twisted-$pkgver.tar.gz")
 sha1sums=('2c7331971b37095faa4d232c402cd7571ce45b37')
 
@@ -37,7 +39,8 @@ build() {
 
 
 package_python3-twisted() {
-  depends=('python3-crypto' 'python3-zope-interface')
+  depends=('python3-zope-interface' 'python3-incremental' 'python3-constantly' 'python3-automat'
+           'python3-hyperlink')
   optdepends=('python3-pyopenssl'
               'python3-service-identity: for TLS client hostname verification'
               'python3-pyasn1: for using conch'
@@ -56,7 +59,8 @@ package_python3-twisted() {
 }
 
 package_python2-twisted() {
-  depends=('python2-crypto' 'python2-zope-interface')
+  depends=('python2-zope-interface' 'python2-incremental' 'python2-constantly' 'python2-automat'
+           'python2-hyperlink')
   optdepends=('python2-pyopenssl'
               'python2-service-identity: for TLS client hostname verification'
               'python2-soappy: for twisted.web.soap'

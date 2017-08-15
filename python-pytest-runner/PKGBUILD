@@ -1,0 +1,51 @@
+# Arch Contributor: Felix Yan <felixonmars@archlinux.org>
+
+pkgbase=python-pytest-runner
+pkgname=('python3-pytest-runner' 'python2-pytest-runner')
+pkgver=2.11.1
+pkgrel=1
+pkgdesc="Invoke py.test as distutils command with dependency resolution"
+arch=('any')
+license=('MIT')
+url="https://github.com/pytest-dev/pytest-runner"
+makedepends=('python3-pytest' 'python2-pytest' 'git')
+source=("git+https://github.com/pytest-dev/pytest-runner.git#tag=$pkgver")
+sha512sums=('SKIP')
+
+prepare() {
+  cp -a pytest-runner{,-py2}
+}
+
+build() {
+  cd "$srcdir"/pytest-runner
+  python3 setup.py build
+
+  cd "$srcdir"/pytest-runner-py2
+  python2 setup.py build
+}
+
+check() {
+  cd "$srcdir"/pytest-runner
+  python3 setup.py egg_info
+  PYTHONPATH="$PWD" py.test
+
+  cd "$srcdir"/pytest-runner-py2
+  python2 setup.py egg_info
+  PYTHONPATH="$PWD" py.test2
+}
+
+package_python3-pytest-runner() {
+  depends=('python3-pytest')
+
+  cd pytest-runner
+  python3 setup.py install --root="$pkgdir" --optimize=1
+  install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}
+
+package_python2-pytest-runner() {
+  depends=('python2-pytest')
+
+  cd pytest-runner-py2
+  python2 setup.py install --root="$pkgdir" --optimize=1
+  install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}

@@ -1,0 +1,44 @@
+# Arch Contributor: Felix Yan <felixonmars@archlinux.org>
+
+pkgbase=python-hypothesis
+pkgname=('python3-hypothesis' 'python2-hypothesis')
+pkgver=3.18.1
+pkgrel=1
+pkgdesc="Advanced Quickcheck style testing library for Python"
+arch=('any')
+license=('MPL')
+url="https://hypothesis.readthedocs.org"
+makedepends=('python3-setuptools' 'python2-setuptools' 'python2-enum34')
+source=("$pkgbase-$pkgver.tar.gz::https://github.com/HypothesisWorks/hypothesis-python/archive/$pkgver.tar.gz")
+sha512sums=('ede531fe037f781f888e1a29ccd13b2a949a6522fec68e658417889a5068e221175e3f709ae6010fd96e69cedc74a019e6fe274d2adde0f5b330c72aa6a3b87c')
+
+prepare() {
+  cp -a hypothesis-python-$pkgver{,-py2}
+
+  rm -r hypothesis-python-$pkgver/tests/py2
+  rm -r hypothesis-python-$pkgver-py2/tests/py3
+
+  export LC_CTYPE=en_US.UTF-8
+}
+
+build() {
+  cd "$srcdir"/hypothesis-python-$pkgver
+  python3 setup.py build
+
+  cd "$srcdir"/hypothesis-python-$pkgver-py2
+  python2 setup.py build
+}
+
+package_python3-hypothesis() {
+  depends=('python3')
+
+  cd hypothesis-python-$pkgver
+  python3 setup.py install --root="$pkgdir" --optimize=1
+}
+
+package_python2-hypothesis() {
+  depends=('python2-enum34')
+
+  cd hypothesis-python-$pkgver-py2
+  python2 setup.py install --root="$pkgdir" --optimize=1
+}

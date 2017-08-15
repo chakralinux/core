@@ -1,0 +1,53 @@
+# Arch Contributor: Felix Yan <felixonmars@archlinux.org>
+
+pkgbase=m2r
+pkgname=(m2r python2-m2r)
+pkgver=0.1.10
+pkgrel=1
+pkgdesc="Markdown to reStructuredText converter"
+arch=('any')
+url="https://github.com/miyakogi/m2r"
+license=('MIT')
+makedepends=('python3-setuptools' 'python2-setuptools' 'python3-mistune' 'python2-mistune'
+             'python3-docutils' 'python2-docutils')
+checkdepends=('python2-mock' 'python3-pygments' 'python2-pygments' 'python3-pytest-runner'
+              'python2-pytest-runner')
+source=("$pkgbase-$pkgver.tar.gz::https://github.com/miyakogi/m2r/archive/v$pkgver.tar.gz")
+sha512sums=('fb2cce8fb4ecf09161cf256ad2bda0f12274bee013c39a0ddea2c58b882a887b69f13bfdae3528dd0d1525f28658d17f62f2856b7cbaa17542eeaa1187a744d9')
+
+prepare() {
+  cp -a m2r-$pkgver{,-py2}
+}
+
+build() {
+  cd "$srcdir"/m2r-$pkgver
+  python3 setup.py build
+
+  cd "$srcdir"/m2r-$pkgver-py2
+  python2 setup.py build
+}
+
+#check() {
+#  cd "$srcdir"/m2r-$pkgver
+#  python3 setup.py pytest
+#
+#  cd "$srcdir"/m2r-$pkgver-py2
+#  python2 setup.py pytest
+#}
+
+package_m2r() {
+  depends=('python3-mistune' 'python3-docutils' 'python3-setuptools')
+
+  cd "$srcdir"/m2r-$pkgver
+  python3 setup.py install --root="$pkgdir" --prefix=/usr --optimize=1
+  install -D -m644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}
+
+package_python2-m2r() {
+  depends=('python2-mistune' 'python2-docutils' 'python2-setuptools')
+
+  cd "$srcdir"/m2r-$pkgver-py2
+  python2 setup.py install --root="$pkgdir" --prefix=/usr --optimize=1
+  mv "$pkgdir"/usr/bin/m2r{,-python2}
+  install -D -m644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}

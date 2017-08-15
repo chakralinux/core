@@ -1,0 +1,33 @@
+# Arch Contributor: Kyle Keen <keenerd@gmail.com>
+
+pkgbase=python-mistune
+_pkgname=mistune
+pkgname=('python3-mistune' 'python2-mistune')
+pkgver=0.7.4
+pkgrel=1
+pkgdesc="The fastest markdown parser in pure Python with renderer feature."
+arch=('any')
+url="https://github.com/lepture/mistune"
+license=('BSD')
+depends=('python')
+makedepends=('python3-setuptools' 'python2-setuptools')
+source=("https://github.com/lepture/mistune/archive/v${pkgver}.tar.gz")
+md5sums=('d1ba4788047ea6930d27bb2a438ffe6b')
+
+prepare() {
+  cd "$srcdir"
+  cp -r "$srcdir/$_pkgname-$pkgver" "$srcdir/${_pkgname}2-$pkgver"
+}
+
+package_python3-mistune() {
+  cd "$srcdir/${_pkgname}-$pkgver"
+  python3 setup.py install --root="$pkgdir/"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/python-mistune/LICENSE"
+}
+
+package_python2-mistune() {
+  depends=('python2')
+  cd "$srcdir/${_pkgname}2-$pkgver"
+  python2 setup.py install --root="$pkgdir/"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/python2-mistune/LICENSE"
+}
