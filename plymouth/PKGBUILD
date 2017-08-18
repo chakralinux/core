@@ -1,26 +1,17 @@
-# Contributor: ahjolinna <@yahoo.com>
-
 pkgname=plymouth
-pkgver=0.9.2.90.e4b7e495
+pkgver=0.9.3
 pkgrel=1
 pkgdesc="A graphical boot splash screen with kernel mode-setting support"
 url="http://www.freedesktop.org/wiki/Software/Plymouth/"
-
 arch=('x86_64')
 license=('GPL')
-
 depends=('libdrm' 'pango' 'systemd')
 makedepends=('git' 'docbook-xsl')
 optdepends=('ttf-dejavu')
-
 options=('!libtool' '!emptydirs')
-
-provides=('plymouth')
 conflicts=('plymouth-git')
 backup=('etc/plymouth/plymouthd.conf')
-
-_gitsha='e4b7e495'
-source=("git://anongit.freedesktop.org/plymouth#commit=${_gitsha}"
+source=("http://www.freedesktop.org/software/${pkgname}/releases/${pkgname}-${pkgver}.tar.xz"
         'chakra-logo.png'
         'plymouth.encrypt_hook'
         'plymouth.encrypt_install'
@@ -33,7 +24,7 @@ source=("git://anongit.freedesktop.org/plymouth#commit=${_gitsha}"
         'plymouth-update-initrd.patch'
         'plymouthd.conf')
 
-sha256sums=('SKIP'
+sha256sums=('9f8dd08a90ceaf6228dcd8c27759adf18fc9482f15b6c56dcbcced268b4e4a74'
             '17ba688027bad20e888f703fef33f2460be4cd4426dd2d5291f9126c71cfceb2'
             'cbfb5bcb6897703e088eefdee9d578f75d987116becafecbb2018b283ba3865e'
             '544399d4f3454644f24ad11e504eaa7d622c73942728f52fb55bea054c756fa1'
@@ -47,7 +38,7 @@ sha256sums=('SKIP'
             '4e28ed8a22dd722f939f788283edde6a6310985c2060c1fd9562ed5b72f6b5ae')
 
 prepare() {
-        cd plymouth
+        cd "$srcdir"/${pkgname}-${pkgver}
 
         patch -p1 -i $srcdir/plymouth-set-default-theme.in.patch
         patch -p1 -i "$srcdir"/plymouth-update-initrd.patch
@@ -55,9 +46,9 @@ prepare() {
 }
 
 build() {
-	cd ${pkgname%-*}
+	cd "$srcdir"/${pkgname}-${pkgver}
 
-	LDFLAGS="$LDFLAGS -ludev" ./autogen.sh \
+	LDFLAGS="$LDFLAGS -ludev" ./configure \
 		--prefix=/usr \
 		--exec-prefix=/usr \
 		--sysconfdir=/etc \
@@ -82,7 +73,7 @@ build() {
 }
 
 package() {
-	cd plymouth
+	cd "$srcdir"/${pkgname}-${pkgver}
 
 	make DESTDIR="$pkgdir" install
 
