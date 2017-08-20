@@ -4,30 +4,34 @@
 source ../xorg.conf
 
 pkgname=xf86-video-intel
-_commit=cb6ba2da056f3298a765b4da5cd626343c00a533  # master
-pkgver=2.99.917+770+gcb6ba2d
+_commit=2100efa105e8c9615eda867d39471d78e500b1bb # master
+pkgver=2.99.917+779+g2100efa
 pkgrel=1
+epoch=1
 arch=('x86_64')
-url="http://xorg.freedesktop.org/"
+url="https://01.org/linuxgraphics"
 license=('custom')
 install=$pkgname.install
 pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
 depends=('mesa-dri' 'libxvmc' 'pixman' 'xcb-util')
 makedepends=('xorg-server-devel' "X-ABI-VIDEODRV_VERSION=${X_ABI_VIDEODRV_VERSION}" 'libx11' 'libxrender'
              # additional deps for intel-virtual-output
-            'libxrandr' 'libxinerama' 'libxcursor' 'libxtst' 'libxss' 'git')
+             'libxrandr' 'libxinerama' 'libxcursor' 'libxtst' 'libxss'
+             # additional for git snapshot
+             'git')
 optdepends=('libxrandr: for intel-virtual-output'
             'libxinerama: for intel-virtual-output'
             'libxcursor: for intel-virtual-output'
-            'libxtst: for intel-virtual-output')
+            'libxtst: for intel-virtual-output'
+            'libxss: for intel-virtual-output')
 conflicts=("X-ABI-VIDEODRV_VERSION<${X_ABI_VIDEODRV_MAJOR}" "X-ABI-VIDEODRV_VERSION>=$((X_ABI_VIDEODRV_MAJOR+1))")
 groups=('xorg-drivers' 'xorg')
-source=("git://anongit.freedesktop.org/xorg/driver/xf86-video-intel#commit=$_commit")
+source=("git+https://anongit.freedesktop.org/git/xorg/driver/xf86-video-intel#commit=$_commit")
 sha256sums=('SKIP')
 
 pkgver() {
   cd $pkgname
-  git describe --long | sed 's/-/+/g'
+  git describe --tags | sed 's/-/+/g'
 }
 
 prepare() {
@@ -37,7 +41,14 @@ prepare() {
 
 build() {
   cd $pkgname
-  # DRI3 is disabled by default and Glamor has been removed
+
+  # Since pacman 5.0.2-2, hardened flags are now enabled in makepkg.conf
+  # With them, module fail to load with undefined symbol.
+  # See https://bugs.archlinux.org/task/55102 / https://bugs.archlinux.org/task/54845
+  export CFLAGS=${CFLAGS/-fno-plt}
+  export CXXFLAGS=${CXXFLAGS/-fno-plt}
+  export LDFLAGS=${LDFLAGS/,-z,now}
+
   ./configure --prefix=/usr \
     --libexecdir=/usr/lib \
     --with-default-dri=3
@@ -57,4 +68,3 @@ package() {
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
 }
-
