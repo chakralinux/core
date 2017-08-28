@@ -1,14 +1,14 @@
 pkgbase=ca-certificates
 pkgname=(ca-certificates-utils ca-certificates)
-pkgver=20170213
-pkgrel=3
+pkgver=20170307
+pkgrel=1
 pkgdesc='Common CA certificates'
 arch=('x86_64')
 url='http://pkgs.fedoraproject.org/cgit/ca-certificates.git'
 license=('GPL2')
 makedepends=('asciidoc' 'p11-kit')
 source=(update-ca-trust update-ca-trust.8.txt)
-sha256sums=('0fc474b2efc32f8319d6a3d10f726030298798d6191b659da7fb6cdc409971e9'
+sha256sums=('857096d0cd82e0cb58622f8e427cec5eaa2d4e3ae32a3bb60c7292ceeabf9668'
             '5b2d3dfaac00027ff169c34ded4b5115a1332c1596c30eb0e41bbfb1a7f959fc')
 
 build() {
@@ -33,8 +33,12 @@ package_ca-certificates-utils() {
 	# Directories used by update-ca-trust (aka "trust extract-compat")
 	install -d "${pkgdir}"/etc/{ssl/certs/java,${pkgbase}/extracted}
 
-	# Contrary to Fedora, the /etc/ssl/certs dir is generated
-	ln -srT "${pkgdir}"/etc/ssl/{certs/ca-certificates.crt,cert.pem}
+	# Compatibility link for OpenSSL using /etc/ssl as CAdir
+	# Used in preference to the individual links in /etc/ssl/certs
+	ln -sr "$pkgdir/etc/$pkgbase/extracted/tls-ca-bundle.pem" "$pkgdir/etc/ssl/cert.pem"
+
+	# Compatiblity link for legacy bundle
+	ln -sr "$pkgdir/etc/$pkgbase/extracted/tls-ca-bundle.pem" "$pkgdir/etc/ssl/certs/ca-certificates.crt"
 }
 
 package_ca-certificates() {
