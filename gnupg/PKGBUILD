@@ -1,5 +1,5 @@
 pkgname=gnupg
-pkgver=2.1.22
+pkgver=2.2.0
 pkgrel=1
 pkgdesc='Complete and free implementation of the OpenPGP standard'
 url='http://www.gnupg.org/'
@@ -11,8 +11,13 @@ makedepends=('libldap' 'libusb-compat')
 depends=('npth' 'libgpg-error' 'libgcrypt' 'libksba' 'libassuan'
          'pinentry' 'bzip2' 'readline' 'gnutls' 'sqlite3')
 checkdepends=('openssh')
-source=("https://gnupg.org/ftp/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
-sha1sums=('706b806f7d8d328b4ffa67954c613fdd3dfed1b9')
+source=("https://gnupg.org/ftp/gcrypt/${pkgname}/${pkgname}-${pkgver}.tar.bz2"{,.sig})
+sha1sums=('36ee693d0b2ec529ecf53dd6d397cc38ba71c0a7'
+          'SKIP')
+validpgpkeys=('D8692123C4065DEA5E0F3AB5249B39D24F25E3B6'
+              '46CC730865BB5C78EBABADCF04376F3EE0856959'
+              '031EC2536E580D8EA286A9F22071B08A33BD3F06'
+              'D238EA65D64C67ED4C3073F28A861B1C7EFD60D9')
 
 install=${pkgname}.install
 
@@ -35,7 +40,7 @@ build() {
 		--enable-maintainer-mode \
 		--enable-symcryptrun \
 		--enable-gpgtar \
-
+                --enable-all-tests
 	make
 }
 
@@ -47,9 +52,8 @@ check() {
 package() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
 	make DESTDIR="${pkgdir}" install
-	ln -s gpg2 "${pkgdir}"/usr/bin/gpg
-	ln -s gpgv2 "${pkgdir}"/usr/bin/gpgv
-	ln -s gpg2.1.gz "${pkgdir}"/usr/share/man/man1/gpg.1.gz
+	ln -s gpg "${pkgdir}"/usr/bin/gpg2
+	ln -s gpgv "${pkgdir}"/usr/bin/gpgv2
         
         cd doc/examples/systemd-user
 	for i in *.*; do
