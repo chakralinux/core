@@ -1,28 +1,21 @@
 pkgname=gd
-pkgver=2.2.4
+pkgver=2.2.5
 pkgrel=1
 pkgdesc='Library for the dynamic creation of images by programmers'
 arch=('x86_64')
 url='http://www.libgd.org/'
 license=('custom')
-depends=('libpng' 'fontconfig' 'libjpeg-turbo' 'libxpm')
+depends=('libpng' 'fontconfig' 'libjpeg-turbo' 'libxpm' 'libwebp')
 optdepends=('perl: bdftogd script')
 checkdepends=('ttf-liberation')
-source=("https://github.com/libgd/libgd/releases/download/gd-${pkgver}/libgd-${pkgver}.tar.xz"
-        'gd-2.2.4-upstream.patch')
-sha256sums=('137f13a7eb93ce72e32ccd7cebdab6874f8cf7ddf31d3a455a68e016ecd9e4e6'
-            '0aa73d278fa7bc70c830660ff8539fb32d703f80523ecdb0994b7e14846435d7')
-
-prepare() {
-  cd libgd-${pkgver}
-  patch -p1 -i ${srcdir}/gd-2.2.4-upstream.patch
-}
+source=("https://github.com/libgd/libgd/releases/download/gd-${pkgver}/libgd-${pkgver}.tar.xz")
+sha256sums=('8c302ccbf467faec732f0741a859eef4ecae22fea2d2ab87467be940842bde51')
 
 build() {
     cd ${srcdir}/libgd-${pkgver}
     ./configure \
-        --prefix=/usr\
-        --without-xpm
+        --prefix=/usr \
+        --disable-rpath
     make
 }
 
