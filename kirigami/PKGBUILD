@@ -1,6 +1,7 @@
 source ../frameworks.conf
 
 pkgname=kirigami
+_pkgname=kirigami2
 pkgver=${KFVersion}
 pkgrel=1
 pkgdesc='A QtQuick based components set'
@@ -14,8 +15,8 @@ provides=(kirigami2)
 conflicts=(kirigami2)
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname}))
+source=("${KFServer}/${_pkgname}-${pkgver}.tar.xz")
+sha256sums=( $(getSum ${_pkgname}))
 
 prepare() {
   mkdir -p build
@@ -23,7 +24,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 ../${_pkgname}-${pkgver}
   make
 }
 
