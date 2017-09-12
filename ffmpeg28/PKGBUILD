@@ -1,5 +1,5 @@
 pkgname=ffmpeg2.8
-pkgver=2.8.11
+pkgver=2.8.13
 pkgrel=1
 pkgdesc='Complete solution to record, convert and stream audio and video'
 arch=('x86_64')
@@ -17,25 +17,10 @@ optdepends=('ladspa: LADSPA filters')
 provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
           'libavresample.so' 'libavutil.so' 'libpostproc.so' 'libswresample.so'
           'libswscale.so')
-source=(http://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.bz2{,.asc}
-        https://github.com/FFmpeg/FFmpeg/commit/7145e80b4f78cff5ed5fee04d4c4d53daaa0e077.patch
-        https://github.com/FFmpeg/FFmpeg/commit/6ba42b6482c725a59eb468391544dc0c75b8c6f0.patch
-        https://github.com/FFmpeg/FFmpeg/commit/cfda1bea4c18ec1edbc11ecc465f788b02851488.patch)
+source=(http://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.bz2{,.asc})
 validpgpkeys=('FCF986EA15E6E293A5644F10B4322F04D67658D8')
-sha256sums=('9987e0f6b1f66311390f807a0c18ad9c90652b5097cff17b3dcbeabdd89f8d32'
-            'SKIP'
-            '402477e1cdea436bc322016d97f0a48433c7063ab8cb1100490d059b1663e92e'
-            'c5e5d2cba239f663004e65f86f87ab608348b5eedb11c0ac6d3403a0b8b49f42'
-            'cd285af37d91e04c26a112d6bcbab994e9acf7f49e9f9db06d7c9e8540bb25bd')
-
-prepare() {
-  cd ffmpeg-${pkgver}
-
-  # FS#47738
-  patch -Np1 -i ../7145e80b4f78cff5ed5fee04d4c4d53daaa0e077.patch
-  patch -Np1 -i ../6ba42b6482c725a59eb468391544dc0c75b8c6f0.patch
-  patch -Np1 -i ../cfda1bea4c18ec1edbc11ecc465f788b02851488.patch
-}
+sha256sums=('df9b98cb584a004ce8e29b4c954cfb8d9e45dac52b4c6d036f25dfbaa3086778'
+            'SKIP')
 
 build() {
   cd ffmpeg-${pkgver}
