@@ -1,7 +1,7 @@
 
 pkgname=chakra-init-live
-pkgver=2016.02
-pkgrel=4
+pkgver=2017.09
+pkgrel=1
 pkgdesc="Live-session systemd startup scripts"
 arch=('x86_64')
 url="https://chakralinux.org"
@@ -11,14 +11,18 @@ install=$pkgname.install
 #dummy depends, needed by the post install script to enable systemd modules
 depends=('upower' 'udisks2' 'avahi' 'networkmanager' 'ntp' 'bluez' 'cups')
 
-source=('live' 'locale_setup.sh')
+source=('live' 'live.service' 'locale_setup.sh')
 md5sums=('5165d0b1c8500cb2a255eaf06d632a8b'
+         '571358cfe8eac5546e90c1341100e903'
          'a6f4d7fc3b1365eb5274afa7177b2cd9')
+
 
 package() {
   cd ${srcdir}
   # setup /etc
   mkdir ${pkgdir}/etc
   install -m755 -t ${pkgdir}/etc live
-  install -m755 -t ${pkgdir}/etc locale_setup.sh	
+  install -m755 -t ${pkgdir}/etc locale_setup.sh
+
+  install -Dm644 live.service ${pkgdir}/usr/lib/systemd/system/live.service
 }
