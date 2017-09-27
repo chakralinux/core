@@ -1,12 +1,12 @@
 pkgname=git
-pkgver=2.10.0
+pkgver=2.14.2
 pkgrel=1
 pkgdesc="Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 arch=('x86_64')
-url="http://git-scm.com/"
+url="https://git-scm.com/"
 license=('GPL2')
-depends=('curl' 'expat>=2.0' 'perl-error' 'perl' 'openssl' 'pcre')
-makedepends=('python2' 'emacs' 'asciidoc' 'xmlto')
+depends=('curl' 'expat>=2.0' 'perl-error' 'perl' 'openssl' 'pcre2')
+makedepends=('python2' 'emacs' 'asciidoc' 'xmlto' 'asciidoc')
 optdepends=('tk: gitk and git gui'
             'perl-libwww: git svn'
             'perl-term-readkey: git svn'
@@ -17,22 +17,18 @@ install="git.install"
 source=("https://www.kernel.org/pub/software/scm/git/git-$pkgver.tar"{.xz,.sign}
         git-daemon@.service
         git-daemon.socket)
-md5sums=('d99fdf256e7c7bc5d2cb428b48d4e038'
+md5sums=('694dd05c8d82b1444ee54c6dbebb1250'
          'SKIP'
          '042524f942785772d7bd52a1f02fe5ae'
          'f67869315c2cc112e076f0c73f248002')
 validpgpkeys=('96E07AF25771955980DAD10020D04E5A713660A7') # Junio C Hamano
-
-prepare() {
-  cd "$srcdir/$pkgname-$pkgver"
-}
 
 build() {
   export PYTHON_PATH='/usr/bin/python2'
   cd "${srcdir}/${pkgname}-${pkgver}"
   make prefix=/usr gitexecdir=/usr/lib/git-core \
     CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
-    USE_LIBPCRE=1 \
+    USE_LIBPCRE2=1 \
     NO_CROSS_DIRECTORY_HARDLINKS=1 \
     MAN_BOLD_LITERAL=1 \
     all doc
@@ -47,6 +43,10 @@ check() {
   local jobs
   jobs=$(expr "$MAKEFLAGS" : '.*\(-j[0-9]*\).*') || true
   mkdir -p /dev/shm/git-test
+  # explicitly specify SHELL to avoid a test failure in t/t9903-bash-prompt.sh
+  # which is caused by 'git rebase' trying to use builduser's SHELL inside the
+  # build chroot (i.e.: /usr/bin/nologin)
+  SHELL=/bin/sh \
   make prefix=/usr gitexecdir=/usr/lib/git-core \
     CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
     USE_LIBPCRE=1 \
@@ -85,7 +85,6 @@ package() {
   # scripts are for python 2.x
   sed -i 's|#![ ]*/usr/bin/env python$|#!/usr/bin/env python2|' \
     $(find "$pkgdir" -name '*.py') \
-    "$pkgdir"/usr/share/git/gitview/gitview \
     "$pkgdir"/usr/share/git/remote-helpers/git-remote-bzr \
     "$pkgdir"/usr/share/git/remote-helpers/git-remote-hg
   sed -i 's|#![ ]*/usr/bin/python$|#!/usr/bin/python2|' \
@@ -98,5 +97,3 @@ package() {
   install -D -m644 "${srcdir}/git-daemon@.service" "${pkgdir}/usr/lib/systemd/system/git-daemon@.service"
   install -D -m644 "${srcdir}/git-daemon.socket" "${pkgdir}/usr/lib/systemd/system/git-daemon.socket"
 }
-
-# vim:set ts=2 sw=2 et:
