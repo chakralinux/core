@@ -1,7 +1,7 @@
 # TODO: Always remember to build lib32-nspr when bumping pkgver
 
 pkgname=nspr
-pkgver=4.16
+pkgver=4.17
 pkgrel=1
 pkgdesc="Netscape Portable Runtime"
 arch=('x86_64')
@@ -11,13 +11,13 @@ depends=('glibc')
 makedepends=('zip')
 options=('!emptydirs')
 source=("https://ftp.mozilla.org/pub/mozilla.org/nspr/releases/v${pkgver}/src/${pkgname}-${pkgver}.tar.gz")
-sha1sums=('b295ee2550b43edc0598c20663ceef9fa3fafe51')
+sha1sums=('5262abb243191d5fa3dcd72857d7d7f8ec47ad01')
 
 build() {
-  cd $pkgname-$pkgver
+  cd $pkgname-$pkgver/$pkgname
   _confflags="--enable-64bit"
 
-  ./nspr/configure \
+  ./configure \
       --prefix=/usr \
       --libdir=/usr/lib \
       --includedir=/usr/include/nspr \
@@ -27,7 +27,7 @@ build() {
 }
 
 package() {
-  cd $pkgname-$pkgver
+  cd $pkgname-$pkgver/$pkgname
   make DESTDIR="$pkgdir" install
 
   ln -s nspr.pc "$pkgdir/usr/lib/pkgconfig/mozilla-nspr.pc"
