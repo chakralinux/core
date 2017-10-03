@@ -1,11 +1,3 @@
-## "1" to enable IA32-EFI build in Arch x86_64, "0" to disable
-_IA32_EFI_IN_ARCH_X64="1"
-
-## "1" to enable EMU build, "0" to disable
-_GRUB_EMU_BUILD="0"
-
-_GRUB_EXTRAS_COMMIT="f2a079441939eee7251bf141986cdd78946e1d20"
-
 _UNIFONT_VER="10.0.06"
 
 _EFI_ARCH="x86_64"
@@ -36,9 +28,9 @@ optdepends=('freetype2: For grub-mkfont usage'
             'os-prober: To detect other OSes when generating grub.cfg in BIOS systems'
             'mtools: For grub-mkrescue FAT FS support')
 
-source=("https://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz"
-        "https://git.savannah.nongnu.org/cgit/grub-extras.git/snapshot/grub-extras-${_GRUB_EXTRAS_COMMIT}.tar.gz"
-        "https://ftp.gnu.org/gnu/unifont/unifont-${_UNIFONT_VER}/unifont-${_UNIFONT_VER}.bdf.gz"
+source=("grub-$pkgver::git+git://git.sv.gnu.org/grub.git#tag=grub-$pkgver"
+        "grub-extras::git+git://git.sv.gnu.org/grub-extras.git#commit=f2a079441939eee7251bf141986cdd78946e1d20"
+        "https://ftp.gnu.org/gnu/unifont/unifont-${_UNIFONT_VER}/unifont-${_UNIFONT_VER}.bdf.gz"{,.sig}
         '0002-intel-ucode.patch'
         '0003-10_linux-detect-archlinux-initramfs.patch'
         '0004-add-GRUB_COLOR_variables.patch'
@@ -103,8 +95,7 @@ _build_grub-common_and_bios() {
 	
 	msg "Add the grub-extra sources for bios build"
 	install -d "${srcdir}/grub-${pkgver}-bios/grub-extras"
-	cp -r "${srcdir}/grub-extras-${_GRUB_EXTRAS_COMMIT}/915resolution" \
-		"${srcdir}/grub-${pkgver}-bios/grub-extras/915resolution"
+	cp -r "${srcdir}/grub-extras/915resolution" "${srcdir}/grub-${pkgver}-bios/grub-extras/915resolution"
 	export GRUB_CONTRIB="${srcdir}/grub-${pkgver}-bios/grub-extras/"
 	
 	msg "Unset all compiler FLAGS for bios build"
@@ -138,7 +129,7 @@ _build_grub-common_and_bios() {
 		--infodir="/usr/share/info" \
 		--datarootdir="/usr/share" \
 		--sysconfdir="/etc" \
-	 	--program-prefix="" \
+		--program-prefix="" \
 		--with-bootdir="/boot" \
 		--with-grubdir="grub" \
 		--disable-silent-rules \
@@ -200,14 +191,14 @@ build() {
 	
 	cd "${srcdir}/grub-${pkgver}/"
 	
-	msg "Build grub bios stuff"
+	msg 'Build grub bios stuff'
 	_build_grub-common_and_bios
 	
 	msg "Build grub ${_EFI_ARCH} efi stuff"
 	_build_grub-efi
 
-	msg "Build grub i386 efi stuff"
-	_EFI_ARCH="i386" _build_grub-efi
+	msg 'Build grub i386 efi stuff'
+	_EFI_ARCH='i386' _build_grub-efi
 }
 
 _package_grub-common_and_bios() {
@@ -248,9 +239,9 @@ package() {
 	msg "Package grub ${_EFI_ARCH} efi stuff"
 	_package_grub-efi
 
-	msg "Package grub i386 efi stuff"
+	msg 'Package grub i386 efi stuff'
 	_EFI_ARCH="i386" _package_grub-efi
 	
-	msg "Package grub bios stuff"
+	msg 'Package grub bios stuff'
 	_package_grub-common_and_bios
 }
