@@ -5,7 +5,7 @@ _EFI_ARCH="x86_64"
 pkgname="grub"
 pkgdesc="GNU GRand Unified Bootloader (2)"
 pkgver=2.02
-pkgrel=1
+pkgrel=2
 url="https://www.gnu.org/software/grub/"
 arch=('x86_64')
 license=('GPL3')
@@ -31,7 +31,6 @@ optdepends=('freetype2: For grub-mkfont usage'
 source=("grub-$pkgver::git+git://git.sv.gnu.org/grub.git#tag=grub-$pkgver"
         "grub-extras::git+git://git.sv.gnu.org/grub-extras.git#commit=f2a079441939eee7251bf141986cdd78946e1d20"
         "https://ftp.gnu.org/gnu/unifont/unifont-${_UNIFONT_VER}/unifont-${_UNIFONT_VER}.bdf.gz"{,.sig}
-        '0002-intel-ucode.patch'
         '0003-10_linux-detect-archlinux-initramfs.patch'
         '0004-add-GRUB_COLOR_variables.patch'
         '0005-Allow_GRUB_to_mount_ext234_filesystems_that_have_the_encryption_feature.patch'
@@ -42,7 +41,6 @@ md5sums=('SKIP'
          'SKIP'
          '14d3e4d86b7134e39224848e582496ed'
          'SKIP'
-         '34cca1ad2da6db58823f17e04e6cdef9'
          'ba9d27c44b677bf329e5b96933bdbde8'
          'e506ae4a9f9f7d1b765febfa84e10d48'
          '7d4aa743cfabe49158e970a97f7795f0'
@@ -53,9 +51,6 @@ validpgpkeys=('95D2E9AB8740D8046387FD151A09227B1F435A33') # Paul Hardy <unifound
 prepare() {
 	
 	cd "${srcdir}/grub-${pkgver}/"
-
-	msg "Patch to load Intel microcode"
-	patch -Np1 -i "${srcdir}/0002-intel-ucode.patch"
 	
 	msg "Patch to detect of Chakra Linux initramfs images by grub-mkconfig (same as Arch)"
 	patch -Np1 -i "${srcdir}/0003-10_linux-detect-archlinux-initramfs.patch"
