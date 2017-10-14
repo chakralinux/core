@@ -1,0 +1,35 @@
+source ../plasma.conf
+
+pkgname=plasma-vault
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc="Plasma applet and services for creating encrypted vaults"
+arch=(x86_64)
+url="https://www.kde.org/"
+license=(LGPL)
+groups=(plasma)
+options=("debug")
+depends=(plasma-workspace)
+makedepends=(extra-cmake-modules python)
+optdepends=('encfs: to use encFS for encryption' 'cryfs: to use cryFS for encryption')
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname}) 
+             'SKIP' )
+validpgpkeys=( ${Pvalidpgpkeys[@]} )
+
+prepare() {
+  mkdir -p build
+
+  cd ${pkgname}-${pkgver}
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

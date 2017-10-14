@@ -2,7 +2,7 @@
 source ../plasma.conf
 
 pkgbase=plasma-workspace
-pkgname=('plasma-workspace' 'drkonqi' 'plasma-wayland-session')
+pkgname=('plasma-workspace' 'plasma-wayland-session')
 pkgver=${PVersion}
 pkgrel=1
 pkgdesc='KDE Plasma Workspace'
@@ -20,12 +20,10 @@ makedepends=('extra-cmake-modules' 'kdoctools' 'gpsd' 'baloo'
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${PVersion}/${pkgname}-${pkgver}.tar.xz"{,.sig}
-        "kde.pam"
-        KDE-375053.patch::https://cgit.kde.org/plasma-workspace.git/patch/?id=dba0f80288b41e385f6a358f325b6b05d8ae11c4)
+        "kde.pam")
 sha256sums=( $(getSum ${pkgname} | head -n1)
             'SKIP'
-            '44a7c7acee30547dd41d0a593486b29df4eaa5c3707287b87e23b1104de3964a'
-            'd0056de5eb52bc1ce9b720c34742a8284d5e0161d41d0c5e67229d65bb873341')
+            '44a7c7acee30547dd41d0a593486b29df4eaa5c3707287b87e23b1104de3964a')
 validpgpkeys=(${Pvalidpgpkeys[@]})
 
 prepare() {
@@ -34,9 +32,6 @@ prepare() {
   cd ${pkgbase}-${pkgver}
   # be sure to use the Qt5 version of qtpaths
   sed -e 's:qtpaths:qtpaths-qt5:' -i startkde/start*.cmake
-  
-  # AppMenu: Don't call AboutToShow on LayoutUpdated
-  patch -Np1 -i ${srcdir}/KDE-375053.patch
 }
 
 build() {
@@ -58,20 +53,8 @@ package_plasma-workspace() {
   install -Dm644 "${srcdir}"/kde.pam \
     "${pkgdir}"/etc/pam.d/kde
 
-  # Remove conflicts with drkonqi
-  rm "${pkgdir}"/usr/lib/drkonqi
-  rm -r "${pkgdir}"/usr/share/drkonqi
-
   # Split plasma-wayland scripts
   rm -r "$pkgdir"/usr/share/wayland-sessions
-}
-
-package_drkonqi() {
-  pkgdesc='KDE crash handler'
-  depends=('kdewebkit' 'kxmlrpcclient' 'gdb')
-
-  cd build/drkonqi
-  make DESTDIR="${pkgdir}" install
 }
 
 package_plasma-wayland-session() {

@@ -1,0 +1,34 @@
+source ../plasma.conf
+
+pkgname=drkonqi
+pkgver=${PVersion}
+pkgrel=1
+pkgdesc='The KDE crash handler'
+arch=(x86_64)
+url='https://www.kde.org/workspaces/plasmadesktop/'
+license=(GPL2)
+depends=(kidletime kxmlrpcclient gdb)
+makedepends=(extra-cmake-modules)
+groups=(plasma)
+options=("debug")
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname}) 
+             'SKIP' )
+validpgpkeys=( ${Pvalidpgpkeys[@]} )
+
+prepare() {
+  mkdir -p build
+
+  cd ${pkgname}-${pkgver}
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
