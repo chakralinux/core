@@ -1,0 +1,32 @@
+source ../frameworks.conf
+
+pkgname=qqc2-desktop-style
+pkgver=${KFVersion}
+pkgrel=1
+pkgdesc='A style for Qt Quick Controls 2 to make it follow your desktop theme'
+arch=(x86_64)
+url='https://community.kde.org/Frameworks'
+license=(LGPL)
+groups=(kf5)
+depends=(kirigami2 kiconthemes)
+makedepends=(extra-cmake-modules)
+options=("debug")
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys[@]} )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
