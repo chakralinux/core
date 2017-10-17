@@ -2,7 +2,7 @@ source ../qt5.conf
 
 pkgname=qt5-base
 pkgver=${QSubVersion}
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
@@ -20,9 +20,10 @@ optdepends=('qt5-svg: to use SVG icon themes'
             'mtdev: evdev plugin')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname}) )
-md5sums=( $(getSum ${pkgname}) )
-
+source=( $(getSrc ${pkgname}) 
+                harmony-fix.diff)
+md5sums=( $(getSum ${pkgname}) 
+                 '8fdc8dc23b19c1c00e817d5c56eac1a0')
 
 prepare() {
   cd $(getPkgName ${pkgname})
@@ -40,6 +41,9 @@ prepare() {
 
   # Fix missing private includes https://bugreports.qt.io/browse/QTBUG-37417
   sed -e '/CMAKE_NO_PRIVATE_INCLUDES\ \=\ true/d' -i mkspecs/features/create_cmake.prf
+  
+  # Freetype 2.8.1
+  patch -p1 -i ../harmony-fix.diff
 }
 
 build() {
