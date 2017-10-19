@@ -1,18 +1,17 @@
-
 pkgname=openmpi
-pkgver=2.0.0
+pkgver=2.1.2
 pkgmin="${pkgver%.*}"
 pkgrel=1
 pkgdesc='High performance message passing library (MPI)'
 arch=('x86_64')
 url='http://www.open-mpi.org'
 license=(custom)
-depends=('libltdl' 'hwloc>=1.9')
+depends=('libltdl' 'hwloc' 'openssh')
 makedepends=('inetutils' 'valgrind' 'gcc-fortran')
 optdepends=('gcc-fortran: fortran support')
 options=(staticlibs)
 source=(http://www.open-mpi.org/software/ompi/v${pkgmin}/downloads/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('a34f07a0e94af4ccd8080d74827befd61824c6c3')
+sha1sums=('4d43bb407eb8b9da099a555e8dc083352c6a1d02')
 
 build() {
    cd $pkgname-$pkgver
@@ -22,7 +21,9 @@ build() {
                --enable-mpi-fortran=all \
                --libdir=/usr/lib/${pkgname} \
                --with-threads=posix \
+               --enable-mpi-thread-multiple \
                --enable-smp-locks \
+               --enable-builtin-atomics \
                --with-valgrind \
                --enable-memchecker \
                --enable-pretty-print-stacktrace \
@@ -45,20 +46,14 @@ package() {
    cd $pkgname-$pkgver
    make DESTDIR="$pkgdir" install
 
-   # FS#28583
-   install -d -m 755 "$pkgdir"/usr/lib/pkgconfig
-   for i in ompi-c.pc ompi-cxx.pc ompi-f77.pc ompi-f90.pc ompi.pc; do
-      ln -sf /usr/lib/openmpi/pkgconfig/$i "$pkgdir"/usr/lib/pkgconfig/
-   done
 
-   # Openmpi's otfinfo conflicts with the one from texlive
-   #mv "$pkgdir"/usr/bin/otfinfo{,mpi}
+  # FS#28583
+  install -dm 755 "${pkgdir}/usr/lib/pkgconfig"
+  for i in ompi-c.pc ompi-cxx.pc ompi-f77.pc ompi-f90.pc ompi.pc; do
+    ln -sf "/usr/lib/openmpi/pkgconfig/${i}" "${pkgdir}/usr/lib/pkgconfig/"
+  done
 
-   # Remove dangling symlink and useless file
-   #rm "$pkgdir"/usr/share/vampirtrace/config.log
-
-   install -d -m 755 "${pkgdir}"/etc/ld.so.conf.d
-   echo "/usr/lib/${pkgname}" > "${pkgdir}"/etc/ld.so.conf.d/${pkgname}.conf
-
-   install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+  install -dm 755 "${pkgdir}/etc/ld.so.conf.d"
+  echo "/usr/lib/${pkgname}" > "${pkgdir}"/etc/ld.so.conf.d/${pkgname}.conf
+  install -Dm 644 LICENSE -t "${pkgdir}/usr/share/licenses/${pkgname}"
 }
