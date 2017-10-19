@@ -1,35 +1,43 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer almack
 
 pkgbase=glibmm
 pkgname=('glibmm' 'glibmm-docs')
-pkgver=2.42.0
+pkgver=2.54.1
 pkgrel=1
 arch=('x86_64')
 license=('LGPL')
-makedepends=('glib2' 'libsigc++' 'pkgconfig')
-source=(http://ftp.gnome.org/pub/GNOME/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz)
-url="http://gtkmm.sourceforge.net/"
-md5sums=('7c52cc42085d30ac3b73d74c3f2eb22e')
+depends=(glib2 libsigc++)
+makedepends=(git mm-common perl-xml-parser clang)
+_commit=1739f07e92763d1dd9092b96f244b6647dc19c91  # tags/2.54.1^0
+source=("git+https://git.gnome.org/browse/glibmm#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd $pkgbase
+  git describe --tags | sed 's/-/+/g'
+}
+
+prepare() {
+  cd $pkgbase
+  NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr
+  cd $pkgbase
+  ./configure --prefix=/usr --enable-maintainer-mode
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   make
 }
 
 package_glibmm() {
-  pkgdesc="Glib-- (glibmm) is a C++ interface for glib"
-  depends=('glib2' 'libsigc++')
-  cd "${srcdir}/${pkgbase}-${pkgver}"
+  cd $pkgbase
   sed -i -e 's/^doc_subdirs/#doc_subdirs/' Makefile
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="$pkgdir" install
 }
 
 package_glibmm-docs() {
-  pkgdesc="Developer documentation for glibmm"
-  cd "${srcdir}/${pkgbase}-${pkgver}/docs"
-  make DESTDIR="${pkgdir}" install
+  pkgdesc+=" (documentation)"
+  depends=()
+
+  cd $pkgbase
+  make -C docs DESTDIR="$pkgdir" install
 }

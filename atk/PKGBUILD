@@ -1,27 +1,39 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer abveritas@chakra-project.org
-
 pkgname=atk
-pkgver=2.15.4
+pkgver=2.26.0
 pkgrel=1
 pkgdesc="A library providing a set of interfaces for accessibility"
+url="https://git.gnome.org/browse/atk"
 arch=('x86_64')
 license=('LGPL')
 depends=('glib2')
-makedepends=('gobject-introspection')
-source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
-url='http://www.gtk.org/'
-md5sums=('430879fbffe433af118a2eb9c3bd69bf')
+makedepends=(gobject-introspection git gtk-doc meson)
+_commit=d2fbf661260626939cc3186c58177c1890c0e2e2  # tags/ATK_2_26_0^0
+source=("git+https://git.gnome.org/browse/atk#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed 's/^ATK_//;s/_/./g;s/-/+/g'
+}
+
+prepare() {
+  mkdir build
+  cd $pkgname
+}
+
+check() {
+  cd build
+  meson test
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr
-  make
+  cd build
+  meson setup --prefix=/usr --buildtype=release ../$pkgname \
+    -Denable_docs=true
+  ninja
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  cd build
+  DESTDIR="$pkgdir" ninja install
 }

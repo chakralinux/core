@@ -1,5 +1,5 @@
 pkgname=bash-completion
-pkgver=2.5
+pkgver=2.7
 pkgrel=1
 pkgdesc="Programmable completion for the bash shell"
 arch=('any')
@@ -9,7 +9,7 @@ depends=('bash')
 options=('!emptydirs' '!makeflags')
 #http://bash-completion.alioth.debian.org/files/${pkgname}-${pkgver}.tar.bz2
 source=("https://github.com/scop/bash-completion/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=('b0b9540c65532825eca030f1241731383f89b2b65e80f3492c5dd2f0438c95cf')
+sha256sums=('41ba892d3f427d4a686de32673f35401bc947a7801f684127120cdb13641441e')
 
 build() {
   cd ${pkgname}-${pkgver}
@@ -29,5 +29,5 @@ package() {
   rm "${pkgdir}/usr/share/bash-completion/completions/makepkg"
 
   # remove completions which overlap with util-linux
-  rm "${pkgdir}/usr/share/bash-completion/completions"/{u,}mount
+  rm "$pkgdir/usr/share/bash-completion/completions"/{{u,}mount,rfkill}
 }

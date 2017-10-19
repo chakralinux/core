@@ -1,33 +1,40 @@
 pkgbase=glib2
 pkgname=(glib2 glib2-docs)
-pkgver=2.51.0
+pkgver=2.54.1
 pkgrel=1
 pkgdesc="Common C routines used by GTK+ and other libs"
 url="http://www.gtk.org/"
 arch=(x86_64)
-makedepends=('pkg-config' 'python2' 'libxslt' 'docbook-xml' 'pcre' 'libffi' 'libelf')
-source=(https://ftp.gnome.org/pub/GNOME/sources/glib/${pkgver:0:4}/glib-$pkgver.tar.xz
-        revert-warn-glib-compile-schemas.patch)
-sha256sums=('f113b7330f4b4a43e3e401fe7849e751831060d574bd936a63e979887137a74a'
-            '049240975cd2f1c88fbe7deb28af14d4ec7d2640495f7ca8980d873bb710cc97')
-
-prepare() {
-  cd glib-$pkgver
-  patch -Rp1 -i ../revert-warn-glib-compile-schemas.patch
-}
+depends=(pcre libffi ) #libutil-linux
+makedepends=(gettext gtk-doc zlib shared-mime-info python3 libelf util-linux)
+options=(!emptydirs)
+source=("http://download.gnome.org/sources/glib/2.54/glib-${pkgver}.tar.xz"
+        0001-docs-Fix-building-with-meson.patch
+        0001-meson-Fix-permissions-of-installed-scripts.patch
+        libs.diff )
+sha256sums=('SKIP'
+            '8b289f3e1a5a3b29d310d45610468199acfe6f2b38a0d1be38c9224437a0e40c'
+            '12b1a2f4e304e4c03e48ae9564d73ae38619bbb7711a013138939ff8e5cc2327'
+            '54c43d5d4d4b5fa591eb639e63050ce5eac30aff6691fa9cf56631782b2aad33')
 
 build() {
-  cd glib-$pkgver
-  PYTHON=/usr/bin/python2 ./configure --prefix=/usr --libdir=/usr/lib \
-      --sysconfdir=/etc \
-      --with-pcre=system \
-      --disable-fam
-  make
+    cd glib-$pkgver
+
+    # Bug 1324770: Also explicitly remove PCRE sources since we use --with-pcre=system
+    rm glib/pcre/*.[ch]
+
+    PYTHON=/usr/bin/python3 ./configure --prefix=/usr --libdir=/usr/lib \
+        --sysconfdir=/etc \
+        --with-pcre=system \
+        --enable-systemtap \
+        --enable-static \
+        --enable-installed-tests
+    make
 }
 
 check() {
   cd glib-$pkgver
-  #make -k check || :
+  #meson test -t 2
 }
 
 package_glib2() {
@@ -40,6 +47,7 @@ package_glib2() {
   cd glib-$pkgver
   make completiondir=/usr/share/bash-completion/completions DESTDIR="$pkgdir" install
 
+  # bash-completion scripts need not be executable
   for _i in "$pkgdir/usr/share/bash-completion/completions/"*; do
       chmod -x "$_i"
   done
