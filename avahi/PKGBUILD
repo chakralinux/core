@@ -5,8 +5,8 @@
 # contributor: Martín González kote[at]chakra-project[dot]org>
 
 pkgname=avahi
-pkgver=0.6.31
-pkgrel=13
+pkgver=0.7
+pkgrel=1
 pkgdesc="A multicast/unicast DNS-SD framework"
 arch=('x86_64')
 url="http://www.avahi.org/"
@@ -14,31 +14,28 @@ license=('LGPL')
 depends=('dbus' 'libcap' 'libdaemon' 'gdbm' 'glib2' 'expat')
 optdepends=('qt: qt bindings'
 	    'nss-mdns: NSS support for mDNS'
-	    'python2-dbus: avahi-discover'
-            'python2-twisted: avahi-bookmarks')
-makedepends=('qt' 'python2-dbus' 'gobject-introspection' 'intltool')
+	    'python3-dbus: avahi-discover'
+            'python2-twisted: avahi-bookmarks'
+            'python3-gobject: avahi-discover')
+makedepends=('qt' 'python3-dbus' 'gobject-introspection' 'intltool' 'python3-gobject')
 backup=(etc/avahi/avahi-daemon.conf etc/avahi/services/{sftp-,}ssh.service)
 install=avahi.install
 source=("http://www.avahi.org/download/avahi-${pkgver}.tar.gz"
-        'gnome-nettool.png' 'avahi-daemon-dbus.patch')
-sha1sums=('7e05bd78572c9088b03b1207a0ad5aba38490684'
-          'cf56387c88aed246b9f435efc182ef44de4d52f3'
-          'd81f472ebb5b6635f5b2621933e7eae45878ca14')
+        'gnome-nettool.png')
+sha1sums=('8a062878968c0f8e083046429647ad33b122542f'
+          'cf56387c88aed246b9f435efc182ef44de4d52f3')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   sed '/^Libs:/s:$: -ldbus-1:' -i avahi-client.pc.in
   sed 's:netdev:network:g' -i avahi-daemon/avahi-dbus.conf
   sed 's:-DG[^ ]*_DISABLE_DEPRECATED=1::g' -i avahi-ui/Makefile.*
-
-  patch -p1 -i "${srcdir}/avahi-daemon-dbus.patch"
 }
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver}
+  export PYTHON=/usr/bin/python3
 
-  PYTHON=python2 \
-  PKG_CONFIG_PATH=/opt/qt/lib/pkgconfig \
     ./configure --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
@@ -59,8 +56,12 @@ build() {
     --with-autoipd-user=avahi \
     --with-autoipd-group=avahi \
     --with-systemdsystemunitdir=/usr/lib/systemd/system
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
 
-  make 
+  cp -a avahi-python/avahi avahi-python/avahi2
+
+  make
+  make -C avahi-python/avahi2 PYTHON=/usr/bin/python2
 }
 
 package() {
