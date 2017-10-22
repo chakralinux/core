@@ -6,7 +6,7 @@
 
 pkgbase=python-babel
 pkgname=(python3-babel python2-babel)
-pkgver=2.2.0
+pkgver=2.5.1
 pkgrel=1
 pkgdesc="A collection of tools for internationalizing Python applications"
 url="http://babel.pocoo.org/"
@@ -15,8 +15,17 @@ arch=('any')
 makedepends=('python3' 'python2'
             'python3-setuptools' 'python2-setuptools'
             'python3-pytz' 'python2-pytz')
-source=("$pkgbase-$pkgver.tar.gz::https://github.com/mitsuhiko/babel/archive/$pkgver.tar.gz")
-md5sums=('44ad7b474978a4976ce5a83e9e33aaa1')
+noextract=("core-28.zip")
+#source=("https://pypi.python.org/packages/source/B/Babel/Babel-$pkgver.tar.gz"
+source=("$pkgbase-$pkgver.tar.gz::https://github.com/python-babel/babel/archive/v$pkgver.tar.gz"
+	"core-29.zip::http://unicode.org/Public/cldr/29/core.zip")
+sha256sums=('78f5e290909a99fc77b7a8076c154189eb2b43761f4d10a4798e521920c2db60'
+            'b3308f8d3b4a80045ce4262b2784ac8d99775e80aaacafbf1277833f6b28ffda')
+
+prepare() {
+  cd "$srcdir"/babel-${pkgver}
+  mv "$srcdir"/core-29.zip cldr/
+}
 
 package_python3-babel() {
   depends=('python3' 'python3-pytz')
