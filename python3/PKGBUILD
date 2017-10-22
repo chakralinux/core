@@ -1,6 +1,6 @@
 pkgname=python3
-pkgver=3.6.3
-pkgrel=1
+pkgver=3.6.2
+pkgrel=2
 _pybasever=3.6
 pkgdesc="Next generation of the python high-level scripting language"
 arch=('x86_64')
@@ -16,12 +16,17 @@ optdepends=('python3-setuptools'
             'tk: for tkinter')
 options=('!makeflags')
 source=("http://www.python.org/ftp/python/${pkgver%rc*}/Python-${pkgver}.tar.xz"
-        dont-make-libpython-readonly.patch)
-sha1sums=('6c71b14bdbc4d8aa0cfd59d4b6dc356d46abfdf5'
-          'c22b24324b8e53326702de439c401d97927ee3f2')
+        dont-make-libpython-readonly.patch
+        openssl-110f.patch)
+sha1sums=('4f92a045de9231b93dfbed50c66bb12cf03ac59a'
+          'c22b24324b8e53326702de439c401d97927ee3f2'
+          'fb888fc23761976616da0b735c702c23f8707771')
 
 prepare() {
   cd Python-${pkgver}
+
+  # https://bugs.python.org/issue30714
+  patch -p1 -i ../openssl-110f.patch
 
   # FS#45809
   patch -p1 -i ../dont-make-libpython-readonly.patch
@@ -76,8 +81,13 @@ check() {
     "${srcdir}/Python-${pkgver}/python" -m test.regrtest -v -uall || warning "Expected failure"
 }
 
+
 package() {
   cd Python-${pkgver}
+  
+  # Hack to avoid building again
+  sed -i 's/^all:.*$/all: build_all/' Makefile
+  
   make DESTDIR="${pkgdir}" EXTRA_CFLAGS="$CFLAGS" install maninstall
 
   # Fix conflicts with python2 
