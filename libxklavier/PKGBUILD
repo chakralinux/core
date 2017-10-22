@@ -9,17 +9,16 @@ pkgdesc="High-level API for X Keyboard Extension"
 arch=('x86_64')
 license=('LGPL')
 depends=('libxkbfile' 'libxml2' 'glib2' 'xkeyboard-config' 'libxi' 'iso-codes')
-makedepends=('pkg-config')
+makedepends=('gobject-introspection' 'intltool' 'gtk-doc' 'libxfixes')
 options=('!emptydirs')
 url="http://gswitchit.sourceforge.net"
 source=("http://cgit.freedesktop.org/$pkgname/snapshot/$pkgname-$pkgver.zip")
 
-md5sums=('65138db064bfe192e415362f0fa882bb')
+md5sums=('2817e89676f25a836fe63ffdae69fca8')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  autoreconf --force --install --verbose
-  ./configure --prefix=/usr \
+  ./autogen.sh --prefix=/usr --with-xkb-bin-base=/usr/bin \
       --with-xkb-base=/usr/share/X11/xkb --disable-static --disable-gtk-doc
 
   make

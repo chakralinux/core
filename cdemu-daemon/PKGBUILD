@@ -13,9 +13,9 @@ optdepends=('alsa-lib: to enable the ALSA audio driver'
             'pulseaudio: to enable the PA audio driver')
 install=$pkgname.install
 source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2"
-        'system-arch.patch')
+        '0001-Patch-system-daemon-for-Arch-friendliness.patch')
 md5sums=('079f276eae7f28968af0b1ba382e1b5b'
-         'fd50ba1c66c95337044db494fba887c4')
+         '46062934311707ba2765a732006367f9')
 
 prepare() {
   mkdir build
@@ -23,7 +23,7 @@ prepare() {
 
   # Patch system daemon for Arch-friendlyness
   # It's disabled by default. Should we even ship it?
-  patch -Np1 -i ../system-arch.patch
+  patch -Np2 -i ../0001-Patch-system-daemon-for-Arch-friendliness.patch
 }
 
 build() {

@@ -1,0 +1,31 @@
+# $Id$
+# Maintainer: Sergej Pupykin <pupykin.s+arch@gmail.com>
+# Maintainer: Sven-Hendrik Haase <sh@lutzhaase.com>
+# Contributor: Gregory Haynes <greg@greghaynes.net>
+
+pkgname=libinfinity
+pkgver=0.6.8
+pkgrel=1
+pkgdesc="An implementation of the Infininote protocol written in GObject-based C"
+arch=('x86_64')
+url="http://gobby.github.io/"
+license=('GPL')
+depends=('gnutls' 'libgsasl' 'glib2' 'libxml2')
+makedepends=('gtk-doc' 'pkgconfig' 'gtk2')
+optdepends=('avahi: zeroconf support'
+            'gtk2: gtk support')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/gobby/libinfinity/archive/${pkgver}.tar.gz")
+sha256sums=('aa058ee50dd62f9a6732a0e78ed2cef7df2c8174638ed398e040af9b7e988e81')
+
+build() {
+  cd "$srcdir"/${pkgname}-${pkgver}
+  [ -x configure ] || ./autogen.sh
+  ./configure --prefix=/usr --localstatedir=/var
+  make
+}
+
+package() {
+  cd "$srcdir"/${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  rm -rf "$pkgdir"/var
+}

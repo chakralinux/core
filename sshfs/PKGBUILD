@@ -1,23 +1,42 @@
 pkgname=sshfs
-pkgver=2.9
+pkgver=3.3.0
 pkgrel=1
 pkgdesc="FUSE client based on the SSH File Transfer Protocol"
 arch=('x86_64')
 url="http://github.com/libfuse/sshfs"
 license=('GPL')
-depends=('fuse' 'glib2' 'openssh')
-source=(https://github.com/libfuse/sshfs/releases/download/sshfs-$pkgver/sshfs-$pkgver.tar.gz)
-sha256sums=('46d1e1287ce97255fcb50010355184d8c5585329f73ab1e755217419a8e6e5de')
+depends=(fuse3 glib2 openssh)
+makedepends=('meson' 'python3-docutils')
+source=(https://github.com/libfuse/sshfs/releases/download/$pkgname-$pkgver/$pkgname-$pkgver.tar.xz{,.asc}
+        001-sshfs-3.3.0-meson.build.patch
+        002-sshfs-3.3.0-sshfs.c.patch)
+sha256sums=('9ddfcc2564fafe002706b093b6295afbcb2cc0a3bc52bc805cc5361cb69ca51d'
+            'SKIP'
+            'da928d31291ad86582ab616ea91619c345513dec00f6aafb5bac8f2929159e6b'
+            '2655139190ee5d2d295afc89a4ae028e78b881ecad9e03fcf9cd1869b2e4e439')
+validpgpkeys=('ED31791B2C5C1613AF388B8AD113FCAC3C4E599F') # Nikolaus Rath <Nikolaus@rath.org>
+
+prepare() {
+  cd $pkgname-$pkgver
+
+  # patch meson.build
+  patch -p1 < ../001-sshfs-3.3.0-meson.build.patch
+  # patch sshfs.c
+  patch -p1 < ../002-sshfs-3.3.0-sshfs.c.patch
+  
+  rm -rf build
+  mkdir build
+  cd build
+  chakra-meson ..
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-
-  ./configure --prefix=/usr
-  make
+  cd $pkgname-$pkgver/build
+  ninja
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd $pkgname-$pkgver/build
 
-  make DESTDIR="${pkgdir}" install
+  DESTDIR="$pkgdir" ninja install
 }
