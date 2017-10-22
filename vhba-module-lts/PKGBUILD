@@ -4,7 +4,7 @@ source ../linux-lts.conf
 
 pkgname=vhba-module-lts
 _pkgname=vhba-module
-pkgver=20161009
+pkgver=20170610
 pkgrel=1
 pkgdesc="Kernel module that emulates SCSI devices"
 arch=('x86_64')
@@ -15,7 +15,7 @@ makedepends=("linux-lts-headers=${_kernelver}")
 install=vhba-module.install
 source=("http://sourceforge.net/projects/cdemu/files/vhba-module/vhba-module-$pkgver.tar.bz2"
         '60-vhba.rules')
-md5sums=('9a9dc156e4cb73d0ca5892eeba801026'
+md5sums=('f9478a5f5528fc672c204b6b4bd02213'
          '4dc37dc348b5a2c83585829bde790dcc')
 
 prepare() {
@@ -25,7 +25,7 @@ prepare() {
 build() {
   cd "$_pkgname-$pkgver"
 
-  make KDIR=/usr/lib/modules/$_kver/build
+  make KDIR=$_rootOfSourceTree KERNELRELEASE=$_kver
 }
 
 package() {

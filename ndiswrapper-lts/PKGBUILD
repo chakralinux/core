@@ -6,7 +6,7 @@ source ../linux-lts.conf
 pkgname=ndiswrapper-lts
 _pkgname=ndiswrapper
 pkgver=1.61
-pkgrel=1
+pkgrel=2
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-lts."
 license=('GPL')
 arch=('x86_64')
@@ -18,9 +18,6 @@ source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$p
 sha1sums=('213854ca8a83f9b5972db8fa873d346124e4bcb5')
 
 prepare() {
-  [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
-  msg "Found kernel version: $_kver"
-
   cd "$srcdir/$_pkgname-$pkgver" 
   #patch -p1 -i ../ndiswrapper-1.59.patch
   sed -i "/modinfo/s/s/usr\//" driver/Makefile

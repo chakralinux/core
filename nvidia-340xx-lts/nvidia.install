@@ -1,12 +1,12 @@
 post_install() {
-    EXTRAMODULES='extramodules-3.14-CHAKRA-LTS'
+    EXTRAMODULES='extramodules-4.4-CHAKRA-LTS'
     depmod $(cat /lib/modules/$EXTRAMODULES/version)
     echo 'In order to use nvidia module, reboot the system.'
     echo "blacklist nouveau" > "/etc/modprobe.d/nouveau_blacklist.conf"
 }
 
 post_upgrade() {
-    EXTRAMODULES='extramodules-3.14-CHAKRA-LTS'
+    EXTRAMODULES='extramodules-4.4-CHAKRA-LTS'
     depmod $(cat /lib/modules/$EXTRAMODULES/version)
     echo "blacklist nouveau" > "/etc/modprobe.d/nouveau_blacklist.conf"
     echo -e '\e[31;46m WARNING'
@@ -16,7 +16,7 @@ post_upgrade() {
 }
 
 post_remove() {
-    EXTRAMODULES='extramodules-3.14-CHAKRA-LTS'
+    EXTRAMODULES='extramodules-4.4-CHAKRA-LTS'
     depmod $(cat /lib/modules/$EXTRAMODULES/version)
     rm "/etc/modprobe.d/nouveau_blacklist.conf"
 }
