@@ -5,15 +5,15 @@
 
 pkgbase=python-zope-interface
 pkgname=('python3-zope-interface' 'python2-zope-interface')
-pkgver=4.1.1
-pkgrel=2
+pkgver=4.4.3
+pkgrel=1
 pkgdesc="Separate distribution of the zope.interface package used in Zope 3"
 license=('ZPL')
 arch=('x86_64')
 url="http://pypi.python.org/pypi/zope.interface"
 makedepends=('python3-setuptools' 'python2-setuptools')
-source=("http://pypi.python.org/packages/source/z/zope.interface/zope.interface-${pkgver}.tar.gz")
-md5sums=('edcd5f719c5eb2e18894c4d06e29b6c6')
+source=("https://pypi.io/packages/source/z/zope.interface/zope.interface-$pkgver.tar.gz")
+md5sums=('8700a4f527c1203b34b10c2b4e7a6912')
 
 prepare() {
   cp -a zope.interface-${pkgver}{,-python2}
@@ -44,7 +44,6 @@ package_python3-zope-interface() {
  
   cd "${srcdir}/zope.interface-${pkgver}"
   python3 setup.py install --prefix=/usr --root="${pkgdir}" --optimize=1
-  cp src/zope/__init__.py "${pkgdir}/usr/lib/python3.5/site-packages/zope/"
 }
 
 package_python2-zope-interface(){
@@ -55,5 +54,4 @@ package_python2-zope-interface(){
 
   cd "${srcdir}/zope.interface-${pkgver}-python2"
   python2 setup.py install --prefix=/usr --root="${pkgdir}" --optimize=1
-  cp src/zope/__init__.py "${pkgdir}/usr/lib/python2.7/site-packages/zope/"
 }

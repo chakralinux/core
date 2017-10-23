@@ -7,15 +7,15 @@
  
 pkgbase=boost
 pkgname=('boost-libs' 'boost')
-pkgver=1.63.0
+pkgver=1.65.0
 _boostver=${pkgver//./_}
-pkgrel=2
+pkgrel=1
 url='http://www.boost.org/'
 arch=('x86_64')
 license=('custom')
 makedepends=('icu' 'python' 'python2' 'bzip2' 'zlib' 'openmpi')
 source=(https://downloads.sourceforge.net/project/${pkgbase}/${pkgbase}/${pkgver}/${pkgbase}_${_boostver}.tar.bz2)
-sha256sums=('beae2529f759f6b3bf3f4969a19c2e9d6f0c503edcb2de4a61d1428519fcb3b0')
+sha256sums=('ea26712742e2fb079c2a566a31f3266973b76e38222b9f88b387e3c8b2f9902c')
 
 build() {
    export _stagedir="${srcdir}/stagedir"
@@ -32,7 +32,7 @@ build() {
    echo "using mpi ;" >> project-config.jam
    # Add an extra python version. This does not replace anything and python 2.x
    # need to be the default.
-   echo "using python : 3.5 : /usr/bin/python3 : /usr/include/python3.5m : /usr/lib ;" \
+   echo "using python : 3.6 : /usr/bin/python3 : /usr/include/python3.6m : /usr/lib ;" \
       >> project-config.jam
 
    # boostbook is needed by quickbook
@@ -78,7 +78,7 @@ build() {
       runtime-link=shared \
       link=shared,static \
       toolset=gcc \
-      python=3.5 \
+      python=3.6 \
       cflags="${CPPFLAGS} ${CFLAGS} -fPIC -O3" \
       cxxflags="${CPPFLAGS} ${CXXFLAGS} -std=c++14 -fPIC -O3" \
       linkflags="${LDFLAGS}" \
