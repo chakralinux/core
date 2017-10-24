@@ -1,11 +1,6 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
 pkgname=pkg-config
-pkgver=0.28
-pkgrel=2
+pkgver=0.29.2
+pkgrel=1
 pkgdesc="A system for managing library compile/link flags"
 arch=('x86_64')
 url="http://pkgconfig.freedesktop.org/wiki/"
@@ -15,8 +10,10 @@ depends=('glibc' 'popt' 'glib2')
 provides=("pkgconfig=${pkgver}")
 conflicts=('pkgconfig')
 replaces=('pkgconfig')
-source=(http://pkg-config.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz)
-md5sums=('aa3c86e67551adc3ac865160e34a2a0d')
+source=(https://pkgconfig.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz{,.asc})
+md5sums=('f6e931e319531b736fadc017f470e68a'
+         'SKIP')
+validpgpkeys=('6B99CE97F17F48C27F722D71023A4420C7EC6914')  # Dan Nicholson
 
 # In case of new pcre major version use --with-internal-glib
 # then build glib2 and then again pkg-config without the option above
