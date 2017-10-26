@@ -1,8 +1,8 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-core
 
 pkgname=texlive-core
-pkgver=2016.41471
-_revnr=${pkgver#2016.}
+pkgver=2017.44918
+_revnr=${pkgver#2017.}
 pkgrel=1
 pkgdesc="TeX Live core distribution"
 license=('GPL')
@@ -26,6 +26,7 @@ replaces=('tetex' 'texlive-latex3')
 url='http://tug.org/texlive/'
 source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
         "$pkgname.maps"
+        "$pkgname.fmts"
         "texmf.cnf"
         "texmfcnf.lua"
         "09-texlive-fonts.conf")
@@ -41,8 +42,9 @@ backup=(etc/texmf/web2c/texmf.cnf \
         etc/texmf/web2c/fmtutil.cnf \
         etc/texmf/web2c/mktex.cnf \
         etc/texmf/xdvi/XDvi)
-md5sums=('7e73ca95a2c2da5cb59af6fbb2aa40fe'
+md5sums=('feee8bb3f8ea6c55941c5dcd9b423ac2'
          '54a34f8ddbeccec2427e4d5763349f9b'
+         'd38aaf62ad1e4d09113c44cd68d82fed'
          'df537245012f3e5f05bdc55644b7a3df'
          '16ad4dc53deb00029baef1b01ba1d984'
          '393a4bf67adc7ca5df2b386759d1a637')
@@ -61,6 +63,7 @@ package() {
    sed -i '/^#/d' CONTENTS
    install -m644 -D CONTENTS $pkgdir/var/lib/texmf/chakra/installedpkgs/${pkgname}_${_revnr}.pkgs
    install -m644 $pkgname.maps $pkgdir/var/lib/texmf/chakra/installedpkgs/
+   install -m644 $pkgname.fmts $pkgdir/var/lib/texmf/chakra/installedpkgs/
    install -m755 -d $pkgdir/usr/share
    wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
    for dir in $wanteddirs; do
@@ -113,10 +116,6 @@ package() {
           "$pkgdir"/etc/texmf/xdvi/
    # remove TL specific warnings in the language.{dat,def} files:
    sed -i -e '/DO NOT EDIT/,+3 d' "$pkgdir"/etc/texmf/tex/generic/config/language.*
-   # clean updmap.cfg
-   sed -i '/^\(Map\|MixedMap\)/d' "$pkgdir"/etc/texmf/web2c/updmap.cfg
-   sed -i '/^#! \(Map\|MixedMap\)/d' "$pkgdir"/etc/texmf/web2c/updmap.cfg
-
 
    # replace upstream texmf.cnf with ours
    rm -f "$pkgdir"/usr/share/texmf-dist/web2c/texmf.cnf
@@ -126,8 +125,6 @@ package() {
    ln -sf /etc/texmf/web2c/texmf.cnf "$pkgdir"/usr/share/texmf-dist/web2c/texmf.cnf
    # replace upstream texmfcnf.lua with ours
    install -m644 "$srcdir"/texmfcnf.lua "$pkgdir"/usr/share/texmf-dist/web2c/texmfcnf.lua
-   ## remove aleph from fmtutil.cnf
-   sed -i -e '/aleph/d' "$pkgdir"/usr/share/texmf-dist/web2c/fmtutil.cnf
 
    # create symlinks for formats 
    echo "--> Create symlinks for TeX formats ..."
@@ -187,6 +184,7 @@ de-macro/de-macro
 dosepsbin/dosepsbin.pl
 dtxgen/dtxgen
 dviasm/dviasm.py
+dviinfox/dviinfox.pl
 epstopdf/epstopdf.pl
 findhyph/findhyph
 fontools/afm2afm
@@ -195,7 +193,9 @@ fontools/ot2kpx
 fragmaster/fragmaster.pl
 installfont/installfont-tl
 latex-git-log/latex-git-log
+latex-papersize/latex-papersize.py
 latex2man/latex2man
+latex2nemeth/latex2nemeth
 latexdiff/latexdiff-vc.pl
 latexdiff/latexdiff.pl
 latexdiff/latexrevise.pl
@@ -207,13 +207,14 @@ ltxfileinfo/ltxfileinfo
 ltximg/ltximg.pl
 lua2dox/lua2dox_filter
 luaotfload/luaotfload-tool.lua
+lwarp/lwarpmk.lua
 make4ht/make4ht
 match_parens/match_parens
 mf2pt1/mf2pt1.pl
 mkjobtexmf/mkjobtexmf.pl
 oberdiek/pdfatfi.pl
 pdfbook2/pdfbook2
-pdfcrop/pdfcr
+pdfcrop/pdfcrop.pl
 pdfjam/pdf180
 pdfjam/pdf270
 pdfjam/pdf90
@@ -226,6 +227,7 @@ pdfjam/pdfjam-slides6up
 pdfjam/pdfjoin
 pdfjam/pdfnup
 pdfjam/pdfpun
+pdflatexpicscale/pdflatexpicscale.pl
 pdfxup/pdfxup
 pfarrei/a5toa4.tlu
 pfarrei/pfarrei.tlu
@@ -240,6 +242,16 @@ srcredact/srcredact.pl
 sty2dtx/sty2dtx.pl
 texcount/texcount.pl
 tex4ebook/tex4ebook
+tex4ht/ht.sh
+tex4ht/htcontext.sh
+tex4ht/htlatex.sh
+tex4ht/htmex.sh
+tex4ht/httex.sh
+tex4ht/httexi.sh
+tex4ht/htxelatex.sh
+tex4ht/htxetex.sh
+tex4ht/mk4ht.pl
+tex4ht/xhlatex.sh
 texdef/texdef.pl
 texdiff/texdiff
 texdirflatten/texdirflatten
@@ -252,6 +264,7 @@ texlive/dvi2fax.sh
 texlive/dvired.sh
 texlive/e2pall.pl
 texlive/fmtutil-sys.sh
+texlive/fmtutil-user.sh
 texlive/fmtutil.pl
 texlive/fontinst.sh
 texlive/kpsetool.sh
@@ -264,6 +277,7 @@ texlive/texconfig-sys.sh
 texlive/texconfig.sh
 texlive/texlinks.sh
 texlive/updmap-sys.sh
+texlive/updmap-user.sh
 texlive/updmap.pl
 texliveonfly/texliveonfly.py
 texloganalyser/texloganalyser

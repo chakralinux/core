@@ -1,9 +1,9 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-bin
 
 pkgname=('texlive-bin' 'libsynctex')
-pkgver=2016.41290
-pkgrel=8
-_biber_ver=2.5 # for biblatex 3.4 only.
+pkgver=2017.44590
+pkgrel=2
+_biber_ver=2.6 # for biblatex 3.5 only.
 license=('GPL')
 arch=('x86_64')
 makedepends=('cairo' 'pixman' 'graphite' 't1lib' 'gd' 'poppler'
@@ -12,27 +12,44 @@ makedepends=('cairo' 'pixman' 'graphite' 't1lib' 'gd' 'poppler'
              'perl' 'clisp' 'ffcall')
 url='http://tug.org/texlive/'
 source=("http://mirrors.kernel.org/archlinux/other/texlive/texlive-bin-source-${pkgver}.tar.xz"
-        "http://downloads.sourceforge.net/project/biblatex-biber/biblatex-biber/${_biber_ver}/binaries/Linux/biber-linux_x86_64.tar.gz")
+        "http://downloads.sourceforge.net/project/biblatex-biber/biblatex-biber/${_biber_ver}/binaries/Linux/biber-linux_x86_64.tar.gz"
+        "luatex-gcc7.patch"
+        "texlive-poppler-0.59.patch")
 noextract=(biber-linux_x86_64.tar.gz)
-md5sums=('7303361f2d441eb5c962a996fd77e8fa'
-         '688235040e2cab1020b7e75a03845a1c')
+md5sums=('aef593aa0021ececdaeb0845e85ec70b'
+         '25709fa4b66c57ec2dfe9e382f23d72c'
+         'd5d1671308eba33b4f23b697834485c6'
+         '382d5c6a3261d35055bd65974ebbd5f5')
+
+prepare() {
+    tar xf biber-linux_x86_64.tar.gz
+    
+    cd "$srcdir/source"
+    
+    # t4ht expects to be un /usr/share/texmf/bin/t4ht (FS#27251)
+    sed -i s/SELFAUTOPARENT/TEXMFROOT/ texk/tex4htk/t4ht.c
+
+    ## prevent compiling Xdvi with libXp
+    sed -i~ 's|-lXp ||' texk/xdvik/configure
+
+    # Luatex crashes when compiled with GCC7.1
+    patch -Np0 -i "${srcdir}/luatex-gcc7.patch"
+
+    # Poppler 0.58 introduces API changes by hiding internal object
+    # management.
+    patch -Np1 -i "${srcdir}/texlive-poppler-0.59.patch"
+}
+
 
 build() {
-  export CFLAGS="${CFLAGS} -fPIC"
-  export CXXFLAGS="${CXXFLAGS} -fPIC"
-  tar xf biber-linux_x86_64.tar.gz
-
-  # t4ht expects to be un /usr/share/texmf/bin/t4ht
-  # t4ht expects to be un /usr/share/texmf/bin/t4ht (FS#27251)
-  sed -i s/SELFAUTOPARENT/TEXMFROOT/ source/texk/tex4htk/t4ht.c
-  #############################################################
-  ### configure
-  cd source
-  ## prevent compiling Xdvi with libXp
-  sed -i~ 's|-lXp ||' texk/xdvik/configure
-  test ! -d Work && mkdir Work
-  cd Work
-  echo "--> Initial configuration..."
+   cd "$srcdir"
+   
+   #############################################################
+   ### configure
+   cd source
+   mkdir -p Work
+   cd Work
+   echo "--> Initial configuration..."
   # we use temporary prefix to avoid messing the existing
   # $pkgdir/usr/share/texmf tree
   # system zlib is disabled due to issues with zlib 1.2.6 (FS#28221)
@@ -91,9 +108,8 @@ package_libsynctex() {
 
   install -d "$pkgdir"/usr/lib
 
-  for lib in "$srcdir"/source/Work/texk/web2c/.libs/libsynctex.so*; do
-    cp -P $lib "$pkgdir"/usr/lib/
-  done
+    cd "${srcdir}/source/Work"
+    make -C texk/web2c DESTDIR="${pkgdir}" install-data-am install-libLTLIBRARIES
 }
 
 package_texlive-bin() {
@@ -109,67 +125,65 @@ package_texlive-bin() {
   options=('!strip')
 
   #############################################################
-  ### install
-  cd source
-  # fixes for xindy
-  find utils/xindy -name Makefile \
-    -exec sed -i -e "s|^prefix =.\+$|prefix = $pkgdir/usr|" \
-                 -e "s|^mandir =.\+$|mandir = \${prefix}/share/man|" \
-                 -e "s|^datadir =.\+$|datadir = \${datarootdir}/texmf|" \
-                 -e "s|^docdir =.\+$|docdir = \${datadir}/doc/xindy|" '{}' \;
+   ### install
+   cd source
+   # fixes for xindy
+   find utils/xindy -name Makefile -exec sed -i -e "s|^prefix =.\+$|prefix = $pkgdir/usr|" -e "s|^mandir =.\+$|mandir = \${prefix}/share/man|" -e "s|^datadir =.\+$|datadir = \${datarootdir}/texmf|" -e "s|^docdir =.\+$|docdir = \${datadir}/doc/xindy|" '{}' \;
 
-  echo "-------------------------------------------------------"
-  echo "--> Proceeding with make install ..."
-  echo "-------------------------------------------------------"
-  cd Work
-  make DESTDIR="${pkgdir}" texmf="$pkgdir"/usr/share/texmf install
-  rm -rf "${pkgdir}"/usr/{texmf,share/texmf-dist}
+   ## install biber
+   install -m755 "${srcdir}"/biber "${pkgdir}/usr/bin/biber"
+  
+   echo "-------------------------------------------------------"
+   echo "--> Proceeding with make install ..."
+   echo "-------------------------------------------------------"
+   cd Work
+   make DESTDIR="${pkgdir}" texmf="$pkgdir"/usr/share/texmf install
+   rm -rf "${pkgdir}"/usr/{texmf,share/texmf-dist}
 
-  ## install biber
-  install -m755 "${srcdir}"/biber "${pkgdir}/usr/bin/biber"
+   ## symlink engines by hand. texlinks has moved to texlive-core...
+   mkdir -p ${pkgdir}/usr/bin
+   ln -s eptex ${pkgdir}/usr/bin/platex
+   ln -s euptex ${pkgdir}/usr/bin/uplatex
+   ln -s luatex ${pkgdir}/usr/bin/dvilualatex
+   ln -s luatex ${pkgdir}/usr/bin/dviluatex
+   ln -s luatex ${pkgdir}/usr/bin/lualatex
+   ln -s pdftex ${pkgdir}/usr/bin/amstex
+   ln -s pdftex ${pkgdir}/usr/bin/cslatex
+   ln -s pdftex ${pkgdir}/usr/bin/csplain
+   ln -s pdftex ${pkgdir}/usr/bin/eplain
+   ln -s pdftex ${pkgdir}/usr/bin/etex
+   ln -s pdftex ${pkgdir}/usr/bin/jadetex
+   ln -s pdftex ${pkgdir}/usr/bin/latex
+   ln -s tex ${pkgdir}/usr/bin/lollipop
+   ln -s pdftex ${pkgdir}/usr/bin/mex
+   ln -s pdftex ${pkgdir}/usr/bin/mllatex
+   ln -s pdftex ${pkgdir}/usr/bin/mltex
+   ln -s pdftex ${pkgdir}/usr/bin/pdfetex
+   ln -s pdftex ${pkgdir}/usr/bin/pdfcslatex
+   ln -s pdftex ${pkgdir}/usr/bin/pdfcsplain
+   ln -s pdftex ${pkgdir}/usr/bin/pdfjadetex
+   ln -s pdftex ${pkgdir}/usr/bin/pdflatex
+   ln -s pdftex ${pkgdir}/usr/bin/pdfmex
+   ln -s pdftex ${pkgdir}/usr/bin/pdfxmltex
+   ln -s pdftex ${pkgdir}/usr/bin/texsis
+   ln -s pdftex ${pkgdir}/usr/bin/utf8mex
+   ln -s pdftex ${pkgdir}/usr/bin/xmltex
+   ln -s xetex ${pkgdir}/usr/bin/xelatex
 
-  ## symlink engines by hand. texlinks has moved to texlive-core...
-  mkdir -p ${pkgdir}/usr/bin
-  ln -s eptex ${pkgdir}/usr/bin/platex
-  ln -s euptex ${pkgdir}/usr/bin/uplatex
-  ln -s luatex ${pkgdir}/usr/bin/dvilualatex
-  ln -s luatex ${pkgdir}/usr/bin/dviluatex
-  ln -s luatex ${pkgdir}/usr/bin/lualatex
-  ln -s pdftex ${pkgdir}/usr/bin/amstex
-  ln -s pdftex ${pkgdir}/usr/bin/cslatex
-  ln -s pdftex ${pkgdir}/usr/bin/csplain
-  ln -s pdftex ${pkgdir}/usr/bin/eplain
-  ln -s pdftex ${pkgdir}/usr/bin/etex
-  ln -s pdftex ${pkgdir}/usr/bin/jadetex
-  ln -s pdftex ${pkgdir}/usr/bin/latex
-  ln -s tex ${pkgdir}/usr/bin/lollipop
-  ln -s pdftex ${pkgdir}/usr/bin/mex
-  ln -s pdftex ${pkgdir}/usr/bin/mllatex
-  ln -s pdftex ${pkgdir}/usr/bin/mltex
-  ln -s pdftex ${pkgdir}/usr/bin/pdfetex
-  ln -s pdftex ${pkgdir}/usr/bin/pdfcslatex
-  ln -s pdftex ${pkgdir}/usr/bin/pdfcsplain
-  ln -s pdftex ${pkgdir}/usr/bin/pdfjadetex
-  ln -s pdftex ${pkgdir}/usr/bin/pdflatex
-  ln -s pdftex ${pkgdir}/usr/bin/pdfmex
-  ln -s pdftex ${pkgdir}/usr/bin/pdfxmltex
-  ln -s pdftex ${pkgdir}/usr/bin/texsis
-  ln -s pdftex ${pkgdir}/usr/bin/utf8mex
-  ln -s pdftex ${pkgdir}/usr/bin/xmltex
-  ln -s xetex ${pkgdir}/usr/bin/xelatex
-
-  #############################################################
-  # remove dangling symlinks
-  _bibtexextra_scripts="
-bibexport
+   #############################################################
+   # remove dangling symlinks
+   _bibtexextra_scripts="
+bbl2bib
 bibdoiadd
+bibexport
+bibmradd
 bibzbladd
 listbib
 ltx2crossrefxml
 multibibliography
 urlbst
 "
-  _core_scripts="
+   _core_scripts="
 a2ping
 a5toa4
 adhocfilelist
@@ -202,15 +216,26 @@ epstopdf
 findhyph
 fmtutil
 fmtutil-sys
+fmtutil-user
 fontinst
 fragmaster
+ht
+htcontext
+htlatex
+htmex
+httex
+httexi
+htxelatex
+htxetex
 installfont-tl
 kpsepath
 kpsetool
 kpsewhere
 kpsexpand
 latex-git-log
+latex-papersize
 latex2man
+latex2nemeth
 latexdiff
 latexdiff-vc
 latexfileversion
@@ -224,9 +249,11 @@ ltximg
 lua2dox_filter
 luaotfload-tool
 luatools
+lwarpmk
 make4ht
 match_parens
 mf2pt1
+mk4ht
 mkjobtexmf
 mkt1font
 mktexfmt
@@ -247,6 +274,7 @@ pdfjam-pocketmod
 pdfjam-slides3up
 pdfjam-slides6up
 pdfjoin
+pdflatexpicscale
 pdfnup
 pdfpun
 pdfxup
@@ -281,27 +309,32 @@ texlinks
 texliveonfly
 texloganalyser
 texmfstart
+texosquery
+texosquery-jre5
+texosquery-jre8
 thumbpdf
 typeoutfileinfo
 updmap
 updmap-sys
+updmap-user
 vpl2ovp
 vpl2vpl
+xhlatex
 xindy
 "
-  _games_scripts="rubikrotation"
-  _htmlxml_scripts="ht htcontext htlatex htmex httex httexi htxelatex htxetex mk4ht"
+   _games_scripts="rubikrotation"
    _humanities_scripts="diadia"
-  _langcyrillic_scripts="rubibtex rumakeindex"
-  _langextra_scripts="ebong"
-  _langgreek_scripts="mkgrkindex"
-  _langjapanese_scripts="convbkmk ptex2pdf
+   _langcyrillic_scripts="rubibtex rumakeindex"
+   _langextra_scripts="ebong"
+   _langgreek_scripts="mkgrkindex"
+   _langjapanese_scripts="convbkmk ptex2pdf
 kanji-fontmap-creator
 kanji-config-updmap
 kanji-config-updmap-sys
+kanji-config-updmap-user
 "
-  _langkorean_scripts="jamo-normalize komkindex ttf2kotexfont"
-  _latexextra_scripts="
+   _langkorean_scripts="jamo-normalize komkindex ttf2kotexfont"
+   _latexextra_scripts="
 authorindex
 exceltex
 makedtx
@@ -314,8 +347,8 @@ splitindex
 svn-multi
 vpe
 yplan"
-  _music_scripts="lily-glyph-commands lily-image-commands lily-rebuild-pdfs
-m-tx musixtex musixflx pmx2pdf pmxchords"
+   _music_scripts="lily-glyph-commands lily-image-commands lily-rebuild-pdfs
+m-tx musixtex musixflx pmxchords"
    _pictures_scripts="
 cachepic
 epspdf
@@ -325,29 +358,32 @@ getmapdl
 mathspic
 mkpic
 pn2pdf"
-  _pstricks_scripts="pedigree pst2pdf"
-  _science_scripts="pygmentex ulqda"
-  for s in \
-    ${_bibtexextra_scripts} \
-      ${_core_scripts}       \
-      ${_games_scripts}      \
-      ${_htmlxml_scripts}    \
+   _pstricks_scripts="pedigree pst2pdf"
+   _science_scripts="pygmentex ulqda"
+   for s in \
+        ${_bibtexextra_scripts} \
+        ${_core_scripts}        \
+        ${_games_scripts}       \
+        ${_htmlxml_scripts}     \
         ${_humanities_scripts}   \
-      ${_langcyrillic_scripts} \
-      ${_langextra_scripts}  \
-      ${_langgreek_scripts}  \
-      ${_langjapanese_scripts} \
-      ${_langkorean_scripts} \
-      ${_latexextra_scripts} \
-      ${_music_scripts}      \
-      ${_pictures_scripts}   \
-      ${_pstricks_scripts}   \
-      ${_science_scripts}    \
-      tlmgr; do
-      ! readlink -e "$pkgdir"/usr/bin/$s && rm "$pkgdir"/usr/bin/$s
-  done
-  ###################################################################
+        ${_langcyrillic_scripts} \
+        ${_langextra_scripts}    \
+        ${_langgreek_scripts}    \
+        ${_langjapanese_scripts} \
+        ${_langkorean_scripts} \
+        ${_latexextra_scripts} \
+        ${_music_scripts}      \
+        ${_pictures_scripts}   \
+        ${_pstricks_scripts}   \
+        ${_science_scripts}    \
+        tlmgr; do
+       ! readlink -e "$pkgdir"/usr/bin/$s && rm "$pkgdir"/usr/bin/$s
+   done
+   ###################################################################
 
    # remove libsynctex
-  rm -f "$pkgdir"/usr/lib/libsynctex.*
+   rm -f "$pkgdir"/usr/include/synctex/*
+   rm -f "$pkgdir"/usr/lib/libsynctex.*
+   rm -f "$pkgdir"/usr/lib/pkgconfig/synctex.pc
+   rm -f "$pkgdir"/usr/share/man/man*/synctex.*
 }
