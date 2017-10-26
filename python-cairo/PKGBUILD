@@ -1,12 +1,12 @@
 pkgbase=python-cairo
-pkgname=(python-cairo python2-cairo)
+pkgname=(python3-cairo python2-cairo)
 pkgver=1.13.3
-pkgrel=1
+pkgrel=2
 pkgdesc="Python bindings for the cairo graphics library"
 arch=('x86_64')
 url="https://pycairo.readthedocs.io/en/latest/"
 license=('LGPL2.1' 'MPL')
-makedepends=(python python2 cairo git)
+makedepends=(python3 python2 cairo git)
 _commit=a636fc44d3c071dc6a3598f51f782202c61add9e  # tags/v1.13.3
 source=("git+https://github.com/pygobject/pycairo/#commit=$_commit")
 sha256sums=('SKIP')
@@ -31,9 +31,9 @@ package_python2-cairo() {
   python2 setup.py install --skip-build --root="${pkgdir}" --optimize='1'
 }
 
-package_python-cairo() {
-  depends=('cairo' 'python')
+package_python3-cairo() {
+  depends=('cairo' 'python3')
 
   cd pycairo
-  python setup.py install --skip-build --root="${pkgdir}" --optimize='1'
+  python3 setup.py install --skip-build --root="${pkgdir}" --optimize='1'
 }

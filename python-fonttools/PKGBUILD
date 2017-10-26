@@ -4,15 +4,15 @@
 
 pkgbase=python-fonttools
 pkgname=('python2-fonttools' 'python3-fonttools')
-pkgver=3.0
-pkgrel=2
+pkgver=3.15.1
+pkgrel=1
 pkgdesc="Converts OpenType and TrueType fonts to and from XML"
 url="https://github.com/behdad/fonttools"
 license=("BSD")
 arch=('any')
-makedepends=("python2-setuptools" "python2-numpy" "python3-numpy")
-source=($pkgbase-$pkgver.tar.gz::https://github.com/behdad/fonttools/archive/${pkgver}.tar.gz)
-md5sums=('e5de6f32a3db235a5adce4f456e8826b')
+makedepends=("python2-setuptools" "python3-setuptools" "python2-numpy" "python3-numpy")
+source=("https://github.com/fonttools/fonttools/releases/download/${pkgver}/fonttools-${pkgver}.zip")
+md5sums=('99cea1ff85d08a3af66f9fb95bb7a2c1')
 
 prepare() {
   cd "$srcdir"
@@ -49,8 +49,9 @@ package_python2-fonttools() {
   mv "$pkgdir"/usr/bin/pyftsubset{,2}
   mv "$pkgdir"/usr/bin/ttx{,2}
   mv "$pkgdir"/usr/share/man/man1/ttx{,2}.1
+  mv "$pkgdir"/usr/bin/fonttools{,2}
 
-  install -D -m755 LICENSE.txt "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+  install -D -m755 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
   chmod oga+r "$pkgdir"/usr/share/man/man1/ttx2.1
 }
 
@@ -61,6 +62,6 @@ package_python3-fonttools() {
 
   python3 setup.py install --skip-build --root="$pkgdir" --optimize=1
 
-  install -D -m755 LICENSE.txt "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+  install -D -m755 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
   chmod oga+r "$pkgdir"/usr/share/man/man1/ttx.1
 }
