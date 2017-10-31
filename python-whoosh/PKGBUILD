@@ -1,0 +1,49 @@
+pkgbase=python-whoosh
+pkgname=(python3-whoosh python2-whoosh)
+pkgver=2.7.4
+pkgrel=1
+pkgdesc="Fast, pure-Python full text indexing, search, and spell checking library"
+arch=('any')
+url="http://bitbucket.org/mchaput/whoosh/wiki/Home"
+license=("BSD")
+makedepends=('python3-setuptools' 'python2-setuptools' 'mercurial')
+checkdepends=('python3-pytest-runner' 'python2-pytest-runner')
+source=("hg+https://bitbucket.org/mchaput/whoosh#tag=$pkgver")
+md5sums=('SKIP')
+
+prepare() {
+  cp -a whoosh{,-py2}
+}
+
+build() {
+  cd "$srcdir"/whoosh
+  python3 setup.py build
+
+  cd "$srcdir"/whoosh-py2
+  python2 setup.py build
+}
+
+# returns this error: https://bitbucket.org/pytest-dev/pytest/issues/567/
+#check() {
+#  cd "$srcdir"/whoosh
+#  python3 setup.py pytest
+#
+#  cd "$srcdir"/whoosh-py2
+#  python2 setup.py pytest || warning "Tests failed"
+#}
+
+package_python3-whoosh() {
+  depends=('python3')
+
+  cd whoosh
+  python3 setup.py install -O1 --root="$pkgdir"
+  install -D -m644 LICENSE.txt "$pkgdir"/usr/share/licenses/$pkgname/LICENSE.txt
+}
+
+package_python2-whoosh() {
+  depends=('python2')
+
+  cd whoosh-py2
+  python2 setup.py install -O1 --root="$pkgdir"
+  install -D -m644 LICENSE.txt "$pkgdir"/usr/share/licenses/$pkgname/LICENSE.txt
+}
