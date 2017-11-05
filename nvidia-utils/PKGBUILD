@@ -2,8 +2,8 @@ pkgbase=nvidia-utils
 pkgname=(nvidia-utils opencl-nvidia)
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 # Update nvidia-settings too
-pkgver=384.59
-pkgrel=2
+pkgver=387.22
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
@@ -11,7 +11,7 @@ options=('!strip')
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
         'nvidia-drm-outputclass.conf')
-md5sums=('778318b0fd2d5d511474a8987cc7dbe5'
+md5sums=('b21f9bafb20409b337505c9b1d362c34'
          'a433deeb5f9cc661e537f42bde2f1df7')
 
 create_links() {
@@ -74,8 +74,8 @@ package_nvidia-utils() {
     #ln -s "libGLX_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/libGLX_indirect.so.0"
 
     # Wayland stuff
-    install -D -m755 "libnvidia-egl-wayland.so.1.0.1"	"${pkgdir}/usr/lib/libnvidia-egl-wayland.so.1.0.1"
-    ln -s "libnvidia-egl-wayland.so.1.0.1"		"${pkgdir}/usr/lib/libnvidia-egl-wayland.so.1"
+    install -D -m755 "libnvidia-egl-wayland.so.1.0.2"	"${pkgdir}/usr/lib/libnvidia-egl-wayland.so.1.0.2"
+    ln -s "libnvidia-egl-wayland.so.1.0.2"		"${pkgdir}/usr/lib/libnvidia-egl-wayland.so.1"
     install -D -m644 "10_nvidia_wayland.json"		"${pkgdir}/usr/share/egl/egl_external_platform.d/10_nvidia_wayland.json"
 
     # OpenGL libraries

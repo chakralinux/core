@@ -3,7 +3,7 @@ source ../linux.conf
 
 pkgname=ndiswrapper
 pkgver=1.61
-pkgrel=4
+pkgrel=5
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
@@ -16,9 +16,11 @@ replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
-              'linux-4.11.patch')
+              'linux-4.11.patch'
+              'linux-4.13.patch')
 sha1sums=('213854ca8a83f9b5972db8fa873d346124e4bcb5'
-          '4d1866b495a7929a3d21b6aebf0fa150702668b6')
+          '4d1866b495a7929a3d21b6aebf0fa150702668b6'
+          '09b308bbc948acc59d33882524b53ce210bb1848')
 
 prepare() {
   [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
@@ -27,6 +29,7 @@ prepare() {
   cd ndiswrapper-$pkgver
 
   patch -p1 -i ../linux-4.11.patch
+  patch -p2 -i ../linux-4.13.patch
   
   sed -i -e 's|strnicmp|strncasecmp|' driver/ndis.c
   sed -i "/modinfo/s/s/usr\//" driver/Makefile

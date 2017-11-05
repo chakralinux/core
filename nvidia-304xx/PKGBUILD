@@ -1,26 +1,19 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 source ../linux.conf
 
-pkgname=('nvidia-304xx' 'chd-nvidia-304xx')
-pkgver=304.135
-pkgrel=3
+pkgbase=nvidia-304xx
+pkgname=('nvidia-304xx' 'chd-nvidia-304xx' 'nvidia-304xx-dkms')
+pkgver=304.137
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 _pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
 source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported"
-        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
-        'drm-driver-legacy.patch'
-        'kernel_4.10.patch'
-        'kernel_4.11.patch'
-        'kernel_4.12.patch')
+        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '8ee9bd0b020508bca9953181811422fa'
-         'a5328715e210e36e5d9bbed0f9e55223'
-         'a8d331a75fbc541f1730e95b95e9ef14'
-         '93365975020db32ab3a670fcafca3925'
-         '9bf784d939ab1bf3191575df89c9e218')
+         '485506ee6a7c54780488dacddf1d56b1')
 
 prepare() {
     cd "${srcdir}"
@@ -28,14 +21,8 @@ prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
     # patches here
-    patch -Np1 --no-backup-if-mismatch -i ../kernel_4.10.patch
-    patch -Np1 --no-backup-if-mismatch -i ../kernel_4.11.patch
-    patch -Np1 --no-backup-if-mismatch -i ../kernel_4.12.patch
-
-    # FS#47092
-    cd kernel
-    patch -p1 --no-backup-if-mismatch -i "$srcdir"/drm-driver-legacy.patch
-
+    
+    cp -a kernel kernel-dkms
 }
 
 build() {
@@ -54,6 +41,20 @@ package_nvidia-304xx() {
     install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
     echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nouveau_blacklist.conf"
     gzip "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
+}
+
+package_nvidia-304xx-dkms() {
+    pkgdesc="NVIDIA driver sources for linux, 304xx legacy branch"
+    depends=('dkms' "nvidia-304xx-utils=$pkgver")
+    optdepends=('linux-headers: Build the module for Arch kernel'
+                'linux-lts-headers: Build the module for LTS Arch kernel')
+    conflicts+=('nvidia-304xx')
+
+    cd "${srcdir}/${_pkg}"
+    make -C kernel clean
+    install -dm 755 "${pkgdir}"/usr/{lib/modprobe.d,src}
+    cp -dr --no-preserve='ownership' kernel-dkms "${pkgdir}"/usr/src/nvidia-${pkgver}
+    echo 'blacklist nouveau' > "${pkgdir}"/usr/lib/modprobe.d/nvidia.conf
 }
 
 package_chd-nvidia-304xx() {

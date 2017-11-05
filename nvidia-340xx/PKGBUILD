@@ -1,34 +1,30 @@
 # Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
 source ../linux.conf
 
-pkgname=('nvidia-340xx' 'chd-nvidia-340xx')
-pkgver=340.102
-pkgrel=3
+pkgbase=nvidia-340xx
+pkgname=('nvidia-340xx' 'chd-nvidia-340xx' 'nvidia-340xx-dkms')
+pkgver=340.104
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported"
-        'fs52243.patch' '4.10.0_kernel.patch' '4.11.0_kernel.patch' '4.12.0_kernel.patch')
+               'kernel-4.11.patch')
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '4b9b61bbcaaea4a99a6abe4a13309016'
-         'fe306bc9c3798a6a922931d6dea7d0e9'
-         'f612dfe457e9ab70b7de4e3682c83a0e'
-         'cd9adcaeebc82bc7be868c3ede1c9445'
-         '81e720487caa2823586b32659da9acc1')
+         'e09208cdee41f89ae787f86c602c69d2'
+         'efbd37cde63d50f657d55a6f2b321142')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
     # patches here
+    patch -Np0 < "${srcdir}/kernel-4.11.patch"
 
-    patch -Np0 < "${srcdir}"/fs52243.patch
-    patch -Np1 < "${srcdir}"/4.10.0_kernel.patch
-    patch -Np1 < "${srcdir}"/4.11.0_kernel.patch
-    patch -Np1 < "${srcdir}"/4.12.0_kernel.patch
+    cp -a kernel kernel-dkms
 }
 
 build() {
@@ -53,6 +49,20 @@ package_nvidia-340xx() {
     install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
     echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nouveau_blacklist.conf"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
+}
+
+package_nvidia-340xx-dkms() {
+    pkgdesc="NVIDIA driver sources for linux, 340xx legacy branch"
+    depends=('dkms' "nvidia-340xx-utils=$pkgver")
+    optdepends=('linux-headers: Build the module for Arch kernel'
+                'linux-lts-headers: Build the module for LTS Arch kernel')
+    conflicts+=('nvidia-340xx')
+
+    cd "${srcdir}/${_pkg}"
+    install -dm 755 "${pkgdir}"/usr/{lib/modprobe.d,src}
+    cp -dr --no-preserve='ownership' kernel-dkms "${pkgdir}"/usr/src/nvidia-${pkgver}
+    echo 'blacklist nouveau' > "${pkgdir}"/usr/lib/modprobe.d/nvidia.conf
+    cat "${pkgdir}"/usr/src/nvidia-${pkgver}/uvm/dkms.conf.fragment >> "${pkgdir}"/usr/src/nvidia-${pkgver}/dkms.conf
 }
 
 package_chd-nvidia-340xx() {
