@@ -1,7 +1,9 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 pkgname=systemd
-pkgver=231
-pkgrel=4
+# latest commit on stable branch
+_commit='743b771c559c6101544f7358a42c8c519fe4b0db'
+pkgver=235.38
+pkgrel=1
 pkgdesc="A system and service manager for Linux"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/systemd"
@@ -10,26 +12,19 @@ depends=('acl' 'bash' 'dbus' 'iptables' 'kbd' 'kmod' 'hwids' 'libcap'
          'libgcrypt' 'glibc' 'libidn' 'lz4' 'pam' 'libseccomp' 'util-linux'
          'xz'
          'libxkbcommon>=0.5.0-2' 'gnutls' 'elfutils') 
-makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam'
+makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam' 'libelf'
              'intltool' 'iptables' 'kmod' 'libcap' 'libidn' 'libgcrypt'
              'libmicrohttpd' 'libxslt' 'util-linux' 'linux-api-headers'
-             'python' 'python2-lxml' 'quota-tools' 'shadow' 'gnu-efi-libs' 'git' 'curl')
+             'python3-lxml' 'quota-tools' 'shadow' 'gnu-efi-libs' 'git'
+             'meson' 'libseccomp')
 optdepends=('curl: upload journal and pull image'
             'cryptsetup: required for encrypted block devices'
             'libmicrohttpd: remote journald capabilities'
             'quota-tools: kernel-level quota management'
             'polkit: allow administration as unprivileged user')
 options=('debug')
-backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
-        etc/dbus-1/system.d/org.freedesktop.hostname1.conf
-        etc/dbus-1/system.d/org.freedesktop.login1.conf
-        etc/dbus-1/system.d/org.freedesktop.locale1.conf
-        etc/dbus-1/system.d/org.freedesktop.machine1.conf
-        etc/dbus-1/system.d/org.freedesktop.timedate1.conf
-        etc/dbus-1/system.d/org.freedesktop.import1.conf
-        etc/dbus-1/system.d/org.freedesktop.network1.conf
-        etc/pam.d/systemd-user
-        etc/systemd/bootchart.conf
+validpgpkeys=('63CDA1E5D3FC22B998D20DD6327F26951A015CC4')  # Lennart Poettering <lennart@poettering.net>
+backup=(etc/pam.d/systemd-user
         etc/systemd/coredump.conf
         etc/systemd/journald.conf
         etc/systemd/journal-remote.conf
@@ -44,7 +39,8 @@ provides=("udev=$pkgver" 'gummiboot')
 conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'gummiboot')
 replaces=('udev' 'gummiboot')
 install="systemd.install"
-source=("git+https://github.com/systemd/systemd.git#tag=v$pkgver"
+source=('git://github.com/systemd/systemd-stable.git'
+        'git://github.com/systemd/systemd.git' # pull in for tags, backports & reverts
         'initcpio-hook-udev'
         'initcpio-install-systemd'
         'initcpio-install-udev'
@@ -52,49 +48,111 @@ source=("git+https://github.com/systemd/systemd.git#tag=v$pkgver"
         'chakra.conf'
         'chakra_fallback.conf'
         'loader.conf'
-        'splash-chakra.bmp')
-md5sums=('SKIP'
-         '90ea67a7bb237502094914622a39e281'
-         '19185c46811f7e056a760864870bfb4c'
-         '1b3aa3a0551b08af9305d33f85b5c2fc'
-         '34c0e45a4c7b598d57a5efcf63ecee2f'
-         '0fdb041cc891292162f6c2f7d1af830c'
-         'bfccc8b2a9da47823e4dcef2206d4b1b'
-         '88949acaf49231fd01e9f0733c5dd812'
-         '3f1e033e9334e33d6e15f3bf7ce076e3')
+        'splash-chakra.bmp'
+        'systemd-user.pam')
+sha512sums=('SKIP'
+            'SKIP'
+            'f0d933e8c6064ed830dec54049b0a01e27be87203208f6ae982f10fb4eddc7258cb2919d594cbfb9a33e74c3510cfd682f3416ba8e804387ab87d1a217eb4b73'
+            '86d7cacd7536b1069c82bbbb08de7ec81e7f0f18a19fc2b06fabe90db4700623eb3540b75121080d325672d92e26912632ae4f93fd3c0bb48eb3e5eedd88352c'
+            'a25b28af2e8c516c3a2eec4e64b8c7f70c21f974af4a955a4a9d45fd3e3ff0d2a98b4419fe425d47152d5acae77d64e69d8d014a7209524b75a81b0edb10bf3a'
+            'ea4f390f4add962ab44181c6ac3f2fa521ff1d5e573700685c19bbd6284d0d6d8b3078377a040139132d77052578c2ecb5c37798ac314e3314de761a9444935d'
+            'd0f3b5ad51e3b94a7c8535e397c6252c98633f808c69b23c1dff4174925c141dc2fc50ca713aa38d76d24e6b6c9bac97b09d2cd1a56dc9a1b94fedc4411d9dc5'
+            '775d54eb7dd4ff9f14d2b95f02ce261f3c39e2d67fdfdc2b170119f4066449009d4e3fb9f8227115fdb17a22e2302feb89d3377027ee798a83414006a49b8713'
+            'f5716775b7b3f05fd5a1b6a3aeeab3d1414c279bcff5357007cad0145f43521121f788f72513ac25b39a0cfc8994077f1fb8a92f3e400ac12756c348e8fa044b'
+            '43a1b82be00b9e228f33c7ee3c8815d155707971602714c0b8825690c2944ee49b4430a13d0e115d165d816abdda3981b5f72ac0ae13138ffddb5488fbfb9330'
+            'b90c99d768dc2a4f020ba854edf45ccf1b86a09d2f66e475de21fe589ff7e32c33ef4aa0876d7f1864491488fd7edb2682fc0d68e83a6d4890a0778dc2d6fe19')
+_backports=(
+)
+
+_reverts=(
+)
+
+_validate_tag() {
+  local success fingerprint trusted status tag=v${pkgver%.*}
+
+  parse_gpg_statusfile /dev/stdin < <(git verify-tag --raw "$tag" 2>&1)
+
+  if (( ! success )); then
+    error 'failed to validate tag %s\n' "$tag"
+    return 1
+  fi
+
+  if ! in_array "$fingerprint" "${validpgpkeys[@]}" && (( ! trusted )); then
+    error 'unknown or untrusted public key: %s\n' "$fingerprint"
+    return 1
+  fi
+
+  case $status in
+    'expired')
+      warning 'the signature has expired'
+      ;;
+    'expiredkey')
+      warning 'the key has expired'
+      ;;
+  esac
+
+  return 0
+}
+
+pkgver() {
+  local version count
+
+  cd "$pkgname-stable"
+
+  git checkout "${_commit}"
+
+  version="$(git describe --abbrev=0 --tags)"
+  count="$(git rev-list --count ${version}..)"
+  printf '%s.%s' "${version#v}" "${count}"
+}
 
 prepare() {
-  cd "$pkgname"
-  
-  ./autogen.sh
+  cd "$pkgname-stable"
+
+  git remote add upstream ../systemd/
+  git fetch --all
+
+  git checkout "${_commit}"
+
+  _validate_tag || return
+
+  local _commit
+  for _commit in "${_backports[@]}"; do
+    git cherry-pick -n "$_commit"
+  done
+  for _commit in "${_reverts[@]}"; do
+    git revert -n "$_commit"
+  done
 }
 
 build() {
-  cd "$pkgname"
-
   local timeservers=({0..3}.chakra.pool.ntp.org)
 
-  ./configure \
-      --libexecdir=/usr/lib \
-      --localstatedir=/var \
-      --sysconfdir=/etc \
-      --enable-introspection \
-      --disable-gtk-doc \
-      --enable-lz4 \
-      --enable-gnuefi \
-      --disable-audit \
-      --disable-ima \
-      --with-sysvinit-path= \
-      --with-sysvrcnd-path= \
-      --with-ntp-servers="${timeservers[*]}" \
-      --with-default-dnssec=no
-      #--without-kill-user-processes
-   make
+  local meson_options=(
+    -Daudit=false
+    -Dgnuefi=true
+    -Dima=false
+    -Dlz4=true
+
+    -Ddbuspolicydir=/usr/share/dbus-1/system.d
+    -Ddefault-dnssec=no
+    # TODO(dreisner): consider changing this to unified
+    -Ddefault-hierarchy=hybrid
+    -Ddefault-kill-user-processes=false
+    -Dfallback-hostname='archlinux'
+    -Dntp-servers="${timeservers[*]}"
+    -Drpmmacrosdir=no
+    -Dsysvinit-path=
+    -Dsysvrcnd-path=
+  )
+
+  chakra-meson "$pkgname-stable" build "${meson_options[@]}"
+
+  ninja -C build
 }
 
 package() {
-  make -C "$pkgname" DESTDIR="$pkgdir" install
-
+  DESTDIR="$pkgdir" ninja -C build install
   install -dm755 "$pkgdir/usr/bin"
   ln -s ../../usr/lib/systemd/systemd "$pkgdir/usr/bin/systemd"
 
@@ -105,21 +163,16 @@ package() {
 
   ln -s '../lib/systemd/systemd' "$pkgdir/usr/sbin/init"
 
-  # the path to udevadm is hardcoded in some places
-  ln -s ../bin/udevadm "$pkgdir/usr/sbin/udevadm"
-
   # udevd is no longer udevd because systemd. why isn't udevadm now udevctl?
   ln -s ../lib/systemd/systemd-udevd "$pkgdir/usr/bin/udevd"
 
   # don't write units to /etc by default. some of these will be re-enabled on
   # post_install.
   rm -r "$pkgdir/etc/systemd/system/"*.wants
-
-  # get rid of RPM macros
-  rm -r "$pkgdir/usr/lib/rpm"
+  rm -r "$pkgdir/etc/systemd/system/"*.service
 
   # add back tmpfiles.d/legacy.conf
-  install -m644 "$pkgname/tmpfiles.d/legacy.conf" "$pkgdir/usr/lib/tmpfiles.d"
+  install -m644 "$pkgname-stable/tmpfiles.d/legacy.conf" "$pkgdir/usr/lib/tmpfiles.d"
 
   # Replace dialout/tape/cdrom group in rules with uucp/storage/optical group
   sed -i 's#GROUP="dialout"#GROUP="uucp"#g;
@@ -138,21 +191,27 @@ package() {
   chown root:systemd-journal "$pkgdir/var/log/journal"
   chmod 2755 "$pkgdir/var/log/journal"
 
+  # match directory owner/group and mode from extra/polkit
+  chown root:102 "$pkgdir"/usr/share/polkit-1/rules.d
+  chmod 0750     "$pkgdir"/usr/share/polkit-1/rules.d
+
   # we'll create this on installation
   rmdir "$pkgdir/var/log/journal/remote"
+  sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
 
-  # fix pam file
-  sed 's|system-auth|system-login|g' -i "$pkgdir/etc/pam.d/systemd-user"
-  
   # Chakra specific .preset
   install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
-  # Make journalctl persistent
-  install -dm755 "$pkgdir/var/log/journal"
-  sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
-  
+
+  # allow core/filesystem to pristine nsswitch.conf
+  rm "$pkgdir/usr/share/factory/etc/nsswitch.conf"
+  sed -i '/^C \/etc\/nsswitch\.conf/d' "$pkgdir/usr/lib/tmpfiles.d/etc.conf"
+
   # add example bootctl configuration
   install -Dm644 "$srcdir/chakra.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra.conf
   install -Dm644 "$srcdir/chakra_fallback.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra_fallback.conf
   install -Dm644 "$srcdir/loader.conf" "$pkgdir"/usr/share/systemd/bootctl/loader.conf
   install -Dm644 "$srcdir/splash-chakra.bmp" "$pkgdir"/usr/share/systemd/bootctl/splash-chakra.bmp
+
+  # overwrite the systemd-user PAM configuration with our own
+  install -Dm644 systemd-user.pam "$pkgdir/etc/pam.d/systemd-user"
 }

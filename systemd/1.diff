@@ -1,0 +1,248 @@
+diff --git a/systemd/PKGBUILD b/systemd/PKGBUILD
+index 48ee349d7..79d1c9288 100644
+--- a/systemd/PKGBUILD
++++ b/systemd/PKGBUILD
+@@ -1,7 +1,9 @@
+ # maintainer: Fabian Kosmale <inkane@chakra-project.org>
+ pkgname=systemd
+-pkgver=231
+-pkgrel=4
++# latest commit on stable branch
++_commit='743b771c559c6101544f7358a42c8c519fe4b0db'
++pkgver=235.38
++pkgrel=1
+ pkgdesc="A system and service manager for Linux"
+ arch=('x86_64')
+ url="http://www.freedesktop.org/wiki/Software/systemd"
+@@ -10,16 +12,18 @@ depends=('acl' 'bash' 'dbus' 'iptables' 'kbd' 'kmod' 'hwids' 'libcap'
+          'libgcrypt' 'glibc' 'libidn' 'lz4' 'pam' 'libseccomp' 'util-linux'
+          'xz'
+          'libxkbcommon>=0.5.0-2' 'gnutls' 'elfutils') 
+-makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam'
++makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam' 'libelf'
+              'intltool' 'iptables' 'kmod' 'libcap' 'libidn' 'libgcrypt'
+              'libmicrohttpd' 'libxslt' 'util-linux' 'linux-api-headers'
+-             'python' 'python2-lxml' 'quota-tools' 'shadow' 'gnu-efi-libs' 'git' 'curl')
++             'python3-lxml' 'quota-tools' 'shadow' 'gnu-efi-libs' 'git'
++             'meson' 'libseccomp')
+ optdepends=('curl: upload journal and pull image'
+             'cryptsetup: required for encrypted block devices'
+             'libmicrohttpd: remote journald capabilities'
+             'quota-tools: kernel-level quota management'
+             'polkit: allow administration as unprivileged user')
+ options=('debug')
++validpgpkeys=('63CDA1E5D3FC22B998D20DD6327F26951A015CC4')  # Lennart Poettering <lennart@poettering.net>
+ backup=(etc/dbus-1/system.d/org.freedesktop.systemd1.conf
+         etc/dbus-1/system.d/org.freedesktop.hostname1.conf
+         etc/dbus-1/system.d/org.freedesktop.login1.conf
+@@ -44,7 +48,8 @@ provides=("udev=$pkgver" 'gummiboot')
+ conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'gummiboot')
+ replaces=('udev' 'gummiboot')
+ install="systemd.install"
+-source=("git+https://github.com/systemd/systemd.git#tag=v$pkgver"
++source=('git://github.com/systemd/systemd-stable.git'
++        'git://github.com/systemd/systemd.git' # pull in for tags, backports & reverts
+         'initcpio-hook-udev'
+         'initcpio-install-systemd'
+         'initcpio-install-udev'
+@@ -53,73 +58,116 @@ source=("git+https://github.com/systemd/systemd.git#tag=v$pkgver"
+         'chakra_fallback.conf'
+         'loader.conf'
+         'splash-chakra.bmp')
+-md5sums=('SKIP'
+-         '90ea67a7bb237502094914622a39e281'
+-         '19185c46811f7e056a760864870bfb4c'
+-         '1b3aa3a0551b08af9305d33f85b5c2fc'
+-         '34c0e45a4c7b598d57a5efcf63ecee2f'
+-         '0fdb041cc891292162f6c2f7d1af830c'
+-         'bfccc8b2a9da47823e4dcef2206d4b1b'
+-         '88949acaf49231fd01e9f0733c5dd812'
+-         '3f1e033e9334e33d6e15f3bf7ce076e3')
+-
+-prepare() {
+-  cd "$pkgname"
+-  
+-  ./autogen.sh
++sha256sums=('SKIP'
++            'SKIP'
++            '5227c9bd463ae9f967a1ffbbf5f95da3c53461eb9fab97ab894fc3a2f56fe96a'
++            '6fd21bf724b9c82b9948db40345ab76622b3708af30a3470c494bcba09128896'
++            '0e2d052591ac85db8e831ba4c08d08dffcacfe8c2aa8a8cc25f04a4b0f67ee9a'
++            '5ab12555ed5e2d87431353744c45b25f3148bc4c3d52c3c2ea1a7a29fb10a054'
++            '3bb43710744df9ec2d5e5387f6080bacb92657983e492e6c0859ba1326affb8d'
++            '0e51456302b80a434489fc3a71541ac14dc864cf79a9b1677df7066208bb7435'
++            'e8a61dec8e6bae1707d05751b675f294cac0916dccda54672c8d590e4044485a'
++            'b8810cb28d2f921e9c8ad08a14f2ca5bfb609f31a734e19104ddf91bcac83a91')
++_backports=(
++)
++
++_reverts=(
++)
++
++_validate_tag() {
++  local success fingerprint trusted status tag=v${pkgver%.*}
++
++  parse_gpg_statusfile /dev/stdin < <(git verify-tag --raw "$tag" 2>&1)
++
++  if (( ! success )); then
++    error 'failed to validate tag %s\n' "$tag"
++    return 1
++  fi
++
++  if ! in_array "$fingerprint" "${validpgpkeys[@]}" && (( ! trusted )); then
++    error 'unknown or untrusted public key: %s\n' "$fingerprint"
++    return 1
++  fi
++
++  case $status in
++    'expired')
++      warning 'the signature has expired'
++      ;;
++    'expiredkey')
++      warning 'the key has expired'
++      ;;
++  esac
++
++  return 0
+ }
+ 
+-build() {
+-  cd "$pkgname"
++pkgver() {
++  local version count
+ 
+-  local timeservers=({0..3}.chakra.pool.ntp.org)
++  cd "$pkgname-stable"
++
++  git checkout "${_commit}"
+ 
+-  ./configure \
+-      --libexecdir=/usr/lib \
+-      --localstatedir=/var \
+-      --sysconfdir=/etc \
+-      --enable-introspection \
+-      --disable-gtk-doc \
+-      --enable-lz4 \
+-      --enable-gnuefi \
+-      --disable-audit \
+-      --disable-ima \
+-      --with-sysvinit-path= \
+-      --with-sysvrcnd-path= \
+-      --with-ntp-servers="${timeservers[*]}" \
+-      --with-default-dnssec=no
+-      #--without-kill-user-processes
+-   make
++  version="$(git describe --abbrev=0 --tags)"
++  count="$(git rev-list --count ${version}..)"
++  printf '%s.%s' "${version#v}" "${count}"
+ }
+ 
+-package() {
+-  make -C "$pkgname" DESTDIR="$pkgdir" install
++prepare() {
++  cd "$pkgname-stable"
++
++  git remote add upstream ../systemd/
++  git fetch --all
++
++  git checkout "${_commit}"
+ 
+-  install -dm755 "$pkgdir/usr/bin"
+-  ln -s ../../usr/lib/systemd/systemd "$pkgdir/usr/bin/systemd"
++  _validate_tag || return
+ 
+-  install -dm755 "$pkgdir/usr/sbin"
+-  for tool in runlevel reboot shutdown poweroff halt telinit; do
+-    ln -s '/usr/bin/systemctl' "$pkgdir/usr/sbin/$tool"
++  local _commit
++  for _commit in "${_backports[@]}"; do
++    git cherry-pick -n "$_commit"
+   done
++  for _commit in "${_reverts[@]}"; do
++    git revert -n "$_commit"
++  done
++}
+ 
+-  ln -s '../lib/systemd/systemd' "$pkgdir/usr/sbin/init"
++build() {
++  local timeservers=({0..3}.chakra.pool.ntp.org)
+ 
+-  # the path to udevadm is hardcoded in some places
+-  ln -s ../bin/udevadm "$pkgdir/usr/sbin/udevadm"
++  local meson_options=(
++    -Daudit=false
++    -Dgnuefi=true
++    -Dima=false
++    -Dlz4=true
++
++    -Ddbuspolicydir=/usr/share/dbus-1/system.d
++    -Ddefault-dnssec=no
++    # TODO(dreisner): consider changing this to unified
++    -Ddefault-hierarchy=hybrid
++    -Ddefault-kill-user-processes=false
++    -Dfallback-hostname='archlinux'
++    -Dntp-servers="${timeservers[*]}"
++    -Drpmmacrosdir=no
++    -Dsysvinit-path=
++    -Dsysvrcnd-path=
++  )
++
++  chakra-meson "$pkgname-stable" build "${meson_options[@]}"
++
++  ninja -C build
++}
+ 
+-  # udevd is no longer udevd because systemd. why isn't udevadm now udevctl?
+-  ln -s ../lib/systemd/systemd-udevd "$pkgdir/usr/bin/udevd"
++package() {
++  DESTDIR="$pkgdir" ninja -C build install
+ 
+   # don't write units to /etc by default. some of these will be re-enabled on
+   # post_install.
+   rm -r "$pkgdir/etc/systemd/system/"*.wants
+-
+-  # get rid of RPM macros
+-  rm -r "$pkgdir/usr/lib/rpm"
++  rm -r "$pkgdir/etc/systemd/system/"*.service
+ 
+   # add back tmpfiles.d/legacy.conf
+-  install -m644 "$pkgname/tmpfiles.d/legacy.conf" "$pkgdir/usr/lib/tmpfiles.d"
++  install -m644 "$pkgname-stable/tmpfiles.d/legacy.conf" "$pkgdir/usr/lib/tmpfiles.d"
+ 
+   # Replace dialout/tape/cdrom group in rules with uucp/storage/optical group
+   sed -i 's#GROUP="dialout"#GROUP="uucp"#g;
+@@ -138,21 +186,27 @@ package() {
+   chown root:systemd-journal "$pkgdir/var/log/journal"
+   chmod 2755 "$pkgdir/var/log/journal"
+ 
++  # match directory owner/group and mode from extra/polkit
++  chown root:102 "$pkgdir"/usr/share/polkit-1/rules.d
++  chmod 0750     "$pkgdir"/usr/share/polkit-1/rules.d
++
+   # we'll create this on installation
+   rmdir "$pkgdir/var/log/journal/remote"
++  sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
+ 
+-  # fix pam file
+-  sed 's|system-auth|system-login|g' -i "$pkgdir/etc/pam.d/systemd-user"
+-  
+   # Chakra specific .preset
+   install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
+-  # Make journalctl persistent
+-  install -dm755 "$pkgdir/var/log/journal"
+-  sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
+-  
++
++  # allow core/filesystem to pristine nsswitch.conf
++  rm "$pkgdir/usr/share/factory/etc/nsswitch.conf"
++  sed -i '/^C \/etc\/nsswitch\.conf/d' "$pkgdir/usr/lib/tmpfiles.d/etc.conf"
++
+   # add example bootctl configuration
+   install -Dm644 "$srcdir/chakra.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra.conf
+   install -Dm644 "$srcdir/chakra_fallback.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra_fallback.conf
+   install -Dm644 "$srcdir/loader.conf" "$pkgdir"/usr/share/systemd/bootctl/loader.conf
+   install -Dm644 "$srcdir/splash-chakra.bmp" "$pkgdir"/usr/share/systemd/bootctl/splash-chakra.bmp
++
++  # overwrite the systemd-user PAM configuration with our own
++  install -Dm644 systemd-user.pam "$pkgdir/etc/pam.d/systemd-user"
+ }
