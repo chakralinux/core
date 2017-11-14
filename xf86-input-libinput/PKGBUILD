@@ -3,8 +3,8 @@
 source ../xorg.conf
 
 pkgname=xf86-input-libinput
-pkgver=0.25.0
-pkgrel=2
+pkgver=0.26.0
+pkgrel=1
 pkgdesc="Generic input driver for the X.Org server based on libinput"
 arch=('x86_64')
 license=('custom')
@@ -14,12 +14,12 @@ makedepends=('xorg-server-devel' 'X-ABI-XINPUT_VERSION=24.1' 'libxi' 'libx11' 'r
 conflicts=('xorg-server<1.19.0' "X-ABI-XINPUT_VERSION<${X_ABI_XINPUT_MAJOR}" "X-ABI-XINPUT_VERSION>=$((X_ABI_XINPUT_MAJOR+1))")
 groups=('xorg-drivers' 'xorg')
 source=(http://xorg.freedesktop.org/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2{,.sig})
-sha256sums=('bb7fd1658fa7e6c757fd55480aa8a07f8ccfb0a80ae42c29dbc67d57958c556f'
+sha256sums=('abca558fc2226f295691f1cf3412d4c0edeaa439f677ca25b5c9fab310d2387b'
             'SKIP')
 validpgpkeys=('3C2C43D9447D5938EF4551EBE23B7E70B467F0BF') # Peter Hutterer (Who-T) <office@who-t.net>
 
 build() {
-  cd ${pkgname}-${pkgver}
+  cd $pkgname-$pkgver
 
   ./configure --prefix=/usr \
     --disable-static
@@ -27,10 +27,10 @@ build() {
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd $pkgname-$pkgver
 
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR=$pkgdir install
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+  install -m755 -d $pkgdir/usr/share/licenses/$pkgname
+  install -m644 COPYING $pkgdir/usr/share/licenses/$pkgname/
 }
