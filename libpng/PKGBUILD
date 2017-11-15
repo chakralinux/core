@@ -1,5 +1,5 @@
 pkgname=libpng
-pkgver=1.6.27
+pkgver=1.6.34
 _apngver=${pkgver}
 pkgrel=1
 pkgdesc="A collection of routines used to create PNG format graphics files"
@@ -7,10 +7,12 @@ arch=('x86_64')
 url="http://www.libpng.org/pub/png/libpng.html"
 license=('custom')
 depends=('zlib' 'sh')
-source=(http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.xz
+source=(http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.xz{,.asc}
         http://downloads.sourceforge.net/sourceforge/apng/libpng-$_apngver-apng.patch.gz)
-sha1sums=('af5d742f5d0a6492133aed7790bb43e8854cca64'
-          'f30910066df7edad07de67bab4f8f9a9657f5844')
+sha1sums=('45de4ec996ffcc3e18037e7c128abe95f4d0292a'
+          'SKIP'
+          '58fe477a096283246df118191f7b74f248d822f5')
+validpgpkeys=('8048643BA2C840F4F92A195FF54984BFA16C640F') # Glenn Randers-Pehrson (mozilla) <glennrp@gmail.com>
           
 prepare() {
   cd ${pkgname}-${pkgver}
@@ -40,5 +42,5 @@ package() {
   cd contrib/pngminus
   make PNGLIB="-L${pkgdir}/usr/lib -lpng" -f makefile.std png2pnm pnm2png
   install -m755 png2pnm pnm2png "${pkgdir}/usr/bin/"
-  install -D -m644 ../../LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 ../../LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
