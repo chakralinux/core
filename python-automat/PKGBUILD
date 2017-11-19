@@ -3,7 +3,7 @@
 pkgbase=python-automat
 pkgname=('python3-automat' 'python2-automat')
 pkgver=0.6.0
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('MIT')
 pkgdesc="Self-service finite-state machines for the programmer on the go."
@@ -30,10 +30,10 @@ build() {
 
 check() {
   cd "$srcdir"/automat-$pkgver
-  python3 setup.py pytest || msg "Failed"
+  python setup.py pytest
 
   cd "$srcdir"/automat-$pkgver-py2
-  python2 setup.py pytest || msg "Failed"
+  python2 setup.py pytest
 }
 
 package_python3-automat() {
