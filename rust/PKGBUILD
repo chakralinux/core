@@ -3,7 +3,7 @@
 # Arch Contributor: Daniel Micay <danielmicay@gmail.com>
 
 pkgname=rust
-pkgver=1.21.0
+pkgver=1.22.1
 pkgrel=1
 arch=('x86_64')
 pkgdesc='Systems programming language focused on safety, speed and concurrency'
@@ -13,20 +13,17 @@ provides=('cargo')
 conflicts=('cargo')
 replaces=('cargo')
 depends=('gcc-libs' 'llvm-libs')
-makedepends=('rust' 'libffi' 'perl' 'python2' 'curl' 'cmake' 'llvm' 'rust')
+makedepends=('rust' 'libffi' 'perl' 'python2' 'curl' 'cmake')
 source=("http://static.rust-lang.org/dist/rustc-$pkgver-src.tar.gz"
-        0001-librustc_llvm-build-Force-link-against-libffi.patch
         bootstrap-config.toml)
-sha256sums=('1707c142244b5bd909993559c6116c81987c1de21d6207c05d3ecbe5bba548fa'
-            '563529da8e02f575ddde7247d5fc5350d74031daa54743b86d075f3c45ae2713'
-            '4252d4873a840216115ee306e4d689819bc791ee05bedd1faa0b00c49ff91c62')
+sha256sums=('8b7a42bdd6eb205a8c533eb41b5c42389a88158d060aed1e0f461f68c1fd3fd3'
+            '6c25c451d6286efd19e96a552406c8b299345749577cf924699cf4c3831d9ad0')
 install="$pkgname.install"
 options=('staticlibs' '!strip' '!emptydirs')
 
 prepare() {
   cd "rustc-$pkgver-src"
 
-  patch -p1 <"$srcdir"/0001-librustc_llvm-build-Force-link-against-libffi.patch
   cp "$srcdir"/bootstrap-config.toml config.toml
 }
 
@@ -42,12 +39,13 @@ package() {
 
   DESTDIR="$pkgdir" python2 ./x.py install
 
-  install -Dm644 LICENSE-APACHE \
-    "$pkgdir/usr/share/licenses/$pkgname/LICENSE-APACHE"
-  install -Dm644 LICENSE-MIT "$pkgdir/usr/share/licenses/$pkgname/LICENSE-MIT"
+  for license in APACHE MIT; do install -Dm644 "LICENSE-$license" \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE-$license"; done
 
   cd "$pkgdir/usr/lib"
+
   rm rustlib/{components,manifest-rustc,rust-installer-version}
   ln -sf rustlib/$CARCH-unknown-linux-gnu/lib/*.so .
+
   rm rustlib/uninstall.sh # remove uninstall.sh, pacman manages the files anyway
 }
