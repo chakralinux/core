@@ -1,7 +1,6 @@
 pkgbase=mariadb
 pkgname=('libmariadbclient' 'mariadb-clients' 'mytop' 'mariadb')
-pkgver=10.1.28
-_pkgver=${pkgver/.a/a}
+pkgver=10.1.29
 pkgrel=1
 arch=('x86_64')
 license=('GPL')
@@ -12,30 +11,36 @@ validpgpkeys=('199369E5404BD5FC7D2FE43BCBCB082A1BB943DB') # MariaDB Package Sign
 source=(https://ftp.heanet.ie/mirrors/mariadb/mariadb-$pkgver/source/mariadb-$pkgver.tar.gz{,.asc}
         mariadb-sysusers.conf
         mariadb-tmpfiles.conf
-        mariadb-post.sh)
-sha256sums=('292dc8fff420c4bdaf3a2c3381ec3c99292965db2b09de0d7fec414c00032bbd'
+        mariadb-post.sh
+        0002-mroonga-after-merge-CMakeLists.txt-fixes.patch)
+sha256sums=('73bbd5602f52ab5aa4d83f465134871b6c87bda25371d098f6da5a3d98517ed4'
             'SKIP'
             'e1a22777c65854041f16fc0a2db3218d17b4d7e7ec7ab7a77cf49c71277c1515'
             '8ef799553c04aad69f8585496b5fa149f7809ff38147ae0bb294a45530e4686c'
-            '368f9fd2454d80eb32abb8f29f703d1cf9553353fb9e1ae4529c4b851cb8c5dd')
+            '368f9fd2454d80eb32abb8f29f703d1cf9553353fb9e1ae4529c4b851cb8c5dd'
+            '98736aefef21e575e450f8066685ba82771264409412e33491ab0a54e4407ba7')
 
 prepare() {
+  cd $pkgbase-$pkgver/
+
   # Changes to the upstream unit files:
   #  * remove the alias from unit files, we install symlinks in package function
   #  * enable PrivateTmp for a little bit more security
   #  * change binary directory from sbin to bin
   sed -i -e '/^Alias/d' \
     -e '/^PrivateTmp/c PrivateTmp=true' \
-    -e 's,/sbin/,/bin/,g' \
-    $pkgbase-$_pkgver/support-files/mariadb{,@}.service.in
-  [[ -d build ]] && rm -rf build
-  mkdir -p build
+    support-files/mariadb{,@}.service.in
+
+  # revert to fix the build
+  # mroonga after-merge CMakeLists.txt fixes
+  patch -Np1 -R < "${srcdir}"/0002-mroonga-after-merge-CMakeLists.txt-fixes.patch
 }
 
 build() {
+  mkdir build
   cd build
 
-  cmake ../$pkgbase-$_pkgver \
+  cmake ../$pkgbase-$pkgver \
     -DCMAKE_AR=/usr/bin/gcc-ar \
     -DCMAKE_RANLIB=/usr/bin/gcc-ranlib \
     -DBUILD_CONFIG=mysql_release \
@@ -60,7 +65,7 @@ build() {
     -DWITH_READLINE=ON \
     -DWITH_ZLIB=system \
     -DWITH_SSL=system \
-    -DWITH_PCRE=system \
+    -DWITH_PCRE=bundled \
     -DWITH_LIBWRAP=OFF \
     -DWITH_INNODB_SNAPPY=ON \
     -DWITH_JEMALLOC=ON \
@@ -97,7 +102,7 @@ package_libmariadbclient() {
   install -Dm0755 scripts/mysql_config "$pkgdir"/usr/bin/mysql_config
   install -d "$pkgdir"/usr/share/man/man1
   for man in mysql_config mysql_client_test_embedded mysqltest_embedded; do
-    install -m0644 "$srcdir"/$pkgbase-$_pkgver/man/$man.1 "$pkgdir"/usr/share/man/man1/$man.1
+    install -m0644 "$srcdir"/$pkgbase-$pkgver/man/$man.1 "$pkgdir"/usr/share/man/man1/$man.1
   done
 
   rm "$pkgdir"/usr/lib/libmysql{client,client_r,d}.a
@@ -115,7 +120,7 @@ package_mariadb-clients() {
   # install man pages
   install -d "$pkgdir"/usr/share/man/man1
   for man in mysql mysqladmin mysqlcheck mysqldump mysqlimport mysqlshow mysqlslap; do
-    install -m0644 "$srcdir"/$pkgbase-$_pkgver/man/$man.1 "$pkgdir"/usr/share/man/man1/$man.1
+    install -m0644 "$srcdir"/$pkgbase-$pkgver/man/$man.1 "$pkgdir"/usr/share/man/man1/$man.1
   done
 
   # provided by mariadb
