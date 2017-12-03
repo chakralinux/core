@@ -1,14 +1,14 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/cups-filters
 
 pkgname=cups-filters
-pkgver=1.13.4
+pkgver=1.17.9
 pkgrel=1
 pkgdesc="OpenPrinting CUPS Filters"
 arch=('x86_64')
 url="http://www.linuxfoundation.org/collaborate/workgroups/openprinting"
 license=('GPL')
-depends=('lcms2' 'poppler' 'qpdf' 'imagemagick' 'ijs' 'libcups')
-makedepends=('ghostscript' 'python2')
+depends=('lcms2' 'poppler' 'qpdf' 'imagemagick' 'ijs' 'libcups' 'systemd')
+makedepends=('ghostscript' 'ttf-dejavu' 'python3')
 checkdepends=('ttf-dejavu')
 optdepends=('ghostscript: for non-PostScript printers to print with CUPS to convert PostScript to raster images'
 	    'foomatic-db: drivers use Ghostscript to convert PostScript to a printable form directly'
@@ -17,7 +17,7 @@ optdepends=('ghostscript: for non-PostScript printers to print with CUPS to conv
 backup=(etc/fonts/conf.d/99pdftoopvp.conf
         etc/cups/cups-browsed.conf)
 source=(http://www.openprinting.org/download/cups-filters/$pkgname-$pkgver.tar.xz)
-md5sums=('a288a63ca44ad6e776cf1e86a457f836')
+md5sums=('2ef5f2b902bcdcb963c5ef5858976bbc')
 
 build() {
   cd $pkgname-$pkgver
@@ -29,6 +29,7 @@ build() {
     --enable-avahi \
     --disable-mutool \
     --with-browseremoteprotocols=DNSSD,CUPS \
+    --enable-auto-setup-driverless \
     --with-test-font-path=/usr/share/fonts/TTF/DejaVuSans.ttf
 # mutool is muted as for now (the 1.13.3-1 build), it requires more dependency and some core package updates
   make
