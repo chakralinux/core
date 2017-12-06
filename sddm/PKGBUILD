@@ -1,7 +1,7 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sddm
 
 pkgname=sddm
-pkgver=0.16.0+137+cc00330
+pkgver=0.17.0
 pkgrel=1
 pkgdesc='QML based X11 and Wayland display manager'
 arch=('x86_64')
@@ -14,18 +14,12 @@ options=('emptydirs')
 backup=('usr/share/sddm/scripts/Xsetup'
         'etc/sddm.conf'
         'etc/pam.d/sddm')
-source=("${pkgname}::git+https://github.com/sddm/sddm.git#commit=cc00330"
-#source=("${pkgname}-${pkgver}.tar.gz::https://github.com/${pkgname}/${pkgname}/archive/v${pkgver}.tar.gz"
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/${pkgname}/${pkgname}/archive/v${pkgver}.tar.gz"
         'sddm.conf' 'sddm.sysusers' 'sddm.tmpfiles')
-md5sums=('SKIP'
+md5sums=('622e825b6b403d165902a5c12163094c'
          '7375f6c4e0be2336b31eec2bec820048'
-         '8e67f619f2e4b141499cbfee564ee097'
+         '36a0440ca3eb8a527a03d7475a6cefd9'
          '098f2a934ecf9c048b6a9d4b6c41ff5c')
-
-pkgver() {
-  cd $pkgname
-  printf "%s" "$(git describe --long | sed 's/\([^-]*-\)g/\1/;s/-/+/g;s/^v//')"
-}
 
 prepare() {
   [[ -e build ]] && rm -rf build
@@ -34,7 +28,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgname} \
+  cmake ../${pkgname}-${pkgver} \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBEXECDIR=/usr/lib/sddm \
