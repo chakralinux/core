@@ -1,7 +1,7 @@
 
 pkgname=rpcbind
-pkgver=0.2.3
-pkgrel=3
+pkgver=0.2.4
+pkgrel=1
 pkgdesc="portmap replacement which supports RPC over various protocols"
 arch=('x86_64')
 backup=('etc/conf.d/rpcbind')
@@ -11,33 +11,21 @@ license=('custom')
 replaces=('portmap')
 # see also http://git.infradead.org/users/steved/rpcbind.git
 source=(http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.bz2
-        bug-940191.patch
-        do_not_use_the_xp_auth_pointer_directly.diff
         rpcbind-sunrpc.patch
-        rpcbind.service
-        rpcbind.socket
-        rpcbind.conf)
+        rpcbind.conf
+        CVE-2017-8779.diff)
 install=rpcbind.install
-sha1sums=('e79974a99d09b6d6fff9d86bf00225dc33723ce2'
-          '717e2700510b1b40f452eddb929a7be00df4292b'
-          '3fa6138b6a559b5b3a5610686ec1de045a0b8d1d'
+sha1sums=('8a6045dd3397e9f71bf3a7c9d269e255cca537bd'
           '1b997ce76f9727efc8c72fc5f97189591c9a60e2'
-          '3534c7bcdecebda90182fe2328a16137353cb1ad'
-          'c52f8396cd05181b788fbdf74898730343c03c9a'
-          '08246ff18d12cee01e5c9391c6ba8f5597cac936')
+          '08246ff18d12cee01e5c9391c6ba8f5597cac936'
+          '38044ce8f3376a0b69da8e078e988fd1645bd435')
 
 prepare() {
-  cd $srcdir/$pkgname-$pkgver
+  cd $pkgname-$pkgver
   # patch for iana services file # FS#20273
   patch -Np1 -i ../rpcbind-sunrpc.patch
-  
-  # fix a memory corruption crash when remote scanning
-  # https://bugs.archlinux.org/task/46341
-  # http://seclists.org/oss-sec/2015/q3/581
-  patch -Np1 -i ../bug-940191.patch
-  
-  # upstream fix for libtirpc 1.0.1
-  patch -Np1 -i ../do_not_use_the_xp_auth_pointer_directly.diff
+  # http://seclists.org/oss-sec/2017/q2/209
+  patch -Np1 -i ../CVE-2017-8779.diff
 }
 
 build() {
@@ -55,22 +43,20 @@ package() {
   
   make DESTDIR=$pkgdir install
   # install rpcbind config file
-  install -D -m644 $srcdir/rpcbind.conf $pkgdir/etc/conf.d/rpcbind
+  install -D -m644 ../rpcbind.conf $pkgdir/etc/conf.d/rpcbind
   # install missing man page - https://bugs.archlinux.org/task/21271
-  install -m644 man/rpcinfo.8 $pkgdir/usr/share/man/man8/
-  # install systemd service file
-  install -D -m644 $srcdir/rpcbind.service $pkgdir/usr/lib/systemd/system/rpcbind.service
-  # install system socket activation
-  install -D -m644 $srcdir/rpcbind.socket $pkgdir/usr/lib/systemd/system/rpcbind.socket
+#  install -m644 man/rpcinfo.8 $pkgdir/usr/share/man/man8/
 
   # add symlinks
-  mkdir $pkgdir/usr/lib/systemd/system/sockets.target.wants
-  mkdir $pkgdir/usr/lib/systemd/system/multi-user.target.wants
-  ln -sf ../rpcbind.socket $pkgdir/usr/lib/systemd/system/sockets.target.wants/rpcbind.socket
-  ln -sf ../rpcbind.service $pkgdir/usr/lib/systemd/system/multi-user.target.wants/rpcbind.service
+#   mkdir $pkgdir/usr/lib/systemd/system/sockets.target.wants
+#   mkdir $pkgdir/usr/lib/systemd/system/multi-user.target.wants
+#   ln -sf ../rpcbind.socket $pkgdir/usr/lib/systemd/system/sockets.target.wants/rpcbind.socket
+#   ln -sf ../rpcbind.service $pkgdir/usr/lib/systemd/system/multi-user.target.wants/rpcbind.service
 
   # add state directory
   install -d -m 700 -o 32 -g 32 $pkgdir/var/lib/rpcbind
   # install license
   install -D -m644 COPYING $pkgdir/usr/share/licenses/rpcbind/COPYING
+  # add EnvironmentFile to systemd service
+  sed -i '14i EnvironmentFile=/etc/conf.d/rpcbind' $pkgdir/usr/lib/systemd/system/rpcbind.service
 }
