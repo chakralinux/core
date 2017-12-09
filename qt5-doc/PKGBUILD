@@ -2,7 +2,7 @@ source ../qt5.conf
 
 pkgname=qt5-doc
 pkgver=${QSubVersion}
-pkgrel=2
+pkgrel=1
 arch=('any')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -10,11 +10,11 @@ pkgdesc='A cross-platform application and UI framework (Documentation)'
 depends=('qt5-base')
 makedepends=('qt5-tools' 'python2' 'pciutils' 'libxtst' 'libxcursor' 'libxrandr' 'libxss')
 groups=('qt5')
-source=("${QSingleServer}/qt-everywhere-opensource-src-${QVersion}.tar.xz")
-md5sums=( $(getSum "qt-everywhere") )
+source=( $(getSrc "qt") )
+md5sums=( $(getSum "qt") )
 
 prepare() {
-  cd $(getPkgName "qt-everywhere")
+  cd $(getPkgName "qt")
 
   # Use python2 for Python 2.x
   find . -name '*.py' -exec sed -i \
@@ -34,7 +34,7 @@ prepare() {
 }
 
 build() {
-  cd $(getPkgName "qt-everywhere")
+  cd $(getPkgName "qt")
 
   export PATH="$srcdir/bin:$PATH"
   PYTHON=/usr/bin/python2 ./configure -confirm-license -opensource \
@@ -56,7 +56,7 @@ build() {
 }
 
 package() {
-  cd $(getPkgName "qt-everywhere")
+  cd $(getPkgName "qt")
   make INSTALL_ROOT="$pkgdir" install_docs
 
   install -d "$pkgdir"/usr/share/licenses

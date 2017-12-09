@@ -1,14 +1,13 @@
 source ../qt5.conf
 
-pkgname=qt5-serialbus
+pkgname=qt5-webglplugin
 pkgver=${QSubVersion}
 pkgrel=1
-arch=('x86_64')
+arch=(x86_64)
 url='http://qt-project.org/'
-license=('GPL3' 'LGPL' 'FDL' 'custom')
-pkgdesc='Qt module for general purpose serial bus access'
-depends=('qt5-serialport')
-makedepends=()
+license=(GPL3 LGPL3 FDL custom)
+pkgdesc='QPA plugin for running an application via a browser using streamed WebGL commands'
+depends=(qt5-websockets qt5-declarative)
 groups=('qt5')
 options=('debug')
 source=( $(getSrc ${pkgname}) )
@@ -21,7 +20,7 @@ prepare() {
 build() {
   cd build
 
-  qmake-qt5 ../$(getPkgName ${pkgname})  
+  qmake-qt5 ../$(getPkgName ${pkgname}) 
   make
 }
 

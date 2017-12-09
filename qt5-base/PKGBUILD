@@ -1,8 +1,9 @@
 source ../qt5.conf
 
-pkgname=qt5-base
+pkgbase=qt5-base
+pkgname=(qt5-base qt5-xcb-private-headers)
 pkgver=${QSubVersion}
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
@@ -21,9 +22,9 @@ optdepends=('qt5-svg: to use SVG icon themes'
 groups=('qt5')
 options=('debug')
 source=( $(getSrc ${pkgname}) 
-                harmony-fix.diff)
+                qt-no-statx.patch)
 md5sums=( $(getSum ${pkgname}) 
-                 '8fdc8dc23b19c1c00e817d5c56eac1a0')
+                 '35cc4abc5f125905645e09bf37e5a3b0')
 
 prepare() {
   cd $(getPkgName ${pkgname})
@@ -42,8 +43,8 @@ prepare() {
   # Fix missing private includes https://bugreports.qt.io/browse/QTBUG-37417
   sed -e '/CMAKE_NO_PRIVATE_INCLUDES\ \=\ true/d' -i mkspecs/features/create_cmake.prf
   
-  # Freetype 2.8.1
-  patch -p1 -i ../harmony-fix.diff
+  # Don't use the statx syscall https://bugs.archlinux.org/task/56289 https://bugreports.qt.io/browse/QTBUG-64490
+  patch -p1 -i ../qt-no-statx.patch
 }
 
 build() {
@@ -84,7 +85,7 @@ build() {
   make
 }
 
-package() {
+package_qt5-base() {
   cd $(getPkgName ${pkgname})
   make INSTALL_ROOT="${pkgdir}" install
 
@@ -103,4 +104,17 @@ package() {
   for b in "${pkgdir}"/usr/lib/qt5/bin/*; do
     ln -s /usr/lib/qt5/bin/$(basename $b) "${pkgdir}"/usr/bin/$(basename $b)-qt5
   done
+}
+
+package_qt5-xcb-private-headers() {
+  pkgdesc='Private headers for Qt5 Xcb'
+
+  depends=("qt5-base=$pkgver")
+  optdepends=()
+  groups=()
+  conflicts=()
+
+  cd $(getPkgName ${pkgbase})
+  install -d -m755 "$pkgdir"/usr/include/qtxcb-private
+  cp -r src/plugins/platforms/xcb/*.h "$pkgdir"/usr/include/qtxcb-private/
 }
