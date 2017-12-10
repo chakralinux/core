@@ -1,14 +1,21 @@
 pkgname=libosip2
 pkgver=5.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="oSIP is an implementation of SIP"
 arch=('x86_64')
 url="http://www.gnu.org/software/osip/"
 license=('LGPL')
 depends=('glibc')
 options=(!emptydirs !libtool)
-source=(http://ftp.gnu.org/gnu/osip/libosip2-${pkgver/_/-}.tar.gz)
-md5sums=('5cb1aebecec58946fceb6c136a30d5e1')
+source=(http://ftp.gnu.org/gnu/osip/libosip2-${pkgver/_/-}.tar.gz
+        SIP_body_len_underflow.patch)
+md5sums=('5cb1aebecec58946fceb6c136a30d5e1'
+         'd4eebc5d861e5a02350cab8a4bdfe45a')
+
+prepare() {
+# Patch to fix CVE-2017-7853 
+  patch -p1 -N -i SIP_body_len_underflow.patch 
+}
 
 build() {
   cd $pkgname-${pkgver/_/-}/
