@@ -1,8 +1,8 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libinput
 
 pkgname=libinput
-pkgver=1.9.1
-pkgrel=2
+pkgver=1.9.3
+pkgrel=1
 pkgdesc="Input device management and event handling library"
 arch=(x86_64)
 url="http://www.freedesktop.org/wiki/Software/libinput/"
@@ -15,7 +15,7 @@ optdepends=('gtk3: libinput debug-gui'
 install=libinput.install
 options=('!libtool')
 source=(http://freedesktop.org/software/$pkgname/$pkgname-$pkgver.tar.xz{,.sig})
-sha256sums=('f0780de4211b3d09f86c17f619f936261a213ca532f8c9ec8f8e7e43422a65f8'
+sha256sums=('240d2c9d605b33358d81324e2c1c2fe3a33f0aeac43bce905162868971619327'
             'SKIP')
 validpgpkeys=('3C2C43D9447D5938EF4551EBE23B7E70B467F0BF') # Peter Hutterer (Who-T) <office@who-t.net>
 
@@ -32,14 +32,14 @@ build() {
 }
 
 package() {
-  DESTDIR="$pkgdir" ninja -C build install
+  DESTDIR=$pkgdir ninja -C build install
 
   install -Dvm644 $pkgname-$pkgver/COPYING \
-    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    $pkgdir/usr/share/licenses/$pkgname/LICENSE
 
   # install doc - no Makefile target
-  install -d "$pkgdir/usr/share/doc"
-  cp -av build/html "$pkgdir/usr/share/doc/libinput"
+  install -d $pkgdir/usr/share/doc
+  cp -av build/html $pkgdir/usr/share/doc/libinput
   
   mv $pkgdir/usr/local/{bin/,lib/,include/,libexec/} $pkgdir/usr/
   mv $pkgdir/usr/local/share/* $pkgdir/usr/share/
