@@ -3,7 +3,7 @@ pkgname=('sqlite3' 'sqlite3-tcl' 'sqlite3-doc' 'sqlite3-analyzer')
 _srcver=3200100
 _docver=${_srcver}
 pkgver=3.20.1
-pkgrel=1
+pkgrel=4
 pkgdesc="A C library that implements an SQL database engine"
 arch=('x86_64')
 license=('custom:Public Domain')
@@ -14,7 +14,7 @@ source=(https://www.sqlite.org/2017/sqlite-src-${_srcver}.zip
         license.txt)
 options=('!emptydirs' '!makeflags') # json extensions breaks parallel build
 sha1sums=('808448837323b4ef9c0771af89d06dca5f0832dd'
-          '9c2faf412173e51841d311e740d2061cad6544ad'
+          '5c674754629392003fa5f7f4d2bc533d571040b1'
           'f34f6daa4ab3073d74e774aad21d66878cf26853')
 
 prepare() {
@@ -49,6 +49,7 @@ package_sqlite3() {
  
  pkgdesc="A C library that implements an SQL database engine"
  depends=('readline')
+ provides=("${pkgname%%3}=${pkgver}")
  
   cd sqlite-src-$_srcver
   make DESTDIR=${pkgdir} install
@@ -70,7 +71,8 @@ package_sqlite3() {
 package_sqlite3-tcl() {
  
  pkgdesc="sqlite Tcl Extension Architecture (TEA)"
- depends=('sqlite3')
+ depends=('sqlite')
+ provides=("${pkgname/3/}=${pkgver}")
 
   install -m755 -d ${pkgdir}/usr/lib
   mv $srcdir/tcl/* ${pkgdir}/usr/lib
@@ -87,7 +89,8 @@ package_sqlite3-tcl() {
 package_sqlite3-analyzer() {
  
  pkgdesc="An analysis program for sqlite3 database files"
- depends=('sqlite3' 'tcl')
+ depends=('sqlite' 'tcl')
+ provides=("${pkgname/3/}=${pkgver}")
 
   cd sqlite-src-$_srcver
   install -m755 -d ${pkgdir}/usr/bin
