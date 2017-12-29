@@ -1,31 +1,33 @@
-# Maintainer: Daniele Cocca <jmc@chakra-project.org>
-
 pkgname=libical
-pkgver=0.48
+pkgver=3.0.1
 pkgrel=1
-pkgdesc="An open source reference implementation of the icalendar data type and serialization format."
-arch=('i686' 'x86_64')
-url='http://sourceforge.net/projects/freeassociation/'
+pkgdesc="An open source reference implementation of the icalendar data type and 
+serialization format"
+arch=('x86_64')
+url='https://github.com/libical/libical'
 license=('LGPL' 'MPL')
-depends=('glibc')
-options=('!libtool')
-source=("http://downloads.sourceforge.net/freeassociation/${pkgname}-${pkgver}.tar.gz")
-md5sums=('e549f434d5fbf9cd156c60ed4943618f')
+depends=('glibc' 'glib2' 'icu' 'db')
+makedepends=('cmake')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/${pkgname}/${pkgname}/archive/v${pkgver}.tar.gz")
+sha256sums=('6405964d596aac64fc82c03c4486387fd6a9c09b1f7af1ff251238e66b9e66e1')
+
+prepare() {
+  mkdir build
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd build
 
-  ./configure --prefix=/usr \
-              --enable-shared \
-              --disable-static \
-  || return 1
-
+  cmake ../"${pkgname}-${pkgver}" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DSHARED_ONLY=true \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make install DESTDIR="${pkgdir}"
+  cd build
+  make DESTDIR="${pkgdir}" install
 }
 
-# vim:set ts=2 sw=2 et:
