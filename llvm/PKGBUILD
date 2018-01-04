@@ -1,8 +1,8 @@
 # resynced with Arch's version from https://projects.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/llvm
 
 pkgname=('llvm' 'llvm-libs' 'llvm-ocaml' 'lld' 'lldb' 'clang' 'clang-tools-extra')
-pkgver=4.0.1
-pkgrel=2
+pkgver=5.0.1
+pkgrel=1
 _ocaml_ver=4.05.0
 arch=('x86_64')
 url="http://llvm.org/"
@@ -19,26 +19,22 @@ source=(http://releases.llvm.org/$pkgver/llvm-$pkgver.src.tar.xz{,.sig}
         https://releases.llvm.org/$pkgver/lldb-$pkgver.src.tar.xz{,.sig}
         llvm-config.h
         0001-GCC-compatibility-Ignore-the-fno-plt-flag.patch
-        0002-Enable-SSP-and-PIE-by-default.patch
-        disable-llvm-symbolizer-test.patch
-        lldb-libedit.patch)
-sha256sums=('da783db1f82d516791179fe103c71706046561f7972b18f0049242dee6712b51'
+        0002-Enable-SSP-and-PIE-by-default.patch)
+sha256sums=('5fa7489fc0225b11821cab0362f5813a05f2bcf2533e8a4ea9c9c860168807b0'
             'SKIP'
-            '61738a735852c23c3bdbe52d035488cdb2083013f384d67c1ba36fabebd8769b'
+            '135f6c9b0cd2da1aff2250e065946258eb699777888df39ca5a5b4fe5e23d0ff'
             'SKIP'
-            '35d1e64efc108076acbe7392566a52c35df9ec19778eb9eb12245fc7d8b915b6'
+            '9aada1f9d673226846c3399d13fab6bba4bfd38bcfe8def5ee7b0ec24f8cd225'
             'SKIP'
-            'a3c87794334887b93b7a766c507244a7cdcce1d48b2e9249fc9a94f2c3beb440'
+            '4edd1417f457a9b3f0eb88082530490edf3cf6a7335cdce8ecbc5d3e16a895da'
             'SKIP'
-            '63ce10e533276ca353941ce5ab5cc8e8dcd99dbdd9c4fa49f344a212f29d36ed'
+            'd5b36c0005824f07ab093616bdff247f3da817cae2c51371e1d1473af717d895'
             'SKIP'
-            '8432d2dfd86044a0fc21713e0b5c1d98e1d8aad863cf67562879f47f841ac47b'
+            'b7c1c9e67975ca219089a3a6a9c77c2d102cead2dc38264f2524aa3326da376a'
             'SKIP'
             '597dc5968c695bbdbb0eac9e8eb5117fcd2773bc91edf5ec103ecffffab8bc48'
-            'd26239d03983fab1f34970b94d727379ca0be689f5826e50503c4d2f314f207a'
-            '686b2e05a151c9a4b36d5090ddc986432ad746bc6060a00928ee3b52d6b3e723'
-            '6fff47ab5ede79d45fe64bb4903b7dfc27212a38e6cd5d01e60ebd24b7557359'
-            'b80bda6dc26792e499b3150e13c3017be4a65280b4b9f5c9f4c07b55a46d93b6')
+            'a1ba7fb859ac157c4b4342435cd656e29b1e1d9bddcb8ae0158a91c0a8ba6203'
+            '186f2d10b013395f2dd6e1fd3baf4961a2e40c403f115517c9b253682934f50f')
 validpgpkeys=('11E521D646982372EB577A1F8F0871F202119294'  # Tom Stellard
               'B6C8F98282B944E3B0D5C2530FC3042E345AD05D')
 
@@ -52,16 +48,9 @@ prepare() {
   mv "$srcdir/lld-$pkgver.src" tools/lld
   mv "$srcdir/lldb-$pkgver.src" tools/lldb
 
-  # Disable test that fails when compiled as PIE
-  # https://bugs.llvm.org/show_bug.cgi?id=31870
-  patch -Np1 <../disable-llvm-symbolizer-test.patch
-
   # Enable SSP and PIE by default
   patch -Np1 -d tools/clang <../0001-GCC-compatibility-Ignore-the-fno-plt-flag.patch
   patch -Np1 -d tools/clang <../0002-Enable-SSP-and-PIE-by-default.patch
-
-  # Fix LLDB input with recent libedit versions
-  patch -Np1 -d tools/lldb <../lldb-libedit.patch
 }
 
 build() {
@@ -79,7 +68,6 @@ build() {
     -DLLVM_BUILD_DOCS=ON \
     -DLLVM_ENABLE_SPHINX=ON \
     -DLLVM_ENABLE_DOXYGEN=OFF \
-    -DLLDB_DISABLE_LIBEDIT=1 \
     -DSPHINX_WARNINGS_AS_ERRORS=OFF \
     -DFFI_INCLUDE_DIR=$(pkg-config --variable=includedir libffi) \
     -DLLVM_BINUTILS_INCDIR=/usr/include \
@@ -96,11 +84,8 @@ build() {
 
 check() {
   cd "$srcdir/llvm-$pkgver.src/build"
-  
-  # TODO remove true on next build
-  # error on: LLVM :: tools/llvm-symbolizer/print_context.c
-  # https://bugs.llvm.org/show_bug.cgi?id=31870
-  make check-{llvm,clang,clang-tools,lld} | true
+
+  make check-{llvm,clang,clang-tools,lld}
 }
 
 package_llvm() {
@@ -182,7 +167,7 @@ package_lld() {
 package_lldb() {
   pkgdesc="Next generation, high-performance debugger"
   url="http://lldb.llvm.org/"
-  depends=('libxml2' 'python2' 'python2-six')
+  depends=("llvm-libs=$pkgver-$pkgrel" 'libxml2' 'python2' 'python2-six')
 
   cd "$srcdir/llvm-$pkgver.src"
 
@@ -205,7 +190,7 @@ package_lldb() {
 package_clang() {
   pkgdesc="C language family frontend for LLVM"
   url="http://clang.llvm.org/"
-  depends=("llvm-libs=$pkgver-$pkgrel" 'gcc')
+  depends=("llvm-libs=$pkgver-$pkgrel" 'gcc' 'libxml2')
   optdepends=('openmp: OpenMP support in clang with -fopenmp'
               'python2: for git-clang-format')
   provides=("clang-analyzer=$pkgver")
@@ -233,10 +218,15 @@ package_clang() {
 
   # Use Python 2
   sed -i 's|/usr/bin/env python|&2|' \
+    "$pkgdir/usr/bin/scan-view" \
     "$pkgdir/usr/bin/git-clang-format" \
     "$pkgdir/usr/share/$pkgname/clang-format-diff.py"
 
-  install -Dm644 tools/clang/LICENSE.TXT \
+  # Compile Python scripts
+  python2 -m compileall "$pkgdir"
+  python2 -O -m compileall "$pkgdir"
+
+  install -Dm644 tools/$pkgname/LICENSE.TXT \
     "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
 
