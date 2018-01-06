@@ -4,16 +4,18 @@ source ../linux.conf
 pkgbase=nvidia-304xx
 pkgname=('nvidia-304xx' 'chd-nvidia-304xx' 'nvidia-304xx-dkms')
 pkgver=304.137
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
 _pkg="NVIDIA-Linux-${arch}-${pkgver}-no-compat32"
-source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported"
-        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
+source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master/hwdb/nvidia_supported"
+        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
+        'kernel-4.14.patch')
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
-         '485506ee6a7c54780488dacddf1d56b1')
+         '485506ee6a7c54780488dacddf1d56b1'
+         'cf9259b845e53903586c29a27de29ddb')
 
 prepare() {
     cd "${srcdir}"
@@ -21,6 +23,8 @@ prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
     # patches here
+    
+    patch -Np1 --no-backup-if-mismatch < "${srcdir}/kernel-4.14.patch"
     
     cp -a kernel kernel-dkms
 }

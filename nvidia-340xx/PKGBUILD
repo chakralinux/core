@@ -4,18 +4,20 @@ source ../linux.conf
 pkgbase=nvidia-340xx
 pkgname=('nvidia-340xx' 'chd-nvidia-340xx' 'nvidia-340xx-dkms')
 pkgver=340.104
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}")
 license=('custom')
-source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported"
-               'kernel-4.11.patch')
+source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master/hwdb/nvidia_supported"
+               'kernel-4.11.patch'
+               'kernel-4.14.patch')
 _ARCH='x86_64'
 _pkg="NVIDIA-Linux-${_ARCH}-${pkgver}-no-compat32"
 source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
 md5sums=('62d0cdb856cfae64753c0f3acf729d47'
          'e09208cdee41f89ae787f86c602c69d2'
+         'cf9259b845e53903586c29a27de29ddb'
          'efbd37cde63d50f657d55a6f2b321142')
 
 prepare() {
@@ -23,6 +25,7 @@ prepare() {
     cd "${_pkg}"
     # patches here
     patch -Np0 < "${srcdir}/kernel-4.11.patch"
+    patch -Np1 < "${srcdir}/kernel-4.14.patch"
 
     cp -a kernel kernel-dkms
 }

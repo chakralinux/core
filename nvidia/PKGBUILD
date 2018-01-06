@@ -2,18 +2,18 @@
 source ../linux.conf
 
 pkgname=(nvidia nvidia-dkms chd-nvidia)
-pkgver=387.22
+pkgver=387.34
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=("linux-headers=${_kernelver}" "nvidia-utils=${pkgver}")
 license=('custom')
 options=('!strip')
-source=("https://chakralinux.org/code/chakra-hardware-detection.git/plain/hwdb/nvidia_supported_new")
+source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master/hwdb/nvidia_supported_new")
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
 sha1sums=('bdb063bbd03eed9fa718664ef2023fd759efe4a3'
-          'b9f4303f135ee0e153092190792989f954c10688')
+          '96110da0cac27da4d8ffffd8c52d825277808085')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
@@ -45,13 +45,12 @@ package_nvidia() {
     conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx')
     install=nvidia.install
 
-    for ko in nvidia nvidia-uvm nvidia-modeset nvidia-drm; do
-        install -Dm644 "${srcdir}/${_pkg}/kernel/${ko}.ko" \
-            "${pkgdir}/usr/lib/modules/${_extramodules}/${ko}.ko"
-    done
-    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
-    install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
+    install -Dt "${pkgdir}/usr/lib/modules/${_extramodules}" -m644 \
+      "${srcdir}/${_pkg}/kernel"/nvidia{,-modeset,-drm,-uvm}.ko
 
+    find "${pkgdir}" -name '*.ko' -exec gzip -n {} +
+
+    install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
     echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nvidia.conf"
     sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
 }
