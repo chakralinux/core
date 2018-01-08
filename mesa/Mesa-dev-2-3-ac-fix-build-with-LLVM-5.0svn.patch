@@ -1,0 +1,37 @@
+diff --git a/src/amd/common/ac_llvm_helper.cpp b/src/amd/common/ac_llvm_helper.cpp
+index 4f03103..83ad7ff 100644
+--- a/src/amd/common/ac_llvm_helper.cpp
++++ b/src/amd/common/ac_llvm_helper.cpp
+@@ -28,26 +28,30 @@
+ // Workaround http://llvm.org/PR23628
+ #pragma push_macro("DEBUG")
+ #undef DEBUG
+ 
+ #include "ac_llvm_util.h"
+ #include <llvm-c/Core.h>
+ #include <llvm/Target/TargetOptions.h>
+ #include <llvm/ExecutionEngine/ExecutionEngine.h>
+ #include <llvm/IR/Attributes.h>
+ 
++#if HAVE_LLVM < 0x0500
++#define AttributeList AttributeSet
++#endif
++
+ void ac_add_attr_dereferenceable(LLVMValueRef val, uint64_t bytes)
+ {
+    llvm::Argument *A = llvm::unwrap<llvm::Argument>(val);
+    llvm::AttrBuilder B;
+    B.addDereferenceableAttr(bytes);
+-   A->addAttr(llvm::AttributeSet::get(A->getContext(), A->getArgNo() + 1,  B));
++   A->addAttr(llvm::AttributeList::get(A->getContext(), A->getArgNo() + 1,  B));
+ }
+ 
+ bool ac_is_sgpr_param(LLVMValueRef arg)
+ {
+ 	llvm::Argument *A = llvm::unwrap<llvm::Argument>(arg);
+-	llvm::AttributeSet AS = A->getParent()->getAttributes();
++	llvm::AttributeList AS = A->getParent()->getAttributes();
+ 	unsigned ArgNo = A->getArgNo();
+ 	return AS.hasAttribute(ArgNo + 1, llvm::Attribute::ByVal) ||
+ 	       AS.hasAttribute(ArgNo + 1, llvm::Attribute::InReg);
+ }
