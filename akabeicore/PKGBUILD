@@ -1,32 +1,33 @@
 #
-# Akabei Packages for Chakra, part of chakra-project.org
+# Akabei Packages for Chakra, part of chakralinux.org
 #
-# maintainer: Lukas Appelhans <boom1992@chakra-project.org>
-
-pkgname=('akabeicore')
-
-pkgver=0.1alpha2
-pkgrel=2
-#epoch=1
+pkgname=akabeicore
+pkgver=alpha2.r150.g07c8f73
+pkgrel=1
 pkgdesc='The backend library of akabei'
 arch=('x86_64')
 url='http://gitorious.org/chakra/akabeicore'
 license=('LGPL')
+depends=('qt5-base' 'libarchive>=3.1.2' 'sqlite3' 'polkit-qt5')
+makedepends=(gmock qt5-tools translate-toolkit)
+source=(git+https://code.chakralinux.org/tools/akabei/akabeicore.git)
+sha256sums=('SKIP')
 
-depends=('qt' 'libarchive>=3.1.2' 'sqlite3' 'polkit-qt')
-source=("http://gitorious.org/chakra/akabeicore/archive-tarball/akabeicore_alpha2")
-md5sums=('d918c38e36372b8675510c5a8f1387b1')
+pkgver() {
+    cd $pkgname    
+    git describe --long --tags | sed 's/^akabeicore_//;s/\([^-]*-g\)/r\1/;s/-/./g'
+}
 
 build() {
-	cd ${srcdir}/chakra-akabeicore
-	mkdir -p build/
-	cd build/
-	cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-	make
+    cd $pkgname
+    mkdir -p build/
+    cd build/
+    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    make
 }
 
 package() {
-	cd ${srcdir}/chakra-akabeicore/build
-	make DESTDIR=$pkgdir install 
+    cd $pkgname/build
+    make DESTDIR=$pkgdir install 
 }
 
