@@ -2,7 +2,7 @@ source ../qt5.conf
 
 pkgname=qt5-webengine
 pkgver=${QSubVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -31,11 +31,12 @@ build() {
   cd build
 
   export PATH="$srcdir/bin:$PATH"
-
-  export CFLAGS="$CFLAGS -fno-delete-null-pointer-checks"
-  export CXXFLAGS="${CXXFLAGS} -fno-delete-null-pointer-checks"
-
-  qmake-qt5 CONFIG+="proprietary-codecs" WEBENGINE_CONFIG+="use_proprietary_codecs use_system_ffmpeg" ../$(getPkgName ${pkgname})
+  qmake-qt5 ../$(getPkgName ${pkgname}) -- \
+    -proprietary-codecs \
+    -system-ffmpeg \
+    -webp \
+    -spellchecker
+#   -webengine-icu
   make
 }
 
