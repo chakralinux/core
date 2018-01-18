@@ -1,46 +1,55 @@
+# maintainer: AlmAck <almack@chakralinux.org>
+
 pkgname=binutils
-pkgver=2.27
-pkgrel=4
-_commit=2870b1ba
+pkgver=2.29.1
+pkgrel=1
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('x86_64')
 url="http://www.gnu.org/software/binutils/"
 license=('GPL')
 groups=('base-devel')
-depends=('glibc>=2.25' 'zlib')
+depends=('glibc>=2.26' 'zlib')
 makedepends=('git')
 checkdepends=('dejagnu' 'bc')
 conflicts=('binutils-multilib')
 replaces=('binutils-multilib')
 options=('staticlibs' '!distcc' '!ccache')
-source=(git+https://sourceware.org/git/binutils-gdb.git#commit=${_commit})
-
-md5sums=('SKIP')
+source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz{,.sig}
+        0001-x86-64_Dont_pass_output_bfd_to_info-callbacks-minfo.patch)
+validpgpkeys=(3A24BC1E8FB409FA9F14371813FCEF89DD9E3C4F)
+md5sums=('acc9cd826edb9954ac7cecb81c727793'
+         'SKIP'
+         'e4be936139ef46122cb3841881c432b2')
 
 prepare() {
-  cd binutils-gdb
+  cd binutils-$pkgver
 
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
   sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
 
-  mkdir ${srcdir}/binutils-build
+  # https://bugs.archlinux.org/task/55741
+  git apply ../0001-x86-64_Dont_pass_output_bfd_to_info-callbacks-minfo.patch
+  
+  mkdir -p ${srcdir}/binutils-build
 }
 
 build() {
   cd binutils-build
 
-  ../binutils-gdb/configure \
+  "$srcdir/binutils-$pkgver/configure" \
     --prefix=/usr \
     --with-lib-path=/usr/lib:/usr/local/lib \
-    --with-bugurl=http://chakralinux.org/bugtracker \
+    --with-bugurl=https://code.chakralinux.org/ \
     --enable-threads \
     --enable-shared \
     --enable-ld=default \
     --enable-gold \
-    --enable-plugins \
+    --enable-relro \
     --enable-deterministic-archives \
+    --with-pic \
     --disable-werror \
-    --disable-gdb # we have an extra gdb package, so we do not build gdb from binutils
+    --disable-gdb \
+    --with-system-zlib
 
   # check the host environment and makes sure all the necessary tools are available
   make configure-host
