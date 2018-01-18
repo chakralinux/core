@@ -19,7 +19,8 @@ source=(http://releases.llvm.org/$pkgver/llvm-$pkgver.src.tar.xz{,.sig}
         https://releases.llvm.org/$pkgver/lldb-$pkgver.src.tar.xz{,.sig}
         llvm-config.h
         0001-GCC-compatibility-Ignore-the-fno-plt-flag.patch
-        0002-Enable-SSP-and-PIE-by-default.patch)
+        0002-Enable-SSP-and-PIE-by-default.patch
+        disable-llvm-symbolizer-test.patch)
 sha256sums=('5fa7489fc0225b11821cab0362f5813a05f2bcf2533e8a4ea9c9c860168807b0'
             'SKIP'
             '135f6c9b0cd2da1aff2250e065946258eb699777888df39ca5a5b4fe5e23d0ff'
@@ -34,7 +35,8 @@ sha256sums=('5fa7489fc0225b11821cab0362f5813a05f2bcf2533e8a4ea9c9c860168807b0'
             'SKIP'
             '597dc5968c695bbdbb0eac9e8eb5117fcd2773bc91edf5ec103ecffffab8bc48'
             'a1ba7fb859ac157c4b4342435cd656e29b1e1d9bddcb8ae0158a91c0a8ba6203'
-            '186f2d10b013395f2dd6e1fd3baf4961a2e40c403f115517c9b253682934f50f')
+            '186f2d10b013395f2dd6e1fd3baf4961a2e40c403f115517c9b253682934f50f'
+            '6fff47ab5ede79d45fe64bb4903b7dfc27212a38e6cd5d01e60ebd24b7557359')
 validpgpkeys=('11E521D646982372EB577A1F8F0871F202119294'  # Tom Stellard
               'B6C8F98282B944E3B0D5C2530FC3042E345AD05D')
 
@@ -48,6 +50,10 @@ prepare() {
   mv "$srcdir/lld-$pkgver.src" tools/lld
   mv "$srcdir/lldb-$pkgver.src" tools/lldb
 
+  # Disable test that fails when compiled as PIE
+  # https://bugs.llvm.org/show_bug.cgi?id=31870
+  patch -Np1 <../disable-llvm-symbolizer-test.patch
+  
   # Enable SSP and PIE by default
   patch -Np1 -d tools/clang <../0001-GCC-compatibility-Ignore-the-fno-plt-flag.patch
   patch -Np1 -d tools/clang <../0002-Enable-SSP-and-PIE-by-default.patch
