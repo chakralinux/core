@@ -1,40 +1,38 @@
-# Contributor: damir <damir@archlinux.org>
-# Maintainer: Bruce Liu <rainman59118 AT Gmail.com>
 
 pkgname=libcdio
-pkgver=0.93
+pkgver=2.0.0
 pkgrel=1
 pkgdesc="GNU Compact Disc Input and Control Library"
 arch=("x86_64")
 license=('GPL3')
 url="http://www.gnu.org/software/libcdio/"
-depends=('gcc-libs>=4.4.2' 'libcddb' 'ncurses')
-options=('!libtool')
-install=libcdio.install
-source=(http://ftp.gnu.org/gnu/libcdio/${pkgname}-${pkgver}.tar.gz)
-source=("http://ftp.gnu.org/gnu/libcdio/${pkgname}-${pkgver}.tar.gz"
-        "libcdio-0.83-linking.patch")
-md5sums=('d154476feaac5a7b5f180e83eaf3d689'
-         '2826f89c78f09b0c0cbaeb47d507a55e')
+depends=('gcc-libs' 'libcddb' 'ncurses')
+source=(https://ftp.gnu.org/gnu/libcdio/$pkgname-$pkgver.tar.bz2{,.sig})
+sha256sums=('cd0da052a0e149e2526c41c5ac37b4865deb5c1cffe6faed18850154dbbd284b'
+            'SKIP')
+validpgpkeys=('DAA63BC2582034A02B923D521A8DE5008275EC21') # R. Bernstein
+
+prepare() {
+  cd $pkgname-$pkgver
+  autoreconf -fi
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  
-  patch -Np1 -i "${srcdir}/libcdio-0.83-linking.patch"
-  
-  ./configure --prefix=/usr \
-              --disable-vcd-info \
-              --enable-cpp-progs \
-              --disable-static
-              
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr --disable-vcd-info --enable-cpp-progs --disable-static
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   make
 }
 
-package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  
-  make DESTDIR="${pkgdir}" install
-  sed -i "/LIBCDIO_SOURCE_PATH/s|.*|/* #undef LIBCDIO_SOURCE_PATH */|" \
-    "${pkgdir}/usr/include/cdio/cdio_config.h"
+check() {
+  cd $pkgname-$pkgver
+  make -C test check
 }
 
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+
+  sed -e "/define CDIO_LIBCDIO_SOURCE_PATH/s|.*|/* #undef CDIO_LIBCDIO_SOURCE_PATH */|" \
+      -i "$pkgdir/usr/include/cdio/cdio_config.h"
+}

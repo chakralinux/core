@@ -1,20 +1,25 @@
 pkgname=libwpd
-pkgver=0.10.1
+pkgver=0.10.2
 pkgrel=1
 pkgdesc="Library for importing WordPerfect (tm) documents"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://libwpd.sourceforge.net/"
 license=('LGPL')
-depends=('gcc-libs' 'librevenge')
-makedepends=('libgsf')
+depends=('gcc-libs' 'zlib' 'librevenge')
+makedepends=('libgsf' 'doxygen' 'boost')
 options=('!emptydirs')
 source=(http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.xz)
-md5sums=('2e98574901f8019a239947c1d8c34b69')
+md5sums=('50d575509d68c940e566c4a0581cd61a')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr --disable-static
   make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
 }
 
 package() {

@@ -1,29 +1,50 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# Maintainer abveritas@chakra-project.org
-
-pkgname=libxml++
-pkgver=2.36.0
-pkgrel=1
-pkgdesc="C++ bindings to libxml2."
+pkgbase=libxml++
+pkgname=('libxml++' 'libxml++-docs')
+pkgver=3.0.1+4+g2af973f
+pkgrel=2
 arch=('x86_64')
 license=('LGPL')
 url="http://libxmlplusplus.sourceforge.net/"
-depends=('glibmm' 'libxml2>=2.7.7')
-options=('!libtool' '!emptydirs')
-source=("http://ftp.gnome.org/pub/GNOME/sources/${pkgname}/2.36/${pkgname}-${pkgver}.tar.xz")
-md5sums=('72838890c773f89ec701ba1a57cf0802')
+makedepends=('pkgconfig' 'glibmm-docs' 'libxml2' 'glibmm' 'git' 'mm-common')
+options=('!emptydirs')
+_commit=2af973ff59b2151e0783bbe4155816ce88d0c8b0  # libxml++-3.0
+source=("git+https://git.gnome.org/browse/libxml++#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd $pkgbase
+  git describe --tags | sed 's/-/+/g'
+}
+
+prepare() {
+  cd $pkgbase
+  NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/$pkgbase"
+  ./configure --prefix=/usr
 
-  ./configure --prefix=/usr 
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   make
 }
 
-package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+check() {
+  cd "${srcdir}/$pkgbase"
+  make check
+}
 
-  make DESTDIR="${pkgdir}" install
+package_libxml++() {
+  pkgdesc="C++ bindings to libxml2"
+  depends=('libxml2' 'glibmm')
+
+  cd "${srcdir}/$pkgbase"
+  make DESTDIR="${pkgdir}" install doc_subdirs=
+}
+
+package_libxml++-docs() {
+  pkgdesc="Developer documentation for libxml++"
+  depends=('glibmm-docs')
+  cd "${srcdir}/$pkgbase"
+  make DESTDIR="${pkgdir}" -C docs install
 }

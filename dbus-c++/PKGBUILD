@@ -1,11 +1,6 @@
-#
-# Platform Packages for Chakra, part of chakraos.org
-#
-# maintainer almack <gluca86 at gmail dot com>
-
 pkgname=dbus-c++
 pkgver=0.9.0
-pkgrel=5
+pkgrel=6
 pkgdesc="dbus-c++ attempts to provide a C++ API for D-BUS"
 url="http://sourceforge.net/projects/dbus-cplusplus/"
 arch=('x86_64')
@@ -13,13 +8,24 @@ license=('GPL')
 depends=('dbus' 'glib2')
 makedepends=('autoconf' 'automake')
 source=("http://sourceforge.net/projects/dbus-cplusplus/files/dbus-c%2B%2B/$pkgver/libdbus-c%2B%2B-$pkgver.tar.gz"
-	"patch-gcc47.patch")
+        'patch-gcc47.patch'
+        'disable-threading.patch'
+        'fix-writechar.patch')
 md5sums=('e752116f523fa88ef041e63d3dee4de2'
-         '9319b402b15f37d881b51bc758368900')
+         '9319b402b15f37d881b51bc758368900'
+         '50306e77ff5b1f654d2ee67f12876e41'
+         'aae096ad317d574317f5cc291256e6c1')
+
+prepare() {
+    cd "${srcdir}/libdbus-c++-${pkgver}"
+    patch -Np0 -i "${srcdir}/patch-gcc47.patch"
+    patch -Np1 -i "${srcdir}/disable-threading.patch"
+    patch -Np1 -i "${srcdir}/fix-writechar.patch"
+    autoreconf -vi
+}
 
 build() {
     cd "${srcdir}/libdbus-c++-${pkgver}"
-    patch -p0 < ${srcdir}/patch-gcc47.patch
     export LDFLAGS="${LDFLAGS} -lexpat -lpthread"
     ./autogen.sh --prefix=/usr --disable-static --enable-glib --disable-ecore
     make
@@ -28,4 +34,10 @@ build() {
 package() {
     cd "${srcdir}/libdbus-c++-${pkgver}"
     make DESTDIR=${pkgdir} install
+
+    install -Dm644 AUTHORS "${pkgdir}/usr/share/doc/${pkgname}/AUTHORS"
+    install -Dm644 ChangeLog "${pkgdir}/usr/share/doc/${pkgname}/ChangeLog"
+    install -Dm644 NEWS "${pkgdir}/usr/share/doc/${pkgname}/NEWS"
+    install -Dm644 README "${pkgdir}/usr/share/doc/${pkgname}/README"
+    install -Dm644 TODO "${pkgdir}/usr/share/doc/${pkgname}/TODO"
 }

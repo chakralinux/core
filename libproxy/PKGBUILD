@@ -9,21 +9,16 @@ license=('LGPL')
 depends=('gcc-libs' 'js17')
 optdepends=('networkmanager: NetworkManager configuration module'
             'perl: Perl bindings'
-            'python2: Python bindings')
+            'python2: Python 2.x bindings'
+            'python3: Python 3.x bindings')
 makedepends=('cmake' 'networkmanager' 'python2' 'perl')
 url="http://libproxy.github.io/libproxy/"
-source=(https://github.com/libproxy/libproxy/archive/${pkgver}.tar.gz
-        0001-pacrunner_mozjs-Also-support-mozjs-17.0.patch
-        libproxy-0.4.11-crash.patch)
-md5sums=('258d89cc052e0a3c09aa1f42d7f93045'
-         '16cb8ad1292f04279108a80f36434c7b'
-         'a45f2195c164a48639e963e8341f5d93')
+source=(https://github.com/libproxy/libproxy/archive/${pkgver}.tar.gz)
+md5sums=('258d89cc052e0a3c09aa1f42d7f93045')
 
 prepare() {
   mkdir build
   cd $pkgname-$pkgver
-  patch -Np1 -i ../0001-pacrunner_mozjs-Also-support-mozjs-17.0.patch
-  patch -Np1 -i ../libproxy-0.4.11-crash.patch
 }
 
 build() {
@@ -38,7 +33,8 @@ build() {
     -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DWITH_KDE4=OFF \
-    -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python2
+    -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python2 \
+    -DBIPR=0
   make
 }
 

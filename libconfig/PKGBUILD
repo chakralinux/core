@@ -1,28 +1,31 @@
-# Maintainer: abveritas[at]chakra-project[dot]org>
 
 pkgname=libconfig
-pkgver=1.4.9
+pkgver=1.7.1
 pkgrel=1
 pkgdesc="C/C++ Configuration File Library"
 arch=('x86_64')
 url="http://hyperrealm.com/libconfig/libconfig.html"
 license=('LGPL')
 depends=('gcc-libs' 'texinfo')
-install=libconfig.install
-options=('!libtool' '!emptydirs' 'zipman')
-source=("http://www.hyperrealm.com/libconfig/$pkgname-$pkgver.tar.gz")
-md5sums=('b6ee0ce2b3ef844bad7cac2803a90634')
+options=('!emptydirs' 'zipman')
+source=($pkgname-$pkgver.tar.gz::"https://github.com/hyperrealm/libconfig/archive/v$pkgver.tar.gz")
+md5sums=('3508ee02a03820da589ad013fb2c8011')
+
+prepare() {
+  cd $pkgname-$pkgver
+  autoreconf -vi
+}
 
 build() {
-  cd ${srcdir}/$pkgname-$pkgver
-  
+  cd $pkgname-$pkgver
+
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd ${srcdir}/$pkgname-$pkgver
-  
-  make DESTDIR=${pkgdir} install
-  rm ${pkgdir}/usr/share/info/dir
+  cd $pkgname-$pkgver
+
+  make DESTDIR="$pkgdir" install
+  rm "$pkgdir/usr/share/info/dir"
 }

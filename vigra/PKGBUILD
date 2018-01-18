@@ -1,60 +1,62 @@
 pkgbase=vigra
 pkgname=('vigra' 'vigra-doc')
-pkgver=1.11.0
-pkgrel=2
+pkgver=1.11.1
+pkgrel=1
 arch=('x86_64')
 url="http://hci.iwr.uni-heidelberg.de/vigra/"
 license=('custom:MIT')
 makedepends=(# runtime deps
              'libpng' 'libtiff' 'openexr' 'gcc-libs' 'sh' 'hdf5' 'fftw'
               # buildtime deps
-             'cmake' 'python2-nose' 'doxygen' 'python2-sphinx' 'boost' 'python2-numpy' 'python3-sphinx')
+             'cmake' 'python3-nose' 'doxygen' 'python3-sphinx' 'boost' 'python3-numpy')
 source=("https://github.com/ukoethe/vigra/releases/download/Version-${pkgver//./-}/${pkgname}-${pkgver}-src.tar.gz")
-md5sums=('7f80d289e03a2f2e8c8e85f3ff29d988')
+md5sums=('e72faf9fb82fa71fa63ba064bb63b703')
+
+prepare() {
+  mkdir -p build
+}
 
 build() {
-  cd "${srcdir}"/${pkgbase}-${pkgver}
-  cmake -DCMAKE_INSTALL_PREFIX=/usr \
+  cd build
+  cmake ../${pkgbase}-${pkgver} \
+      -DCMAKE_INSTALL_PREFIX=/usr \
       -DPYTHON_EXECUTABLE=/usr/bin/python2 \
       -DWITH_OPENEXR=true \
       -DWITH_VIGRANUMPY=1 \
+      -DDOCDIR=../build/doc \
       -DDOCINSTALL=share/doc
   make
 }
 
-#check() {
-#  cd "${srcdir}"/${pkgname}-${pkgver}
-#  make -j1 -k check #|| /bin/true # i686 fails
-#}
+check() {
+  cd build
+  make -j1 -k check || warning "Tests failed" # https://github.com/ukoethe/vigra/issues/409
+}
 
 package_vigra() {
   pkgdesc="Computer vision library"
   depends=('libpng' 'libtiff' 'openexr' 'gcc-libs' 'sh' 'hdf5' 'fftw')
-  optdepends=('python2: for python bindings'
+  optdepends=('python3: for python bindings'
               'boost-libs: for python bindings')
 
-  cd "${srcdir}"/${pkgbase}-${pkgver}
+  cd build
   make DESTDIR="${pkgdir}" install
-  # license
-  install -D -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
-  
-  # remove doc
-  rm -rf "${pkgdir}"/usr/share/doc
 
-  #fix shebang for python2
-  sed -i 's|python$|python2|' "$pkgdir"/usr/bin/vigra-config
+  install -Dm644 ${srcdir}/${pkgbase}-${pkgver}/LICENSE.txt "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+  
+  # Remove doc
+  rm -rf "${pkgdir}"/usr/share/doc
 }
 
 package_vigra-doc() {
   pkgdesc="Computer vision library - documentation and examples"
-  #depends=('vigra')
-  #arch=('any')
+  #arch=('any') # Not supported for now, maybe later
 
-  cd "${srcdir}"/${pkgbase}-${pkgver}
+  cd build
   make DESTDIR="${pkgdir}" install
-  # cleanup
+
+  # Remove vigra package content
   rm -rf "${pkgdir}"/usr/{bin,include,lib}
 
-  # license
-  install -D -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+  install -Dm644 ${srcdir}/${pkgbase}-${pkgver}/LICENSE.txt "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
 }
