@@ -3,23 +3,19 @@
 # Contributor: dorphell <dorphell@gmx.net>
 
 pkgname=gc
-pkgver=7.4.2
+pkgver=7.6.0
 pkgrel=1
 pkgdesc="A garbage collector for C and C++"
 arch=('x86_64')
 url="http://www.hboehm.info/gc/"
 license=('GPL')
 depends=('gcc-libs' 'libatomic_ops')
-source=("http://www.hboehm.info/gc/gc_source/${pkgname}-${pkgver}.tar.gz"
-        noelision.patch)
-md5sums=('12c05fd2811d989341d8c6d81f66af87'
-         '0be354bf60cc18363dc4c1601697717b')
+#source=(https://github.com/ivmai/bdwgc/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz)
+source=(http://www.hboehm.info/gc/gc_source/${pkgname}-${pkgver}.tar.gz)
+md5sums=('bf46ccbdaccfa3186c2ab87191c8855a')
 
 prepare() {
   cd ${pkgname}-${pkgver}
-  
-  # https://github.com/ivmai/bdwgc/pull/51
-  patch -p1 -i ../noelision.patch
   
   sed -i 's#pkgdata#doc#' doc/doc.am
 }
@@ -27,7 +23,10 @@ prepare() {
 build() {
   cd ${pkgname}-${pkgver}
   autoreconf -fi
-  ./configure --prefix=/usr --enable-cplusplus --disable-static
+
+  #https://github.com/ivmai/bdwgc/issues/87
+  CXXFLAGS+=' -std=gnu++98' ./configure --prefix=/usr --enable-cplusplus --disable-static
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   make
 }
 

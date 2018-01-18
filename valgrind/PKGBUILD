@@ -1,20 +1,36 @@
 pkgname=valgrind
-pkgver=3.12.0
-pkgrel=2
+pkgver=3.13.0
+pkgrel=1
 pkgdesc="A tool to help find memory-management problems in programs"
 arch=('x86_64')
 license=('GPL')
 url="http://valgrind.org/"
-depends=('glibc>=2.25' 'glibc<2.26' 'perl')
-makedepends=('gdb' 'openmpi')
-optdepends=('openmpi: MPI support')
+depends=('glibc=2.26' 'perl')
+makedepends=('gdb' 'openmpi' 'lib32-glibc' 'lib32-gcc-libs')
+optdepends=('openmpi: MPI support'
+            'lib32-glibc: 32-bit ABI support')
 options=('!emptydirs' '!buildflags')
 # patches taken from Arch
-source=(http://valgrind.org/downloads/${pkgname}-${pkgver}.tar.bz2)
-sha1sums=('7a6878bf998c60d1e377a4f22ebece8d9305bda4')
+source=(https://sourceware.org/pub/valgrind/valgrind-${pkgver}.tar.bz2
+        valgrind-fix-xml-socket.patch
+        valgrind-3.13.0-test-fixes.patch
+        valgrind-3.13.0-amd64-eflags-tests.patch
+        valgrind-3.13.0-gdb-8-testfix.patch
+        valgrind-3.7.0-respect-flags.patch)
+sha1sums=('ddf13e22dd0ee688bd533fc66b94cf88f75fad86'
+          '2c76dfee0b715ff11197b797d9b6084d23d451d4'
+          '2acd34d6b688c12f5c7e897979d53efe63a2368b'
+          'ef0832c8a5f8c28b3ed49026660abfe2cb78fe22'
+          '11cc688df5f9dc0b1ae4a2974996f170939e13eb'
+          'eb0eb41a8ae344c1a3849e6b3e3578fea8d5cff0')
 
 prepare() {
   cd ${pkgname}-${pkgver}
+  patch -Np1 < ../valgrind-3.7.0-respect-flags.patch
+  patch -Np1 < ../valgrind-3.13.0-test-fixes.patch
+  patch -Np1 < ../valgrind-3.13.0-amd64-eflags-tests.patch
+  patch -Np1 < ../valgrind-3.13.0-gdb-8-testfix.patch
+  patch -Np1 < ../valgrind-fix-xml-socket.patch
 }
 
 build() {
@@ -24,7 +40,10 @@ build() {
   CXXFLAGS=${CXXFLAGS/-fstack-protector-strong/}
 
   cd $pkgname-$pkgver
-  ./configure --prefix=/usr --mandir=/usr/share/man --with-mpicc=mpicc
+  ./configure \
+    --prefix=/usr \
+    --mandir=/usr/share/man \
+    --with-mpicc=mpicc
   make
 }
 
