@@ -1,31 +1,31 @@
-#
-# Chakra Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
 pkgname=ftgl
 _pkgver=2.1.3-rc5
 pkgver=${_pkgver/-/}
-pkgrel=2
+pkgrel=3
 pkgdesc="OpenGL library to use arbitrary fonts"
-arch=('i686' 'x86_64')
-url="http://ftgl.wiki.sourceforge.net/"
-license=('MIT')
-depends=('freetype2' 'glut')
-makedepends=('doxygen')
-options=('!libtool')
-source=(http://downloads.sourceforge.net/ftgl/$pkgname-2.1.3-rc5.tar.bz2)
-md5sums=('c7879018cde844059495b3029b0b6503')
+arch=(x86_64)
+url="https://sourceforge.net/projects/ftgl/"
+license=(MIT)
+depends=(freetype2 glu)
+makedepends=(doxygen mesa graphviz)
+source=("https://downloads.sourceforge.net/$pkgname/$pkgname-$_pkgver.tar.bz2")
+sha256sums=('521ff7bd62c459ff5372e269c223e2a6107a6a99a36afdc2ae634a973af70c59')
+
+prepare() {
+  cd $pkgname-${_pkgver/-/\~}
+  sed -i '/^SUBDIRS =/s/demo//' Makefile.in
+  printf '%s\n' >>docs/doxygen.cfg.in \
+    HAVE_DOT=yes DOT_IMAGE_FORMAT=svg INTERACTIVE_SVG=yes
+}
 
 build() {
-  cd "$srcdir/$pkgname-${_pkgver/-/~}"
-  ./configure --prefix=/usr --with-pic
+  cd $pkgname-${_pkgver/-/\~}
+  ./configure --prefix=/usr --with-pic --disable-static
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-${_pkgver/-/~}"
+  cd $pkgname-${_pkgver/-/\~}
   make DESTDIR="$pkgdir" install
 
   # FS#23283: install missing headers for OpenCascade

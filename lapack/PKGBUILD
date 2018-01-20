@@ -1,48 +1,52 @@
 # maintainer (x86_64): AlmAck
 
 pkgname=lapack
-pkgver=3.6.0
+pkgver=3.8.0
 pkgdesc="Linear Algebra PACKage"
-pkgrel=5
+pkgrel=1
 url="http://www.netlib.org/lapack"
 depends=("openblas")
-replaces=("atlas-lapack")
-makedepends=('gcc-fortran' 'cmake' 'python2')
+makedepends=('gcc-fortran' 'cmake' 'python2' 'doxygen')
 arch=('x86_64')
 license=("custom")
-source=(http://www.netlib.org/${pkgname}/${pkgname}-${pkgver}.tgz
-        LICENSE.blas)
-md5sums=('f2f6c67134e851fe189bb3ca1fbb5101'
+source=(http://www.netlib.org/${pkgname}/${pkgname}-${pkgver}.tar.gz
+            LICENSE.blas)
+md5sums=('96591affdbf58c450d45c1daa540dbd2'
          '38b6acb8ed5691d25863319d30a8b365')
 
 prepare() {
   cd "${srcdir}"
   install -d build
-
 }
-
 
 build() {
   cd "${srcdir}/build"
 
   cmake ../${pkgname}-${pkgver} \
-    -DUSE_OPTIMIZED_BLAS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_SKIP_RPATH=ON \
     -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_TESTING=OFF \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_Fortran_COMPILER=gfortran \
-    -DLAPACKE=ON
+    -DCBLAS=OFF \
+    -DLAPACKE_WITH_TMG=ON
   make
+
+# Build man pages
+  cd ../$pkgname-$pkgver
+  doxygen DOCS/Doxyfile_man
 }
 
 package() {
-
   cd ${srcdir}/build
   make DESTDIR=$pkgdir install
 
   install -m755 -d "${pkgdir}/usr/share/licenses/lapack"
   install -m644 "${srcdir}/${pkgname}-${pkgver}/LICENSE" \
     "${pkgdir}/usr/share/licenses/lapack/"
+  
+  # libblas provided by openblas
+  rm ${pkgdir}/usr/lib/libblas.so* 
 }

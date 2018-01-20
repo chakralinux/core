@@ -3,10 +3,10 @@
 
 pkgname=openblas
 _pkgname=OpenBLAS
-pkgver=0.2.17
-pkgrel=9
+pkgver=0.2.20
+pkgrel=1
 pkgdesc="An optimized BLAS library based on GotoBLAS2 1.13 BSD "
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.openblas.net/"
 license=('BSD')
 depends=('gcc-libs')
@@ -14,7 +14,7 @@ makedepends=('perl' 'gcc-fortran')
 conflicts=('blas' 'cblas')
 options=(!makeflags !emptydirs staticlibs)
 source=(${_pkgname}-v${pkgver}.tar.gz::http://github.com/xianyi/OpenBLAS/archive/v${pkgver}.tar.gz)
-sha256sums=('0fe836dfee219ff4cadcc3567fb2223d9e0da5f60c7382711fb9e2c35ecf0dbf')
+sha256sums=('5ef38b15d9c652985774869efd548b8e3e972e1e99475c673b25537ed7bcf394')
 
 build() {
   cd "$srcdir/$_pkgname-$pkgver"
@@ -33,13 +33,13 @@ package() {
   make PREFIX="$pkgdir/usr" USE_OPENMP=1 NO_LAPACK=1 NO_LAPACKE=1 MAJOR_VERSION=3 DYNAMIC_ARCH=1 install
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 
-
   # Remove reference to ${pkgdir}
   sed -i -e "s|${pkgdir}||" "${pkgdir}/usr/lib/cmake/openblas/OpenBLASConfig.cmake"
-
+  sed -i -e "s|${pkgdir}||" "${pkgdir}/usr/lib/pkgconfig/openblas.pc"
+  
   # create symlink as some packages just don't support arbitrary blas packages
+  ln -s libopenblas.a $pkgdir/usr/lib/libblas.a
   ln -s libopenblas.so $pkgdir/usr/lib/libblas.so.3
   ln -sf libblas.so.3 $pkgdir/usr/lib/libblas.so
-}
 
-# vim:set ts=2 sw=2 et:
+}

@@ -1,13 +1,12 @@
 pkgname=('openjdk' 'openjdk-src' 'openjdk-doc')
 pkgbase='openjdk'
 _java_ver=8
-_jdk_update=144
-_jdk_build=01
-# latest release notes:
-# http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+_jdk_update=172
+_jdk_build=02
+# check latest release: http://jdk.java.net/8/
 pkgver=${_java_ver}.u${_jdk_update}	
 _repo_ver=jdk${_java_ver}u${_jdk_update}-b${_jdk_build}
-pkgrel=1
+pkgrel=2
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 arch=('x86_64')
 url="http://icedtea.classpath.org/"
@@ -29,20 +28,18 @@ source=(jdk8u-${_repo_ver}.tar.gz::${_url_src}/archive/${_repo_ver}.tar.gz
         nashorn-${_repo_ver}.tar.gz::${_url_src}/nashorn/archive/${_repo_ver}.tar.gz
         openjdk.profile.sh
         openjdk.profile.csh
-	add-fontconfig.patch
-	build_with_gcc6.patch)
-md5sums=('18f72e701a83ff59be90ece7973ff35a'
-         'e55158ba39f7ec59543852474130a458'
-         'b24c2fe7cd55f9848102bd767e80ebb0'
-         '56dcd2747448e489c0aa3a40b9d269ad'
-         '21be367587fc85bad50ca916dc5f326a'
-         'd66456cd237263ebbe15329738f38d4e'
-         'd210b1fa792252a27ea11ff66aacd2b3'
-         '6d75303fd919d1a46e6b601385615a4e'
+	add-fontconfig.patch)
+md5sums=('d4d916815c60344c0f1c1bc2f8d427cf'
+         '635f248981acc34cdec023cb09b960e2'
+         '87f93741e992c56fa5e01fde617fcea5'
+         'ef3a1756d239b69e013c680372ade502'
+         '02d4fa4e9893005d3dc8b6517210e7f2'
+         '0ddbb53037f161245e13a41ae725b998'
+         '3dcbd3bc608b614208261ab01bac62a3'
+         '78ba8473724bccf2f4a7cb3dc4426f15'
          '65fecbcbadfa455f35cb6fef7d1fc553'
          'b839efffcbdb4f630b52d92ee1565c90'
-         '4615ccfc1731f49d27d17bda79f9a82f'
-         '86c80fc46517f73a6b325d702534d5ae')
+         '4615ccfc1731f49d27d17bda79f9a82f')
 
 _jdkname=openjdk8
 _jvmdir=/usr/lib/jvm/java-8-openjdk
@@ -55,7 +52,6 @@ _nonheadless=(bin/policytool
 
 prepare() {
   cd "${srcdir}/jdk8u-${_repo_ver}"
-  patch -p1 -i ${srcdir}/build_with_gcc6.patch
 
   for subrepo in corba hotspot jdk jaxws jaxp langtools nashorn
   do
