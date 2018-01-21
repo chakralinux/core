@@ -3,7 +3,7 @@
 
 pkgname=gtk-doc
 pkgver=1.27
-pkgrel=1
+pkgrel=2
 pkgdesc="Documentation tool for public library API"
 arch=('any')
 license=('GPL' 'FDL')
@@ -11,12 +11,12 @@ depends=('docbook-xsl' 'perl')
 makedepends=('pkgconfig' 'jade' 'itstool')
 optdepends=('jade: SGML support')
 url="http://www.gtk.org/gtk-doc/"
-source=(http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz)
+source=(https://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz)
 sha256sums=('e26bd3f7080c749b1cb66c46c6bf8239e2f320a949964fb9c6d56e1b0c6d9a6f')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  export PYTHON=/usr/bin/python2
+  export PYTHON=/usr/bin/python3
   ./configure --prefix=/usr
   make
 }
