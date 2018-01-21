@@ -2,91 +2,160 @@
 # Contributors: A Boersma (abveritas) <abveritas@chakra-project.org>
 
 pkgbase=qscintilla
-pkgname=('qscintilla'
-         'qscintilla-python2'
-         'qscintilla-python3'
-         'qscintilla-python-common')
-pkgver=2.8.3
-pkgrel=3
+pkgname=('qscintilla-qt4' 'python3-qscintilla-qt4' 'python2-qscintilla-qt4'
+         'python-qscintilla-qt4-common'
+         'qscintilla-qt5' 'python3-qscintilla-qt5' 'python2-qscintilla-qt5'
+         'python-qscintilla-qt5-common')
+pkgver=2.10.2
+pkgrel=1
 license=('GPL')
 arch=('x86_64')
 url="http://www.riverbankcomputing.co.uk/software/qscintilla/intro"
-makedepends=("python2-pyqt4" "python3-pyqt4" "chrpath" "python2-sip" "python3-sip")
-source=("http://downloads.sourceforge.net/pyqt/QScintilla-gpl-${pkgver}.tar.gz"
-        'configure.py-objdir-support.diff')
-md5sums=('bbf6944a9d3b089a79763ca4e6486b9d'
-         'e304f8cd5e3e7ded61eda15bf56613a8')
+makedepends=("python2-pyqt4" "python3-pyqt4" 'python3-pyqt5' 'python2-pyqt5' 'qt5-tools')
+options=('!buildflags') # Fix Qt Designer plugin
+source=("http://downloads.sourceforge.net/pyqt/QScintilla_gpl-${pkgver}.tar.gz")
+md5sums=('0d2b25ad607f93453c37478e83ec4640')
 
 prepare() {
-  cd QScintilla-gpl-${pkgver}
-  patch -p1 -i "${srcdir}"/configure.py-objdir-support.diff
+  cp -a QScintilla_gpl-${pkgver}{,-qt4}
 }
 
 build() {
-    cd $srcdir/QScintilla-gpl-$pkgver
+    cd "$srcdir"/QScintilla_gpl-${pkgver}
+    export QMAKEFEATURES=$PWD/Qt4Qt5/features/
 
     cd Qt4Qt5
+    qmake-qt5 qscintilla.pro
+    make
+
+    cd ../designer-Qt4Qt5
+    qmake-qt5 designer.pro INCLUDEPATH+=../Qt4Qt5 QMAKE_LIBDIR+=../Qt4Qt5
+    make
+
+    cd ../
+    cp -rf Python Python2
+    cd Python
+    python3 configure.py --pyqt=PyQt5 -n ../Qt4Qt5/ -o ../Qt4Qt5/ -c --qmake /usr/bin/qmake-qt5
+    make
+
+    cd ../Python2
+    python2 configure.py --pyqt=PyQt5 -n ../Qt4Qt5/ -o ../Qt4Qt5/ -c --qmake /usr/bin/qmake-qt5
+    make
+
+    cd "$srcdir"/QScintilla_gpl-${pkgver}-qt4/Qt4Qt5
     qmake qscintilla.pro
     make
-    
+
     cd ../designer-Qt4Qt5
-    QMAKEFEATURES=../Qt4Qt5/features qmake designer.pro INCLUDEPATH+=../Qt4Qt5 QMAKE_LIBDIR+=../Qt4Qt5
+    qmake designer.pro INCLUDEPATH+=../Qt4Qt5 QMAKE_LIBDIR+=../Qt4Qt5
     make
 
-    cp -r ../Python ../Python3
-
-    cd ../Python
-    QMAKEFEATURES=../Qt4Qt5/features python2 configure.py -n ../Qt4Qt5/ -o ../Qt4Qt5 -c --qmake /usr/bin/qmake
+    cd ../
+    cp -rf Python Python2
+    cd Python
+    python3 configure.py -n ../Qt4Qt5/ -o ../Qt4Qt5/ -c --qmake /usr/bin/qmake
     make
 
-   cd ../Python3
-   QMAKEFEATURES=../Qt4Qt5/features python3 configure.py -n ../Qt4Qt5/ -o ../Qt4Qt5/ -c --qmake /usr/bin/qmake
-   make
+    cd ../Python2
+    python2 configure.py -n ../Qt4Qt5/ -o ../Qt4Qt5/ -c --qmake /usr/bin/qmake
+    make
 }
+package_qscintilla-qt5() {
+    pkgdesc="A port to Qt5 of Neil Hodgson's Scintilla C++ editor class"
+    depends=('qt5-base')
 
-package_qscintilla() {
-    pkgdesc="A port to Qt of Neil Hodgson's Scintilla C++ editor class"
-    provides=('qscintilla2')
-    conflicts=('qscintilla2')
-    replaces=('qscintilla2')
-    depends=('qt')
-
-    cd "${srcdir}/QScintilla-gpl-${pkgver}/"Qt4Qt5
+    cd QScintilla_gpl-${pkgver}/Qt4Qt5
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
 
-    cd ${srcdir}/QScintilla-gpl-${pkgver}/designer-Qt4Qt5
+    cd ../designer-Qt4Qt5
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
 }
 
-package_qscintilla-python-common() {
-    pkgdesc="Common python qscintilla bindings files shared between the Python2 and Python3 version"
-    depends=('qscintilla')
-    conflicts=('python-qscintilla<=2.7')
+package_python-qscintilla-qt5-common() {
+    pkgdesc="Common python qscintilla bindings files shared between python-qscintilla-qt5 and python2-qscintilla-qt5"
+    depends=('qscintilla-qt5')
 
-    cd "${srcdir}/QScintilla-gpl-${pkgver}"/Python
+    cd QScintilla_gpl-${pkgver}/Python
     make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
-      
-    # Provided by qscintilla-python2
-    rm "${pkgdir}/usr/lib/python2.7/site-packages/PyQt4/Qsci.so"
+
+    # Provided by python-qscintilla
+    rm -r "${pkgdir}"/usr/lib
 }
 
-package_qscintilla-python2() {
-    pkgdesc="Python bindings for QScintilla2 (for Python 2)"
-    conflicts=('python-qscintilla')
-    replaces=('python-qscintilla')
-    provides=("python-qscintilla=${pkgver}")
-    depends=('qscintilla' 'qscintilla-python-common' 'python2-pyqt4')
+package_python3-qscintilla-qt5() {
+    pkgdesc="Python 3.x bindings for QScintilla2"
+    depends=('python-qscintilla-qt5-common' 'python3-pyqt5')
 
-   cd "${srcdir}/QScintilla-gpl-${pkgver}/Python"
-   install -Dm755 Qsci.so \
-      "${pkgdir}/usr/lib/python2.7/site-packages/PyQt4/Qsci.so"
+    cd QScintilla_gpl-${pkgver}/Python
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+    # Provided by python-qscintilla-common
+    rm -r "${pkgdir}"/usr/share
 }
 
-package_qscintilla-python3() {
-    pkgdesc="Python bindings for QScintilla2 (for Python 3)"
-    depends=('qscintilla' 'qscintilla-python-common' 'python3-pyqt4')
+package_python2-qscintilla-qt5() {
+    pkgdesc="Python 2.x bindings for QScintilla2"
+    depends=('python-qscintilla-qt5-common' 'python2-pyqt5')
 
-   cd "${srcdir}/QScintilla-gpl-${pkgver}/Python3"
-   install -Dm755 Qsci.so \
-      "${pkgdir}/usr/lib/python3.4/site-packages/PyQt4/Qsci.so"
+    cd QScintilla_gpl-${pkgver}/Python2
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+    # Provided by python-qscintilla
+    rm -r "${pkgdir}"/usr/share
+}
+
+package_qscintilla-qt4() {
+    pkgdesc="A port to Qt4 of Neil Hodgson's Scintilla C++ editor class"
+    depends=('qt4')
+    replaces=('qscintilla<2.8.3')
+    conflicts=('qscintilla<2.8.3')
+    provides=("qscintilla=$pkgver")
+
+    cd QScintilla_gpl-${pkgver}-qt4/Qt4Qt5
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+    cd ../designer-Qt4Qt5
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+}
+
+package_python-qscintilla-qt4-common() {
+    pkgdesc="Common python qscintilla bindings files shared between python-qscintilla-qt4 and python2-qscintilla-qt4"
+    depends=('qscintilla-qt4')
+    replaces=('python-qscintilla-common<2.8.3')
+    conflicts=('python-qscintilla-common<2.8.3')
+    provides=("python-qscintilla-common=$pkgver")
+
+    cd QScintilla_gpl-${pkgver}-qt4/Python
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+    # Provided by python-qscintilla
+    rm -r "${pkgdir}"/usr/lib
+}
+
+package_python3-qscintilla-qt4() {
+    pkgdesc="Python 3.x bindings for QScintilla2"
+    depends=('python-qscintilla-qt4-common' 'python3-pyqt4')
+    replaces=('python3-qscintilla<2.8.3')
+    conflicts=('python3-qscintilla<2.8.3')
+    provides=("python3-qscintilla=$pkgver")
+
+    cd QScintilla_gpl-${pkgver}-qt4/Python
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+    # Provided by python2-qscintilla-common
+    rm -r "${pkgdir}"/usr/share
+}
+
+package_python2-qscintilla-qt4() {
+    pkgdesc="Python 2.x bindings for QScintilla2"
+    depends=('python-qscintilla-qt4-common' 'python2-pyqt4')
+    replaces=('python2-qscintilla<2.8.3')
+    conflicts=('python2-qscintilla<2.8.3')
+    provides=("python2-qscintilla=$pkgver")
+
+    cd QScintilla_gpl-${pkgver}-qt4/Python2
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+
+    # Provided by python2-qscintilla-common
+    rm -r "${pkgdir}"/usr/share
 }

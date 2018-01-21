@@ -1,8 +1,7 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/v4l-utils
 
 pkgname=v4l-utils
-# Caution: This package has a lib32 alternative, make sure to update that one as well
-pkgver=1.8.1
+pkgver=1.12.5
 pkgrel=1
 pkgdesc="Userspace tools and conversion library for Video 4 Linux"
 arch=('x86_64')
@@ -11,11 +10,13 @@ provides=("libv4l=$pkgver")
 replaces=('libv4l')
 conflicts=('libv4l')
 license=('LGPL')
-makedepends=('qt')
-optdepends=('qt')
-depends=('glibc' 'gcc-libs' 'sysfsutils' 'libjpeg-turbo')
-source=(http://linuxtv.org/downloads/v4l-utils/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('f86d0938e46fde821dc10d4d2f6636e4')
+makedepends=('qt5-base' 'alsa-lib')
+optdepends=('qt5-base' 'alsa-lib')
+depends=('hicolor-icon-theme' 'gcc-libs' 'sysfsutils' 'libjpeg-turbo')
+source=(http://linuxtv.org/downloads/v4l-utils/${pkgname}-${pkgver}.tar.bz2{,.asc})
+sha256sums=('0618162ddb0b57fe7c45407d4d66ed79e3a134cdbc9e72598d34e61d3359e20d'
+            'SKIP')
+validpgpkeys=('05D0169C26E41593418129DF199A64FADFB500FF') # Gregor Jasny <gjasny@googlemail.com>
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"

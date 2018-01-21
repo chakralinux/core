@@ -1,32 +1,60 @@
 pkgbase=protobuf
 pkgname=('protobuf' 'python2-protobuf' 'python3-protobuf')
-pkgver=2.6.1
-pkgrel=2
-pkgdesc="A way of encoding structured data in an efficient yet extensible format"
+pkgver=3.5.1.1
+_gtestver=1.8.0
+pkgrel=1
+pkgdesc="Protocol Buffers - Google's data interchange format"
 arch=('x86_64')
 url="http://code.google.com/p/protobuf/"
-license=('APACHE')
+license=('BSD')
 depends=('gcc-libs' 'zlib')
-makedepends=('python2-setuptools' 'python3')
-options=(!libtool)
-source=("https://github.com/google/protobuf/releases/download/v$pkgver/protobuf-$pkgver.tar.bz2")
-sha512sums=('8b092b87fcd79223db199cd3d330f3d43689b47f345aa4e34028dcf1680d609a5d5a89ab08588e817b566d3b265834c38f1db580bc1c144b512ce74d35f2a174')
+makedepends=('unzip' 'python3-setuptools' 'python2-setuptools' 'clang')
+source=("$pkgbase-$pkgver.tgz::https://github.com/google/${pkgbase}/archive/v${pkgver}.tar.gz"
+        "gtest-${_gtestver}.tar.gz::https://github.com/google/googletest/archive/release-${_gtestver}.tar.gz")
+sha512sums=('f25ecf772facc8efd196b7c06012ce9ec24152b2c0cde38ed2e29ecded8f534221b008e649f4cbd991436ad3436130cd2e31d51e75019d08240d518111fb4496'
+            '1dbece324473e53a83a60601b02c92c089f5d314761351974e097b2cf4d24af4296f9eb8653b6b03b1e363d9c5f793897acae1f0c7ac40149216035c4d395d9d')
+
+prepare() {
+  cd "$pkgbase-$pkgver"
+
+  rm -rf gmock && cp -r "$srcdir/googletest-release-${_gtestver}/googlemock" gmock
+  rm -rf googletest && cp -r "$srcdir/googletest-release-${_gtestver}/googletest" googletest
+  ln -sf ../googletest gmock/gtest
+
+  sed -r 's|/usr/bin/env python|/usr/bin/env python2|' -i googletest/scripts/*.py
+}
 
 build() {
-	cd $srcdir/$pkgname-$pkgver
-#	./autogen.sh
-#	./configure --prefix=/usr --disable-static
+  # GCC is stuck on src/google/protobuf/util/internal/protostream_objectsource_test.cc
+  # and src/google/protobuf/util/internal/protostream_objectwriter_test.cc.
+  export CC=/usr/bin/clang CXX=/usr/bin/clang++
+
+  cd "$srcdir/$pkgbase-$pkgver"
+  ./autogen.sh
+
+  cd "$srcdir/$pkgbase-$pkgver/googletest"
+  ./configure
+  make
+
+  cd "$srcdir/$pkgbase-$pkgver/gmock"
+  ./configure
+  make
+
+  cd "$srcdir/$pkgbase-$pkgver"
   ./configure --prefix=/usr
   make
+}
+
+check() {
+  make -C "$srcdir/$pkgbase-$pkgver" check
 }
 
 package_protobuf() {
   cd $pkgbase-$pkgver
   make DESTDIR="$pkgdir" install
-  install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
 
-  install -Dm644 editors/protobuf-mode.el \
-    "$pkgdir"/usr/share/emacs/site-lisp/protobuf-mode.el
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 editors/protobuf-mode.el "$pkgdir"/usr/share/emacs/site-lisp/protobuf-mode.el
 }
 
 package_python2-protobuf() {
@@ -36,14 +64,20 @@ package_python2-protobuf() {
     conflicts=("protobuf-python")
     replaces=("protobuf-python")
 
-    cd $srcdir/protobuf-$pkgver/python
-    python2 setup.py install --prefix=/usr --root $pkgdir
+  cd "$srcdir/$pkgbase-$pkgver/python"
+  python2 setup.py install --root="$pkgdir"
+
+  install -d "$pkgdir/usr/share/licenses/$pkgname"
+  ln -s "/usr/share/licenses/$pkgbase/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/"
 }
 
 package_python3-protobuf() {
     pkgdesc="protobuf python3 API"
     depends=("python3" "protobuf=${pkgver}")
 
-    cd $srcdir/protobuf-$pkgver/python
-    python3 setup.py install --prefix=/usr --root $pkgdir
+  cd "$srcdir/$pkgbase-$pkgver/python"
+  python3 setup.py install --root="$pkgdir"
+
+  install -d "$pkgdir/usr/share/licenses/$pkgname"
+  ln -s "/usr/share/licenses/$pkgbase/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/"
 }

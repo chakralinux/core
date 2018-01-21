@@ -1,7 +1,7 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/openal
 
 pkgname=openal
-pkgver=1.17.1
+pkgver=1.18.2
 # Caution: This package has a lib32 dependency, make sure to update that package as well
 pkgrel=1
 pkgdesc="OpenAL is a cross-platform 3D audio library"
@@ -9,18 +9,19 @@ arch=('x86_64')
 url="http://www.openal.org/"
 license=('LGPL')
 depends=('glibc')
-makedepends=('alsa-lib' 'sdl' 'cmake' 'libpulse' 'qt4' 'fluidsynth')
-optdepends=('qt4: alsoft-config GUI Configurator'
+makedepends=('alsa-lib' 'sdl' 'cmake' 'libpulse' 'qt5-base' 'fluidsynth')
+optdepends=('qt5-base: alsoft-config GUI Configurator'
             'fluidsynth: MIDI rendering')
 source=(http://kcat.strangesoft.net/$pkgname-releases/$pkgname-soft-${pkgver}.tar.bz2)
-md5sums=('4e1cff46cdb3ac147745dea33ad92687')
+md5sums=('d4eeb0889812e2fdeaa1843523d76190')
 
 build() {
   cd ${srcdir}/${pkgname}-soft-${pkgver}/build
   cmake \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -D CMAKE_BUILD_TYPE=Release \
-  ..
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    ..
   make
 }
 

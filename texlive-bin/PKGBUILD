@@ -2,7 +2,7 @@
 
 pkgname=('texlive-bin' 'libsynctex')
 pkgver=2017.44590
-pkgrel=2
+pkgrel=3
 _biber_ver=2.6 # for biblatex 3.5 only.
 license=('GPL')
 arch=('x86_64')
@@ -129,9 +129,6 @@ package_texlive-bin() {
    cd source
    # fixes for xindy
    find utils/xindy -name Makefile -exec sed -i -e "s|^prefix =.\+$|prefix = $pkgdir/usr|" -e "s|^mandir =.\+$|mandir = \${prefix}/share/man|" -e "s|^datadir =.\+$|datadir = \${datarootdir}/texmf|" -e "s|^docdir =.\+$|docdir = \${datadir}/doc/xindy|" '{}' \;
-
-   ## install biber
-   install -m755 "${srcdir}"/biber "${pkgdir}/usr/bin/biber"
   
    echo "-------------------------------------------------------"
    echo "--> Proceeding with make install ..."
@@ -381,6 +378,9 @@ pn2pdf"
    done
    ###################################################################
 
+   ## install biber
+   install -m755 "${srcdir}"/biber "${pkgdir}/usr/bin/biber"
+   
    # remove libsynctex
    rm -f "$pkgdir"/usr/include/synctex/*
    rm -f "$pkgdir"/usr/lib/libsynctex.*

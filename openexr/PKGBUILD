@@ -1,20 +1,33 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# maintainer (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
-
 pkgname=openexr
-pkgver=2.0.1
+pkgver=2.2.1
 pkgrel=1
 depends=('zlib' 'ilmbase')
 pkgdesc="openexr library for EXR images"
-arch=(i686 x86_64)
-options=('!libtool')
+arch=(x86_64)
 license=('custom')
-source=("http://download.savannah.nongnu.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('4387e6050d2faa65dd5215618ff2ddce')
+source=("http://download.savannah.gnu.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+            openexr-2.2.0-fix-config.h-collision.patch
+            openexr-2.2.0-fix-cpuid-on-abi_x86_32.patch
+            openexr-2.2.0-Fix-typo-in-C-bindings.patch
+            openexr-2.2.0-Install-missing-header-files.patch
+            openexr-2.2.0-use-ull-for-64-bit-literals.patch)
+md5sums=('421815c32989e1b98fc4798ee754c433'
+         '37666d158c16dd6338f4b8b4138ff73e'
+         '3916b771857e3f4a959b631eb8504bf3'
+         'fb9a58317e4b3b4ab298c99bf4a42ea6'
+         '833f23eb1677b0f1f367f9d694fb278d'
+         '52226f57047312531a02d2c7834b762d')
 url="http://www.openexr.org"
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  
+  patch -Np1 -i ../openexr-2.2.0-fix-config.h-collision.patch
+  patch -Np1 -i ../openexr-2.2.0-fix-cpuid-on-abi_x86_32.patch
+  patch -Np1 -i ../openexr-2.2.0-Fix-typo-in-C-bindings.patch
+  patch -Np1 -i ../openexr-2.2.0-Install-missing-header-files.patch
+  patch -Np1 -i ../openexr-2.2.0-use-ull-for-64-bit-literals.patch
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"

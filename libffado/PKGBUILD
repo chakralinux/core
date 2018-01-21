@@ -1,8 +1,8 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libffado
 
 pkgname=libffado
-pkgver=2.2.1
-pkgrel=4
+pkgver=2.4.0
+pkgrel=1
 pkgdesc="Driver for FireWire audio devices"
 arch=('x86_64')
 url="http://www.ffado.org/"
@@ -12,27 +12,17 @@ depends=('libiec61883' 'libavc1394' 'libsigc++' 'libxml++' 'alsa-lib'
 makedepends=('scons' 'python2-pyqt4' 'jack2' 'python2-dbus')
 optdepends=('python2-pyqt4: mixer applet'
             'python2: ffado-diag')
-source=("http://www.ffado.org/files/libffado-$pkgver.tgz"
-	'fix-test-errno-usage.patch')
-md5sums=('e113d828835051f835fb4a329cb0cbd4'
-         'd9cf3bed720e82ea97e29003f20b3c6b')
+source=("http://www.ffado.org/files/libffado-$pkgver.tgz")
+md5sums=('3050229da90bbc4830acc0d09a92b8f2')
 
-
-prepare() {
-  cd $pkgname-$pkgver
-  
-  # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=805211
-  patch -Np1 -i ../fix-test-errno-usage.patch
-}
 
 build() {
   cd $pkgname-$pkgver
 
-  scons DEBUG=False \
-        PREFIX=/usr \
+  scons PREFIX=/usr \
+        DEBUG=no \
         MANDIR=/usr/share/man \
-        UDEVDIR=/usr/lib/udev/rules.d \
-        COMPILE_FLAGS="$CFLAGS -std=gnu++11"
+        UDEVDIR=/usr/lib/udev/rules.d
 }
 
 package() {
@@ -46,4 +36,7 @@ package() {
 
   install -Dm644 support/xdg/hi64-apps-ffado.png \
     "$pkgdir/usr/share/pixmaps/ffado.png"
+
+  install -Dm644 AUTHORS "${pkgdir}/usr/share/doc/${pkgname}/AUTHORS"
+  install -Dm644 README "${pkgdir}/usr/share/doc/${pkgname}/README"
 }

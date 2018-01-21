@@ -1,5 +1,5 @@
 pkgname=imagemagick
-pkgver=6.9.4.7
+pkgver=6.9.9.33
 pkgrel=1
 pkgdesc="An image viewing/manipulation program"
 arch=('x86_64')
@@ -17,11 +17,10 @@ optdepends=('ghostscript: for Ghostscript support'
             'libpng: for PNG support'
             'libwebp: for WEBP support')
 options=('libtool' '!emptydirs')
-source=(http://www.imagemagick.org/download/releases/ImageMagick-${pkgver%.*}-${pkgver##*.}.tar.xz{,.asc}
-        'perlmagick.rpath.patch')
-sha1sums=('d386de76334a7c1c13f40d337a0f38b18c4ca86c'
-          'SKIP'
-          'e143cf9d530fabf3b58023899b5cc544ba93daec')
+source=(http://www.imagemagick.org/download/releases/ImageMagick-${pkgver%.*}-${pkgver##*.}.tar.xz{,.asc})
+sha1sums=('25e97ff67107ba9e8a45a9751153827244124e0d'
+          'SKIP')
+validpgpkeys=(D8272EF51DA223E4D05B466989AB63D48277377A)  # Lexie Parsimoniae
 backup=("etc/ImageMagick-${pkgver%%.*}/coder.xml"
         "etc/ImageMagick-${pkgver%%.*}/colors.xml"
         "etc/ImageMagick-${pkgver%%.*}/delegates.xml"
@@ -40,7 +39,6 @@ prepare() {
   cd ImageMagick-${pkgver%.*}-${pkgver##*.}
   sed '/AC_PATH_XTRA/d' -i configure.ac
   autoreconf --force --install
-  patch -p0 -i "${srcdir}/perlmagick.rpath.patch"
 }
 
 build() {
@@ -72,7 +70,7 @@ build() {
     --without-fpx \
     --without-gvc \
     --without-jbig
-
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   make
 }
 

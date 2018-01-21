@@ -1,24 +1,35 @@
 pkgname=webrtc-audio-processing
-pkgver=0.1
-pkgrel=7
+pkgver=0.3
+pkgrel=1
 pkgdesc="AudioProcessing library based on Google's implementation of WebRTC"
 arch=('x86_64')
 url="http://freedesktop.org/software/pulseaudio/webrtc-audio-processing"
 license=(custom)
 depends=('gcc-libs')
-source=("http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/$pkgname-$pkgver.tar.xz")
-md5sums=('da25bb27812c8404060d4cc0dc712f04')
+makedepends=(git)
+_commit=fc0e76139404e08cc5b8024daafa1ddf576a4e21  # tags/v0.3^0
+source=("git+https://anongit.freedesktop.org/git/pulseaudio/webrtc-audio-processing#commit=$_commit")
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed 's/^v//;s/-/+/g'
+}
+
+prepare() {
+  cd $pkgname
+  NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd $pkgname-$pkgver
+  cd $pkgname
   ./configure --prefix=/usr --disable-static
   make
 }
 
 package() {
-  cd $pkgname-$pkgver
+  cd $pkgname
   make DESTDIR="$pkgdir" install
 
   install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
-  install -Dm644 PATENTS "$pkgdir/usr/share/licenses/$pkgname/PATENTS"
 }
+md5sums=('SKIP')

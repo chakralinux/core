@@ -3,7 +3,7 @@
 pkgbase=qt
 pkgname=('qt' 'qt-private-headers' 'qt-docs')
 pkgver=4.8.7
-pkgrel=7
+pkgrel=8
 arch=('x86_64')
 url='http://www.qt.io'
 license=('GPL3' 'LGPL')
@@ -80,6 +80,10 @@ prepare() {
         sed -i "/^QMAKE_LFLAGS_RPATH/s| -Wl,-rpath,||g" mkspecs/common/gcc-base-unix.conf
         sed -i "/^QMAKE_LFLAGS\s/s|+=|+= ${LDFLAGS}|g" mkspecs/common/gcc-base.conf
 
+        cp mkspecs/common/linux{,32}.conf
+        sed -i "/^QMAKE_LIBDIR\s/s|=|= /usr/lib32|g" mkspecs/common/linux32.conf
+        sed -i "s|common/linux.conf|common/linux32.conf|" mkspecs/linux-g++-32/qmake.conf
+  
 	# Fix build with GCC6 (Fedora)
 	patch -p1 -i "$srcdir"/qt4-gcc6.patch
 
@@ -90,18 +94,17 @@ prepare() {
 	patch -p1 -i "$srcdir"/qt4-icu59.patch
 
 	# Fix build with OpenSSL 1.1 (Debian + OpenMandriva)
-	# patch -p1 -i "$srcdir"/qt4-openssl-1.1.patch
+	#patch -p1 -i "$srcdir"/qt4-openssl-1.1.patch
+
+	echo "QMAKE_CXXFLAGS += -std=gnu++98" >> src/3rdparty/javascriptcore/JavaScriptCore/JavaScriptCore.pri
+        echo "QMAKE_CXXFLAGS += -std=gnu++98" >> src/plugins/accessible/qaccessiblebase.pri
 }
 
 build() {
-	cd $srcdir/$_pkgfqn
+	cd ${_pkgfqn}
 
         export QT4DIR="${srcdir}"/${_pkgfqn}
         export LD_LIBRARY_PATH=${QT4DIR}/lib:${LD_LIBRARY_PATH}
-	export CXXFLAGS+=" -std=gnu++98" # Fix build with GCC 6
-	export OPENSSL_LIBS='-L/usr/lib/openssl-1.0 -lssl -lcrypto'
-	export CXXFLAGS+=" -I/usr/include/openssl-1.0"
-
 
 	./configure -confirm-license -opensource \
                 -release \

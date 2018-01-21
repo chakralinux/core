@@ -4,16 +4,16 @@
 
 pkgbase=polkit-qt
 pkgname=('polkit-qt4' 'polkit-qt5')
-pkgver=0.112.0+git20160226
+pkgver=0.112.0+git20180107
 pkgrel=1
 pkgdesc='A library that allows developers to access PolicyKit API with a nice Qt-style API'
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url='https://projects.kde.org/projects/kdesupport/polkit-qt-1'
 license=('LGPL')
 makedepends=('cmake' 'automoc4' 'polkit' 'qt' 'qt5-base')
 #source=("http://download.kde.org/stable/apps/KDE4.x/admin/${pkgbase}-1-${pkgver}.tar.bz2")
-source=("http://quickgit.kde.org/?p=polkit-qt-1.git&a=snapshot&h=15c7867e88c5278f61896b5531ac2b544add8220&fmt=tgz")
-md5sums=('e74c39223328edf89cdce4e037ef3c38')
+source=("${pkgbase}::git+https://anongit.kde.org/polkit-qt-1.git#commit=cbecf60ac7b5c17cf37503d6675bf5542efbab29")
+md5sums=('SKIP')
 
 prepare() {
   mkdir build{,-qt5}
@@ -21,7 +21,7 @@ prepare() {
 
 build() {
   cd build
-  cmake ../${pkgbase}-1 \
+  cmake ../${pkgbase} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DLIB_DESTINATION=/usr/lib \
@@ -29,7 +29,7 @@ build() {
   make
 
   cd ../build-qt5
-  cmake ../${pkgbase}-1 \
+  cmake ../${pkgbase} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DLIB_DESTINATION=/usr/lib
