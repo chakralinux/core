@@ -1,14 +1,12 @@
-# Contributor: Jan Alexander Steffens (heftig) <jan.steffens@gmail.com>
-
 pkgname=libqmi
 pkgver=1.20.0
-pkgrel=1
+pkgrel=2
 pkgdesc="QMI modem protocol helper library"
-arch=(i686 x86_64)
+arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/libqmi/"
 license=(GPL2)
-depends=(libmbim)
-makedepends=(python3-six git)
+depends=('libmbim')
+makedepends=('python2-six' 'git')
 _commit=a7fd5363cff7af6137065065ce405adf7bcbfc35  # tags/1.20.0
 source=("git://anongit.freedesktop.org/libqmi#commit=$_commit")
 sha256sums=('SKIP')
@@ -21,8 +19,6 @@ pkgver() {
 prepare() {
   cd $pkgname
   NOCONFIGURE=1 ./autogen.sh
-  cd $srcdir/$pkgname/build-aux/qmi-codegen
-  sed 's/env python/env python3/g' -i *.py
 }
 
 build() {
@@ -39,5 +35,5 @@ check() {
 
 package() {
   cd $pkgname
-  make DESTDIR="$pkgdir" install
+  make DESTDIR=$pkgdir install
 }
