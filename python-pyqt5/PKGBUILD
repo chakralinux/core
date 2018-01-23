@@ -1,9 +1,9 @@
 pkgbase=pyqt5
 pkgname=('python-pyqt5-common' 'python3-pyqt5' 'python2-pyqt5')
-pkgver=5.9.1
-pkgrel=2
+pkgver=5.10
+pkgrel=1
 arch=('x86_64')
-url='http://riverbankcomputing.co.uk/software/pyqt/intro'
+url="http://riverbankcomputing.co.uk/software/pyqt/intro"
 license=('GPL')
 makedepends=('python3-sip'
              'python2-sip'
@@ -19,13 +19,16 @@ makedepends=('python3-sip'
              'qt5-webengine'
              'qt5-webkit'
              'qt5-websockets'
-             'qt5-x11extras')
+             'qt5-x11extras'
+             'qt5-networkauth')
 source=("http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-$pkgver/PyQt5_gpl-$pkgver.tar.gz")
-sha512sums=('1c7d00dac5329296dd205eddeeecfd29495c4746791730056d143438871eb64a5d9827dcb1e28a78e8746218908e0e72374bd686a21b631b9aa1aa1c67e61eac')
+sha512sums=('a86520870536618857ed3ee1601af45f5a0b456de192a5d6a3f8fa734e5cf49b8ce373928c0f4aeaae365d3fa95db03b5f59ae2903bc5eb2304b7edf22198033')
 
 prepare() {
   # Support new versions of Qt - don't remove, needs to be reapplied after every new Qt release
+  pushd PyQt5_gpl-$pkgver
   # patch -p1 -i ../pyqt-support-new-qt.patch
+  popd
 
   # The additional include path was removed due to this line, I don't really know why they are doing this...
   sed -i '/target_config.dbus_inc_dirs = \[\]/d' PyQt5_gpl-$pkgver/configure.py
@@ -53,6 +56,7 @@ build() {
     --no-sip-files \
     --qsci-api \
     -q /usr/bin/qmake-qt5
+
   find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
   msg "Making the Python 2 version"
   make
