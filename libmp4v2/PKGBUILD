@@ -2,24 +2,32 @@
 
 pkgname=libmp4v2
 pkgver=2.0.0
-pkgrel=3
+pkgrel=4
 pkgdesc="MPEG-4 library"
 arch=('x86_64')
 license=('MPL')
 url="http://code.google.com/p/mp4v2/"
 depends=('gcc-libs')
-source=("https://sources.archlinux.org/other/packages/$pkgname/mp4v2-${pkgver}.tar.bz2")
-md5sums=('c91f06711225b34b4c192c9114887b14')
+source=("https://sources.archlinux.org/other/packages/$pkgname/mp4v2-${pkgver}.tar.bz2"
+            gcc7.patch)
+md5sums=('c91f06711225b34b4c192c9114887b14'
+         '1f0dc0fe591c0924982ba637bdcca633')
+
+prepare() {
+  cd "mp4v2-${pkgver}"
+  
+  patch -Np1 -i "${srcdir}/gcc7.patch"
+}
 
 build() {
-  cd "${srcdir}/mp4v2-${pkgver}"
+  cd "mp4v2-${pkgver}"
 
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "${srcdir}/mp4v2-${pkgver}"
+  cd "mp4v2-${pkgver}"
   make DESTDIR=${pkgdir} install
   make DESTDIR=${pkgdir} install-man
 }

@@ -1,107 +1,89 @@
 pkgbase=jack2
 pkgname=('jack2' 'jack2-dbus')
 _tarname=jack
-pkgver=1.9.10
-pkgrel=3
+pkgver=1.9.12
+pkgrel=1
 arch=('x86_64')
 url="http://jackaudio.org/"
 backup=(etc/security/limits.d/99-audio.conf)
 license=('GPL')
-makedepends=('python2-dbus' 'libffado' 'celt' 'opus' 'libsamplerate')
-source=("https://dl.dropbox.com/u/28869550/jack-$pkgver.tar.bz2"
+makedepends=('python3' 'python2-dbus' 'libffado' 'celt' 'opus' 'libsamplerate')
+source=("${pkgbase}-${pkgver}::https://github.com/jackaudio/${pkgbase}/archive/v${pkgver}.tar.gz"
         '99-audio.conf'
         '40-hpet-permissions.rules')
-md5sums=('4aeb91d7ae0cabce98355436ed4f217a'
+md5sums=('6cb5dfea0586bcf009c733c4e4b04a03'
          '4d928a76e3f3d77d037c42ab75ac0f0b'
          '23eba69d2dbbb800f68176e5d38b9af5')
 
-_isbuild() {
-  printf "%s\n" ${pkgname[@]} | grep -qx $1
-}
-
-_pyfix() {
-  sed -i 's:bin/env python:bin/env python2:' \
-    "$pkgdir/usr/bin/jack_control"
-}
-
-_wafconf() {
-  python2 waf configure --prefix=/usr \
-                        --alsa \
-                        --firewire $@
-}
-
 prepare() {
-  cd "$srcdir"
+  cd "${pkgbase}-${pkgver}"
 
-  # we may do 2 different builds
-  cp -r $_tarname-$pkgver $_tarname-dbus-$pkgver
+  # https://github.com/jackaudio/jack2/issues/308
+  sed -i 's:bin/env python:bin/env python2:' \
+    "example-clients/jack_control"
+
+  # copy of the source for jack2-dbus
+  cp -r "${srcdir}/${pkgbase}-${pkgver}" "${srcdir}/${pkgname[1]}-${pkgver}"
+
+  # configure jack2
+  python3 waf configure --prefix=/usr \
+                       --htmldir="/usr/share/doc/${pkgbase}/" \
+                       --freebob=no \
+                       --classic \
+                       --dbus
+
+  # configure jack2-dbus
+  cd "${srcdir}/${pkgname[1]}-${pkgver}"
+  python3 waf configure --prefix=/usr \
+                       --htmldir="/usr/share/doc/${pkgbase}/" \
+                       --freebob=no \
+                       --dbus
 }
+
 
 build() {
-  cd "$srcdir"
-
-  # mixed dbus/classic build
-  if _isbuild jack2; then
-    cd $_tarname-$pkgver
-    msg2 "Running Mixed D-Bus/Classic build"
-    _wafconf --classic --dbus
-    python2 waf build $MAKEFLAGS
-    cd ..
-  fi
-
-  # dbus-ONLY build
-  if _isbuild jack2-dbus; then
-    cd $_tarname-dbus-$pkgver
-    msg2 "Running D-Bus-only build"
-    _wafconf --dbus
-    python2 waf build $MAKEFLAGS
-    cd ..
-  fi
+  # build jack2
+  cd "${pkgname[0]}-${pkgver}"
+  python3 waf build
+  # build jack2-dbus
+  cd "${srcdir}/${pkgname[1]}-${pkgver}"
+  python3 waf build
 }
 
 package_jack2() {
-  ! _isbuild jack2 && return 0
-
   pkgdesc="The next-generation JACK with SMP support"
-  depends=('libsamplerate' 'celt' 'opus' 'libffado')
-  optdepends=('python2-dbus: jack_control')
+  depends=('celt' 'opus' 'libffado' 'python2-dbus')
   conflicts=('jack')
   provides=('jack' 'jackmp' 'jackdmp' 'jackdbus')
+  backup=(etc/security/limits.d/99-audio.conf)
 
-  cd "$srcdir/$_tarname-$pkgver"
-
-  python2 waf install --destdir="$pkgdir"
-
-  # fix for major python transition
-  _pyfix
+  cd "${pkgname[0]}-${pkgver}"
+  python3 waf install --destdir="${pkgdir}"
 
   # configure realtime access/scheduling
   # see https://bugs.archlinux.org/task/26343
-  install -Dm644 "$srcdir/99-audio.conf" \
-    "$pkgdir/etc/security/limits.d/99-audio.conf"
+  install -Dm644 "${srcdir}/99-audio.conf" \
+    "${pkgdir}/etc/security/limits.d/99-audio.conf"
 
-  install -Dm644 "$srcdir/40-hpet-permissions.rules" \
-    "$pkgdir/usr/lib/udev/rules.d/40-hpet-permissions.rules"
+  install -Dm644 "${srcdir}/40-hpet-permissions.rules" \
+    "${pkgdir}/usr/lib/udev/rules.d/40-hpet-permissions.rules"
 }
 
 package_jack2-dbus() {
-  ! _isbuild jack2-dbus && return 0
-
   pkgdesc="The next-generation JACK with SMP support (for D-BUS interaction only)"
-  depends=('libsamplerate' 'celt' 'opus' 'libffado')
-  optdepends=('python2-dbus: jack_control')
+  depends=('celt' 'opus' 'libffado' 'python2-dbus')
   conflicts=('jack' 'jack2')
   provides=('jack' 'jack2' 'jackmp' 'jackdmp' 'jackdbus')
+  backup=(etc/security/limits.d/99-audio.conf)
 
-  cd "$srcdir/$_tarname-dbus-$pkgver"
+  cd "${pkgname[1]}-${pkgver}"
+  python3 waf install --destdir="${pkgdir}"
 
-  python2 waf install --destdir="$pkgdir"
+  # configure realtime access/scheduling
+  # see https://bugs.archlinux.org/task/26343
+  install -Dm644 "${srcdir}/99-audio.conf" \
+    "${pkgdir}/etc/security/limits.d/99-audio.conf"
 
-  _pyfix
-
-  install -Dm644 "$srcdir/99-audio.conf" \
-    "$pkgdir/etc/security/limits.d/99-audio.conf"
-
-  install -Dm644 "$srcdir/40-hpet-permissions.rules" \
-    "$pkgdir/usr/lib/udev/rules.d/40-hpet-permissions.rules"
+  install -Dm644 "${srcdir}/40-hpet-permissions.rules" \
+    "${pkgdir}/usr/lib/udev/rules.d/40-hpet-permissions.rules"
 }

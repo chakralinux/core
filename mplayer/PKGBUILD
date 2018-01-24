@@ -1,6 +1,6 @@
 pkgbase=mplayer
 pkgname=('mplayer' 'mencoder')
-pkgver=37916
+pkgver=38017
 pkgrel=1
 arch=('x86_64')
 makedepends=(
@@ -10,13 +10,13 @@ makedepends=(
   'libdca' 'a52dec' 'schroedinger' 'libvpx' 'libpulse' 'fribidi' 'unzip' 'mesa'
   'live-media' 'yasm' 'git' 'fontconfig' 'mpg123' 'ladspa' 'libass' 'libbluray'
   'libcdio-paranoia' 'opus' 'subversion' 'x264' 'libx264' 'rtmpdump' 'gnutls'
-  'gsm' 'libdvdcss' 'libdvdread' 'libdvdnav' 'ncurses'
+  'gsm' 'libdvdcss' 'libdvdread' 'libdvdnav' 'ncurses' 'ffmpeg'
 )
 license=('GPL')
 url='http://www.mplayerhq.hu/'
 categories=('multimedia')
 screenshot=("http://www.mplayerhq.hu/images/screenshots/gui-preview-01.jpg")
-options=('!buildflags' '!emptydirs')
+options=('!emptydirs')
 source=($pkgbase-$pkgver::svn://svn.mplayerhq.hu/mplayer/trunk#revision=$pkgver
         mplayer.desktop
         include-samba-4.0.patch
@@ -37,7 +37,10 @@ prepare() {
 
 build() {
   cd $pkgbase-$pkgver
-
+  export CFLAGS="${CFLAGS/-march=x86-64/}"
+  export CFLAGS="${CFLAGS/-mtune=generic/}"
+  export LDFLAGS="${LDFLAGS/,O1/}"
+  export LDFLAGS="${LDFLAGS/,--sort-common/}"
   ./configure --prefix=/usr \
     --enable-runtime-cpudetection \
     --disable-gui \
@@ -51,19 +54,21 @@ build() {
     --disable-mga \
     --disable-ass-internal \
     --disable-cdparanoia \
+    --disable-ffmpeg_a \
     --enable-xvmc \
     --enable-radio \
     --enable-radio-capture \
     --enable-smb \
     --language=all \
-    --confdir=/etc/mplayer
+    --confdir=/etc/mplayer \
+    --extra-cflags="${CFLAGS}" \
+    --extra-ldflags="${LDFLAGS}"
 
   make
 }
 
 package_mplayer() {
   pkgdesc='Media player for Linux'
-  install=mplayer.install
   backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
   depends=(
     'desktop-file-utils' 'ttf-dejavu' 'enca' 'libxss' 'a52dec' 'libvpx'
@@ -72,7 +77,7 @@ package_mplayer() {
     'opencore-amr' 'jack' 'libmad' 'sdl' 'libtheora' 'libcaca' 'libxxf86dga'
     'fribidi' 'libjpeg' 'faac' 'faad2' 'libxvmc' 'schroedinger' 'mpg123'
     'libass' 'libxxf86vm' 'libbluray' 'libcdio-paranoia' 'opus' 'rtmpdump'
-    'gsm' 'gnutls' 'libdvdnav' 'giflib' 
+    'gsm' 'gnutls' 'libdvdnav' 'giflib' 'ffmpeg'
   )
   provides=('mplayer2')
   replaces=('mplayer2')
@@ -98,7 +103,7 @@ package_mencoder() {
     'alsa-lib' 'fontconfig' 'giflib' 'libpng' 'smbclient' 'xvidcore'
     'opencore-amr' 'libmad' 'libtheora' 'fribidi' 'libjpeg' 'faac' 'faad2'
     'schroedinger' 'mpg123' 'libass' 'libbluray' 'libcdio-paranoia'
-    'libvorbis' 'opus' 'rtmpdump' 'gsm' 'libdvdnav'
+    'libvorbis' 'opus' 'rtmpdump' 'gsm' 'libdvdnav' 'ffmpeg'
   )
 
   make -C $pkgbase-$pkgver DESTDIR="$pkgdir" install-mencoder install-mencoder-man

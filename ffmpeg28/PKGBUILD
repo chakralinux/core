@@ -1,6 +1,6 @@
 pkgname=ffmpeg2.8
 pkgver=2.8.13
-pkgrel=1
+pkgrel=2
 pkgdesc='Complete solution to record, convert and stream audio and video'
 arch=('x86_64')
 url='http://ffmpeg.org/'
@@ -9,7 +9,7 @@ depends=('alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'gnutls' 'gsm' 'lame'
          'libass' 'libbluray' 'libmodplug' 'libpulse' 'libsoxr' 'libssh'
          'libtheora' 'libva' 'libvdpau' 'libwebp' 'opencore-amr' 'openjpeg'
          'opus' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore' 'zlib'
-         'dcadec' 'vid.stab' 'libvorbis' 'lame' 'openh264'
+         'dcadec' 'vid.stab' 'libvorbis' 'lame' 
          'libvpx' 'libx264.so' 'x265' 'libfdk-aac')
 makedepends=('hardening-wrapper' 'ladspa' 'libvdpau' 'yasm')
 optdepends=('ladspa: LADSPA filters')
@@ -70,7 +70,6 @@ build() {
     --enable-x11grab \
     --enable-nonfree \
     --enable-libfdk-aac \
-    --enable-libopenh264 \
     --enable-libmp3lame
 
   make
@@ -93,4 +92,3 @@ package() {
   echo -e '/usr/lib/\n/usr/lib/ffmpeg2.8/' > "${pkgdir}"/etc/ld.so.conf.d/ffmpeg2.8.conf
 }
 
-# vim: ts=2 sw=2 et:
