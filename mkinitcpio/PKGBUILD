@@ -1,6 +1,6 @@
 pkgname=mkinitcpio
 pkgver=24
-pkgrel=1
+pkgrel=2
 pkgdesc="Modular initramfs image creation utility"
 arch=('any')
 url="https://projects.archlinux.org/mkinitcpio.git/"
@@ -29,7 +29,7 @@ prepare() {
   patch -Np1 -i ../microcode.patch
 
   patch -Np1 <"$srcdir"/0001-Restore-addition-of-modules-from-config-file.patch
-  sed -i 's/HOOKS="base udev autodetect modconf block filesystems keyboard fsck"/HOOKS="base udev autodetect resume keymap modconf block filesystems keyboard fsck microcode"/g' mkinitcpio.conf
+  sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect resume keymap modconf block filesystems keyboard fsck microcode)/g' mkinitcpio.conf
 }
 
 check() {
