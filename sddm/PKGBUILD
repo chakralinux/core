@@ -17,7 +17,7 @@ backup=('usr/share/sddm/scripts/Xsetup'
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/${pkgname}/${pkgname}/archive/v${pkgver}.tar.gz"
         'sddm.conf' 'sddm.sysusers' 'sddm.tmpfiles')
 md5sums=('622e825b6b403d165902a5c12163094c'
-         '7375f6c4e0be2336b31eec2bec820048'
+         '4c33d11ed7ba1c4069ec445d26947636'
          '36a0440ca3eb8a527a03d7475a6cefd9'
          '098f2a934ecf9c048b6a9d4b6c41ff5c')
 
@@ -42,7 +42,17 @@ package() {
   cd build
   make DESTDIR="${pkgdir}" install
   
-  # set the default configuration, with heritage as theme
+  # configuration handling
+  # Move sddm.conf to /usr/lib https://bugs.archlinux.org/task/56609
+  install -dm755 "$pkgdir"/usr/lib/sddm/sddm.conf.d/
+  mv "$pkgdir"/{etc/sddm.conf,usr/lib/sddm/sddm.conf.d}
+
+  # Don't set PATH in sddm.conf
+  sed -r 's|DefaultPath=.*|DefaultPath=/usr/local/sbin:/usr/local/bin:/usr/bin|g' -i "$pkgdir"/usr/lib/sddm/sddm.conf.d/sddm.conf
+  # Unset InputMethod https://github.com/sddm/sddm/issues/952
+  sed -e "/^InputMethod/s/qtvirtualkeyboard//" -i "$pkgdir"/usr/lib/sddm/sddm.conf.d/sddm.conf
+
+  # Install Chakra default settings
   install -m 644 -p ${srcdir}/sddm.conf ${pkgdir}/etc/
 
   # create sddm system user and directory
