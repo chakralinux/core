@@ -1,7 +1,7 @@
 pkgbase=opencv
 pkgname=('opencv' 'opencv-samples')
 pkgver=3.4.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Open Source Computer Vision Library"
 arch=('x86_64')
 license=('BSD')
@@ -17,23 +17,24 @@ source=("opencv-$pkgver.zip::https://github.com/Itseez/opencv/archive/${pkgver}.
         "opencv_contrib-$pkgver.zip::https://github.com/Itseez/opencv_contrib/archive/${pkgver}.zip")
 sha1sums=('b60908c5f52c7897be40e20f4b064911dbe8de0d'
           '7aafd8ce8cf2de62fe686f6ea21410b0c9c1c978')
-_cmakeopts=('-D CMAKE_BUILD_TYPE=Release'
-            '-D CMAKE_INSTALL_PREFIX=/usr'
-            '-D CMAKE_SKIP_RPATH=ON'
-            '-D BUILD_SHARED_LIBS=ON'
+
+_cmakeopts=('-D WITH_OPENCL=ON'
+            '-D WITH_OPENGL=ON'
+            '-D WITH_TBB=ON'
+            '-D WITH_XINE=ON'
+            '-D WITH_GSTREAMER=ON'
+            '-D BUILD_WITH_DEBUG_INFO=OFF'
             '-D BUILD_TESTS=OFF'
+            '-D BUILD_PERF_TESTS=OFF'
             '-D BUILD_EXAMPLES=ON'
             '-D INSTALL_C_EXAMPLES=ON'
             '-D INSTALL_PYTHON_EXAMPLES=ON'
-            '-D WITH_XINE=ON'
-            '-D WITH_OPENGL=ON'
-            '-D WITH_OPENCL=ON'
+            '-D CMAKE_BUILD_TYPE=Release'
+            '-D CMAKE_INSTALL_PREFIX=/usr'
+            '-D CMAKE_INSTALL_LIBDIR=lib'
+            '-D CMAKE_SKIP_RPATH=ON'
             '-D WITH_QT=5'
             '-D WITH_GTK=OFF'
-            '-D WITH_GSTREAMER=ON'
-            '-D ENABLE_SSE41=OFF'
-            '-D ENABLE_SSE42=OFF'
-            '-D ENABLE_FAST_MATH=OFF'
             '-D CPU_BASELINE_DISABLE=SSE3 -D CPU_BASELINE_REQUIRE=SSE2'
             )
 
