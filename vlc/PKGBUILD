@@ -2,12 +2,12 @@
 
 pkgname=vlc
 pkgver=2.2.8
-pkgrel=2
-pkgdesc="A multi-platform MPEG, VCD/DVD, and DivX player"
+pkgrel=3
+pkgdesc='Multi-platform MPEG, VCD/DVD, and DivX player'
+url='https://www.videolan.org/vlc/'
 arch=('x86_64')
-url="https://www.videolan.org/vlc/"
 license=('LGPL2.1' 'GPL2')
-depends=('a52dec' 'libdvbpsi' 'libxpm' 'libdca' 'qt4' 'libproxy'
+depends=('a52dec' 'libdvbpsi' 'libxpm' 'libdca' 'qt5-base' 'qt5-x11extras' 'libproxy'
          'sdl_image' 'libdvdnav' 'libtiger' 'lua' 'libmatroska'
          'zvbi' 'taglib' 'libmpcdec' 'ffmpeg2.8' 'faad2' 'libupnp'
          'libshout' 'libmad' 'libmpeg2' 'xcb-util-keysyms' 'libtar'
@@ -15,7 +15,7 @@ depends=('a52dec' 'libdvbpsi' 'libxpm' 'libdca' 'qt4' 'libproxy'
 makedepends=('live-media' 'libnotify' 'libbluray' 'flac'
              'libdc1394' 'libavc1394' 'lirc' 'libcaca'
              'librsvg' 'portaudio' 'libgme' 'xosd' 'projectm'
-             'twolame' 'aalib' 'libmtp' 'libdvdcss'
+             'twolame' 'aalib' 'libmtp' 'libdvdcss' 'smbclient'
              'libgoom2' 'vcdimager' 'opus' 'libssh2' 'mesa')
 optdepends=('avahi: for service discovery using bonjour protocol'
             'libnotify: for notification plugin'
@@ -54,25 +54,34 @@ categories=('multimedia')
 options=('!emptydirs')
 install="vlc.install"
 source=("http://download.videolan.org/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
-        "lua53_compat.patch")
+        vlc-2.2.6-fix-memleak.patch
+        lua53_compat.patch
+        vlc-2.2.8-libupnp-1.6.24.patch)
 sha1sums=('b960ec5bdb9a51da285430fc68962927ccc87187'
-          '5d7dba23756ff577a90b8631b187fbeac1f94e17')
+          '6306b02c3462816779df90518ddfc05b3971c019'
+          '5d7dba23756ff577a90b8631b187fbeac1f94e17'
+          'ae65e0e44fbe842b8149c2ba7debb868419a0022')
 screenshot='http://images1.videolan.org/vlc/screenshots/0.9.2/screenshot-kde4.jpg'
 
 prepare() {
-  cd "${pkgname}-${pkgver}"
-
+  cd ${pkgname}-${pkgver}
   sed -i -e 's:truetype/freefont:TTF:g' modules/text_renderer/freetype.c
   sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
-
-  patch -p1 < "${srcdir}/lua53_compat.patch"
+  patch -Np1 < "${srcdir}/lua53_compat.patch"
+  patch -Np1 < "${srcdir}/vlc-2.2.6-fix-memleak.patch"
+  patch -Np1 < "${srcdir}/vlc-2.2.8-libupnp-1.6.24.patch"
 }
 
 build() {
-  cd "${pkgname}-${pkgver}"
-  PKG_CONFIG_PATH="/usr/lib/ffmpeg2.8/pkgconfig" \
-  CFLAGS+=" -I/usr/include/samba-4.0" CPPFLAGS+=" -I/usr/include/samba-4.0" \
-  LUAC=/usr/bin/luac  LUA_LIBS="`pkg-config --libs lua`" \
+  cd ${pkgname}-${pkgver}
+
+  export PKG_CONFIG_PATH="/usr/lib/ffmpeg2.8/pkgconfig"
+  export CFLAGS+=" -I/usr/include/samba-4.0"
+  export CPPFLAGS+=" -I/usr/include/samba-4.0"
+  export CXXFLAGS+=" -std=c++11"
+  export LUAC=/usr/bin/luac
+  export LUA_LIBS="$(pkg-config --libs lua)"
+
   ./configure --prefix=/usr \
               --sysconfdir=/etc \
               --disable-rpath \
@@ -86,16 +95,20 @@ build() {
               --enable-upnp \
               --enable-opus \
               --enable-sftp \
-              --with-x \
-              RCC=/usr/bin/rcc
+              --enable-qt \
+              RCC=/usr/bin/rcc-qt5
   make
 }
 
 package() {
   cd "${pkgname}-${pkgver}"
+
   make DESTDIR="${pkgdir}" install
+
   for res in 16 32 48 128; do
-    install -D -m644 "${srcdir}/vlc-${pkgver}/share/icons/${res}x${res}/vlc.png" \
+    install -Dm 644 "${srcdir}/vlc-${pkgver}/share/icons/${res}x${res}/vlc.png" \
                      "${pkgdir}/usr/share/icons/hicolor/${res}x${res}/apps/vlc.png"
   done
 }
+
+# vim: ts=2 sw=2 et:
