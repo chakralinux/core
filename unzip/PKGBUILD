@@ -5,7 +5,7 @@
 
 pkgname=unzip
 pkgver=6.0
-pkgrel=8
+pkgrel=9
 pkgdesc="Unpacks .zip archives such as those made by PKZIP"
 arch=('x86_64')
 url="http://www.info-zip.org/"
@@ -19,6 +19,7 @@ source=('http://downloads.sourceforge.net/infozip/unzip60.tar.gz'
         CVE-2014-9636-overflow-fsize.patch
         CVE-2015-7696+CVE-2015-7697-csiz-underflow.patch
         CVE-2015-7696+CVE-2015-7697-heap-overflow.patch
+        CVE-2016-9844-zipinfo-buffer-overflow.patch
         iconv-utf8+CVE-2015-1315.patch)
 md5sums=('62b490407489521db863b523a7f86375'
          '86fdb01be92ca170fca89ed9e914a560'
@@ -28,6 +29,7 @@ md5sums=('62b490407489521db863b523a7f86375'
          '0e9e554ff80396f391709cf98ff26b7c'
          '1935de2ff982992d8d7e8c5c360add03'
          'cdc14eca25a4de37148822830046bca2'
+         'f460e0b6e4b9f01b2d637827c3b20341'
          '1addc224d4168d76a69be84cb0a32d31')
 
 prepare(){
@@ -41,6 +43,7 @@ prepare(){
   patch -Np1 -i ${srcdir}/CVE-2014-9636-overflow-fsize.patch
   patch -Np1 -i "${srcdir}"/CVE-2015-7696+CVE-2015-7697-csiz-underflow.patch
   patch -Np1 -i "${srcdir}"/CVE-2015-7696+CVE-2015-7697-heap-overflow.patch
+  patch -Np1 -i "${srcdir}"/CVE-2016-9844-zipinfo-buffer-overflow.patch
   patch -Np1 -i "${srcdir}"/iconv-utf8+CVE-2015-1315.patch
 }
 
