@@ -1,7 +1,7 @@
 # maintainer : AlmAck
 
 pkgname=chakra-signatures
-pkgver=2017.12
+pkgver=2018.02
 pkgrel=1
 pkgdesc='Chakra Package Signatures'
 arch=('any')
@@ -50,4 +50,7 @@ package() {
         # totte's key
         gpg --recv-keys --keyserver keys.gnupg.net 0x99421f98
         gpg --armor --export totte@chakralinux.org > totte.asc
+        # Chaka Build Server (gitlab-ci) key
+        gpg --recv-keys --keyserver keys.gnupg.net 0xDC2F4138
+        gpg --armor --export staff@chakralinux.org > chakra_build_server.asc
 }
