@@ -21,15 +21,16 @@ makedepends=('qt' 'python3-dbus' 'gobject-introspection' 'intltool' 'python3-gob
 backup=(etc/avahi/avahi-daemon.conf etc/avahi/services/{sftp-,}ssh.service)
 install=avahi.install
 source=("http://www.avahi.org/download/avahi-${pkgver}.tar.gz"
-        'gnome-nettool.png')
+        'gnome-nettool.png'
+        0001-avahi-python-Use-the-agnostic-DBM-interface.patch)
 sha1sums=('8a062878968c0f8e083046429647ad33b122542f'
-          'cf56387c88aed246b9f435efc182ef44de4d52f3')
+          'cf56387c88aed246b9f435efc182ef44de4d52f3'
+          '641381523c84b470ec8d49a9bb2f5be861fa458f')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  sed '/^Libs:/s:$: -ldbus-1:' -i avahi-client.pc.in
-  sed 's:netdev:network:g' -i avahi-daemon/avahi-dbus.conf
-  sed 's:-DG[^ ]*_DISABLE_DEPRECATED=1::g' -i avahi-ui/Makefile.*
+  patch -Np1 -i ../0001-avahi-python-Use-the-agnostic-DBM-interface.patch
+  NOCONFIGURE=1 ./autogen.sh
 }
 
 build() {
