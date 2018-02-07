@@ -3,7 +3,7 @@ source ../plasma.conf
 
 pkgname=kwin
 pkgver=${PSubVersion}
-pkgrel=2
+pkgrel=1
 pkgdesc='KDE Window manager'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/kwin'
@@ -17,16 +17,10 @@ options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
 sha256sums=( $(getSum ${pkgname}) 
              'SKIP' )
-source+=(cmake3.10.patch::https://github.com/KDE/kwin/commit/cd544890ced4192d07467c89e23adbb62d8cea5c.patch)
-sha256sums+=('42105c4cd898237851c1631ecea27e0ef96f230ad6f55e9defcf2e499d836ac4')
 validpgpkeys=(${Pvalidpgpkeys[@]})
 
 prepare() {
   mkdir -p build
-  
-  cd ${pkgname}-${pkgver}
-  # fix build with cmake 3.10 (https://github.com/KDE/kwin/commit/cd544890ced4192d07467c89e23adbb62d8cea5c)
-  patch -p1 -i ${srcdir}/cmake3.10.patch
 }
 
 build() {
