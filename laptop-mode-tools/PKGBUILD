@@ -1,5 +1,5 @@
 pkgname=laptop-mode-tools
-pkgver=1.71
+pkgver=1.72.2
 pkgrel=1
 pkgdesc="Laptop mode is a kernel mode that allows you to extend the battery life of your laptop"
 arch=('x86_64')
@@ -7,11 +7,13 @@ url="https://github.com/rickysarraf/laptop-mode-tools"
 license=('GPL')
 depends=('bash')
 optdepends=('acpid: for ACPI support'
+            'bluez-utils: Bluetooth support'
             'hdparm: hard disk power management'
             'sdparm: SCSI disk power management'
             'ethtool: ethernet support'
             'wireless_tools: WiFi support'
-	    'python2-pyqt4: for GUI support')
+            'xorg-xset: DPMS standby support'
+	    'python3-pyqt5: for GUI support')
 backup=(etc/laptop-mode/conf.d/ac97-powersave.conf
         etc/laptop-mode/conf.d/auto-hibernate.conf
         etc/laptop-mode/conf.d/battery-level-polling.conf
@@ -45,7 +47,7 @@ backup=(etc/laptop-mode/conf.d/ac97-powersave.conf
         etc/laptop-mode/lm-profiler.conf)
 install=laptop-mode.install
 source=("https://github.com/rickysarraf/$pkgname/releases/download/$pkgver/${pkgname}_${pkgver}.tar.gz")
-md5sums=('11aba1e8f5d6fa10df1f0a43d01ddb52')
+md5sums=('1c630ed63db14d644df2326bcd7c3f75')
 
 package() {
   cd ${pkgname}_${pkgver}
