@@ -6,7 +6,7 @@ pkgbase=linux-tools
 pkgname=('cgroup_event_listener' 'cpupower' 'libtraceevent' 'perf'
          'tmon' 'turbostat' 'usbip' 'x86_energy_perf_policy')
 pkgver=${_kernelver}
-pkgrel=2
+pkgrel=3
 license=('GPL2')
 arch=('x86_64')
 url='http://www.kernel.org'
@@ -68,8 +68,6 @@ build() {
 
   msg2 'cpupower'
   pushd linux-${pkgver}/tools/power/cpupower
-  # we cannot use --as-needed
-  #LDFLAGS=${LDFLAGS:+"$LDFLAGS,--no-as-needed"}
   make VERSION=$pkgver-$pkgrel
   popd
 
@@ -163,6 +161,7 @@ package_cpupower() {
   make \
     DESTDIR="$pkgdir" \
     sbindir='/usr/bin' \
+    libdir='/usr/lib' \
     mandir='/usr/share/man' \
     docdir='/usr/share/doc/cpupower' \
     install install-man
