@@ -2,7 +2,7 @@
 source ../linux.conf
 
 pkgname=(nvidia nvidia-dkms chd-nvidia)
-pkgver=387.34
+pkgver=390.25
 pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
@@ -11,14 +11,18 @@ license=('custom')
 options=('!strip')
 source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master/hwdb/nvidia_supported_new")
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
+source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
+                4.15-FS57305.patch)
 sha1sums=('bdb063bbd03eed9fa718664ef2023fd759efe4a3'
-          '96110da0cac27da4d8ffffd8c52d825277808085')
+          '74c7d1ddead5af17cebe34821fb68447a34c695e'
+          'b1327c1e0716dc7820cea5938fd504ee58ef1fde')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
 
+    patch -Np2 -i "${srcdir}"/4.15-FS57305.patch
+    
     cp -a kernel kernel-dkms
     cd kernel-dkms
     sed -i "s/__VERSION_STRING/${pkgver}/" dkms.conf

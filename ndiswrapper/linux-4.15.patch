@@ -1,0 +1,191 @@
+From eabb320dedd3d7f957e7e3604820f1f3488bbe00 Mon Sep 17 00:00:00 2001
+From: AlmAck <almack@chakralinux.org>
+Date: Mon, 12 Feb 2018 00:10:24 +0100
+Subject: [PATCH] Add support for linux 4.15+
+
+---
+ driver/ntoskernel.c | 30 ++++++++++++++++++++++++++++--
+ driver/usb.c        |  2 +-
+ driver/wrapndis.c   | 36 ++++++++++++++++++++++++++++++++++--
+ 3 files changed, 63 insertions(+), 5 deletions(-)
+
+diff --git a/driver/ntoskernel.c b/driver/ntoskernel.c
+index 4fe0dc1..1508b9d 100644
+--- a/driver/ntoskernel.c
++++ b/driver/ntoskernel.c
+@@ -77,7 +77,11 @@ u64 wrap_ticks_to_boot;
+ #if defined(CONFIG_X86_64)
+ static struct timer_list shared_data_timer;
+ struct kuser_shared_data kuser_shared_data;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ static void update_user_shared_data_proc(unsigned long data);
++#else
++static void update_user_shared_data_proc(struct timer_list *data);
++#endif
+ #endif
+ 
+ WIN_SYMBOL_MAP("KeTickCount", &jiffies)
+@@ -91,7 +95,11 @@ DEFINE_PER_CPU(struct irql_info, irql_info);
+ #endif
+ 
+ #if defined(CONFIG_X86_64)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ static void update_user_shared_data_proc(unsigned long data)
++#else
++static void update_user_shared_data_proc(struct timer_list * data)
++#endif
+ {
+ 	/* timer is supposed to be scheduled every 10ms, but bigger
+ 	 * intervals seem to work (tried up to 50ms) */
+@@ -407,9 +415,19 @@ static void initialize_object(struct dispatcher_header *dh, enum dh_type type,
+ 	InitializeListHead(&dh->wait_blocks);
+ }
+ 
+-static void timer_proc(unsigned long data)
++static void timer_proc(
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
++    unsigned long data
++#else
++    struct timer_list * data
++#endif
++)
+ {
+-	struct wrap_timer *wrap_timer = (struct wrap_timer *)data;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
++        struct wrap_timer *wrap_timer = (struct wrap_timer *)data;
++#else
++        struct wrap_timer *wrap_timer = from_timer(wrap_timer, data, timer);
++#endif
+ 	struct nt_timer *nt_timer;
+ 	struct kdpc *kdpc;
+ 
+@@ -452,9 +470,13 @@ void wrap_init_timer(struct nt_timer *nt_timer, enum timer_type type,
+ 		return;
+ 	}
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ 	init_timer(&wrap_timer->timer);
+ 	wrap_timer->timer.data = (unsigned long)wrap_timer;
+ 	wrap_timer->timer.function = timer_proc;
++#else
++        timer_setup(&wrap_timer->timer,timer_proc,0);
++#endif
+ 	wrap_timer->nt_timer = nt_timer;
+ #ifdef TIMER_DEBUG
+ 	wrap_timer->wrap_timer_magic = WRAP_TIMER_MAGIC;
+@@ -2559,9 +2581,13 @@ int ntoskernel_init(void)
+ #if defined(CONFIG_X86_64)
+ 	memset(&kuser_shared_data, 0, sizeof(kuser_shared_data));
+ 	*((ULONG64 *)&kuser_shared_data.system_time) = ticks_1601();
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ 	init_timer(&shared_data_timer);
+ 	shared_data_timer.function = update_user_shared_data_proc;
+ 	shared_data_timer.data = 0;
++#else
++        timer_setup(&shared_data_timer,update_user_shared_data_proc,0);
++#endif
+ #endif
+ 	return 0;
+ }
+diff --git a/driver/usb.c b/driver/usb.c
+index 3e7021a..ef0dbaa 100644
+--- a/driver/usb.c
++++ b/driver/usb.c
+@@ -776,7 +776,7 @@ static USBD_STATUS wrap_get_status_request(struct usb_device *udev,
+ 		return NT_URB_STATUS(nt_urb);
+ 	}
+ 	assert(status_req->transfer_buffer_length == sizeof(u16));
+-	ret = usb_get_status(udev, type, status_req->index,
++	ret = usb_get_std_status(udev, type, status_req->index,
+ 			     status_req->transfer_buffer);
+ 	if (ret >= 0) {
+ 		assert(ret <= status_req->transfer_buffer_length);
+diff --git a/driver/wrapndis.c b/driver/wrapndis.c
+index 3ce1570..704795c 100644
+--- a/driver/wrapndis.c
++++ b/driver/wrapndis.c
+@@ -1089,9 +1089,19 @@ send_assoc_event:
+ 	EXIT2(return);
+ }
+ 
+-static void iw_stats_timer_proc(unsigned long data)
++static void iw_stats_timer_proc(
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
++    unsigned long data
++#else
++    struct timer_list * data
++#endif
++)
+ {
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ 	struct ndis_device *wnd = (struct ndis_device *)data;
++#else
++        struct ndis_device *wnd = from_timer(wnd, data, hangcheck_timer);
++#endif
+ 
+ 	ENTER2("%d", wnd->iw_stats_interval);
+ 	if (wnd->iw_stats_interval > 0) {
+@@ -1107,8 +1117,10 @@ static void add_iw_stats_timer(struct ndis_device *wnd)
+ 		return;
+ 	if (wnd->iw_stats_interval < 0)
+ 		wnd->iw_stats_interval *= -1;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ 	wnd->iw_stats_timer.data = (unsigned long)wnd;
+ 	wnd->iw_stats_timer.function = iw_stats_timer_proc;
++#endif
+ 	mod_timer(&wnd->iw_stats_timer, jiffies + wnd->iw_stats_interval);
+ }
+ 
+@@ -1120,9 +1132,19 @@ static void del_iw_stats_timer(struct ndis_device *wnd)
+ 	EXIT2(return);
+ }
+ 
+-static void hangcheck_proc(unsigned long data)
++static void hangcheck_proc(
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
++    unsigned long data
++#else
++    struct timer_list * data
++#endif
++)
+ {
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ 	struct ndis_device *wnd = (struct ndis_device *)data;
++#else
++        struct ndis_device *wnd = from_timer(wnd, data, hangcheck_timer);
++#endif
+ 
+ 	ENTER3("%d", wnd->hangcheck_interval);
+ 	if (wnd->hangcheck_interval > 0) {
+@@ -1143,8 +1165,10 @@ void hangcheck_add(struct ndis_device *wnd)
+ 		wnd->hangcheck_interval = hangcheck_interval * HZ;
+ 	if (wnd->hangcheck_interval < 0)
+ 		wnd->hangcheck_interval *= -1;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ 	wnd->hangcheck_timer.data = (unsigned long)wnd;
+ 	wnd->hangcheck_timer.function = hangcheck_proc;
++#endif
+ 	mod_timer(&wnd->hangcheck_timer, jiffies + wnd->hangcheck_interval);
+ 	EXIT2(return);
+ }
+@@ -2134,9 +2158,17 @@ static NTSTATUS ndis_add_device(struct driver_object *drv_obj,
+ 	wnd->dma_map_count = 0;
+ 	wnd->dma_map_addr = NULL;
+ 	wnd->nick[0] = 0;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ 	init_timer(&wnd->hangcheck_timer);
++#else
++        timer_setup(&wnd->hangcheck_timer,hangcheck_proc,0);
++#endif
+ 	wnd->scan_timestamp = 0;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ 	init_timer(&wnd->iw_stats_timer);
++#else
++        timer_setup(&wnd->iw_stats_timer,iw_stats_timer_proc,0);
++#endif
+ 	wnd->iw_stats_interval = 10 * HZ;
+ 	wnd->ndis_pending_work = 0;
+ 	memset(&wnd->essid, 0, sizeof(wnd->essid));
+-- 
+2.14.2
+
