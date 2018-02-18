@@ -1,44 +1,20 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 # edit /etc/locale.gen and enable en_US.UTF8, then run locale-gen, then export LC_ALL=en_US.UTF8
-pkgname=systemd
+pkgbase=systemd
+pkgname=('systemd' 'libsystemd')
 # latest commit on stable branch
 _commit='743b771c559c6101544f7358a42c8c519fe4b0db'
 pkgver=235.38
-pkgrel=4
-pkgdesc="A system and service manager for Linux"
+pkgrel=5
 arch=('x86_64')
-url="http://www.freedesktop.org/wiki/Software/systemd"
-license=('GPL2' 'LGPL2.1' 'MIT')
-depends=('acl' 'bash' 'dbus' 'iptables' 'kbd' 'kmod' 'hwids' 'libcap'
-         'libgcrypt' 'glibc' 'libidn' 'lz4' 'pam' 'libseccomp' 'util-linux'
-         'xz' 'cryptsetup' 'libxkbcommon>=0.5.0-2' 'gnutls' 'elfutils')
 makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam' 'libelf'
              'intltool' 'iptables' 'kmod' 'libcap' 'libidn' 'libgcrypt'
              'libmicrohttpd' 'libxslt' 'util-linux' 'linux-api-headers'
              'python3-lxml' 'quota-tools' 'shadow' 'gnu-efi-libs' 'git'
              'meson' 'libseccomp')
-optdepends=('curl: upload journal and pull image'
-            'cryptsetup: required for encrypted block devices'
-            'libmicrohttpd: remote journald capabilities'
-            'quota-tools: kernel-level quota management'
-            'polkit: allow administration as unprivileged user')
 options=('debug')
 validpgpkeys=('63CDA1E5D3FC22B998D20DD6327F26951A015CC4')  # Lennart Poettering <lennart@poettering.net>
-backup=(etc/pam.d/systemd-user
-        etc/systemd/coredump.conf
-        etc/systemd/journald.conf
-        etc/systemd/journal-remote.conf
-        etc/systemd/journal-upload.conf
-        etc/systemd/logind.conf
-        etc/systemd/system.conf
-        etc/systemd/timesyncd.conf
-        etc/systemd/resolved.conf
-        etc/systemd/user.conf
-        etc/udev/udev.conf)
-provides=("udev=$pkgver" 'gummiboot')
-conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'gummiboot')
-replaces=('udev' 'gummiboot')
-install="systemd.install"
+
 source=('git://github.com/systemd/systemd-stable.git'
         'git://github.com/systemd/systemd.git' # pull in for tags, backports & reverts
         'initcpio-hook-udev'
@@ -109,12 +85,12 @@ pkgver() {
 prepare() {
   cd "$pkgname-stable"
 
-  git remote add upstream ../systemd/
+  #git remote add upstream ../systemd/
   git fetch --all
 
   git checkout "${_commit}"
 
-  _validate_tag || return
+  #_validate_tag || return
 
   local _commit
   for _commit in "${_backports[@]}"; do
@@ -151,7 +127,35 @@ build() {
   ninja -C build
 }
 
-package() {
+package_systemd() {
+  pkgdesc="A system and service manager for Linux"
+  url="http://www.freedesktop.org/wiki/Software/systemd"
+  license=('GPL2' 'LGPL2.1' 'MIT')
+  depends=('acl' 'bash' 'dbus' 'iptables' 'kbd' 'kmod' 'hwids' 'libcap'
+          'libgcrypt' 'glibc' 'libidn' 'lz4' 'pam' 'libseccomp' 'util-linux'
+          'xz' 'cryptsetup' 'libxkbcommon>=0.5.0-2' 'gnutls' 'elfutils'
+          'libsystemd')
+  provides=("udev=$pkgver" 'gummiboot')
+  conflicts=('udev' 'sysvinit' 'initscripts' 'initscripts-systemd' 'gummiboot')
+  replaces=('udev' 'gummiboot')
+  optdepends=('curl: upload journal and pull image'
+              'cryptsetup: required for encrypted block devices'
+              'libmicrohttpd: remote journald capabilities'
+              'quota-tools: kernel-level quota management'
+              'polkit: allow administration as unprivileged user')
+  backup=(etc/pam.d/systemd-user
+          etc/systemd/coredump.conf
+          etc/systemd/journald.conf
+          etc/systemd/journal-remote.conf
+          etc/systemd/journal-upload.conf
+          etc/systemd/logind.conf
+          etc/systemd/system.conf
+          etc/systemd/timesyncd.conf
+          etc/systemd/resolved.conf
+          etc/systemd/user.conf
+          etc/udev/udev.conf)
+  install="systemd.install"
+
   DESTDIR="$pkgdir" ninja -C build install
   install -dm755 "$pkgdir/usr/bin"
   ln -s ../../usr/lib/systemd/systemd "$pkgdir/usr/bin/systemd"
@@ -202,6 +206,9 @@ package() {
   # Chakra specific .preset
   install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
 
+  # runtime libraries shipped with libsystemd
+  rm "$pkgdir"/usr/lib/lib{nss,systemd,udev}*.so*
+  
   # allow core/filesystem to pristine nsswitch.conf
   rm "$pkgdir/usr/share/factory/etc/nsswitch.conf"
   sed -i '/^C \/etc\/nsswitch\.conf/d' "$pkgdir/usr/lib/tmpfiles.d/etc.conf"
@@ -214,4 +221,18 @@ package() {
 
   # overwrite the systemd-user PAM configuration with our own
   install -Dm644 systemd-user.pam "$pkgdir/etc/pam.d/systemd-user"
+}
+
+package_libsystemd() {
+  pkgdesc="systemd client libraries"
+  depends=('glibc' 'libcap' 'libgcrypt' 'lz4' 'xz')
+  license=('GPL2')
+  provides=('libsystemd.so' 'libudev.so')
+
+  # meson does not support installing subsets of files, no?
+  # So do a full install to temporary directory, then install what we need.
+  DESTDIR="$srcdir"/full-install ninja -C build install
+
+  install -dm755 "$pkgdir"/usr/lib/
+  cp --archive "$srcdir"/full-install/usr/lib/lib{nss_*,systemd,udev}.so* "$pkgdir"/usr/lib/
 }
