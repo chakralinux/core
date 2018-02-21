@@ -10,14 +10,20 @@ pkgdesc='A cross-platform application and UI framework (Documentation)'
 depends=('qt5-base')
 makedepends=('qt5-tools' 'python2' 'pciutils' 'libxtst' 'libxcursor' 'libxrandr' 'libxss')
 groups=('qt5')
-source=( $(getSingleSrc "qt") )
-md5sums=( $(getSum "qt") )
+source=( $(getSingleSrc "qt") 
+        'qt-no-statx.patch')
+md5sums=( $(getSum "qt")
+         '35cc4abc5f125905645e09bf37e5a3b0')
 
 prepare() {
   cd $(getPkgName "qt")
 
-  #ln -s /usr/lib/qt5/bin qttools/
-  #ln -s /usr/lib/qt5/bin/{rcc,uic,moc} qtbase/bin/
+  ln -s /usr/lib/qt5/bin qttools/
+  ln -s /usr/lib/qt5/bin/{rcc,uic,moc} qtbase/bin/
+
+  # Don't use the statx syscall https://bugs.archlinux.org/task/56289 https://bugreports.qt.io/browse/QTBUG-64490
+  cd qtbase
+  patch -p1 -i "$srcdir"/qt-no-statx.patch
 
   # Hack to force using python2
   cd "$srcdir"

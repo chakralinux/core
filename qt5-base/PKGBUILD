@@ -3,7 +3,7 @@ source ../qt5.conf
 pkgbase=qt5-base
 pkgname=(qt5-base qt5-xcb-private-headers)
 pkgver=${QSubVersion}
-pkgrel=3
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
@@ -22,13 +22,9 @@ optdepends=('qt5-svg: to use SVG icon themes'
 groups=('qt5')
 options=('debug')
 source=( $(getSrc ${pkgname}) 
-                qt-no-statx.patch
-                qtbug-65235.patch::"https://github.com/qt/qtbase/commit/79d78d81.patch"
-                qtbug-59261.patch::"https://github.com/qt/qtbase/commit/d1960360.patch")
-md5sums=('bf0391a89cb529219bef075555088b1e'
-         '35cc4abc5f125905645e09bf37e5a3b0'
-         'ac93cc0390ac2fea154fb0e01e6d420d'
-         'c966cdd21576ef63ae0fb3a59abc7a4f')
+                qt-no-statx.patch)
+md5sums=($(getSum ${pkgname})
+         '35cc4abc5f125905645e09bf37e5a3b0')
 
 prepare() {
   cd $(getPkgName ${pkgname})
@@ -49,9 +45,6 @@ prepare() {
   
   # Don't use the statx syscall https://bugs.archlinux.org/task/56289 https://bugreports.qt.io/browse/QTBUG-64490
   patch -p1 -i ../qt-no-statx.patch
-
-  patch -p1 -i ../qtbug-65235.patch # https://bugreports.qt.io/browse/QTBUG-65235
-  patch -p1 -i ../qtbug-59261.patch # https://bugreports.qt.io/browse/QTBUG-59261
 }
 
 build() {
