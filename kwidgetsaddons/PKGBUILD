@@ -9,7 +9,7 @@ arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kwidgetsaddons'
 license=('LGPL')
 depends=("qt5-base")
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools')
+makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'clang' 'python2-pyqt5' 'python3-pyqt5' 'doxygen')
 groups=('kf5')
 options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
@@ -23,7 +23,7 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake_kf5 -DBUILD_QCH=ON ../${pkgname}-${pkgver}
   make
 }
 
