@@ -1,7 +1,7 @@
 
 pkgname=pacman
-pkgver=5.0.1
-pkgrel=2
+pkgver=5.0.2
+pkgrel=1
 pkgdesc="A library-based package manager with dependency support"
 arch=('x86_64')
 url="http://www.archlinux.org/pacman/"
@@ -12,27 +12,21 @@ depends=('bash>=4.3.025-1' 'glibc>=2.20-2' 'libarchive=3.2.2' 'curl>=7.28.1'
 checkdepends=('python2' 'fakechroot')
 makedepends=('asciidoc')
 optdepends=('fakeroot: for makepkg usage as normal user')
-provides=('pacman-contrib')
-conflicts=('pacman-contrib')
-replaces=('pacman-contrib')
 backup=(etc/pacman.conf etc/makepkg.conf)
 install=pacman.install
 options=(!libtool)
 source=(https://sources.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz{,.sig}
-        pacman-5.0.1-roundup.patch::'https://git.archlinux.org/svntogit/packages.git/plain/trunk/pacman-5.0.1-roundup.patch?h=packages/pacman'
-        pacman.conf
-        makepkg.conf)
-sha1sums=('d0157ab851d570d640e253527b336bcfad6cb13c'
+        pacman5.conf
+        makepkg5.conf)
+sha1sums=('3b9c0797ac04a89d1517771595f13bddc68933b1'
           'SKIP'
-          '34b85e8040ff483f3814c27eb838bc4d898bbfbf'
           '735dfdbf78f1249567b3250a2766f55eb6ae9a0c'
           '0e61e106d58a332ac7bb0a34885358d37297886e')
-validpgpkeys=('6645B0A8C7005E78DB1D7864F99FFE0FEAE999BD')  # Allan McRae <allan@archlinux.org>
+validpgpkeys=('6645B0A8C7005E78DB1D7864F99FFE0FEAE999BD'  # Allan McRae <allan@archlinux.org>
+              'B8151B117037781095514CA7BBDFFC92306B1121') # Andrew Gregory (pacman) <andrew@archlinux.org>
 
 prepare() {
    cd "$pkgname-$pkgver"
-   # v5.0.1..pacman-5.0.1..c2f97580
-   patch -p1 -i $srcdir/pacman-5.0.1-roundup.patch
 }
 
 build() {
@@ -56,14 +50,13 @@ package() {
   make DESTDIR="$pkgdir" -C contrib install
 
   # install Chakra specific stuff
-  install -dm755 "$pkgdir"/etc
-  install -m644 "$srcdir"/pacman.conf "$pkgdir"/etc/pacman.conf
+  install -Dm644 "$srcdir"/pacman5.conf "$pkgdir"/etc/pacman.conf
 
   mycarch="x86_64"
   mychost="x86_64-pc-linux-gnu"
   myflags="-march=x86-64"
 
-  install -m644 "$srcdir"/makepkg.conf "$pkgdir"/etc/
+  install -Dm644 "$srcdir"/makepkg5.conf "$pkgdir"/etc/makepkg.conf
   # set things correctly in the default conf file
   sed -i "$pkgdir"/etc/makepkg.conf \
     -e "s|@CARCH[@]|$mycarch|g" \
