@@ -1,21 +1,31 @@
-# $Id: PKGBUILD 69734 2010-02-22 09:25:57Z giovanni $
-# Maintainer: Jan de Groot <jgc@archlinux.org>
-# Contributer: Sean Middleditch <elanthis@awesomeplay.com>
+# Contributions from Arch:
+# Maintainer: Antonio Rojas <arojas@archlinux.org>
+# Contributor: Tom Gundersen <teg@jklm.no>
+# Contributor: Jan de Groot <jgc@archlinux.org>
+# Contributor: Sean Middleditch <elanthis@awesomeplay.com>
+# Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
 
 pkgname=docbook-xsl
-pkgver=1.78.1
-pkgrel=2
+pkgver=1.79.2
+pkgrel=1
 pkgdesc="XML stylesheets for Docbook-xml transformations."
 arch=('any')
 license=('custom')
-url="http://scrollkeeper.sourceforge.net/docbook.shtml"
+url="http://docbook.org/"
 depends=('libxml2' 'libxslt' 'docbook-xml')
-source=(http://downloads.sourceforge.net/sourceforge/docbook/docbook-xsl-${pkgver}.tar.bz2)
+source=("https://github.com/docbook/xslt10-stylesheets/releases/download/release%2F$pkgver/docbook-xsl-nons-$pkgver.tar.gz"
+        765567_non-recursive_string_subst.patch)
 install=$pkgname.install
-md5sums=('6dd0f89131cc35bf4f2ed105a1c17771')
+md5sums=('ca2a6aa27de09ed676d5fc0c9385cbba'
+         'f77800752a4815cbcf138a3578032628')
+
+prepare() {
+  cd ${srcdir}/${pkgname}-nons-${pkgver}
+  patch -Np2 -i ../765567_non-recursive_string_subst.patch
+}
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${srcdir}/${pkgname}-nons-${pkgver}
 
   _pkgroot=${pkgdir}/usr/share/xml/docbook/xsl-stylesheets-${pkgver}
 
@@ -23,8 +33,8 @@ package() {
   install -m644 VERSION VERSION.xsl ${_pkgroot}
 
   for fn in assembly common eclipse epub epub3 fo highlighting html htmlhelp javahelp lib \
-	    manpages params profiling roundtrip template website xhtml xhtml-1_1 xhtml5; do
-	  install -dm755 ${_pkgroot}/${fn}
+      manpages params profiling roundtrip template website xhtml xhtml-1_1 xhtml5; do
+          install -dm755 ${_pkgroot}/${fn}
 	  install -m644 ${fn}/*.{xml,xsl,dtd,ent} ${_pkgroot}/${fn} || true  # ignore missing files
   done
 
