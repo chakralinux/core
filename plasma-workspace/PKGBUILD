@@ -9,14 +9,10 @@ pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
 license=('LGPL')
-# note on libxdamage:
-# not detected by namcap because libgl depends on it
-# but nvidia providing libgl does not depend on libxdamage
-depends=('kjsembed' 'knotifyconfig' 'libxdamage' 'libksysguard' 'libkscreen' 'ktexteditor' 'libqalculate'
-         'qt5-tools' 'kded' 'kde-cli-tools' 'xorg-xrdb' 'xorg-xsetroot' 'kholidays'
-         'xorg-apps' 'xorg-utils' 'milou' 'breeze' 'prison' 'kwin' 'chakra-common' 'plasma-integration')
-makedepends=('extra-cmake-modules' 'kdoctools' 'gpsd' 'baloo'
-             'krunner' 'kxmlrpcclient' 'networkmanager-qt' 'kdewebkit')
+depends=(kjsembed knotifyconfig libksysguard ktexteditor libqalculate qt5-tools kde-cli-tools bc
+         xorg-xrdb xorg-xsetroot kactivitymanagerd kholidays xorg-utils milou prison kwin
+         plasma-integration kdelibs4support)
+makedepends=(extra-cmake-modules kdoctools gpsd baloo krunner networkmanager-qt kdesignerplugin) #appstream-qt
 groups=('plasma')
 options=("debug")
 source=("${PServer}/${PVersion}/${pkgname}-${pkgver}.tar.xz"{,.sig}

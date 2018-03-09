@@ -7,21 +7,17 @@ pkgdesc="Breeze port for GTK. (GIT version)"
 arch=('x86_64')
 url='https://quickgit.kde.org/?p=breeze-gtk.git'
 license=('LGPL')
-depends=('qt5-base')
-optdepends=('gtk2: GTK+2 theme'
-            'gtk3: GTK+3 theme')
-makedepends=('git' 'cmake' 'extra-cmake-modules' 'gtk3')
-conflicts=('gnome-breeze')
-replaces=('gnome-breeze')
-group=('gtk-integration') # groups=('plasma')
+depends=(qt5-base)
+makedepends=(extra-cmake-modules)
+group=('gtk-integration' 'plasma')
 options=("debug")
 source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
 sha256sums=( $(getSum ${pkgname}) 
              'SKIP' )
 validpgpkeys=(${Pvalidpgpkeys[@]})
+
 prepare() {
   mkdir -p build
-  cd ${pkgname}-${pkgver}
 }
 
 build() {
