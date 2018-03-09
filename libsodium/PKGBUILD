@@ -1,28 +1,33 @@
 #contributions from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/libsodium
 
 pkgname=libsodium
-pkgver=1.0.6
+pkgver=1.0.16
 pkgrel=1
 pkgdesc="P(ortable|ackageable) NaCl-based crypto library"
 arch=('x86_64')
-url="https://github.com/jedisct1/libsodium"
+url="https://libsodium.org/"
 license=('custom:ISC')
 depends=('glibc')
-source=("http://download.dnscrypt.org/$pkgname/releases/$pkgname-${pkgver}.tar.gz")
-sha512sums=('f1232bfd31f8ba60650f594af469e48797924de0d2ce1e9bd0be75614e19b77727b3bcaa9a553cd5613db92738caea79edca5f2ff77ab392b1dff570dcd6be7d')
+source=("https://download.libsodium.org/libsodium/releases/$pkgname-$pkgver.tar.gz")
+sha512sums=('eab917d599c9c1fe971a6ecf915b9a6476ccec2d46cf23cbfbf06dd3833089b422f192de4d55f17b93362f1251ba8d5ddeb95ced1a422a3a2631b4b82553907f')
 
 build() {
-  cd "$pkgname-$pkgver"
+  cd $pkgname-$pkgver
 
   ./configure --prefix=/usr
   make
 }
 
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
 package() {
-  cd "$pkgname-$pkgver"
-  make DESTDIR="$pkgdir" install
+  cd $pkgname-$pkgver
+  make DESTDIR=$pkgdir install
 
   # install license
-  install -d -m 755 "$pkgdir/usr/share/licenses/$pkgname"
-  install -m 644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -d -m 755 $pkgdir/usr/share/licenses/$pkgname
+  install -m 644 LICENSE $pkgdir/usr/share/licenses/$pkgname/LICENSE
 }
