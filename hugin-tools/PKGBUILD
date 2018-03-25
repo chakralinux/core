@@ -1,19 +1,23 @@
 pkgname=hugin-tools
 _pkgname=hugin
-pkgver=2017.0.0
-pkgrel=4
+pkgver=2018.0.0
+pkgrel=1
 pkgdesc="Hugin libs and tools to be used by Kipi-plugins"
 arch=('x86_64')
 url="http://hugin.sourceforge.net/"
 license=('LGPL')
 depends=('boost-libs' 'enblend-enfuse' 'exiv2>=0.25' 'fftw' 'perl-exiftool' 'openexr' 'libpano13>=2.9.19'
          'sqlite3' 'lapack' 'glew' 'desktop-file-utils' 'icu' 'libxt' 'libpng' 'libxrandr' 'openexr')
-makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap' 'swig')
-source=("http://downloads.sourceforge.net/${_pkgname}/${_pkgname}-${pkgver}.tar.bz2")
-sha1sums=('4ba7f5bf5afdadbea9cf10d15aa14e644ef94ed3')
+makedepends=('zip' 'cmake' 'boost' 'mesa' 'tclap' 'swig' )
+source=("http://downloads.sourceforge.net/${_pkgname}/${_pkgname}-${pkgver}.tar.bz2"
+            noWxWidgets.patch)
+sha1sums=('bf62cc597015f8fcbddb52590fe3f8eac497449f'
+          '66645cebd74bff5eeb5f4436923aa50956ffff73')
 
 prepare() {
   cd "${srcdir}/${_pkgname}-${pkgver}"
+  
+  patch -Np1 -i ../noWxWidgets.patch
 }
 
 build() {
@@ -24,7 +28,7 @@ build() {
 
   # this makes possible to compile all the hugin tools without GUis
   sed -i -e "s~FIND_PACKAGE(wxWidgets REQUIRED)~~g" ${srcdir}/${_pkgname}-${pkgver}/CMakeLists.txt
-  mkdir -p ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
+  #mkdir -p ${srcdir}/${_pkgname}-${pkgver}/src/hugin_base/PT
 
   cmake "${srcdir}/${_pkgname}-${pkgver}" \
     -DCMAKE_BUILD_TYPE=Release \

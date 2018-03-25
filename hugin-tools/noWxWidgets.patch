@@ -1,0 +1,77 @@
+diff -r 7434a0f80b91 -r 9bcca0a49d44 CMakeLists.txt
+--- a/CMakeLists.txt	Wed Sep 06 18:14:21 2017 +0200
++++ b/CMakeLists.txt	Wed Sep 06 18:08:36 2017 +0200
+@@ -170,15 +170,21 @@
+   EXEC_PROGRAM(sh ARGS "${wxWidgets_CONFIG_EXECUTABLE} --version" OUTPUT_VARIABLE wxWidgets_VERSION)
+   STRING(REGEX REPLACE "^([0-9]+\\.[0-9]+)\\..*" "\\1"  wxWidgets_VERSION ${wxWidgets_VERSION})
+   IF(wxWidgets_VERSION VERSION_LESS "3.0")
+-    MESSAGE(FATAL_ERROR "At least wxWidgets 3.0 is required")
++    SET(wxWidgets_FOUND FALSE)
++    MESSAGE("At least wxWidgets 3.0 is required")
+   ENDIF()
+   # Ubuntu has 2 different devel packages, we need the GUI version
+   EXEC_PROGRAM(sh ARGS "${wxWidgets_CONFIG_EXECUTABLE} --query-toolkit" OUTPUT_VARIABLE wxWidgets_TOOLKIT)
+   IF(wxWidgets_TOOLKIT STREQUAL "base")
+-    MESSAGE(FATAL_ERROR "wxWidgets is as non-GUI package configured. Check you wxWidgets installation (maybe wxgtkXX-devel is missing)")
++    SET(wxWidgets_FOUND FALSE)
++    MESSAGE("wxWidgets is as non-GUI package configured. Check you wxWidgets installation (maybe wxgtkXX-devel is missing)")
+   ENDIF()
+ ENDIF (UNIX)
+ 
++IF(NOT wxWidgets_FOUND)
++  MESSAGE("wxWidgets was not found, GUI programs (hugin, nona_gui) disabled")
++ENDIF(NOT wxWidgets_FOUND) 
++
+ ##
+ ## Graphics libraries
+ ##
+diff -r 7434a0f80b91 -r 9bcca0a49d44 src/CMakeLists.txt
+--- a/src/CMakeLists.txt	Wed Sep 06 18:14:21 2017 +0200
++++ b/src/CMakeLists.txt	Wed Sep 06 18:08:36 2017 +0200
+@@ -35,4 +35,8 @@
+ 
+ add_subdirectory(hugin_cpfind)
+ add_subdirectory(translations)
+-add_subdirectory(hugin1)
++
++# build gui only if wxWidgets was found
++IF(wxWidgets_FOUND)
++  add_subdirectory(hugin1)
++ENDIF(wxWidgets_FOUND)
+diff -r 7434a0f80b91 -r 9bcca0a49d44 src/hugin1/CMakeLists.txt
+--- a/src/hugin1/CMakeLists.txt	Wed Sep 06 18:14:21 2017 +0200
++++ b/src/hugin1/CMakeLists.txt	Wed Sep 06 18:08:36 2017 +0200
+@@ -1,17 +1,21 @@
+ 
+ include_directories( ${CMAKE_SOURCE_DIR}/src/hugin1 )
+ 
+-INCLUDE(${wxWidgets_USE_FILE})
++# build gui only if wxWidgets was found
++IF(wxWidgets_FOUND)
++  INCLUDE(${wxWidgets_USE_FILE})
+ 
+-# do we need to define _UNICODE on windows?
+-IF(WIN32)
+-  ADD_DEFINITIONS(-D_UNICODE -DUNICODE)
+-ENDIF(WIN32)
++  # do we need to define _UNICODE on windows?
++  IF(WIN32)
++    ADD_DEFINITIONS(-D_UNICODE -DUNICODE)
++  ENDIF(WIN32)
+ 
+-add_subdirectory(base_wx)
+-add_subdirectory(stitch_project)
+-add_subdirectory(icpfind)
+-add_subdirectory(executor)
+-add_subdirectory(hugin)
+-add_subdirectory(ptbatcher)
+-add_subdirectory(calibrate_lens)
++  add_subdirectory(base_wx)
++  add_subdirectory(stitch_project)
++  add_subdirectory(icpfind)
++  add_subdirectory(executor)
++  add_subdirectory(hugin)
++  add_subdirectory(ptbatcher)
++  add_subdirectory(calibrate_lens)
++ENDIF(wxWidgets_FOUND)
++
