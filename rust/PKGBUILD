@@ -3,7 +3,7 @@
 # Arch Contributor: Daniel Micay <danielmicay@gmail.com>
 
 pkgname=rust
-pkgver=1.24.1
+pkgver=1.25.0
 pkgrel=1
 arch=('x86_64')
 pkgdesc='Systems programming language focused on safety, speed and concurrency'
@@ -13,18 +13,18 @@ provides=('cargo')
 conflicts=('cargo')
 replaces=('cargo')
 depends=('gcc-libs' 'curl' 'libssh2')
-makedepends=('rust' 'libffi' 'perl' 'python2' 'curl' 'cmake')
-source=("http://static.rust-lang.org/dist/rustc-$pkgver-src.tar.gz"
-        bootstrap-config.toml)
-sha256sums=('3ea53d45e8d2e9a41afb3340cf54b9745f845b552d802d607707cf04450761ef'
-            '8e30fcd8633e1900056ecbcc7267fea23e8e08889460239c614d4dcd796ce4f3')
+makedepends=('rust' 'libffi' 'perl' 'python2' 'curl' 'cmake' 'ninja')
+source=("https://static.rust-lang.org/dist/rustc-$pkgver-src.tar.gz"
+        config.toml)
+sha256sums=('eef63a0aeea5147930a366aee78cbde248bb6e5c6868801bdf34849152965d2d'
+            'c0988fa7cb0dd3686379df9e0c45104895b69519a258f8a4ae56bd6af1670639')
 install="$pkgname.install"
 options=('staticlibs' '!strip' '!emptydirs')
 
 prepare() {
   cd "rustc-$pkgver-src"
 
-  cp "$srcdir"/bootstrap-config.toml config.toml
+  cp "$srcdir"/config.toml config.toml
 }
 
 build() {
@@ -46,6 +46,9 @@ package() {
 
   rm rustlib/{components,manifest-rustc,rust-installer-version}
   ln -sf rustlib/$CARCH-unknown-linux-gnu/lib/*.so .
+
+  install -d "$pkgdir"/usr/share/bash-completion
+  mv "$pkgdir"/etc/bash_completion.d/ "$pkgdir"/usr/share/bash-completion/completions/
 
   rm rustlib/uninstall.sh # remove uninstall.sh, pacman manages the files anyway
 }
