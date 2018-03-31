@@ -1,5 +1,5 @@
 pkgname=meson
-pkgver=0.44.0
+pkgver=0.45.1
 pkgrel=1
 pkgdesc='High productivity build system'
 url='http://mesonbuild.com/'
@@ -13,7 +13,7 @@ checkdepends=('gcc-objc' 'vala' 'rust' 'gcc-fortran' 'mono' 'boost' 'qt5-base' '
               'openmpi' 'openssh' 'mercurial')
 source=(https://github.com/mesonbuild/meson/releases/download/${pkgver}/meson-${pkgver}.tar.gz{,.asc}
         chakra-meson)
-sha512sums=('9aefa52d92d7750528e9a9236f19131c8e58bfc21212595c311f4e2787ad40bb53d6085f52283cad13923ddf12da1a59067d48424c72ace47fc127978d1af2ff'
+sha512sums=('50bcc299d69a3649a3aa3582322c548af44c2771d65e57c79eae9d67ccb256a17e534649ee5080f50f6f9d4e5d717a1b1a28b3ef4684468094b16bbed8864846'
             'SKIP'
             'a4398dcd70bf8ad983f80f666b07c2122029a69d385ea10e411a6f31fb5ac77b7f6f3910ca35baebf6f577e82baab3cc38fb53afbe0be6fe4da74cedfb8eaecd')
 validpgpkeys=('95181F4EED14FDF4E41B518D3BF4693BFEEB9428') # Jussi Pakkanen <jpakkane@gmail.com>
@@ -24,21 +24,21 @@ build() {
   python3 setup.py build
 }
 
-#check() {
-#  cd ${pkgname}-${pkgver}
-#  unset CLASSPATH  # GNUstep breaks java tests
-#  # export MESON_PRINT_TEST_OUTPUT=1 # set this for debug output
-#  # Installing graphviz breaks doxygen tests
-#  LC_CTYPE=en_US.UTF-8 DC=ldc ./run_tests.py
-#}
+check() {
+  cd ${pkgname}-${pkgver}
+  LDFLAGS="${LDFLAGS/,--as-needed/}"
+  # export MESON_PRINT_TEST_OUTPUT=1 # set this for debug output
+  
+  export LC_CTYPE=en_US.UTF-8
+  ./run_tests.py
+}
 
 package() {
   cd ${pkgname}-${pkgver}
   python3 setup.py install --root="${pkgdir}" -O1
 
-  for _f in data/syntax-highlighting/vim/*/*; do
-    install -Dt "${pkgdir}/usr/share/vim/vimfiles/$(basename "$(dirname "$_f")")" -m644 "$_f"
-  done
+  install -d "${pkgdir}/usr/share/vim/vimfiles"
+  cp -rt "${pkgdir}/usr/share/vim/vimfiles" data/syntax-highlighting/vim/*
   install -Dt "${pkgdir}/usr/share/emacs/site-lisp" -m644 data/syntax-highlighting/emacs/*
   install -Dt "${pkgdir}/usr/share/zsh/site-functions" -m644 data/shell-completions/zsh/*
 
