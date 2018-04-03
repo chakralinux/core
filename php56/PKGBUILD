@@ -20,7 +20,7 @@ pkgname=("${pkgbase}"
          "${pkgbase}-snmp"
          "${pkgbase}-sqlite"
          "${pkgbase}-xsl")
-pkgver=5.6.33
+pkgver=5.6.35
 pkgrel=1
 pkgdesc="A general-purpose scripting language that is especially suited to web development"
 arch=('x86_64')
@@ -58,15 +58,17 @@ source=("http://php.net/distributions/${_pkgbase}-${pkgver}.tar.xz"
         'php-fpm.conf.in.patch'
         'logrotate.d.php-fpm'
         'php-fpm.service'
-        'php-fpm.tmpfiles')
-md5sums=('ca5d8f4b2b8c19519e495ecfed625ffa'
+        'php-fpm.tmpfiles'
+        'use-enchant2.patch')
+md5sums=('50afbbc745ad433b9f368c5885bd73bf'
          'SKIP'
          'c893cdf2599f68a7844cd4c91e66a18b'
          'dec2cbaad64e3abf4f0ec70e1de4e8e9'
          '2d0e98c423a9dc57e923f31d63117106'
          'bc1006ba3308c0b641726944874da315'
          'c1cc15d2123931f883f75f231ae44f60'
-         '12392414f768281ae96f292d0aa9669c')
+         '12392414f768281ae96f292d0aa9669c'
+         'd4e12952c5b4aaa79b05640ebe21ad32')
 validpgpkeys=('6E4F6AB321FDC07F2C332E3AC2BF0BC433CFC8B3'
               '0BD78B5F97500D450838F95DFE857D9A90D90EC1')
 
@@ -75,6 +77,8 @@ prepare() {
 
   patch -p0 -i ${srcdir}/php.ini.patch
   patch -p0 -i ${srcdir}/php-fpm.conf.in.patch
+  patch -p0 -i ${srcdir}/use-enchant2.patch
+  
   # Just because our Apache 2.4 is configured with a threaded MPM by default does not mean we want to build a ZTS PHP.
   # Let's supress this behaviour and build a SAPI that works fine with the prefork MPM.
   sed '/APACHE_THREADED_MPM=/d' -i sapi/apache2handler/config.m4 -i configure
