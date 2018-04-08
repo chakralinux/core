@@ -1,0 +1,22 @@
+# Arch contributor: https://git.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/xmltoman
+
+pkgname=xmltoman
+pkgver=0.4
+pkgrel=1
+pkgdesc='Convert xml to man pages in groff format or html'
+url='http://xmltoman.sourceforge.net/'
+license=('GPL')
+arch=('any')
+depends=('perl-xml-parser')
+source=("https://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgname}-${pkgver}.tar.gz/${pkgname}-${pkgver}.tar.gz")
+sha256sums=('948794a316aaecd13add60e17e476beae86644d066cb60171fc6b779f2df14b0')
+
+build() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	make PREFIX=/usr
+}
+
+package() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	make install PREFIX=/usr DESTDIR="${pkgdir}"
+}
