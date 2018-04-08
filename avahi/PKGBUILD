@@ -5,39 +5,47 @@
 # contributor: Martín González kote[at]chakra-project[dot]org>
 
 pkgname=avahi
-pkgver=0.7
+pkgver=0.7+4+gd8d8c67
 pkgrel=1
 pkgdesc="A multicast/unicast DNS-SD framework"
 arch=('x86_64')
 url="http://www.avahi.org/"
 license=('LGPL')
 depends=('dbus' 'libcap' 'libdaemon' 'gdbm' 'glib2' 'expat')
+makedepends=('git' 'qt' 'python3-dbus' 'gobject-introspection' 'intltool' 'python3-gobject'
+             'xmltoman')
 optdepends=('qt: qt bindings'
 	    'nss-mdns: NSS support for mDNS'
 	    'python3-dbus: avahi-discover'
             'python2-twisted: avahi-bookmarks'
             'python3-gobject: avahi-discover')
-makedepends=('qt' 'python3-dbus' 'gobject-introspection' 'intltool' 'python3-gobject')
-backup=(etc/avahi/avahi-daemon.conf etc/avahi/services/{sftp-,}ssh.service)
-install=avahi.install
-source=("http://www.avahi.org/download/avahi-${pkgver}.tar.gz"
-        'gnome-nettool.png'
+backup=(etc/avahi/{hosts,avahi-daemon.conf,avahi-{autoip,dnsconf}d.action}
+        usr/lib/avahi/service-types.db)
+_commit=d8d8c67d8279f35eef157f5f442a1dde4ac5c45e  # master
+source=("git+https://github.com/lathiat/avahi#commit=$_commit"
+        "gnome-nettool.png"
         0001-avahi-python-Use-the-agnostic-DBM-interface.patch)
-sha1sums=('8a062878968c0f8e083046429647ad33b122542f'
-          'cf56387c88aed246b9f435efc182ef44de4d52f3'
-          '641381523c84b470ec8d49a9bb2f5be861fa458f')
+sha512sums=('SKIP'
+            'd8e92fcdd82759f8de536ebfa356fe208c27b2d998ce5bb51d585dffc163dc16228be4a7108644fe1a11defbe750244bc8105a430b1397297cdef4cb83ab0db5'
+            'a29c8efd7b529d5b89ec1eee8df680a742cc886a712b1ca41530b7b7cb5580b7d995888e8a0a0bd3800c1b927254e779c5f77990befda017dcc79af3b5a2a3ac')
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed 's/^v//;s/-/+/g'
+}
 
 prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd $pkgname
   patch -Np1 -i ../0001-avahi-python-Use-the-agnostic-DBM-interface.patch
   NOCONFIGURE=1 ./autogen.sh
 }
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  export PYTHON=/usr/bin/python3
+  cd $pkgname
+  export MOC_QT4=/usr/bin/moc PYTHON=/usr/bin/python3
 
-    ./configure --prefix=/usr \
+  ./configure \
+    --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
     --disable-static \
@@ -46,12 +54,10 @@ build() {
     --disable-mono \
     --disable-monodoc \
     --disable-doxygen-doc \
-    --disable-xmltoman \
     --disable-gtk \
     --disable-gtk3 \
     --disable-pygtk \
     --enable-compat-libdns_sd \
-    --enable-compat-howl \
     --with-distro=archlinux \
     --with-avahi-priv-access-group=network \
     --with-autoipd-user=avahi \
@@ -66,21 +72,26 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-  rm -fr "${pkgdir}"/etc/rc.d
+  cd $pkgname
+  make DESTDIR="$pkgdir" install
+  make DESTDIR="$pkgdir" -C avahi-python/avahi2 install \
+    PYTHON=/usr/bin/python2 pythondir=/usr/lib/python2.7/site-packages
 
-  # /var/run already provided by filesystem
-  rm -fr "${pkgdir}"/var
+  rmdir "$pkgdir/run"
 
   install -D -m 644 ../gnome-nettool.png "${pkgdir}"/usr/share/pixmaps/gnome-nettool.png
 
-  cd "${pkgdir}"
-  sed -i '1c #!/usr/bin/python2' usr/bin/avahi-bookmarks
-  # howl and mdnsresponder compatability
-  (cd usr/include; ln -s avahi-compat-libdns_sd/dns_sd.h dns_sd.h; ln -s avahi-compat-howl howl)
-  (cd usr/lib/pkgconfig; ln -s avahi-compat-howl.pc howl.pc)
+  # this isn't ported
+  sed -i '1s|python3|python2|' "$pkgdir/usr/bin/avahi-bookmarks"
 
-  ln avahi-daemon.service -s "${pkgdir}"/usr/lib/systemd/system/dbus-org.freedesktop.Avahi.service
+  # mdnsresponder compat
+  ln -s avahi-compat-libdns_sd/dns_sd.h "$pkgdir/usr/include/dns_sd.h"
+
+  # move example services https://bugs.archlinux.org/task/47822
+  install -d "$pkgdir/usr/share/doc/$pkgname"
+  mv "$pkgdir"/etc/avahi/services/{,sftp-}ssh.service \
+    "$pkgdir/usr/share/doc/$pkgname/"
+
+  echo 'u avahi - "Avahi mDNS/DNS-SD daemon"' |
+    install -Dm644 /dev/stdin "$pkgdir/usr/lib/sysusers.d/$pkgname.conf"
 }
-
