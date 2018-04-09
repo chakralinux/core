@@ -1,32 +1,32 @@
-# Contribution from Arch Linux:
-# Maintainer:Antonio Rojas <arojas@archlinux.org>
+# Include global configuration
+source ../frameworks.conf
 
 pkgname=purpose
-pkgver=1.2.1
+pkgver=$KFVersion
 pkgrel=1
 pkgdesc="Framework for providing abstractions to get the developer's purposes fulfilled"
 arch=('x86_64')
 url='https://projects.kde.org/purpose'
 license=('LGPL')
-depends=('kaccounts-integration' 'accounts-qml-module' 'hicolor-icon-theme')
-makedepends=('extra-cmake-modules' 'intltool' 'python3')
+depends=(kaccounts-integration accounts-qml-module hicolor-icon-theme)
+makedepends=(extra-cmake-modules intltool python3)
 optdepends=('kdeconnect: sharing to smartphone via KDE Connect')
-source=("http://download.kde.org/stable/$pkgname/$pkgname-$pkgver.tar.xz")
-install=$pkgname.install
-md5sums=('09a76125fd24323755b6d655f1cb038f')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys[@]} )
+
+prepare() {
+  mkdir -p build
+}
 
 build() {
-  mkdir -p build && cd build
-  cmake ../$pkgname-$pkgver \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DKDE_INSTALL_LIBDIR=lib \
-    -DKDE_INSTALL_LIBEXECDIR=lib \
-    -DBUILD_TESTING=OFF
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver} 
   make
 }
 
 package() {
   cd build
-  make DESTDIR="$pkgdir" install
+  make DESTDIR="${pkgdir}" install
 }
