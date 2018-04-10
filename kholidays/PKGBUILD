@@ -1,0 +1,33 @@
+# Include global configuration
+source ../frameworks.conf
+
+pkgname=kholidays
+pkgver=${KFVersion}
+pkgrel=2
+epoch=1
+pkgdesc="KDE library for regional holiday information"
+arch=('x86_64')
+url='https://community.kde.org/Frameworks'
+license=(LGPL)
+depends=(qt5-base)
+makedepends=(extra-cmake-modules qt5-declarative qt5-tools doxygen)
+options=('debug')
+source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=( $(getSum ${pkgname})
+                        SKIP)
+validpgpkeys=( ${KFvalidpgpkeys[@]} )
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake_kf5 ../${pkgname}-${pkgver}
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}
