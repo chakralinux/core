@@ -1,13 +1,14 @@
 pkgname=libmtp
-pkgver=1.1.11
+pkgver=1.1.15
 pkgrel=1
 pkgdesc="Library implementation of the Media Transfer Protocol"
 arch=('x86_64')
 url="http://libmtp.sourceforge.net"
 license=('LGPL')
-depends=('libusb' 'libgcrypt')
-source=("http://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('eea14dd30ddd08bbe39cfcb57564a4b8')
+depends=('libusb')
+makedepends=('doxygen')
+source=("https://downloads.sourceforge.net/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+sha256sums=('d040900b46757e311b1fb3bfa8c05db09c8b6811e044bce8c88c9f3f6d3a3021')
 
 build() {
   cd ${pkgname}-${pkgver}
@@ -16,14 +17,11 @@ build() {
 }
 
 check() {
-  cd $pkgname-$pkgver
+  cd ${pkgname}-${pkgver}
   make -k check
 }
 
 package() {
   cd ${pkgname}-${pkgver}
   make DESTDIR="${pkgdir}" install
-
-  # fix broken udev rule
-  sed -i "/^Unable to open/d" ${pkgdir}/usr/lib/udev/rules.d/69-libmtp.rules
 }
