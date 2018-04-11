@@ -1,30 +1,35 @@
 pkgname=exfat-utils
-pkgver=1.2.4
-pkgrel=2
+pkgver=1.2.8
+pkgrel=1
 pkgdesc="Utilities for exFAT file system"
 arch=('x86_64')
-url="https://github.com/relan/exfat"
+url='https://github.com/relan/exfat'
 license=('GPL2')
-depends=('glibc' 'fuse')
+depends=('glibc' 'fuse2')
 conflicts=('fuse-exfat')
 provides=('fuse-exfat')
 replaces=('fuse-exfat')
-source=("$pkgname-$pkgver.zip::https://github.com/relan/exfat/archive/v$pkgver.zip")
-md5sums=('7644cccb8f70603b50c95cebba88005d')
+source=(${pkgname}-${pkgver}.tar.gz::https://github.com/relan/exfat/archive/v${pkgver}.tar.gz)
+sha256sums=('778474bfbcd92e35bba5b88bd7ad3f6400328256636abb9031bfcc1ce15ed887')
  
+prepare() {
+  cd exfat-${pkgver}
+  autoreconf -fiv
+}
+
 build() {
   cd exfat-$pkgver
- 
-  autoreconf -i
+
   ./configure --prefix=/usr \
               --sbindir=/usr/bin
  
-  make CCFLAGS="${CFLAGS} -std=c99" LINKFLAGS="${LDFLAGS}"
+  make CCFLAGS="${CFLAGS} ${CPPFLAGS} -std=c99" LINKFLAGS="${LDFLAGS}"
 }
  
 package() {
   cd exfat-$pkgver
  
   make DESTDIR=$pkgdir install
-}
 
+  install -Dm 644 */*.8 -t "${pkgdir}/usr/share/man/man8"
+}
