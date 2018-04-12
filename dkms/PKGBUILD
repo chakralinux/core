@@ -1,26 +1,26 @@
 pkgname=dkms
-pkgver=2.3+git161025
+pkgver=2.5
 pkgrel=1
 pkgdesc='Dynamic Kernel Modules System'
 arch=('any')
-url='http://linux.dell.com/dkms/'
+url='https://github.com/dell/dkms'
 license=('GPL2')
 depends=('bash' 'kmod' 'gcc' 'make' 'patch')
 makedepends=('git')
 optdepends=('linux-headers: build modules against Chakra kernel'
             'linux-lts-headers: build modules against LTS Chakra kernel')
-backup=('etc/dkms/framework.conf' 'etc/default/dkms')
+backup=('etc/dkms/framework.conf')
 install=$pkgname.install
-source=('git+https://github.com/dell/dkms.git#commit=88e020c'
-        "$pkgname.default"
-        "$pkgname.service"
-        "$pkgname.systemd"
-        '02-no-kernel-hook.patch')
+source=("git+https://github.com/dell/dkms.git#tag=v$pkgver"
+        'hook.install'
+        'hook.remove'
+        'hook.sh'
+        '0001-Revert-Make-newly-installed-modules-available-immedi.patch')
 md5sums=('SKIP'
-         '33be2fbf1bcc1b3fb2f38d9e7eaa809d'
-         '02e9744e3fdc3d2f68e46966fb32e260'
-         '267632312aa52a190ec0db0758920dd3'
-         '82d520c39c99c34977e48b313a189c6c')
+         '90f1486e0af9aab85e8c60d456802c63'
+         '2e8ffd0c2ddec02872d0234befd129fd'
+         'f1ea074ef22d1afe855a1eb63233566b'
+         'd3b91ef709f567a375f4bbdbd3291d2b')
 
 prepare() {
   cd dkms
@@ -29,8 +29,8 @@ prepare() {
   local filename
   for filename in "${source[@]}"; do
     if [[ "$filename" =~ \.patch$ ]]; then
-      msg2 "Applying patch $filename"
-      patch -p1 -N -i "$srcdir/$filename"
+      msg2 "Applying patch ${filename##*/}"
+      patch -p1 -N -i "$srcdir/${filename##*/}"
     fi
   done
 
@@ -39,20 +39,21 @@ prepare() {
   for i in dkms{,_framework.conf,.bash-completion,.8,_common.postinst}; do
     sed -ri 's,/lib/modules,/usr/lib/modules,g' "$i"
   done
-  # fix hardcoded paths
-  sed -i "s|/sbin/depmod|depmod|" dkms
 }
 
 package() {
-  # systemd
-  install -D -m 644 $pkgname.service "$pkgdir/usr/lib/systemd/system/$pkgname.service"
-  install -D -m 755 $pkgname.systemd "$pkgdir/usr/lib/systemd/scripts/$pkgname"
-  install -D -m 644 $pkgname.default "$pkgdir/etc/default/$pkgname"
+  # alpm hook
+  install -D -m 644 hook.install "$pkgdir/usr/share/libalpm/hooks/70-dkms-install.hook"
+  install -D -m 644 hook.remove "$pkgdir/usr/share/libalpm/hooks/70-dkms-remove.hook"
+  install -D -m 755 hook.sh "$pkgdir/usr/lib/dkms/alpm-hook"
   # upstream installer
   cd dkms
+  # we don't need kconf files, so we install them outside $pkgdir
   make \
     DESTDIR="$pkgdir" \
     BASHDIR="$pkgdir/usr/share/bash-completion/completions" \
+    KCONF="$srcdir"/kconf \
     install
 }
 
+# vim:set ts=2 sw=2 et:
