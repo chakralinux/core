@@ -1,5 +1,5 @@
 pkgname=mercurial
-pkgver=4.3.1
+pkgver=4.5.3
 pkgrel=1
 pkgdesc="A scalable distributed SCM tool"
 arch=('x86_64')
@@ -10,13 +10,18 @@ optdepends=('tk: for the hgk GUI')
 backup=('etc/mercurial/hgrc')
 source=("https://www.mercurial-scm.org/release/${pkgname}-${pkgver}.tar.gz"
         'mercurial.profile')
-md5sums=('b9cbdcf0bd41a2b385b35b9fbfeb0eea'
+md5sums=('065c73bf523b76666710f10ae6e2fe8a'
          '43e1d36564d4c7fbe9a091d3ea370a44')
 
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   sed -i -e 's#env python#env python2#' mercurial/lsprof.py
 }         
+
+build() {
+  cd $pkgname-$pkgver/contrib/chg
+  make
+}
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -38,10 +43,13 @@ package() {
   install -m755 -d ${pkgdir}/etc/profile.d
   install -m755 ${srcdir}/mercurial.profile "${pkgdir}/etc/profile.d/mercurial.sh" 
   
-  # install configuration file
-  install -m755 -d ${pkgdir}/etc/mercurial
-  #install -m644 contrib/sample.hgrc "${pkgdir}/etc/mercurial/hgrc"
-  
   # Arch's FS#38825 - Add certs config to package
-  echo -e "\n[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt\n" >> "${pkgdir}/etc/mercurial/hgrc"
+  install -m755 -d "$pkgdir/etc/mercurial"
+  cat <<-EOF > "$pkgdir/etc/mercurial/hgrc"
+	[web]
+	cacerts = /etc/ssl/certs/ca-certificates.crt
+	EOF
+
+  cd contrib/chg
+  make DESTDIR="$pkgdir" PREFIX=/usr install
 }
