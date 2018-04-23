@@ -2,12 +2,12 @@
 # kernel.
 
 pkgname=btrfs-progs
-pkgver=4.15.1
-pkgrel=2
+pkgver=4.16
+pkgrel=1
 pkgdesc='Btrfs filesystem utilities'
 arch=('x86_64')
 depends=('glibc' 'util-linux' 'e2fsprogs' 'lzo2' 'zlib' 'zstd')
-makedepends=('git' 'asciidoc' 'xmlto')
+makedepends=('git' 'asciidoc' 'xmlto' 'systemd' 'python3-setuptools')
 url='http://btrfs.wiki.kernel.org/'
 license=('GPL2')
 source=("https://github.com/kdave/${pkgname}/archive/v${pkgver}.tar.gz"
@@ -15,7 +15,7 @@ source=("https://github.com/kdave/${pkgname}/archive/v${pkgver}.tar.gz"
         'initcpio-hook-btrfs'
         'btrfs-scrub@.service'
         'btrfs-scrub@.timer')
-md5sums=('90e22a853bb5680f9b6192cdb0b5ea34'
+md5sums=('8b071de61c6a33ba0e1fef78a6eed51c'
          '7241ba3a4286d08da0d50b7176941112'
          'b09688a915a0ec8f40e2f5aacbabc9ad'
          '794b867e09451284c545bae112aa0cfd'
@@ -25,7 +25,7 @@ options=(!staticlibs)
 
 build() {
    cd $pkgname-$pkgver
-   ./autogen.sh
+    ./autogen.sh
    ./configure --prefix=/usr
    make
 }
