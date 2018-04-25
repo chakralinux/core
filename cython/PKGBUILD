@@ -1,6 +1,6 @@
-pkgbase=cython
 pkgname=('cython3' 'cython2')
-pkgver=0.27.3
+pkgbase=cython
+pkgver=0.28.2
 pkgrel=1
 pkgdesc="C-Extensions for Python"
 arch=(x86_64)
@@ -8,7 +8,7 @@ url="http://cython.org"
 license=('APACHE')
 makedepends=('python3-setuptools' 'python2-setuptools')
 source=($pkgbase-$pkgver.tar.gz::"https://github.com/cython/cython/archive/$pkgver.tar.gz")
-sha256sums=('648feb8a257574a3e4ef854475e7d767732ef26e870d2f9fcc1ca5b244b3ac89')
+sha256sums=('d8fad58f7484466ff64a3d54f76943a3e2aef72a4efa1506eccca6ddc3ee547a')
 
 prepare() {
   cp -r cython-$pkgver cython2-$pkgver
@@ -25,6 +25,9 @@ build() {
 
 package_cython3() {
   depends=(python3 python3-setuptools)
+  provides=(python3-cython)
+  conflicts=(python3-cython)
+  replaces=(python3-cython)
 
   cd cython-$pkgver
   python3 setup.py install --root="$pkgdir" --skip-build
@@ -37,6 +40,9 @@ package_cython3() {
 
 package_cython2() {
   depends=(python2 python2-setuptools)
+  provides=(python2-cython)
+  conflicts=(python2-cython)
+  replaces=(python2-cython)
 
   cd cython2-$pkgver
   python2 setup.py install --root="$pkgdir" --skip-build
