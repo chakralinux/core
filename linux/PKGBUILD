@@ -5,7 +5,7 @@ pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs')
 _srcname=linux-${_basekernel}
 pkgver=${_kernelver}
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -22,23 +22,21 @@ source=(
   0002-drm-i915-edp-Only-use-the-alternate-fixed-mode-if-it.patch
   0003-Partially-revert-swiotlb-remove-various-exports.patch
   0004-Fix-vboxguest-on-guests-with-more-than-4G-RAM.patch
-  0005-Revert-drm-amd-display-disable-CRTCs-with-NULL-FB-on.patch
-  0006-net-aquantia-Regression-on-reset-with-1.x-firmware.patch
+  0005-net-aquantia-Regression-on-reset-with-1.x-firmware.patch
 )
 sha256sums=('63f6dc8e3c9f3a0273d5d6f4dca38a2413ca3a5f689329d05b750e4c87bb21b9'
             'SKIP'
-            '336252cb15f2f2574461c1d3daabf5dc207842526085802270e1e5223f645db3'
+            'bad271dbda2d024daf4a2ab6e122b95b262ea80508ac8018bc61e8aa44f40cfe'
             'SKIP'
-            '50b72cb7e96708c60958374aafd146bafc016e7714d7c3722c3b4320e0a9978d'
-            'ae2e95db94ef7176207c690224169594d49445e04249d2499e9d2fbc117a0b21'
+            '9128c28a2bfe76fc90bd18dc6864839200e8b9ab941496c878313091b2a70023'
+            '287b43e83535d0aba2797b8fe4c1527788995cbfd858097be37214345e781a25'
             '75f99f5239e03238f88d1a834c50043ec32b1dc568f2cc291b07d04718483919'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
-            'a6119b46856ed2652c509fed380052e6df2be89c69a0d748cf7d8745bf35b871'
-            '545566a7358d711b8d4f9924df685e2410549e20d99e5d1c0dfaccdfeafda60d'
-            'bef6dd7b3a749ec072614ea4ed0bd5ea1d90519731f3438e4938d5b957032cc5'
-            'd647211e288436bcc010019a69f4ebf9a94c33b423c650aea8098969208ec836'
-            '6fb4fb81dab69ff432767e02585b3eb6a5a39c941e4bc2a6d4940ee17116c14e'
-            'd49a70d3b3f60c81d93735871f01ea60cafca87588d8d0d01801b2aec92e0e93')
+            '113b1fe603f61b749c4cb3902a4f5d4fbec9d1e5081f008bac485cc345defa5f'
+            '9db235c5edfc9a81a0f5866f9942e74d896243c37d50298288fbbe2f79169fd3'
+            'd57665a468f93c94b92924fdbdc72ea50def74d9c8999104c9594e64fb196328'
+            '079180ceaae87a4851eb56e80f6e33b0199dad3343c73275ddb710e0824feb73'
+            'f1c751e29bc1bcfe634c49873eb34a5418db3dfbd1f6d789e738dee78071d3dd')
 validpgpkeys=(
               'ABAF11C65A2970B130ABE3C479BE3E4300411886' # Linus Torvalds
               '647F28654894E3BD457199BE38DBBDC86092693E' # Greg Kroah-Hartman
@@ -66,11 +64,8 @@ prepare() {
   # https://bugs.archlinux.org/task/58153
   patch -Np1 -i ../0004-Fix-vboxguest-on-guests-with-more-than-4G-RAM.patch
 
-  # https://bugs.archlinux.org/task/58158
-  patch -Np1 -i ../0005-Revert-drm-amd-display-disable-CRTCs-with-NULL-FB-on.patch
-
   # https://bugs.archlinux.org/task/58174
-  patch -Np1 -i ../0006-net-aquantia-Regression-on-reset-with-1.x-firmware.patch
+  patch -Np1 -i ../0005-net-aquantia-Regression-on-reset-with-1.x-firmware.patch
 
   cat "${srcdir}/config.x86_64" > ./.config
 
@@ -106,7 +101,7 @@ prepare() {
 build() {
   cd "$_srcname"
 
-  make ${MAKEFLAGS} LOCALVERSION= bzImage modules
+  make ${MAKEFLAGS} bzImage modules
 }
 
 package_linux() {
@@ -119,56 +114,46 @@ package_linux() {
 
   cd ${_srcname}
 
-  # get kernel version
-  _kernver="$(make kernelrelease)"
-  _basekernel=${_kernver%%-*}
-  _basekernel=${_basekernel%.*}
-
   mkdir -p "${pkgdir}"/{boot,usr/lib/modules}
-  make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}/usr" modules_install
+  make INSTALL_MOD_PATH="${pkgdir}/usr" modules_install
   cp arch/x86/boot/bzImage "${pkgdir}/boot/vmlinuz-${pkgname}"
 
-  # set correct depmod command for install
-  cp -f "${startdir}/${install}" "${startdir}/${install}.pkg"
-  true && install=${install}.pkg
-  sed \
-    -e  "s/KERNEL_NAME=.*/KERNEL_NAME=${_kernelname}/" \
-    -e  "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" \
-    -i "${startdir}/${install}"
+  # make room for external modules
+  #local _extramodules="extramodules-${_basekernel}${_kernelname:--CHAKRA}"
+  ln -s "../${_extramodules}" "${pkgdir}/usr/lib/modules/${_kernelver}/extramodules"
 
-  # install fallback mkinitcpio.conf file and preset file for kernel
-  install -D -m644 "${srcdir}/linux.preset" "${pkgdir}/etc/mkinitcpio.d/linux${_kernelname}.preset"
-  sed \
-    -e "1s|'linux.*'|'${pkgname}'|" \
-    -e "s|ALL_kver=.*|ALL_kver=\"/boot/vmlinuz-${pkgname}\"|" \
-    -e "s|default_image=.*|default_image=\"/boot/initramfs-${pkgname}.img\"|" \
-    -e "s|fallback_image=.*|fallback_image=\"/boot/initramfs-${pkgname}-fallback.img\"|" \
-    -i "${pkgdir}/etc/mkinitcpio.d/linux${_kernelname}.preset"
+  # add real version for building modules and running depmod from hook
+  echo "${_kernelver}" |
+    install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modules/${_extramodules}/version"
 
   # remove build and source links
-  rm -f "${pkgdir}"/usr/lib/modules/${_kernver}/{source,build}
+  rm -f "${pkgdir}"/usr/lib/modules/${_kernelver}/{source,build}
 
   # gzip -9 all modules to save 100MB of space
   find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
-  
-  # make room for external modules
-  ln -s "../extramodules-${_basekernel}${_kernelname:--CHAKRA}" "${pkgdir}/usr/lib/modules/${_kernver}/extramodules"
-  # add real version for building modules and running depmod from post_install/upgrade
-  mkdir -p "${pkgdir}/usr/lib/modules/extramodules-${_basekernel}${_kernelname:--CHAKRA}"
-  echo "${_kernver}" > "${pkgdir}/usr/lib/modules/extramodules-${_basekernel}${_kernelname:--CHAKRA}/version"
 
   # now we call depmod...
-  depmod -b "${pkgdir}/usr" -F System.map "${_kernver}"
+  depmod -b "${pkgdir}/usr" -F System.map "${_kernelver}"
 
   # add vmlinux
-  install -Dt "${pkgdir}/usr/lib/modules/${_kernver}/build" -m644 vmlinux
-
-  # install pacman hooks
+  install -Dt "${pkgdir}/usr/lib/modules/${_kernelver}/build" -m644 vmlinux
+  
+  # sed expression for following substitutions
   local _subst="
-    s|%PKGBASE%|${pkgbase}-CHAKRA|g
-    s|%KERNVER%|${_kernver}|g
+    s|%PKGBASE%|${pkgbase}/|g
+    s|%KERNVER%|${_kernelver}|g
     s|%EXTRAMODULES%|${_extramodules}|g
   "
+
+  # hack to allow specifying an initially nonexisting install file
+  sed "${_subst}" "${startdir}/${install}" > "${startdir}/${install}.pkg"
+  true && install=${install}.pkg
+
+  # install mkinitcpio preset file
+  sed "${_subst}" ../linux.preset |
+    install -Dm644 /dev/stdin "${pkgdir}/etc/mkinitcpio.d/${pkgbase}.preset"
+
+  # install pacman hooks
   sed "${_subst}" ../60-linux.hook |
     install -Dm644 /dev/stdin "${pkgdir}/usr/share/libalpm/hooks/60-${pkgbase}.hook"
   sed "${_subst}" ../90-linux.hook |
@@ -179,7 +164,7 @@ package_linux-headers() {
   pkgdesc="Header files and scripts for building modules for linux kernel"
 
   cd ${_srcname}
-  local _builddir="${pkgdir}/usr/lib/modules/${_kernver}/build"
+  local _builddir="${pkgdir}/usr/lib/modules/${_kernelver}/build"
 
   install -Dt "${_builddir}" -m644 Makefile .config Module.symvers
   install -Dt "${_builddir}/kernel" -m644 kernel/Makefile
@@ -246,10 +231,8 @@ package_linux-docs() {
 
   cd $_srcname
 
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build"
-  cp -al Documentation "${pkgdir}/usr/lib/modules/${_kernver}/build"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernelver}/build"
+  cp -al Documentation "${pkgdir}/usr/lib/modules/${_kernelver}/build"
   find "${pkgdir}" -type f -exec chmod 444 {} \;
   find "${pkgdir}" -type d -exec chmod 755 {} \;
 }
-
-# vim:set ts=8 sts=2 sw=2 et:
