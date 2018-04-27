@@ -3,7 +3,7 @@ source ../qt5.conf
 pkgbase=qt5-base
 pkgname=(qt5-base qt5-xcb-private-headers)
 pkgver=${QSubVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
@@ -22,9 +22,19 @@ optdepends=('qt5-svg: to use SVG icon themes'
 groups=('qt5')
 options=('debug')
 source=( $(getSrc ${pkgname}) 
-                qt-no-statx.patch)
+        qt-no-statx.patch
+        qtbug-65478.patch
+        qheaderview-restore.patch::"https://code.qt.io/cgit/qt/qtbase.git/patch/?id=4a04eea4"
+        qtbug-66444.patch::"https://code.qt.io/cgit/qt/qtbase.git/patch/?id=9395f35c"
+        qtbug-66420.patch::"https://code.qt.io/cgit/qt/qtbase.git/patch/?id=fa091640"
+        qtbug-66816.patch::"https://code.qt.io/cgit/qt/qtbase.git/patch/?id=e4e87a2e")
 md5sums=($(getSum ${pkgname})
-         '35cc4abc5f125905645e09bf37e5a3b0')
+         '35cc4abc5f125905645e09bf37e5a3b0'
+         'e5bbb67fffe0bcc48e921ca567a3eec6'
+         '0afbecdd84674d8e362102f6756e8859'
+         '45095820d2517e3c45c456663a52beb1'
+         '922d3d4d6a49bf03acfab49031edd8b3'
+         '49e505b771ffbd389998d0065a7f63c9')
 
 prepare() {
   cd $(getPkgName ${pkgname})
@@ -45,6 +55,17 @@ prepare() {
   
   # Don't use the statx syscall https://bugs.archlinux.org/task/56289 https://bugreports.qt.io/browse/QTBUG-64490
   patch -p1 -i ../qt-no-statx.patch
+
+  # Fix kexi crash at startup http://bugreports.qt.io/browse/QTBUG-65478
+  patch -p1 -i ../qtbug-65478.patch
+  # Fix restoring column status in kmail and ksysguard
+  patch -p1 -i ../qheaderview-restore.patch
+  # Fix QHeaderView regression https://bugreports.qt.io/browse/QTBUG-66444
+  patch -p1 -i ../qtbug-66444.patch
+  # Fix white screen with Mesa 18 https://bugreports.qt.io/browse/QTBUG-66420
+  patch -p1 -i ../qtbug-66420.patch
+  # Fix crashes in QSqlite http://bugreports.qt.io/browse/QTBUG-66816
+  patch -p1 -i ../qtbug-66816.patch
 }
 
 build() {
