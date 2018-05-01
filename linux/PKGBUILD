@@ -5,11 +5,11 @@ pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs')
 _srcname=linux-${_basekernel}
 pkgver=${_kernelver}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
-url="http://www.kernel.org/"
+url="https://www.kernel.org/"
 license=('GPL2')
-makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'libelf')
+makedepends=('xmlto' 'kmod' 'inetutils' 'bc' 'libelf')
 options=('!strip')
 source=(
   https://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.{xz,sign}
@@ -23,11 +23,15 @@ source=(
   0003-Partially-revert-swiotlb-remove-various-exports.patch
   0004-Fix-vboxguest-on-guests-with-more-than-4G-RAM.patch
 )
+validpgpkeys=(
+  'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
+  '647F28654894E3BD457199BE38DBBDC86092693E'  # Greg Kroah-Hartman
+)
 sha256sums=('63f6dc8e3c9f3a0273d5d6f4dca38a2413ca3a5f689329d05b750e4c87bb21b9'
             'SKIP'
             '634d3fd97e5d9d90262db0a9d62ed0a40043eb691d68bd4a545f907079610b56'
             'SKIP'
-            'c3bb5ce947d8fbde8e6ff0f2a482e3fd00ee6cf73200b6a343d94286fa67ceff'
+            'f6f6c7eaf5f87ad77cc305266853c4eb8ceba21d32a76a9b7026891ecda65fac'
             '287b43e83535d0aba2797b8fe4c1527788995cbfd858097be37214345e781a25'
             '75f99f5239e03238f88d1a834c50043ec32b1dc568f2cc291b07d04718483919'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
@@ -35,10 +39,6 @@ sha256sums=('63f6dc8e3c9f3a0273d5d6f4dca38a2413ca3a5f689329d05b750e4c87bb21b9'
             '9db235c5edfc9a81a0f5866f9942e74d896243c37d50298288fbbe2f79169fd3'
             'd57665a468f93c94b92924fdbdc72ea50def74d9c8999104c9594e64fb196328'
             '079180ceaae87a4851eb56e80f6e33b0199dad3343c73275ddb710e0824feb73')
-validpgpkeys=(
-              'ABAF11C65A2970B130ABE3C479BE3E4300411886' # Linus Torvalds
-              '647F28654894E3BD457199BE38DBBDC86092693E' # Greg Kroah-Hartman
-             )
 
 prepare() {
   cd ${_srcname}
@@ -62,12 +62,10 @@ prepare() {
   # https://bugs.archlinux.org/task/58153
   patch -Np1 -i ../0004-Fix-vboxguest-on-guests-with-more-than-4G-RAM.patch
 
-  cat "${srcdir}/config.x86_64" > ./.config
-
-  if [ "${_kernelname}" != "" ]; then
-    sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
-    sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
-  fi
+  cat ../config.x86_64 - >.config <<END
+CONFIG_LOCALVERSION="${_kernelname}"
+CONFIG_LOCALVERSION_AUTO=n
+END
 
   # set extraversion to pkgrel and empty localversion
   sed -e "/^EXTRAVERSION =/s/=.*/= -${pkgrel}/" \
@@ -96,7 +94,7 @@ prepare() {
 }
 
 build() {
-  cd "$_srcname"
+  cd ${_srcname}
 
   make ${MAKEFLAGS} bzImage modules
 }
@@ -106,22 +104,22 @@ package_linux() {
   groups=('base')
   depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7')
   optdepends=('crda: to set the correct wireless channels of your country')
-  backup=("etc/mkinitcpio.d/${pkgname}.preset")
+  backup=("etc/mkinitcpio.d/${pkgbase}.preset")
   install=linux.install
 
   cd ${_srcname}
-  
-    # get kernel version
+
+  # get kernel version
   _kernver="$(make kernelrelease)"
   _basekernel=${_kernver%%-*}
   _basekernel=${_basekernel%.*}
 
   mkdir -p "${pkgdir}"/{boot,usr/lib/modules}
   make INSTALL_MOD_PATH="${pkgdir}/usr" modules_install
-  cp arch/x86/boot/bzImage "${pkgdir}/boot/vmlinuz-${pkgname}"
+  cp arch/x86/boot/bzImage "${pkgdir}/boot/vmlinuz-${pkgbase}"
 
   # make room for external modules
-  #local _extramodules="extramodules-${_basekernel}${_kernelname:--CHAKRA}"
+  local _extramodules="extramodules-${_basekernel}${_kernelname}"
   ln -s "../${_extramodules}" "${pkgdir}/usr/lib/modules/${_kernver}/extramodules"
 
   # add real version for building modules and running depmod from hook
@@ -139,10 +137,10 @@ package_linux() {
 
   # add vmlinux
   install -Dt "${pkgdir}/usr/lib/modules/${_kernver}/build" -m644 vmlinux
-  
+
   # sed expression for following substitutions
   local _subst="
-    s|%PKGBASE%|${pkgbase}/|g
+    s|%PKGBASE%|${pkgbase}|g
     s|%KERNVER%|${_kernver}|g
     s|%EXTRAMODULES%|${_extramodules}|g
   "
@@ -204,13 +202,15 @@ package_linux-headers() {
   # remove unneeded architectures
   local _arch
   for _arch in "${_builddir}"/arch/*/; do
-    if [[ ${_arch} != */x86/ ]]; then
-      rm -r "${_arch}"
-    fi
+    [[ ${_arch} == */x86/ ]] && continue
+    rm -r "${_arch}"
   done
 
   # remove files already in linux-docs package
   rm -r "${_builddir}/Documentation"
+
+  # remove now broken symlinks
+  find -L "${_builddir}" -type l -printf 'Removing %P\n' -delete
 
   # Fix permissions
   chmod -R u=rwX,go=rX "${_builddir}"
@@ -231,10 +231,12 @@ package_linux-headers() {
 package_linux-docs() {
   pkgdesc="Kernel hackers manual - HTML documentation that comes with the Linux kernel."
 
-  cd $_srcname
+  cd ${_srcname}
+  local _builddir="${pkgdir}/usr/lib/modules/${_kernver}/build"
 
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build"
-  cp -al Documentation "${pkgdir}/usr/lib/modules/${_kernver}/build"
-  find "${pkgdir}" -type f -exec chmod 444 {} \;
-  find "${pkgdir}" -type d -exec chmod 755 {} \;
+  mkdir -p "${_builddir}"
+  cp -t "${_builddir}" -a Documentation
+
+  # Fix permissions
+  chmod -R u=rwX,go=rX "${_builddir}"
 }
