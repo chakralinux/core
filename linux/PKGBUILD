@@ -22,21 +22,19 @@ source=(
   0002-drm-i915-edp-Only-use-the-alternate-fixed-mode-if-it.patch
   0003-Partially-revert-swiotlb-remove-various-exports.patch
   0004-Fix-vboxguest-on-guests-with-more-than-4G-RAM.patch
-  0005-net-aquantia-Regression-on-reset-with-1.x-firmware.patch
 )
 sha256sums=('63f6dc8e3c9f3a0273d5d6f4dca38a2413ca3a5f689329d05b750e4c87bb21b9'
             'SKIP'
-            'bad271dbda2d024daf4a2ab6e122b95b262ea80508ac8018bc61e8aa44f40cfe'
+            '634d3fd97e5d9d90262db0a9d62ed0a40043eb691d68bd4a545f907079610b56'
             'SKIP'
-            '9128c28a2bfe76fc90bd18dc6864839200e8b9ab941496c878313091b2a70023'
+            'c3bb5ce947d8fbde8e6ff0f2a482e3fd00ee6cf73200b6a343d94286fa67ceff'
             '287b43e83535d0aba2797b8fe4c1527788995cbfd858097be37214345e781a25'
             '75f99f5239e03238f88d1a834c50043ec32b1dc568f2cc291b07d04718483919'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             '113b1fe603f61b749c4cb3902a4f5d4fbec9d1e5081f008bac485cc345defa5f'
             '9db235c5edfc9a81a0f5866f9942e74d896243c37d50298288fbbe2f79169fd3'
             'd57665a468f93c94b92924fdbdc72ea50def74d9c8999104c9594e64fb196328'
-            '079180ceaae87a4851eb56e80f6e33b0199dad3343c73275ddb710e0824feb73'
-            'f1c751e29bc1bcfe634c49873eb34a5418db3dfbd1f6d789e738dee78071d3dd')
+            '079180ceaae87a4851eb56e80f6e33b0199dad3343c73275ddb710e0824feb73')
 validpgpkeys=(
               'ABAF11C65A2970B130ABE3C479BE3E4300411886' # Linus Torvalds
               '647F28654894E3BD457199BE38DBBDC86092693E' # Greg Kroah-Hartman
@@ -64,9 +62,6 @@ prepare() {
   # https://bugs.archlinux.org/task/58153
   patch -Np1 -i ../0004-Fix-vboxguest-on-guests-with-more-than-4G-RAM.patch
 
-  # https://bugs.archlinux.org/task/58174
-  patch -Np1 -i ../0005-net-aquantia-Regression-on-reset-with-1.x-firmware.patch
-
   cat "${srcdir}/config.x86_64" > ./.config
 
   if [ "${_kernelname}" != "" ]; then
@@ -74,8 +69,10 @@ prepare() {
     sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
   fi
 
-  # set extraversion to pkgrel
-  sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
+  # set extraversion to pkgrel and empty localversion
+  sed -e "/^EXTRAVERSION =/s/=.*/= -${pkgrel}/" \
+      -e "/^EXTRAVERSION =/aLOCALVERSION =" \
+      -i Makefile
 
   # don't run depmod on 'make install'. We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
@@ -113,6 +110,11 @@ package_linux() {
   install=linux.install
 
   cd ${_srcname}
+  
+    # get kernel version
+  _kernver="$(make kernelrelease)"
+  _basekernel=${_kernver%%-*}
+  _basekernel=${_basekernel%.*}
 
   mkdir -p "${pkgdir}"/{boot,usr/lib/modules}
   make INSTALL_MOD_PATH="${pkgdir}/usr" modules_install
@@ -120,28 +122,28 @@ package_linux() {
 
   # make room for external modules
   #local _extramodules="extramodules-${_basekernel}${_kernelname:--CHAKRA}"
-  ln -s "../${_extramodules}" "${pkgdir}/usr/lib/modules/${_kernelver}/extramodules"
+  ln -s "../${_extramodules}" "${pkgdir}/usr/lib/modules/${_kernver}/extramodules"
 
   # add real version for building modules and running depmod from hook
-  echo "${_kernelver}" |
+  echo "${_kernver}" |
     install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modules/${_extramodules}/version"
 
   # remove build and source links
-  rm -f "${pkgdir}"/usr/lib/modules/${_kernelver}/{source,build}
+  rm -f "${pkgdir}"/usr/lib/modules/${_kernver}/{source,build}
 
   # gzip -9 all modules to save 100MB of space
   find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
 
   # now we call depmod...
-  depmod -b "${pkgdir}/usr" -F System.map "${_kernelver}"
+  depmod -b "${pkgdir}/usr" -F System.map "${_kernver}"
 
   # add vmlinux
-  install -Dt "${pkgdir}/usr/lib/modules/${_kernelver}/build" -m644 vmlinux
+  install -Dt "${pkgdir}/usr/lib/modules/${_kernver}/build" -m644 vmlinux
   
   # sed expression for following substitutions
   local _subst="
     s|%PKGBASE%|${pkgbase}/|g
-    s|%KERNVER%|${_kernelver}|g
+    s|%KERNVER%|${_kernver}|g
     s|%EXTRAMODULES%|${_extramodules}|g
   "
 
@@ -164,7 +166,7 @@ package_linux-headers() {
   pkgdesc="Header files and scripts for building modules for linux kernel"
 
   cd ${_srcname}
-  local _builddir="${pkgdir}/usr/lib/modules/${_kernelver}/build"
+  local _builddir="${pkgdir}/usr/lib/modules/${_kernver}/build"
 
   install -Dt "${_builddir}" -m644 Makefile .config Module.symvers
   install -Dt "${_builddir}/kernel" -m644 kernel/Makefile
@@ -231,8 +233,8 @@ package_linux-docs() {
 
   cd $_srcname
 
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernelver}/build"
-  cp -al Documentation "${pkgdir}/usr/lib/modules/${_kernelver}/build"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build"
+  cp -al Documentation "${pkgdir}/usr/lib/modules/${_kernver}/build"
   find "${pkgdir}" -type f -exec chmod 444 {} \;
   find "${pkgdir}" -type d -exec chmod 755 {} \;
 }
