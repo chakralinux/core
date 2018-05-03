@@ -2,7 +2,7 @@ source ../plasma.conf
 
 pkgname=kwallet-pam
 pkgver=${PVersion}
-pkgrel=1
+pkgrel=2
 pkgdesc='KWallet PAM integration'
 arch=(x86_64)
 url='https://projects.kde.org/kwallet-pam'
@@ -11,24 +11,31 @@ depends=(pam libgcrypt socat)
 makedepends=(extra-cmake-modules qt5-base)
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
+source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig}
+        CVE-2018-10380-1.patch::"https://cgit.kde.org/kwallet-pam.git/patch/?id=2134dec8"
+        CVE-2018-10380-2.patch::"https://cgit.kde.org/kwallet-pam.git/patch/?id=01d4143f")
 sha256sums=( $(getSum ${pkgname}) 
-             'SKIP' )
+            'SKIP'
+            'bc509c7d04aa21c35caac263720967dd098af47e6d282e437f1b69de38f42d66'
+            'b3c8500c7951b4a919875907abcefe817d8d613e31a2eb4ccf63b0038a4f5b62')
 validpgpkeys=(${Pvalidpgpkeys[@]})
 
 prepare() {
   mkdir -p build
   mkdir -p build4
   cd ${pkgname}-${pkgver}
+  # https://www.kde.org/info/security/advisory-20180503-1.txt
+  patch -p1 -i ../CVE-2018-10380-1.patch
+  patch -p1 -i ../CVE-2018-10380-2.patch
 }
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver} -DCMAKE_INSTALL_LIBDIR=lib
+  cmake_kf5 ../${pkgname}-${pkgver}
   make
 
   cd ../build4
-  cmake_kf5 ../${pkgname}-${pkgver} -DCMAKE_INSTALL_LIBDIR=lib -DKWALLET4=1
+  cmake_kf5 ../${pkgname}-${pkgver} -DKWALLET4=1
   make
 }
 package() {
