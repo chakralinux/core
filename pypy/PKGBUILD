@@ -1,17 +1,17 @@
 pkgname=pypy
-pkgver=5.10.0
+pkgver=6.0.0
 pkgrel=1
 pkgdesc="A Python implementation written in Python, JIT enabled"
 arch=('x86_64')
-url="http://www.pypy.org/"
-license=('custom:MIT')
+url="https://pypy.org/"
+license=('MIT')
 depends=('expat' 'bzip2' 'gdbm' 'openssl' 'libffi' 'zlib' 'ncurses')
-makedepends=('python2' 'tk' 'sqlite3' 'python2-pycparser')
+makedepends=('python2' 'tk' 'sqlite3' 'mercurial' 'python2-pycparser')
 optdepends=('sqlite3: sqlite module'
             'tk: tk module')
 source=("https://bitbucket.org/${pkgname}/${pkgname}/downloads/pypy2-v$pkgver-src.tar.bz2")
 options=(!buildflags)
-md5sums=('32e6ec331cce2a8a8e86c1f8738dd829')
+sha256sums=('6097ec5ee23d0d34d8cd27a1072bed041c8a080ad48731190a03a2223029212d')
 
 build() {
   cd "${srcdir}"/pypy2-v${pkgver}-src/pypy/goal
@@ -34,13 +34,14 @@ package() {
   # Install pypy
   cd unpacked
   install -Dm755 pypy/bin/pypy "${pkgdir}"/opt/pypy/bin/pypy
-  install -Dm755 pypy/bin/libpypy-c.so "${pkgdir}"/usr/lib/libpypy-c.so
+  install -Dm755 pypy/bin/libpypy-c.so "${pkgdir}"/opt/pypy/bin/libpypy-c.so
   cp -r pypy/include pypy/lib_pypy pypy/lib-python pypy/site-packages "${pkgdir}"/opt/pypy/
   cd ..
 
   # Install symlink
-  mkdir -p "${pkgdir}"/usr/bin
+  mkdir -p "${pkgdir}"/usr/bin "${pkgdir}"/usr/lib
   ln -s /opt/pypy/bin/pypy "${pkgdir}"/usr/bin/pypy
+  ln -s /opt/pypy/bin/libpypy-c.so "${pkgdir}"/usr/lib/libpypy-c.so
 
   # Install misc stuff
   install -Dm644 ${srcdir}/pypy2-v${pkgver}-src/LICENSE "${pkgdir}"/opt/pypy/LICENSE
