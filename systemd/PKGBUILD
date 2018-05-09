@@ -3,9 +3,9 @@
 pkgbase=systemd
 pkgname=('systemd' 'libsystemd')
 # Can be from either systemd or systemd-stable
-_commit='c58ab03f64890e7db88745a843bd4520e307099b'
-pkgver=238.51
-pkgrel=2
+_commit='f398c546c6fc43121131f41acec56b5a851bd35e'
+pkgver=238.76
+pkgrel=1
 arch=('x86_64')
 url="https://www.github.com/systemd/systemd"
 makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam' 'libelf'
@@ -42,7 +42,7 @@ sha512sums=('SKIP'
             'SKIP'
             '9348683829190628e25b7b3300fd880c426d555bde330d5fc5150a9a54b3ad9d4d1f2e69ea1dc6d6f086693dacc53c5af30f1fa7ad9b479791fd77bcdafa430e'
             'f0d933e8c6064ed830dec54049b0a01e27be87203208f6ae982f10fb4eddc7258cb2919d594cbfb9a33e74c3510cfd682f3416ba8e804387ab87d1a217eb4b73'
-            '86d7cacd7536b1069c82bbbb08de7ec81e7f0f18a19fc2b06fabe90db4700623eb3540b75121080d325672d92e26912632ae4f93fd3c0bb48eb3e5eedd88352c'
+            '01de24951a05d38eca6b615a7645beb3677ca0e0f87638d133649f6dc14dcd2ea82594a60b793c31b14493a286d1d11a0d25617f54dbfa02be237652c8faa691'
             'a25b28af2e8c516c3a2eec4e64b8c7f70c21f974af4a955a4a9d45fd3e3ff0d2a98b4419fe425d47152d5acae77d64e69d8d014a7209524b75a81b0edb10bf3a'
             'ea4f390f4add962ab44181c6ac3f2fa521ff1d5e573700685c19bbd6284d0d6d8b3078377a040139132d77052578c2ecb5c37798ac314e3314de761a9444935d'
             'd0f3b5ad51e3b94a7c8535e397c6252c98633f808c69b23c1dff4174925c141dc2fc50ca713aa38d76d24e6b6c9bac97b09d2cd1a56dc9a1b94fedc4411d9dc5'
@@ -60,7 +60,10 @@ sha512sums=('SKIP'
             'ff1429a7c88e21d578c25d07e8cd9568577feb5a940fe39a7a815cf8431c57ca951ac6b394c53d2cdeb4efc645572c0b1b670a48cafcc405db41a6602b548e35'
             'e4a9d7607fe93daf1d45270971c8d8455c4bfc2c0bea8bcad05aeb89847edee23cd1a41073a72042622acf417018fe254f5bfc137604fe2c71292680bf67a1c2'
             '209b01b044877cc986757fa4009a92ea98f480306c2530075d153203c3cd2b3afccab6aacc1453dee8857991e04270572f1700310705d7a0f4d5bed27fab8c67')
+
 _backports=(
+  # nspawn: wait for network namespace creation before interface setup (#8633)
+  '7511655807e90aa33ea7b71991401a79ec36bb41'
 )
 
 _reverts=(
@@ -160,8 +163,8 @@ check() {
 
 package_systemd() {
   pkgdesc="system and service manager"
-  license=('GPL2' 'LGPL2.1' 'MIT')
-  url="http://www.freedesktop.org/wiki/Software/systemd"
+  license=('GPL2' 'LGPL2.1')
+  groups=('base-devel')
   depends=('acl' 'bash' 'cryptsetup' 'dbus' 'iptables' 'kbd' 'kmod' 'hwids' 'libcap'
            'libgcrypt' 'libsystemd' 'libidn' 'lz4' 'pam' 'libelf' 'libseccomp'
            'util-linux' 'xz' 'pcre2')
@@ -183,7 +186,7 @@ package_systemd() {
           etc/systemd/resolved.conf
           etc/systemd/user.conf
           etc/udev/udev.conf)
-  install="systemd.install"
+  install=systemd.install
 
   DESTDIR="$pkgdir" ninja -C build install
   install -dm755 "$pkgdir/usr/bin"
