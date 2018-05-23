@@ -3,14 +3,14 @@
 
 pkgname=farstream
 pkgver=0.2.8
-pkgrel=1
+pkgrel=2
 pkgdesc="Audio/Video Communications Framework (legacy version)"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/Farstream"
 license=('LGPL2.1')
-depends=('libnice' 'gstreamer' 'gst-plugins-base')
-makedepends=('gobject-introspection')
-options=('!libtool')
+depends=('gst-plugins-base-libs' 'libnice')
+makedepends=('gobject-introspection' 'python2')
+optdepends=('gst-plugins-good' 'gst-plugins-bad')
 source=(http://freedesktop.org/software/$pkgname/releases/$pkgname/$pkgname-$pkgver.tar.gz)
 sha256sums=('2b3b9c6b4f64ace8c83e03d1da5c5a2884c1cae10b35471072b574201ab38908')
 
@@ -19,9 +19,8 @@ build() {
 
   ./configure \
     --prefix=/usr \
-    --with-package-name='Chakra Farstream Package' \
-    --with-package-origin='httpw://www.chakraos.org/' \
-    --disable-static
+    --with-package-name='Chakra Linux farstream package' \
+    --with-package-origin='https://www.chakralinux.org/'
   make
 }
 

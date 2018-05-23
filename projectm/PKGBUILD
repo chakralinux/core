@@ -6,22 +6,27 @@ pkgbase=projectm
 pkgname=('projectm' 'projectm-libvisual' 'projectm-pulseaudio' 'projectm-jack' 'projectm-qt' 'projectm-test')
 pkgver=2.1.0
 pkgrel=1
-arch=('x86_64' 'i686')
+arch=('x86_64')
 url='http://projectm.sourceforge.net/'
 license=('LGPL')
 makedepends=('mesa-libgl' 'qt4' 'cmake' 'ftgl' 'glew' 'libvisual' 'sdl' 'libxext' 'pulseaudio' 'jack')
 source=("http://downloads.sourceforge.net/$pkgname/projectM-complete-$pkgver-Source.tar.gz"
         'projectm-test-opengl.patch'
-        'projectm-install-vera-ttf.patch')
+        'projectm-install-vera-ttf.patch'
+        'projectm-gcc6.patch')
 sha256sums=('513204f033006bd3dcdf8aada196d816d6b7187266ddcbb1594d0285cc9406ee'
             'c577d8356be011a3b3ee9f9b389db55f47804d100f690d8ea12f2920cdd432d1'
-            '7d67aad0b210edf25a527274504c9efdf3e9d5b737235b938fec361ac5a8b110')
+            '7d67aad0b210edf25a527274504c9efdf3e9d5b737235b938fec361ac5a8b110'
+            '5f7cd6baef1c90d2a22772c0352a40645c3554c6d75bde41a2b6ec3ebdaa6128')
 
 prepare() {
   cd "projectM-complete-$pkgver-Source"
 
   patch -p1 -i "$srcdir/projectm-test-opengl.patch"
   patch -p1 -i "$srcdir/projectm-install-vera-ttf.patch"
+  sed 's/projectM_isnan/std::isnan/g' -i src/libprojectM/Renderer/BeatDetect.cpp 
+  patch -p1 -i ../projectm-gcc6.patch
+  
   mkdir -p "$srcdir/build"
 }
 

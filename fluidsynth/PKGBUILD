@@ -2,41 +2,46 @@
 
 pkgname=fluidsynth
 # Caution: This package has a lib32 alternative, please update that as well
-pkgver=1.1.6
-pkgrel=7
+pkgver=1.1.11
+pkgrel=1
 pkgdesc="A real-time software synthesizer based on the SoundFont 2 specifications"
 arch=('x86_64')
 url="http://www.fluidsynth.org/"
-depends=('jack' 'pulseaudio')
+depends=('glib2' 'jack' 'libpulse' 'portaudio')
 makedepends=('cmake' 'ladspa' 'doxygen')
+optdepends=('pulseaudio: PulseAudio sound support')
 license=('LGPL')
-install=$pkgname.install
-backup=('etc/conf.d/fluidsynth')
-source=("http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.tar.gz"
-	'fluidsynth.conf' 
-	'fluidsynth.service')
-md5sums=('ae5aca6de824b4173667cbd3a310b263'
-         '16c5f4d4cbdddc6c5fcbd4fd4cc142f1'
-         'e0406748a154409907df62292be32e8a')
+backup=("etc/conf.d/$pkgname")
+source=($pkgname-$pkgver.tar.gz::"https://github.com/${pkgname}/${pkgname}/archive/v$pkgver.tar.gz")
+sha512sums=('ad7c634426b29e5a05d67addf32d43a9ccb11a1fe3cfc09ad617416b9df3dc99a48191377f5027232521380737dde2d9b59833516d1bffb90f410bab3bbe140c')
+
+
+prepare() {
+  cd "${pkgname}-${pkgver}"
+  # out-of-tree build
+  mkdir build
+}
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
-
-  cmake . -DCMAKE_INSTALL_PREFIX=/usr \
-          -DCMAKE_BUILD_TYPE=Release \
-          -Denable-ladspa=ON \
-          -DLIB_SUFFIX=""
+  cd "${pkgname}-${pkgver}/build"
+  cmake .. -DCMAKE_INSTALL_PREFIX=/usr \
+           -DFLUID_DAEMON_ENV_FILE=/etc/conf.d/fluidsynth \
+           -Denable-ladspa=ON \
+           -Denable-lash=ON \
+           -Denable-portaudio=ON \
+           -DLIB_SUFFIX=""
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
-
-  make DESTDIR="$pkgdir/" install
-
-  install -Dm644 "$srcdir/fluidsynth.conf" \
-    "$pkgdir/etc/conf.d/fluidsynth"
-
-  install -Dm644 "$srcdir/fluidsynth.service" \
-    "$pkgdir/usr/lib/systemd/system/fluidsynth.service"
+  cd "${pkgname}-${pkgver}/build"
+  make DESTDIR="$pkgdir" install
+  # systemd user unit
+  install -vDm644 "${pkgname}.service" \
+    "$pkgdir/usr/lib/systemd/user/${pkgname}.service"
+  # system-wide configuration file
+  install -vDm644 "${pkgname}.conf" "${pkgdir}/etc/conf.d/${pkgname}"
+  # docs
+  install -t "${pkgdir}/usr/share/doc/${pkgname}" \
+    -vDm644 ../{AUTHORS,ChangeLog,NEWS,README.md,THANKS,TODO}
 }

@@ -1,17 +1,18 @@
 pkgname=ffmpeg
-pkgver=3.2.10
-pkgrel=3
+pkgver=4.0
+pkgrel=1
 pkgdesc='Complete solution to record, convert and stream audio and video'
 arch=('x86_64')
 url='http://ffmpeg.org/'
-license=('GPL3' 'custom')
+license=('GPL3')
 depends=('alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'gnutls' 'gsm' 'lame'
          'libass' 'libbluray' 'libmodplug' 'libpulse' 'libsoxr' 'libssh'
          'libtheora' 'libva' 'libvdpau' 'libwebp' 'opencore-amr' 'openjpeg'
          'opus' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore' 'zlib'
          'dcadec' 'vid.stab' 'libvorbis' 'lame' 'openh264'
-         'libvpx' 'libx264.so' 'x265' 'libfdk-aac' 'jack' 'libavc1394' 'libiec61883')
-makedepends=('hardening-wrapper' 'ladspa' 'libvdpau' 'yasm')
+         'libvpx' 'libx264.so' 'x265' 'libfdk-aac' 'jack' 'libavc1394' 'libiec61883'
+         'openjpeg2')
+makedepends=('ffnvcodec-headers' 'ladspa' 'yasm')
 optdepends=('ladspa: LADSPA filters')
 #checkdepends=('valgrind')
 provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
@@ -19,7 +20,7 @@ provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
           'libswscale.so')
 source=(http://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.bz2{,.asc})
 validpgpkeys=('FCF986EA15E6E293A5644F10B4322F04D67658D8')
-sha256sums=('4fbad0a9e1a7984cc4f8748f5e8a8ad643453f95aad9b400074072d71b415adb'
+sha256sums=('318a39d906c9107d49766c63787798dd078d2a36e6670a9dfeda3c55be4573b8'
             'SKIP')
 
 build() {
@@ -30,7 +31,6 @@ build() {
     --disable-debug \
     --disable-static \
     --disable-stripping \
-    --enable-avisynth \
     --enable-avresample \
     --enable-fontconfig \
     --enable-gmp \
@@ -39,6 +39,7 @@ build() {
     --enable-ladspa \
     --enable-libass \
     --enable-libbluray \
+    --enable-libdrm \
     --enable-libfreetype \
     --enable-libfribidi \
     --enable-libgsm \
@@ -50,7 +51,6 @@ build() {
     --enable-libopenjpeg \
     --enable-libopus \
     --enable-libpulse \
-    --enable-libschroedinger \
     --enable-libsoxr \
     --enable-libspeex \
     --enable-libssh \
@@ -63,9 +63,10 @@ build() {
     --enable-libx264 \
     --enable-libx265 \
     --enable-libxvid \
+    --enable-nvenc \
+    --enable-omx \
     --enable-shared \
     --enable-version3 \
-    --enable-x11grab \
     --enable-nonfree \
     --enable-libfdk-aac \
     --enable-libopenh264 \
@@ -73,7 +74,7 @@ build() {
 
   make
   make tools/qt-faststart
-  make doc/ff{mpeg,play,server}.1
+  make doc/ff{mpeg,play}.1
 }
 
 #check() {

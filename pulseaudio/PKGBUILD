@@ -1,10 +1,10 @@
 # Note: remember to build lib32 counterpart when bumping pkgver
 
 pkgbase=pulseaudio
-pkgname=(pulseaudio libpulse pulseaudio-gconf)
+pkgname=(pulseaudio libpulse pulseaudio-{gconf,zeroconf,lirc,jack,bluetooth,equalizer})
 pkgdesc="A featureful, general-purpose sound server"
-pkgver=10.0
-pkgrel=4
+pkgver=11.1
+pkgrel=1
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/PulseAudio"
 license=(LGPL)
@@ -13,11 +13,9 @@ makedepends=(libasyncns libcap attr libxtst libsm libsndfile libtool rtkit libso
              lirc openssl fftw orc webrtc-audio-processing
              check autoconf-archive git)
 options=(!emptydirs)
-_commit=84952e6a092b6a0c5b153bd7a4f6e490810681c8  # tags/v10.0^0
-source=("git+https://anongit.freedesktop.org/git/pulseaudio/pulseaudio#commit=$_commit"
-        padsp-lib32.patch)
-sha256sums=('SKIP'
-            '7832fc59df76538ff10aedd297c03cb7ff117235da8bfad26082994bb5b84332')
+_commit=f93e372b0b2cb960df04de3f0a8fbea683bb8229  # tags/v11.1^0
+source=("git+https://anongit.freedesktop.org/git/pulseaudio/pulseaudio#commit=$_commit")
+sha256sums=('SKIP')
 
 pkgver() {
   cd pulseaudio
@@ -81,8 +79,6 @@ package_pulseaudio() {
     bashcompletiondir=/usr/share/bash-completion/completions
 
   cd "$pkgdir"
-  patch -Np1 -i "$srcdir/padsp-lib32.patch"
-
   # Assumes that any volume adjustment is intended by the user, who can control
   # each app's volume. Misbehaving clients can trigger earsplitting volume
   # jumps. App volumes can diverge wildly and cause apps without their own
@@ -149,14 +145,33 @@ package_pulseaudio() {
   mv usr/share/vala \
      "$srcdir/libpulse/usr/share"
 
+
 ### Split modules
 
-  mkdir -p "$srcdir"/gconf/usr/lib/{pulse-${_pulsever}/modules,pulse}
-  
+  mkdir -p "$srcdir"/{gconf,zeroconf,lirc,jack,bluetooth,equalizer}/usr/lib/pulse-$_pulsever/modules \
+           "$srcdir"/{gconf/usr/lib/pulse,equalizer/usr/bin}
+
   mv usr/lib/pulse-$_pulsever/modules/module-gconf.so \
      "$srcdir/gconf/usr/lib/pulse-$_pulsever/modules"
   mv usr/lib/pulse/gconf-helper \
      "$srcdir/gconf/usr/lib/pulse"
+
+  mv usr/lib/pulse-$_pulsever/modules/{libavahi-wrap,module-{zeroconf-{publish,discover},raop-discover}}.so \
+     "$srcdir/zeroconf/usr/lib/pulse-$_pulsever/modules"
+
+  mv usr/lib/pulse-$_pulsever/modules/module-lirc.so \
+     "$srcdir/lirc/usr/lib/pulse-$_pulsever/modules"
+
+  mv usr/lib/pulse-$_pulsever/modules/module-jack{-sink,-source,dbus-detect}.so \
+     "$srcdir/jack/usr/lib/pulse-$_pulsever/modules"
+
+  mv usr/lib/pulse-$_pulsever/modules/{libbluez5-util,module-{bluetooth-{discover,policy},bluez5-{discover,device}}}.so \
+     "$srcdir/bluetooth/usr/lib/pulse-$_pulsever/modules"
+
+  mv usr/lib/pulse-$_pulsever/modules/module-equalizer-sink.so \
+     "$srcdir/equalizer/usr/lib/pulse-$_pulsever/modules"
+  mv usr/bin/qpaeq \
+     "$srcdir/equalizer/usr/bin"
 }
 
 package_libpulse() {
@@ -172,9 +187,41 @@ package_pulseaudio-gconf(){
   pkgdesc="GConf support for PulseAudio"
   depends=("pulseaudio=$pkgver-$pkgrel" gconf)
 
-  mkdir -p $pkgdir/usr/lib/pulse-$_pulsever/modules/
-  mkdir -p $pkgdir/usr/lib/pulse/
-  
-  mv gconf/usr/lib/pulse-$_pulsever/modules/module-gconf.so $pkgdir/usr/lib/pulse-$_pulsever/modules/
-  mv gconf/usr/lib/pulse/gconf-helper $pkgdir/usr/lib/pulse/
+  mv "$srcdir"/gconf/* "$pkgdir"
+}
+
+package_pulseaudio-zeroconf(){
+  pkgdesc="Zeroconf support for PulseAudio"
+  depends=("pulseaudio=$pkgver-$pkgrel" avahi openssl)
+
+  mv "$srcdir"/zeroconf/* "$pkgdir"
+}
+
+package_pulseaudio-lirc(){
+  pkgdesc="IR (lirc) support for PulseAudio"
+  depends=("pulseaudio=$pkgver-$pkgrel" lirc)
+
+  mv "$srcdir"/lirc/* "$pkgdir"
+}
+
+package_pulseaudio-jack(){
+  pkgdesc="Jack support for PulseAudio"
+  depends=("pulseaudio=$pkgver-$pkgrel" jack)
+
+  mv "$srcdir"/jack/* "$pkgdir"
+}
+
+package_pulseaudio-bluetooth(){
+  pkgdesc="Bluetooth support for PulseAudio"
+  depends=("pulseaudio=$pkgver-$pkgrel" bluez bluez-libs sbc)
+
+  mv "$srcdir"/bluetooth/* "$pkgdir"
+}
+
+package_pulseaudio-equalizer(){
+  pkgdesc="Equalizer for PulseAudio"
+  depends=("pulseaudio=$pkgver-$pkgrel" python-pyqt4 fftw)
+  license=(AGPL3)
+
+  mv "$srcdir"/equalizer/* "$pkgdir"
 }

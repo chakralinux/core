@@ -2,27 +2,41 @@
 # Maintainer: Jan de Groot <jgc@archlinux.org>
 
 pkgname=gtk-doc
-pkgver=1.27
+pkgver=1.28
 pkgrel=1
 pkgdesc="Documentation tool for public library API"
 arch=('any')
 license=('GPL' 'FDL')
-depends=('docbook-xsl' 'perl') 
-makedepends=('pkgconfig' 'jade' 'itstool')
+depends=('docbook-xsl' 'perl' 'python2-six') 
+makedepends=('jade' 'itstool')
 optdepends=('jade: SGML support')
 url="http://www.gtk.org/gtk-doc/"
-source=(https://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz)
-sha256sums=('e26bd3f7080c749b1cb66c46c6bf8239e2f320a949964fb9c6d56e1b0c6d9a6f')
+_commit=695816a36b492140529ed84c59ee246be2b952b7  # tags/GTK_DOC_1_28^0
+source=("git+https://git.gnome.org/browse/gtk-doc#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed -e 's/GTK_DOC_//' -e 's/_/\./g' -e 's/-/+/g'
+}
+
+prepare() {
+  cd $pkgname
+  NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  export PYTHON=/usr/bin/python2
-  ./configure --prefix=/usr
+  cd $pkgname
+  ./configure --prefix=/usr --disable-static
   make
 }
 
-package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+check() {
+  cd $pkgname
+  make check | true
 }
 
+package() {
+  cd $pkgname
+  make DESTDIR="$pkgdir" install
+}

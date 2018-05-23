@@ -1,43 +1,59 @@
-# maintainer almack@chakraos.org
+# maintainer almack@chakralinux.org
 # contributor Jan de Groot <jgc@archlinux.org>
 
 pkgname=gstreamer
-pkgver=1.12.3
+pkgver=1.14.1
 pkgrel=1
 pkgdesc="GStreamer Multimedia Framework"
 arch=('x86_64')
 license=('LGPL')
 url="http://gstreamer.freedesktop.org/"
-depends=('libxml2' 'glib2')
+depends=(libxml2 glib2 libunwind libcap libelf)
 optdepends=('sh: feedback script')
-makedepends=('intltool' 'pkgconfig' 'gobject-introspection')
-source=(${url}/src/gstreamer/gstreamer-${pkgver}.tar.xz{,.asc})
-sha256sums=('d388f492440897f02b01eebb033ca2d41078a3d85c0eddc030cdea5a337a216e'
+makedepends=(gtk-doc gobject-introspection autoconf-archive git valgrind bash-completion)
+_commit=cba2c7dd89dc4cefebe6592b9b98e6e097bd840e  # tags/1.14.1^0
+install=gstreamer.install
+source=("git+https://anongit.freedesktop.org/git/gstreamer/gstreamer#commit=$_commit"
+        "gst-common::git+https://anongit.freedesktop.org/git/gstreamer/common")
+sha256sums=('SKIP'
             'SKIP')
-validpgpkeys=('7F4BC7CC3CA06F97336BBFEB0668CC1486C2D7B5')
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed 's/-/+/g'
+}
+
+prepare() {
+  cd $pkgname
+
+  git submodule init
+  git config --local submodule.common.url "$srcdir/gst-common"
+  git submodule update
+
+  NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd "${srcdir}/gstreamer-${pkgver}"
-    ./configure --prefix=/usr \
-      --sysconfdir=/etc \
-      --localstatedir=/var \
-      --libexecdir=/usr/lib \
-      --with-package-name="GStreamer (Chakra GNU/Linux)" \
-      --with-package-origin="https://chakralinux.org/" \
-      --disable-static
-
-  # https://bugzilla.gnome.org/show_bug.cgi?id=655517
+  cd $pkgname
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libexecdir=/usr/lib \
+    --with-package-name="GStreamer (Chakra Linux)" \
+    --with-package-origin="https://chakralinux.org/" \
+    --enable-gtk-doc \
+    --disable-static
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
-
   make
 }
 
 check() {
-  cd "${srcdir}/gstreamer-${pkgver}"
+  cd $pkgname
   make check
 }
 
 package() {
-  cd "${srcdir}/gstreamer-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  cd $pkgname
+  make DESTDIR="$pkgdir" install
 }
