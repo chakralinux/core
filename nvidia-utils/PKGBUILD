@@ -2,21 +2,24 @@ pkgbase=nvidia-utils
 pkgname=(nvidia-utils opencl-nvidia)
 # Edit chakra-hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
 # Update nvidia-settings too
-pkgver=390.48
-pkgrel=3
+pkgver=396.24
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
-_pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
-        'nvidia-drm-outputclass.conf')
-md5sums=('8ed67fc67710b6cfd9c9273054e2117a'
-         'a433deeb5f9cc661e537f42bde2f1df7')
+_pkg="NVIDIA-Linux-x86_64-${pkgver}"
+source=('nvidia-drm-outputclass.conf'
+        'nvidia-utils.sysusers'
+        "https://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
+sha512sums=('c49d246a519731bfab9d22afa5c2dd2d366db06d80182738b84881e93cd697c783f16ee04819275c05597bb063451a5d6102fbc562cd078d2a374533a23cea48'
+            '4b3ad73f5076ba90fe0b3a2e712ac9cde76f469cd8070280f960c3ce7dc502d1927f525ae18d008075c8f08ea432f7be0a6c3a7a6b49c361126dcf42f97ec499'
+            'dfe837804d01e903cdf980353add0227362771cd252e4a7d8aff99fc489e5535edfda51ed1a20b9d60e23f1a9e7312f23309c59c67ff0a09a9b9214e52f09077')
+
 
 create_links() {
     # create soname links
-    for _lib in $(find "${pkgdir}" -name '*.so*' | grep -v 'xorg/'); do
+    find "$pkgdir" -type f -name '*.so*' ! -path '*xorg/*' -print0 | while read -d $'\0' _lib; do
         _soname=$(dirname "${_lib}")/$(readelf -d "${_lib}" | grep -Po 'SONAME.*: \[\K[^]]*' || true)
         _base=$(echo ${_soname} | sed -r 's/(.*).so.*/\1.so/')
         [[ -e "${_soname}" ]] || ln -s $(basename "${_lib}") "${_soname}"
@@ -28,6 +31,8 @@ prepare() {
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
     bsdtar -xf nvidia-persistenced-init.tar.bz2
+
+    sed -i 's/__NV_VK_ICD__/libGLX_nvidia.so.0/' nvidia_icd.json.template
 }
 
 package_opencl-nvidia() {
@@ -74,15 +79,15 @@ package_nvidia-utils() {
     #ln -s "libGLX_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/libGLX_indirect.so.0"
 
     # Wayland stuff
-    install -D -m755 "libnvidia-egl-wayland.so.1.0.2"	"${pkgdir}/usr/lib/libnvidia-egl-wayland.so.1.0.2"
-    ln -s "libnvidia-egl-wayland.so.1.0.2"		"${pkgdir}/usr/lib/libnvidia-egl-wayland.so.1"
-    install -D -m644 "10_nvidia_wayland.json"		"${pkgdir}/usr/share/egl/egl_external_platform.d/10_nvidia_wayland.json"
+    install -D -m755 "libnvidia-egl-wayland.so.1.0.3" "${pkgdir}/usr/lib/libnvidia-egl-wayland.so.1.0.3"
+    ln -s "libnvidia-egl-wayland.so.1.0.3" "${pkgdir}/usr/lib/libnvidia-egl-wayland.so.1"
+    install -D -m644 "10_nvidia_wayland.json" "${pkgdir}/usr/share/egl/egl_external_platform.d/10_nvidia_wayland.json"
 
     # OpenGL libraries
-    install -D -m755 "libEGL_nvidia.so.${pkgver}"	"${pkgdir}/usr/lib/libEGL_nvidia.so.${pkgver}"
-    install -D -m755 "libGLESv1_CM_nvidia.so.${pkgver}"	"${pkgdir}/usr/lib/libGLESv1_CM_nvidia.so.${pkgver}"
-    install -D -m755 "libGLESv2_nvidia.so.${pkgver}"	"${pkgdir}/usr/lib/libGLESv2_nvidia.so.${pkgver}"
-    install -D -m644 "10_nvidia.json"			"${pkgdir}/usr/share/glvnd/egl_vendor.d/10_nvidia.json"
+    install -D -m755 "libEGL_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/libEGL_nvidia.so.${pkgver}"
+    install -D -m755 "libGLESv1_CM_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/libGLESv1_CM_nvidia.so.${pkgver}"
+    install -D -m755 "libGLESv2_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/libGLESv2_nvidia.so.${pkgver}"
+    install -D -m644 "10_nvidia.json" "${pkgdir}/usr/share/glvnd/egl_vendor.d/10_nvidia.json"
 
     # OpenGL core library
     install -D -m755 "libnvidia-glcore.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-glcore.so.${pkgver}"
@@ -95,6 +100,11 @@ package_nvidia-utils() {
     install -D -m755 "libnvidia-encode.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-encode.so.${pkgver}"
     install -D -m755 "libnvidia-cfg.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-cfg.so.${pkgver}"
     install -D -m755 "libnvidia-ml.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-ml.so.${pkgver}"
+    install -D -m755 "libnvidia-wfb.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-wfb.so.${pkgver}"
+    install -D -m755 "libnvidia-glvkspirv.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-glvkspirv.so.${pkgver}"
+
+    # Vulkan ICD
+    install -D -m644 "nvidia_icd.json.template" "${pkgdir}/usr/share/vulkan/icd.d/nvidia_icd.json"
 
     # VDPAU
     install -D -m755 "libvdpau_nvidia.so.${pkgver}" "${pkgdir}/usr/lib/vdpau/libvdpau_nvidia.so.${pkgver}"
@@ -113,10 +123,6 @@ package_nvidia-utils() {
     # Fat (multiarchitecture) binary loader
     install -D -m755 "libnvidia-fatbinaryloader.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-fatbinaryloader.so.${pkgver}"
 
-    # Vulkan icd
-    install -Dm644 nvidia_icd.json.template "$pkgdir"/usr/share/vulkan/icd.d/nvidia_icd.json
-    sed -i 's/__NV_VK_ICD__/libGLX_nvidia.so.0/' "$pkgdir"/usr/share/vulkan/icd.d/nvidia_icd.json
-  
     # DEBUG
     install -D -m755 nvidia-debugdump "${pkgdir}/usr/bin/nvidia-debugdump"
 
@@ -151,8 +157,7 @@ package_nvidia-utils() {
     install -D -m644 nvidia-application-profiles-${pkgver}-rc "${pkgdir}/usr/share/nvidia/nvidia-application-profiles-${pkgver}-rc"
     install -D -m644 nvidia-application-profiles-${pkgver}-key-documentation "${pkgdir}/usr/share/nvidia/nvidia-application-profiles-${pkgver}-key-documentation"
 
-    install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/nvidia/LICENSE"
-    ln -s nvidia "${pkgdir}/usr/share/licenses/nvidia-utils"
+    install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/nvidia-utils/LICENSE"
     install -D -m644 README.txt "${pkgdir}/usr/share/doc/nvidia/README"
     install -D -m644 NVIDIA_Changelog "${pkgdir}/usr/share/doc/nvidia/NVIDIA_Changelog"
     cp -r html "${pkgdir}/usr/share/doc/nvidia/"
@@ -160,6 +165,8 @@ package_nvidia-utils() {
 
     # distro specific files must be installed in /usr/share/X11/xorg.conf.d
     install -D -m644 "${srcdir}/nvidia-drm-outputclass.conf" "${pkgdir}/usr/share/X11/xorg.conf.d/10-nvidia-drm-outputclass.conf"
+
+    install -Dm644 "${srcdir}/nvidia-utils.sysusers" "${pkgdir}/usr/lib/sysusers.d/$pkgname.conf"
 
     create_links
 }
