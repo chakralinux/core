@@ -5,7 +5,7 @@ pkgname=('systemd' 'libsystemd')
 # Can be from either systemd or systemd-stable
 _commit='f398c546c6fc43121131f41acec56b5a851bd35e'
 pkgver=238.76
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="https://www.github.com/systemd/systemd"
 makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam' 'libelf'
@@ -121,7 +121,7 @@ pkgver() {
 
   cd "$pkgbase-stable"
 
-  git checkout "$_commit"
+  # git checkout "$_commit"
 
   version="$(git describe --abbrev=0 --tags)"
   count="$(git rev-list --count ${version}..)"
@@ -138,7 +138,7 @@ build() {
     -Dgnuefi=true
     -Dima=false
     -Dlz4=true
-
+    -Dqrencode=false
     -Ddbuspolicydir=/usr/share/dbus-1/system.d
     -Ddefault-dnssec=no
     # TODO(dreisner): consider changing this to unified
