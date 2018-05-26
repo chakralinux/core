@@ -1,6 +1,6 @@
 pkgname=ffmpeg
 pkgver=4.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Complete solution to record, convert and stream audio and video'
 arch=('x86_64')
 url='http://ffmpeg.org/'
@@ -16,13 +16,12 @@ depends=('alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'glibc' 'gmp' 'gnutls' 'gsm'
          'libvpx.so' 'libx264.so' 'libx265.so' 'libxvidcore.so')
 makedepends=('ffnvcodec-headers' 'ladspa' 'yasm')
 optdepends=('ladspa: LADSPA filters')
-#checkdepends=('valgrind')
 provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
           'libavresample.so' 'libavutil.so' 'libpostproc.so' 'libswresample.so'
           'libswscale.so')
-source=(http://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.bz2{,.asc})
+source=("https://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.xz"{,.asc})
 validpgpkeys=('FCF986EA15E6E293A5644F10B4322F04D67658D8')
-sha256sums=('318a39d906c9107d49766c63787798dd078d2a36e6670a9dfeda3c55be4573b8'
+sha256sums=('ed945daf40b124e77a685893cc025d086f638bc703183460aff49508edb3a43f'
             'SKIP')
 
 build() {
@@ -64,25 +63,18 @@ build() {
     --enable-libwebp \
     --enable-libx264 \
     --enable-libx265 \
+    --enable-libxcb \
+    --enable-libxml2 \
     --enable-libxvid \
     --enable-nvenc \
     --enable-omx \
     --enable-shared \
-    --enable-version3 \
-    --enable-nonfree \
-    --enable-libfdk-aac \
-    --enable-libopenh264 \
-    --enable-libmp3lame
+    --enable-version3
 
   make
   make tools/qt-faststart
   make doc/ff{mpeg,play}.1
 }
-
-#check() {
-#  cd ${pkgname}-${pkgver}
-#  make check
-#}
 
 package() {
   cd ${pkgname}-${pkgver}
