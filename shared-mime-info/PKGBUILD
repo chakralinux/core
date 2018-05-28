@@ -1,6 +1,6 @@
 pkgname=shared-mime-info
 pkgver=1.9
-pkgrel=1
+pkgrel=2
 pkgdesc="Freedesktop.org Shared MIME Info"
 arch=('x86_64')
 license=('GPL')
@@ -8,9 +8,10 @@ depends=('libxml2' 'glib2')
 makedepends=('intltool' 'pkgconfig' 'gettext')
 install=shared-mime-info.install
 url="http://freedesktop.org/Software/shared-mime-info"
-source=(http://freedesktop.org/~hadess/${pkgname}-${pkgver}.tar.xz)
-md5sums=('45103889b91242850aa47f09325e798b')
-#options=(!makeflags)
+source=(https://freedesktop.org/~hadess/${pkgname}-${pkgver}.tar.xz
+        update-mime-database.hook)
+sha256sums=('5c0133ec4e228e41bdf52f726d271a2d821499c2ab97afd3aa3d6cf43efcdc83'
+            '7ecdd55ff7c4331e188cf46debbcc5660edb0e2bbeb4dd87cc5b87278c292821')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -18,21 +19,23 @@ build() {
   # https://bugs.freedesktop.org/show_bug.cgi?id=70366
   export ac_cv_func_fdatasync=no
 
-  ./configure --prefix=/usr  --disable-update-mimedb
+  ./configure --prefix=/usr --disable-update-mimedb
 
   # FIXME: fails with -j9 every second time like:
   # update_mime_database-update-mime-database.o: file not recognized: File truncated
   # FIXME build and check returns:
   #  *** Some comments are not marked as translatable, fix before committing ***
-  make -j1 | true
+  make -j1
 }
 
 check() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make  -k check | true
+  make -k check
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install
+
+  install -Dm644 "$srcdir"/update-mime-database.hook "$pkgdir"/usr/share/libalpm/hooks/update-mime-database.hook
 }
