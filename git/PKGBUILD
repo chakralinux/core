@@ -1,11 +1,11 @@
 pkgname=git
-pkgver=2.14.2
+pkgver=2.17.1
 pkgrel=1
 pkgdesc="Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 arch=('x86_64')
 url="https://git-scm.com/"
 license=('GPL2')
-depends=('curl' 'expat>=2.0' 'perl-error' 'perl' 'openssl' 'pcre2')
+depends=('curl' 'expat>=2.0' 'perl-error' 'perl' 'openssl' 'pcre2' 'perl-mailtools' 'shadow' 'grep')
 makedepends=('python2' 'emacs' 'asciidoc' 'xmlto' 'asciidoc')
 optdepends=('tk: gitk and git gui'
             'perl-libwww: git svn'
@@ -15,22 +15,43 @@ optdepends=('tk: gitk and git gui'
             'subversion: git svn')
 install="git.install"
 source=("https://www.kernel.org/pub/software/scm/git/git-$pkgver.tar"{.xz,.sign}
-        git-daemon@.service
-        git-daemon.socket)
-md5sums=('694dd05c8d82b1444ee54c6dbebb1250'
-         'SKIP'
-         '042524f942785772d7bd52a1f02fe5ae'
-         'f67869315c2cc112e076f0c73f248002')
+        '0001-perl-fix-installing-modules-from-contrib.patch'
+        'git-daemon@.service'
+        'git-daemon.socket'
+        'git-sysusers.conf')
+sha256sums=('79136e7aa83abae4d8a25c8111f113d3c5a63aeb5fd93cc72c26d49c6d5ba65e'
+            'SKIP'
+            'c105015d2e5e4e671cb766edf4169e853021b07296e6d449b3209b4de7848afc'
+            '3bc3250d9e04b05c41975c01f85f512d3386d60b41475cbc7292bc88148852f6'
+            'ac4c90d62c44926e6d30d18d97767efc901076d4e0283ed812a349aece72f203'
+            '7630e8245526ad80f703fac9900a1328588c503ce32b37b9f8811674fcda4a45')
 validpgpkeys=('96E07AF25771955980DAD10020D04E5A713660A7') # Junio C Hamano
+
+make_paths=(
+  prefix='/usr'
+  gitexecdir='/usr/lib/git-core'
+  perllibdir="$(/usr/bin/perl -MConfig -wle 'print $Config{installvendorlib}')"
+)
+
+make_options=(
+  CFLAGS="$CFLAGS"
+  LDFLAGS="$LDFLAGS"
+  USE_LIBPCRE2=1
+  NO_CROSS_DIRECTORY_HARDLINKS=1
+  NO_PERL_CPAN_FALLBACKS=1
+  MAN_BOLD_LITERAL=1
+)
 
 build() {
   export PYTHON_PATH='/usr/bin/python2'
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make prefix=/usr gitexecdir=/usr/lib/git-core \
-    CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
-    USE_LIBPCRE2=1 \
-    NO_CROSS_DIRECTORY_HARDLINKS=1 \
-    MAN_BOLD_LITERAL=1 \
+
+  # perl: fix installing modules from contrib
+  patch -Np1 < ../0001-perl-fix-installing-modules-from-contrib.patch
+
+  make \
+    "${make_paths[@]}" \
+    "${make_options[@]}" \
     all doc
 
   make -C contrib/emacs prefix=/usr
@@ -47,11 +68,9 @@ check() {
   # which is caused by 'git rebase' trying to use builduser's SHELL inside the
   # build chroot (i.e.: /usr/bin/nologin)
   SHELL=/bin/sh \
-  make prefix=/usr gitexecdir=/usr/lib/git-core \
-    CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
-    USE_LIBPCRE=1 \
-    NO_CROSS_DIRECTORY_HARDLINKS=1 \
-    MAN_BOLD_LITERAL=1 \
+  make \
+    "${make_paths[@]}" \
+    "${make_options[@]}" \
     NO_SVN_TESTS=y \
     DEFAULT_TEST_TARGET=prove \
     GIT_PROVE_OPTS="$jobs -Q" \
@@ -62,12 +81,11 @@ check() {
 package() {
   export PYTHON_PATH='/usr/bin/python2'
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make prefix=/usr gitexecdir=/usr/lib/git-core \
-    CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" \
-    USE_LIBPCRE=1 \
-    NO_CROSS_DIRECTORY_HARDLINKS=1 \
-    MAN_BOLD_LITERAL=1 \
-    INSTALLDIRS=vendor DESTDIR="$pkgdir" install install-doc
+  make \
+    "${make_paths[@]}" \
+    "${make_options[@]}" \
+    DESTDIR="$pkgdir" \
+    install install-doc
 
   # bash completion
   mkdir -p "${pkgdir}/usr/share/bash-completion/completions/"
@@ -75,7 +93,7 @@ package() {
   # fancy git prompt
   mkdir -p "${pkgdir}/usr/share/git/"
   install -m644 ./contrib/completion/git-prompt.sh "${pkgdir}/usr/share/git/git-prompt.sh"
-  # emacs interface
+  # emacs
   make -C contrib/emacs prefix=/usr DESTDIR="$pkgdir" install
   # subtree installation
   make -C contrib/subtree prefix=/usr gitexecdir=/usr/lib/git-core DESTDIR="$pkgdir" install install-doc
@@ -90,10 +108,10 @@ package() {
   sed -i 's|#![ ]*/usr/bin/python$|#!/usr/bin/python2|' \
     "$pkgdir"/usr/share/git/svn-fe/svnrdump_sim.py
 
-  # remove perllocal.pod, .packlist, and empty directories.
-  rm -rf "${pkgdir}/usr/lib/perl5"
+  # git-daemon via systemd socket activation
+  install -D -m 0644 "$srcdir"/git-daemon@.service "$pkgdir"/usr/lib/systemd/system/git-daemon@.service
+  install -D -m 0644 "$srcdir"/git-daemon.socket "$pkgdir"/usr/lib/systemd/system/git-daemon.socket
 
-  # systemd stuff
-  install -D -m644 "${srcdir}/git-daemon@.service" "${pkgdir}/usr/lib/systemd/system/git-daemon@.service"
-  install -D -m644 "${srcdir}/git-daemon.socket" "${pkgdir}/usr/lib/systemd/system/git-daemon.socket"
+  # sysusers file
+  install -D -m 0644 "$srcdir"/git-sysusers.conf "$pkgdir"/usr/lib/sysusers.d/git.conf
 }
