@@ -1,6 +1,5 @@
 # Contributor: Andrea Scarpino <andrea@archlinux.org>
 
-source ../frameworks.conf
 
 pkgname=kapidox
 pkgver=$KFVersion
@@ -14,9 +13,10 @@ makedepends=("extra-cmake-modules>=$KFECMVersion" 'qt5-base')
 groups=('kf5')
 options=("debug")
 source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname}) 
+sha256sums=($(curl "$_url.sha256" | cut -c-64)
+            SKIP)
              'SKIP' )
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
 
 prepare() {
   mkdir -p build
@@ -25,8 +25,8 @@ prepare() {
 build() {
   cd build
   cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=${KFBuildType} \
-    -DCMAKE_INSTALL_PREFIX=${KFInstallPrefix} \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_INSTALL_PREFIX=/usr \
     -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }
