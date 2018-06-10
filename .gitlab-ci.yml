@@ -1,0 +1,80 @@
+image: chakralinux/makepkg:latest
+
+variables:
+  REPODIR: "$CI_PROJECT_DIR"
+
+stages:
+  - package
+  - sign
+  - deploy
+  - stable
+
+before_script:
+  # import the gitlab-ci scripts
+  - git clone --depth 1 https://code.chakralinux.org/tools/chakra-gitlab-ci-scripts _gitlab-ci-scripts
+  # setup basic environment settings, as root
+  - _gitlab-ci-scripts/prepare.sh
+  # import pgp keys flagged as valid
+  - sudo -u builder -E -H _gitlab-ci-scripts/import-validpgpkeys.sh
+
+build_pkgs:
+  stage: package
+  script:
+    # setup makepkg settings (enable and sync the correct repository), as root
+    - _gitlab-ci-scripts/prepare_makepkg.sh
+    # the build script can't be run as root, as makepkg would complain...
+    - sudo -u builder -E -H _gitlab-ci-scripts/build.sh
+
+  artifacts:
+    # expire artifacts per default - the gitlab web frontend can be used to keep
+    # artifacts of interest for an unlimited time
+    expire_in: 1 week
+    paths:
+      - ./*.pkg.tar.xz
+    name: "$CI_BUILD_NAME"
+  cache:
+    paths:
+      - /var/cache/pacman/pkg
+  tags:
+    - PKGBUILD
+
+sign_pkgs:
+  stage: sign
+  script:
+     - for pkg in $(find . -type f | grep ".pkg.tar.xz"); do echo "signing $pkg" && echo "$GPG_PASSWORD" | gpg -sb --pinentry-mode loopback --passphrase-fd 0 $pkg; done
+  artifacts:
+    # expire artifacts per default - the gitlab web frontend can be used to keep
+    # artifacts of interest for an unlimited time
+    expire_in: 1 week
+    paths:
+      - ./*.pkg.tar.xz.sig
+    name: "$CI_BUILD_NAME"
+  tags:
+    - signature
+
+deploy_pkgs:
+  stage: deploy
+  variables:
+    DEPLOY_SERVER: "$DEPLOY_SERVER"
+    SSH_USER: "$SSH_USER"
+    SSH_PORT: "$SSH_PORT"
+    GPG_PASSWORD: "$GPG_PASSWORD"
+  script:
+     - _gitlab-ci-scripts/deploy.sh
+  when: manual
+  tags:
+    - rsync
+
+move_pkgs_to_stable:
+  stage: stable
+  variables:
+    DEPLOY_SERVER: "$DEPLOY_SERVER"
+    SSH_USER: "$SSH_USER"
+    SSH_PORT: "$SSH_PORT"
+    GPG_PASSWORD: "$GPG_PASSWORD"
+    DEST_REPO: "core"
+  script:
+     - _gitlab-ci-scripts/move.sh
+  when: manual
+  tags:
+    - rsync
