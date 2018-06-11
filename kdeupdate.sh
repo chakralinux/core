@@ -49,25 +49,29 @@ build()
     msg "Processing: '$pkg'"
     pushd "$pkg" &>/dev/null
 
-        # update pkgver
+        # update version
         sed -r "s|pkgver=.*|pkgver=$Version|g" -i PKGBUILD
+        sed -r 's|"extra-cmake-modules>=[^"]*"|"extra-cmake-modules>='${Version}'"|g' -i PKGBUILD
 
         # update source link
         sed -r "s|https://download.kde.org/.*stable/|https://download.kde.org/${Branch}/|g" -i PKGBUILD
 
         # update sha256 sums
-        local  pkgver pkgname _pkgname
-        _package_info "$pkg" pkgver pkgname _pkgname
+        local  pkgver pkgname source _pkgname _pkgbase
+        _package_info "$pkg" pkgver pkgname source _pkgname _pkgbase
 
         if [ ! -z "$_pkgname" ]; then
             pkgname=$_pkgname
         fi
+        if [ ! -z "$_pkgbase" ]; then
+            pkgname=$_pkgbase
+        fi
 
-        _url="https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"
+        _url=$source
         _sha256sum=$(curl "$_url.sha256" | cut -c-64)
         sed -r "s|sha256sums=.*|sha256sums=('$_sha256sum'|g" -i PKGBUILD
         echo $_sha256sum
-        unset pkgver pkgname _pkgname
+        unset pkgver pkgname source _pkgname _pkgbase
 
     popd &>/dev/null
   done < "$1"
