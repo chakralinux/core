@@ -24,6 +24,20 @@ for subroutine in $_needed_functions ; do
   source ~/bin/functions/$subroutine
 done
 
+# Get package information
+function _package_info() {
+    local package="${1}"
+    local properties=("${@:2}")
+    for property in "${properties[@]}"; do
+        local -n nameref_property="${property}"
+        nameref_property=($(
+            #source "${package}/PKGBUILD"
+            source "PKGBUILD"
+            declare -n nameref_property="${property}"
+            echo "${nameref_property[@]}"))
+    done
+}
+
 build()
 {
   while read -r pkg; do
@@ -35,8 +49,25 @@ build()
     msg "Processing: '$pkg'"
     pushd "$pkg" &>/dev/null
 
-    sed -r "s|pkgver=.*|pkgver=$Version|g" -i PKGBUILD
-    #sed -r 's|_url=.*|_url="$Server${pkgver%.*}/${_pkgname}-${pkgver}.tar.xz"|g' -i PKGBUILD
+        # update pkgver
+        sed -r "s|pkgver=.*|pkgver=$Version|g" -i PKGBUILD
+
+        # update source link
+        sed -r "s|https://download.kde.org/.*stable/|https://download.kde.org/${Branch}/|g" -i PKGBUILD
+
+        # update sha256 sums
+        local  pkgver pkgname _pkgname
+        _package_info "$pkg" pkgver pkgname _pkgname
+
+        if [ ! -z "$_pkgname" ]; then
+            pkgname=$_pkgname
+        fi
+
+        _url="https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"
+        _sha256sum=$(curl "$_url.sha256" | cut -c-64)
+        sed -r "s|sha256sums=.*|sha256sums=('$_sha256sum'|g" -i PKGBUILD
+        echo $_sha256sum
+        unset pkgver pkgname _pkgname
 
     popd &>/dev/null
   done < "$1"

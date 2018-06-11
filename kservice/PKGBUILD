@@ -13,10 +13,9 @@ makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools' 'python3')
 checkdepends=('xorg-server-xvfb' 'kded')
 groups=('kf5')
 options=("debug")
-_url="https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"
-source=(${_url}{,.sig}
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig}
         '03_chakra_menu.patch')
-sha256sums=($(curl "$_url.sha256" | cut -c-64)
+sha256sums=('a92d60aae5ebf99c1b518e39cb624b4da9a7f88ebc7e77e52722c1e677bdd167'
             SKIP
             '505e9e5e969be5094b3f713b865d5927cc3de1f4693915174732b20793228c4f')
 validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
