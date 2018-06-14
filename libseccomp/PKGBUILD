@@ -1,15 +1,21 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libseccomp
 
 pkgname=libseccomp
-pkgver=2.3.1
+pkgver=2.3.3
 pkgrel=1
 pkgdesc='Enhanced seccomp library'
 arch=('x86_64')
 license=('LGPL2.1')
-url="http://sourceforge.net/projects/libseccomp/"
+url="https://github.com/seccomp/libseccomp"
 depends=('glibc')
-source=("https://github.com/seccomp/$pkgname/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
-md5sums=('e6f3e84921ef9c2e9188681963f0943f')
+validpgpkeys=('7100AADFAE6E6E940D2E0AD655E45A5AE8CA7C8A') # Paul Moore <paul@paul-moore.com>
+source=("https://github.com/seccomp/$pkgname/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz"{,.asc})
+sha256sums=('7fc28f4294cc72e61c529bedf97e705c3acf9c479a8f1a3028d4cd2ca9f3b155'
+            'SKIP')
+
+prepare() {
+  cd $pkgname-$pkgver
+}
 
 build() {
   cd $pkgname-$pkgver
@@ -21,4 +27,3 @@ package() {
   cd $pkgname-$pkgver
   make DESTDIR="$pkgdir" install
 }
-

@@ -1,0 +1,96 @@
+# Source global configuration
+source ../linux.conf
+
+pkgbase=nvidia-390xx
+pkgname=(nvidia-390xx nvidia-390xx-dkms chd-nvidia-390xx)
+pkgver=390.59
+pkgrel=1
+pkgdesc="NVIDIA drivers for linux, 390xx legacy branch"
+arch=('x86_64')
+url="http://www.nvidia.com/"
+makedepends=("linux-headers=${_kernelver}" "nvidia-390xx-utils=${pkgver}")
+license=('custom')
+options=('!strip')
+source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master/hwdb/nvidia_supported_new")
+_pkg="NVIDIA-Linux-x86_64-${pkgver}"
+source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
+        kernel-4.16.patch)
+sha256sums=('94db1b11de33b0299da021fee8c21e4442656fe76452ac582b556e3f96365d5d'
+            '270246eaca001b374e9ed8c1ac9b73c1d32b461ca5776761985f745ad769fe28'
+            '622ac792ec200b2239cb663c0010392118b78c9904973d82cd261165c16d6385')
+
+prepare() {
+    sh "${_pkg}.run" --extract-only
+    cd "${_pkg}"
+
+    # Restore phys_to_dma support (still needed for 396.18)
+    # https://bugs.archlinux.org/task/58074
+    patch -Np1 -i ../kernel-4.16.patch
+
+    cp -a kernel kernel-dkms
+    cd kernel-dkms
+    sed -i "s/__VERSION_STRING/${pkgver}/" dkms.conf
+    sed -i 's/__JOBS/`nproc`/' dkms.conf
+    sed -i 's/__DKMS_MODULES//' dkms.conf
+    sed -i '$iBUILT_MODULE_NAME[0]="nvidia"\
+DEST_MODULE_LOCATION[0]="/kernel/drivers/video"\
+BUILT_MODULE_NAME[1]="nvidia-uvm"\
+DEST_MODULE_LOCATION[1]="/kernel/drivers/video"\
+BUILT_MODULE_NAME[2]="nvidia-modeset"\
+DEST_MODULE_LOCATION[2]="/kernel/drivers/video"\
+BUILT_MODULE_NAME[3]="nvidia-drm"\
+DEST_MODULE_LOCATION[3]="/kernel/drivers/video"' dkms.conf
+
+    # Gift for linux-rt guys
+    sed -i 's/NV_EXCLUDE_BUILD_MODULES/IGNORE_PREEMPT_RT_PRESENCE=1 NV_EXCLUDE_BUILD_MODULES/' dkms.conf
+}
+
+build() {
+    cd "${_pkg}/kernel"
+    make SYSSRC=/usr/lib/modules/"${_kver}/build" module
+}
+
+package_nvidia-390xx() {
+    pkgdesc="NVIDIA drivers for linux, 390xx legacy branch"
+    depends=("linux=${_kernelver}" "nvidia-390xx-utils=${pkgver}" 'libgl')
+    conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx' 'nvidia-340xx')
+
+    install -Dt "${pkgdir}/usr/lib/modules/${_extramodules}" -m644 \
+      "${srcdir}/${_pkg}/kernel"/nvidia{,-modeset,-drm,-uvm}.ko
+
+    find "${pkgdir}" -name '*.ko' -exec gzip -n {} +
+
+    echo "blacklist nouveau" |
+        install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modprobe.d/${pkgname}.conf"
+
+    install -Dt "${pkgdir}/usr/share/licenses/${pkgname}" -m644 "${srcdir}/${_pkg}/LICENSE"
+}
+
+package_nvidia-390xx-dkms() {
+    pkgdesc="NVIDIA driver sources for linux, 390xx legacy branch"
+    depends=('dkms' "nvidia-390xx-utils=$pkgver" 'libgl')
+    optdepends=('linux-headers: Build the module for Arch kernel'
+                'linux-lts-headers: Build the module for LTS Arch kernel')
+    conflicts+=('nvidia-390xx')
+
+    cd ${_pkg}
+
+    install -dm 755 "${pkgdir}"/usr/src
+    cp -dr --no-preserve='ownership' kernel-dkms "${pkgdir}/usr/src/nvidia-${pkgver}"
+
+    echo "blacklist nouveau" |
+        install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modprobe.d/${pkgname}.conf"
+
+    install -Dt "${pkgdir}/usr/share/licenses/${pkgname}" -m644 "${srcdir}/${_pkg}/LICENSE"
+}
+
+package_chd-nvidia-390xx() {
+    pkgdesc="CHD ids for nvidia $pkgver"
+    arch=('x86_64')
+
+    cd "${srcdir}/${_pkg}"
+
+    install -dm755 "${pkgdir}/opt/chakra/hwdb"
+    sh -e "${srcdir}/nvidia_supported_new" README.txt kernel/nv-kernel.o \
+        > "${pkgdir}/opt/chakra/hwdb/hw_nvidia390xx_hwdb"
+}

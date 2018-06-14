@@ -1,25 +1,27 @@
 pkgname=ffmpeg
-pkgver=3.2.10
-pkgrel=2
+pkgver=4.0
+pkgrel=3
 pkgdesc='Complete solution to record, convert and stream audio and video'
 arch=('x86_64')
 url='http://ffmpeg.org/'
-license=('GPL3' 'custom')
-depends=('alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'gnutls' 'gsm' 'lame'
-         'libass' 'libbluray' 'libmodplug' 'libpulse' 'libsoxr' 'libssh'
-         'libtheora' 'libva' 'libvdpau' 'libwebp' 'opencore-amr' 'openjpeg'
-         'opus' 'schroedinger' 'sdl' 'speex' 'v4l-utils' 'xvidcore' 'zlib'
-         'dcadec' 'vid.stab' 'libvorbis' 'lame' 'openh264'
-         'libvpx' 'libx264.so' 'x265' 'libfdk-aac' 'jack' 'libavc1394' 'libiec61883')
-makedepends=('hardening-wrapper' 'ladspa' 'libvdpau' 'yasm')
+license=('GPL3')
+depends=('alsa-lib' 'bzip2' 'fontconfig' 'fribidi' 'glibc' 'gmp' 'gnutls' 'gsm'
+         'lame' 'libavc1394' 'libdrm' 'libiec61883' 'libmodplug'
+         'libomxil-bellagio' 'libpulse' 'libraw1394' 'libsoxr' 'libssh'
+         'libtheora' 'libvdpau' 'libwebp' 'libx11' 'libxcb' 'libxext' 'libxml2'
+         'libxv' 'opencore-amr' 'openjpeg2' 'opus' 'sdl2' 'speex' 'v4l-utils'
+         'xz' 'zlib'
+         'libass.so' 'libbluray.so' 'libfreetype.so' 'libva-drm.so' 'libva.so'
+         'libva-x11.so' 'libvidstab.so' 'libvorbisenc.so' 'libvorbis.so'
+         'libvpx.so' 'libx264.so' 'libx265.so' 'libxvidcore.so')
+makedepends=('ffnvcodec-headers' 'ladspa' 'yasm')
 optdepends=('ladspa: LADSPA filters')
-#checkdepends=('valgrind')
 provides=('libavcodec.so' 'libavdevice.so' 'libavfilter.so' 'libavformat.so'
           'libavresample.so' 'libavutil.so' 'libpostproc.so' 'libswresample.so'
           'libswscale.so')
-source=(http://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.bz2{,.asc})
+source=("https://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.xz"{,.asc})
 validpgpkeys=('FCF986EA15E6E293A5644F10B4322F04D67658D8')
-sha256sums=('4fbad0a9e1a7984cc4f8748f5e8a8ad643453f95aad9b400074072d71b415adb'
+sha256sums=('ed945daf40b124e77a685893cc025d086f638bc703183460aff49508edb3a43f'
             'SKIP')
 
 build() {
@@ -30,7 +32,6 @@ build() {
     --disable-debug \
     --disable-static \
     --disable-stripping \
-    --enable-avisynth \
     --enable-avresample \
     --enable-fontconfig \
     --enable-gmp \
@@ -39,6 +40,7 @@ build() {
     --enable-ladspa \
     --enable-libass \
     --enable-libbluray \
+    --enable-libdrm \
     --enable-libfreetype \
     --enable-libfribidi \
     --enable-libgsm \
@@ -50,7 +52,6 @@ build() {
     --enable-libopenjpeg \
     --enable-libopus \
     --enable-libpulse \
-    --enable-libschroedinger \
     --enable-libsoxr \
     --enable-libspeex \
     --enable-libssh \
@@ -62,24 +63,18 @@ build() {
     --enable-libwebp \
     --enable-libx264 \
     --enable-libx265 \
+    --enable-libxcb \
+    --enable-libxml2 \
     --enable-libxvid \
+    --enable-nvenc \
+    --enable-omx \
     --enable-shared \
-    --enable-version3 \
-    --enable-x11grab \
-    --enable-nonfree \
-    --enable-libfdk-aac \
-    --enable-libopenh264 \
-    --enable-libmp3lame
+    --enable-version3
 
   make
   make tools/qt-faststart
-  make doc/ff{mpeg,play,server}.1
+  make doc/ff{mpeg,play}.1
 }
-
-#check() {
-#  cd ${pkgname}-${pkgver}
-#  make check
-#}
 
 package() {
   cd ${pkgname}-${pkgver}

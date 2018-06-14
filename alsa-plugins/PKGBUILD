@@ -1,30 +1,24 @@
 # Maintainer: almack
 
 pkgname=alsa-plugins
-pkgver=1.1.5
+pkgver=1.1.6
 pkgrel=1
 pkgdesc="Extra alsa plugins"
-arch=('x86_64')
+arch=(x86_64)
 url="http://www.alsa-project.org"
 license=(GPL)
-depends=('alsa-lib')
-makedepends=('pulseaudio' 'jack' 'ffmpeg')
-optdepends=('pulseaudio: PulseAudio plugin'
+depends=(alsa-lib)
+makedepends=(libpulse jack ffmpeg)
+optdepends=('libpulse: PulseAudio plugin'
             'jack: Jack plugin'
             'ffmpeg: libavcodec resampling plugin, a52 plugin'
             'libsamplerate: libsamplerate resampling plugin'
             'speex: libspeexdsp resampling plugin')
 source=("ftp://ftp.alsa-project.org/pub/plugins/$pkgname-$pkgver.tar.bz2")
-md5sums=('f898b0e6e8acf3f6f82bc2a0f0c84a97')
-
-prepare() {
-  cd $pkgname-$pkgver
-  sed -i 's/ && LIBAVCODEC_VERSION_MINOR >= 34//' a52/pcm_a52.c
-}
+sha1sums=('a3601513f1a54eaef606744c9c9f4e9d4d44bf40')
 
 build() {
   cd $pkgname-$pkgver
-  CFLAGS+=' -DHAVE_STDINT_H' # We have issue similar to this one https://code.google.com/p/cantata/issues/detail?id=627
   ./configure --prefix=/usr
   make
 }

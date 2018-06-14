@@ -1,0 +1,24 @@
+# Arch contributors: https://git.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/tslib
+
+pkgname=tslib
+pkgver=1.16
+pkgrel=1
+pkgdesc="Touchscreen Access Library"
+arch=(x86_64)
+url="https://github.com/kergoth/tslib"
+license=(GPL2)
+depends=(glibc)
+makedepends=()
+source=("https://github.com/kergoth/tslib/releases/download/$pkgver/$pkgname-$pkgver.tar.xz")
+sha256sums=('c9a54651337a701a66b074c603c313225579995a7910e519bbc7b1dcdab9a755')
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr --sysconfdir=/etc
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+}

@@ -1,28 +1,38 @@
 pkgname=orc
-pkgver=0.4.24
+pkgver=0.4.28
 pkgrel=1
-pkgdesc="The Oild Runtime Compiler"
-arch=('x86_64')
-license=('custom')
-url="http://code.entropywave.com/projects/orc/"
-depends=('glibc')
-makedepends=('valgrind')
-source=(http://gstreamer.freedesktop.org/data/src/orc/orc-${pkgver}.tar.xz)
-md5sums=('9e793ec34c0e20339659dd4bbbf62135')
+pkgdesc="Optimized Inner Loop Runtime Compiler"
+url="https://cgit.freedesktop.org/gstreamer/orc"
+arch=(x86_64)
+license=(custom)
+depends=(glibc)
+makedepends=(valgrind git gtk-doc meson python3-six)
+_commit=31cb4bfc51de81b5c2569abdcff830b83c74499c  # tags/orc-0.4.28^0
+source=("git+https://anongit.freedesktop.org/git/gstreamer/orc#commit=$_commit")
+sha256sums=('SKIP')
 
-build () {
-    cd "$srcdir/$pkgname-$pkgver"
-    ./configure --prefix=/usr --disable-static
-    make
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed 's/^orc-//;s/-/+/g'
+}
+
+prepare() {
+  mkdir build
+  cd $pkgname
+}
+
+build() {
+  cd build
+  chakra-meson ../$pkgname
+  ninja
 }
 
 check() {
-    cd $pkgname-$pkgver
-    make check
+  cd build
+  meson test
 }
 
 package() {
-    cd "$srcdir/$pkgname-$pkgver"
-    make DESTDIR="$pkgdir" install
-    install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
+  DESTDIR="$pkgdir" ninja -C build install
+  install -Dm644 $pkgname/COPYING "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

@@ -2,19 +2,26 @@ source ../qt5.conf
 
 pkgname=qt5-webengine
 pkgver=${QSubVersion}
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
-license=('GPL3' 'LGPL' 'FDL' 'custom')
+license=('LGPL3' 'LGPL2.1' 'BSD')
 pkgdesc='Provides support for web applications using the Chromium browser project'
-depends=('qt5-webchannel' 'qt5-location' 'libxcomposite' 'libxrandr' 'pciutils' 'libxss' 'libvpx' 
-         'libevent' 'libsrtp' 'snappy' 'nss' 'protobuf' 'libxslt' 'libxdamage' 'minizip' 'ffmpeg' 'libxcursor')
-         # namcap note: libxdamage is needed for nvidia users
-makedepends=('python2' 'git' 'gperf' 'jsoncpp' 'ninja')
+depends=('qt5-webchannel' 'qt5-location' 'libxcomposite' 'libxrandr' 'pciutils' 'libxss'
+         'libevent' 'snappy' 'nss' 'protobuf' 'libxslt' 'minizip' 'ffmpeg' 're2' 'libvpx')
+makedepends=('python2' 'git' 'gperf' 'jsoncpp' 'ninja' 'qt5-tools')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname}))
-md5sums=( $(getSum ${pkgname}) )
+source=( $(getSrc ${pkgname})
+         qtwebengine-harmony.patch qtwebengine-gcc8.patch qtwebengine-ffmpeg4.patch
+         falkon-copy-menu.patch::"http://code.qt.io/cgit/qt/qtwebengine.git/patch/?id=af0c47b1"
+         qtwebengine-no-gpu.patch)
+md5sums=( $(getSum ${pkgname})
+         '254061cb349cff714230b7cca83b0a4c'
+         'c5779e35eb15edf97789885a72ec873a'
+         '2835f9fe8097ff3d6098812c70f48044'
+         '4fd37c3ceb4a1f92276cae2c83ee1a5a'
+	 'c182ccd60d079d65203e112c30a4217d')
 
 prepare() {
   mkdir -p build
@@ -25,6 +32,17 @@ prepare() {
 
   cd $(getPkgName ${pkgname})
 
+  # FreeType 2.8.1
+  patch -Np1 -i ../qtwebengine-harmony.patch
+  # Fix copy context menu
+  patch -p1 -i "$srcdir"/falkon-copy-menu.patch
+  # Disable GPU rendering on Wayland https://bugreports.qt.io/browse/QTBUG-68479
+  patch -p1 -i "$srcdir"/qtwebengine-no-gpu.patch
+  # Fix build with gcc8 (Fedora)
+  cd src/3rdparty/chromium
+  patch -p1 -i "$srcdir"/qtwebengine-gcc8.patch
+  # Fix build with ffmpeg 4
+  patch -p2 -i "$srcdir"/qtwebengine-ffmpeg4.patch
 }
 
 build() {
@@ -35,8 +53,8 @@ build() {
     -proprietary-codecs \
     -system-ffmpeg \
     -webp \
-    -spellchecker
-#   -webengine-icu
+    -spellchecker \
+    -webengine-icu
   make
 }
 
@@ -47,6 +65,5 @@ package() {
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
   qtprlfix
 
-  install -d "$pkgdir"/usr/share/licenses
-  ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/${pkgname}
+  install -Dm644 "$srcdir"/$(getPkgName ${pkgname})/src/3rdparty/chromium/LICENSE "$pkgdir"/usr/share/licenses/${pkgname}/LICENSE.chromium
 }

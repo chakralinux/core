@@ -3,16 +3,16 @@ source ../qt5.conf
 pkgbase=qt5-base
 pkgname=(qt5-base qt5-xcb-private-headers)
 pkgver=${QSubVersion}
-pkgrel=2
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
 pkgdesc='A cross-platform application and UI framework'
-depends=('libjpeg-turbo' 'xcb-util-keysyms' 'xcb-util-renderutil' 'libgl' 'fontconfig'
-         'xcb-util-wm' 'libxrender' 'libxi' 'sqlite3' 'xcb-util-image' 'icu' 'pcre2'
-         'libinput' 'libsm' 'libxkbcommon-x11' 'libproxy' 'dbus' 'openssl')
-makedepends=('mtdev' 'libmariadbclient' 'sqlite3' 'unixodbc' 'postgresql-libs' 'alsa-lib' 'gst-plugins-base-libs'
-             'libpulse' 'cups' 'freetds')
+depends=('libjpeg-turbo' 'xcb-util-keysyms' 'xcb-util-renderutil' 'libgl' 'fontconfig' 'xdg-utils' 'shared-mime-info'
+         'xcb-util-wm' 'libxrender' 'libxi' 'sqlite' 'xcb-util-image' 'icu' 'pcre2'
+         'tslib' 'libinput' 'libsm' 'libxkbcommon-x11' 'libproxy' 'libcups' 'double-conversion')
+makedepends=('mtdev' 'libmariadbclient' 'sqlite' 'unixodbc' 'postgresql-libs' 'alsa-lib' 'gst-plugins-base-libs'
+             'libpulse' 'cups' 'freetds' 'vulkan-headers')
 optdepends=('qt5-svg: to use SVG icon themes'
             'postgresql-libs: PostgreSQL driver'
             'libmariadbclient: MariaDB driver'
@@ -22,19 +22,9 @@ optdepends=('qt5-svg: to use SVG icon themes'
 groups=('qt5')
 options=('debug')
 source=( $(getSrc ${pkgname}) 
-        qt-no-statx.patch
-        qtbug-65478.patch
-        qheaderview-restore.patch::"https://code.qt.io/cgit/qt/qtbase.git/patch/?id=4a04eea4"
-        qtbug-66444.patch::"https://code.qt.io/cgit/qt/qtbase.git/patch/?id=9395f35c"
-        qtbug-66420.patch::"https://code.qt.io/cgit/qt/qtbase.git/patch/?id=fa091640"
-        qtbug-66816.patch::"https://code.qt.io/cgit/qt/qtbase.git/patch/?id=e4e87a2e")
+        qt-private-includes.patch::"http://code.qt.io/cgit/qt/qtbase.git/patch/?id=67aa365d")
 md5sums=($(getSum ${pkgname})
-         '35cc4abc5f125905645e09bf37e5a3b0'
-         'e5bbb67fffe0bcc48e921ca567a3eec6'
-         '0afbecdd84674d8e362102f6756e8859'
-         '45095820d2517e3c45c456663a52beb1'
-         '922d3d4d6a49bf03acfab49031edd8b3'
-         '49e505b771ffbd389998d0065a7f63c9')
+         'aad1e05394f971c793771d4c0aacbd6f')
 
 prepare() {
   cd $(getPkgName ${pkgname})
@@ -51,36 +41,20 @@ prepare() {
     's|#![ ]*/usr/bin/python$|&2|;s|#![ ]*/usr/bin/env python$|&2|' {} +
 
   # Fix missing private includes https://bugreports.qt.io/browse/QTBUG-37417
-  sed -e '/CMAKE_NO_PRIVATE_INCLUDES\ \=\ true/d' -i mkspecs/features/create_cmake.prf
-  
-  # Don't use the statx syscall https://bugs.archlinux.org/task/56289 https://bugreports.qt.io/browse/QTBUG-64490
-  patch -p1 -i ../qt-no-statx.patch
-
-  # Fix kexi crash at startup http://bugreports.qt.io/browse/QTBUG-65478
-  patch -p1 -i ../qtbug-65478.patch
-  # Fix restoring column status in kmail and ksysguard
-  patch -p1 -i ../qheaderview-restore.patch
-  # Fix QHeaderView regression https://bugreports.qt.io/browse/QTBUG-66444
-  patch -p1 -i ../qtbug-66444.patch
-  # Fix white screen with Mesa 18 https://bugreports.qt.io/browse/QTBUG-66420
-  patch -p1 -i ../qtbug-66420.patch
-  # Fix crashes in QSqlite http://bugreports.qt.io/browse/QTBUG-66816
-  patch -p1 -i ../qtbug-66816.patch
+  patch -p1 -i ../qt-private-includes.patch
 }
 
 build() {
   cd $(getPkgName ${pkgname})
 
-  export _xkbconfigroot=$(pkg-config --variable=xkb_base xkeyboard-config)
-  
   PYTHON=/usr/bin/python2 ./configure -confirm-license -opensource -v \
     -prefix /usr \
     -bindir /usr/lib/qt5/bin \
     -docdir /usr/share/doc/qt5 \
-    -force-debug-info \
     -headerdir /usr/include/qt5 \
     -archdatadir /usr/lib/qt5 \
     -datadir /usr/share/qt5 \
+    -force-debug-info \
     -sysconfdir /etc/xdg \
     -examplesdir /usr/share/doc/qt5/examples \
     -plugindir /usr/lib/qt5/plugins \
@@ -98,20 +72,19 @@ build() {
     -dbus-linked \
     -system-harfbuzz \
     -journald \
-    -libinput \
-    -reduce-relocations \
-    -xkb-config-root $_xkbconfigroot \
-    -system-xkbcommon
-
+    -no-use-gold-linker \
+    -reduce-relocations
   make
 }
 
 package_qt5-base() {
+  pkgdesc='A cross-platform application and UI framework'
+
   cd $(getPkgName ${pkgname})
   make INSTALL_ROOT="${pkgdir}" install
 
   install -D -m644 LGPL_EXCEPTION.txt \
-    "${pkgdir}"/usr/share/licenses/${pkgname}/LGPL_EXCEPTION.txt
+    "${pkgdir}"/usr/share/licenses/${pkgbase}/LGPL_EXCEPTION.txt
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
   qtprlfix

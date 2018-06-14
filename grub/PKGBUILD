@@ -5,7 +5,8 @@ _EFI_ARCH="x86_64"
 pkgname="grub"
 pkgdesc="GNU GRand Unified Bootloader (2)"
 pkgver=2.02
-pkgrel=2
+pkgrel=1
+epoch=1
 url="https://www.gnu.org/software/grub/"
 arch=('x86_64')
 license=('GPL3')
@@ -34,6 +35,9 @@ source=("grub-$pkgver::git+git://git.sv.gnu.org/grub.git#tag=grub-$pkgver"
         '0003-10_linux-detect-archlinux-initramfs.patch'
         '0004-add-GRUB_COLOR_variables.patch'
         '0005-Allow_GRUB_to_mount_ext234_filesystems_that_have_the_encryption_feature.patch'
+        '0006-tsc-Change-default-tsc-calibration-method-to-pmtimer-on-EFI-systems.patch'
+        '0007-grub-mkconfig_10_linux_Support_multiple_early_initrd_images.patch'
+        '0008-Fix-packed-not-aligned-error-on-GCC-8.patch'
         'grub.default'
         'update-grub')
 
@@ -44,7 +48,10 @@ md5sums=('SKIP'
          'ba9d27c44b677bf329e5b96933bdbde8'
          'e506ae4a9f9f7d1b765febfa84e10d48'
          '7d4aa743cfabe49158e970a97f7795f0'
-         '31e4c7414cef3db3fb26c40ac8da97f2'
+         '0b459ce31fecd7f61d373fd064f15dcc'
+         '2256273cdf34e1a7a0976bb0b6e6c1de'
+         '6b7813c4c3cb2704939782430f0314cf'
+         '40a711c6b12d0b02088eaadc36476eea'
          '9910bdfd42fa7d3e21e6961bfcc977f9')
 validpgpkeys=('95D2E9AB8740D8046387FD151A09227B1F435A33') # Paul Hardy <unifoundry@unifoundry.com>
 
@@ -61,6 +68,16 @@ prepare() {
 
         msg "Patch to allow GRUB to mount ext2/3/4 filesystems that have the encryption feature"
 	patch -Np1 -i "${srcdir}/0005-Allow_GRUB_to_mount_ext234_filesystems_that_have_the_encryption_feature.patch"
+
+	msg "Patch to change default tsc calibration method to pmtimer on EFI systems"
+	patch -Np1 -i "${srcdir}/0006-tsc-Change-default-tsc-calibration-method-to-pmtimer-on-EFI-systems.patch"
+	echo
+
+	msg "Support multiple early initrd images"
+	patch -Np1 -i "${srcdir}/0007-grub-mkconfig_10_linux_Support_multiple_early_initrd_images.patch"
+
+	msg "Fix packed-not-aligned error on GCC 8"
+	patch -Np1 -i "${srcdir}/0008-Fix-packed-not-aligned-error-on-GCC-8.patch"
 	
 	msg "Fix DejaVuSans.ttf location so that grub-mkfont can create *.pf2 files for starfield theme"
 	sed 's|/usr/share/fonts/dejavu|/usr/share/fonts/dejavu /usr/share/fonts/TTF|g' -i "${srcdir}/grub-${pkgver}/configure.ac"
@@ -109,6 +126,7 @@ _build_grub-common_and_bios() {
 	
 	msg "Run ./configure for bios build"
 	./configure \
+		FREETYPE="pkg-config freetype2" \
 		--with-platform="pc" \
 		--target="i386" \
 		--enable-efiemu \
@@ -157,6 +175,7 @@ _build_grub-efi() {
 	
 	msg "Run ./configure for ${_EFI_ARCH} efi build"
 	./configure \
+		FREETYPE="pkg-config freetype2" \
 		--with-platform="efi" \
 		--target="${_EFI_ARCH}" \
 		--disable-efiemu \

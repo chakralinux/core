@@ -1,7 +1,7 @@
 pkgbase="cups"
 pkgname=('libcups' 'cups')
 pkgver=2.2.6
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 license=('GPL')
 url="http://www.cups.org/"
@@ -16,6 +16,7 @@ source=("https://github.com/apple/cups/releases/download/v${pkgver}/${pkgbase}-$
         cups-1.6.2-statedir.patch
         # bugfixes
         cups-systemd-socket.patch
+        cups-ppdLocalize.patch
 )
 md5sums=('e91c26d8d97b5a1630a962f530f02192'
          'SKIP'
@@ -24,7 +25,8 @@ md5sums=('e91c26d8d97b5a1630a962f530f02192'
          '3ba9e3410df1dc3015463d615ef91b3b'
          '39dd3141991c3052b73f59ece70e1ea6'
          '451609db34f95209d64c38474de27ce1'
-         '53bb3c80ee6823d36f9ab499373edfc5')
+         '53bb3c80ee6823d36f9ab499373edfc5'
+         '95f76349f46cd05c5943e2459dd1e747')
 validpgpkeys=('3737FD0D0E63B30172440D2DDBA3A7AB08D76223') # CUPS.org (CUPS.org PGP key) <security [at] cups.org>
 
 prepare() {
@@ -42,6 +44,8 @@ prepare() {
   # bug fixes
   # make sure network is up when starting and notify systemd - FC
   patch -Np1 -i ${srcdir}/cups-systemd-socket.patch
+  # https://github.com/apple/cups/pull/5303
+  patch -Np1 -i ${srcdir}/cups-ppdLocalize.patch
   
   # set MaxLogSize to 0 to prevent using cups internal log rotation
   sed -i -e '5i\ ' conf/cupsd.conf.in

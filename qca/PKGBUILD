@@ -5,7 +5,7 @@
 pkgbase=qca
 pkgname=(qca qca-qt5)
 pkgver=2.1.3
-pkgrel=1
+pkgrel=2
 pkgdesc="Qt Cryptographic Architecture"
 arch=('x86_64')
 url="http://delta.affinix.com/qca/"
@@ -22,19 +22,21 @@ prepare(){
 
 build() {
   cd $srcdir/build
-  cmake ../${pkgbase}-${pkgver} \
+  cmake ../$pkgbase-$pkgver \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DQT4_BUILD=true
+    -DBUILD_TESTS=OFF \
+    -DQCA_LIBRARY_INSTALL_DIR=/usr/lib \
+    -DQCA_FEATURE_INSTALL_DIR=/usr/share/qt/mkspecs/features/ \
+    -DQT4_BUILD=ON
   make
 
   cd $srcdir/build-qt5
-  cmake ../${pkgbase}-${pkgver} \
+  cmake ../$pkgbase-$pkgver \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_TESTS=OFF \
-    -DQCA_SUFFIX=qt5 \
-    -DQCA_INSTALL_IN_QT_PREFIX=ON
+    -DQCA_INSTALL_IN_QT_PREFIX=ON \
+    -DQCA_FEATURE_INSTALL_DIR=/usr/share/qt5/mkspecs/features/ \
+    -DQCA_MAN_INSTALL_DIR=/usr/share/man
   make
 }
 

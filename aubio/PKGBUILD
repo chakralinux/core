@@ -1,8 +1,8 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/aubio
 
 pkgname=aubio
-pkgver=0.4.2
-pkgrel=2
+pkgver=0.4.6
+pkgrel=1
 pkgdesc="A library for audio labelling"
 arch=('x86_64')
 url="http://aubio.org/"
@@ -10,12 +10,17 @@ license=('GPL')
 depends=('ffmpeg' 'fftw' 'jack')
 makedepends=('python2-numpy' 'python2-setuptools')
 optdepends=('python2-numpy: Python 2.x interface')
-source=("http://aubio.org/pub/$pkgname-$pkgver.tar.bz2")
-md5sums=('c0f6d8355e92669722501c3a762ba548')
+source=("http://aubio.org/pub/$pkgname-$pkgver.tar.bz2"
+            "0001-Fix-build-with-FFmpeg-4.0.patch")
+md5sums=('78d326e5e44d19b0d21a5abf834bae20'
+         '2dc57ccd9be5f93118564d5dc4f2de4f')
 
 prepare() {
   cd "$srcdir/$pkgname-$pkgver"
 
+  # apply patch to build with ffmpeg >= 4.0
+  patch -Np1 -i "../0001-Fix-build-with-FFmpeg-4.0.patch"
+  
   # python2 compat (for python interface)
   sed -i 's:bin/env python:bin/env python2:' \
     "$srcdir/$pkgname-$pkgver/python/lib/aubio/__init__.py"
@@ -26,7 +31,7 @@ build() {
 
   python2 waf configure --prefix=/usr --enable-fftw3f --libdir=/usr/lib
   python2 waf build $MAKEFLAGS
-  (cd python && python2 setup.py build) # python interface
+  python2 setup.py build # python interface
 }
 
 package() {
@@ -35,5 +40,5 @@ package() {
   python2 waf --destdir="$pkgdir" install
 
   # python interface
-  (cd python && python2 setup.py install --root="$pkgdir" --optimize=1)
+  python2 setup.py install --root="$pkgdir" --optimize=1
 }

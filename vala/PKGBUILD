@@ -1,5 +1,5 @@
 pkgname=vala
-pkgver=0.40.3
+pkgver=0.40.6
 pkgrel=1
 pkgdesc="Compiler for the GObject type system."
 arch=('x86_64')
@@ -9,11 +9,12 @@ depends=('glib2' 'graphviz' 'ttf-font' 'pkg-config' 'gcc')
 makedepends=('libxslt' 'gtk-doc' 'help2man')
 checkdepends=('dbus' 'libx11' 'gobject-introspection')
 source=(https://ftp.gnome.org/pub/gnome/sources/$pkgname/${pkgver:0:4}/$pkgname-$pkgver.tar.xz)
-sha256sums=('6d4f1f0b2edaa0d4aa96f72735a9845e6b1acf80a0a2ae494b5d43e07833119e')
+sha256sums=('6da450f1a73e0f1e17506e68cce5b9e8996349e576d3f8cb6b0b73ee22e44be2')
 
 build() {
     cd $pkgname-$pkgver
     ./configure --prefix=/usr
+    sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
     make
 }
 

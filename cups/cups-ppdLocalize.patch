@@ -1,0 +1,51 @@
+From 78e0e56f43e7bcac395e1e56f1cf565df73f83b0 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <albert.astals.cid@kdab.com>
+Date: Thu, 26 Apr 2018 12:08:29 +0200
+Subject: [PATCH] ppdLocalize: Also translate some global ppd properties
+
+There's quite a few ppds out there with translations
+for Manufacturer, ModelName, ShortNickName and NickName
+so use them
+---
+ cups/ppd-localize.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/cups/ppd-localize.c b/cups/ppd-localize.c
+index 29b2d3d9a..cda917360 100644
+--- a/cups/ppd-localize.c
++++ b/cups/ppd-localize.c
+@@ -163,6 +163,34 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
+     cupsArrayRestore(ppd->sorted_attrs);
+   }
+ 
++ /*
++  * Translate ppd global properties
++  */
++  if ((attr = ppdFindAttr(ppd, "Manufacturer", NULL)) != NULL)
++  {
++    if ((locattr = _ppdLocalizedAttr(ppd, "Translation",
++                                     "Manufacturer", ll_CC)) != NULL)
++      strlcpy(ppd->manufacturer , locattr->text, sizeof(attr->text));
++  }
++  if ((attr = ppdFindAttr(ppd, "ModelName", NULL)) != NULL)
++  {
++    if ((locattr = _ppdLocalizedAttr(ppd, "Translation",
++                                     "ModelName", ll_CC)) != NULL)
++      strlcpy(ppd->modelname , locattr->text, sizeof(attr->text));
++  }
++  if ((attr = ppdFindAttr(ppd, "ShortNickName", NULL)) != NULL)
++  {
++    if ((locattr = _ppdLocalizedAttr(ppd, "Translation",
++                                     "ShortNickName", ll_CC)) != NULL)
++      strlcpy(ppd->shortnickname , locattr->text, sizeof(attr->text));
++  }
++  if ((attr = ppdFindAttr(ppd, "NickName", NULL)) != NULL)
++  {
++    if ((locattr = _ppdLocalizedAttr(ppd, "Translation",
++                                     "NickName", ll_CC)) != NULL)
++      strlcpy(ppd->nickname , locattr->text, sizeof(attr->text));
++  }
++
+   return (0);
+ }
+ 

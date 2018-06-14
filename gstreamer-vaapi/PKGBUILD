@@ -1,0 +1,55 @@
+pkgname=gstreamer-vaapi
+pkgver=1.14.1
+pkgrel=1
+pkgdesc="GStreamer Multimedia Framework VAAPI Plugin"
+url="https://gstreamer.freedesktop.org/"
+arch=(x86_64)
+license=(LGPL)
+provides=(gst-vaapi)
+replaces=(gst-vaapi)
+conflicts=(gst-vaapi)
+depends=(gst-plugins-bad libva libxrandr)
+makedepends=(python gtk-doc autoconf-archive git)
+_commit=6f879bbc62037bc08b0867bc8e48e6f515e2eac8  # tags/1.14.1^0
+source=("git+https://anongit.freedesktop.org/git/gstreamer/gstreamer-vaapi#commit=$_commit"
+        "gst-common::git+https://anongit.freedesktop.org/git/gstreamer/common")
+sha256sums=('SKIP'
+            'SKIP')
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed 's/-/+/g'
+}
+
+prepare() {
+  cd $pkgname
+
+  git submodule init
+  git config --local submodule.common.url "$srcdir/gst-common"
+  git submodule update
+
+  NOCONFIGURE=1 ./autogen.sh
+}
+
+build() {
+  cd $pkgname
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libexecdir=/usr/lib \
+    --enable-gtk-doc \
+    --disable-static
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  make
+}
+
+check() {
+  cd $pkgname
+  make check
+}
+
+package() {
+  cd $pkgname
+  make DESTDIR="$pkgdir" install
+}
