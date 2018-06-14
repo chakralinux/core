@@ -1,8 +1,7 @@
 # Include global configuration
-source ../frameworks.conf
 
 pkgname=breeze-icons
-pkgver=${KFVersion}
+pkgver=5.47.0
 pkgrel=1
 pkgdesc='Breeze icon themes'
 arch=('any')
@@ -11,10 +10,10 @@ license=('LGPL')
 groups=('kf5')
 optdepends=('oxygen-icons: fallback icon theme')
 makedepends=('extra-cmake-modules' 'qt5-base')
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname})
-                        SKIP)
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('a759fb54f07e9fb2be0e6ddb973de17917d828d23c6919f7af20a36c5298df3b'
+            SKIP)
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
 
 prepare() {
   mkdir -p build
@@ -22,7 +21,15 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 -DBINARY_ICONS_RESOURCE=ON  ../${pkgname}-${pkgver}
+    cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DKDE_INSTALL_LIBDIR=lib \
+    -DKDE_INSTALL_SYSCONFDIR=/etc \
+    -DKDE_INSTALL_LIBEXECDIR=lib \
+    -DBUILD_TESTING=OFF \
+    -DKDE_INSTALL_USE_QT_SYS_PATHS=ON \
+    -DBINARY_ICONS_RESOURCE=ON  ../${pkgname}-${pkgver}
   make
 }
 

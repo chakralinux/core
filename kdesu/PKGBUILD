@@ -1,23 +1,22 @@
 # Contributor: Andrea Scarpino <andrea@archlinux.org>
 
-source ../frameworks.conf
 
 pkgname=kdesu
-pkgver=${KFVersion}
+pkgver=5.47.0
 pkgrel=1
 pkgdesc='Integration with su for elevated privileges'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kdesu'
 license=('LGPL')
 depends=('kservice' 'kpty')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python3')
+makedepends=("extra-cmake-modules>=5.47.0" 'python3')
 checkdepends=('cmake')
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname})
-                        SKIP)
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('79bb672375c2f4cd883998ba7494e3a431384d348eaffceae71c44d246d882e5'
+            SKIP)
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
 
 prepare() {
   mkdir -p build
@@ -25,7 +24,14 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver} \
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@" \
     -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }

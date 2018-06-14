@@ -1,23 +1,22 @@
 # Contributor: Andrea Scarpino <andrea@archlinux.org>
 
-source ../frameworks.conf
 
 pkgname=knotifications
-pkgver=${KFVersion}
+pkgver=5.47.0
 pkgrel=1
 pkgdesc='Abstraction for system notifications'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/knotifications'
 license=('LGPL')
 depends=('phonon-qt5' 'libdbusmenu-qt5' 'kwindowsystem' 'kconfig' 'kcodecs' 'kcoreaddons' 'qt5-speech')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'qt5-tools' 'python3')
+makedepends=("extra-cmake-modules>=5.47.0" 'qt5-tools' 'python3')
 checkdepends=('xorg-server-xvfb')
 groups=('kf5')
 options=('debug')
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname})
-                        SKIP)
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('5b9bfcce9b6492639288fe386e96a4b992e95611d72c0fd9d59f96a1a7129521'
+            SKIP)
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
 
 prepare() {
   mkdir -p build
@@ -25,7 +24,14 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver} \
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@" \
     -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }

@@ -1,23 +1,22 @@
 # Contributor: Andrea Scarpino <andrea@archlinux.org>
 
-source ../frameworks.conf
 
 pkgname=kimageformats
-pkgver=${KFVersion}
+pkgver=5.47.0
 pkgrel=1
 pkgdesc='Image format plugins for Qt5'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kimageformats'
 license=('LGPL')
 depends=("qt5-base" 'jasper' 'openexr' 'karchive')
-makedepends=("extra-cmake-modules>=${KFECMVersion}")
+makedepends=("extra-cmake-modules>=5.47.0")
 checkdepends=("xorg-server-xvfb")
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname})
-                        SKIP)
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('8e5c2cb68ee57bf902cfbe72db1e9543819dcbcf40c652d96bccfab45de346a6'
+            SKIP)
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
 
 prepare() {
   mkdir -p build
@@ -25,7 +24,14 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@"
   make
 }
 

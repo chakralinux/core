@@ -1,23 +1,22 @@
 # Contributor: Andrea Scarpino <andrea@archlinux.org>
 
-source ../frameworks.conf
 
 pkgname=kparts
-pkgver=${KFVersion}
+pkgver=5.47.0
 pkgrel=1
 pkgdesc='Document centric plugin system'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kparts'
 license=('LGPL')
 depends=('kio')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" "python3")
+makedepends=("extra-cmake-modules>=5.47.0" "python3")
 checkdepends=("cmake" "xorg-server-xvfb")
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname})
-                        SKIP)
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('4ed3f8ac1d937a1a159f9320893c61a6a89bfcba98a946214e06cb856c9d41ac'
+            SKIP)
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
 
 prepare() {
   mkdir -p build
@@ -26,7 +25,14 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver} \
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@" \
     -DPYTHON_EXECUTABLE=/usr/bin/python3
   make
 }

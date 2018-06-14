@@ -1,9 +1,7 @@
 #contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/extra-cmake-modules
 
-source ../frameworks.conf
-
 pkgname=extra-cmake-modules
-pkgver=$KFECMVersion
+pkgver=5.47.0
 pkgrel=1
 pkgdesc='Extra CMake modules'
 arch=('x86_64')
@@ -11,13 +9,22 @@ url='https://projects.kde.org/projects/kdesupport/extra-cmake-modules'
 license=('LGPL')
 depends=('cmake')
 makedepends=('qt5-tools' 'python3-sphinx')
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname})
-                        SKIP)
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('976d8bd15a0b929376bfaef34602a0fb9614229851c46fac3c4b28938f682195'
+            SKIP)
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
+
 
 prepare() {
   mkdir -p build
+}
+
+build() {
+  cd build
+   cmake ../${pkgname}-${pkgver} \
+     -DCMAKE_INSTALL_PREFIX=/usr \
+     -DCMAKE_BUILD_TYPE=RelWithDebInfo
+  make
 }
 
 check() {
@@ -38,14 +45,6 @@ check() {
   # This reverts commit 009c480413910e8c1a18f4d1420f4a517ea606e6.
 
   make test | true
-}
-
-build() {
-  cd build
-   cmake ../${pkgname}-${pkgver} \
-     -DCMAKE_INSTALL_PREFIX=$KFInstallPrefix \
-     -DCMAKE_BUILD_TYPE=$KFBuildType
-  make
 }
 
 package() {

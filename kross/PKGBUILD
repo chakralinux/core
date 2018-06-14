@@ -1,23 +1,22 @@
 # Contributor: Andrea Scarpino <andrea@archlinux.org>
 
-source ../frameworks.conf
 
 pkgname=kross
-pkgver=${KFVersion}
+pkgver=5.47.0
 pkgrel=1
 pkgdesc='Multi-language application scripting'
 arch=('x86_64')
 url='https://projects.kde.org/projects/frameworks/kross'
 license=('LGPL')
 depends=('kparts')
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'kdoctools' 'qt5-tools')
+makedepends=("extra-cmake-modules>=5.47.0" 'kdoctools' 'qt5-tools')
 checkdepends=('xorg-server-xvfb')
 groups=('kf5-aids')
 options=("debug")
-source=("${KFServer}/portingAids/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname})
-                        SKIP)
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/portingAids/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('01af097ef87d37ca21ce87b4ee6b67555f2c1051167d1e6b553748181ddaca8e'
+            SKIP)
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
 
 prepare() {
   mkdir -p build
@@ -25,7 +24,14 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@"
   make
 }
 

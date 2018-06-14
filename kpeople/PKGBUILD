@@ -1,22 +1,21 @@
-source ../frameworks.conf
 
 pkgname=kpeople
-pkgver=${KFVersion}
+pkgver=5.47.0
 pkgrel=1
 pkgdesc='A library that provides access to all contacts and the people who hold them'
 arch=('x86_64')
 url='http://community.kde.org/KTp/libkpeople'
 license=(LGPL)
 depends=('kservice' 'kwidgetsaddons' 'kitemviews' "qt5-declarative")
-makedepends=("extra-cmake-modules>=${KFECMVersion}" 'python3')
+makedepends=("extra-cmake-modules>=5.47.0" 'python3')
 conflicts=('libkpeople')
 #replaces=('libkpeople') # enable only when we switch to P5
 groups=('kf5')
 options=("debug")
-source=("${KFServer}/${pkgname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname})
-                        SKIP)
-validpgpkeys=( ${KFvalidpgpkeys[@]} )
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('0bb7fad53b13bd1cb40d9339a0782b4902517b751f0f8271c1adc2ce6571a18f'
+            SKIP)
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
 
 prepare() {
   mkdir -p build
@@ -24,7 +23,14 @@ prepare() {
 
 build() { 
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver}
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@"
   make
 }
 
