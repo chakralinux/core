@@ -33,7 +33,8 @@ prepare() {
 
 build() {
   cd build
-  cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  cmake ../${_pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DKDE_INSTALL_LIBDIR=lib \
         -DKDE_INSTALL_SYSCONFDIR=/etc \
@@ -44,7 +45,8 @@ build() {
   make
 
   cd ../build4
-  cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  cmake ../${_pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DKDE_INSTALL_LIBDIR=lib \
         -DKDE_INSTALL_SYSCONFDIR=/etc \
