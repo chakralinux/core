@@ -19,18 +19,24 @@ validpgpkeys=('2D1D5B0588357787DE9EE225EC94D18F7F05997E'  # Jonathan Riddell
               '1FA881591C26B276D7A5518EEAAF29B42A678C20') # Marco Martin <notmart@gmail.com>
 
 prepare() {
-  cd ${srcdir}/${_pkgname}-${pkgver}
   mkdir -p build
 }
 
 build() {
-  cd ${srcdir}/${_pkgname}-${pkgver}/build
-  cmake_kf5 .. \
-    -DLIBEXEC_INSTALL_DIR=lib/polkit-kde 
+  cd build
+  cmake ../${_pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DUDEV_RULES_INSTALL_DIR=/usr/lib/udev/rules.d \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@"  -DLIBEXEC_INSTALL_DIR=lib/polkit-kde 
   make
 }
 
 package() {
-  cd ${srcdir}/${_pkgname}-${pkgver}/build
+  cd build
   make DESTDIR="$pkgdir" install
 }

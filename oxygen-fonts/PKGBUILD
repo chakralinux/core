@@ -1,8 +1,7 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/ttf-oxygen
-source ../plasma.conf
 
 pkgname=oxygen-fonts
-pkgver=${PVersion}
+pkgver=5.13.0
 pkgrel=1
 pkgdesc='The Oxygen font family. A desktop/gui font family for integrated use with the KDE desktop'
 url='https://projects.kde.org/projects/kde/workspace/oxygen-fonts'
@@ -15,8 +14,13 @@ depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
 makedepends=('extra-cmake-modules' 'qt5-base' 'fontforge')
 options=('!emptydirs')
 install=${pkgname}.install
-source=("${PServer}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=( $(getSum ${pkgname} | head -n 1) )
+source=("https://download.kde.org/stable/plasma/$pkgver/$_pkgname-$pkgver.tar.xz"{,.sig})
+sha256sums=('95dd1da6458f0777f494d18647e07776c77477a6887316738868a54f5f024b69'
+             'SKIP' )
+validpgpkeys=('2D1D5B0588357787DE9EE225EC94D18F7F05997E'  # Jonathan Riddell
+              '0AAC775BB6437A8D9AF7A3ACFE0784117FBCE11D'  # Bhushan Shah <bshah@kde.org>
+              'D07BD8662C56CB291B316EB2F5675605C74E02CF'  # David Edmundson
+              '1FA881591C26B276D7A5518EEAAF29B42A678C20') # Marco Martin <notmart@gmail.com>
 
 prepare() {
   mkdir -p build
@@ -24,7 +28,15 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../oxygen-fonts-${pkgver}
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DUDEV_RULES_INSTALL_DIR=/usr/lib/udev/rules.d \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@"
   make
 }
 
