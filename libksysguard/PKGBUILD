@@ -1,9 +1,8 @@
 #Contributiosn from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/libksysguard
-source ../plasma.conf
 
 pkgname=libksysguard
-pkgver=${PVersion}
-pkgrel=2
+pkgver=5.13.0
+pkgrel=1
 pkgdesc="KSysguard library"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/libksysguard'
@@ -12,10 +11,13 @@ depends=(libxres qt5-webkit kwindowsystem kconfigwidgets)
 makedepends=(extra-cmake-modules kdoctools python3 plasma-framework)
 groups=('plasma')
 options=("debug")
-source=("${PServer}/${pkgver}/${pkgname}-${PVersion}.tar.xz"{,.sig})
-sha256sums=( $(getSum ${pkgname}) 
+source=("https://download.kde.org/stable/plasma/$pkgver/$pkgname-$pkgver.tar.xz"{,.sig})
+sha256sums=('416d28f0dbfde88bffb83feea4d8c9d6af6ec23032b62bbf951957a16a166885'
              'SKIP' )
-validpgpkeys=(${Pvalidpgpkeys[@]})
+validpgpkeys=('2D1D5B0588357787DE9EE225EC94D18F7F05997E'  # Jonathan Riddell
+              '0AAC775BB6437A8D9AF7A3ACFE0784117FBCE11D'  # Bhushan Shah <bshah@kde.org>
+              'D07BD8662C56CB291B316EB2F5675605C74E02CF'  # David Edmundson
+              '1FA881591C26B276D7A5518EEAAF29B42A678C20') # Marco Martin <notmart@gmail.com>
 
 prepare() {
   mkdir -p build
@@ -23,7 +25,15 @@ prepare() {
 
 build() {
   cd build
-  cmake_kf5 ../${pkgname}-${pkgver} \
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DUDEV_RULES_INSTALL_DIR=/usr/lib/udev/rules.d \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@" \
      -DPYTHON_EXECUTABLE=/usr/bin/python3
     make
 }

@@ -51,6 +51,7 @@ build()
 
         # update version
         sed -r "s|pkgver=.*|pkgver=$Version|g" -i PKGBUILD
+        sed -r "s|pkgrel=.*|pkgrel=1|g" -i PKGBUILD
         sed -r 's|"extra-cmake-modules>=[^"]*"|"extra-cmake-modules>='${Version}'"|g' -i PKGBUILD
 
         # update source link
