@@ -57,8 +57,8 @@ package() {
   make INSTALL_ROOT="$pkgdir" install
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
-  find "${pkgdir}/usr/lib" -type f -name *.prl \
-    -exec sed -i -e /^QMAKE_PRL_BUILD_DIR/d {} ;
+  find "${pkgdir}/usr/lib" -type f -name '*.prl' \
+    -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} ;
 
   install -Dm644 "$srcdir"/${_pkgfqn}/src/3rdparty/chromium/LICENSE "$pkgdir"/usr/share/licenses/${pkgname}/LICENSE.chromium
 }
