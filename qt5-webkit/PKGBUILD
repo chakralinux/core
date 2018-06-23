@@ -1,7 +1,7 @@
 pkgname=qt5-webkit
 _qtver=5.212.0-alpha2
-pkgver=5.11.1
-pkgrel=1
+pkgver=${_qtver/-/}
+pkgrel=7
 arch=(x86_64)
 url='http://qt-project.org/'
 license=(GPL3 LGPL3 FDL custom)
@@ -11,8 +11,7 @@ makedepends=(cmake ruby gperf python2 qt5-doc qt5-tools)
 optdepends=('gst-plugins-good: Webm codec support')
 groups=(qt5)
 _pkgfqn="${pkgname/5-/}-opensource-src-${_qtver}"
-_pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
-source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
+source=("https://github.com/annulen/webkit/releases/download/qtwebkit-$_qtver/qtwebkit-$_qtver.tar.xz"
         qt5-webkit-gcc7.patch
         qt5-webkit-null-pointer-dereference.patch
         qt5-webkit-trojita-1.patch::"https://github.com/annulen/webkit/commit/6faf1121.patch"
