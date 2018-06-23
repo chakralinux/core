@@ -1,7 +1,6 @@
-source ../qt5.conf
 
 pkgname=qt5-examples
-pkgver=${QSubVersion}
+pkgver=5.11.1
 pkgrel=1
 arch=('any')
 url='http://qt-project.org/'
@@ -10,8 +9,9 @@ pkgdesc='Examples and demos from qt5 documentation'
 depends=('qt5-doc')
 makedepends=()
 groups=('qt5')
-source=( $(getSrc "qt") )
-md5sums=( $(getSum "qt") )
+_pkgfqn="qt-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/single/${_pkgfqn}.tar.xz")
+md5sums=('')
 
 package() {
   _base="$pkgdir"/usr/share/doc/qt5/examples
@@ -20,9 +20,9 @@ package() {
   # QtCreator requires them to be in the same top-level directory.
   # Matching the Qt5 installer, only the qtbase project is kept.
   mkdir -p $_base
-  cp $(getPkgName "qt")/qtbase/examples/examples.pro $_base
+  cp ${_pkgfqn}/qtbase/examples/examples.pro $_base
 
-  _fdirs=$(find "$(getPkgName "qt")" -maxdepth 2 -type d -name examples)
+  _fdirs=$(find "${_pkgfqn}" -maxdepth 2 -type d -name examples)
   for _dir in $_fdirs; do
       _mod=$(basename ${_dir%/examples})
 

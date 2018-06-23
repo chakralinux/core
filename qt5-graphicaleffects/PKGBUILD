@@ -1,7 +1,6 @@
-source ../qt5.conf
 
 pkgname=qt5-graphicaleffects
-pkgver=${QSubVersion}
+pkgver=5.11.1
 pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
@@ -11,8 +10,9 @@ depends=('qt5-declarative')
 makedepends=()
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname}) )
-md5sums=( $(getSum ${pkgname}) )
+_pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
+md5sums=('90e4ec0ff93a07abcb121e33196f44eb')
 
 prepare() {
   mkdir -p build
@@ -21,7 +21,7 @@ prepare() {
 build() {
   cd build
 
-  qmake-qt5 ../$(getPkgName ${pkgname})
+  qmake-qt5 ../${_pkgfqn}
   make
 }
 

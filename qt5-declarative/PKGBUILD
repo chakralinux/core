@@ -1,7 +1,6 @@
-source ../qt5.conf
 
 pkgname=qt5-declarative
-pkgver=${QSubVersion}
+pkgver=5.11.1
 pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
@@ -13,8 +12,9 @@ conflicts=('qt5-declarative-render2d')
 replaces=('qt5-declarative-render2d')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname}) )
-md5sums=( $(getSum ${pkgname}) )
+_pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
+md5sums=('cc655aaa10c47a84c41e8f0eb3bce112')
 
 prepare() {
   mkdir -p build
@@ -27,7 +27,7 @@ build() {
   cd build
 
   export PYTHON=python2
-  qmake-qt5 ../$(getPkgName ${pkgname})
+  qmake-qt5 ../${_pkgfqn}
   make
 }
 
@@ -42,7 +42,8 @@ package() {
   done
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
-  qtprlfix
+  find "${pkgdir}/usr/lib" -type f -name *.prl \
+    -exec sed -i -e /^QMAKE_PRL_BUILD_DIR/d {} ;
 
   install -d "$pkgdir"/usr/share/licenses
   ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/${pkgname}

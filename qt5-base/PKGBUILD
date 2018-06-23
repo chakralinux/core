@@ -1,8 +1,7 @@
-source ../qt5.conf
 
 pkgbase=qt5-base
 pkgname=(qt5-base qt5-xcb-private-headers)
-pkgver=${QSubVersion}
+pkgver=5.11.1
 pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
@@ -21,13 +20,12 @@ optdepends=('qt5-svg: to use SVG icon themes'
             'mtdev: evdev plugin')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname}) 
-        qt-private-includes.patch::"http://code.qt.io/cgit/qt/qtbase.git/patch/?id=67aa365d")
-md5sums=($(getSum ${pkgname})
-         'aad1e05394f971c793771d4c0aacbd6f')
+_pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
+md5sums=('c656471f138d3810187a523293e2cc28')
 
 prepare() {
-  cd $(getPkgName ${pkgname})
+  cd ${_pkgfqn}
 
   # Build qmake using Chakra {C,LD}FLAGS
   # This also sets default {C,CXX,LD}FLAGS for projects built using qmake
@@ -45,7 +43,7 @@ prepare() {
 }
 
 build() {
-  cd $(getPkgName ${pkgname})
+  cd ${_pkgfqn}
 
   PYTHON=/usr/bin/python2 ./configure -confirm-license -opensource -v \
     -prefix /usr \
@@ -80,17 +78,18 @@ build() {
 package_qt5-base() {
   pkgdesc='A cross-platform application and UI framework'
 
-  cd $(getPkgName ${pkgname})
+  cd ${_pkgfqn}
   make INSTALL_ROOT="${pkgdir}" install
 
   install -D -m644 LGPL_EXCEPTION.txt \
     "${pkgdir}"/usr/share/licenses/${pkgbase}/LGPL_EXCEPTION.txt
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
-  qtprlfix
+  find "${pkgdir}/usr/lib" -type f -name *.prl \
+    -exec sed -i -e /^QMAKE_PRL_BUILD_DIR/d {} ;
 
   # Fix wrong qmake path in pri file
-  sed -i "s|${srcdir}/$(getPkgName ${pkgname})|/usr|" \
+  sed -i "s|${srcdir}/${_pkgfqn}|/usr|" \
     "${pkgdir}"/usr/lib/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri
 
   # Useful symlinks
@@ -108,7 +107,7 @@ package_qt5-xcb-private-headers() {
   groups=()
   conflicts=()
 
-  cd $(getPkgName ${pkgbase})
+  cd ${_pkgfqn}
   install -d -m755 "$pkgdir"/usr/include/qtxcb-private
   cp -r src/plugins/platforms/xcb/*.h "$pkgdir"/usr/include/qtxcb-private/
 }
