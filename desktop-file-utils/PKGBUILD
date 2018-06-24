@@ -1,21 +1,44 @@
 pkgname=desktop-file-utils
-pkgver=0.23
+pkgver=0.23+4+g92af410
 pkgrel=1
 pkgdesc="Command line utilities for working with desktop entries"
 arch=('x86_64')
 url="http://www.freedesktop.org/wiki/Software/desktop-file-utils"
 license=('GPL')
 depends=('glib2')
-source=(http://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-${pkgver}.tar.xz)
-md5sums=('599133d51cc9a41bfec186414906b6f1')
+makedepends=(git)
+source=("git+https://anongit.freedesktop.org/git/xdg/desktop-file-utils"
+        'update-desktop-database.hook')
+#source=(https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-${pkgver}.tar.xz)
+md5sums=('SKIP'
+         '63b2a090a303cbf9e244dc79b40fd81b')
+validpgpkeys=('C01EDE5BB0D91E26D003662EC76BB9FEEAD12EA7') #Hans Petter Jansson <hpj@suse.com>
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed 's/-/+/g'
+}
+
+prepare() {
+  cd $pkgname
+  NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd "${srcdir}/desktop-file-utils-${pkgver}"
+  cd "$pkgname"
   ./configure --prefix=/usr
   make
 }
 
+check() {
+  cd $pkgname
+  make check
+}
+
 package() {
-  cd "${srcdir}/desktop-file-utils-${pkgver}"
+  cd "$pkgname"
   make DESTDIR="${pkgdir}" install
+
+  # install pacman hook
+  install -Dm644 "$srcdir"/update-desktop-database.hook "$pkgdir"/usr/share/libalpm/hooks/update-desktop-database.hook
 }
