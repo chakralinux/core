@@ -54,24 +54,6 @@ post_install() {
   chgrp systemd-journal-remote var/log/journal/remote
 }
 
-# Do not remove this. otherwise next reboot will have mismatched systemd,
-# which may make system fail to start some services. Unless we have proper
-# hook in pacman (not yet because it's in pacman 5).
-update_image() {
-  if which mkinitcpio >/dev/null 2>&1; then
-    echo ">>> Generating initial ramdisk, using mkinitcpio.  Please wait..."
-    echo ">>> If you are using non-default kernel, you should update kernel"
-    echo ">>> manually"
-    if [ -f etc/mkinitcpio.d/linux-CHAKRA.preset ]; then
-      mkinitcpio -p linux-CHAKRA
-    fi
-    if [ -f etc/mkinitcpio.d/linux-CHAKRA-LTS.preset ]; then
-      mkinitcpio -p linux-CHAKRA-LTS
-    fi
-  fi
-}
-
-
 post_upgrade() {
   post_common "$@"
 
@@ -86,6 +68,4 @@ post_upgrade() {
       "_${v//-/_}_changes"
     fi
   done
-
-  update_image
 }
