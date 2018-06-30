@@ -1,7 +1,6 @@
-source ../qt5.conf
 
 pkgname=qt5-wayland
-pkgver=${QSubVersion}
+pkgver=5.11.1
 pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
@@ -10,8 +9,9 @@ pkgdesc='Provides APIs for Wayland'
 depends=('qt5-declarative' 'libxcomposite')
 makedepends=()
 groups=('qt5')
-source=( $(getSrc ${pkgname}) )
-md5sums=( $(getSum ${pkgname}) )
+_pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
+md5sums=('26d9d22805572adb75610da4316736cd')
 
 prepare() {
   mkdir -p build
@@ -23,21 +23,22 @@ build() {
   # build bug: https://bugreports.qt.io/browse/QTBUG-54148
   #- out-of-tree build fails
 
-  #qmake-qt5 ../$(getPkgName ${pkgname})
-  #qmake-qt5 ../$(getPkgName ${pkgname})/src/plugins
+  #qmake-qt5 ../${_pkgfqn}
+  #qmake-qt5 ../${_pkgfqn}/src/plugins
   
-  cd $(getPkgName ${pkgname})
+  cd ${_pkgfqn}
   qmake-qt5 .
   make
 }
 
 package() {
   #cd build
-  cd $(getPkgName ${pkgname})
+  cd ${_pkgfqn}
   make INSTALL_ROOT="$pkgdir" install
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
-  qtprlfix
+  find "${pkgdir}/usr/lib" -type f -name '*.prl' \
+    -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
 
   install -d "$pkgdir"/usr/share/licenses
   ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/${pkgname}

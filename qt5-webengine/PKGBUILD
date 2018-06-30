@@ -1,8 +1,7 @@
-source ../qt5.conf
 
 pkgname=qt5-webengine
-pkgver=${QSubVersion}
-pkgrel=2
+pkgver=5.11.1
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('LGPL3' 'LGPL2.1' 'BSD')
@@ -12,16 +11,14 @@ depends=('qt5-webchannel' 'qt5-location' 'libxcomposite' 'libxrandr' 'pciutils' 
 makedepends=('python2' 'git' 'gperf' 'jsoncpp' 'ninja' 'qt5-tools')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname})
-         qtwebengine-harmony.patch qtwebengine-gcc8.patch qtwebengine-ffmpeg4.patch
-         falkon-copy-menu.patch::"http://code.qt.io/cgit/qt/qtwebengine.git/patch/?id=af0c47b1"
-         qtwebengine-no-gpu.patch)
-md5sums=( $(getSum ${pkgname})
+_pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz"
+         qtwebengine-harmony.patch qtwebengine-ffmpeg4.patch
+         qtwebengine-wayland.patch::"http://code.qt.io/cgit/qt/qtwebengine.git/patch/?id=a66d4cd8")
+md5sums=('75d2ff31addba4ec41981b0f459cc587'
          '254061cb349cff714230b7cca83b0a4c'
-         'c5779e35eb15edf97789885a72ec873a'
          '2835f9fe8097ff3d6098812c70f48044'
-         '4fd37c3ceb4a1f92276cae2c83ee1a5a'
-	 'c182ccd60d079d65203e112c30a4217d')
+         '04360a0896a267ee6b32df946db8202f')
 
 prepare() {
   mkdir -p build
@@ -30,17 +27,14 @@ prepare() {
   mkdir -p bin
   ln -s /usr/bin/python2 bin/python
 
-  cd $(getPkgName ${pkgname})
+  cd ${_pkgfqn}
 
   # FreeType 2.8.1
   patch -Np1 -i ../qtwebengine-harmony.patch
-  # Fix copy context menu
-  patch -p1 -i "$srcdir"/falkon-copy-menu.patch
-  # Disable GPU rendering on Wayland https://bugreports.qt.io/browse/QTBUG-68479
-  patch -p1 -i "$srcdir"/qtwebengine-no-gpu.patch
-  # Fix build with gcc8 (Fedora)
+  # Fix openGL detection on Wayland
+  patch -p1 -i ../qtwebengine-wayland.patch
+
   cd src/3rdparty/chromium
-  patch -p1 -i "$srcdir"/qtwebengine-gcc8.patch
   # Fix build with ffmpeg 4
   patch -p2 -i "$srcdir"/qtwebengine-ffmpeg4.patch
 }
@@ -49,7 +43,7 @@ build() {
   cd build
 
   export PATH="$srcdir/bin:$PATH"
-  qmake-qt5 ../$(getPkgName ${pkgname}) -- \
+  qmake-qt5 ../${_pkgfqn} -- \
     -proprietary-codecs \
     -system-ffmpeg \
     -webp \
@@ -63,7 +57,8 @@ package() {
   make INSTALL_ROOT="$pkgdir" install
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
-  qtprlfix
+  find "${pkgdir}/usr/lib" -type f -name '*.prl' \
+    -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
 
-  install -Dm644 "$srcdir"/$(getPkgName ${pkgname})/src/3rdparty/chromium/LICENSE "$pkgdir"/usr/share/licenses/${pkgname}/LICENSE.chromium
+  install -Dm644 "$srcdir"/${_pkgfqn}/src/3rdparty/chromium/LICENSE "$pkgdir"/usr/share/licenses/${pkgname}/LICENSE.chromium
 }

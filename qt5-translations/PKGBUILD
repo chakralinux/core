@@ -1,7 +1,6 @@
-source ../qt5.conf
 
 pkgname=qt5-translations
-pkgver=${QSubVersion}
+pkgver=5.11.1
 pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
@@ -10,8 +9,9 @@ pkgdesc='A cross-platform application and UI framework (Translations)'
 depends=('qt5-base')
 makedepends=('qt5-tools')
 groups=('qt5')
-source=( $(getSrc ${pkgname}) )
-md5sums=( $(getSum ${pkgname}) )
+_pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
+md5sums=('67c0dbd61c2b92552b5339d82a94b1a8')
 
 prepare() {
   mkdir -p build
@@ -20,7 +20,7 @@ prepare() {
 build() {
   cd build
 
-  qmake-qt5 ../$(getPkgName ${pkgname})  
+  qmake-qt5 ../${_pkgfqn}  
   make
 }
 

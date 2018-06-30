@@ -1,7 +1,6 @@
-source ../qt5.conf
 
 pkgname=qt5-tools
-pkgver=${QSubVersion}
+pkgver=5.11.1
 pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
@@ -12,9 +11,10 @@ makedepends=('qt5-declarative' 'qt5-webkit' 'vulkan-headers' 'clang')
 optdepends=('clang: for qdoc' 'qt5-webkit: for Qt Assistant')
 groups=('qt5')
 options=('debug')
-source=( $(getSrc ${pkgname}) 
+_pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz"
         {assistant,designer,linguist,qdbusviewer}-qt5.desktop)
-md5sums=( $(getSum ${pkgname}) 
+md5sums=('41aea9500d21bd03bfa718b1d715cbba'
          '892d3632bdcd9a22f191aa8f28a3c0e1'
          '208921efc9e4c11fae762e9580ca23aa'
          '59cbeef3e6090dcb7d2a7d32cd62ea08'
@@ -27,7 +27,7 @@ prepare() {
 build() {
   cd build
 
-  qmake-qt5 ../$(getPkgName ${pkgname}) 
+  qmake-qt5 ../${_pkgfqn} 
   make
 }
 
@@ -35,7 +35,7 @@ package() {
   cd build
   make INSTALL_ROOT="${pkgdir}" install
 
-  cd ../$(getPkgName ${pkgname}) 
+  cd ../${_pkgfqn} 
   # install missing icons and desktop files
   for icon in src/linguist/linguist/images/icons/linguist-*-32.png ; do
     size=$(echo $(basename ${icon}) | cut -d- -f2)
@@ -64,7 +64,8 @@ package() {
   done
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
-  qtprlfix
+  find "${pkgdir}/usr/lib" -type f -name '*.prl' \
+    -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
 
   install -d "$pkgdir"/usr/share/licenses
   ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/${pkgname}
