@@ -6,7 +6,7 @@ _jdk_build=02
 # check latest release: http://jdk.java.net/8/
 pkgver=${_java_ver}.u${_jdk_update}	
 _repo_ver=jdk${_java_ver}u${_jdk_update}-b${_jdk_build}
-pkgrel=3
+pkgrel=4
 pkgdesc="An open-source implementation of the seventh edition of the Java SE Platform."
 arch=('x86_64')
 url="http://icedtea.classpath.org/"
@@ -70,7 +70,7 @@ build() {
   unset JAVA_HOME
   # http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1346
   export MAKEFLAGS=${MAKEFLAGS/-j*}
-  export CFLAGS="${CFLAGS} -Wno-error=deprecated-declarations"
+  export CFLAGS="${CFLAGS} -Wno-error=deprecated-declarations -fno-lifetime-dse -fno-delete-null-pointer-checks"
 
   install -d -m 755 "${srcdir}/${_prefix}/"
   sh configure \
