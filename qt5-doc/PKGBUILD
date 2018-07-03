@@ -1,7 +1,6 @@
-source ../qt5.conf
 
 pkgname=qt5-doc
-pkgver=${QSubVersion}
+pkgver=5.11.1
 pkgrel=1
 arch=('any')
 url='http://qt-project.org/'
@@ -10,11 +9,12 @@ pkgdesc='A cross-platform application and UI framework (Documentation)'
 depends=('qt5-base')
 makedepends=('qt5-tools' 'python2' 'pciutils' 'libxtst' 'libxcursor' 'libxrandr' 'libxss')
 groups=('qt5')
-source=( $(getSingleSrc "qt") )
-md5sums=( $(getSum "qt") )
+_pkgfqn="qt-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/single/${_pkgfqn}.tar.xz")
+md5sums=('26a2b31d8a4dce8260048f6d18fb6fc3')
 
 prepare() {
-  cd $(getPkgName "qt")
+  cd ${_pkgfqn} 
 
   ln -s /usr/lib/qt5/bin qttools/
   ln -s /usr/lib/qt5/bin/{rcc,uic,moc} qtbase/bin/
@@ -26,7 +26,7 @@ prepare() {
 }
 
 build() {
-  cd $(getPkgName "qt")
+  cd ${_pkgfqn} 
 
   export PATH="$srcdir/bin:$PATH"
   PYTHON=/usr/bin/python2 ./configure -confirm-license -opensource \
@@ -48,7 +48,7 @@ build() {
 }
 
 package() {
-  cd $(getPkgName "qt")
+  cd ${_pkgfqn} 
   make INSTALL_ROOT="$pkgdir" install_docs
 
   install -d "$pkgdir"/usr/share/licenses

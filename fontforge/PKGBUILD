@@ -1,35 +1,23 @@
-#contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/fontforge
 
 pkgname=fontforge
-_pkgver=2014-11-26
-pkgver=${_pkgver//-/}
+pkgver=20170731
 pkgrel=1
-pkgdesc="An outline and bitmap font editor"
+pkgdesc='Outline and bitmap font editor'
+url='https://fontforge.github.io/'
 arch=('x86_64')
-url="http://www.fontforge.org"
 license=('BSD')
-depends=('libtool' 'libxkbui' 'libxi' 'pango' 'giflib' 'libtiff' 'libspiro' 'libxml2' 'libunicodenames'
-         'zeromq' 'python2' 'desktop-file-utils' 'hicolor-icon-theme' )
-install=${pkgname}.install
-source=("http://github.com/fontforge/fontforge/releases/download/${pkgver}/fontforge-${_pkgver}-Unix-Source.tar.gz"
-        'http://fontforge.org/cidmaps.tgz')
-sha1sums=('ecd776480a47cdcbe1b30ce275172d7d52288e77'
-          'efbc7c9d3e95159f5600dc71f9cccb370e46bb94')
-
-prepare() {
-	cd "${srcdir}/${pkgname}-${pkgver}"
-	rm -fr libltdl
-	for i in m4/*.m4; do
-		if [[ ! -L $i ]]; then continue; fi
-		j=$(readlink "$i")
-		ln -sf "${j/aclocal\//aclocal\/lt}" "$i"
-	done
-}
+makedepends=('git')
+depends=('libtool' 'libxkbui' 'libxi'
+         'pango' 'giflib' 'libtiff' 'libxml2' 'libspiro' 'libunicodenames' 'zeromq'
+         'python3' 'desktop-file-utils' 'gtk-update-icon-cache' 'hicolor-icon-theme')
+source=("https://github.com/fontforge/fontforge/archive/${pkgver}.tar.gz"
+        'https://fontforge.github.io/cidmaps.tgz')
+sha256sums=('89203db05658e79418104fb6442b3feffb20762198c2d8b0343db49a07769302'
+            '1bf9c7eb8835e6ed94e62cb49f1141bc046c562849e52e6c3c7f1d7cfc95c7b3')
 
 build() {
 	cd "${srcdir}/${pkgname}-${pkgver}"
 	export LIBZMQ_LIBS=-lzmq
-	export PYTHON=python2
 	./bootstrap --force
 	./configure \
 		--prefix=/usr \
@@ -44,10 +32,6 @@ package() {
 
 	install -d "${pkgdir}/usr/share/fontforge"
 	install -m644 ../Adobe-* "${pkgdir}/usr/share/fontforge"
-
-	install -d "${pkgdir}/usr/share/icons"
-	cp -a desktop/icons "${pkgdir}/usr/share/icons/hicolor"
-	rm -fr "${pkgdir}/usr/share/icons/hicolor/src"
 
 	install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 	install -Dm644 desktop/fontforge.desktop "${pkgdir}/usr/share/applications/fontforge.desktop"
