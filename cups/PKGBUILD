@@ -1,7 +1,7 @@
 pkgbase="cups"
 pkgname=('libcups' 'cups')
-pkgver=2.2.6
-pkgrel=4
+pkgver=2.2.8
+pkgrel=1
 arch=('x86_64')
 license=('GPL')
 url="http://www.cups.org/"
@@ -9,25 +9,31 @@ makedepends=('libtiff>=4.0.0' 'libpng>=1.5.7' 'acl' 'pam' 'xdg-utils' 'krb5' 'gn
              'cups-filters' 'bc' 'colord' 'xinetd' 'gzip' 'autoconf' 'libusb' 'dbus' 
              'avahi'  'hicolor-icon-theme' 'systemd' 'inetutils' 'libpaper' 'valgrind')
 source=("https://github.com/apple/cups/releases/download/v${pkgver}/${pkgbase}-${pkgver}-source.tar.gz"{,.sig}
-        cups.logrotate cups.pam
+        cups.logrotate
+        cups.pam
+        cups.sysusers
         # improve build and linking
         cups-no-export-ssllibs.patch
         cups-no-gzip-man.patch
         cups-1.6.2-statedir.patch
         # bugfixes
         cups-systemd-socket.patch
-        cups-ppdLocalize.patch
-)
-md5sums=('e91c26d8d97b5a1630a962f530f02192'
+        guid.patch
+        cups-2.2.8-5325.patch)
+md5sums=('33150d08993a04c8e22176e93805a051'
          'SKIP'
          'fc8286f185e2cc5f7e1f6843bf193e2b'
          '96f82c38f3f540b53f3e5144900acf17'
+         '76422fe851f79800a3b0a83467c3fceb'
          '3ba9e3410df1dc3015463d615ef91b3b'
          '39dd3141991c3052b73f59ece70e1ea6'
          '451609db34f95209d64c38474de27ce1'
-         '53bb3c80ee6823d36f9ab499373edfc5'
-         '95f76349f46cd05c5943e2459dd1e747')
-validpgpkeys=('3737FD0D0E63B30172440D2DDBA3A7AB08D76223') # CUPS.org (CUPS.org PGP key) <security [at] cups.org>
+         '2642d914f0b3b05f9c38d9864b670302'
+         'e42820dd62ef79f1a2f0448bf06393d2'
+         'e9825ade79e15524a85a00820a20d324')
+validpgpkeys=('3737FD0D0E63B30172440D2DDBA3A7AB08D76223') # CUPS.org (CUPS.org PGP key) <security@cups.org>
+validpgpkeys+=('45D083946E3035282B3CCA9AF434104235DA97EB') # "CUPS.org <security@cups.org>"
+validpgpkeys+=('845464660B686AAB36540B6F999559A027815955') # "Michael R Sweet <michael.r.sweet@gmail.com>"
 
 prepare() {
 
@@ -45,7 +51,10 @@ prepare() {
   # make sure network is up when starting and notify systemd - FC
   patch -Np1 -i ${srcdir}/cups-systemd-socket.patch
   # https://github.com/apple/cups/pull/5303
-  patch -Np1 -i ${srcdir}/cups-ppdLocalize.patch
+  patch -Np1 -i ${srcdir}/cups-2.2.8-5325.patch
+  
+  # FS#56818 - https://github.com/apple/cups/issues/5236
+  patch -Np1 -i ${srcdir}/guid.patch
   
   # set MaxLogSize to 0 to prevent using cups internal log rotation
   sed -i -e '5i\ ' conf/cupsd.conf.in
@@ -67,8 +76,8 @@ build() {
      --with-logdir=/var/log/cups \
      --with-docdir=/usr/share/cups/doc \
      --with-exe-file-perm=0755 \
-     --with-cups-user=daemon \
-     --with-cups-group=lp \
+     --with-cups-user=209 \
+     --with-cups-group=209 \
      --enable-pam=yes \
      --enable-raw-printing \
      --enable-dbus --with-dbusdir=/etc/dbus-1 \
@@ -83,7 +92,7 @@ build() {
 
 package_libcups() {
 pkgdesc="The CUPS Printing System - client libraries and headers"
-depends=('gnutls>=3.4.6' 'libtiff>=4.0.0' 'libpng>=1.5.7' 'krb5' 'avahi' 'libusb')
+depends=('gnutls' 'libtiff>=4.0.0' 'libpng>=1.5.7' 'krb5' 'avahi' 'libusb')
 backup=(etc/cups/client.conf)
 
   cd ${pkgbase}-${pkgver}
@@ -91,15 +100,6 @@ backup=(etc/cups/client.conf)
   # put this into the libs pkg to make other software find the libs(no pkg-config file included)
   mkdir -p ${pkgdir}/usr/bin 
   install -m755 ${srcdir}/${pkgbase}-${pkgver}/cups-config ${pkgdir}/usr/bin/cups-config
-  
-  # install client.conf man page and config file
-  install -dm755 ${pkgdir}/usr/share/man/man5
-  install -Dm644  ${srcdir}/${pkgbase}-${pkgver}/man/client.conf.man ${pkgdir}/usr/share/man/man5/
-  install -dm755 -g lp ${pkgdir}/etc/cups
-  touch ${pkgdir}/etc/cups/client.conf
-  echo "# see 'man client.conf'" >> ${pkgdir}/etc/cups/client.conf
-  echo "ServerName /run/cups/cups.sock #  alternative: ServerName hostname-or-ip-address[:port] of a remote server" >> ${pkgdir}/etc/cups/client.conf
-  chgrp -R lp ${pkgdir}/etc/cups
 }
 
 package_cups() {
@@ -134,8 +134,13 @@ optdepends=('xdg-utils: xdg .desktop file support')
   chmod 755 ${pkgdir}/var/spool
   chmod 755 ${pkgdir}/etc
 
+  # use cups group FS#36769
+  install -Dm644 "$srcdir"/cups.sysusers "${pkgdir}/usr/lib/sysusers.d/$pkgname.conf"
+  sed -i "s:#User 209:User 209:" ${pkgdir}/etc/cups/cups-files.conf{,.default}
+  sed -i "s:#Group 209:Group 209:" ${pkgdir}/etc/cups/cups-files.conf{,.default}
+
   # install ssl directory where to store the certs, solves some samba issues
-  install -dm700 -g lp ${pkgdir}/etc/cups/ssl
+  install -dm700 -g 209 ${pkgdir}/etc/cups/ssl
   # remove directory from package, it will be recreated at each server start
   rm -rf ${pkgdir}/run
 
@@ -143,7 +148,7 @@ optdepends=('xdg-utils: xdg .desktop file support')
   touch ${pkgdir}/etc/cups/printers.conf
   touch ${pkgdir}/etc/cups/classes.conf
   touch ${pkgdir}/etc/cups/subscriptions.conf 
-  chgrp -R lp ${pkgdir}/etc/cups
+  chgrp -R 209 ${pkgdir}/etc/cups
   
   # fix .desktop file
   sed -i 's|^Exec=htmlview http://localhost:631/|Exec=xdg-open http://localhost:631/|g' ${pkgdir}/usr/share/applications/cups.desktop
