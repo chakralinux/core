@@ -1,62 +1,122 @@
-pkgbase="foomatic"
-pkgname=('foomatic-db' 'foomatic-db-engine' 'foomatic-db-nonfree')
-arch=('x86_64')
-_snapdate=20161210
-_relver=4.0
-pkgver=${_relver}_${_snapdate}
-pkgrel=2
-makedepends=('cups' 'perl' 'libxml2' 'enscript' 'perl' 'net-snmp' 'bash')
-source=("http://www.openprinting.org/download/foomatic/${pkgbase}-db-engine-${_relver}-${_snapdate}.tar.gz"
-        "http://www.openprinting.org/download/foomatic/${pkgbase}-db-${_relver}-${_snapdate}.tar.xz"
-        "http://www.openprinting.org/download/foomatic/${pkgbase}-db-nonfree-${_snapdate}.tar.gz")
+pkgbase="foomatic-db"
+pkgname=('foomatic-db' 'foomatic-db-ppds' 'foomatic-db-nonfree' 'foomatic-db-nonfree-ppds')
+arch=('any')
+pkgver=20180709
+pkgrel=1
+
+makedepends=('cups' 'perl' 'libxml2' 'enscript' 'perl' 'net-snmp' 'bash' 'bzr')
 url="http://www.linuxprinting.org/foomatic.html"
 options=('!emptydirs')
-md5sums=('9692ec892f73160885c5da6d71db4dfd'
-         'b6cf3456db861b84f2ee191e88607eb0'
-         'c33e7804dfa33b769ed249a9e2f5af77')
+
+# check http://bzr.linuxfoundation.org/loggerhead/openprinting/foomatic/
+# for latest commits and development, identical to foomatic-4.0 branch
+
+source=(foomatic-db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/#revision=1322                    #2018-06-05
+        foomatic-db-nonfree::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db-nonfree/#revision=41      #2015-06-05
+)
+md5sums=('SKIP'
+         'SKIP')
+
+pkgver() {
+  date +%Y%m%d
+}
+
+prepare(){
+  cp -a foomatic-db foomatic-db-ppds
+  cp -a foomatic-db-nonfree foomatic-db-nonfree-ppds
+}
+
+build() {
+  # foomatic-db
+  pushd foomatic-db
+  ./make_configure
+  ./configure --prefix=/usr \
+    --disable-gzip-ppds \
+    --disable-ppds-to-cups \
+    --with-drivers=NOOBSOLETES,NOEMPTYCMDLINE
+  popd
+  
+  # foomatic-db-ppds
+  pushd foomatic-db-ppds
+  ./make_configure
+  ./configure --prefix=/usr
+  popd
+  
+  # foomatic-db-nonfree
+  pushd foomatic-db-nonfree
+  ./make_configure
+  ./configure --prefix=/usr
+  popd
+  
+  # foomatic-db-nonfree-ppds
+  pushd foomatic-db-nonfree-ppds
+  ./make_configure
+  ./configure --prefix=/usr
+  popd
+}
 
 package_foomatic-db() {
 
-  pkgdesc="Foomatic - The collected knowledge about printers, drivers, and driver options in XML files, used by foomatic-db-engine to generate PPD files."
-  arch=('any')
-  license=('GPL' 'custom')
-  depends=('perl' 'libxml2')
+ pkgdesc="Foomatic - The collected knowledge about printers, drivers, and driver options in XML files, used by foomatic-db-engine to generate PPD files."
+ license=('GPL' 'custom')
+ optdepends=('foomatic-db-ppds: PostScript PPD files')
+ replaces=('foomatic-db-foo2zjs') # AUR pkg no more conflicting and dropped, formerly required by foo2zjs-utils
+ conflicts=('foomatic-db-foo2zjs')
+ provides=('foomatic-db-foo2zjs')
 
-  cd "${srcdir}/${pkgname}-${_snapdate}"
-  ./configure --prefix=/usr
-  make DESTDIR="${pkgdir}" install 
-  install -v -Dm0644 "${srcdir}/${pkgname}-${_snapdate}/COPYING" "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+   cd ${srcdir}/foomatic-db
+   make DESTDIR=${pkgdir} install
+   
+   # add some docs
+   install -Dm644 USAGE ${pkgdir}/usr/share/doc/${pkgname}/USAGE
+   install -Dm644 README ${pkgdir}/usr/share/doc/${pkgname}/README
+   install -v -Dm644 ${srcdir}/${pkgname}/COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
+   install -Dm644 ${pkgdir}/usr/share/foomatic/db/source/PPD/Kyocera/ReadMe.htm ${pkgdir}/usr/share/doc/${pkgname}/Kyocera/ReadMe.htm
+   # remove files from foomatic-db-ppds pkg
+   rm -rf ${pkgdir}/usr/share/cups/model/foomatic-db-ppds
+   rm -rf ${pkgdir}/usr/share/foomatic/db/source/PPD
 }
 
-package_foomatic-db-engine() {
+package_foomatic-db-ppds() {
 
-  pkgdesc="Foomatic - Foomatic's database engine generates PPD files from the data in Foomatic's XML database. It also contains scripts to directly generate print queues and handle jobs."
-  arch=('x86_64')
-  license=('GPL')
-  depends=('perl' 'libxml2' 'cups-filters' 'bash')
+ pkgdesc="Foomatic - PPDs from printer manufacturers"
+ license=('GPL' 'custom')
 
-  cd "${srcdir}/foomatic-db-engine-${_relver}-${_snapdate}"
-  ./configure --prefix=/usr --libdir=/usr/lib
-  make 
-  eval `perl -V:archname`
-  make DESTDIR=${pkgdir} \
-       INSTALLARCHLIB=/usr/lib/perl5/vendor_perl/ \
-       INSTALLSITELIB=/usr/lib/perl5/vendor_perl/ \
-       INSTALLSITEARCH=/usr/lib/perl5/vendor_perl/ install 
-  /usr/bin/find ${pkgdir} -name '.packlist' -delete
-  # fix permissions
-  chmod 755 ${pkgdir}/usr/lib{,/perl5,/perl5/vendor_perl}
+   cd ${srcdir}/foomatic-db-ppds
+   make DESTDIR=${pkgdir} install
+
+   # remove files from foomatic-db pkg
+   rm -rf ${pkgdir}/usr/share/foomatic/db/oldprinterids
+   rm -rf ${pkgdir}/usr/share/foomatic/db/source/{driver,opt,printer}
+   rm -rf ${pkgdir}/usr/share/foomatic/xmlschema
+   rm -f ${pkgdir}/usr/share/foomatic/db/source/PPD/Kyocera/ReadMe.htm
+
+   install -v -Dm644 ${srcdir}/${pkgname}/COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
 }
 
 package_foomatic-db-nonfree() {
 
-  pkgdesc="Foomatic - database extension consisting of manufacturer-supplied PPD files released under non-free licenses"
-  arch=('any')
-  license=('custom')
-  depends=('perl' 'libxml2' "foomatic-db-engine" 'foomatic-db')
+ pkgdesc="Foomatic - database extension consisting of manufacturer-supplied PPD files released under non-free licenses"
+ license=('custom')
+ optdepends=('foomatic-db-nonfree-ppds: nonfree PPD files')
 
-  cd "${srcdir}/foomatic-db-nonfree-${_snapdate}"
-  ./configure --prefix=/usr
-  make DESTDIR="${pkgdir}" install 
-  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/foomatic-db-nonfree/COPYING"
+   cd ${srcdir}/foomatic-db-nonfree
+   make DESTDIR=${pkgdir} install
+   # remove files from foomatic-db-nonfree-ppds pkg
+   rm -rf ${pkgdir}/usr/share/foomatic/db/source/PPD
+   
+   install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
+}
+
+package_foomatic-db-nonfree-ppds() {
+
+ pkgdesc="Foomatic - non-free PPDs from printer manufacturers"
+ license=('custom')
+
+   cd ${srcdir}/foomatic-db-nonfree-ppds
+   make DESTDIR=${pkgdir} install
+   # remove files from foomatic-db-nonfree pkg
+   rm -rf ${pkgdir}/usr/share/foomatic/db/source/driver
+   
+   install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
 }
