@@ -69,7 +69,12 @@ build()
         fi
 
         _url=$source
-        _sha256sum=$(curl "$_url.sha256" | cut -c-64)
+        if [ -z ${SumsFile} ]; then
+            # variable is unset
+            _sha256sum=$(curl "$_url.sha256" | cut -c-64)
+        else
+            _sha256sum=$(cat "../${2}.sums" |grep $pkgname  | cut -c-64 | tail -1)
+        fi
         sed -r "s|sha256sums=.*|sha256sums=('$_sha256sum'|g" -i PKGBUILD
         echo $_sha256sum
         unset pkgver pkgname source _pkgname _pkgbase
@@ -88,5 +93,5 @@ fi
 # load the configurations
 source $1.conf
 
-time build "$1.order"
+time build "$1.order" $1
 
