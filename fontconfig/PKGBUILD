@@ -1,5 +1,5 @@
 pkgname=fontconfig
-pkgver=2.11.94
+pkgver=2.12.6
 pkgrel=1
 _ubuntu_diff_version=${pkgver}-0ubuntu2
 pkgdesc="A library for configuring and customizing font access"
@@ -7,21 +7,24 @@ arch=('x86_64')
 url="http://www.fontconfig.org/release/"
 license=('custom')
 depends=('expat' 'freetype2')
+makedepends=('gperf')
 install='fontconfig.install'
 source=("http://www.fontconfig.org/release/$pkgname-$pkgver.tar.bz2"
         "http://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/fontconfig_${_ubuntu_diff_version}.debian.tar.xz"
         '29-replace-bitmap-fonts.conf'
         '70-yes-bitmaps.conf'
-        '20-no-embeded.conf')
+        '20-no-embeded.conf'
+        fontconfig.hook)
 
 conflicts=('fontconfig-ubuntu')
 provides=('fontconfig-ubuntu')
 replaces=('fontconfig-ubuntu')
-md5sums=('c988ea12f4117330246e041109152b4a'
-         '1527bc9abef9c13eef6178b4369dda2e'
+md5sums=('733f5e2371ca77b69707bd7b30cc2163'
+         'e49b6389d0f44c4145b2b9c8e5e7e0d9'
          '39654873d8ff74d418f533e559b57fb9'
          '91c414090c7d8bfe557785fe845cb6bd'
-         '9b991efd2795149fac2e1452b97aeb74')
+         '9b991efd2795149fac2e1452b97aeb74'
+         'ba07f578513842a325e397aa0f696319')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
@@ -54,7 +57,9 @@ check() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="$pkgdir" install
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
+  install -Dm644 ../fontconfig.hook "$pkgdir/usr/share/libalpm/hooks/fontconfig.hook"
   
   # use ubuntu 70-yes-bitmaps.conf
   mv ${pkgdir}/etc/fonts/conf.avail/70-yes-bitmaps.conf ${pkgdir}/etc/fonts/conf.avail/70-force-bitmaps.conf

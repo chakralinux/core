@@ -18,28 +18,17 @@ post_install() {
 
 _EOF
 
-  echo -n "updating font cache... "
-  /usr/bin/fc-cache -f
-  echo "done."
+  post_upgrade $1
 }
 
 post_upgrade() {
-  echo -n "updating font cache... "
-  /usr/bin/fc-cache -f
-  echo "done."
+  echo -n "Rebuilding fontconfig cache..."
+  # a full forced directory scan is required here
+  /usr/bin/fc-cache -rs
+  echo " done."
 }
 
 post_remove() {
-  if [[ "$1" == "2.8.0-3" ]]; then
-    rm /etc/fonts/conf.d/20-fix-globaladvance.conf
-    rm /etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf
-    rm /etc/fonts/conf.d/20-unhint-small-dejavu-sans-mono.conf
-    rm /etc/fonts/conf.d/20-unhint-small-dejavu-serif.conf
-    rm /etc/fonts/conf.d/57-dejavu-sans.conf
-    rm /etc/fonts/conf.d/57-dejavu-sans-mono.conf
-    rm /etc/fonts/conf.d/57-dejavu-serif.conf
-  fi
-
   cat << _EOF
 
   Check for dead symlinks and leftover files 

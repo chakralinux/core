@@ -1,30 +1,30 @@
-# $Id: PKGBUILD 73458 2010-03-26 07:43:21Z francois $
-# Maintainer: Firmicus <francois.archlinux.org>
-# Contributor: dorphell <dorphell@archlinux.org>
 
 pkgname=gsfonts
-_realname=urw-fonts
-pkgver=1.0.7pre44
-_fedoraver=2.4
-_fedorarel=12.fc18
-pkgrel=3
-pkgdesc="Ghostscript standard Type1 fonts from URW"
-arch=(any)
-url="http://sourceforge.net/projects/gs-fonts/"
-license=('GPL2')
-depends=('xorg-font-utils' 'fontconfig')
-makedepends=('rpmextract')
-provides=(${_realname})
-install=xfonts.install
-source=(http://kojipkgs.fedoraproject.org/packages/${_realname}/${_fedoraver}/${_fedorarel}/src/${_realname}-${_fedoraver}-${_fedorarel}.src.rpm)
-options=()
-md5sums=('7bd842c30948a43eaabb107fb5773647')
+pkgver=20170829
+pkgrel=1
+pkgdesc='(URW)++ Core Font Set [Level 2]'
+url='https://github.com/ArtifexSoftware/urw-base35-fonts'
+arch=('any')
+license=('AGPL3')
+makedepends=('git')
+_commit=b1605de3323b42ca3fae7aea3bf2dd72aa2cd490  # master
+source=("git+https://github.com/ArtifexSoftware/urw-base35-fonts#commit=${_commit}")
+sha256sums=('SKIP')
 
-build() {
-  cd $srcdir || return 1
-  /usr/bin/rpmextract.sh ${_realname}-${_fedoraver}-${_fedorarel}.src.rpm || return 1
-  bsdtar xf *.tar.bz2 || return 1
-  install -d ${pkgdir}/usr/share/fonts/Type1
-  install -m644 *.{pfb,pfm,afm} \
-                ${pkgdir}/usr/share/fonts/Type1/ || return 1
+pkgver() {
+	cd urw-base35-fonts
+	echo $(TZ=UTC git show -s --pretty=%cd --date=format-local:%Y%m%d HEAD)
+}
+
+package() {
+	cd urw-base35-fonts
+	install -Dt "${pkgdir}/usr/share/fonts/${pkgname}" -m644 fonts/*.otf
+	install -Dt "${pkgdir}/usr/share/appdata" -m644 appstream/*.xml
+
+	install -d "${pkgdir}"/etc/fonts/conf.{avail,d}
+	for _f in fontconfig/*.conf; do
+		_fn="${pkgdir}/etc/fonts/conf.avail/69-${_f##*/}"
+		install -m644 ${_f} "${_fn}"
+		ln -srt "${pkgdir}/etc/fonts/conf.d" "${_fn}"
+	done
 }

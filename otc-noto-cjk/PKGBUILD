@@ -1,6 +1,7 @@
 pkgname=otc-noto-cjk
-pkgver=1.004+4+gff6b779
+pkgver=20170601
 pkgrel=1
+_commit=32a5844539f2e348ed36b44e990f9b06d7fb89fe
 pkgdesc="Google Noto CJK fonts"
 arch=(any)
 url="https://www.google.com/get/noto/"
@@ -8,12 +9,10 @@ license=(custom:SIL)
 depends=(fontconfig)
 provides=(otf-noto ttf-noto-cjk)
 replaces=("ttf-noto-cjk<${pkgver}")
-install=$pkgname.install
-source=("https://github.com/googlei18n/noto-cjk/archive/master.zip")
-sha256sums=('24ba4d42ee7330732f4f3f81b29fe0007efd422aa29697247ffb0a2f36e5221a')
+source=($pkgname-$pkgver.zip::"https://github.com/googlei18n/noto-cjk/archive/$_commit.zip")
+sha256sums=('31e53af3f5e97ae021f24f960608e98f64aaa12804eda7fb583dcfaa8d496ebf')
 
 package() {
-  mkdir -p "$pkgdir"/usr/share/fonts/OTF
-  install -m644 noto-cjk-master/*.ttc "$pkgdir"/usr/share/fonts/OTF
-  install -Dm644 noto-cjk-master/LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+  install -Dt "$pkgdir"/usr/share/fonts/noto-cjk -m644 noto-cjk-*/*.ttc
+  install -Dt "$pkgdir"/usr/share/licenses/$pkgname -m644 noto-cjk-*/LICENSE
 }
