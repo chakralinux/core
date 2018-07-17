@@ -1,7 +1,7 @@
 pkgbase=glib2
 pkgname=(glib2 glib2-docs)
 pkgver=2.54.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Common C routines used by GTK+ and other libs"
 url="http://www.gtk.org/"
 arch=(x86_64)
@@ -11,11 +11,14 @@ options=(!emptydirs)
 source=("http://download.gnome.org/sources/glib/2.54/glib-${pkgver}.tar.xz"
         0001-docs-Fix-building-with-meson.patch
         0001-meson-Fix-permissions-of-installed-scripts.patch
-        libs.diff )
+        libs.diff
+        glib-compile-schemas.hook gio-querymodules.hook)
 sha256sums=('bb89e5c5aad33169a8c7f28b45671c7899c12f74caf707737f784d7102758e6c'
             '8b289f3e1a5a3b29d310d45610468199acfe6f2b38a0d1be38c9224437a0e40c'
             '12b1a2f4e304e4c03e48ae9564d73ae38619bbb7711a013138939ff8e5cc2327'
-            '54c43d5d4d4b5fa591eb639e63050ce5eac30aff6691fa9cf56631782b2aad33')
+            '54c43d5d4d4b5fa591eb639e63050ce5eac30aff6691fa9cf56631782b2aad33'
+            'e1123a5d85d2445faac33f6dae1085fdd620d83279a4e130a83fe38db52b62b3'
+            '5ba204a2686304b1454d401a39a9d27d09dd25e4529664e3fd565be3d439f8b6')
 
 build() {
     cd glib-$pkgver
@@ -34,7 +37,7 @@ build() {
 
 check() {
   cd glib-$pkgver
-  #meson test -t 2
+  make check
 }
 
 package_glib2() {
@@ -54,6 +57,9 @@ package_glib2() {
 
   # Our gdb does not ship the required python modules, so remove it
   rm -rf "$pkgdir/usr/share/gdb/"
+
+  # pacman hook
+  install -Dt "$pkgdir/usr/share/libalpm/hooks" -m644 ../*.hook
 }
 
 package_glib2-docs() {
