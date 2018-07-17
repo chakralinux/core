@@ -1,23 +1,29 @@
 pkgname=poppler-data
 pkgver=0.4.8
-pkgrel=1
+pkgrel=2
 pkgdesc="Encoding data for the poppler PDF rendering library"
 arch=(any)
+makedepends=(cmake)
 license=('custom' 'GPL2')
 conflicts=('poppler<0.10.5')
 url="http://poppler.freedesktop.org/"
 source=(http://poppler.freedesktop.org/${pkgname}-${pkgver}.tar.gz)
 md5sums=('00f8989c804de84af0ba2ea629949980')
 
+prepare() {
+  mkdir -p $srcdir/build
+}
+
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make prefix=/usr
+  cd $srcdir/build
+  cmake -DCMAKE_INSTALL_PREFIX=/usr ../${pkgname}-${pkgver}  
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${srcdir}/build"
   make DESTDIR="${pkgdir}" install
 
+  cd "${srcdir}/${pkgname}-${pkgver}"
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -m644 COPYING COPYING.adobe \
     "${pkgdir}/usr/share/licenses/${pkgname}/"
