@@ -1,8 +1,8 @@
 #Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/sddm
 
 pkgname=sddm
-pkgver=0.17.0
-pkgrel=3
+pkgver=0.18.0
+pkgrel=1
 pkgdesc='QML based X11 and Wayland display manager'
 arch=('x86_64')
 url='http://github.com/sddm/sddm'
@@ -16,7 +16,7 @@ backup=('usr/share/sddm/scripts/Xsetup'
         'etc/pam.d/sddm')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/${pkgname}/${pkgname}/archive/v${pkgver}.tar.gz"
         'sddm.conf' 'sddm.sysusers' 'sddm.tmpfiles')
-md5sums=('622e825b6b403d165902a5c12163094c'
+md5sums=('f8656aa61020c727b6925225fa681996'
          '4c33d11ed7ba1c4069ec445d26947636'
          '36a0440ca3eb8a527a03d7475a6cefd9'
          '098f2a934ecf9c048b6a9d4b6c41ff5c')
@@ -30,7 +30,6 @@ build() {
   cd build
   cmake ../${pkgname}-${pkgver} \
         -DCMAKE_INSTALL_PREFIX=/usr \
-        -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBEXECDIR=/usr/lib/sddm \
         -DDBUS_CONFIG_FILENAME=sddm_org.freedesktop.DisplayManager.conf \
         -DENABLE_PAM=ON \
@@ -42,21 +41,16 @@ package() {
   cd build
   make DESTDIR="${pkgdir}" install
   
-  # configuration handling
-  # Move sddm.conf to /usr/lib https://bugs.archlinux.org/task/56609
-  install -dm755 "$pkgdir"/usr/lib/sddm/sddm.conf.d/
-  mv "$pkgdir"/{etc/sddm.conf,usr/lib/sddm/sddm.conf.d}
-
-  # Don't set PATH in sddm.conf
-  sed -r 's|DefaultPath=.*|DefaultPath=/usr/local/sbin:/usr/local/bin:/usr/bin|g' -i "$pkgdir"/usr/lib/sddm/sddm.conf.d/sddm.conf
-  # Unset InputMethod https://github.com/sddm/sddm/issues/952
-  sed -e "/^InputMethod/s/qtvirtualkeyboard//" -i "$pkgdir"/usr/lib/sddm/sddm.conf.d/sddm.conf
-
-  # Install Chakra default settings
-  install -m 644 -p ${srcdir}/sddm.conf ${pkgdir}/etc/
-
-  # create sddm system user and directory
-  install -d -g 996 -o 996 ${pkgdir}/var/lib/sddm
   install -Dm644 "$srcdir"/sddm.sysusers "$pkgdir"/usr/lib/sysusers.d/sddm.conf
   install -Dm644 "$srcdir"/sddm.tmpfiles "$pkgdir"/usr/lib/tmpfiles.d/sddm.conf
+
+  install -d "$pkgdir"/usr/lib/sddm/sddm.conf.d
+  "$pkgdir"/usr/bin/sddm --example-config > "$pkgdir"/usr/lib/sddm/sddm.conf.d/default.conf
+  # Don't set PATH in sddm.conf
+  sed -r 's|DefaultPath=.*|DefaultPath=/usr/local/sbin:/usr/local/bin:/usr/bin|g' -i "$pkgdir"/usr/lib/sddm/sddm.conf.d/default.conf
+  # Unset InputMethod https://github.com/sddm/sddm/issues/952
+  sed -e "/^InputMethod/s/qtvirtualkeyboard//" -i "$pkgdir"/usr/lib/sddm/sddm.conf.d/default.conf
+  
+  # Install Chakra default settings
+  install -m 644 -p ${srcdir}/sddm.conf ${pkgdir}/etc/
 }
