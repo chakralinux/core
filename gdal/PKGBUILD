@@ -1,7 +1,7 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/gdal
 
 pkgname=gdal
-pkgver=2.2.4
+pkgver=2.3.1
 pkgrel=1
 pkgdesc="A translator library for raster geospatial data formats"
 arch=('x86_64')
@@ -17,7 +17,7 @@ optdepends=('postgresql: postgresql database support'
 options=('!makeflags')
 source=("http://download.osgeo.org/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
               'gdal-perl-vendor.patch')
-sha256sums=('441eb1d1acb35238ca43a1a0a649493fc91fdcbab231d0747e9d462eea192278'
+sha256sums=('9c4625c45a3ee7e49a604ef221778983dd9fd8104922a87f20b99d9bedb7725a'
             '20989e5fa499206b42c92280ce084fdf7b2f661a4233fc349611cc57102fe114')
 
 prepare() {
@@ -32,7 +32,7 @@ prepare() {
   sed -i "s|^mandir=.*|mandir='\${prefix}/share/man'|" configure
 
 # Fix Perl bindings installation path
-  patch -Np1 -i ../gdal-perl-vendor.patch
+#  patch -Np1 -i ../gdal-perl-vendor.patch
 }
 
 build() {
