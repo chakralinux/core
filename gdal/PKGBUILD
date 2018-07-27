@@ -2,7 +2,7 @@
 
 pkgname=gdal
 pkgver=2.3.1
-pkgrel=1
+pkgrel=2
 pkgdesc="A translator library for raster geospatial data formats"
 arch=('x86_64')
 url="http://www.gdal.org/"
@@ -18,7 +18,7 @@ options=('!makeflags')
 source=("http://download.osgeo.org/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz"
               'gdal-perl-vendor.patch')
 sha256sums=('9c4625c45a3ee7e49a604ef221778983dd9fd8104922a87f20b99d9bedb7725a'
-            '20989e5fa499206b42c92280ce084fdf7b2f661a4233fc349611cc57102fe114')
+            'a41a0129a878a0d09b8ecf24b8a0b473856d929d52f535afdf4dca95ddd347d3')
 
 prepare() {
   cd "${srcdir}"/$pkgname-$pkgver
@@ -32,7 +32,7 @@ prepare() {
   sed -i "s|^mandir=.*|mandir='\${prefix}/share/man'|" configure
 
 # Fix Perl bindings installation path
-#  patch -Np1 -i ../gdal-perl-vendor.patch
+  patch -Np1 -i ../gdal-perl-vendor.patch
 }
 
 build() {
