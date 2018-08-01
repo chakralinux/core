@@ -1,7 +1,7 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-bibtexextra
 
 pkgname=texlive-bibtexextra
-pkgver=2017.44915
+pkgver=2018.47418
 _revnr=${pkgver#*.}
 pkgrel=1
 pkgdesc="TeX Live - Additional BibTeX styles and bibliography databases"
@@ -12,7 +12,7 @@ groups=('texlive-most')
 url='http://tug.org/texlive/'
 source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip")
 install=texlive.install
-md5sums=('b3acc6c8681c08178c034bcb2bf35dff')
+md5sums=('f6f1a10cae7e911d12b3ef1e0b02f8d6')
 
 build() {
    cd "${srcdir}"
@@ -47,8 +47,13 @@ package() {
 
    # link programs from /usr/share/texmf-dist/scripts
    _linked_scripts="
+bib2gls/bib2gls.sh
+bib2gls/convertgls2bib.sh
 bibexport/bibexport.sh
+crossrefware/bbl2bib.pl
 crossrefware/bibdoiadd.pl
+crossrefware/bibmradd.pl
+crossrefware/biburl2doi.pl
 crossrefware/bibzbladd.pl
 crossrefware/ltx2crossrefxml.pl
 listbib/listbib
