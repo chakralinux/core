@@ -1,7 +1,7 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/texlive-latexextra
 
 pkgname=texlive-latexextra
-pkgver=2017.44907
+pkgver=2018.47410
 _revnr=${pkgver#*.}
 pkgrel=1
 pkgdesc="TeX Live - Large collection of add-on packages for LaTeX"
@@ -19,8 +19,8 @@ source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
         "$pkgname.maps")
 options=('!emptydirs')
 install=texlive.install
-md5sums=('c66adbc5f79e6402a063ce142a83b457'
-         '017fc9ed83747aa8884ca9ae0767531f')
+md5sums=('9253165a3dcf7d68da99f28ad377216c'
+         'f06643f92ce3c5d565c6414f3e77bc4c')
 
 build() {
   for p in *.tar.xz; do
@@ -57,13 +57,14 @@ authorindex/authorindex
 exceltex/exceltex
 glossaries/makeglossaries
 glossaries/makeglossaries-lite.lua
+l3build/l3build.lua
 makedtx/makedtx.pl
 pax/pdfannotextractor.pl
 perltex/perltex.pl
-pst-pdf/ps4pdf
 splitindex/splitindex.pl
 svn-multi/svn-multi.pl
 vpe/vpe.pl
+wordcount/wordcount.sh
 yplan/yplan
 "
   install -m755 -d "$pkgdir"/usr/bin
@@ -73,7 +74,5 @@ yplan/yplan
     ln -s /usr/share/texmf-dist/scripts/${_script} ${pkgdir}/usr/bin/${_scriptbase}
   done
 
-  rm $pkgdir/usr/share/texmf-dist/scripts/glossaries/makeglossaries.bat
-  rm $pkgdir/usr/share/texmf-dist/scripts/pst-pdf/ps4pdf.bat*
   rm $pkgdir/usr/share/texmf-dist/scripts/shipunov/biokey2html.bat
 }
