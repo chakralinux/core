@@ -1,9 +1,9 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/texlive-pstricks
 
 pkgname=texlive-pstricks
-pkgver=2016.41321
-_pkgver=${pkgver#*.}
-pkgrel=2
+pkgver=2018.47400
+_revnr=${pkgver#*.}
+pkgrel=1
 pkgdesc="TeX Live - Additional PSTricks packages."
 license=('GPL3')
 arch=(x86_64)
@@ -13,7 +13,7 @@ url='http://tug.org/texlive/'
 install=texlive.install
 options=('!emptydirs')
 source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip")
-md5sums=('d61f741137c3f6d8e3839dbe22fb6abe')
+md5sums=('cd1fe9a41c8613f6905684d087778dc2')
 
 build() {
   for p in *.tar.xz; do
@@ -39,7 +39,9 @@ package() {
   if [[ -d $pkgdir/usr/share/texmf-dist/scripts ]]; then
     find $pkgdir/usr/share/texmf-dist/scripts -type f -exec chmod a+x '{}' \;
   fi
-  install -m755 -d $pkgdir/usr/bin
-  ln -s /usr/share/texmf-dist/scripts/pedigree-perl/pedigree.pl $pkgdir/usr/bin/pedigree
-  ln -s /usr/share/texmf-dist/scripts/pst2pdf/pst2pdf $pkgdir/usr/bin/pst2pdf
+   rm "$pkgdir"/usr/share/texmf-dist/scripts/pst-pdf/ps4pdf.bat*
+   install -m755 -d $pkgdir/usr/bin
+   ln -s /usr/share/texmf-dist/scripts/pedigree-perl/pedigree.pl $pkgdir/usr/bin/pedigree
+   ln -s /usr/share/texmf-dist/scripts/pst2pdf/pst2pdf.pl $pkgdir/usr/bin/pst2pdf
+   ln -s /usr/share/texmf-dist/scripts/pst-pdf/ps4pdf $pkgdir/usr/bin/ps4pdf
 }
