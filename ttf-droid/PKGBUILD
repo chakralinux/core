@@ -1,12 +1,11 @@
 pkgname=ttf-droid
 pkgver=20121017
-pkgrel=2
+pkgrel=3
 pkgdesc="General-purpose fonts released by Google as part of Android"
 arch=('x86_64')
 license=('Apache')
 url="http://code.google.com/android/"
 depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
-install=$pkgname.install
 source=('ftp://ftp.archlinux.org/other/community/ttf-droid/ttf-droid-20121017.tar.xz' 'serif-fontconfig.conf'
         'sans-fontconfig.conf'
         'sans-mono-fontconfig.conf' 
@@ -17,8 +16,7 @@ md5sums=('0fa20eb63d7d05b23be955777bb52a5d'
          'bc22e71abb23049274235c86a206c617'
          '85b49cc0e3bdbc8b52229b851aec411a')
 
-package()
-{
+package() {
         # Install fonts
         cd $srcdir/google-droid-fonts-$pkgver
         install -d $pkgdir/usr/share/fonts/TTF/ 
@@ -32,4 +30,3 @@ package()
         install -m644 serif-fontconfig.conf $pkgdir/etc/fonts/conf.avail/65-$pkgname-serif-fontconfig.conf
         install -m644 kufi-fontconfig.conf $pkgdir/etc/fonts/conf.avail/65-$pkgname-kufi-fontconfig.conf
 }
-
