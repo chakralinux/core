@@ -1,15 +1,14 @@
-# Source global configuration
-source ../linux.conf
 
 pkgname=broadcom-wl
 pkgver=6.30.223.271
-pkgrel=22
+pkgrel=23
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 arch=('x86_64')
 license=('custom')
-depends=("linux=${_kernelver}")
-makedepends=("linux-headers=${_kernelver}")
+depends=("linux=4.17.12")
+makedepends=("linux-headers=4.17.12")
+_extramodules=extramodules-CHAKRA
 source=("https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz"
          #"http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" "http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
         'modprobe.d'
@@ -32,8 +31,6 @@ sha1sums=('1f568bb989d175813c5631c6629d9479eae6f3be'
           '1d3fb939df5ba3b04e2949df6c5ed24f4a3d1f48'
           '0b14384c82fe2a511d4f0210a682871b8906ae6a')
 
-install=install
-
 prepare() {
     cd "${srcdir}"
 
@@ -52,15 +49,17 @@ prepare() {
 
 build() {
     cd "${srcdir}"
-
-    make -C /usr/lib/modules/"${_kver}"/build M=`pwd`
+    KERNEL_VERSION=$(</usr/lib/modules/extramodules-CHAKRA/version)
+    msg2 "Kernel = $KERNEL_VERSION"
+    
+    make -C /usr/lib/modules/"${KERNEL_VERSION}"/build M=`pwd`
 }
 
 package() {
     cd "${srcdir}"
 
-    install -Dm644 wl.ko "${pkgdir}/usr/lib/modules/${_extramodules}/wl.ko"
-    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/wl.ko"
+    install -Dm644 wl.ko "${pkgdir}/usr/lib/modules/$_extramodules/wl.ko"
+    gzip "${pkgdir}/usr/lib/modules/$_extramodules/wl.ko"
 
     install -Dm644 lib/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
     install -Dm644 modprobe.d "${pkgdir}/usr/lib/modprobe.d/broadcom-wl.conf"

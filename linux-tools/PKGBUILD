@@ -1,11 +1,19 @@
 # Contribution from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/linux-tools
-# Include global configuration
-source ../linux.conf
 
 pkgbase=linux-tools
-pkgname=('cgroup_event_listener' 'cpupower' 'libtraceevent' 'perf'
-         'tmon' 'turbostat' 'usbip' 'x86_energy_perf_policy')
-pkgver=${_kernelver}
+pkgname=(
+  'cgroup_event_listener'
+  'cpupower'
+  'hyperv'
+  'libtraceevent'
+  'linux-tools-meta'
+  'perf'
+  'tmon'
+  'turbostat'
+  'usbip'
+  'x86_energy_perf_policy'
+)
+pkgver=4.17.12
 pkgrel=1
 license=('GPL2')
 arch=('x86_64')
@@ -29,7 +37,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/linux-${pkgver}.tar.xz"
         'cpupower.systemd'
         'cpupower.service'
         'usbipd.service')
-sha256sums=('fa919108d37f6b5dec85ce3fde3bc76eabdfc93b0b8c8386878ad8fb46168a4b'
+sha256sums=('c098e2e4dcb64f8e3fb5cec35e872ff383edefa18532744ddf35bbba829cb5a3'
             '4fa509949d6863d001075fa3e8671eff2599c046d20c98bb4a70778595cd1c3f'
             'fbf6e0ce6eb0ef15703fe212958de6ca46e62188900b5e9f9272ed3cc9cfd54e'
             'a89284d0ecb556ca53a66d1c2087b5fd6d0a901ab2769cd3aebb93f4478905dc'
@@ -97,7 +105,13 @@ build() {
   pushd linux-${pkgver}/tools/power/x86/turbostat
   make
   popd
+
+  msg2 'hv'
+  pushd linux/tools/hv
+  CFLAGS+=' -DKVP_SCRIPTS_PATH=/usr/lib/hyperv/kvp_scripts/' make
+  popd
 }
+
 
 package_linux-tools-meta() {
   pkgdesc='Linux kernel tools meta package'
@@ -105,6 +119,7 @@ package_linux-tools-meta() {
   depends=(
     'cgroup_event_listener'
     'cpupower'
+    'hyperv'
     'libtraceevent'
     'perf'
     'tmon'
@@ -121,18 +136,18 @@ package_libtraceevent() {
   pkgdesc='Linux kernel trace event library'
   depends=('glibc')
 
-  cd linux-${pkgver}/tools/lib/traceevent
+  cd linux/tools/lib/traceevent
   install -dm 755 "$pkgdir/usr/lib"
   install -m 644 libtraceevent.so "$pkgdir/usr/lib"
 }
 
 package_perf() {
   pkgdesc='Linux kernel performance auditing tool'
-  depends=('perl' 'python2' 'libnewt' 'elfutils' 'libunwind' 'binutils'
+  depends=('perl' 'python2' 'slang' 'elfutils' 'libunwind' 'binutils'
            'numactl' 'audit')
   optdepends=('gtk2: support GTK2 browser for perf report')
 
-  cd linux-${pkgver}/tools/perf
+  cd linux/tools/perf
   make -f Makefile.perf \
     prefix=/usr \
     lib=lib/perf \
@@ -144,9 +159,12 @@ package_perf() {
     DESTDIR="$pkgdir" \
     install install-man
   cd "$pkgdir"
+  # add linker search path
+  mkdir "$pkgdir/etc/ld.so.conf.d"
+  echo '/usr/lib/perf' > "$pkgdir/etc/ld.so.conf.d/$pkgname.conf"
   # move completion in new directory
   install -Dm644 etc/bash_completion.d/perf usr/share/bash-completion/completions/perf
-  rm -r etc
+  rm -r etc/bash_completion.d
   # no exec on usr/share
   find usr/share -type f -exec chmod a-x {} \;
 }
@@ -157,7 +175,7 @@ package_cpupower() {
   depends=('bash' 'pciutils')
   install=cpupower.install
 
-  pushd linux-${pkgver}/tools/power/cpupower
+  pushd linux/tools/power/cpupower
   make \
     DESTDIR="$pkgdir" \
     sbindir='/usr/bin' \
@@ -176,16 +194,16 @@ package_x86_energy_perf_policy() {
   pkgdesc='Read or write MSR_IA32_ENERGY_PERF_BIAS'
   depends=('glibc')
 
-  cd linux-${pkgver}/tools/power/x86/x86_energy_perf_policy
+  cd linux/tools/power/x86/x86_energy_perf_policy
   install -Dm 755 x86_energy_perf_policy "$pkgdir/usr/bin/x86_energy_perf_policy"
   install -Dm 644 x86_energy_perf_policy.8 "$pkgdir/usr/share/man/man8/x86_energy_perf_policy.8"
 }
 
 package_usbip() {
   pkgdesc='An USB device sharing system over IP network'
-  depends=('glib2' 'sysfsutils' 'systemd')
+  depends=('glib2' 'sysfsutils' 'libsystemd')
 
-  pushd linux-${pkgver}/tools/usb/usbip
+  pushd linux/tools/usb/usbip
   make install DESTDIR="$pkgdir"
   popd
   # module loading
@@ -199,7 +217,7 @@ package_tmon() {
   pkgdesc='Monitoring and Testing Tool for Linux kernel thermal subsystem'
   depends=('glibc' 'ncurses')
 
-  cd linux-${pkgver}/tools/thermal/tmon
+  cd linux/tools/thermal/tmon
   make install INSTALL_ROOT="$pkgdir"
 }
 
@@ -207,7 +225,7 @@ package_cgroup_event_listener() {
   pkgdesc='Simple listener of cgroup events'
   depends=('glibc')
 
-  cd linux-${pkgver}/tools/cgroup
+  cd linux/tools/cgroup
   install -Dm755 cgroup_event_listener "$pkgdir/usr/bin/cgroup_event_listener"
 }
 
@@ -215,6 +233,17 @@ package_turbostat() {
   pkgdesc='Report processor frequency and idle statistics'
   depends=('glibc')
 
-  cd linux-${pkgver}/tools/power/x86/turbostat
+  cd linux/tools/power/x86/turbostat
   make install DESTDIR="$pkgdir"
+}
+
+package_hyperv() {
+  pkgdesc='Hyper-V tools'
+  depends=('glibc')
+
+  cd linux/tools/hv
+  for _p in hv_fcopy_daemon hv_kvp_daemon hv_vss_daemon; do
+    install -Dm755 "$_p" "$pkgdir/usr/bin/$_p"
+  done
+  install -dm755 "$pkgdir/usr/lib/hyperv/kvp_scripts"
 }

@@ -1,16 +1,14 @@
-# Source global configuration
-source ../linux.conf
 
 pkgname=vhba-module
 pkgver=20170610
-pkgrel=10
+pkgrel=11
 pkgdesc="Kernel module that emulates SCSI devices"
 arch=('x86_64')
 url="http://cdemu.sourceforge.net/"
 license=('GPL')
-depends=("linux=${_kernelver}")
-makedepends=("linux-headers=${_kernelver}")
-install=vhba-module.install
+depends=("linux=4.17.12")
+makedepends=("linux-headers=4.17.12")
+_extramodules=extramodules-CHAKRA
 source=("http://downloads.sourceforge.net/cdemu/$pkgname-$pkgver.tar.bz2"
         60-vhba.rules)
 md5sums=('f9478a5f5528fc672c204b6b4bd02213'
@@ -26,13 +24,7 @@ build() {
 }
 
 package() {
-  depends=("linux=${_kernelver}")
-  install=vhba-module.install
-
   cd $pkgname-$pkgver
   install -Dt "$pkgdir/usr/lib/modules/$_extramodules" -m644 vhba.ko
   install -Dt "$pkgdir/usr/lib/udev/rules.d" -m644 ../60-vhba.rules
-  
-  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
-          "${startdir}/vhba-module.install"
 }

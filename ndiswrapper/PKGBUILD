@@ -1,20 +1,18 @@
-# Source global configuration
-source ../linux.conf
 
 pkgname=ndiswrapper
 pkgver=1.61
-pkgrel=12
+pkgrel=13
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-testing."
 license=('GPL')
 arch=('x86_64')
 url="http://ndiswrapper.sourceforge.net"
-install="ndiswrapper.install"
-depends=("linux=${_kernelver}")
-makedepends=("linux-headers=${_kernelver}")
+depends=("linux=4.17.12")
+makedepends=("linux-headers=4.17.12")
 provides=("ndiswrapper-utils=$pkgver")
 replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
+_extramodules=extramodules-CHAKRA
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
               'linux-4.11.patch'
               'linux-4.13.patch'
@@ -24,10 +22,9 @@ sha1sums=('213854ca8a83f9b5972db8fa873d346124e4bcb5'
           '09b308bbc948acc59d33882524b53ce210bb1848'
           '4a47e255e27767dd87757f159eb1fdf1ddaf4993')
 
-prepare() {
-  [ -z "$_kver" ] && error "Could not get kernel version from '/usr/lib/modules/${_extramodules}/version'..." && false
-  msg "Found kernel version: $_kver"
+KERNEL_VERSION=$(</usr/lib/modules/$_extramodules/version)
 
+prepare() {
   cd ndiswrapper-$pkgver
 
   patch -p1 -i ../linux-4.11.patch
@@ -40,16 +37,13 @@ prepare() {
 
 build() {
   cd ndiswrapper-$pkgver
-  make -C driver KVERS_UNAME=${_kver}
+  make -C driver KVERS_UNAME=${KERNEL_VERSION}
   make -C utils
 }
 
 package() {
   cd ndiswrapper-$pkgver
 
-  make sbindir=usr/sbin usrsbindir=usr/bin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
-        KVERS=$_kver DESTDIR="$pkgdir/" install
-
-  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
-          "${startdir}/ndiswrapper.install"
+  make sbindir=usr/sbin usrsbindir=usr/bin KBUILD="/usr/lib/modules/$KERNEL_VERSION/build/" INST_DIR="usr/lib/modules/$_extramodules" \
+        KVERS=$KERNEL_VERSION DESTDIR="$pkgdir/" install
 }
