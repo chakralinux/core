@@ -136,7 +136,7 @@ package_libtraceevent() {
   pkgdesc='Linux kernel trace event library'
   depends=('glibc')
 
-  cd linux/tools/lib/traceevent
+  cd linux-${pkgver}/tools/lib/traceevent
   install -dm 755 "$pkgdir/usr/lib"
   install -m 644 libtraceevent.so "$pkgdir/usr/lib"
 }
@@ -147,7 +147,7 @@ package_perf() {
            'numactl' 'audit')
   optdepends=('gtk2: support GTK2 browser for perf report')
 
-  cd linux/tools/perf
+  cd linux-${pkgver}/tools/perf
   make -f Makefile.perf \
     prefix=/usr \
     lib=lib/perf \
@@ -175,7 +175,7 @@ package_cpupower() {
   depends=('bash' 'pciutils')
   install=cpupower.install
 
-  pushd linux/tools/power/cpupower
+  pushd linux-${pkgver}/tools/power/cpupower
   make \
     DESTDIR="$pkgdir" \
     sbindir='/usr/bin' \
@@ -194,7 +194,7 @@ package_x86_energy_perf_policy() {
   pkgdesc='Read or write MSR_IA32_ENERGY_PERF_BIAS'
   depends=('glibc')
 
-  cd linux/tools/power/x86/x86_energy_perf_policy
+  cd linux-${pkgver}/tools/power/x86/x86_energy_perf_policy
   install -Dm 755 x86_energy_perf_policy "$pkgdir/usr/bin/x86_energy_perf_policy"
   install -Dm 644 x86_energy_perf_policy.8 "$pkgdir/usr/share/man/man8/x86_energy_perf_policy.8"
 }
@@ -203,7 +203,7 @@ package_usbip() {
   pkgdesc='An USB device sharing system over IP network'
   depends=('glib2' 'sysfsutils' 'libsystemd')
 
-  pushd linux/tools/usb/usbip
+  pushd linux-${pkgver}/tools/usb/usbip
   make install DESTDIR="$pkgdir"
   popd
   # module loading
@@ -217,7 +217,7 @@ package_tmon() {
   pkgdesc='Monitoring and Testing Tool for Linux kernel thermal subsystem'
   depends=('glibc' 'ncurses')
 
-  cd linux/tools/thermal/tmon
+  cd linux-${pkgver}/tools/thermal/tmon
   make install INSTALL_ROOT="$pkgdir"
 }
 
@@ -225,7 +225,7 @@ package_cgroup_event_listener() {
   pkgdesc='Simple listener of cgroup events'
   depends=('glibc')
 
-  cd linux/tools/cgroup
+  cd linux-${pkgver}/tools/cgroup
   install -Dm755 cgroup_event_listener "$pkgdir/usr/bin/cgroup_event_listener"
 }
 
@@ -233,7 +233,7 @@ package_turbostat() {
   pkgdesc='Report processor frequency and idle statistics'
   depends=('glibc')
 
-  cd linux/tools/power/x86/turbostat
+  cd linux-${pkgver}/tools/power/x86/turbostat
   make install DESTDIR="$pkgdir"
 }
 
@@ -241,7 +241,7 @@ package_hyperv() {
   pkgdesc='Hyper-V tools'
   depends=('glibc')
 
-  cd linux/tools/hv
+  cd linux-${pkgver}/tools/hv
   for _p in hv_fcopy_daemon hv_kvp_daemon hv_vss_daemon; do
     install -Dm755 "$_p" "$pkgdir/usr/bin/$_p"
   done
