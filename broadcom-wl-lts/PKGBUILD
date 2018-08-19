@@ -1,17 +1,14 @@
-# Source global configuration
-source ../linux-lts.conf
-
 pkgname=broadcom-wl-lts
 pkgver=6.30.223.271
-pkgrel=7
+pkgrel=9
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 arch=('x86_64')
 url='http://www.broadcom.com/support/802.11/linux_sta.php'
 license=('custom')
-depends=("linux-lts=${_kernelver}")
-makedepends=("linux-lts-headers=${_kernelver}")
+depends=("linux-lts=4.4.150")
+makedepends=("linux-lts-headers=4.4.150")
 backup=('etc/modprobe.d/broadcom-wl-lts.conf')
-install=install
+_extramodules=extramodules-CHAKRA-LTS
 source=("https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${pkgver//./_}.tar.gz"
          #"http://ftp.de.debian.org/debian/pool/non-free/b/broadcom-sta/broadcom-sta_5.100.82.112.orig.tar.gz" "http://www.broadcom.com/docs/linux_sta/hybrid-portsrc_${ARCH}-v${pkgver//./_}.tar.gz" we need the debian version, because upstream URL doesn't exist anymore
         'modprobe.d'
@@ -33,21 +30,25 @@ prepare() {
     patch -p1 -i 002-rdtscl.patch
     patch -p1 -i 005-debian-fix-kernel-warnings.patch
 
+
     sed -e "/BRCM_WLAN_IFNAME/s:eth:wlan:" \
         -i src/wl/sys/wl_linux.c
 }
 
 build() {
-  cd "${srcdir}"
-  make -C $_rootOfSourceTree M=`pwd`
+    cd "${srcdir}"
+    KERNEL_VERSION=$(</usr/lib/modules/$_extramodules/version)
+    msg2 "Kernel = $KERNEL_VERSION"
+    
+    make -C /usr/lib/modules/"${KERNEL_VERSION}"/build M=`pwd`
 }
 
 package() {
-	cd "${srcdir}"
+    cd "${srcdir}"
 
-	install -D -m 755 wl.ko "${pkgdir}/usr/lib/modules/${_extramodules}/wl.ko"
-	gzip "${pkgdir}/usr/lib/modules/${_extramodules}/wl.ko"
+    install -Dm644 wl.ko "${pkgdir}/usr/lib/modules/$_extramodules/wl.ko"
+    gzip "${pkgdir}/usr/lib/modules/$_extramodules/wl.ko"
 
-	install -D -m 644 lib/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-	install -D -m 644 ${srcdir}/modprobe.d "${pkgdir}"/etc/modprobe.d/broadcom-wl-lts.conf
+    install -Dm644 lib/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 modprobe.d "${pkgdir}/usr/lib/modprobe.d/broadcom-wl.conf"
 }

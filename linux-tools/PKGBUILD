@@ -1,17 +1,25 @@
 # Contribution from Arch: https://projects.archlinux.org/svntogit/community.git/tree/trunk?h=packages/linux-tools
-# Include global configuration
-source ../linux.conf
 
 pkgbase=linux-tools
-pkgname=('cgroup_event_listener' 'cpupower' 'libtraceevent' 'perf'
-         'tmon' 'turbostat' 'usbip' 'x86_energy_perf_policy')
-pkgver=${_kernelver}
+pkgname=(
+  'cgroup_event_listener'
+  'cpupower'
+  'hyperv'
+  'libtraceevent'
+  'linux-tools-meta'
+  'perf'
+  'tmon'
+  'turbostat'
+  'usbip'
+  'x86_energy_perf_policy'
+)
+pkgver=4.18.3
 pkgrel=1
 license=('GPL2')
 arch=('x86_64')
 url='http://www.kernel.org'
 options=('!strip')
-makedepends=('git' "linux=${pkgver}")
+makedepends=('git' "linux=4.18.3")
 # split packages need all package dependencies set manually in makedepends
 # kernel source deps
 makedepends+=('asciidoc' 'xmlto')
@@ -29,7 +37,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v4.x/linux-${pkgver}.tar.xz"
         'cpupower.systemd'
         'cpupower.service'
         'usbipd.service')
-sha256sums=('fa919108d37f6b5dec85ce3fde3bc76eabdfc93b0b8c8386878ad8fb46168a4b'
+sha256sums=('81ed3ccef8eb43cba3d2451a963d0bbaf5392af98435d42caee82d019a8443d4'
             '4fa509949d6863d001075fa3e8671eff2599c046d20c98bb4a70778595cd1c3f'
             'fbf6e0ce6eb0ef15703fe212958de6ca46e62188900b5e9f9272ed3cc9cfd54e'
             'a89284d0ecb556ca53a66d1c2087b5fd6d0a901ab2769cd3aebb93f4478905dc'
@@ -97,7 +105,13 @@ build() {
   pushd linux-${pkgver}/tools/power/x86/turbostat
   make
   popd
+
+  msg2 'hv'
+  pushd linux-${pkgver}/tools/hv
+  CFLAGS+=' -DKVP_SCRIPTS_PATH=/usr/lib/hyperv/kvp_scripts/' make
+  popd
 }
+
 
 package_linux-tools-meta() {
   pkgdesc='Linux kernel tools meta package'
@@ -105,6 +119,7 @@ package_linux-tools-meta() {
   depends=(
     'cgroup_event_listener'
     'cpupower'
+    'hyperv'
     'libtraceevent'
     'perf'
     'tmon'
@@ -128,7 +143,7 @@ package_libtraceevent() {
 
 package_perf() {
   pkgdesc='Linux kernel performance auditing tool'
-  depends=('perl' 'python2' 'libnewt' 'elfutils' 'libunwind' 'binutils'
+  depends=('perl' 'python2' 'slang' 'elfutils' 'libunwind' 'binutils'
            'numactl' 'audit')
   optdepends=('gtk2: support GTK2 browser for perf report')
 
@@ -144,9 +159,12 @@ package_perf() {
     DESTDIR="$pkgdir" \
     install install-man
   cd "$pkgdir"
+  # add linker search path
+  mkdir "$pkgdir/etc/ld.so.conf.d"
+  echo '/usr/lib/perf' > "$pkgdir/etc/ld.so.conf.d/$pkgname.conf"
   # move completion in new directory
   install -Dm644 etc/bash_completion.d/perf usr/share/bash-completion/completions/perf
-  rm -r etc
+  rm -r etc/bash_completion.d
   # no exec on usr/share
   find usr/share -type f -exec chmod a-x {} \;
 }
@@ -183,7 +201,7 @@ package_x86_energy_perf_policy() {
 
 package_usbip() {
   pkgdesc='An USB device sharing system over IP network'
-  depends=('glib2' 'sysfsutils' 'systemd')
+  depends=('glib2' 'sysfsutils' 'libsystemd')
 
   pushd linux-${pkgver}/tools/usb/usbip
   make install DESTDIR="$pkgdir"
@@ -217,4 +235,15 @@ package_turbostat() {
 
   cd linux-${pkgver}/tools/power/x86/turbostat
   make install DESTDIR="$pkgdir"
+}
+
+package_hyperv() {
+  pkgdesc='Hyper-V tools'
+  depends=('glibc')
+
+  cd linux-${pkgver}/tools/hv
+  for _p in hv_fcopy_daemon hv_kvp_daemon hv_vss_daemon; do
+    install -Dm755 "$_p" "$pkgdir/usr/bin/$_p"
+  done
+  install -dm755 "$pkgdir/usr/lib/hyperv/kvp_scripts"
 }

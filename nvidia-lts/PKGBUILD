@@ -1,23 +1,16 @@
-# Source global configuration
-source ../linux-lts.conf
-
-pkgname=('nvidia-lts')
-pkgdesc=('NVIDIA drivers for linux-lts')
-pkgver=390.25
+pkgname=nvidia-lts
+pkgdesc="NVIDIA drivers for linux-lts"
+pkgver=396.51
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
-depends=("linux-lts=${_kernelver}" "nvidia-utils=${pkgver}" 'libglvnd')
-makedepends=("linux-lts-headers=${_kernelver}")
-install=nvidia.install
+depends=("linux-lts=4.4.150" "nvidia-utils=${pkgver}" 'libglvnd')
+makedepends=("linux-lts-headers=4.4.150")
+_extramodules=extramodules-CHAKRA-LTS
 license=('custom')
-
-_pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-#_pkg="NVIDIA-Linux-x86_64-${pkgver}"
-
-source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-#source=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
-md5sums=('e41e28d1f380c64ec2eacae344fb5017')
+_pkg="NVIDIA-Linux-x86_64-${pkgver}"
+source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
+md5sums=('42b1a62681dff47f82d66bf9e9406915')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
@@ -26,19 +19,21 @@ prepare() {
 }
 
 build() {
-    _kver="$(cat /usr/lib/modules/${_extramodules}/version)"
     cd "${_pkg}/kernel"
-    make SYSSRC=/usr/lib/modules/"${_kver}/build" module
+    KERNEL_VERSION=$(</usr/lib/modules/$_extramodules/version)
+    msg2 "Kernel = $KERNEL_VERSION"
+    make SYSSRC=/usr/lib/modules/$KERNEL_VERSION/build module
 }
 
 package() {
-    for ko in nvidia nvidia-uvm nvidia-modeset nvidia-drm; do
-    install -Dm644 "${srcdir}/${_pkg}/kernel/${ko}.ko" \
-        "${pkgdir}/usr/lib/modules/${_extramodules}/${ko}.ko"
-    done
-    gzip "${pkgdir}/usr/lib/modules/${_extramodules}/"*.ko
+    install -Dt "${pkgdir}/usr/lib/modules/${_extramodules}" -m644 \
+      "${srcdir}/${_pkg}/kernel"/nvidia{,-modeset,-drm,-uvm}.ko
 
-    install -d -m755 "${pkgdir}/usr/lib/modprobe.d"
+    find "${pkgdir}" -name '*.ko' -exec gzip -n {} +
+
+    echo "blacklist nouveau" |
+        install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modprobe.d/${pkgname}.conf"
+
+    install -Dt "${pkgdir}/usr/share/licenses/${pkgname}" -m644 "${srcdir}/${_pkg}/LICENSE"
     echo "blacklist nouveau" >> "${pkgdir}/usr/lib/modprobe.d/nouveau_blacklist.conf"
-    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
 }

@@ -1,21 +1,20 @@
-# Source global configuration
-source ../linux.conf
 
 pkgbase=nvidia
 pkgname=(nvidia nvidia-dkms chd-nvidia)
-pkgver=396.24
-pkgrel=1
+pkgver=396.51
+pkgrel=3
 arch=('x86_64')
 url="http://www.nvidia.com/"
-makedepends=("linux-headers=${_kernelver}" "nvidia-utils=${pkgver}")
+makedepends=("linux-headers=4.18.3" "nvidia-utils=${pkgver}")
 license=('custom')
 options=('!strip')
 source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master/hwdb/nvidia_supported_new")
 _pkg="NVIDIA-Linux-x86_64-${pkgver}"
+_extramodules=extramodules-CHAKRA
 source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
         kernel-4.16.patch)
 sha256sums=('94db1b11de33b0299da021fee8c21e4442656fe76452ac582b556e3f96365d5d'
-            '59bb112b17ca72cd15fed4e521d4b52b0e9f5b8b13a95b36521f8eda978b568e'
+            '6add8c3782bdf276b4a5a5bcea102ceff8e90cf3fc2439dde9d5e60d557ac0d6'
             '622ac792ec200b2239cb663c0010392118b78c9904973d82cd261165c16d6385')
 
 prepare() {
@@ -46,12 +45,14 @@ DEST_MODULE_LOCATION[3]="/kernel/drivers/video"' dkms.conf
 
 build() {
     cd "${_pkg}/kernel"
-    make SYSSRC=/usr/lib/modules/"${_kver}/build" module
+    KERNEL_VERSION=$(</usr/lib/modules/$_extramodules/version)
+    msg2 "Kernel = $KERNEL_VERSION"
+    make SYSSRC=/usr/lib/modules/$KERNEL_VERSION/build module
 }
 
 package_nvidia() {
     pkgdesc="NVIDIA drivers for linux"
-    depends=("linux=${_kernelver}" "nvidia-utils=${pkgver}")
+    depends=("linux=4.18.3" "nvidia-utils=${pkgver}")
     conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx')
 
     install -Dt "${pkgdir}/usr/lib/modules/${_extramodules}" -m644 \

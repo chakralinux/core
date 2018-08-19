@@ -1,40 +1,34 @@
-# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
-
-# Source global configuration
-source ../linux-lts.conf
 
 pkgname=ndiswrapper-lts
 _pkgname=ndiswrapper
 pkgver=1.61
-pkgrel=4
+pkgrel=7
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For linux-lts."
 license=('GPL')
 arch=('x86_64')
 url="http://ndiswrapper.sourceforge.net"
-install="ndiswrapper.install"
-depends=("linux-lts=${_kernelver}")
-makedepends=("linux-lts-headers=${_kernelver}")
+depends=("linux-lts=4.4.150")
+makedepends=("linux-lts-headers=4.4.150")
+_extramodules=extramodules-CHAKRA-LTS
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz")
 sha1sums=('213854ca8a83f9b5972db8fa873d346124e4bcb5')
 
+KERNEL_VERSION=$(</usr/lib/modules/$_extramodules/version)
+
 prepare() {
   cd "$srcdir/$_pkgname-$pkgver" 
-  #patch -p1 -i ../ndiswrapper-1.59.patch
   sed -i "/modinfo/s/s/usr\//" driver/Makefile
 }
 
 build() {
-  cd "$srcdir/$_pkgname-$pkgver"        
-  make -C driver KVERS_UNAME=${_kver}
+  cd ndiswrapper-$pkgver
+  make -C driver KVERS_UNAME=${KERNEL_VERSION}
   make -C utils
 }
 
 package() {
-  cd "$srcdir/$_pkgname-$pkgver"   
+  cd ndiswrapper-$pkgver
 
-  make sbindir=usr/sbin usrsbindir=usr/bin KBUILD=${_rootOfSourceTree} INST_DIR="usr/lib/modules/$_extramodules" \
-        KVERS=$_kver DESTDIR="$pkgdir/" install
-
-  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" \
-          "${startdir}/ndiswrapper.install"
+  make sbindir=usr/sbin usrsbindir=usr/bin KBUILD="/usr/lib/modules/$KERNEL_VERSION/build/" INST_DIR="usr/lib/modules/$_extramodules" \
+        KVERS=$KERNEL_VERSION DESTDIR="$pkgdir/" install
 }
