@@ -1,42 +1,38 @@
-# Maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
-
-# Source global configuration
-source ../linux-lts.conf
 
 pkgname=acpi_call-lts
 _pkgname=acpi_call
 pkgver=1.1.0
-pkgrel=8
+pkgrel=9
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('x86_64')
 url='http://github.com/mkottman/acpi_call'
 license=('GPL')
-depends=("linux-lts>=${_kernelver}")
+depends=("linux-lts=${_kernelver}")
 makedepends=("linux-lts-headers=${_kernelver}")
 provides=("${pkgname%-*}")
-install="${pkgname%-*}.install"
-source=("acpi_call-$pkgver.tar.gz::${url}/archive/v${pkgver}.tar.gz")
-sha256sums=('d0d14b42944282724fca76f57d598eed794ef97448f387d1c489d85ad813f2f0')
+_extramodules=extramodules-CHAKRA-LTS
+source=("https://github.com/mkottman/acpi_call/archive/v${pkgver}.tar.gz")
+md5sums=('f69d40e130b0e5ed17ce8adb19e6dda1')
 
 prepare() {
   cd ${pkgname%-*}-${pkgver}
+
   # Fix build with Linux >= 3.17
   sed -i 's|acpi/acpi.h|linux/acpi.h|' acpi_call.c
 }
 
 build() {
   cd ${pkgname%-*}-${pkgver}
-  make KVERSION="${_kver}"
+  make KVERSION="$(cat /usr/lib/modules/$_extramodules/version)"
 }
 
 package() {
   cd ${pkgname%-*}-${pkgver}
+  install -Dt "$pkgdir/usr/lib/modules/$_extramodules" -m644 *.ko
+  find "$pkgdir" -name '*.ko' -exec xz {} +
 
-  install -dm 755 "${pkgdir}"/usr/lib/{modules/${_extramodules},modules-load.d}
-  install -m 644 ${pkgname%-*}.ko "${pkgdir}"/usr/lib/modules/${_extramodules}/
-  gzip "${pkgdir}"/usr/lib/modules/${_extramodules}/${pkgname%-*}.ko
-  echo ${pkgname%-*} > "${pkgdir}"/usr/lib/modules-load.d/${pkgname}.conf
+  echo acpi_call | install -Dm644 /dev/stdin "$pkgdir/usr/lib/modules-load.d/acpi_call.conf"
 
-  install -dm 755 "${pkgdir}"/usr/share/${pkgname}
-  cp -dr --no-preserve='ownership' {examples,support} "${pkgdir}"/usr/share/${pkgname}/
+  mkdir -p "$pkgdir/usr/share/acpi_call"
+  cp -t "$pkgdir/usr/share/acpi_call" -dr --no-preserve=ownership examples support
 }
