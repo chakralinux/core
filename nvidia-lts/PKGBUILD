@@ -1,20 +1,16 @@
-pkgname=('nvidia-lts')
-pkgdesc=('NVIDIA drivers for linux-lts')
+pkgname=nvidia-lts
+pkgdesc="NVIDIA drivers for linux-lts"
 pkgver=396.51
-pkgrel=3
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 depends=("linux-lts=4.4.150" "nvidia-utils=${pkgver}" 'libglvnd')
 makedepends=("linux-lts-headers=4.4.150")
 _extramodules=extramodules-CHAKRA-LTS
 license=('custom')
-
-_pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-#_pkg="NVIDIA-Linux-x86_64-${pkgver}"
-
-source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-#source=("NVIDIA-Linux-x86_64-${pkgver}.run::https://developer.nvidia.com/linux64bit")
-md5sums=('e41e28d1f380c64ec2eacae344fb5017')
+_pkg="NVIDIA-Linux-x86_64-${pkgver}"
+source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
+md5sums=('42b1a62681dff47f82d66bf9e9406915')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
@@ -29,7 +25,7 @@ build() {
     make SYSSRC=/usr/lib/modules/$KERNEL_VERSION/build module
 }
 
-package_nvidia() {
+package() {
     install -Dt "${pkgdir}/usr/lib/modules/${_extramodules}" -m644 \
       "${srcdir}/${_pkg}/kernel"/nvidia{,-modeset,-drm,-uvm}.ko
 

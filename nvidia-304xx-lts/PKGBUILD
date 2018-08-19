@@ -15,7 +15,6 @@ md5sums=('485506ee6a7c54780488dacddf1d56b1')
 
 prepare() {
     cd "${srcdir}"
-    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
     sh "${_pkg}.run" --extract-only
     cd "${_pkg}"
 }
@@ -32,7 +31,6 @@ package() {
     install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
         "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
     install -d -m755 "${pkgdir}/etc/modprobe.d"
-    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/nvidia.install"
     gzip "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia.ko"
     echo "blacklist nouveau" |
       install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modprobe.d/${pkgname}.conf"
