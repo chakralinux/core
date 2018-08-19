@@ -30,13 +30,14 @@ prepare() {
     patch -p1 -i 002-rdtscl.patch
     patch -p1 -i 005-debian-fix-kernel-warnings.patch
 
+
     sed -e "/BRCM_WLAN_IFNAME/s:eth:wlan:" \
         -i src/wl/sys/wl_linux.c
 }
 
 build() {
     cd "${srcdir}"
-    KERNEL_VERSION=$(</usr/lib/modules/extramodules-CHAKRA/version)
+    KERNEL_VERSION=$(</usr/lib/modules/$_extramodules/version)
     msg2 "Kernel = $KERNEL_VERSION"
     
     make -C /usr/lib/modules/"${KERNEL_VERSION}"/build M=`pwd`
