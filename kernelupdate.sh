@@ -59,7 +59,7 @@ build()
             sed -e "s/\(makedepends=([^>]*linux-headers=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
             
             sed -e "s/\(depends=([^>]*linux-lts=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
-            sed -e "s/\(makedepends=([^>]*linux-headers-lts=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
+            sed -e "s/\(makedepends=([^>]*linux-lts-headers=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
             
             git add PKGBUILD
         popd &>/dev/null
@@ -77,7 +77,7 @@ build()
         sed -e "s/\(makedepends=([^>]*linux-headers=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
         
         sed -e "s/\(depends=([^>]*linux-lts=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
-        sed -e "s/\(makedepends=([^>]*linux-headers-lts=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
+        sed -e "s/\(makedepends=([^>]*linux-lts-headers=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
 
         # update source link
         #sed -r "s|https://download.kde.org/.*stable/|https://download.kde.org/${Branch}/|g" -i PKGBUILD
