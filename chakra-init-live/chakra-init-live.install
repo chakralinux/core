@@ -1,7 +1,7 @@
 post_install() {
   echo "Enabling systemd services"
          systemctl enable upower.service
-         systemctl enable udisks.service
+         systemctl enable udisks2.service
          systemctl enable avahi-daemon.service
          systemctl enable NetworkManager.service
          systemctl enable sddm.service
@@ -13,4 +13,9 @@ post_install() {
 
 post_upgrade() {
   post_install
-} 
+}
+
+pre_remove() {
+   echo "Disabling systemd service"
+         systemctl disable live.service
+}
