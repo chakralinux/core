@@ -1,9 +1,9 @@
 
-pkgbase="linux-lts"
+pkgbase=linux-lts
 pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs')
 pkgver=4.4.150
 _srcname=linux-4.4
-pkgrel=1
+pkgrel=2
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 arch=('x86_64')
 license=('GPL2')
@@ -15,12 +15,16 @@ source=(http://www.kernel.org/pub/linux/kernel/v4.x/${_srcname}.tar.{xz,sign}
         config.x86_64
         # standard config files for mkinitcpio ramdisk
         linux-lts.preset
+        60-linux.hook  # pacman hook for depmod
+        90-linux.hook  # pacman hook for initramfs regeneration
         change-default-console-loglevel.patch)
 md5sums=('9a78fa2eb6c68ca5a40ed5af08142599'
          'SKIP'
          '271ce334e88a808cda42184d69ebd95b'
          '3c82e548b482a80cb344c083a9e4e259'
-         '232b52576a62c7a333e9fe7a1e1ca359'
+         'a329f9581060d555dc7358483de9760a'
+         'ce6c81ad1ad1f8b333fd6077d47abdaf'
+         'a85bfae59eb537b973c388ffadb281ff'
          'df7fceae6ee5d7e7be7b60ecd7f6bb35')
 validpgpkeys=(
               'ABAF11C65A2970B130ABE3C479BE3E4300411886' # Linus Torvalds
@@ -61,6 +65,7 @@ prepare() {
 
   # get kernel version
   make prepare
+  make -s kernelrelease > ../version
 
   # load configuration
   # Configure the kernel. Replace the line below with one of your choice.
@@ -105,191 +110,154 @@ package_linux-lts() {
   backup=("etc/mkinitcpio.d/${pkgbase}.preset")
   install=${pkgname}.install
 
-  cd "${srcdir}/$_srcname"
 
-  KARCH=x86
+  local kernver="$(<version)"
+  
+  cd ${_srcname}
 
-  # get kernel version
-  _kernver="$(make LOCALVERSION= kernelrelease)"
+  msg2 "Installing boot image..."
+  install -Dm644 "$(make -s image_name)" "$pkgdir/boot/vmlinuz-$pkgbase"
 
-  mkdir -p "${pkgdir}"/{lib/modules,lib/firmware,boot}
-  make INSTALL_MOD_PATH="${pkgdir}" modules_install
-  cp arch/$KARCH/boot/bzImage "${pkgdir}/boot/vmlinuz-${pkgname}"
+  msg2 "Installing modules..."
+  local modulesdir="$pkgdir/usr/lib/modules/$kernver"
+  mkdir -p "$modulesdir"
+  make INSTALL_MOD_PATH="$pkgdir/usr" DEPMOD=/doesnt/exist modules_install
 
-  # set correct depmod command for install
-  cp -f "${startdir}/${install}" "${startdir}/${install}.pkg"
-  true && install=${install}.pkg
-  sed \
-    -e  "s/KERNEL_NAME=.*/KERNEL_NAME=${_kernelname}/" \
-    -e  "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" \
-    -i "${startdir}/${install}"
-
-  # install fallback mkinitcpio.conf file and preset file for kernel
-  install -D -m644 "${srcdir}/${pkgbase}.preset" "${pkgdir}/etc/mkinitcpio.d/linux${_kernelname}.preset"
-  sed \
-    -e "1s|'linux.*'|'${pkgname}'|" \
-    -e "s|ALL_kver=.*|ALL_kver=\"/boot/vmlinuz-${pkgname}\"|g" \
-    -e "s|default_image=.*|default_image=\"/boot/initramfs-${pkgname}.img\"|g" \
-    -e "s|fallback_image=.*|fallback_image=\"/boot/initramfs-${pkgname}-fallback.img\"|g" \
-    -i "${pkgdir}/etc/mkinitcpio.d/linux${_kernelname}.preset"
+  # a place for external modules,
+  # with version file for building modules and running depmod from hook
+  local extramodules="extramodules$_kernelname"
+  local extradir="$pkgdir/usr/lib/modules/$extramodules"
+  install -Dt "$extradir" -m644 ../version
+  ln -sr "$extradir" "$modulesdir/extramodules"
 
   # remove build and source links
-  rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
-  # remove the firmware
-  rm -rf "${pkgdir}/lib/firmware"
-  # gzip -9 all modules to save 100MB of space
-  find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
-  # make room for external modules
-  ln -s "../extramodules${_kernelname}" "${pkgdir}/lib/modules/${_kernver}/extramodules"
-  # add real version for building modules and running depmod from post_install/upgrade
-  mkdir -p "${pkgdir}/lib/modules/extramodules${_kernelname}"
-  echo "${_kernver}" > "${pkgdir}/lib/modules/extramodules${_kernelname}/version"
-  
-  # Now we call depmod...
-  depmod -b "$pkgdir" -F System.map "$_kernver"
+  rm "$modulesdir"/{source,build}
 
-  # move module tree /lib -> /usr/lib
-  mkdir -p "${pkgdir}/usr"
-  mv "${pkgdir}/lib" "${pkgdir}/usr/"
-  
-  # add vmlinux
-  install -D -m644 vmlinux "${pkgdir}/usr/lib/modules/${_kernver}/build/vmlinux"
+  msg2 "Running depmod..."
+  depmod -b "${pkgdir}/usr" -F System.map "${kernver}"
+
+  msg2 "Installing hooks..."
+
+  # sed expression for following substitutions
+  local subst="
+    s|%PKGBASE%|$pkgbase|g
+    s|%KERNVER%|$kernver|g
+    s|%EXTRAMODULES%|$extramodules|g
+  "
+
+  # hack to allow specifying an initially nonexisting install file
+  sed "$subst" "$startdir/$install" > "$startdir/$install.pkg"
+  true && install=$install.pkg
+
+  # fill in mkinitcpio preset and pacman hooks
+  sed "$subst" ../linux-lts.preset | install -Dm644 /dev/stdin \
+    "$pkgdir/etc/mkinitcpio.d/$pkgbase.preset"
+  sed "$subst" ../60-linux.hook | install -Dm644 /dev/stdin \
+    "$pkgdir/usr/share/libalpm/hooks/60-$pkgbase.hook"
+  sed "$subst" ../90-linux.hook | install -Dm644 /dev/stdin \
+    "$pkgdir/usr/share/libalpm/hooks/90-$pkgbase.hook"
+
+  msg2 "Fixing permissions..."
+  chmod -Rc u=rwX,go=rX "$pkgdir"
 }
 
 package_linux-lts-headers() {
   pkgdesc="Header files and scripts for building modules for linux lts-kernel"
 
+  local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
+  
   install -dm755 "${pkgdir}/usr/lib/modules/${_kernver}"
 
-  cd "${srcdir}/$_srcname"
-  install -D -m644 Makefile \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/Makefile"
-  install -D -m644 kernel/Makefile \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/kernel/Makefile"
-  install -D -m644 .config \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/.config"
+  cd ${_srcname}
+  
+  msg2 "Installing build files..."
+  install -Dt "$builddir" -m644 Makefile .config Module.symvers System.map vmlinux
+  install -Dt "$builddir/kernel" -m644 kernel/Makefile
+  install -Dt "$builddir/arch/x86" -m644 arch/x86/Makefile
+  cp -t "$builddir" -a scripts
+  
+  # add xfs and shmem for aufs building
+  mkdir -p "$builddir"/{fs/xfs,mm}
 
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/include"
-
-  for i in acpi asm-generic config crypto drm generated keys linux math-emu \
-    media net pcmcia scsi sound trace uapi video xen; do
-    cp -a include/${i} "${pkgdir}/usr/lib/modules/${_kernver}/build/include/"
-  done
-
-  # copy arch includes for external modules
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/x86"
-  cp -a arch/x86/include "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/x86/"
-
-  # copy files necessary for later builds, like nvidia and vmware
-  cp Module.symvers "${pkgdir}/usr/lib/modules/${_kernver}/build"
-  cp -a scripts "${pkgdir}/usr/lib/modules/${_kernver}/build"
-
-  # fix permissions on scripts dir
-  chmod og-w -R "${pkgdir}/usr/lib/modules/${_kernver}/build/scripts"
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/.tmp_versions"
-
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/kernel"
-
-  cp arch/${KARCH}/Makefile "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/"
-
-  cp arch/${KARCH}/kernel/asm-offsets.s \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/kernel/"
-
-  # add docbook makefile
-  install -D -m644 Documentation/DocBook/Makefile \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/DocBook/Makefile"
+  # ???
+  mkdir "$builddir/.tmp_versions"
+  
+  msg2 "Installing headers..."
+  cp -t "$builddir" -a include
+  cp -t "$builddir/arch/x86" -a arch/x86/include
+  install -Dt "$builddir/arch/x86/kernel" -m644 arch/x86/kernel/asm-offsets.s
 
   # add dm headers
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/md"
-  cp drivers/md/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/md"
+  install -Dt "$builddir/drivers/md" -m644 drivers/md/*.h
 
   # add inotify.h
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/include/linux"
-  cp include/linux/inotify.h "${pkgdir}/usr/lib/modules/${_kernver}/build/include/linux/"
+  install -Dt "$builddir/include/linux/inotify" -m644 include/linux/inotify.h
 
   # add wireless headers
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/net/mac80211/"
-  cp net/mac80211/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/net/mac80211/"
+  install -Dt "$builddir/net/mac80211" -m644 net/mac80211/*.h
 
   # add dvb headers for external modules
-  # in reference to:
-  # http://bugs.archlinux.org/task/9912
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-core"
-  cp drivers/media/dvb-core/*.h \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-core/"
-  # and...
-  # http://bugs.archlinux.org/task/11194
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/include/config/dvb/"
-  cp include/config/dvb/*.h \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/include/config/dvb/"
-
-  # add dvb headers for http://mcentral.de/hg/~mrec/em28xx-new
-  # in reference to:
+  install -Dt "$builddir/drivers/media/dvb-core" -m644 drivers/media/dvb-core/*.h
+  install -Dt "$builddir/include/config/dvb" -m644 include/config/dvb/*.h
+    
   # http://bugs.archlinux.org/task/13146
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
-  cp drivers/media/dvb-frontends/lgdt330x.h \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/i2c/"
-  cp drivers/media/i2c/msp3400-driver.h \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/i2c/"
+  install -Dt "$builddir/drivers/media/i2c" -m644 drivers/media/i2c/msp3400-driver.h
 
-  # add dvb headers
-  # in reference to:
   # http://bugs.archlinux.org/task/20402
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/usb/dvb-usb"
-  cp drivers/media/usb/dvb-usb/*.h \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/usb/dvb-usb/"
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends"
-  cp drivers/media/dvb-frontends/*.h \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/tuners"
-  cp drivers/media/tuners/*.h \
-    "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/tuners/"
+  install -Dt "$builddir/drivers/media/usb/dvb-usb" -m644 drivers/media/usb/dvb-usb/*.h
+  install -Dt "$builddir/drivers/media/dvb-frontends" -m644 drivers/media/dvb-frontends/*.h
+  install -Dt "$builddir/drivers/media/tuners" -m644 drivers/media/tuners/*.h
 
-  # add xfs and shmem for aufs building
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/fs/xfs"
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/mm"
+  msg2 "Installing KConfig files..."
+  find . -name 'Kconfig*' -exec install -Dm644 {} "$builddir/{}" \;
 
-  # copy in Kconfig files
-  for i in $(find . -name "Kconfig*"); do
-    mkdir -p "${pkgdir}"/usr/lib/modules/${_kernver}/build/`echo ${i} | sed 's|/Kconfig.*||'`
-    cp ${i} "${pkgdir}/usr/lib/modules/${_kernver}/build/${i}"
+  msg2 "Removing unneeded architectures..."
+  local arch
+  for arch in "$builddir"/arch/*/; do
+    [[ $arch = */x86/ ]] && continue
+    echo "Removing $(basename "$arch")"
+    rm -r "$arch"
   done
 
-  chown -R root.root "${pkgdir}/usr/lib/modules/${_kernver}/build"
-  find "${pkgdir}/usr/lib/modules/${_kernver}/build" -type d -exec chmod 755 {} \;
+  msg2 "Removing documentation..."
+  rm -r "$builddir/Documentation"
 
-  # strip scripts directory
-  find "${pkgdir}/usr/lib/modules/${_kernver}/build/scripts" -type f -perm -u+w 2>/dev/null | while read binary ; do
-    case "$(file -bi "${binary}")" in
-      *application/x-sharedlib*) # Libraries (.so)
-        /usr/bin/strip ${STRIP_SHARED} "${binary}";;
-      *application/x-archive*) # Libraries (.a)
-        /usr/bin/strip ${STRIP_STATIC} "${binary}";;
-      *application/x-executable*) # Binaries
-        /usr/bin/strip ${STRIP_BINARIES} "${binary}";;
+  msg2 "Removing broken symlinks..."
+  find -L "$builddir" -type l -printf 'Removing %P\n' -delete
+
+  msg2 "Removing loose objects..."
+  find "$builddir" -type f -name '*.o' -printf 'Removing %P\n' -delete
+
+  msg2 "Stripping build tools..."
+  local file
+  while read -rd '' file; do
+    case "$(file -bi "$file")" in
+      application/x-sharedlib\;*)      # Libraries (.so)
+        strip -v $STRIP_SHARED "$file" ;;
+      application/x-archive\;*)        # Libraries (.a)
+        strip -v $STRIP_STATIC "$file" ;;
+      application/x-executable\;*)     # Binaries
+        strip -v $STRIP_BINARIES "$file" ;;
+      application/x-pie-executable\;*) # Relocatable binaries
+        strip -v $STRIP_SHARED "$file" ;;
     esac
-  done
+  done < <(find "$builddir" -type f -perm -u+x ! -name vmlinux -print0)
 
-  # remove unneeded architectures
-  rm -rf "${pkgdir}"/usr/lib/modules/${_kernver}/build/arch/{alpha,arc,arm,arm26,arm64,avr32,blackfin,c6x,cris,frv,h8300,hexagon,ia64,m32r,m68k,m68knommu,metag,mips,microblaze,mn10300,openrisc,parisc,powerpc,ppc,s390,score,sh,sh64,sparc,sparc64,tile,unicore32,um,v850,xtensa}
-
-  # remove files already in linux-docs package
-  rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.recursion-issue-01"
-  rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.recursion-issue-02"
-  rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.select-break"
+  msg2 "Fixing permissions..."
+  chmod -Rc u=rwX,go=rX "$pkgdir"
 }
 
 package_linux-lts-docs() {
   pkgdesc="Kernel hackers manual - HTML documentation that comes with the Linux lts-kernel."
 
+  local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
+
   cd "${srcdir}/$_srcname"
 
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build"
-  cp -al Documentation "${pkgdir}/usr/lib/modules/${_kernver}/build"
-  find "${pkgdir}" -type f -exec chmod 444 {} \;
-  find "${pkgdir}" -type d -exec chmod 755 {} \;
+  msg2 "Installing documentation..."
+  mkdir -p "$builddir"
+  cp -t "$builddir" -a Documentation
 
-  # remove a file already in linux package
-  rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/DocBook/Makefile"
+  msg2 "Fixing permissions..."
+  chmod -Rc u=rwX,go=rX "$pkgdir"
 }
