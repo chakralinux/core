@@ -3,7 +3,7 @@ pkgbase=linux-lts
 pkgname=('linux-lts' 'linux-lts-headers' 'linux-lts-docs')
 pkgver=4.4.152
 _srcname=linux-4.4
-pkgrel=1
+pkgrel=3
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 arch=('x86_64')
 license=('GPL2')
@@ -132,6 +132,8 @@ package_linux-lts() {
 
   # remove build and source links
   rm "$modulesdir"/{source,build}
+  # remove the firmware
+  rm -rf "${pkgdir}/usr/lib/firmware"
 
   msg2 "Running depmod..."
   depmod -b "${pkgdir}/usr" -F System.map "${kernver}"
