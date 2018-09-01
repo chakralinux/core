@@ -1,7 +1,7 @@
 # Contributions from ArchLinux: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/vlc
 
 pkgname=vlc
-pkgver=3.0.3
+pkgver=3.0.4
 pkgrel=1
 pkgdesc='Multi-platform MPEG, VCD/DVD, and DivX player'
 url='https://www.videolan.org/vlc/'
@@ -52,13 +52,11 @@ categories=('multimedia')
 options=('!emptydirs')
 source=("http://download.videolan.org/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz"{,.asc}
         update-vlc-plugin-cache.hook
-        lua53_compat.patch
-        vlc-qt5.11.patch)
-sha1sums=('dd1b7350bb0a7848e172e9dbbe0705ec5bb3d48c'
+        lua53_compat.patch)
+sha1sums=('218603f05ab5f30de0cc87b0ccceb57bb1efcfa4'
           'SKIP'
           'c3a35ba4dbd6c8e4e5b032664f50b9f0dcf579ee'
-          '5d7dba23756ff577a90b8631b187fbeac1f94e17'
-          '5ea98173668d076103df11041b0dceaec5b77707')
+          '5d7dba23756ff577a90b8631b187fbeac1f94e17')
 validpgpkeys=('65F7C6B4206BD057A7EB73787180713BE58D1ADC') # VideoLAN Release Signing Key
 screenshot='http://images1.videolan.org/vlc/screenshots/0.9.2/screenshot-kde4.jpg'
 
@@ -67,7 +65,6 @@ prepare() {
   sed -i -e 's:truetype/ttf-dejavu:TTF:g' modules/visualization/projectm.cpp
   sed -e 's|-Werror-implicit-function-declaration||g' -i configure
   patch -Np1 < "${srcdir}/lua53_compat.patch"
-  patch -Np1 < "${srcdir}/vlc-qt5.11.patch"
 }
 
 build() {
