@@ -1,6 +1,6 @@
 pkgname=pacman-mirrorlist
 pkgver=20180117
-pkgrel=1
+pkgrel=2
 pkgdesc="Chakra Linux mirror list for use by pacman"
 arch=('x86_64')
 url="https://chakralinux.org/code/core.git/plain/pacman-mirrorlist/mirrorlist"
@@ -13,4 +13,6 @@ md5sums=('637049e031cf3b361eaf26a65f0a9a58')
 package() {
   mkdir -p $pkgdir/etc/pacman.d
   install -m644 $srcdir/mirrorlist $pkgdir/etc/pacman.d/
+  # Chakra: create link with ".conf" suffix to allow an easy upload of the file with Discourse
+  ln -s /etc/pacman.d/mirrorlist $pkgdir/etc/pacman.d/mirrorlist.conf
 }
