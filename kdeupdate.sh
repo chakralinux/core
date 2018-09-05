@@ -78,6 +78,8 @@ build()
         sed -r "s|sha256sums=.*|sha256sums=('$_sha256sum'|g" -i PKGBUILD
         echo $_sha256sum
         unset pkgver pkgname source _pkgname _pkgbase
+        
+        git add PKGBUILD
 
     popd &>/dev/null
   done < "$1"
