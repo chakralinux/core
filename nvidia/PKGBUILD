@@ -2,10 +2,10 @@
 pkgbase=nvidia
 pkgname=(nvidia nvidia-dkms chd-nvidia)
 pkgver=396.51
-pkgrel=4
+pkgrel=5
 arch=('x86_64')
 url="http://www.nvidia.com/"
-makedepends=("linux-headers=4.18.5" "nvidia-utils=${pkgver}")
+makedepends=("linux-headers=4.18.6" "nvidia-utils=${pkgver}")
 license=('custom')
 options=('!strip')
 source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master/hwdb/nvidia_supported_new")
@@ -52,7 +52,7 @@ build() {
 
 package_nvidia() {
     pkgdesc="NVIDIA drivers for linux"
-    depends=("linux=4.18.5" "nvidia-utils=${pkgver}")
+    depends=("linux=4.18.6" "nvidia-utils=${pkgver}")
     conflicts=('nvidia-96xx' 'nvidia-173xx' 'nvidia-304xx')
 
     install -Dt "${pkgdir}/usr/lib/modules/${_extramodules}" -m644 \
