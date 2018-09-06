@@ -1,13 +1,13 @@
 # maintainer: Fabian Kosmale <inkane@chakra-project.org>
 # edit /etc/locale.gen and enable en_US.UTF8, then run locale-gen, then export LC_ALL=en_US.UTF8
 pkgbase=systemd
-pkgname=('systemd' 'libsystemd')
+pkgname=('systemd' 'libsystemd' 'systemd-resolvconf')
 # Can be from either systemd or systemd-stable
-_commit='f398c546c6fc43121131f41acec56b5a851bd35e'
-pkgver=238.76
-pkgrel=4
+_commit='de7436b02badc82200dc127ff190b8155769b8e7'
+pkgver=239.0
+pkgrel=1
 arch=('x86_64')
-url="https://www.github.com/systemd/systemd"
+url='https://www.github.com/systemd/systemd'
 makedepends=('acl' 'cryptsetup' 'docbook-xsl' 'gperf' 'lz4' 'xz' 'pam' 'libelf'
              'intltool' 'iptables' 'kmod' 'libcap' 'libidn' 'libgcrypt'
              'libmicrohttpd' 'libxslt' 'util-linux' 'linux-api-headers'
@@ -19,7 +19,6 @@ validpgpkeys=('63CDA1E5D3FC22B998D20DD6327F26951A015CC4'  # Lennart Poettering <
 source=('git+https://github.com/systemd/systemd-stable'
         'git+https://github.com/systemd/systemd'
         '0001-Use-Arch-Linux-device-access-groups.patch'
-        '0002-udev_ignore_bind_unbind_uevents.patch' #Chakra Issue #73
         'initcpio-hook-udev'
         'initcpio-install-systemd'
         'initcpio-install-udev'
@@ -42,30 +41,28 @@ source=('git+https://github.com/systemd/systemd-stable'
 sha512sums=('SKIP'
             'SKIP'
             '9348683829190628e25b7b3300fd880c426d555bde330d5fc5150a9a54b3ad9d4d1f2e69ea1dc6d6f086693dacc53c5af30f1fa7ad9b479791fd77bcdafa430e'
-            'e95040a14f61d6fa8e3776c5e9072d7fc63056b1a83a9908df382b39267edc01ad9587727fa6ef16d4a16135d8e74a9ea189693d9c8761278c36574e4729229b'
             'f0d933e8c6064ed830dec54049b0a01e27be87203208f6ae982f10fb4eddc7258cb2919d594cbfb9a33e74c3510cfd682f3416ba8e804387ab87d1a217eb4b73'
             '01de24951a05d38eca6b615a7645beb3677ca0e0f87638d133649f6dc14dcd2ea82594a60b793c31b14493a286d1d11a0d25617f54dbfa02be237652c8faa691'
             'a25b28af2e8c516c3a2eec4e64b8c7f70c21f974af4a955a4a9d45fd3e3ff0d2a98b4419fe425d47152d5acae77d64e69d8d014a7209524b75a81b0edb10bf3a'
             'ea4f390f4add962ab44181c6ac3f2fa521ff1d5e573700685c19bbd6284d0d6d8b3078377a040139132d77052578c2ecb5c37798ac314e3314de761a9444935d'
-            'd0f3b5ad51e3b94a7c8535e397c6252c98633f808c69b23c1dff4174925c141dc2fc50ca713aa38d76d24e6b6c9bac97b09d2cd1a56dc9a1b94fedc4411d9dc5'
+            'e9d6d90e7f8b23a079e4fd35b13a65faad9872bcd7f22904f4c67af61879ec59efa25ca5d58c3198b3bf7dfeea5e6d3c36d6521aa21d04558a1c1f42c073c1e8'
             '775d54eb7dd4ff9f14d2b95f02ce261f3c39e2d67fdfdc2b170119f4066449009d4e3fb9f8227115fdb17a22e2302feb89d3377027ee798a83414006a49b8713'
             'f5716775b7b3f05fd5a1b6a3aeeab3d1414c279bcff5357007cad0145f43521121f788f72513ac25b39a0cfc8994077f1fb8a92f3e400ac12756c348e8fa044b'
             '43a1b82be00b9e228f33c7ee3c8815d155707971602714c0b8825690c2944ee49b4430a13d0e115d165d816abdda3981b5f72ac0ae13138ffddb5488fbfb9330'
             'b90c99d768dc2a4f020ba854edf45ccf1b86a09d2f66e475de21fe589ff7e32c33ef4aa0876d7f1864491488fd7edb2682fc0d68e83a6d4890a0778dc2d6fe19'
-            '462ed39bd5c90168079956a402abafe8f0910882e6876b165a2c27af73833d0cad1be9cdbcb3549b34652ea86e5d0dba044946a38797bd533fdd1f5a0083f63b'
-            '46f93725bc94381300535737fd0186a3c096fa83661179eab0c450c7b164a87d9a5dd9abcf6ae98bdeb4bf50a4ba4f1944769948c236e4814f166ff03b0ee177'
+            '6b82386fc20619eefa911cd9cdac8efbd0c7137bba4955e8ae75a0ea378d19dbfccc1f7bde6684f03e5f2badefa4abf20623153d88a170d14499167319586db7'
+            '5a6b6beef8c31c79018884d948de840f4d3dfb07d9a87081ebf65e2b8fe595bc8c96dbd7742920ccf948c233213ed0026abc913650cefd77ad90c6f8c89bddb8'
             '4cff2ebd962e26e2f516d8b4ac45c839dbfa54dd0588b423c224a328b9f7c62306ca7b2f6cb55240c564caf9972d5bcd2e0efaf2de49d64729aeb3bc1560c9eb'
             '872de70325e9798f0b5a77e991c85bd2ab6de24d9b9ba4e35002d2dd5df15f8b30739a0042a624776177ffc14a838cde7ee98622016ed41df3efda9a659730b2'
             '471342b8d0e05533908cda5d6a906050a51e3181beda1239e91d717029ee40a9eaed714996a445417d87c4e31b7f8522a665de176077fe0536d538369594996d'
-            '3b11e8956169e6d80eca6e6de1b3e42641454d9d7be48961d400754f2242077d69fb7bfbeb0904f35ce569511036a7c9614a4a1cc3096fba993f46ae65e02895'
-            'bf3225011760695040e9f7be2560348e68e86eac0295f5a17a6f7e3dda7ad7c008812a15904e2071b53d5f8048891602c8a9a18608ac64930f2d8cc4fac2a319'
-            'ff1429a7c88e21d578c25d07e8cd9568577feb5a940fe39a7a815cf8431c57ca951ac6b394c53d2cdeb4efc645572c0b1b670a48cafcc405db41a6602b548e35'
+            'da783e3bfc6469b92dee4064a13e2b427520d3d96b57c95a4e07aaca3e844d95210a8b16122b022080f5452d65096f274dd1c1467725bbdb2e40ef304b78774a'
+            '08a590d08043a21f30f04252164b94df972b1ff1022a0469d6aef713e14484a3a037cce290a2a582851e6fac3e64add69d6cc8fc130bbeeaea08626ebf3e1763'
+            '577e33a1c50b4b41157a67f64162b035dd0c4a541e19cee55a100048bdb50cb2c82852741b1372989a0fe4c4782ba477522747fcc81d72aed99b3db512a86447'
             'e4a9d7607fe93daf1d45270971c8d8455c4bfc2c0bea8bcad05aeb89847edee23cd1a41073a72042622acf417018fe254f5bfc137604fe2c71292680bf67a1c2'
             '209b01b044877cc986757fa4009a92ea98f480306c2530075d153203c3cd2b3afccab6aacc1453dee8857991e04270572f1700310705d7a0f4d5bed27fab8c67')
 
 _backports=(
-  # nspawn: wait for network namespace creation before interface setup (#8633)
-  '7511655807e90aa33ea7b71991401a79ec36bb41'
+
 )
 
 _reverts=(
@@ -116,8 +113,6 @@ prepare() {
 
   # Replace cdrom/dialout/tape groups with optical/uucp/storage
   patch -Np1 -i ../0001-Use-Arch-Linux-device-access-groups.patch
-  # udev: fragile handling of uevent actions breaks with kernel 4.12+
-  patch -Np1 -i ../0002-udev_ignore_bind_unbind_uevents.patch
 }
 
 pkgver() {
@@ -135,7 +130,21 @@ pkgver() {
 build() {
   # _validate_tag || return
 
-  local timeservers=({0..3}.chakra.pool.ntp.org)
+  local _timeservers=({0..3}.chakra.pool.ntp.org)
+
+  local _nameservers=(
+    # We use these public name services, ordered by their
+    # privacy policy (hopefully):
+    #  * Cloudflare (https://1.1.1.1/)
+    #  * Quad9 without filtering (https://www.quad9.net/)
+    #  * Google (https://developers.google.com/speed/public-dns/)
+    1.1.1.1
+    9.9.9.10
+    8.8.8.8
+    2606:4700:4700::1111
+    2620:fe::10
+    2001:4860:4860::8888
+  )
 
   local meson_options=(
     -Daudit=false
@@ -149,7 +158,8 @@ build() {
     -Ddefault-hierarchy=hybrid
     -Ddefault-kill-user-processes=false
     -Dfallback-hostname='chakralinux'
-    -Dntp-servers="${timeservers[*]}"
+    -Dntp-servers="${_timeservers[*]}"
+    -Ddns-servers="${_nameservers[*]}"
     -Drpmmacrosdir=no
     -Dsysvinit-path=
     -Dsysvrcnd-path=
@@ -207,23 +217,26 @@ package_systemd() {
   rmdir "$pkgdir"/var/log/journal/remote
 
   # runtime libraries shipped with libsystemd
-  install -dm755 libsystemd
+  install -d -m0755 libsystemd
   mv "$pkgdir"/usr/lib/lib{nss,systemd,udev}*.so* libsystemd
+
+  # files shipped with systemd-resolvconf
+  rm "$pkgdir"/usr/{bin/resolvconf,share/man/man1/resolvconf.1}
 
   # avoid a potential conflict with [core]/filesystem
   rm "$pkgdir"/usr/share/factory/etc/nsswitch.conf
   sed -i '/^C \/etc\/nsswitch\.conf/d' "$pkgdir"/usr/lib/tmpfiles.d/etc.conf
 
   # add back tmpfiles.d/legacy.conf, normally omitted without sysv-compat
-  install -m644 $pkgbase-stable/tmpfiles.d/legacy.conf "$pkgdir"/usr/lib/tmpfiles.d
+  install -m0644 $pkgbase-stable/tmpfiles.d/legacy.conf "$pkgdir"/usr/lib/tmpfiles.d
 
   # Chakra specific .preset
-  install -Dm644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
+  install -D -m0644 "$srcdir/99-default.preset" "$pkgdir/usr/lib/systemd/system-preset/99-default.preset"
 
   # add mkinitcpio hooks
-  install -Dm644 initcpio-install-systemd "$pkgdir"/usr/lib/initcpio/install/systemd
-  install -Dm644 initcpio-install-udev "$pkgdir"/usr/lib/initcpio/install/udev
-  install -Dm644 initcpio-hook-udev "$pkgdir"/usr/lib/initcpio/hooks/udev
+  install -D -m0644 initcpio-install-systemd "$pkgdir"/usr/lib/initcpio/install/systemd
+  install -D -m0644 initcpio-install-udev "$pkgdir"/usr/lib/initcpio/install/udev
+  install -D -m0644 initcpio-hook-udev "$pkgdir"/usr/lib/initcpio/hooks/udev
 
   # ensure proper permissions for /var/log/journal
   # The permissions are stored with named group by tar, so this works with
@@ -232,22 +245,22 @@ package_systemd() {
   install -d -o root -g systemd-journal -m 2755 "$pkgdir"/var/log/journal
 
   # match directory owner/group and mode from [extra]/polkit
-  install -d -o root -g 102 -m 750 "$pkgdir"/usr/share/polkit-1/rules.d
+  install -d -o root -g 102 -m 0750 "$pkgdir"/usr/share/polkit-1/rules.d
 
   sed -i -e 's/#SystemMaxUse=/SystemMaxUse=25M/' ${pkgdir}/etc/systemd/journald.conf
 
   # add example bootctl configuration
-  install -Dm644 "$srcdir/chakra.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra.conf
-  install -Dm644 "$srcdir/chakra_fallback.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra_fallback.conf
-  install -Dm644 "$srcdir/loader.conf" "$pkgdir"/usr/share/systemd/bootctl/loader.conf
-  install -Dm644 "$srcdir/splash-chakra.bmp" "$pkgdir"/usr/share/systemd/bootctl/splash-chakra.bmp
+  install -D -m0644 "$srcdir/chakra.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra.conf
+  install -D -m0644 "$srcdir/chakra_fallback.conf" "$pkgdir"/usr/share/systemd/bootctl/chakra_fallback.conf
+  install -D -m0644 "$srcdir/loader.conf" "$pkgdir"/usr/share/systemd/bootctl/loader.conf
+  install -D -m0644 "$srcdir/splash-chakra.bmp" "$pkgdir"/usr/share/systemd/bootctl/splash-chakra.bmp
 
   # pacman hooks
-  install -Dm755 systemd-hook "$pkgdir"/usr/share/libalpm/scripts/systemd-hook
-  install -Dm644 -t "$pkgdir"/usr/share/libalpm/hooks *.hook
+  install -D -m755 systemd-hook "$pkgdir"/usr/share/libalpm/scripts/systemd-hook
+  install -D -m0644 -t "$pkgdir"/usr/share/libalpm/hooks *.hook
 
   # overwrite the systemd-user PAM configuration with our own
-  install -Dm644 systemd-user.pam "$pkgdir"/etc/pam.d/systemd-user
+  install -D -m0644 systemd-user.pam "$pkgdir"/etc/pam.d/systemd-user
 }
 
 package_libsystemd() {
@@ -256,6 +269,20 @@ package_libsystemd() {
   license=('GPL2')
   provides=('libsystemd.so' 'libudev.so')
 
-  install -dm755 "$pkgdir"/usr
+  install -d -m0755 "$pkgdir"/usr
   mv libsystemd "$pkgdir"/usr/lib
+}
+
+package_systemd-resolvconf() {
+  pkgdesc='systemd resolvconf replacement'
+  license=('GPL2')
+  depends=('systemd')
+  provides=('openresolv')
+  conflicts=('openresolv')
+
+  install -d -m0755 "$pkgdir"/usr/bin
+  ln -s resolvectl "$pkgdir"/usr/bin/resolvconf
+
+  install -d -m0755 "$pkgdir"/usr/share/man/man1
+  ln -s resolvectl.1.gz "$pkgdir"/usr/share/man/man1/resolvconf.1.gz
 }
