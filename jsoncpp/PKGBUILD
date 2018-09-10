@@ -1,12 +1,12 @@
 pkgbase=jsoncpp
 pkgname=('jsoncpp' 'jsoncpp-doc')
 pkgver=1.8.4
-pkgrel=1
+pkgrel=3
 pkgdesc='A C++ library for interacting with JSON'
 url='https://github.com/open-source-parsers/jsoncpp'
 license=('MIT' 'custom:Public_Domain')
 arch=('x86_64')
-makedepends=('gcc-libs' 'cmake' 'doxygen' 'graphviz' 'python')
+makedepends=('gcc-libs' 'cmake' 'doxygen' 'graphviz' 'python3' 'meson')
 options=('staticlibs')
 source=(${pkgbase}-${pkgver}.tar.gz::https://github.com/open-source-parsers/${pkgbase}/archive/${pkgver}.tar.gz)
 md5sums=('fa47a3ab6b381869b6a5f20811198662')
@@ -18,24 +18,26 @@ prepare() {
 
 build() {
   cd ${pkgbase}-${pkgver}
-  python doxybuild.py --with-dot
+  msg2 "Building docs..."
+  python3 doxybuild.py \
+    --doxygen="$(which doxygen)" \
+    --with-dot
 
-  cd build
-  cmake \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_INSTALL_LIBDIR=lib \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DBUILD_SHARED_LIBS=ON \
-    -DBUILD_STATIC_LIBS=ON \
-    -DJSONCPP_WITH_CMAKE_PACKAGE=ON \
-    ..
-  make
+  msg2 "Building shared library..."
+  chakra-meson --default-library shared build
+  ninja -C build
+
+  msg2 "Building static library..."
+  chakra-meson --default-library static build-static
+  ninja -C build-static
 }
 
 check() {
-  cd ${pkgbase}-${pkgver}/build
-  make test jsoncpp_test jsoncpp_readerwriter_tests
+  cd ${pkgbase}-${pkgver}
+  ninja -C build test
+  cd test
+  python3 runjsontests.py ../build/jsontestrunner
+  python3 rununittests.py ../build/jsoncpp_test
 }
 
 package_jsoncpp() {
@@ -43,7 +45,8 @@ package_jsoncpp() {
   optdepends=('jsoncpp-doc: documentation')
 
   cd ${pkgbase}-${pkgver}
-  make -C build DESTDIR="${pkgdir}" install
+  DESTDIR="${pkgdir}" ninja -C build install
+  DESTDIR="${pkgdir}" ninja -C build-static install
   install -Dm 644 LICENSE -t "${pkgdir}/usr/share/licenses/${pkgname}"
   install -Dm 644 README.md -t "${pkgdir}/usr/share/doc/${pkgname}"
 }
