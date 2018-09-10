@@ -1,78 +1,65 @@
 pkgbase=glib2
 pkgname=(glib2 glib2-docs)
-pkgver=2.54.2
-pkgrel=2
+pkgver=2.58.0
+pkgrel=1
 pkgdesc="Common C routines used by GTK+ and other libs"
-url="http://www.gtk.org/"
+url="https://wiki.gnome.org/Projects/GLib"
 arch=(x86_64)
-depends=(pcre libffi ) #libutil-linux
-makedepends=(gettext gtk-doc zlib shared-mime-info python3 libelf util-linux)
+depends=(pcre libffi libutil-linux zlib)
+makedepends=(gettext gtk-doc shared-mime-info python3 libelf git util-linux meson dbus)
+checkdepends=(desktop-file-utils)
+optdepends=('python: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report'
+            'libelf: gresource inspection tool')
 options=(!emptydirs)
-source=("http://download.gnome.org/sources/glib/2.54/glib-${pkgver}.tar.xz"
-        0001-docs-Fix-building-with-meson.patch
-        0001-meson-Fix-permissions-of-installed-scripts.patch
-        libs.diff
+source=("http://download.gnome.org/sources/glib/2.58/glib-${pkgver}.tar.xz"
+        noisy-glib-compile-schemas.diff
         glib-compile-schemas.hook gio-querymodules.hook)
-sha256sums=('bb89e5c5aad33169a8c7f28b45671c7899c12f74caf707737f784d7102758e6c'
-            '8b289f3e1a5a3b29d310d45610468199acfe6f2b38a0d1be38c9224437a0e40c'
-            '12b1a2f4e304e4c03e48ae9564d73ae38619bbb7711a013138939ff8e5cc2327'
-            '54c43d5d4d4b5fa591eb639e63050ce5eac30aff6691fa9cf56631782b2aad33'
+sha256sums=('c0f4ce0730b4f95c47b711613b5406a887c2ee13ea6d25930d72a4fa7fdb77f6'
+            '81a4df0b638730cffb7fa263c04841f7ca6b9c9578ee5045db6f30ff0c3fc531'
             'e1123a5d85d2445faac33f6dae1085fdd620d83279a4e130a83fe38db52b62b3'
             '5ba204a2686304b1454d401a39a9d27d09dd25e4529664e3fd565be3d439f8b6')
 
+pkgver() {
+  cd glib
+  git describe --tags | sed 's/-/+/g'
+}
+
+prepare() {
+  cd glib
+
+  # Suppress noise from glib-compile-schemas.hook
+  patch -Np1 -i ../noisy-glib-compile-schemas.diff
+}
+
 build() {
-    cd glib-$pkgver
-
-    # Bug 1324770: Also explicitly remove PCRE sources since we use --with-pcre=system
-    rm glib/pcre/*.[ch]
-
-    PYTHON=/usr/bin/python3 ./configure --prefix=/usr --libdir=/usr/lib \
-        --sysconfdir=/etc \
-        --with-pcre=system \
-        --enable-systemtap \
-        --enable-static \
-        --enable-installed-tests
-    make
+  chakra-meson glib build \
+    -D selinux=false \
+    -D man=true \
+    -D gtk_doc=true
+  ninja -C build
 }
 
 check() {
-  cd glib-$pkgver
-  make check
+  meson test -C build -t 2
 }
 
 package_glib2() {
-  depends=('pcre' 'libffi')
-  optdepends=('python2: for gdbus-codegen and gtester-report'
-              'libelf: gresource inspection tool')
-  options=('!docs' '!emptydirs')
-  license=('LGPL')
-
-  cd glib-$pkgver
-  make completiondir=/usr/share/bash-completion/completions DESTDIR="$pkgdir" install
-
-  # bash-completion scripts need not be executable
-  for _i in "$pkgdir/usr/share/bash-completion/completions/"*; do
-      chmod -x "$_i"
-  done
-
-  # Our gdb does not ship the required python modules, so remove it
-  rm -rf "$pkgdir/usr/share/gdb/"
-
-  # pacman hook
-  install -Dt "$pkgdir/usr/share/libalpm/hooks" -m644 ../*.hook
+  DESTDIR="$pkgdir" meson install -C build
+  mv "$pkgdir/usr/share/gtk-doc" "$srcdir"
+  python3 -m compileall "$pkgdir/usr/share/glib-2.0/codegen"
+  python3 -O -m compileall "$pkgdir/usr/share/glib-2.0/codegen"
+  install -Dt "$pkgdir/usr/share/libalpm/hooks" -m644 *.hook
 }
 
 package_glib2-docs() {
-  pkgdesc="Documentation for glib2"
-  conflicts=('gobject2-docs')
-  replaces=('gobject2-docs')
-  license=('custom')
-  options=('docs' '!emptydirs')
-  
-  cd glib-$pkgver/docs
-  make DESTDIR="${pkgdir}" install
-  install -m755 -d "${pkgdir}/usr/share/licenses/glib2-docs"
-  install -m644 reference/COPYING "${pkgdir}/usr/share/licenses/glib2-docs/"
+  pkgdesc="Documentation for GLib"
+  depends=()
+  optdepends=()
+  license+=(custom)
 
-  rm -rf "${pkgdir}/usr/share/man"
+  mkdir -p "$pkgdir/usr/share"
+  mv gtk-doc "$pkgdir/usr/share"
+
+  install -Dt "$pkgdir/usr/share/licenses/glib2-docs" -m644 glib/docs/reference/COPYING
 }
+
