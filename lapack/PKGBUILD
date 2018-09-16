@@ -1,21 +1,31 @@
 # maintainer (x86_64): AlmAck
 
-pkgbase=lapack
-pkgname=('lapack' 'blas' 'cblas' 'lapacke' 'lapack-doc')
+pkgname=lapack
 pkgver=3.8.0
-pkgrel=5
-url="http://www.netlib.org/lapack"
 pkgdesc="Linear Algebra PACKage"
+<<<<<<< HEAD
 makedepends=('gcc-fortran' 'cmake' 'python3' 'doxygen')
+=======
+pkgrel=4
+url="http://www.netlib.org/lapack"
+depends=("openblas")
+makedepends=('gcc-fortran' 'cmake' 'python2' 'doxygen')
+>>>>>>> parent of 0e4a3090c... split lapack to ('lapack' 'blas' 'cblas' 'lapacke' 'lapack-doc')
 arch=('x86_64')
 license=("custom")
-source=(http://www.netlib.org/${pkgbase}/${pkgbase}-${pkgver}.tar.gz LICENSE.blas)
-sha1sums=('55ac9d6be510883c5442c8aca967722cdf58fb29'
-          '2491a151a37f0162b25fc4e4e9a8ac444b574a76')
+source=(http://www.netlib.org/${pkgname}/${pkgname}-${pkgver}.tar.gz
+            LICENSE.blas)
+md5sums=('96591affdbf58c450d45c1daa540dbd2'
+         '38b6acb8ed5691d25863319d30a8b365')
+
+prepare() {
+  cd "${srcdir}"
+  install -d build
+}
 
 build() {
-  install -d build
-  cd build
+  cd "${srcdir}/build"
+
   cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_SKIP_RPATH=ON \
@@ -24,9 +34,8 @@ build() {
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_Fortran_COMPILER=gfortran \
-    -DLAPACKE_WITH_TMG=ON \
-    -DCBLAS=ON \
-    -DBUILD_DEPRECATED=ON
+    -DCBLAS=OFF \
+    -DLAPACKE_WITH_TMG=ON
   make
 
 # Build man pages
@@ -34,49 +43,14 @@ build() {
   doxygen DOCS/Doxyfile_man
 }
 
-package_lapack() {
-  depends=("blas")
+package() {
+  cd ${srcdir}/build
+  make DESTDIR=$pkgdir install
 
-  cd build
-  make DESTDIR="$pkgdir" install
-
-  rm -r "$pkgdir"/usr/lib/{libblas.*,libcblas.*,liblapacke.*}
-  rm -r "$pkgdir"/usr/lib/pkgconfig/{blas.*,cblas.*,lapacke.*}
-  rm -r "$pkgdir"/usr/lib/cmake/{cblas*,lapacke*}
-  rm -r "$pkgdir"/usr/include
-}
-
-package_blas() {
-  pkgdesc="Basic Linear Algebra Subprograms"
-  depends=('gcc-libs')
-
-  cd build/BLAS
-  make DESTDIR="$pkgdir" install
+  install -m755 -d "${pkgdir}/usr/share/licenses/lapack"
+  install -m644 "${srcdir}/${pkgname}-${pkgver}/LICENSE" \
+    "${pkgdir}/usr/share/licenses/lapack/"
   
-  install -m755 -d "${pkgdir}/usr/share/licenses/blas"
-  install -m644 "${srcdir}/LICENSE.blas" \
-    "${pkgdir}/usr/share/licenses/blas/"
-}
-
-package_cblas() {
-  pkgdesc="C interface to BLAS"
-  depends=("blas")
-
-  cd build/CBLAS
-  make DESTDIR="$pkgdir" install
-}
-
-package_lapacke() {
-  pkgdesc="C interface to LAPACK"
-  depends=("lapack")
-
-  cd build/LAPACKE
-  make DESTDIR="$pkgdir" install
-}
-
-package_lapack-doc() {
-  pkgdesc="Man pages for BLAS/LAPACK"
-
-  mkdir -p "$pkgdir"/usr/share
-  cp -r lapack-$pkgver/DOCS/man "$pkgdir"/usr/share
+  # libblas provided by openblas
+  rm ${pkgdir}/usr/lib/libblas.so* 
 }
