@@ -1,6 +1,6 @@
 pkgname=enblend-enfuse
 pkgver=4.2
-pkgrel=3
+pkgrel=4
 pkgdesc="Intelligent blend tool for overlapping picture"
 arch=("x86_64")
 license=('GPL')
@@ -18,7 +18,9 @@ sha1sums=('bc03ddb0066a0682cc8c08fa2529e602d671735a')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  ./configure --prefix=/usr
+    ./configure --prefix=/usr \
+                --enable-openmp=yes \
+                --enable-opencl=yes
   make
 }
 
