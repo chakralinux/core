@@ -10,7 +10,8 @@ license=('LGPL')
 url="http://gstreamer.freedesktop.org/"
 depends=(libxml2 glib2 libunwind libcap libelf)
 optdepends=('sh: feedback script')
-makedepends=(gtk-doc gobject-introspection autoconf-archive git valgrind bash-completion)
+makedepends=(gobject-introspection autoconf-archive git bash-completion)
+checkdepends=(valgrind)
 _commit=cba2c7dd89dc4cefebe6592b9b98e6e097bd840e  # tags/1.14.1^0
 install=gstreamer.install
 source=("git+https://anongit.freedesktop.org/git/gstreamer/gstreamer#commit=$_commit"
@@ -42,7 +43,7 @@ build() {
     --libexecdir=/usr/lib \
     --with-package-name="GStreamer (Chakra Linux)" \
     --with-package-origin="https://chakralinux.org/" \
-    --enable-gtk-doc \
+    --disable-gtk-doc \
     --disable-static
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   make
