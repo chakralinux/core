@@ -1,16 +1,14 @@
-# Maintainer abveritas@chakra-project.org
-
 pkgname=hdf5
-pkgver=1.8.18
+pkgver=1.10.3
 pkgrel=1
 arch=('x86_64')
 pkgdesc="General purpose library and file format for storing scientific data"
 url="http://www.hdfgroup.org/HDF5/"
 license=('custom')
 depends=('zlib' 'sh')
-source=("https://support.hdfgroup.org/ftp/HDF5/current18/src/${pkgname}-${pkgver}.tar.bz2")
+source=("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.3/src/$pkgname-$pkgver.tar.bz2")
 options=('!libtool')
-md5sums=('29117bf488887f89888f9304c8ebea0b')
+md5sums=('56c5039103c51a40e493b43c504ce982')
 
 build() {
   cd $srcdir/${pkgname}-${pkgver/_/-}
@@ -19,7 +17,7 @@ build() {
   ./configure --prefix=/usr --disable-static \
     --disable-hl \
     --enable-threadsafe \
-    --enable-production \
+    --enable-build-mode=production \
     --with-pic \
     --docdir=/usr/share/doc/hdf5/ \
     --with-pthread=/usr/lib/ \
