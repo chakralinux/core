@@ -2,7 +2,7 @@
 
 pkgname=('texlive-bin' 'libsynctex')
 pkgver=2018.47465
-pkgrel=3
+pkgrel=4
 _biber_ver=2.10
 license=('GPL')
 arch=('x86_64')
@@ -135,10 +135,12 @@ package_texlive-bin() {
    #############################################################
    ### install
    cd source
+   
    # fixes for xindy
    find utils/xindy -name Makefile -exec sed -i -e "s|^prefix =.\+$|prefix = $pkgdir/usr|" -e "s|^mandir =.\+$|mandir = \${prefix}/share/man|" -e "s|^datadir =.\+$|datadir = \${datarootdir}/texmf|" -e "s|^docdir =.\+$|docdir = \${datadir}/doc/xindy|" '{}' \;
 
    ## install biber
+   mkdir -p ${pkgdir}/usr/bin 
    install -m755 "${srcdir}"/biber "${pkgdir}/usr/bin/biber"
 
    echo "-------------------------------------------------------"
@@ -149,7 +151,7 @@ package_texlive-bin() {
    rm -rf "${pkgdir}"/usr/{texmf,share/texmf-dist}
 
    ## symlink engines by hand. texlinks has moved to texlive-core...
-   mkdir -p ${pkgdir}/usr/bin
+   
    ln -s eptex ${pkgdir}/usr/bin/platex
    ln -s euptex ${pkgdir}/usr/bin/uplatex
    ln -s luatex ${pkgdir}/usr/bin/dvilualatex
