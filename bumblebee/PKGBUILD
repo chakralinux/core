@@ -2,17 +2,19 @@
 
 pkgname=bumblebee
 pkgver=3.2.1
-pkgrel=16
+pkgrel=17
 pkgdesc="Bumblebee brings Optimus Support for Linux Through VirtualGL."
 arch=('x86_64')
 depends=('virtualgl' 'glib2' 'mesa')
 makedepends=('help2man')
 optdepends=('bbswitch: switch on/off discrete card' 
             'nvidia: NVIDIA kernel driver'
-            'nvidia-340xx: NVIDIA kernel driver for older devices'
-            'nvidia-304xx: NVIDIA kernel driver for even older devices'
-            'primus: faster back-end for optirun')
-url="http://www.Bumblebee-Project.org"
+            'nvidia-390xx: NVIDIA kernel driver for old devices'
+            'nvidia-340xx: NVIDIA kernel driver for even older devices'
+            'primus: faster back-end for optirun'
+            'lib32-virtualgl: run 32bit applications with optirun'
+            'lib32-primus: faster back-end for optirun')
+url="https://www.bumblebee-project.org/"
 license=("GPL3")
 install='bumblebee.install'
 backup=('etc/bumblebee/bumblebee.conf'
@@ -26,8 +28,10 @@ source=("http://www.bumblebee-project.org/${pkgname}-${pkgver}.tar.gz"
         "0005-bb_nvidia_drm_detection_bug699_02.patch::https://github.com/arafey/Bumblebee/commit/fcfe596eb13f62ca9dd7de272a5a87ae843b2a00.patch"
         "0006-bb_hexadicimal_bug573.patch::https://github.com/Bumblebee-Project/Bumblebee/commit/2073f8537412aa47755eb6f3f22a114403e5285b.patch"
         "0007-bb_mutebblogger.patch"
-        "0008-libglvnd.patch::https://github.com/Bumblebee-Project/Bumblebee/pull/845.patch"
-        "bumblebee.conf")
+        "0008-libglvnd.patch"
+        "bumblebee.conf"
+        "bumblebee.sysusers"
+        "nvidia-drm-outputclass.conf")
 md5sums=('30974e677bb13e8a3825fd6f3e7d3b24'
          'ce459c536367e39a6fcc981651da3cc7'
          '92c5aa0bfa39e41b0092362e555e93de'
@@ -37,7 +41,9 @@ md5sums=('30974e677bb13e8a3825fd6f3e7d3b24'
          'd0a7d504a717e34b05fb4bc9ee68f881'
          '613527d15fb5d40925dc2b3843e545c4'
          '46c8cd4ce30db7c22de0417febb7a2ab'
-         '8bfc4331d956abc6d205dd9b9e22e6eb')
+         '8bfc4331d956abc6d205dd9b9e22e6eb'
+         '005d6940f97a5f5421b666895a3562b0'
+         '768a64259f7e8d8a46a13b876d6c443c')
 
 
 prepare(){
@@ -51,8 +57,8 @@ build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
     ./configure \
         CONF_DRIVER_MODULE_NVIDIA=nvidia \
-        CONF_LDPATH_NVIDIA=/usr/lib/nvidia:/usr/lib32/nvidia \
-        CONF_MODPATH_NVIDIA=/usr/lib/nvidia/xorg/,/usr/lib/xorg/modules \
+        CONF_LDPATH_NVIDIA=/usr/lib/nvidia:/usr/lib32/nvidia:/usr/lib:/usr/lib32 \
+        CONF_MODPATH_NVIDIA=/usr/lib/nvidia/xorg,/usr/lib/xorg/modules \
         --prefix=/usr \
         --sbindir=/usr/bin \
         --with-udev-rules=/usr/lib/udev/rules.d/ \
@@ -65,12 +71,26 @@ package() {
     cd "${srcdir}/${pkgname}-${pkgver}"
     make install DESTDIR="$pkgdir"
 
-    # Stop nvidia from loading on boot
-    install -Dm644 "${srcdir}/bumblebee.conf" "${pkgdir}/usr/lib/modprobe.d/bumblebee.conf"  
+    # Install main app
+    make install DESTDIR="$pkgdir" \
+      completiondir=/usr/share/bash-completion/completions
+
+    # Blacklist nvidia and nouveau modules
+    # Reference: https://github.com/Bumblebee-Project/Bumblebee/issues/719
+    install -Dm644 "${srcdir}/bumblebee.conf" "${pkgdir}/usr/lib/modprobe.d/bumblebee.conf"
 
     # Install systemd unit
-    install -D -m644 "scripts/systemd/bumblebeed.service" "${pkgdir}/usr/lib/systemd/system/bumblebeed.service"
+    install -Dm644 "scripts/systemd/bumblebeed.service" "${pkgdir}/usr/lib/systemd/system/bumblebeed.service"
+    sed -i "s/sbin/bin/" "${pkgdir}/usr/lib/systemd/system/bumblebeed.service"
 
     # Make bash_completion work
-    mv -v "${pkgdir}/etc/bash_completion.d/bumblebee" "${pkgdir}/etc/bash_completion.d/optirun"    
+    mv -v "$pkgdir"/usr/share/bash-completion/completions/{bumblebee,optirun}
+
+    # Fix for FS#59312
+    sed -i "s/have/_have/" "${pkgdir}/usr/share/bash-completion/completions/optirun"
+
+    install -Dm644 "$srcdir"/bumblebee.sysusers "$pkgdir"/usr/lib/sysusers.d/$pkgname.conf
+
+    # Overwrite the OutputClass due to https://bugs.archlinux.org/task/60102
+    install -D -m644 "${srcdir}/nvidia-drm-outputclass.conf" "${pkgdir}/usr/share/X11/xorg.conf.d/11-nvidia-drm-outputclass.conf"
 }
