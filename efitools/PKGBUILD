@@ -1,0 +1,42 @@
+# Arch Contribution: https://www.archlinux.org/packages/extra/x86_64/efitools/
+
+pkgname="efitools"
+pkgver=1.8.1
+pkgrel=1
+pkgdesc="Tools for manipulating UEFI secure boot platforms"
+url="http://git.kernel.org/cgit/linux/kernel/git/jejb/efitools.git"
+arch=('x86_64')
+replaces=('prebootloader')
+license=('GPL' 'LGPL2.1')
+options=('!strip' '!makeflags')
+makedepends=('gnu-efi-libs' 'help2man' 'sbsigntools' 'perl-file-slurp' 'git')
+depends=('openssl')
+_commit=28687de80b18b3b35271de1d70769eac3c0b1ab4 # master
+source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/jejb/$pkgname.git#commit=$_commit")
+md5sums=('SKIP')
+
+pkgver() {
+	cd "${pkgname}"
+	echo "$(git describe --tags)" | sed -e 's|-|\.|g' -e 's|^v||g'
+}
+
+prepare() {
+	cd "${pkgname}"
+	git clean -x -d -f
+	sed -i "s/-O2/${CFLAGS} -Wno-pointer-sign/" Make.rules
+}
+
+build() {
+	cd "${pkgname}"
+	# fix PreLoader.efi building on x86_64 #49314
+	export ARCH="${CARCH}"
+	make
+}
+
+package() {
+	# http://www.rodsbooks.com/efi-bootloaders/secureboot.html#prebootloader
+	# http://blog.hansenpartnership.com/uefi-secure-boot/
+	# http://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released
+	cd "${pkgname}"
+	make DESTDIR="${pkgdir}" install
+}
