@@ -1,7 +1,7 @@
 #contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/gnu-efi-libs
 
 pkgname="gnu-efi-libs"
-pkgver=3.0.3
+pkgver=3.0.8
 pkgrel=1
 pkgdesc="Library for building UEFI Applications using GNU toolchain"
 url="http://sourceforge.net/projects/gnu-efi/"
@@ -9,24 +9,20 @@ license=('GPL')
 arch=('x86_64')
 options=('!strip' '!makeflags' '!buildflags')
 makedepends=('pciutils')
-source=("http://download.sourceforge.net/gnu-efi/gnu-efi-${pkgver}.tar.bz2")
-md5sums=('15a4bcbc18a9a5e8110ed955970622e6')
+source=("https://download.sourceforge.net/gnu-efi/gnu-efi-${pkgver}.tar.bz2")
+md5sums=('ae32011cfe6b1c40c0f244b9a49ba181')
 
 
 build() {
-	
 	cd "${srcdir}/gnu-efi-${pkgver}/"
 	make lib gnuefi inc apps
 }
 
 package() {
-	
 	cd "${srcdir}/gnu-efi-${pkgver}/"
 	
 	make INSTALLROOT="${pkgdir}" PREFIX="/usr" LIBDIR="/usr/lib" install
 	
 	install -d "${pkgdir}/usr/share/gnu-efi/apps/${arch}/"
 	install -D -m0644 "${srcdir}/gnu-efi-${pkgver}/${arch}/apps"/*.efi "${pkgdir}/usr/share/gnu-efi/apps/${arch}/"
-	
 }
-
