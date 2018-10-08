@@ -2,7 +2,7 @@
 
 pkgname=libinput
 pkgver=1.12.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Input device management and event handling library"
 arch=(x86_64)
 url="http://www.freedesktop.org/wiki/Software/libinput/"
@@ -22,7 +22,7 @@ validpgpkeys=('3C2C43D9447D5938EF4551EBE23B7E70B467F0BF') # Peter Hutterer (Who-
 
 build() {
   meson $pkgname-$pkgver build \
--Dudev-dir=/usr/lib/udev \
+    -Dudev-dir=/usr/lib/udev \
     -Dtests=false \
     -Ddocumentation=false
     ninja -C build
@@ -33,5 +33,8 @@ package() {
 
   install -Dvm644 $pkgname-$pkgver/COPYING \
     $pkgdir/usr/share/licenses/$pkgname/LICENSE
+  
+  cp -R $pkgdir/usr/local/* $pkgdir/usr/
+  rm -rf $pkgdir/usr/local/
 }
 
