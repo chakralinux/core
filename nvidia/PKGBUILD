@@ -1,21 +1,18 @@
-
 pkgbase=nvidia
 pkgname=(nvidia nvidia-dkms chd-nvidia)
-pkgver=396.51
-pkgrel=5
+pkgver=410.57
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
-makedepends=("linux-headers=4.18.6" 'libglvnd' "nvidia-utils=${pkgver}")
+makedepends=("linux-headers=4.18.12" 'libglvnd' "nvidia-utils=${pkgver}")
 license=('custom')
 options=('!strip')
 source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master/hwdb/nvidia_supported_new")
 _pkg="NVIDIA-Linux-x86_64-${pkgver}"
 _extramodules=extramodules-CHAKRA
-source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
-        kernel-4.16.patch)
+source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run")
 sha256sums=('94db1b11de33b0299da021fee8c21e4442656fe76452ac582b556e3f96365d5d'
-            '6add8c3782bdf276b4a5a5bcea102ceff8e90cf3fc2439dde9d5e60d557ac0d6'
-            '622ac792ec200b2239cb663c0010392118b78c9904973d82cd261165c16d6385')
+            '5c3c2e1fef0615c0002946c586c815a77676f4683304cc17d5bf323e7626a320')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
