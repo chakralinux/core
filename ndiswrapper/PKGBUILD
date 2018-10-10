@@ -1,4 +1,3 @@
-
 pkgname=ndiswrapper
 pkgver=1.61
 pkgrel=18
@@ -6,21 +5,22 @@ pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. 
 license=('GPL')
 arch=('x86_64')
 url="http://ndiswrapper.sourceforge.net"
-depends=("linux=4.18.6")
+depends=("dkms")
 makedepends=("linux-headers=4.18.12")
 provides=("ndiswrapper-utils=$pkgver")
 replaces=('ndiswrapper-utils')
 conflicts=('ndiswrapper-utils')
 makedepends=('linux-headers')
-_extramodules=extramodules-CHAKRA
 source=("http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz"
-              'linux-4.11.patch'
-              'linux-4.13.patch'
-              'linux-4.15.patch')
+        'linux-4.11.patch'
+        'linux-4.13.patch'
+        'linux-4.15.patch'
+        'dkms.conf')
 sha1sums=('213854ca8a83f9b5972db8fa873d346124e4bcb5'
           '4d1866b495a7929a3d21b6aebf0fa150702668b6'
           '09b308bbc948acc59d33882524b53ce210bb1848'
-          '4a47e255e27767dd87757f159eb1fdf1ddaf4993')
+          '4a47e255e27767dd87757f159eb1fdf1ddaf4993'
+          'f00657ca9177cea9bc77d7084c3c56b3728050a3')
 
 prepare() {
   cd ndiswrapper-$pkgver
@@ -34,17 +34,17 @@ prepare() {
 }
 
 build() {
+  _extramodules=extramodules-CHAKRA
   KERNEL_VERSION=$(cat /usr/lib/modules/$_extramodules/version)
   cd ndiswrapper-$pkgver
 
-  make -C driver KVERS_UNAME=${KERNEL_VERSION}
   make -C utils
 }
 
 package() {
-  KERNEL_VERSION=$(cat /usr/lib/modules/$_extramodules/version)
   cd ndiswrapper-$pkgver
-
-  make sbindir=usr/sbin usrsbindir=usr/bin KBUILD="/usr/lib/modules/$KERNEL_VERSION/build/" INST_DIR="usr/lib/modules/$_extramodules" \
-        KVERS=$KERNEL_VERSION DESTDIR="$pkgdir/" install
+  mkdir -p "$pkgdir"/usr/src
+  cp -RL ./driver "$pkgdir"/usr/src/ndiswrapper-$pkgver
+  cp "$srcdir"/dkms.conf "$pkgdir"/usr/src/ndiswrapper-$pkgver
+  make -C utils sbindir=/usr/bin usrsbindir=/usr/bin DESTDIR="$pkgdir" install
 }
