@@ -6,35 +6,16 @@ url='https://mesonbuild.com/'
 arch=('any')
 license=('Apache')
 depends=('python3-setuptools' 'ninja')
-checkdepends=('gcc-objc' 'vala' 'rust' 'gcc-fortran' 'mono' 'boost' 'qt5-base' 'git'
-              'python3-cython' 'gtest' 'gmock' 'protobuf' 'python3-gobject' 'gobject-introspection'
-              'itstool' 'valgrind' 'sdl2' 'doxygen' 'llvm' 'clang' 'gnustep-base' 'gtk-doc' 'gtk3' 'vulkan-validation-layers'
-              'qt5-tools' 'openssh' 'mercurial')
 source=(https://github.com/mesonbuild/meson/releases/download/${pkgver}/meson-${pkgver}.tar.gz{,.asc}
         chakra-meson)
-sha512sums=('b86a95a057cfe3b46a33dfe57d0b215133306808871cd2d0f479421b7fd7ce7f5b49aa4c1d429ac0a1a56f805e1c690d220b567b8118e875b140dc75ad8218a5'
+sha256sums=('982937ba5b380abe13f3a0c4dff944dd19d08b72870e3b039f5037c91f82835f'
             'SKIP'
-            'dc24aa41002a9e27c2cb043caf4bdcb3aae66adcaffc6c38858eb300b7e2ce776f8d5859922817decbceab2e06912598bf887d7691cfecdfbdde9e08e7da4474')
+            '52066130b9938b38bd75a11a5f3aee8c7cdacdd719af8e3b5ab2770e05176049')
 validpgpkeys=('95181F4EED14FDF4E41B518D3BF4693BFEEB9428') # Jussi Pakkanen <jpakkane@gmail.com>
-
-prepare() {
-  cd ${pkgname}-${pkgver}
-
-  # Succeeds for us?
-  mv 'test cases/failing/85 gtest dependency with version' 'test cases/frameworks/'
-}
 
 build() {
   cd ${pkgname}-${pkgver}
   python3 setup.py build
-}
-
-check() {
-  cd ${pkgname}-${pkgver}
-  # export MESON_PRINT_TEST_OUTPUT=1 # set this for debug output
-  
-  export LC_CTYPE=en_US.UTF-8
-  ./run_tests.py
 }
 
 package() {
@@ -50,4 +31,3 @@ package() {
   # Chakra packaging helper
   install -D ../chakra-meson -t "${pkgdir}/usr/bin"
 }
-
