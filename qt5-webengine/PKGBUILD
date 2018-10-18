@@ -7,18 +7,15 @@ url='http://qt-project.org/'
 license=('LGPL3' 'LGPL2.1' 'BSD')
 pkgdesc='Provides support for web applications using the Chromium browser project'
 depends=('qt5-webchannel' 'qt5-location' 'libxcomposite' 'libxrandr' 'pciutils' 'libxss'
-         'libevent' 'snappy' 'nss' 'protobuf' 'libxslt' 'minizip' 'ffmpeg' 're2' 'libvpx')
+         'libevent' 'snappy' 'nss' 'libxslt' 'minizip' 'ffmpeg' 're2' 'libvpx')
 makedepends=('python2' 'git' 'gperf' 'jsoncpp' 'ninja' 'qt5-tools')
 groups=('qt5')
 options=('debug')
 _pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
 source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz"
-         qtwebengine-harmony.patch qtwebengine-ffmpeg4.patch
-         qtwebengine-wayland.patch::"http://code.qt.io/cgit/qt/qtwebengine.git/patch/?id=a66d4cd8")
+         qtwebengine-harmony.patch)
 md5sums=('183b1e44bac4f70b54a77a9e569ff554'
-         '254061cb349cff714230b7cca83b0a4c'
-         '2835f9fe8097ff3d6098812c70f48044'
-         '04360a0896a267ee6b32df946db8202f')
+         '254061cb349cff714230b7cca83b0a4c')
 
 prepare() {
   mkdir -p build
@@ -31,12 +28,7 @@ prepare() {
 
   # FreeType 2.8.1
   patch -Np1 -i ../qtwebengine-harmony.patch
-  # Fix openGL detection on Wayland
-  patch -p1 -i ../qtwebengine-wayland.patch
 
-  cd src/3rdparty/chromium
-  # Fix build with ffmpeg 4
-  patch -p2 -i "$srcdir"/qtwebengine-ffmpeg4.patch
 }
 
 build() {

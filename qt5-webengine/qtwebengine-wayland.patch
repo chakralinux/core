@@ -36,33 +36,5 @@ index 9ed1db8b..95491709 100644
  QT_END_NAMESPACE
  
  #if defined(USE_OZONE) || defined(OS_WIN)
-diff --git a/src/core/gl_context_qt.h b/src/core/gl_context_qt.h
-index 8ffdad58..cecceabc 100644
---- a/src/core/gl_context_qt.h
-+++ b/src/core/gl_context_qt.h
-@@ -63,6 +63,7 @@ public:
-     static void* getXDisplay();
-     static void* getNativeDisplay();
-     static QFunctionPointer getGlXGetProcAddress();
-+    static QFunctionPointer getEglGetProcAddress();
- private:
-     Q_INVOKABLE bool initializeContextOnBrowserThread(gl::GLContext* context, gl::GLSurface* surface, gl::GLContextAttribs attribs);
- 
-diff --git a/src/core/gl_surface_qt.cpp b/src/core/gl_surface_qt.cpp
-index 7e579246..4d38d7c2 100644
---- a/src/core/gl_surface_qt.cpp
-+++ b/src/core/gl_surface_qt.cpp
-@@ -227,6 +227,10 @@ bool InitializeStaticGLBindings(GLImplementation implementation) {
-               base::GetFunctionPointerFromNativeLibrary(library,
-                                                         "eglGetProcAddress"));
-       if (!get_proc_address) {
-+          QFunctionPointer address = GLContextHelper::getEglGetProcAddress();
-+          get_proc_address = reinterpret_cast<gl::GLGetProcAddressProc>(address);
-+      }
-+      if (!get_proc_address) {
-         LOG(ERROR) << "eglGetProcAddress not found.";
-         base::UnloadNativeLibrary(library);
-         return false;
--- 
-cgit v1.1-6-g87c4
+
 
