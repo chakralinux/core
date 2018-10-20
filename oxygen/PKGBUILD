@@ -1,14 +1,14 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/oxygen
 
 pkgbase=oxygen
-pkgname=('oxygen' 'oxygen-cursors' 'oxygen-kde4')
+pkgname=('oxygen' 'oxygen-cursors')
 pkgver=5.14.1
 pkgrel=1
 pkgdesc="KDE Oxygen style"
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/oxygen'
 license=('LGPL')
-makedepends=(frameworkintegration kcmutils kdecoration extra-cmake-modules kdoctools kdelibs automoc4 python3)
+makedepends=(frameworkintegration kcmutils kdecoration extra-cmake-modules kdoctools python3)
 options=("debug")
 source=("https://download.kde.org/stable/plasma/$pkgver/$pkgname-$pkgver.tar.xz"{,.sig})
 sha256sums=('491f8c464583f2aa15b5a887d02c9b0023c9b57a1a8ea371914654c87073ee63'
@@ -35,14 +35,6 @@ build() {
         -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@"
   make
   cd ..
-
-  cd build-kde4
-  cmake ../${pkgname}-${pkgver} \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DBUILD_TESTING=OFF \
-    -DUSE_KDE4=ON
-  make
 }
 
 package_oxygen() {
@@ -65,17 +57,4 @@ package_oxygen-cursors() {
 
   cd build/cursors
   make DESTDIR="${pkgdir}" install
-}
-
-package_oxygen-kde4() {
-  pkgdesc='KDE Oxygen style for KDE4 applications'
-  depends=('kdelibs')
-  conflicts=('kde-workspace')
-
-  cd build-kde4
-  make DESTDIR="${pkgdir}" install
-
-  # needed so that pure Qt4 apps are correctly themed
-  install -d -m755 "$pkgdir"/usr/lib/qt/plugins/styles
-  ln -s /usr/lib/kde4/plugins/styles/oxygen.so "$pkgdir"/usr/lib/qt/plugins/styles
 }
