@@ -1,9 +1,9 @@
 pkgname=apache
-pkgver=2.4.33
+pkgver=2.4.37
 pkgrel=1
 pkgdesc='A high performance Unix-based HTTP server'
 arch=('x86_64')
-url='http://www.apache.org/dist/httpd'
+url='https://httpd.apache.org/'
 license=('Apache')
 backup=(etc/httpd/conf/httpd.conf
         etc/httpd/conf/extra/httpd-{autoindex,dav,default,info,languages}.conf
@@ -12,38 +12,42 @@ backup=(etc/httpd/conf/httpd.conf
         etc/httpd/conf/extra/proxy-html.conf
         etc/httpd/conf/{mime.types,magic}
         etc/logrotate.d/httpd)
-depends=('zlib' 'apr-util' 'pcre' 'systemd')
-makedepends=('libxml2' 'lua' 'openssl')
+depends=('zlib' 'apr-util' 'pcre' 'openssl')
+makedepends=('libxml2' 'lua' 'curl' 'jansson')
 optdepends=(
     'lua: for mod_lua module'
-    'openssl: for mod_ssl module'
-    'libxml2: for mod_proxy_html, mod_xml2enc modules' 
+    'libxml2: for mod_proxy_html, mod_xml2enc modules'
+    'curl: for mod_md module'
+    'jansson: for mod_md module' 
     'lynx: apachectl status'
 )
-install=${pkgname}.install
-source=(http://www.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2
+source=(https://www.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2
+        apache.tmpfiles.conf
         httpd.logrotate
-        chakra.layout
         httpd.service
-        httpd-tmpfile.conf)
-md5sums=('6ef469d3f16fffeb688bc6e0346823e5'
-         '13dbaaf949c5bc36cfcf5718b95cb020'
-         'a53ea863aab5714e39ebc8bbce6218ca'
-         '3494dece165bda4f207135e53655a9ec'
-         'e5894af20fee1d64fdaba35c2a10be9d')
+        chakra.layout)
+sha256sums=('3498dc5c6772fac2eb7307dc7963122ffe243b5e806e0be4fb51974ff759d726'
+            '16caf534bd54b7ce2203a085ddf844b8297eb63f91f2f3d09b2a8c971f8acc10'
+            '875903831634edf35d8d57e9a51bacb818255ecb3bfff29627f03e43d1ab65c3'
+            'ee39f38ea07d0294578e6964c86489ff605a0886b8d6105d49a06bf29496cd24'
+            'ee0bd61092331f1b3e091086cb1f147466ad6731fe81c347ae862e104ff8a096')
 
-build() {
+prepare() {
   cd httpd-${pkgver}
 
   # set default user
   sed -e 's#User daemon#User http#' \
       -e 's#Group daemon#Group http#' \
-      -i docs/conf/httpd.conf.in 
+      -i docs/conf/httpd.conf.in
 
   cat "${srcdir}/chakra.layout" >> config.layout
+}
+
+build() {
+  cd httpd-${pkgver}
 
   # enable-mpms-shared=all -- all possible MPMs for the platform will be installed.
-  ./configure \
+  ./configure --sbindir=/usr/bin \
       --enable-layout=Chakra \
       --enable-mpms-shared=all \
       --enable-modules=all \
@@ -53,20 +57,19 @@ build() {
       --with-suexec-caller=http \
       --with-suexec-docroot=/srv/http \
       --with-suexec-logfile=/var/log/httpd/suexec.log \
-      --with-suexec-bin=/usr/sbin/suexec \
+      --with-suexec-bin=/usr/bin/suexec \
       --with-suexec-uidmin=99 --with-suexec-gidmin=99 \
-      --enable-ldap --enable-authnz-ldap \
+      --enable-ldap --enable-authnz-ldap --enable-authnz-fcgi \
       --enable-cache --enable-disk-cache --enable-mem-cache --enable-file-cache \
       --enable-ssl --with-ssl \
       --enable-deflate --enable-cgi --enable-cgid \
       --enable-proxy --enable-proxy-connect \
       --enable-proxy-http --enable-proxy-ftp \
       --enable-dbd --enable-imagemap --enable-ident --enable-cern-meta \
-      --enable-lua --enable-xml2enc \
+      --enable-lua --enable-xml2enc --enable-md \
       --with-apr=/usr/bin/apr-1-config \
       --with-apr-util=/usr/bin/apu-1-config \
-      --with-pcre=/usr \
-      --with-mpm=prefork
+      --with-pcre=/usr
   make
 
 }
@@ -75,21 +78,15 @@ package() {
   cd httpd-${pkgver}
 
   make DESTDIR="${pkgdir}" install
-
-  install -D -m644 "${srcdir}/httpd.logrotate" \
-                   "${pkgdir}/etc/logrotate.d/httpd" 
-
-  install -D -m644 "${srcdir}/httpd-tmpfile.conf" \
-                   "${pkgdir}/usr/lib/tmpfiles.d/httpd.conf"
-
-  install -D -m644 "${srcdir}/httpd.service" \
-                   "${pkgdir}/usr/lib/systemd/system/httpd.service"
+   
+  install -D -m644 "${srcdir}/httpd.logrotate" "${pkgdir}/etc/logrotate.d/httpd"
+  install -D -m644 "${srcdir}/apache.tmpfiles.conf" "${pkgdir}/usr/lib/tmpfiles.d/apache.conf"
+  install -D -m644 "${srcdir}/httpd.service" "${pkgdir}/usr/lib/systemd/system/httpd.service"	
+  install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
   # symlinks for /etc/httpd
-  ln -fs /var/log/httpd "${pkgdir}/etc/httpd/logs"
-  ln -fs /run/httpd "${pkgdir}/etc/httpd/run"
+  # do we really need this symlink?
   ln -fs /usr/lib/httpd/modules "${pkgdir}/etc/httpd/modules"
-  ln -fs /usr/lib/httpd/build "${pkgdir}/etc/httpd/build"
 
   # set sane defaults
   sed -e 's#/usr/lib/httpd/modules/#modules/#' \
@@ -104,4 +101,10 @@ package() {
       -e 's|#\(Include conf/extra/httpd-default.conf\)|\1|' \
       -e 's|#\(Include conf/extra/httpd-mpm.conf\)|\1|' \
       -i "${pkgdir}/etc/httpd/conf/httpd.conf"
+
+  # cleanup
+  rm -r "${pkgdir}/usr/share/httpd/manual"
+  rm -r "${pkgdir}/etc/httpd/conf/original"
+  rm -r "${pkgdir}/srv/"
+  rm -r "${pkgdir}/run"
 }
