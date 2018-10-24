@@ -3,7 +3,7 @@
 pkgname=transcode
 _sripver=0.3-4
 pkgver=1.1.7
-pkgrel=22
+pkgrel=23
 pkgdesc="A video/DVD ripper and encoder for the terminal/console"
 arch=('x86_64')
 url="https://bitbucket.org/france/transcode-tcforge/"
@@ -17,23 +17,27 @@ source=("https://bitbucket.org/france/transcode-tcforge/downloads/${pkgname}-${p
         'srip-respectldflags.patch'
         'transcode-ffmpeg3.patch'
         'transcode-ffmpeg4.patch'
+        'transcode-imagemagick7.patch'
         )
 md5sums=('9bb25a796a8591fb764de46ee87ce505'
          'c0bd49a88f667c68c4430ad25bbed510'
          '26d0abf7d62f437d2266ff522acbf1bb'
          '99e1cebdfe7b983989a29a90c3452b8b'
          '33eb57fd8a83366f825a22588e6f53f8'
-         'dac497265353af4f077fd59ae55d97e8')
+         'dac497265353af4f077fd59ae55d97e8'
+         '3d15b0a8c0afce7903f8cdb302affd72')
 
 prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd $pkgname-$pkgver
 
-  patch -p1 -i "${srcdir}/transcode-ffmpeg3.patch"
-  patch -p1 -i "${srcdir}/transcode-ffmpeg4.patch" # Gentoo patch
+  patch -p1 -i $srcdir/transcode-ffmpeg3.patch
+  patch -p1 -i $srcdir/transcode-ffmpeg4.patch # Gentoo patch
+  patch -p1 -i $srcdir/transcode-imagemagick7.patch # Gentoo patch
+  autoreconf -vi
   
   cd ../subtitleripper
-  patch -p1 -i "${srcdir}/srip-linkingorder.patch"
-  patch -p1 -i "${srcdir}/srip-respectldflags.patch"
+  patch -p1 -i $srcdir/srip-linkingorder.patch
+  patch -p1 -i $srcdir/srip-respectldflags.patch
   sed -e 's|^\(.*lppm.*\)$|#\1|' \
       -e 's|^\(.*D_HAVE_LIB_PPM.*\)$|#\1|' \
       -e 's/DEFINES :=/DEFINES = -DHAVE_GETLINE/' \
@@ -46,7 +50,7 @@ build() {
     --disable-sse --disable-sse2 --disable-altivec --enable-mmx \
     --enable-lame --enable-ogg --enable-vorbis --enable-theora \
     --enable-libdv --enable-libxml2 --enable-v4l \
-    --enable-imagemagick --enable-libjpeg --enable-lzo --enable-mjpegtools \
+    --enable-imagemagick --with-imagemagick-includes=/usr/include/ImageMagick-7 --enable-libjpeg --enable-lzo --enable-mjpegtools \
     --enable-sdl --enable-freetype2 --enable-a52 --enable-libpostproc \
     --enable-xvid --enable-x264 --enable-alsa --enable-libmpeg2 --enable-libmpeg2convert
   make
