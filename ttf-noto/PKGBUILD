@@ -6,7 +6,7 @@ pkgver=20181007
 _commit=5a89b487c648c34c2b6d1b9ebb73bb3fab1df4b2  # master
 _commit_cjk=32a5844539f2e348ed36b44e990f9b06d7fb89fe
 _commit_emoji=8a6530b7b26e8c5ee7b177a1388d492bbcaf4319
-pkgrel=1
+pkgrel=2
 arch=('any')
 url="http://www.google.com/get/noto"
 license=('custom:SIL')
@@ -15,13 +15,14 @@ makedepends=()
 source=("noto-fonts-$_commit.zip::https://github.com/googlei18n/noto-fonts/archive/$_commit.zip"
         "noto-cjk-$_commit_cjk.zip::https://github.com/googlei18n/noto-cjk/archive/$_commit_cjk.zip"
         "noto-emoji-$_commit_emoji.zip::https://github.com/googlei18n/noto-emoji/archive/$_commit_emoji.zip"
-        66-noto-sans.conf 66-noto-serif.conf 66-noto-mono.conf)
+        66-noto-sans.conf 66-noto-serif.conf 66-noto-mono.conf 70-noto-cjk.conf)
 md5sums=('b55c7ef00750a0a168696e893f8f9811'
          'd8f4fc212846dc916fa8a6df5dd33a5d'
          '08ad948161383cbc933cf3e5fe3b3ed0'
          'd1c1f1fdd1ee428b9317de9e639d7544'
          'e99b33ffbf57d7a7d277acea0a0ce910'
-         '2478ab187743480e77c10e9e8af5d326')
+         '2478ab187743480e77c10e9e8af5d326'
+         'd00d70e55a3267f61e87c73c8ab651d7')
 
 pkgver() {
   date +%Y%m%d
@@ -68,6 +69,9 @@ package_otf-noto-cjk() {
     cd noto-cjk-${_commit_cjk}
     install -Dm644 *.ttc -t "$pkgdir"/usr/share/fonts/noto
     install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/"$pkgname"/LICENSE
+
+    install $srcdir 70-noto-cjk.conf $pkgdir/etc/fonts/conf.avail/70-noto-cjk.conf
+    ln -s ../conf.avail/70-noto-cjk.conf $pkgdir/etc/fonts/conf.d/70-noto-cjk.conf
 }
 
 package_ttf-noto-emoji() {
