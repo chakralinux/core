@@ -1,34 +1,38 @@
-# Platform Packages for Chakra, part of chakra-project.org
-# maintainer (x86_64): Giuseppe Calà <jiveaxe@gmail.com>
-#contributions from Arch:
+# Maintainer: Jaroslav Lichtblau <svetlemodry@archlinux.org>
+# Contributor: Mateusz Herych <heniekk@gmail.com>
+# Contributor: dibblethewrecker <dibblethewrecker.at.jiwe.dot.org>
+# Contributor: William Rea <sillywilly@gmail.com>
 
 pkgname=proj
-pkgver=4.8.0
+pkgver=5.2.0
 pkgrel=1
-pkgdesc="Cartographic Projections library"
+pkgdesc='Cartographic Projections library'
 arch=('x86_64')
 url="http://trac.osgeo.org/proj/"
 license=('MIT')
-options=('!libtool')
-source=(http://download.osgeo.org/proj/$pkgname-$pkgver.tar.gz
-	http://download.osgeo.org/proj/$pkgname-datumgrid-1.5.zip
-        chenyx06a.zip::http://www.swisstopo.admin.ch/internet/swisstopo/en/home/products/software/products/chenyx06.parsys.00011.downloadList.70576.DownloadFile.tmp/chenyx06ntv2.zip)
-md5sums=('d815838c92a29179298c126effbb1537'
-         'f5bf28a2a9c6afe9a3f670f0c0adb783'
-         'fbbfe2b6bcbc41168fe3bdc4a6c1082a')
+makedepends=('autoconf')
+changelog=$pkgname.changelog
+source=($pkgname-$pkgver.tar.gz::https://github.com/OSGeo/proj.4/archive/$pkgver.tar.gz
+        https://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
+sha256sums=('d784d51a8e56282123eb5918a2c685ed7da5097595afcacf5fa0246337a44361'
+            'b9838ae7e5f27ee732fb0bfed618f85b36e8bb56d7afb287d506338e9f33861e')
 
-build() {
-  bsdtar -xzvf ${srcdir}/${pkgname}-datumgrid-1.5.zip -C ${srcdir}/proj-${pkgver}/nad
-  bsdtar -xzvf "${srcdir}/chenyx06a.zip" -C "${srcdir}/proj-${pkgver}/nad" CHENYX06a.gsb
-  cd ${srcdir}/proj-${pkgver}
+prepare() {
+  bsdtar -xzvf "${srcdir}"/proj-datumgrid-1.8.zip -C "${srcdir}"/proj.4-$pkgver/nad
+}
 
+build(){
+  cd "${srcdir}"/$pkgname.4-$pkgver
+
+  autoreconf -if
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd ${srcdir}/proj-${pkgver}
-  make DESTDIR=${pkgdir} install
+  cd "${srcdir}"/$pkgname.4-$pkgver
 
-  install -D COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  make DESTDIR="${pkgdir}" install
+
+  install -Dm644 COPYING "${pkgdir}"/usr/share/licenses/$pkgname/LICENSE
 }
