@@ -1,7 +1,7 @@
 pkgbase=pyqt5
 pkgname=('python-pyqt5-common' 'python3-pyqt5' 'python2-pyqt5')
 pkgver=5.11.3
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="https://riverbankcomputing.co.uk/software/pyqt/intro"
 license=('GPL')
@@ -36,11 +36,10 @@ prepare() {
   cp -a PyQt5_gpl-$pkgver{,-py2}
 
   # Remove check for sip from py2, it doesn't work since sip doesn't install __init__.py
-  #sed -e 's|from PyQt5 import sip|pass|g' -i PyQt5_gpl-$pkgver-py2/configure.py
+  sed -e 's|from PyQt5 import sip|pass|g' -i PyQt5_gpl-$pkgver-py2/configure.py
 }
 
 build() {
-  msg "Configuring the Python 3 version"
   cd "$srcdir"/PyQt5_gpl-$pkgver
   python3 configure.py \
     --confirm-license \
@@ -50,11 +49,9 @@ build() {
     -q /usr/bin/qmake-qt5
 
   find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
-  msg "Making the Python 3 version"
   make
 
   cd "$srcdir"/PyQt5_gpl-$pkgver-py2
-  msg "Configuring the Python 2 version"
   python2 configure.py \
     --confirm-license \
     --no-sip-files \
@@ -63,7 +60,6 @@ build() {
     -q /usr/bin/qmake-qt5
 
   find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
-  msg "Making the Python 2 version"
   make
 }
 
@@ -101,11 +97,6 @@ package_python3-pyqt5(){
   # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
   make DESTDIR="$pkgdir" INSTALL_ROOT="$pkgdir" install
 
-  # Fix conflicts with python2-pyqt5
-  mv "$pkgdir"/usr/bin/{,python3-}pyuic5
-  mv "$pkgdir"/usr/bin/{,python3-}pylupdate5
-  mv "$pkgdir"/usr/bin/{,python3-}pyrcc5
-
   # Provided by pyqt-common
   rm "$pkgdir"/usr/share/qt5/qsci/api/python/PyQt5.api
 }
@@ -136,11 +127,6 @@ package_python2-pyqt5(){
   mv "$pkgdir"/usr/bin/{,python2-}pyuic5
   mv "$pkgdir"/usr/bin/{,python2-}pylupdate5
   mv "$pkgdir"/usr/bin/{,python2-}pyrcc5
-
-  # Default to python2 version
-  ln -s python2-pyuic5     "$pkgdir"/usr/bin/pyuic5
-  ln -s python2-pylupdate5 "$pkgdir"/usr/bin/pylupdate5
-  ln -s python2-pyrcc5     "$pkgdir"/usr/bin/pyrcc5
 
   rm "$pkgdir"/usr/lib/qt5/plugins/designer/libpyqt5.so
   rm "$pkgdir"/usr/lib/qt5/plugins/PyQt5/libpyqt5qmlplugin.so
