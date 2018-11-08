@@ -1,7 +1,6 @@
 # Platform packages for Chakra
 
-pkgname=qwt6
-_pkgname=qwt
+pkgname=qwt
 pkgver=6.1.3
 pkgrel=1
 pkgdesc="Qt Widgets for Technical Applications"
@@ -10,16 +9,18 @@ url="http://qwt.sourceforge.net/"
 depends=('qt5-base' 'qt5-svg')
 optdepends=('qt5-tools: For Designer plugin')
 makedepends=('qt5-tools')
-license=("custom:$_pkgname")
-source=("http://downloads.sourceforge.net/sourceforge/qwt/$_pkgname-$pkgver.tar.bz2")
+conflicts=(${pkgname}6)
+replaces=(${pkgname}6)
+license=("custom:$pkgname")
+source=("http://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.bz2")
 md5sums=('19d1f5fa5e22054d22ee3accc37c54ba')
 
 prepare() {
-  cd ${_pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
 
   sed -e '/^\s*QWT_INSTALL_PREFIX/ s|=.*|= /usr|' \
-      -e '/^QWT_INSTALL_DOCS/ s|/doc|/share/doc/qwt6|' \
-      -e '/^QWT_INSTALL_HEADERS/ s|include|&/qwt6|' \
+      -e '/^QWT_INSTALL_DOCS/ s|/doc|/share/doc/qwt|' \
+      -e '/^QWT_INSTALL_HEADERS/ s|include|&/qwt|' \
       -e '/^QWT_INSTALL_PLUGINS/ s|plugins/designer|lib/qt5/&|' \
       -e '/^QWT_INSTALL_FEATURES/ s|features|lib/qt5/mkspecs/&|' \
       -i qwtconfig.pri
@@ -27,7 +28,7 @@ prepare() {
 
 
 build() {
-  cd ${_pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
 
   # build qwt:
   qmake-qt5 qwt.pro
@@ -35,13 +36,10 @@ build() {
 }
 
 package() {
-  cd ${_pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
 
   make INSTALL_ROOT=${pkgdir} QTDIR=/usr install
   
- # rename conflicting symlinks
-  mv ${pkgdir}/usr/lib/libqwt.so ${pkgdir}/usr/lib/libqwt6.so
- 
   # install licence
   install -Dm 644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
