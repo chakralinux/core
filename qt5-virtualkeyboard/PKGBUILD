@@ -1,7 +1,7 @@
 
 pkgname=qt5-virtualkeyboard
 pkgver=5.11.2
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
@@ -10,8 +10,10 @@ depends=('qt5-declarative' 'qt5-svg')
 makedepends=()
 groups=('qt5')
 _pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
-source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
-md5sums=('df1531505041cac0d4e48158f05b76d9')
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz"
+"https://github.com/qt/qtvirtualkeyboard/commit/c7a94110987672308ed04b40fd8ed207d1c8d93b.diff")
+md5sums=('df1531505041cac0d4e48158f05b76d9'
+         'e49c186eccddb816bd6a38a65babfdff')
 
 prepare() {
   mkdir -p build
@@ -19,6 +21,9 @@ prepare() {
 
 build() {
   cd build
+
+  # Security warning KDE ml
+ patch -p1 -i ${srcdir}/c7a94110987672308ed04b40fd8ed207d1c8d93b.diff
 
   qmake-qt5 ../${_pkgfqn}  
   make
