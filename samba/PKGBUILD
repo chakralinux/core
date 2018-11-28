@@ -2,7 +2,7 @@
 
 pkgbase=samba
 pkgname=('libwbclient' 'smbclient' 'samba')
-pkgver=4.8.4
+pkgver=4.8.7
 pkgrel=1
 arch=('x86_64')
 url="https://www.samba.org"
@@ -23,7 +23,7 @@ source=(http://us1.samba.org/samba/ftp/stable/${pkgbase}-${pkgver}.tar{.gz,.asc}
         samba.conf)
 validpgpkeys=('52FBC0B86D954B0843324CDC6F33915B6568B7EA') #Samba Distribution Verification Key <samba-bugs@samba.org>
 
-md5sums=('ca5bfbebd8d9eb95506e16594b2bbee2'
+md5sums=('db7d5e17e5cc2e49f5032ab62680d92d'
          'SKIP'
          '5697da77590ec092cc8a883bae06093c'
          '96f82c38f3f540b53f3e5144900acf17'
@@ -225,10 +225,6 @@ sys.path.insert(0, '/usr/lib/python${_pyver}/site-packages')" \
 
   install -D -m644 ${srcdir}/samba.logrotate ${pkgdir}/etc/logrotate.d/samba
   install -D -m644 ${srcdir}/samba.pam ${pkgdir}/etc/pam.d/samba 
-
-  # winbind krb5 locator
-  mkdir -p ${pkgdir}/usr/lib/krb5/plugins/libkrb5
-  mv  ${pkgdir}/usr/lib/*.so ${pkgdir}/usr/lib/krb5/plugins/libkrb5/
   
   # spool directory
   install -d -m1777 ${pkgdir}/var/spool/samba
