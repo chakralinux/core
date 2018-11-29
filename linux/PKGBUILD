@@ -1,8 +1,11 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs')
 pkgver=4.19.5
+_kernelbasever=${pkgver:0:4}
 _srcname=linux-$pkgver
-pkgrel=1
+pkgrel=2
+_ckpatchversion=1
+_ckpatchname="patch-${_kernelbasever}-ck${_ckpatchversion}"
 arch=('x86_64')
 url="https://www.kernel.org/"
 license=('GPL2')
@@ -14,6 +17,7 @@ source=(
   60-linux.hook  # pacman hook for depmod
   90-linux.hook  # pacman hook for initramfs regeneration
   linux.preset   # standard config files for mkinitcpio ramdisk
+  "http://ck.kolivas.org/patches/4.0/${_kernelbasever}/${_kernelbasever}-ck${_ckpatchversion}/${_ckpatchname}.xz"
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
@@ -25,7 +29,8 @@ sha256sums=('8c839ec29cce7eb0e8ef7eaa10d1eb9d84d2be2521e352fb4f9414e76856ef75'
             'be58633094281798af70d8ba2a018f923d6618244bd3840b91f8f9c51354fd42'
             '287b43e83535d0aba2797b8fe4c1527788995cbfd858097be37214345e781a25'
             '75f99f5239e03238f88d1a834c50043ec32b1dc568f2cc291b07d04718483919'
-            'ad6344badc91ad0630caacde83f7f9b97276f80d26a20619a87952be65492c65')
+            'ad6344badc91ad0630caacde83f7f9b97276f80d26a20619a87952be65492c65'
+            '77863d16a08e1b3c726b6c965f1bb7c672bd7317776810121062b73f9ea26780')
 
 _kernelname=-CHAKRA
 
@@ -44,6 +49,9 @@ END
   sed -e "/^EXTRAVERSION =/s/=.*/= -${pkgrel}/" \
       -e "/^EXTRAVERSION =/aLOCALVERSION =" \
       -i Makefile
+
+  msg2 "Patching with ck patchset..."
+  patch -Np1 -i "$srcdir/${_ckpatchname}"
 
   # don't run depmod on 'make install'. We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
