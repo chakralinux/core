@@ -70,8 +70,17 @@ build()
     pushd "$pkg" &>/dev/null
 
         # update version
-        sed -r "s|pkgver=.*|pkgver=$_kernelver|g" -i PKGBUILD
-        sed -r "s|pkgrel=.*|pkgrel=1|g" -i PKGBUILD
+        case "linux" in
+            *$pkg*)
+                echo "linux package found, set pkgver"
+                sed -r "s|pkgver=.*|pkgver=$_kernelver|g" -i PKGBUILD
+                sed -r "s|pkgrel=.*|pkgrel=1|g" -i PKGBUILD
+                ;;
+            *) echo "normal pkg found, pkgrel++ only"
+                 _rel=$(cat PKGBUILD | grep pkgrel= | cut -d= -f2)
+                sed -i -e "s/pkgrel=$_rel/pkgrel=$(($_rel+1))/" PKGBUILD
+                ;;
+        esac
 
         sed -e "s/\(depends=([^>]*linux=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
         sed -e "s/\(makedepends=([^>]*linux-headers=\)[^\"]*/\1$_kernelver/" -i PKGBUILD
