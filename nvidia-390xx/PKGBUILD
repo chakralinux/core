@@ -13,10 +13,12 @@ source=("https://code.chakralinux.org/tools/chakra-hardware-detection/raw/master
 _pkg="NVIDIA-Linux-x86_64-${pkgver}"
 _extramodules=extramodules-CHAKRA
 source+=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
-        kernel-4.16.patch)
+        kernel-4.16.patch
+        kernel-4.19.patch)
 sha256sums=('94db1b11de33b0299da021fee8c21e4442656fe76452ac582b556e3f96365d5d'
             '38290a0b19e86037112f22397e02be9cdd6bcd677dd926b2977bbd49119e611e'
-            '622ac792ec200b2239cb663c0010392118b78c9904973d82cd261165c16d6385')
+            '622ac792ec200b2239cb663c0010392118b78c9904973d82cd261165c16d6385'
+            'e425320bd3712cc789035d5936412724b0b410f50463980c0a48715fd3f8c431')
 
 prepare() {
     sh "${_pkg}.run" --extract-only
@@ -25,6 +27,7 @@ prepare() {
     # Restore phys_to_dma support (still needed for 396.18)
     # https://bugs.archlinux.org/task/58074
     patch -Np1 -i ../kernel-4.16.patch
+    patch -Np1 -i ../kernel-4.19.patch
 
     cp -a kernel kernel-dkms
     cd kernel-dkms
