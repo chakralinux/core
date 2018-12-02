@@ -1,0 +1,40 @@
+pkgname=vulkan-icd-loader
+pkgver=1.1.92
+pkgrel=1
+arch=(x86_64)
+pkgdesc="Vulkan Installable Client Driver (ICD) Loader"
+url="https://www.khronos.org/vulkan/"
+license=('custom')
+makedepends=(cmake python3-lxml libx11 libxrandr wayland vulkan-headers git)
+depends=(glibc)
+optdepends=('vulkan-driver: packaged vulkan driver') # vulkan-driver: vulkan-intel/vulkan-radeon/nvidia-utils/....
+source=("${pkgname}+${pkgver}"::"https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-${pkgver}.tar.gz")
+
+
+build() {
+  cd "${srcdir}/Vulkan-Loader-sdk-${pkgver}"
+
+  rm -rf build ; mkdir build ; cd build
+  cmake -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_SYSCONFDIR=/etc \
+    -DCMAKE_INSTALL_DATADIR=/share \
+    -DCMAKE_SKIP_RPATH=True \
+    -DBUILD_TESTS=Off \
+    -DBUILD_WSI_XCB_SUPPORT=On \
+    -DBUILD_WSI_XLIB_SUPPORT=On \
+    -DBUILD_WSI_WAYLAND_SUPPORT=On \
+    -DCMAKE_BUILD_TYPE=Release \
+    ..
+  make
+}
+
+package() {
+  cd "${srcdir}/Vulkan-Loader-sdk-${pkgver}/build"
+  
+  make DESTDIR="${pkgdir}" install
+  
+  install -dm755 ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m644 ../LICENSE.txt "${pkgdir}"/usr/share/licenses/${pkgname}/
+}
+md5sums=('ab5b62084e21d0f1230bfc5d584cd88a')
