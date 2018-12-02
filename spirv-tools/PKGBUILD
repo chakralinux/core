@@ -1,32 +1,37 @@
-# Arch contributor: https://projects.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/spirv-tools
+# Contributions from Arch:
+# Maintainer: Laurent Carlier <lordheavym@gmail.com>
 
 pkgname=spirv-tools
-pkgver=1.1.1
-_pkgver=1.1-rev1
+pkgver=2018.5
 pkgrel=1
 pkgdesc="API and commands for processing SPIR-V modules"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="https://www.khronos.org/vulkan/"
 license=('custom')
 groups=(vulkan-devel)
 depends=(gcc-libs)
-makedepends=(cmake)
-source=("https://github.com/KhronosGroup/SPIRV-Tools/archive/spirv-${_pkgver}.tar.gz")
-sha256sums=('c843441dd994b589ac23eac4b83826fe55c5823a7fcbbde6d61826494f6843b5')
+makedepends=(cmake python3 git)
+source=("git+https://github.com/KhronosGroup/SPIRV-Tools.git#tag=v${pkgver}"
+        git+git://github.com/KhronosGroup/SPIRV-Headers.git)
+sha256sums=('SKIP'
+            'SKIP')
 
 build() {
-  cd SPIRV-Tools-spirv-"${_pkgver}"
-  
-  rm -rf build ; mkdir build ; cd build
-  cmake -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release \
-    ../
+  cd SPIRV-Tools
+
+  rm -rf build && mkdir build && cd build
+  cmake .. \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DCMAKE_INSTALL_LIBDIR=lib \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DSPIRV_WERROR=Off \
+      -DSPIRV-Headers_SOURCE_DIR=${srcdir}/SPIRV-Headers
   make
 }
 
 package() {
-  cd SPIRV-Tools-spirv-"${_pkgver}"/build
-  
+  cd SPIRV-Tools/build
+
   make DESTDIR="${pkgdir}" install
 
   install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
