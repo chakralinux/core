@@ -1,23 +1,27 @@
-# Contributions from Arch:
+# Contrubutions from Arch:
 # Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
 
 pkgname=libplacebo
-pkgver=0.4.0
+pkgver=0.6.0
 pkgrel=1
 pkgdesc='Reusable library for GPU-accelerated video/image rendering primitives'
 url='https://github.com/haasn/libplacebo'
 arch=('x86_64')
 license=('LGPL2.1')
-depends=('vulkan-icd-loader')
+depends=('vulkan-icd-loader' 'glslang' 'lcms2' 'shaderc' 'libshaderc_shared.so')
 makedepends=('meson' 'ninja' 'vulkan-headers')
+provides=('libplacebo.so')
 source=(${pkgname}-${pkgver}.tar.gz::https://github.com/haasn/libplacebo/archive/v${pkgver}.tar.gz)
-sha512sums=('4dfcdfaa2e52d68b65219ed6ba8895388a6caadd996212cbe5389b7a2ed54296422ead3ad5b4f4495209e7bfb132cc15d6e6a0ac2edcf0ecae5562912c026710')
+sha256sums=('199b0b76be2c20d1ef9c78bea1e2409781026398c9689187e5e5d69a775e65ee')
 
 build() {
   cd ${pkgbase}-${pkgver}
   chakra-meson build \
     -D tests=true \
-    -D vulkan=true
+    -D vulkan=enabled \
+    -D glslang=enabled \
+    -D shaderc=enabled \
+    -D lcms=enabled
   ninja -C build
 }
 
