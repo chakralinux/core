@@ -1,28 +1,44 @@
-# Arch contributor: https://git.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/vulkan-loader-layers
+# Cpntributions from Arch:
+# Maintainer: Sven-Hendrik Haase <sh@lutzhaase.com>
 
 pkgname=glslang
-pkgver=3.0.git4678ca9d
+pkgver=7.9.2888
 pkgrel=1
-arch=(i686 x86_64)
-url="https://www.khronos.org/vulkan/"
-license=('custom')
-pkgdesc="Khronos reference front-end for GLSL and ESSL, and sample SPIR-V generator"
-makedepends=(git cmake)
-depends=(glibc)
-source=('git://github.com/KhronosGroup/glslang.git#commit=4678ca9dacfec7a084dbc69bbe568bdad6889f1b')
-sha256sums=('SKIP')
+pkgdesc='OpenGL and OpenGL ES shader front end and validator'
+arch=('x86_64')
+url='https://github.com/KhronosGroup/glslang'
+license=('BSD')
+depends=('gcc-libs' 'spirv-tools')
+makedepends=('cmake')
+options=('staticlibs')
+source=(${pkgname}-${pkgver}.tar.gz::https://github.com/KhronosGroup/glslang/archive/${pkgver}.tar.gz)
+sha256sums=('cb66779d0e6b5f07f0445bd58289a24e56e12693e71d75c8fae3db31ffacaf8c')
 
 build() {
-  cd "${pkgname}"
-  rm -rf build ; mkdir build ; cd build
-  cmake -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release \
-    ../
-  make
+  cd ${pkgname}-${pkgver}
+  mkdir -p build-{shared,static}
+  (cd build-shared
+    cmake .. \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_SHARED_LIBS=ON
+    make
+  )
+  (cd build-static
+    cmake .. \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_SHARED_LIBS=OFF
+    make
+  )
 }
 
 package() {
-  cd "${pkgname}/build"
-  make DESTDIR="${pkgdir}" install
+  cd ${pkgname}-${pkgver}
+  make -C build-shared DESTDIR="${pkgdir}" install
+  make -C build-static DESTDIR="${pkgdir}" install
+  cd "${pkgdir}"/usr/lib
+  for lib in *.so; do
+    ln -sf "${lib}" "${lib}.0"
+  done
 }
-
