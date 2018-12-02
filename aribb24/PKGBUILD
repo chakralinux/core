@@ -1,0 +1,32 @@
+# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
+# Contributor: Ryotaro Ko <aur@p1kachu.net>
+
+pkgname=aribb24
+pkgver=1.0.3
+pkgrel=1
+pkgdesc='Library for ARIB STD-B24, decoding JIS 8 bit characters and parsing MPEG-TS stream'
+url='https://github.com/nkoriyama/aribb24'
+arch=('x86_64')
+license=('LGPL3')
+depends=("libpng")
+source=(${pkgname}-${pkgver}.tar.gz::https://github.com/nkoriyama/aribb24/archive/v${pkgver}.tar.gz
+        ${pkgname}-1.0.3-add-missing-libm.patch::https://github.com/nkoriyama/aribb24/commit/b08931895599e42ce6930a720a3fca74f6f6d9cb.patch)
+sha256sums=('f61560738926e57f9173510389634d8c06cabedfa857db4b28fb7704707ff128'
+            'e9311b9ec6df28eb93ad92982c9a5286b0f1afc049501694e7674496440a463e')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  patch -Np1 < ../${pkgname}-1.0.3-add-missing-libm.patch
+  autoreconf -fiv
+}
+
+build() {
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+}
