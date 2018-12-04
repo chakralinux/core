@@ -1,21 +1,26 @@
-#
-# Core Packages for Chakra, part of chakraos.org
-#
-
 pkgname=reiserfsprogs
-pkgver=3.6.25
+pkgver=3.6.27
 pkgrel=1
 pkgdesc="Reiserfs utilities"
 arch=(x86_64)
-url="http://www.kernel.org/"
+url="https://www.kernel.org/"
 license=('GPL')
 groups=('base')
 depends=('util-linux')
-source=("http://ftp.kernel.org/pub/linux/kernel/people/jeffm/reiserfsprogs/v${pkgver}/${pkgname}-${pkgver}.tar.xz")
-sha256sums=('fb1199405af8b8af609e9e97054de8f0d05b6cc2b6727713db92ed5e2919d20d')
+source=("https://www.kernel.org/pub/linux/kernel/people/jeffm/reiserfsprogs/v${pkgver}/${pkgname}-${pkgver}.tar.xz"
+        reiserfsprogs-3.6.27-loff_t.patch)
+sha256sums=('0e95b67fa7746a3c2d59145e9b9c2feb4a6be52853e83b497b182eae508e62e3'
+            '2d4e90d5e2b0610021d0c078f350e098d5573edccdf2864909aada83ed0473f9')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  patch -p1 -i $srcdir/reiserfsprogs-3.6.27-loff_t.patch
+  autoreconf -i
+}
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+  CFLAGS+=' -fgnu89-inline'
   ./configure --prefix=/usr --sbindir=/usr/bin
   make
 }
