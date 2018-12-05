@@ -3,7 +3,7 @@ pkgname=('linux' 'linux-headers' 'linux-docs')
 pkgver=4.19.6
 _kernelbasever=${pkgver:0:4}
 _srcname=linux-$pkgver
-pkgrel=1
+pkgrel=2
 _ckpatchversion=1
 _ckpatchname="patch-${_kernelbasever}-ck${_ckpatchversion}"
 arch=('x86_64')
@@ -32,6 +32,9 @@ sha256sums=('644e61beb66211c0c5c13f91d96de1725055e6eea4cda7bb37ce9929ba8f09c3'
             'ad6344badc91ad0630caacde83f7f9b97276f80d26a20619a87952be65492c65'
             '77863d16a08e1b3c726b6c965f1bb7c672bd7317776810121062b73f9ea26780')
 
+source+=("BUG201685.patch::https://bugzilla.kernel.org/attachment.cgi?id=279857&action=diff&collapsed=&headers=1&format=raw")
+sha256sums+=('d182453163bb16b231457ae54fd7d4b69497d65e3c48bbf7e1e265724cc94a34')
+
 _kernelname=-CHAKRA
 
 prepare() {
@@ -52,6 +55,9 @@ END
 
   msg2 "Patching with ck patchset..."
   patch -Np1 -i "$srcdir/${_ckpatchname}"
+
+  msg2 "Apply patch: Incorrect disk IO caused by blk-mq direct issue can lead to file system corruption"
+  patch -Np1 -i "$srcdir/BUG201685.patch"
 
   # don't run depmod on 'make install'. We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
