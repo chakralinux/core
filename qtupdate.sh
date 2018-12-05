@@ -19,6 +19,8 @@
 
 _script_name="kde update"
 
+# helper functions
+_needed_functions="messages"
 # load functions
 for subroutine in $_needed_functions ; do
   source ~/bin/functions/$subroutine
@@ -40,6 +42,8 @@ function _package_info() {
 
 build()
 {
+  local missing_sums=()
+  
   while read -r pkg; do
     [[ $pkg =~ ^[:blank:]*$ ]] && continue
 
@@ -48,6 +52,10 @@ build()
 
     echo "Processing: '$pkg'"
     pushd "$pkg" &>/dev/null
+
+        # reset to the current git version
+        git reset HEAD PKGBUILD
+        git checkout PKGBUILD
 
         # update version
         sed -r "s|pkgver=.*|pkgver=$Version|g" -i PKGBUILD
@@ -58,7 +66,7 @@ build()
 
         # update md5 sums
         local  pkgver pkgname source _pkgname _pkgbase
-        _package_info "$pkg" pkgver pkgname source _pkgname _pkgbase
+        _package_info "$pkg" pkgver pkgname source _pkgname _pkgbase md5sums
 
         if [ ! -z "$_pkgname" ]; then
             pkgname=$_pkgname
@@ -73,12 +81,43 @@ build()
         _pkgfqn="${pkgname/5-/}-everywhere-src"
         echo $_pkgfqn
         _md5sums=$(curl "$_url" | grep "${_pkgfqn}" | grep .xz | cut -c-32)
-        sed -r "s|md5sums=.*|md5sums=('$_md5sums'|g" -i PKGBUILD
-        echo $_md5sums
-        unset pkgver pkgname source _pkgname _pkgbase
+
+        if [ -z "$_md5sums" ]; then
+            missing_sums+=($pkgname)
+            # try with an updpkgsums
+            updpkgsums            
+        else
+            # A little bit triky, but in order to replace only the first md5sum
+            # and keep the correct parentesis we need to know if the array
+            # contains 1 element or not
+            if [ ${#md5sums[@]} -eq "1" ]; then
+                # contains ()
+                sed -r "s|md5sums=.*|md5sums=('$_md5sums')|g" -i PKGBUILD
+            else
+                # contains only (
+                sed -r "s|md5sums=.*|md5sums=('$_md5sums'|g" -i PKGBUILD
+            fi
+        fi
+        
+        unset pkgver pkgname source _pkgname _pkgbase md5sums
+        
+        # add the new changes on git
+        git add PKGBUILD
 
     popd &>/dev/null
   done < "$1"
+  
+  # check output
+  title "Process output"
+  if [ ${#missing_sums[@]} -gt "0" ]; then
+    status_fail
+    for i in "${missing_sums[@]}"
+    do
+        notice "Sums for $i not found, updpkgsums was executed but manually verify the output!"
+    done
+  else
+    status_done
+  fi
 }
 
 title "$_script_name"
