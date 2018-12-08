@@ -10,17 +10,13 @@ depends=('qt5-declarative' 'qt5-svg')
 makedepends=()
 groups=('qt5')
 _pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
-source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz"
-"https://github.com/qt/qtvirtualkeyboard/commit/c7a94110987672308ed04b40fd8ed207d1c8d93b.diff")
-md5sums=('66b03225f71549ea63f351c781ffba94'
-         'e49c186eccddb816bd6a38a65babfdff')
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
+md5sums=('66b03225f71549ea63f351c781ffba94')
 
 prepare() {
   mkdir -p build
 
   cd ${_pkgfqn}
- # Security warning KDE ml
- patch -p1 -i ${srcdir}/c7a94110987672308ed04b40fd8ed207d1c8d93b.diff
 }
 
 build() {
