@@ -1,13 +1,13 @@
 pkgbase=sip
-pkgname=('python-sip-common' 'python2-sip' 'python3-sip' 'python3-sip-pyqt5' 'python2-sip-pyqt5')
-pkgver=4.19.12
-pkgrel=2
+pkgname=('sip' 'python2-sip' 'python3-sip' 'python3-sip-pyqt5' 'python2-sip-pyqt5')
+pkgver=4.19.13
+pkgrel=3
 arch=('x86_64')
 url="https://www.riverbankcomputing.com/software/sip/"
 license=('custom:"sip"')
 makedepends=('python2' 'python3')
 source=("https://downloads.sourceforge.net/pyqt/${pkgbase}-${pkgver}.tar.gz")
-md5sums=('e28b0790dfe4962ce6bbd7c4772f40c9')
+md5sums=('9124cb8978742685747a5415179a9890')
 
 prepare() {
   mkdir -p build{,-py2,-pyqt5,-pyqt5-py2}
@@ -31,23 +31,25 @@ build() {
   make
 }
 
-package_python-sip-common() {
-    pkgdesc="A tool for creating Python bindings for C and C++ libraries"
+package_sip() {
+    pkgdesc="A tool that makes it easy to create Python bindings for C and C++ libraries"
     depends=('glibc')
-    conflicts=('sip-common' 'sip')
-    replaces=('sip-common' 'sip')
-    provides=('sip-common=${pkgver}' 'sip')
+    conflicts=('python-sip-common')
+    replaces=('python-sip-common')
+    provides=('python-sip-common')
 
     cd build
     make DESTDIR="$pkgdir" install -C sipgen
-    install -Dm644 ../sip-$pkgver/siplib/sip.h -t "$pkgdir"/usr/include
+    # move sip.h to /usr/include
+    mv "$pkgdir"/usr/include/{python*/sip.h,}
+    rm -r "$pkgdir"/usr/include/python*
 
     install -Dm644 ../sip-$pkgver/LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
 }
 
 package_python3-sip() {
   pkgdesc="Python 3.x SIP bindings for C and C++ libraries"
-  depends=('python3' 'python-sip-common')
+  depends=('python3')
 
   cd build
   make DESTDIR="$pkgdir" install
@@ -58,7 +60,7 @@ package_python3-sip() {
 
 package_python2-sip() {
   pkgdesc="Python 2.x SIP bindings for C and C++ libraries"
-  depends=('python2' 'python-sip-common')
+  depends=('python2')
 
   cd build-py2
   make DESTDIR="$pkgdir" install
@@ -69,7 +71,7 @@ package_python2-sip() {
 
 package_python3-sip-pyqt5() {
   pkgdesc="Python 3.x SIP bindings for C and C++ libraries (PyQt5 version)"
-  depends=('python3' 'python-sip-common')
+  depends=('python3')
 
   cd build-pyqt5
   make DESTDIR="$pkgdir" install
