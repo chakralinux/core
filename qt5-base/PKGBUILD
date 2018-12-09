@@ -1,8 +1,8 @@
 
 pkgbase=qt5-base
 pkgname=(qt5-base qt5-xcb-private-headers)
-pkgver=5.11.3
-pkgrel=2
+pkgver=5.12.0
+pkgrel=1
 arch=('x86_64')
 url='http://qt-project.org/'
 license=('GPL3' 'LGPL3' 'FDL' 'custom')
@@ -22,7 +22,7 @@ groups=('qt5')
 options=('debug')
 _pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
 source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
-md5sums=('dd5a2a295c38cbb852cb7b45cb3a8e27')
+md5sums=('c9aa3776f3c1e5cf9dbde238fbf1e6e3')
 
 prepare() {
   cd ${_pkgfqn}
@@ -78,8 +78,7 @@ package_qt5-base() {
   cd ${_pkgfqn}
   make INSTALL_ROOT="${pkgdir}" install
 
-  install -D -m644 LGPL_EXCEPTION.txt \
-    "${pkgdir}"/usr/share/licenses/${pkgbase}/LGPL_EXCEPTION.txt
+  install -Dm644 LICENSE* -t "$pkgdir"/usr/share/licenses/$pkgbase
 
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
   find "${pkgdir}/usr/lib" -type f -name '*.prl' \
