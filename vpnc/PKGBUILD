@@ -5,7 +5,7 @@ pkgname=vpnc
 pkgver=0.5.3.1
 _svnver=550
 _git=6f87b0fe7b20d802a0747cc310217920047d58d3
-pkgrel=5
+pkgrel=6
 pkgdesc="VPN client for cisco3000 VPN Concentrators"
 url="http://www.unix-ag.uni-kl.de/~massar/vpnc/"
 license=('GPL')
@@ -16,12 +16,20 @@ arch=('x86_64')
 source=("$pkgname::svn+http://svn.unix-ag.uni-kl.de/vpnc/trunk/#revision=$_svnver"
         "http://git.infradead.org/users/dwmw2/vpnc-scripts.git/blob_plain/$_git:/vpnc-script"
         'vpnc.conf'
-        'vpnc@.service')
+        'vpnc@.service'
+        'bug_799429.patch')
 md5sums=('SKIP'
          '70198474faf36a84beaa11136f6c4d9c'
          'a3f4e0cc682f437e310a1c86ae198e45'
-         '09cfded435c43dd2adb5a8863bd74cfc')
+         '09cfded435c43dd2adb5a8863bd74cfc'
+         '14083b1cc67a517b52d617fcde6efad9')
 backup=(etc/vpnc/default.conf)
+
+prepare() {
+  cd $pkgname
+  # http://lists.unix-ag.uni-kl.de/pipermail/vpnc-devel/2015-June/004160.html
+  patch -Np1 -i $srcdir/bug_799429.patch
+}
 
 build() {
   cd $pkgname
