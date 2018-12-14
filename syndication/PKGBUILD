@@ -1,0 +1,40 @@
+
+pkgname=syndication
+pkgver=5.53.0
+pkgrel=1
+epoch=1
+pkgdesc="RSS/Atom parser library"
+arch=('x86_64')
+url="https://projects.kde.org/$pkgname"
+license=(LGPL)
+depends=(kcodecs)
+makedepends=(extra-cmake-modules doxygen qt5-tools)
+groups=(kf5)
+options=('debug')
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz"{,.sig})
+sha256sums=('cbe4bfbbfdd90401574a6c60463ffa08083ad14efac0d0ed888c04d85e46d27e'
+            'SKIP')
+validpgpkeys=(53E6B47B45CEA3E0D5B7457758D0EE648A48B3BB) # David Faure <faure@kde.org>
+
+
+prepare() {
+  mkdir -p build
+}
+
+build() {
+  cd build
+  cmake ../${pkgname}-${pkgver} \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DKDE_INSTALL_LIBDIR=lib \
+        -DKDE_INSTALL_SYSCONFDIR=/etc \
+        -DKDE_INSTALL_LIBEXECDIR=lib \
+        -DBUILD_TESTING=OFF \
+        -DKDE_INSTALL_USE_QT_SYS_PATHS=ON "$@"
+  make
+}
+
+package() {
+  cd build
+  make DESTDIR="${pkgdir}" install
+}

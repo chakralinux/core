@@ -1,0 +1,64 @@
+From b81680067887b054bd0d048bc5820604796c4c6e Mon Sep 17 00:00:00 2001
+From: Jeff Layton <jeff.layton@primarydata.com>
+Date: Fri, 26 Jun 2015 12:36:13 -0400
+Subject: [PATCH] vpnc: skip parsing responder lifetime payload
+
+My company upgraded its Fortigate firewall recently, and I started seeing this assertion pop when connecting to it. Looking at the debug output from vpnc, I see this:
+
+   PARSING PAYLOAD type: 0b (ISAKMP_PAYLOAD_N)
+   next_type: 0b (ISAKMP_PAYLOAD_N)
+   length: 0028
+   n.doi: 00000001 (ISAKMP_DOI_IPSEC)
+   n.protocol: 01 (ISAKMP_IPSEC_PROTO_ISAKMP)
+   n.spi_length: 10
+   n.type: 6000 (ISAKMP_N_IPSEC_RESPONDER_LIFETIME)
+   n.spi: 66548f57 ce7a153b ab19c18b 851d4fbb
+   n.data: 800b0001 00020004 00007080
+   t.attributes.type: 000b (IKE_ATTRIB_LIFE_TYPE)
+   t.attributes.u.attr_16: 0001 (IKE_LIFE_TYPE_SECONDS)
+   t.attributes.type: 0002 (IKE_ATTRIB_HASH)
+   t.attributes.u.lots.length: 0004
+   t.attributes.u.lots.data: 00007080
+   DONE PARSING PAYLOAD type: 0b (ISAKMP_PAYLOAD_N)
+
+
+...which makes little sense to me. The firewall is sending a
+IKE_ATTRIB_LIFE_TYPE with a value of seconds in it, but then it sends an
+attribute specifying the hash algorithm. I think this is a bug in the
+firewall code, and I've asked our IT people to report it to fortinet.
+
+This patch works around the problem. In the event that we get a bogus
+responder lifetime payload that doesn't include a value for the
+lifetime, just skip parsing it instead of asserting.
+
+Signed-off-by: Jeff Layton <jeff.layton@primarydata.com>
+---
+ vpnc.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/vpnc.c b/vpnc.c
+index 74814a6bb493..0612859e35c6 100644
+--- a/vpnc.c
++++ b/vpnc.c
+@@ -1203,7 +1203,17 @@ static void lifetime_ike_process(struct sa_block *s, struct isakmp_attribute *a)
+ 	assert(a->af == isakmp_attr_16);
+ 	assert(a->u.attr_16 == IKE_LIFE_TYPE_SECONDS || a->u.attr_16 == IKE_LIFE_TYPE_K);
+ 	assert(a->next != NULL);
+-	assert(a->next->type == IKE_ATTRIB_LIFE_DURATION);
++
++	/*
++	 * Workaround for broken RESPONDER_LIFETIME payload from Fortigate
++	 * firewall. If the next attribute is not the LIFE_DURATION, then
++	 * just ignore this payload and move on.
++	 */
++	if (a->next->type != IKE_ATTRIB_LIFE_DURATION) {
++		DEBUG(2, printf("got bogus type %d instead of IKE_ATTRIB_LIFE_DURATION. Ignoring this payload.\n",
++					a->next->type));
++		return;
++	}
+ 
+ 	if (a->next->af == isakmp_attr_16)
+ 		value = a->next->u.attr_16;
+-- 
+2.4.3
+
