@@ -1,11 +1,11 @@
 pkgbase=linux
 pkgname=('linux' 'linux-headers' 'linux-docs')
-pkgver=4.19.6
+pkgver=4.19.9
 _kernelbasever=${pkgver:0:4}
 _srcname=linux-$pkgver
-pkgrel=2
+pkgrel=1
 _ckpatchversion=1
-_ckpatchname="patch-${_kernelbasever}-ck${_ckpatchversion}"
+#_ckpatchname="patch-${_kernelbasever}-ck${_ckpatchversion}"
 arch=('x86_64')
 url="https://www.kernel.org/"
 license=('GPL2')
@@ -17,14 +17,16 @@ source=(
   60-linux.hook  # pacman hook for depmod
   90-linux.hook  # pacman hook for initramfs regeneration
   linux.preset   # standard config files for mkinitcpio ramdisk
-  "http://ck.kolivas.org/patches/4.0/${_kernelbasever}/${_kernelbasever}-ck${_ckpatchversion}/${_ckpatchname}.xz"
+  #"http://ck.kolivas.org/patches/4.0/${_kernelbasever}/${_kernelbasever}-ck${_ckpatchversion}/${_ckpatchname}.xz"
+  "http://ck.kolivas.org/patches/4.0/4.19/4.19-ck${_ckpatchversion}/4.19-ck1-broken-out.tar.xz"
+  "unfuck-post.patch::https://pastebin.com/raw/v618N2xd"
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
   '647F28654894E3BD457199BE38DBBDC86092693E'  # Greg Kroah-Hartman
   '8218F88849AAC522E94CF470A5E9288C4FA415FA'  # Jan Alexander Steffens (heftig)
 )
-sha256sums=('644e61beb66211c0c5c13f91d96de1725055e6eea4cda7bb37ce9929ba8f09c3'
+sha256sums=('fc116cc6829c73944215d3b3ac0fc368dde9e8235b456744afffde001269dbf2'
             'SKIP'
             'be58633094281798af70d8ba2a018f923d6618244bd3840b91f8f9c51354fd42'
             '287b43e83535d0aba2797b8fe4c1527788995cbfd858097be37214345e781a25'
@@ -32,14 +34,43 @@ sha256sums=('644e61beb66211c0c5c13f91d96de1725055e6eea4cda7bb37ce9929ba8f09c3'
             'ad6344badc91ad0630caacde83f7f9b97276f80d26a20619a87952be65492c65'
             '77863d16a08e1b3c726b6c965f1bb7c672bd7317776810121062b73f9ea26780')
 
-source+=("BUG201685.patch::https://bugzilla.kernel.org/attachment.cgi?id=279857&action=diff&collapsed=&headers=1&format=raw")
-sha256sums+=('d182453163bb16b231457ae54fd7d4b69497d65e3c48bbf7e1e265724cc94a34')
-
 _kernelname=-CHAKRA
 
 prepare() {
   cd ${_srcname}
 
+  # array defines CK1 broken out
+  # we need to modify 0001 to fix for 4.19.7+
+  _CKArr=(
+  0001-MultiQueue-Skiplist-Scheduler-version-v0.180.patch
+  0002-Fix-Werror-build-failure-in-tools.patch
+  0003-Make-preemptible-kernel-default.patch
+  0004-Expose-vmsplit-for-our-poor-32-bit-users.patch
+  0005-Create-highres-timeout-variants-of-schedule_timeout-.patch
+  0006-Special-case-calls-of-schedule_timeout-1-to-use-the-.patch
+  0007-Convert-msleep-to-use-hrtimers-when-active.patch
+  0008-Replace-all-schedule-timeout-1-with-schedule_min_hrt.patch
+  0009-Replace-all-calls-to-schedule_timeout_interruptible-.patch
+  0010-Replace-all-calls-to-schedule_timeout_uninterruptibl.patch
+  0011-Don-t-use-hrtimer-overlay-when-pm_freezing-since-som.patch
+  0012-Make-hrtimer-granularity-and-minimum-hrtimeout-confi.patch
+  0013-Make-threaded-IRQs-optionally-the-default-which-can-.patch
+  0014-Reinstate-default-Hz-of-100-in-combination-with-MuQS.patch
+  0015-Swap-sucks.patch
+  0016-Add-ck1-version.patch
+  )
+  
+  pushd ../patches
+  
+  # fix naming schema in EXTRAVERSION of ck patch set
+  sed -i -re "s/^(.EXTRAVERSION).*$/\1 = /" 0016-Add-ck1-version.patch
+
+  # unfuck 0001-MultiQueue-Skiplist-Scheduler-version-v0.180.patch
+  # http://ck-hack.blogspot.com/2018/11/linux-419-ck1-muqss-version-0180-for.html?showComment=1544055404401#c6971461776340355351
+  patch -Np1 -i "$srcdir/unfuck-pre.patch"
+  
+  popd
+  
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
@@ -53,11 +84,8 @@ END
       -e "/^EXTRAVERSION =/aLOCALVERSION =" \
       -i Makefile
 
-  msg2 "Patching with ck patchset..."
-  patch -Np1 -i "$srcdir/${_ckpatchname}"
-
-  msg2 "Apply patch: Incorrect disk IO caused by blk-mq direct issue can lead to file system corruption"
-  patch -Np1 -i "$srcdir/BUG201685.patch"
+  #msg2 "Patching with ck patchset..."
+  #patch -Np1 -i "$srcdir/${_ckpatchname}"
 
   # don't run depmod on 'make install'. We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
