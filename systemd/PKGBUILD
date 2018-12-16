@@ -3,8 +3,8 @@
 pkgbase=systemd
 pkgname=('systemd' 'libsystemd' 'systemd-resolvconf')
 # Can be from either systemd or systemd-stable
-_commit='de7436b02badc82200dc127ff190b8155769b8e7'
-pkgver=239.0
+_commit='63f95c0297aea62ce47d1389e5221c54992f580e'
+pkgver=239.303
 pkgrel=1
 arch=('x86_64')
 url='https://www.github.com/systemd/systemd'
@@ -118,7 +118,7 @@ build() {
 
   local meson_options=(
     -Daudit=false
-    -Dgnuefi=true
+    -Dgnu-efi=true
     -Dima=false
     -Dlz4=true
     -Ddbuspolicydir=/usr/share/dbus-1/system.d
@@ -140,8 +140,7 @@ build() {
 }
 
 check() {
-  cd build
-  meson test
+  meson test -C build
 }
 
 package_systemd() {
@@ -171,7 +170,7 @@ package_systemd() {
           etc/udev/udev.conf)
   install=systemd.install
 
-  DESTDIR="$pkgdir" ninja -C build install
+  DESTDIR="$pkgdir" meson install -C build
   install -dm755 "$pkgdir/usr/bin"
   ln -s ../../usr/lib/systemd/systemd "$pkgdir/usr/bin/systemd"
 
