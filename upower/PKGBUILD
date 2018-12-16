@@ -1,30 +1,41 @@
 pkgname=upower
-pkgver=0.99.7
+pkgver=0.99.9
 pkgrel=1
 pkgdesc="Abstraction for enumerating power devices, listening to device events and querying history and statistics"
 arch=('x86_64')
 url="http://upower.freedesktop.org"
 license=('GPL')
 depends=('systemd' 'libusb' 'libgudev')
-makedepends=('intltool' 'docbook-xsl' 'gobject-introspection' 'python2')
+makedepends=('intltool' 'docbook-xsl' 'gobject-introspection' 'python2' 'git' 'gtk-doc')
 optdepends=('libimobiledevice: make upower in use with Apple iPod/iPad')
 backup=('etc/UPower/UPower.conf')
-source=(https://upower.freedesktop.org/releases/$pkgname-$pkgver.tar.xz)
-sha256sums=('24bcc2f6ab25a2533bac70b587bcb019e591293076920f5b5e04bdedc140a401')
+_commit=59faabc3c2634b6677ae0e1f3d94a23bbca21b12  # tags/UPOWER_0_99_9^0
+source=("git+https://anongit.freedesktop.org/git/upower#commit=$_commit")
+md5sums=('SKIP')
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed -e 's/UPOWER_//' -e 's/_/\./g' -e 's/-/+/g'
+}
+
+prepare() {
+  cd $pkgname
+  NOCONFIGURE=1 ./autogen.sh
+}
 
 build() {
-  cd $pkgname-$pkgver
+  cd $pkgname
 
   ./configure \
     --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
-    --libexecdir=/usr/lib/$pkgname \
+    --libexecdir=/usr/lib \
     --disable-static
   make
 }
 
 package() {
-  cd $pkgname-$pkgver
+  cd $pkgname
   make DESTDIR="$pkgdir" install
 }
