@@ -1,9 +1,9 @@
-# Platform Packages for Chakra, part of chakraos.org
+# Platform Packages for Chakra, part of chakralinux.org
 #
 # freetype2 and harfbuzz update
 # build freetype2 with old harfbuzz -> harfbuzz with new freetype -> build freetype2 with new harfbuzz.
-pkgname=('freetype2' 'freetype2-demos')
-pkgver=2.8
+pkgname=('freetype2' 'freetype2-demos'  'freetype2-docs')
+pkgver=2.9.1
 pkgrel=2
 pkgdesc="Font rasterization library"
 arch=('x86_64')
@@ -17,21 +17,19 @@ source=(https://download-mirror.savannah.gnu.org/releases/freetype/freetype-${pk
         https://download-mirror.savannah.gnu.org/releases/freetype/freetype-doc-${pkgver}.tar.bz2{,.sig}
         https://download-mirror.savannah.gnu.org/releases/freetype/ft2demos-${pkgver}.tar.bz2{,.sig}
         0001-Enable-table-validation-modules.patch
-        0002-Enable-subpixel-rendering.patch
-        0003-Enable-infinality-subpixel-hinting.patch
-        0004-Enable-long-PCF-family-names.patch
+        0002-Enable-infinality-subpixel-hinting.patch
+        0003-Enable-long-PCF-family-names.patch
         0005-freetype-2.5.2-more-demos.patch
         freetype2.sh)
-sha1sums=('42c6b1f733fe13a3eba135f5025b22cb68450f91'
+sha1sums=('220c82062171c513e4017c523d196933c9de4a7d'
           'SKIP'
-          '5b221ee14fe674cd5f6db0193d55360bc0bd3655'
+          'bb6c973f9fef972ad4ecc03bc09ed676b8dc0d59'
           'SKIP'
-          '7849f1ac4a352971fab61a5fc2e5c6a597201201'
+          '45704d7b75c4f9fdd6a9b3787918e8220b36aa77'
           'SKIP'
-          'c3e91e668936206d3c158bffde0f69788a086a5b'
-          '4ff958229a7f87e04a9894d5a6ed2df227071931'
-          '81586014ea44375ddc85dd9dbcabae6e91c34d62'
-          '334f229875039794adeb574e27d365bb445fb314'
+          'd9eb22e5c962923089b0c9fc5491cf28a19bd982'
+          'd13503902e0404cf3558db76b477f23f9910d06e'
+          'fc49742fb6c19fe0677e3552bb7c00aac8530265'
           '72cfecbe738085eec475e012617661ad0cc9b76f'
           'bc6df1661c4c33e20f5ce30c2da8ad3c2083665f')
 validpgpkeys=('58E0C111E39F5408C5D3EC76C1A60EACE707FDA5')
@@ -43,9 +41,8 @@ prepare() {
 
   cd freetype2
   patch -Np1 -i ../0001-Enable-table-validation-modules.patch
-  patch -Np1 -i ../0002-Enable-subpixel-rendering.patch
-  patch -Np1 -i ../0003-Enable-infinality-subpixel-hinting.patch
-  patch -Np1 -i ../0004-Enable-long-PCF-family-names.patch
+  patch -Np1 -i ../0002-Enable-infinality-subpixel-hinting.patch
+  patch -Np1 -i ../0003-Enable-long-PCF-family-names.patch
 
   cd ../freetype2-demos
   # enable more demos
@@ -95,4 +92,11 @@ package_freetype2-demos() {
   done
 }
 
-# vim:set ts=2 sw=2 et:
+package_freetype2-docs() {
+  pkgdesc="Freetype documentation"
+  depends=('freetype2')
+
+  cd freetype2
+  install -d "${pkgdir}/usr/share/doc"
+  cp -a docs "${pkgdir}/usr/share/doc/freetype2"
+}
