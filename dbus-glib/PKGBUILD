@@ -1,28 +1,31 @@
 pkgname=dbus-glib
-pkgver=0.108
+pkgver=0.110
 pkgrel=1
 pkgdesc="GLib bindings for DBUS"
 arch=('x86_64')
 license=('GPL')
 url="http://www.freedesktop.org/wiki/Software/DBusBindings"
 depends=('dbus' 'glib2')
-makedepends=('pkgconfig')
-options=('!emptydirs')
-source=("http://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('a66a613705870752ca9786e0359aea97')
+makedepends=('python' 'gtk-doc')
+source=(https://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz)
+md5sums=('d7cebf1d69445cbd28b4983392145192')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr \
-              --sysconfdir=/etc \
-              --localstatedir=/var \
-              --enable-static=no \
-              --enable-bash-completion=no
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libexecdir=/usr/lib \
+    --enable-gtk-doc \
+    --disable-static
   make
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  cd $pkgname-$pkgver
+  _c=/usr/share/bash-completion/completions
+  make DESTDIR="$pkgdir" install completiondir=$_c
+  mv "$pkgdir$_c"/{dbus-bash-completion.sh,dbus-send}
 }
