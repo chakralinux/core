@@ -1,15 +1,16 @@
 pkgbase=ca-certificates
 pkgname=(ca-certificates-utils ca-certificates)
-pkgver=20170307
-pkgrel=2
+pkgver=20181109
+pkgrel=1
 pkgdesc="Common CA certificates"
 url="https://src.fedoraproject.org/rpms/ca-certificates"
 arch=(any)
 license=(GPL2)
-makedepends=('asciidoc' 'p11-kit')
-source=(update-ca-trust update-ca-trust.8.txt)
-sha256sums=('857096d0cd82e0cb58622f8e427cec5eaa2d4e3ae32a3bb60c7292ceeabf9668'
-            '5b2d3dfaac00027ff169c34ded4b5115a1332c1596c30eb0e41bbfb1a7f959fc')
+makedepends=(asciidoc p11-kit)
+source=(update-ca-trust update-ca-trust.8.txt update-ca-trust.hook)
+sha256sums=('ba98e00f80f94e2648b66252119d1b0da2339b8c83860cd69738e5c4e2d0fcc3'
+            'acf571f7d7a9df2149a373017280e8f22d07a2d36600256fa48159d22ab74751'
+            '15eb04e757b7c61c8ee1540fd697771b8ae8e31f92cfb39c260b423101e21af8')
 
 build() {
   asciidoc.py -v -d manpage -b docbook update-ca-trust.8.txt
@@ -18,14 +19,14 @@ build() {
 
 package_ca-certificates-utils() {
   pkgdesc+=" (utilities)"
-  depends=('bash' 'coreutils' 'findutils' 'p11-kit')
-  install=ca-certificates-utils.install
+  depends=('bash' 'coreutils' 'findutils' 'p11-kit>=0.23.1')
   provides=(ca-certificates ca-certificates-java)
   conflicts=(ca-certificates-java)
   replaces=(ca-certificates-java)
 
   install -D update-ca-trust "$pkgdir/usr/bin/update-ca-trust"
   install -Dm644 update-ca-trust.8 "$pkgdir/usr/share/man/man8/update-ca-trust.8"
+  install -Dm644 update-ca-trust.hook "$pkgdir/usr/share/libalpm/hooks/update-ca-trust.hook"
 
   # Trust source directories
   install -d "$pkgdir"/{etc,usr/share}/$pkgbase/trust-source/{anchors,blacklist}
@@ -43,7 +44,9 @@ package_ca-certificates-utils() {
 
 package_ca-certificates() {
   pkgdesc+=" (default providers)"
-  depends=(ca-certificates-{mozilla,cacert})
+  depends=(ca-certificates-mozilla)
+  replaces=('ca-certificates-cacert<=20140824-4')
+  conflicts=('ca-certificates-cacert<=20140824-4')
 }
 
 # vim:set et sw=2:
