@@ -2,48 +2,48 @@ pkgbase=ca-certificates
 pkgname=(ca-certificates-utils ca-certificates)
 pkgver=20170307
 pkgrel=2
-pkgdesc='Common CA certificates'
-arch=('x86_64')
-url='http://pkgs.fedoraproject.org/cgit/ca-certificates.git'
-license=('GPL2')
+pkgdesc="Common CA certificates"
+url="https://src.fedoraproject.org/rpms/ca-certificates"
+arch=(any)
+license=(GPL2)
 makedepends=('asciidoc' 'p11-kit')
 source=(update-ca-trust update-ca-trust.8.txt)
 sha256sums=('857096d0cd82e0cb58622f8e427cec5eaa2d4e3ae32a3bb60c7292ceeabf9668'
             '5b2d3dfaac00027ff169c34ded4b5115a1332c1596c30eb0e41bbfb1a7f959fc')
 
 build() {
-	asciidoc.py -v -d manpage -b docbook update-ca-trust.8.txt
-	xsltproc --nonet -o update-ca-trust.8 /etc/asciidoc/docbook-xsl/manpage.xsl update-ca-trust.8.xml
+  asciidoc.py -v -d manpage -b docbook update-ca-trust.8.txt
+  xsltproc --nonet -o update-ca-trust.8 /etc/asciidoc/docbook-xsl/manpage.xsl update-ca-trust.8.xml
 }
 
 package_ca-certificates-utils() {
-	pkgdesc+=" (utilities)"
-	depends=('bash' 'coreutils' 'findutils' 'p11-kit')
-	install=ca-certificates-utils.install
-	provides=(ca-certificates ca-certificates-java)
-	conflicts=(ca-certificates-java)
-	replaces=(ca-certificates-java)
+  pkgdesc+=" (utilities)"
+  depends=('bash' 'coreutils' 'findutils' 'p11-kit')
+  install=ca-certificates-utils.install
+  provides=(ca-certificates ca-certificates-java)
+  conflicts=(ca-certificates-java)
+  replaces=(ca-certificates-java)
 
-	install -D update-ca-trust "${pkgdir}/usr/bin/update-ca-trust"
-	install -Dm644 update-ca-trust.8 "${pkgdir}/usr/share/man/man8/update-ca-trust.8"
+  install -D update-ca-trust "$pkgdir/usr/bin/update-ca-trust"
+  install -Dm644 update-ca-trust.8 "$pkgdir/usr/share/man/man8/update-ca-trust.8"
 
-	# Trust source directories
-	install -d "${pkgdir}"/{etc,usr/share}/${pkgbase}/trust-source/{anchors,blacklist}
+  # Trust source directories
+  install -d "$pkgdir"/{etc,usr/share}/$pkgbase/trust-source/{anchors,blacklist}
 
-	# Directories used by update-ca-trust (aka "trust extract-compat")
-	install -d "${pkgdir}"/etc/{ssl/certs/java,${pkgbase}/extracted}
+  # Directories used by update-ca-trust (aka "trust extract-compat")
+  install -d "$pkgdir"/etc/{ssl/certs/{edk2,java},$pkgbase/extracted}
 
-	# Compatibility link for OpenSSL using /etc/ssl as CAdir
-	# Used in preference to the individual links in /etc/ssl/certs
-	ln -sr "$pkgdir/etc/$pkgbase/extracted/tls-ca-bundle.pem" "$pkgdir/etc/ssl/cert.pem"
+  # Compatibility link for OpenSSL using /etc/ssl as CAdir
+  # Used in preference to the individual links in /etc/ssl/certs
+  ln -sr "$pkgdir/etc/$pkgbase/extracted/tls-ca-bundle.pem" "$pkgdir/etc/ssl/cert.pem"
 
-	# Compatiblity link for legacy bundle
-	ln -sr "$pkgdir/etc/$pkgbase/extracted/tls-ca-bundle.pem" "$pkgdir/etc/ssl/certs/ca-certificates.crt"
+  # Compatiblity link for legacy bundle
+  ln -sr "$pkgdir/etc/$pkgbase/extracted/tls-ca-bundle.pem" "$pkgdir/etc/ssl/certs/ca-certificates.crt"
 }
 
 package_ca-certificates() {
-	pkgdesc+=" (default providers)"
-	depends=(ca-certificates-{mozilla,cacert})
+  pkgdesc+=" (default providers)"
+  depends=(ca-certificates-{mozilla,cacert})
 }
 
-# vim:set ts=2 sw=2 et:
+# vim:set et sw=2:
