@@ -1,6 +1,6 @@
 
 pkgname=e2fsprogs
-pkgver=1.42.13
+pkgver=1.44.5
 pkgrel=1
 pkgdesc="Ext2/3/4 filesystem utilities"
 arch=('x86_64')
@@ -13,23 +13,29 @@ source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pk
         'MIT-LICENSE')
 backup=('etc/mke2fs.conf')
 options=('staticlibs')
-install=${pkgname}.install
-sha1sums=('77d1412472ac5a67f8954166ec16c37616074c37'
+sha1sums=('c3f64d10b6ef1a268a077838a5cafb6aaebe2986'
           'f4a0d5b0cdb980e3fedd6f5e7dde0b0ffb7bbdfb')
 
 prepare() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${pkgname}-${pkgver}"
 
   # Remove unnecessary init.d directory
   sed -i '/init\.d/s|^|#|' misc/Makefile.in
 }
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${pkgname}-${pkgver}"
 
-  ./configure --prefix=/usr --with-root-prefix="" --libdir=/usr/lib \
-      --sbindir=/usr/bin --enable-elf-shlibs --disable-fsck --disable-uuidd \
-      --disable-libuuid --disable-libblkid
+  ./configure \
+      --prefix=/usr \
+      --with-root-prefix="" \
+      --libdir=/usr/lib \
+      --sbindir=/usr/bin \
+      --enable-elf-shlibs \
+      --disable-fsck \
+      --disable-uuidd \
+      --disable-libuuid \
+      --disable-libblkid
 
   make
 }
@@ -37,7 +43,7 @@ build() {
 package() {
   unset MAKEFLAGS
 
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd "${pkgname}-${pkgver}"
   make DESTDIR="${pkgdir}" install install-libs
 
   sed -i -e 's/^AWK=.*/AWK=awk/' "${pkgdir}/usr/bin/compile_et"
