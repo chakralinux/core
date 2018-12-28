@@ -24,7 +24,7 @@ makedepends=('git' "linux=4.19.12")
 # kernel source deps
 makedepends+=('asciidoc' 'xmlto')
 # perf deps
-makedepends+=('perl' 'python2' 'libnewt' 'elfutils' 'libunwind' 'numactl' 'audit')
+makedepends+=('perl' 'python3' 'slang' 'libnewt' 'elfutils' 'libunwind' 'numactl' 'audit')
 # cpupower deps
 makedepends+=('pciutils')
 # usbip deps
@@ -68,8 +68,8 @@ build() {
     lib=lib/perf \
     perfexecdir=lib/perf \
     NO_SDT=1 \
-    PYTHON=python2 \
-    PYTHON_CONFIG=python2-config \
+    PYTHON=python3 \
+    PYTHON_CONFIG=python3-config \
     PERF_VERSION=$pkgver-$pkgrel \
     all man
   popd
@@ -143,8 +143,8 @@ package_libtraceevent() {
 
 package_perf() {
   pkgdesc='Linux kernel performance auditing tool'
-  depends=('perl' 'python2' 'slang' 'elfutils' 'libunwind' 'binutils'
-           'numactl' 'audit')
+  depends=('perl' 'python3' 'slang' 'elfutils' 'libunwind' 'binutils'
+           'numactl' 'audit' 'coreutils' 'glib2' 'xz' 'zlib' 'libelf' 'bash')
   optdepends=('gtk2: support GTK2 browser for perf report')
 
   cd linux-${pkgver}/tools/perf
@@ -153,8 +153,8 @@ package_perf() {
     lib=lib/perf \
     perfexecdir=lib/perf \
     NO_SDT=1 \
-    PYTHON=python2 \
-    PYTHON_CONFIG=python2-config \
+    PYTHON=python3 \
+    PYTHON_CONFIG=python3-config \
     PERF_VERSION=$pkgver-$pkgrel \
     DESTDIR="$pkgdir" \
     install install-man
