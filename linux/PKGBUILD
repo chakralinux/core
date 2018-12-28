@@ -19,6 +19,7 @@ source=(
   linux.preset   # standard config files for mkinitcpio ramdisk
   #"http://ck.kolivas.org/patches/4.0/${_kernelbasever}/${_kernelbasever}-ck${_ckpatchversion}/${_ckpatchname}.xz"
   "http://ck.kolivas.org/patches/4.0/4.19/4.19-ck${_ckpatchversion}/4.19-ck1-broken-out.tar.xz"
+  https://gist.githubusercontent.com/graysky2/dc820c1b41c5eeb63d2de7a2e72499f4/raw/3d2b3be40df7e538db4ef9a69b438e00e5575e2d/unfuck-pre.patch
   "unfuck-post.patch::https://pastebin.com/raw/v618N2xd"
 )
 validpgpkeys=(
@@ -33,12 +34,17 @@ sha256sums=('4d81ac539d62617f5b52f25971749d8c6d3a200deee76898bb99be8492999b77'
             '75f99f5239e03238f88d1a834c50043ec32b1dc568f2cc291b07d04718483919'
             'ad6344badc91ad0630caacde83f7f9b97276f80d26a20619a87952be65492c65'
             '61431037fd487f4eff135a3fcf5962270913af9fd95c31e27a2f9d4124bd3d3b'
+            'b57666e47574edcb0b12c3a4fbddf2a37b1badf3591c76344aae0e8f91452915'
             'd761a320bade7e16dfaf4ae87a9ee1280b96068b11ac5691beb4d55edb0bada2')
 
 _kernelname=-CHAKRA
 
 prepare() {
   cd ${_srcname}
+
+  # when the ck patch set is ready, refer to:
+  # https://code.chakralinux.org/chakra/packages/core/commit/401096701cadaf3da9d93b0073ea1a479827e1ea
+  # in order to revert back the original PKGBUILD
 
   # array defines CK1 broken out
   # we need to modify 0001 to fix for 4.19.7+
@@ -60,18 +66,26 @@ prepare() {
   0015-Swap-sucks.patch
   0016-Add-ck1-version.patch
   )
-  
+
   pushd ../patches
-  
+
   # fix naming schema in EXTRAVERSION of ck patch set
   sed -i -re "s/^(.EXTRAVERSION).*$/\1 = /" 0016-Add-ck1-version.patch
 
   # unfuck 0001-MultiQueue-Skiplist-Scheduler-version-v0.180.patch
   # http://ck-hack.blogspot.com/2018/11/linux-419-ck1-muqss-version-0180-for.html?showComment=1544055404401#c6971461776340355351
   patch -Np1 -i "$srcdir/unfuck-pre.patch"
-  
+
   popd
-  
+
+  msg2 "Applying ck patchset..."
+  local ckp
+  for ckp in "${_CKArr[@]}"; do
+    patch -Np1 < "../patches/$ckp"
+  done
+
+  patch -Np1 < "../unfuck-post.patch"
+
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
