@@ -1,11 +1,11 @@
 # Contributions from ArchLinux: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/vlc
 
 pkgname=vlc
-_vlcver=3.0.4
+_vlcver=3.0.6
 # optional fixup version including hyphen
 _vlcfixupver=
 pkgver=${_vlcver}${_vlcfixupver//-/.r}
-pkgrel=3
+pkgrel=1
 pkgdesc='Multi-platform MPEG, VCD/DVD, and DivX player'
 url='https://www.videolan.org/vlc/'
 arch=('x86_64')
@@ -25,8 +25,10 @@ makedepends=('gst-plugins-base-libs' 'live-media' 'libbluray'
              'libvorbis' 'speex' 'opus' 'libtheora' 'libpng' 'libjpeg-turbo'
              'libx265.so' 'libx264.so' 'zvbi' 'libass' 'libkate' 'libtiger'
              'sdl_image' 'libpulse' 'alsa-lib' 'jack' 'libsamplerate' 'libsoxr'
-             'lirc' 'libgoom2' 'projectm' 'chromaprint')
+             'lirc' 'libgoom2' 'projectm' 'chromaprint' 'aom' 'srt' 'dav1d')
 optdepends=('avahi: service discovery using bonjour protocol'
+            'aom: AOM AV1 codec'
+            'dav1d: dav1d AV1 decoder'
             'gst-plugins-base-libs: for libgst plugins'
             'libdvdcss: decoding encrypted DVDs'
             'libavc1394: devices using the 1394ta AV/C'
@@ -71,6 +73,7 @@ optdepends=('avahi: service discovery using bonjour protocol'
             'libass: Subtitle support'
             'libkate: Kate codec'
             'libtiger: Tiger rendering for Kate streams'
+            'srt: SRT input/output plugin'
             'sdl_image: SDL image support'
             'aalib: ASCII art video output'
             'libcaca: colored ASCII art video output'
@@ -91,7 +94,7 @@ options=('!emptydirs')
 source=("http://download.videolan.org/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz"{,.asc}
         update-vlc-plugin-cache.hook
         lua53_compat.patch)
-sha1sums=('218603f05ab5f30de0cc87b0ccceb57bb1efcfa4'
+sha1sums=('b35168c1811b07844d861311bd0f2194f4bb82ac'
           'SKIP'
           'c3a35ba4dbd6c8e4e5b032664f50b9f0dcf579ee'
           '5d7dba23756ff577a90b8631b187fbeac1f94e17')
@@ -207,7 +210,10 @@ build() {
               --disable-update-check \
               --enable-libplacebo \
               --enable-vlc \
-              --enable-aribsub
+              --enable-aribsub \
+              --enable-aom \
+              --enable-srt
+              #--enable-dav1d \
   make
 }
 
