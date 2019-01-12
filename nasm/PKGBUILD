@@ -1,28 +1,24 @@
 # Contributions from Arch: https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/nasm
 
 pkgname=nasm
-pkgver=2.11.08
+pkgver=2.14.02
 pkgrel=1
 pkgdesc="80x86 assembler designed for portability and modularity"
-url="http://www.nasm.us"
+url="https://www.nasm.us"
 license=('BSD')
 arch=('x86_64')
 depends=('glibc')
-install=nasm.install
 source=(http://www.nasm.us/pub/nasm/releasebuilds/${pkgver}/${pkgname}-${pkgver}.tar.xz)
-sha1sums=('6908296ac437b3ade79fadfaad0efcfd99582f70')
+sha1sums=('7e9cb20d49ca279c72125b2701b3457c9d1609a5')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   ./configure --prefix=/usr 
-  make 
-  make -C doc info
+  make
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
-  make INSTALLROOT="${pkgdir}" install install_rdf
-  install -d "${pkgdir}/usr/share/info"
-  install -m644 doc/info/* "${pkgdir}/usr/share/info/"
+  make DESTDIR="${pkgdir}" install install_rdf
   install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/nasm/LICENSE"
 }
