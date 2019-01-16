@@ -1,8 +1,8 @@
 
 pkgbase=elfutils
 pkgname=(elfutils libelf)
-pkgver=0.170
-pkgrel=2
+pkgver=0.175
+pkgrel=1
 pkgdesc="Utilities to handle ELF object files and DWARF debugging information"
 arch=('x86_64')
 url="https://sourceware.org/elfutils/"
@@ -10,7 +10,7 @@ license=('LGPL3' 'GPL' 'GPL3')
 depends=('gcc-libs' 'zlib' 'bzip2' 'xz')
 options=('staticlibs')
 source=(https://fedorahosted.org/releases/e/l/elfutils/${pkgver}/elfutils-${pkgver}.tar.bz2{,.sig})
-sha1sums=('aff6feac0ff69eb7b240babdf2918f640eadb032'
+sha1sums=('361f835640ecffddc6d4543fb044eb53f673026f'
           'SKIP')
 validpgpkeys=('47CC0331081B8BC6D0FD4DA08370665B57816A6A')  # Mark J. Wielaard <mark@klomp.org>
 
@@ -26,7 +26,7 @@ build() {
 check() {
   cd ${pkgbase}-${pkgver}
 
-  make check
+  make check || (cat tests/test-suite.log; false)
 }
 
 package_elfutils() {
