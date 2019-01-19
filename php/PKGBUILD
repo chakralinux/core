@@ -20,7 +20,7 @@ pkgname=('php'
          'php-sqlite'
          'php-tidy'
          'php-xsl')
-pkgver=7.1.25
+pkgver=7.1.26
 pkgrel=1
 arch=('x86_64')
 license=('PHP')
@@ -34,15 +34,17 @@ source=("https://php.net/distributions/${pkgbase}-${pkgver}.tar.xz"{,.asc}
         'php-fpm.patch'
         'php-fpm.tmpfiles'
         'php.ini.patch'
-        'enchant-2.patch')
-sha256sums=('0fd8dad1903cd0b2d615a1fe4209f99e53b7292403c8ffa1919c0f4dd1eada88'
+        'enchant-2.patch'
+        'php-freetype-2.9.1.patch')
+sha256sums=('10b7ae634c12852fae52a22dc2262e5f12418ad59fd20da2d00d71a212235d31'
             'SKIP'
             '8b5b15f1c348d8897d837ea9894157d9630dc542bbb0dbc7ad93c5dc0235d1d5'
             '258b33b6531b1128d9804c8b608b6013423a421edcf764747042d07e79ec6df3'
             '7d982a3cefb3eaec0b3458340e4991c2959c10d1518ecb7c1d041884b14efc73'
             '640dba0d960bfeaae9ad38d2826d3f6b5d6c175a4d3e16664eefff29141faad5'
             '0cdf279582db1615a7c539e7a7efdfbbf56cad7859ba7e35eea3c5a468f0cc69'
-            'b11c3de747ef222696f5135556d624e3f7f0135a3cb1b06082f1ec8e9b7eeb0a')
+            'b11c3de747ef222696f5135556d624e3f7f0135a3cb1b06082f1ec8e9b7eeb0a'
+            'f9fe57f809ac13e0043d18b795ef777af3e8c710a83745b37b09db536f683d2a')
 validpgpkeys=('A917B1ECDA84AEC2B568FED6F50ABC807BD5DCD0'
               '528995BFEDFBA7191D46839EF9BA0ADA31CBD89E'
               '1729F83938DA44E27BA0F4D3DBDB397470D12172')
@@ -54,6 +56,7 @@ prepare() {
 	patch -p0 -i ${srcdir}/php-fpm.patch
 	patch -p0 -i ${srcdir}/php.ini.patch
 	patch -p1 -i ${srcdir}/enchant-2.patch
+	patch -p1 -i ${srcdir}/php-freetype-2.9.1.patch
 
 	# Just because our Apache 2.4 is configured with a threaded MPM by default does not mean we want to build a ZTS PHP.
         # Let's supress this behaviour and build a SAPI that works fine with the prefork MPM.
