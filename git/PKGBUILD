@@ -1,5 +1,5 @@
 pkgname=git
-pkgver=2.19.1
+pkgver=2.20.1
 pkgrel=1
 pkgdesc="Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 arch=('x86_64')
@@ -18,7 +18,7 @@ source=("https://www.kernel.org/pub/software/scm/git/git-$pkgver.tar"{.xz,.sign}
         'git-daemon@.service'
         'git-daemon.socket'
         'git-sysusers.conf')
-sha256sums=('345056aa9b8084280b1b9fe1374d232dec05a34e8849028a20bfdb56e920dbb5'
+sha256sums=('9d2e91e2faa2ea61ba0a70201d023b36f54d846314591a002c610ea2ab81c3e9'
             'SKIP'
             '3bc3250d9e04b05c41975c01f85f512d3386d60b41475cbc7292bc88148852f6'
             'ac4c90d62c44926e6d30d18d97767efc901076d4e0283ed812a349aece72f203'
@@ -47,9 +47,9 @@ build() {
   make \
     "${_make_paths[@]}" \
     "${_make_options[@]}" \
-    all doc
+    all man
 
-  make -C contrib/subtree prefix=/usr gitexecdir=/usr/lib/git-core all doc
+  make -C contrib/subtree prefix=/usr gitexecdir=/usr/lib/git-core all man
 }
 
 check() {
@@ -79,7 +79,7 @@ package() {
     "${_make_paths[@]}" \
     "${_make_options[@]}" \
     DESTDIR="$pkgdir" \
-    install install-doc
+    install install-man
 
   # bash completion
   mkdir -p "${pkgdir}/usr/share/bash-completion/completions/"
@@ -88,7 +88,7 @@ package() {
   mkdir -p "${pkgdir}/usr/share/git/"
   install -m644 ./contrib/completion/git-prompt.sh "${pkgdir}/usr/share/git/git-prompt.sh"
   # subtree installation
-  make -C contrib/subtree prefix=/usr gitexecdir=/usr/lib/git-core DESTDIR="$pkgdir" install install-doc
+  make -C contrib/subtree prefix=/usr gitexecdir=/usr/lib/git-core DESTDIR="$pkgdir" install install-man
   # the rest of the contrib stuff
   cp -a ./contrib/* $pkgdir/usr/share/git/
 
