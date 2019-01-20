@@ -12,8 +12,15 @@ provides=("obexfs=${pkgver}")
 replaces=('obexfs')
 conflicts=('obexfs')
 options=('!makeflags' '!docs')
-source=(http://downloads.sourceforge.net/sourceforge/openobex/${pkgname}-${pkgver}-Source.tar.gz)
-md5sums=('157a9d1b2ed220203f7084db906de73c')
+source=("http://downloads.sourceforge.net/openobex/${pkgname}-${pkgver}-Source.tar.gz"
+        "explicitly-link-libbfb-and-libmulticobex.patch")
+sha256sums=('d40fb48e0a0eea997b3e582774b29f793919a625d54b87182e31a3f3d1c989a3'
+            'b2bdc9c9ad1894864d77531549be6f921f8d04344c64185ca053cc677c609a50')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}-Source"
+  patch -p1 < "${srcdir}/explicitly-link-libbfb-and-libmulticobex.patch"
+}
 
 build() {
   cd "${srcdir}/"
