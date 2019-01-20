@@ -1,22 +1,19 @@
-#
-# Platform Packages for Chakra, part of chakra-project.org
-#
-# maintainer: Fabian Kosmale <inkane@chakra-project.org>
-# contributor (i686): Phil Miller <philm[at]chakra-project[dog]org>
-# contributor (x86_64): Manuel Tortosa <manutortosa[at]chakra-project[dot]org>
 
 pkgname=obexftp
-pkgver=0.24
+pkgver=0.24.2
 pkgrel=1
 pkgdesc="A tool for transfer files to/from any OBEX enabled device"
-arch=('i686' 'x86_64')
-url="http://openobex.triq.net/obexftp/obexftp"
+arch=('x86_64')
+url="http://dev.zuckschwerdt.org/openobex/wiki/ObexFtp"
 license=('GPL')
-depends=('openobex>=1.5' 'python2')
-makedepends=('cmake' 'asciidoc' 'xmlto' 'fuse' 'swig' 'ruby' 'tk' 'python2')
-options=('!libtool' '!makeflags')
+depends=('openobex' 'expat' 'fuse2')
+makedepends=('cmake' 'asciidoc' 'xmlto' 'swig' 'ruby' 'tk')
+provides=("obexfs=${pkgver}")
+replaces=('obexfs')
+conflicts=('obexfs')
+options=('!makeflags' '!docs')
 source=(http://downloads.sourceforge.net/sourceforge/openobex/${pkgname}-${pkgver}-Source.tar.gz)
-md5sums=('31a50dbbd09c63cbb5399772aaff7936')
+md5sums=('157a9d1b2ed220203f7084db906de73c')
 
 build() {
   cd "${srcdir}/"
