@@ -1,8 +1,6 @@
-# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
-# Maintainer: Dan McGee <dan@archlinux.org>
 
 pkgname=postgresql-old-upgrade
-pkgver=9.6.7
+pkgver=9.6.11
 _majorver=${pkgver%.*}
 pkgrel=1
 pkgdesc='PostgreSQL build for migrating between major versions with pg_upgrade'
@@ -12,7 +10,7 @@ license=('custom:PostgreSQL')
 depends=("postgresql-libs>=${_majorver}" 'libxml2' 'openssl>=1.0.0' 'pam' 'zlib')
 makedepends=('krb5' 'python2' 'perl' 'tcl>=8.6.0')
 source=(https://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.tar.bz2)
-sha256sums=('2ebe3df3c1d1eab78023bdc3ffa55a154aa84300416b075ef996598d78a624c6')
+sha256sums=('38250adc69a1e8613fb926c894cda1d01031391a03648894b9a6e13ff354a530')
 
 build() {
   cd postgresql-${pkgver}
@@ -47,6 +45,4 @@ package() {
   # clean up unneeded installed items
   rm -rf "${pkgdir}/opt/pgsql-${_majorver}/include"
 }
-
-# vim: ts=2 sw=2 et:
 
