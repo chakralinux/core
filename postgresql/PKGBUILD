@@ -4,7 +4,7 @@ pkgbase=postgresql
 pkgname=('postgresql-libs'
          'postgresql-docs'
          'postgresql')
-pkgver=9.6.7
+pkgver=10.6
 _majorver=${pkgver%.*}
 # When upgrading to a major version, remember to update the postgresql-check-db-dir file accordingly!!
 pkgrel=1
@@ -20,7 +20,7 @@ source=("https://ftp.postgresql.org/pub/source/v${pkgver}/postgresql-${pkgver}.t
         'postgresql.pam'
         'postgresql.service'
         'postgresql.tmpfiles.conf')
-sha256sums=('2ebe3df3c1d1eab78023bdc3ffa55a154aa84300416b075ef996598d78a624c6'
+sha256sums=('68a8276f08bda8fbefe562faaf8831cb20664a7a1d3ffdbbcc5b83e08637624b'
             'e0b86be2aba21517061563b235c485d723e7af6273ced3fd23b41c4b5431677f'
             '8538619cb8bea51078b605ad64fe22abd6050373c7ae3ad6595178da52f6a7d9'
             '419550699aae3d19715e87e51f32d1ad50cbb5d3175794f5476697572383b4e3'
@@ -70,7 +70,7 @@ package_postgresql-libs() {
     done
 
     for util in pg_config pg_dump pg_dumpall pg_restore psql \
-        clusterdb createdb createlang createuser dropdb droplang dropuser pg_isready reindexdb vacuumdb; do
+        clusterdb createdb createuser dropdb dropuser pg_isready reindexdb vacuumdb; do
     install -Dm 644 doc/src/sgml/man1/${util}.1 "${pkgdir}"/usr/share/man/man1/${util}.1
     done
 
@@ -141,7 +141,7 @@ package_postgresql() {
     make -C ${dir} DESTDIR="${pkgdir}" uninstall
     done
     for util in pg_config pg_dump pg_dumpall pg_restore psql \
-        clusterdb createdb createlang createuser dropdb droplang dropuser pg_isready reindexdb vacuumdb; do
+        clusterdb createdb createuser dropdb dropuser pg_isready reindexdb vacuumdb; do
     rm "${pkgdir}"/usr/share/man/man1/${util}.1
     done
 
