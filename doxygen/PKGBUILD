@@ -1,64 +1,64 @@
-# maintainer: Neophytos Kolokotronis <tetris4 AT gmail DOT com>
+# Contributions from Arch:
+# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
+# Maintainer: Dan McGee <dan@archlinux.org>
 
-pkgname=doxygen
-pkgver=1.8.13
-pkgrel=2
-pkgdesc="A documentation system for C++, C, Java, IDL and PHP"
-license=('GPL')
+pkgbase=doxygen
+pkgname=('doxygen' 'doxygen-docs')
+pkgver=1.8.15
+pkgrel=1
+pkgdesc='Documentation system for C++, C, Java, IDL and PHP'
+url='http://www.doxygen.org/'
 arch=('x86_64')
-url="http://www.doxygen.org/"
-makedepends=('flex' 'qt5-tools' 'graphviz' 'cmake' 'texlive-core' 'ghostscript' 'texlive-latexextra' 'gcc-libs' 'python')
-source=("ftp://ftp.stack.nl/pub/users/dimitri/${pkgname}-${pkgver}.src.tar.gz")
-md5sums=('0fa414975f8cd6d30e126c28327c1f7c')
+license=('GPL')
+makedepends=('cmake' 'gcc-libs' 'flex' 'qt5-base' 'texlive-core' 'ghostscript'
+             'texlive-latexextra' 'graphviz' 'python2')
+source=(${pkgbase}-${pkgver}.tar.gz::https://github.com/doxygen/doxygen/archive/Release_${pkgver//./_}.tar.gz)
+sha256sums=('cc5492b3e2d1801ae823c88e0e7a38caee61a42303587e987142fe9b68a43078')
 
 prepare() {
+  cd ${pkgbase}-Release_${pkgver//./_}
   mkdir build
-
-  cd "${srcdir}/${pkgname}-${pkgver}"
   # Install the man pages in the right place
   sed -i 's:DESTINATION man/man1:DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1":g' \
     doc/CMakeLists.txt
 }
 
 build() {
-  cd build
+  cd ${pkgbase}-Release_${pkgver//./_}/build
 
-  cmake "../${pkgbase}-${pkgver}" \
+  cmake .. \
     -DCMAKE_INSTALL_PREFIX:PATH=/usr \
     -DDOC_INSTALL_DIR:PATH=share/doc/doxygen \
     -DPYTHON_EXECUTABLE:FILE=/usr/bin/python2 \
     -Dbuild_doc:BOOL=ON \
     -Dbuild_wizard:BOOL=ON
-
   make
   make docs
 }
 
-check(){
-  cd build
+check() {
+  cd ${pkgbase}-Release_${pkgver//./_}/build
   make tests
 }
 
 package_doxygen() {
-  pkgdesc="A documentation system for C++, C, Java, IDL and PHP"
+  pkgdesc='Documentation system for C++, C, Java, IDL and PHP'
   depends=('gcc-libs')
   optdepends=('graphviz: for caller/callee graph generation'
               'qt5-base: for doxywizard')
 
-  cd build
-  make DESTDIR="$pkgdir" install
+  cd ${pkgbase}-Release_${pkgver//./_}/build
+  make DESTDIR="${pkgdir}" install
 
-  # Docs are in 'doxygen-docs'
   rm -rf "${pkgdir}/usr/share/doc"
 }
 
 package_doxygen-docs() {
-  pkgdesc="Developer documentation for doxygen"
+  pkgdesc='Developer documentation for doxygen'
 
-  cd build
+  cd ${pkgbase}-Release_${pkgver//./_}/build
   make DESTDIR="${pkgdir}" install
 
   rm -rf "${pkgdir}/usr/bin"
   rm -rf "${pkgdir}/usr/share/man"
 }
-
