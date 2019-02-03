@@ -3,7 +3,7 @@
 pkgbase=plasma-workspace
 pkgname=('plasma-workspace' 'plasma-wayland-session')
 pkgver=5.14.5
-pkgrel=1
+pkgrel=2
 pkgdesc='KDE Plasma Workspace'
 arch=('x86_64')
 url='https://projects.kde.org/projects/kde/workspace/plasma-workspace'
@@ -61,6 +61,9 @@ package_plasma-workspace() {
 
   # Split plasma-wayland scripts
   rm -r "$pkgdir"/usr/share/wayland-sessions
+  
+  # Fix qdbus path in startplasmacompositor
+  sed -i -e 's/qdbus/qdbus-qt5/g'
 }
 
 package_plasma-wayland-session() {
