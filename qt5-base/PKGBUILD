@@ -22,7 +22,12 @@ groups=('qt5')
 options=('debug')
 _pkgfqn="${pkgname/5-/}-everywhere-src-${pkgver}"
 source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/$pkgver/submodules/${_pkgfqn}.tar.xz")
-md5sums=('540e4d774f89615c413dd0cb7aeda555')
+md5sums=('540e4d774f89615c413dd0cb7aeda555'
+         '5f7a6953e797ef4ceeda7a352b36425e'
+         'f41158d2f590dfc631a492d581173f7d')
+
+source+=(qt-delayed-highlight.patch::https://code.qt.io/cgit/qt/qtbase.git/patch/?id=f8f0f3ee
+                qtbug-69310.patch::https://code.qt.io/cgit/qt/qtbase.git/patch/?id=fcba9fa8)
 
 prepare() {
   cd ${_pkgfqn}
@@ -37,6 +42,9 @@ prepare() {
   # Use python2 for Python 2.x
   find . -name '*.py' -exec sed -i \
     's|#![ ]*/usr/bin/python$|&2|;s|#![ ]*/usr/bin/env python$|&2|' {} +
+
+  patch -p1 -i ../qt-delayed-highlight.patch # https://codereview.qt-project.org/#/c/249881/
+  patch -p1 -i ../qtbug-69310.patch # https://bugreports.qt.io/browse/QTBUG-69310
 }
 
 build() {
