@@ -1,14 +1,14 @@
 pkgbase=qscintilla
 pkgname=('qscintilla-qt5' 'python3-qscintilla-qt5' 'python-qscintilla-qt5-common' 'python2-qscintilla-qt5')
-pkgver=2.10.8
-pkgrel=2
+pkgver=2.11
+pkgrel=1
 license=('GPL')
 arch=('x86_64')
-url="http://www.riverbankcomputing.co.uk/software/qscintilla/intro"
+url="https://www.riverbankcomputing.com/software/qscintilla/intro"
 makedepends=('python3-pyqt5' 'qt5-tools' 'sip')
 options=('!buildflags') # Fix Qt Designer plugin
-source=("https://downloads.sourceforge.net/pyqt/QScintilla_gpl-${pkgver}.tar.gz")
-md5sums=('3f497c0f6bf7ead40b5821b86e1f5421')
+source=("https://www.riverbankcomputing.com/static/Downloads/QScintilla/QScintilla_gpl-$pkgver.tar.gz")
+md5sums=('fdaf6acb2dfacabb8d66a31f81500bc0')
 
 build() {
     cd "$srcdir"/QScintilla_gpl-${pkgver}
@@ -58,7 +58,7 @@ package_python3-qscintilla-qt5() {
     depends=('python-qscintilla-qt5-common' 'python3-pyqt5')
 
     cd QScintilla_gpl-${pkgver}/Python
-    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install -j1
 
     # Provided by python-qscintilla-common
     rm -r "${pkgdir}"/usr/share
@@ -69,8 +69,8 @@ package_python2-qscintilla-qt5() {
     depends=('python-qscintilla-qt5-common' 'python2-pyqt5')
 
     cd QScintilla_gpl-${pkgver}/Python2
-    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install
+    make DESTDIR="${pkgdir}" INSTALL_ROOT="${pkgdir}" install -j1
 
-    # Provided by python-qscintilla
+    # Provided by python-qscintilla-common
     rm -r "${pkgdir}"/usr/share
 }
