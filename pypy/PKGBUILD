@@ -1,5 +1,5 @@
 pkgname=pypy
-pkgver=6.0.0
+pkgver=7.0.0
 pkgrel=1
 pkgdesc="A Python implementation written in Python, JIT enabled"
 arch=('x86_64')
@@ -9,12 +9,12 @@ depends=('expat' 'bzip2' 'gdbm' 'openssl' 'libffi' 'zlib' 'ncurses')
 makedepends=('python2' 'tk' 'sqlite3' 'mercurial' 'python2-pycparser')
 optdepends=('sqlite3: sqlite module'
             'tk: tk module')
-source=("https://bitbucket.org/${pkgname}/${pkgname}/downloads/pypy2-v$pkgver-src.tar.bz2")
+source=("https://bitbucket.org/${pkgname}/${pkgname}/downloads/pypy2.7-v$pkgver-src.tar.bz2")
 options=(!buildflags)
-sha256sums=('6097ec5ee23d0d34d8cd27a1072bed041c8a080ad48731190a03a2223029212d')
+sha256sums=('f51d8bbfc4e73a8a01820b7871a45d13c59f1399822cdf8a19388c69eb20c18c')
 
 build() {
-  cd "${srcdir}"/pypy2-v${pkgver}-src/pypy/goal
+  cd "${srcdir}"/pypy2.7-v${pkgver}-src/pypy/goal
 
   python2 ../../rpython/bin/rpython -Ojit --shared targetpypystandalone
 
@@ -24,7 +24,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}"/pypy2-v${pkgver}-src/pypy/tool/release
+  cd "${srcdir}"/pypy2.7-v${pkgver}-src/pypy/tool/release
 
   # Prepare installation
   python2 package.py --archive-name pypy --targetdir .
